@@ -166,7 +166,9 @@ namespace FEAT
           alglib::minlbfgscreate(_lbfgs_dim, _opt_var, _state);
           alglib::minlbfgssetxrep(_state, true);
           // Set stopping criteria: absolute tolerance, function improvement, length of update step, max iterations
-          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
           // Set the direction update
         }
@@ -199,7 +201,9 @@ namespace FEAT
         void set_max_iter(Index max_iter)
         {
           this->_max_iter = max_iter;
-          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -215,7 +219,9 @@ namespace FEAT
         void set_tol_fval(DataType tol_fval)
         {
           _tol_fval = tol_fval;
-          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -229,7 +235,9 @@ namespace FEAT
         void set_tol_abs(DataType tol_abs)
         {
           this->_tol_abs = tol_abs;
-          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -246,7 +254,9 @@ namespace FEAT
         void set_tol_step(DataType tol_step)
         {
           _tol_step = tol_step;
-          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -406,7 +416,7 @@ namespace FEAT
             }
 
             // Because ALGLIB knows no relative tolerance, we have to do it here
-            if(me->_def_cur <= (me->_tol_rel * me->_def_init))
+            if( (me->_def_cur <= me->_tol_abs) && (me->_def_cur <= (me->_tol_rel * me->_def_init)) )
               alglib::minlbfgsrequesttermination(me->_state);
 
           }
@@ -616,7 +626,9 @@ namespace FEAT
           alglib::mincgcreate(_opt_var, _state);
           alglib::mincgsetxrep(_state, true);
           // Set stopping criteria: Absolute tolerance, function improvement, length of update step, max iterations
-          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
           // Set the direction update
           set_direction_update(this->_direction_update);
@@ -630,14 +642,14 @@ namespace FEAT
           switch(update_)
           {
             case NLCGDirectionUpdate::DaiYuan:
-                alglib::mincgsetcgtype(_state, 0);
-                break;
+              alglib::mincgsetcgtype(_state, 0);
+              break;
             case NLCGDirectionUpdate::DYHSHybrid:
-                alglib::mincgsetcgtype(_state, 1);
-                break;
+              alglib::mincgsetcgtype(_state, 1);
+              break;
             default:
-                throw InternalError(__func__,__FILE__, __LINE__, name()+" got invalid direction update: "
-                    +stringify(update_));
+              throw InternalError(__func__,__FILE__, __LINE__, name()+" got invalid direction update: "
+                  +stringify(update_));
 
           }
         }
@@ -671,7 +683,9 @@ namespace FEAT
         void set_max_iter(Index max_iter)
         {
           this->_max_iter = max_iter;
-          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -687,7 +701,9 @@ namespace FEAT
         void set_tol_fval(DataType tol_fval)
         {
           _tol_fval = tol_fval;
-          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -695,13 +711,15 @@ namespace FEAT
          * \brief Sets the relative tolerance for the norm of the defect vector
          *
          * \param[in] tol_abs
-         * New relative tolerance for the norm of the defect vector.
+         * New absolute tolerance for the norm of the defect vector.
          *
          */
         void set_tol_abs(DataType tol_abs)
         {
           this->_tol_abs = tol_abs;
-          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -718,7 +736,9 @@ namespace FEAT
         void set_tol_step(DataType tol_step)
         {
           _tol_step = tol_step;
-          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -878,7 +898,7 @@ namespace FEAT
             }
 
             // Because ALGLIB knows no relative tolerance, we have to do it here
-            if(me->_def_cur <= (me->_tol_rel * me->_def_init))
+            if( (me->_def_cur <= me->_tol_abs) && (me->_def_cur <= (me->_tol_rel * me->_def_init)) )
               alglib::mincgrequesttermination(me->_state);
 
           }

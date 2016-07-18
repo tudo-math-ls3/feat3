@@ -493,7 +493,7 @@ class ALGLIBMinCGTest:
 };
 
 ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-alg_mincg_hb_f(float(0.6), Index(12), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_hb_f(float(0.6), Index(13), NLCGDirectionUpdate::DaiYuan);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 alg_mincg_rb_d(double(0.6), Index(40), NLCGDirectionUpdate::DYHSHybrid);
