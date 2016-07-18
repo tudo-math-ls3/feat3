@@ -71,8 +71,7 @@ namespace FEAT
 
           finished = true;
 
-          TimeStamp ts_stop;
-          Statistics::add_time_mpi_wait(ts_stop.elapsed(ts_start));
+          Statistics::add_time_mpi_wait(ts_start.elapsed_now());
 
           if (sqrt)
             return Math::sqrt(r);
@@ -186,8 +185,7 @@ namespace FEAT
           if (scale)
             target.component_product(target, frequencies);
 
-          TimeStamp ts_stop;
-          Statistics::add_time_mpi_wait(ts_stop.elapsed(ts_start));
+          Statistics::add_time_mpi_wait(ts_start.elapsed_now());
         }
 
         /// Destructor

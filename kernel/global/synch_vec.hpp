@@ -47,6 +47,7 @@ namespace FEAT
             }
 
             //gather and start send
+            double temp_spmv_time = Statistics::get_time_spmv();
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
               mirrors.at(i).gather_dual(ticket->sendbufs.at(i), target);
@@ -59,9 +60,11 @@ namespace FEAT
                           communicator
                           );
             }
+            //internally mirrors::gather_dual uses the apply method, which must not counted twice towards execution times
+            temp_spmv_time = Statistics::get_time_spmv() - temp_spmv_time;
+            Statistics::add_time_spmv(-temp_spmv_time);
 
-            TimeStamp ts_stop;
-            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
+            Statistics::add_time_mpi_execute(ts_start.elapsed_now());
 
             return ticket;
           }

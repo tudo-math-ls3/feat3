@@ -28,8 +28,7 @@ namespace FEAT
 
             Util::Comm::iallreduce(&(ticket->x), &(ticket->r), 1, *ticket->req, op);
 
-            TimeStamp ts_stop;
-            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
+            Statistics::add_time_mpi_execute(ts_start.elapsed_now());
 
             return ticket;
           }
