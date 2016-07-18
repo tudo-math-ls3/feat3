@@ -557,6 +557,38 @@ struct MeshoptScrewsApp
         }
       }
 
+      // Compute quality indicators
+      {
+        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+#ifdef FEAT_HAVE_MPI
+        DT_ min_quality_snd(min_quality);
+        Util::Comm::allreduce(&min_quality_snd, &min_quality, Index(1), Util::CommOperationMin());
+
+        DT_ min_angle_snd(min_angle);
+        Util::Comm::allreduce(&min_angle_snd, &min_angle, Index(1), Util::CommOperationMin());
+#endif
+
+        DT_ lambda_min;
+        DT_ lambda_max;
+        DT_ vol_min;
+        DT_ vol_max;
+        cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
+        if(Util::Comm::rank() == 0)
+        {
+          std::cout << "Quality indicator: " << stringify_fp_sci(min_quality) <<
+            " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+          std::cout << "Cell size defect: " << stringify_fp_sci(cell_size_defect) <<
+            " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
+            " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
+        }
+      }
+
       if(min_angle < DT_(1))
       {
         Util::mpi_cout("Mesh deteriorated, stopping.\n");
