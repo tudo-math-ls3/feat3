@@ -3,7 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/product_matmat.hpp>
 
-#include <mkl.h>
+#include <mkl_blas.h>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -16,7 +16,8 @@ void ProductMatMat<Mem::Main>::dense_mkl(float * r, const float * const x, const
   MKL_INT minner = (MKL_INT)inner;
   float one = 1.f;
   float zero = 0.f;
-  cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, mrows, mcolumns, minner, one, x, minner, y, mcolumns, zero, r, mcolumns);
+  char trans = 'N';
+  sgemm(&trans, &trans, &mcolumns, &mrows, &minner, &one, y, &mcolumns, x, &minner, &zero, r, &mcolumns);
 }
 
 void ProductMatMat<Mem::Main>::dense_mkl(double * r, const double * const x, const double * const y, const Index rows, const Index columns, const Index inner)
@@ -26,5 +27,6 @@ void ProductMatMat<Mem::Main>::dense_mkl(double * r, const double * const x, con
   MKL_INT minner = (MKL_INT)inner;
   double one = 1.;
   double zero = 0.;
-  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, mrows, mcolumns, minner, one, x, minner, y, mcolumns, zero, r, mcolumns);
+  char trans = 'N';
+  dgemm(&trans, &trans, &mcolumns, &mrows, &minner, &one, y, &mcolumns, x, &minner, &zero, r, &mcolumns);
 }

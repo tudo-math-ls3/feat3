@@ -228,12 +228,6 @@ public:
   {
     for (Index size(1) ; size < 100 ; size*=2)
     {
-      /*DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size, DT_(0));
-      DenseMatrix<Mem::Main, DT_, IT_> y_local(size, size, DT_(0));
-      DenseMatrix<Mem::Main, DT_, IT_> ref_local(size, size, DT_(4711));
-      DenseMatrix<Mem::Main, DT_, IT_> result_local(size, size, DT_(0));
-      DenseMatrix<Mem_, DT_, IT_> result(size, size, DT_(1234));*/
-
       DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size+2, DT_(0));
       DenseMatrix<Mem::Main, DT_, IT_> y_local(size+2, size+1, DT_(0));
       DenseMatrix<Mem::Main, DT_, IT_> ref_local(size, size+1, DT_(4711));

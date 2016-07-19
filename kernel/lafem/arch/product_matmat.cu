@@ -23,13 +23,9 @@ namespace FEAT
         float * temp;
         cudaMalloc((void**)&temp, m*n*sizeof(float));
 
-        status = cublasSgemm(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_T, m, n, k, &one, x, k, y, n, &zero, temp, m);
+        status = cublasSgemm(Util::Intern::cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, &one, y, n, x, k, &zero, r, n);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSgemm failed with status code: " + stringify(status));
-
-        status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, n, m, &one, temp, m, &zero, r, n, r, n);
-        if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasSgeam failed with status code: " + stringify(status));
 
         cudaFree(temp);
       }
@@ -44,13 +40,9 @@ namespace FEAT
         double * temp;
         cudaMalloc((void**)&temp, m*n*sizeof(double));
 
-        status = cublasDgemm(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_T, m, n, k, &one, x, k, y, n, &zero, temp, m);
+        status = cublasDgemm(Util::Intern::cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, &one, y, n, x, k, &zero, r, n);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemm failed with status code: " + stringify(status));
-
-        status = cublasDgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, n, m, &one, temp, m, &zero, r, n, r, n);
-        if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasDgeam failed with status code: " + stringify(status));
 
         cudaFree(temp);
       }
