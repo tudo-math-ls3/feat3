@@ -87,8 +87,8 @@ class NLCGTest:
       solver = new_nlcg(my_op, my_filter, my_linesearch, _update, false, my_precond);
 
       solver->init();
-      solver->set_tol_abs(Math::sqrt(Math::eps<DT_>()));
-      solver->set_tol_rel(Math::sqrt(Math::eps<DT_>()));
+      solver->set_tol_abs(Math::eps<DT_>());
+      solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
       solver->set_max_iter(100);
 
@@ -134,22 +134,22 @@ NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 nlcg_sw_hb_f(float(0.5),Index(12),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_rb_d(double(0.6),Index(40),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_rb_d(double(0.8),Index(40),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.15),Index(25),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_bs_d(double(0.33),Index(52),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_s_hb_d(float(0.45),Index(10),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
+nlcg_s_hb_d(float(1),Index(14),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d(double(0.175), Index(13), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
+nlcg_s_bs_d(double(0.19), Index(69), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
 
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_d(float(0.5), Index(35),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_hessian_rb_d(double(0.), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_hessian_rb_d(double(1), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
 nlcg_sw_hessian_gp_d(double(0.5), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
@@ -159,18 +159,18 @@ NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_q(__float128(0.55), Index(33), "NewtonRaphsonLinesearch", "Hessian",
 NLCGDirectionUpdate::PolakRibiere);
 
-NLCGTest<Mem::Main, __float128, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_q(__float128(0.175), Index(30), "StrongWolfeLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
+NLCGTest<Mem::Main, __float128, Index, Analytic::Common::HimmelblauFunction>
+nlcg_sw_bs_q(__float128(1), Index(23), "StrongWolfeLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(0.5), Index(10), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_sw_hb_f_cuda(float(1), Index(11), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d_cuda(double(0.175), Index(13), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
+nlcg_s_bs_d_cuda(double(0.18), Index(37), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
 #endif
 
 /**
@@ -243,6 +243,7 @@ class NLSDTest:
       solver = new_nlsd(my_op, my_filter, my_linesearch, false, my_precond);
 
       solver->init();
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
       solver->set_max_iter(100);
@@ -297,14 +298,14 @@ nlsd_rb_d_sw(double(0.6), Index(10), "NewtonRaphsonLinesearch", "none");
 
 #ifdef FEAT_HAVE_QUADMATH
 NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlsd_rb_q(__float128(1), Index(19), "SecantLinesearch", "Hessian");
+nlsd_rb_q(__float128(0.9), Index(95), "SecantLinesearch", "Hessian");
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f_cuda(float(0.7), Index(8), "StrongWolfeLinesearch", "Hessian");
+nlsd_hb_f_cuda(float(0.75), Index(8), "StrongWolfeLinesearch", "Hessian");
 #endif
 
 #ifdef FEAT_HAVE_ALGLIB
@@ -351,6 +352,7 @@ class ALGLIBMinLBFGSTest:
       //auto my_precond = nullptr;
       auto solver = new_alglib_minlbfgs(my_op, my_filter);
       solver->init();
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
       solver->set_max_iter(100);
@@ -398,13 +400,13 @@ ALGLIBMinLBFGSTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction
 alg_lbfgs_hb_f(float(0.9), Index(12));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
-alg_lbfgs_rb_d(double(0.7), Index(36));
+alg_lbfgs_rb_d(double(1), Index(36));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_lbfgs_bs_d(double(0.35), Index(33));
+alg_lbfgs_bs_d(double(0.48), Index(34));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::GoldsteinPriceFunction>
-alg_lbfgs_gp_d(double(0.6), Index(15));
+alg_lbfgs_gp_d(double(0.65), Index(15));
 
 /**
  * \brief Test class template for ALGLIB's mincg optimiser
@@ -452,9 +454,10 @@ class ALGLIBMinCGTest:
       solver = new_alglib_mincg(my_op, my_filter, _direction_update, false);
 
       solver->init();
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
-      solver->set_max_iter(100);
+      solver->set_max_iter(250);
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();
@@ -496,8 +499,8 @@ ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 alg_mincg_hb_f(float(0.6), Index(13), NLCGDirectionUpdate::DaiYuan);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
-alg_mincg_rb_d(double(0.6), Index(40), NLCGDirectionUpdate::DYHSHybrid);
+alg_mincg_rb_d(double(0.8), Index(41), NLCGDirectionUpdate::DYHSHybrid);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_mincg_bs_d(double(0.15), Index(53), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_bs_d(double(0.33), Index(53), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAT_HAVE_ALGLIB
