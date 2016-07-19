@@ -319,6 +319,7 @@ namespace FEAT
         explicit NewtonRaphsonLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
           BaseClass("NR-LS", op_, filter_, keep_iterates)
           {
+            this->set_max_iter(20);
           }
 
         /// \copydoc ~BaseClass()
@@ -544,6 +545,7 @@ namespace FEAT
           _sigma_0(initial_step_),
           _eta(DataType(0))
           {
+            this->set_max_iter(20);
           }
 
         /// \copydoc ~BaseClass()
@@ -838,6 +840,7 @@ namespace FEAT
           _tol_decrease(tol_decrease_),
           _tol_curvature(tol_curvature_)
           {
+            this->set_max_iter(20);
           }
 
         /// \copydoc ~BaseClass()
