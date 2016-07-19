@@ -149,7 +149,7 @@ template
 
     // Compute initial functional value
     DataType fval(0);
-    fval = rumpflpumpfl.compute_func(func_norm, func_det, func_rec_det);
+    fval = rumpflpumpfl.compute_func_cellwise(func_norm, func_det, func_rec_det);
     std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     // Compute initial functional gradient
@@ -179,7 +179,7 @@ template
     solver->correct(new_coords, rhs);
     solver->done();
 
-    fval = rumpflpumpfl.compute_func(func_norm, func_det, func_rec_det);
+    fval = rumpflpumpfl.compute_func_cellwise(func_norm, func_det, func_rec_det);
     std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     rumpflpumpfl.compute_grad(grad);

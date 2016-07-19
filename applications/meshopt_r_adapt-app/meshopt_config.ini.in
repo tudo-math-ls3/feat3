@@ -21,6 +21,7 @@ fac_cof = 0.0
 fac_reg = 1e-8
 scale_computation = iter_concentration
 conc_function = OuterDist
+align_mesh = 1
 
 [OuterDist]
 type = ChartDistance

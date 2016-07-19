@@ -27,18 +27,13 @@ namespace FEAT
           typename FilterType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemFilter
         >
         static std::shared_ptr<Solver::NLOptPrecond<SolverVectorType_, FilterType_>>
-        create_nlopt_precond(MeshoptCtrl_& my_ctrl, DomCtrl_& dom_ctrl)
+        create_nlopt_precond(MeshoptCtrl_& my_ctrl, DomCtrl_& dom_ctrl, PropertyMap* current_section)
         {
           std::shared_ptr<Solver::NLOptPrecond<SolverVectorType_, FilterType_> > result;
 
           auto& solver_config = my_ctrl.solver_config;
 
-          // Check the solver section to see if we have to create a precon_control
-          auto solver_section = solver_config.query_section(my_ctrl.solver_name);
-          if(solver_section == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,"Solver section "+my_ctrl.solver_name+" not found!");
-
-          auto precon_p = solver_section->query("precon");
+          auto precon_p = current_section->query("precon");
 
           if(precon_p.second && precon_p.first != "none")
           {
@@ -82,6 +77,15 @@ namespace FEAT
             else if(precon_p.first != "none")
               throw InternalError(__func__,__FILE__,__LINE__,
               "Unsupport nonlinear optimiser precon: "+precon_p.first);
+          }
+          else
+          {
+            auto inner_solver_p = current_section->query("inner_solver");
+            if(inner_solver_p.second)
+            {
+              auto inner_solver_section = solver_config.query_section(inner_solver_p.first);
+              result = create_nlopt_precond(my_ctrl, dom_ctrl, inner_solver_section);
+            }
           }
 
           return result;

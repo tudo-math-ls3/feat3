@@ -297,6 +297,12 @@ namespace FEAT
         /// How to compute the optimal scales
         ScaleComputation _scale_computation;
 
+      protected:
+        /// Factor for the alignment penalty term
+        DataType _penalty_param;
+        /// Last computed contraint (violation)
+        DataType _alignment_constraint;
+
       public:
         /**
          * \brief Constructor
@@ -338,15 +344,17 @@ namespace FEAT
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
           _rows(_trafo_space.get_num_dofs()),
-          _scale_computation(ScaleComputation::once_uniform)
+          _scale_computation(ScaleComputation::once_uniform),
+          _penalty_param(0),
+          _alignment_constraint(0)
           {
 
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
 
             // Compute desired element size distribution
-            compute_scales_once();
+            _compute_scales_once();
             // Compute element weights
-            compute_mu();
+            _compute_mu();
           }
 
         /**
@@ -382,7 +390,8 @@ namespace FEAT
           std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& slip_asm_,
           std::shared_ptr<FunctionalType_> functional_,
           ScaleComputation scale_computation_,
-          std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr)
+          std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr,
+          DataType penalty_param_ = DataType(0))
           : BaseClass(rmn_),
           _trafo(trafo_space_.get_trafo()),
           _trafo_space(trafo_space_),
@@ -395,7 +404,9 @@ namespace FEAT
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
           _rows(_trafo_space.get_num_dofs()),
-          _scale_computation(scale_computation_)
+          _scale_computation(scale_computation_),
+          _penalty_param(penalty_param_),
+          _alignment_constraint(0)
           {
             if(( _scale_computation == ScaleComputation::once_concentration ||
                   _scale_computation == ScaleComputation::current_concentration ||
@@ -411,9 +422,9 @@ namespace FEAT
             }
 
             // Perform one time scal computation
-            compute_scales_once();
+            _compute_scales_once();
             // Compute the cell weights
-            compute_mu();
+            _compute_mu();
           }
 
         /// Explicitly delete default constructor
@@ -427,7 +438,7 @@ namespace FEAT
         };
 
         /**
-         * \brief Checks if the functional is empty (= the null functional
+         * \brief Checks if the functional is empty (= the null functional)
          *
          * \returns True if the number of DoFs is zero.)
          */
@@ -504,13 +515,23 @@ namespace FEAT
           DataType* func_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
           DataType* func_rec_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
 
-          compute_func(func_norm, func_det, func_rec_det);
+          compute_func_cellwise(func_norm, func_det, func_rec_det);
           exporter.add_cell_vector("fval", func_norm, func_det, func_rec_det);
 
           if(_mesh_conc != nullptr)
           {
             exporter.add_vertex_scalar("dist", _mesh_conc->get_dist().elements());
             exporter.add_vertex_vector("grad_dist", _mesh_conc->get_grad_dist());
+
+            if(this->_penalty_param > DataType(0))
+            {
+              DataType* constraint_at_cell = new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)];
+
+              this->_mesh_conc->compute_constraint(constraint_at_cell);
+              exporter.add_cell_scalar("alignment_constraint", constraint_at_cell);
+
+              delete[] constraint_at_cell;
+            }
           }
 
           delete [] func_norm;
@@ -519,14 +540,96 @@ namespace FEAT
 
         }
 
+        /**
+         * \brief Gets the penalty parameter
+         *
+         * \returns The penalty parameter
+         */
+        DataType get_penalty_param() const
+        {
+          return _penalty_param;
+        }
+
+        /**
+         * \brief Sets the penalty parameter
+         *
+         * \param[in] penalty_param_
+         * The new penalty parameter.
+         *
+         */
+        void set_penalty_param(const DataType penalty_param_)
+        {
+          XASSERTM(penalty_param_ >= DataType(0),"Penalty parameter must be >= 0!");
+          XASSERTM(penalty_param_ <= Math::pow(Math::huge<DataType>(), DataType(0.25)), "Excessively large penalty parameter.");
+
+          _penalty_param = penalty_param_;
+        }
+
+        /**
+         * \brief Gets the last computed (alignment) constraint
+         *
+         * This is useful if you KNOW the constraint was already computed (i.e. by prepare())
+         *
+         * \returns The (alignment) constraint.
+         */
+        DataType get_constraint()
+        {
+          return _alignment_constraint;
+        }
+
+        ///**
+        // * \brief Computes (alignment) constraint at the current state of _mesh_conc
+        // *
+        // * This also saves the result to _alignment_constraint.
+        // *
+        // * \returns The (alignment) constraint.
+        // */
+        //DataType compute_constraint()
+        //{
+        //  XASSERT(this->_mesh_conc != nullptr);
+
+        //  _alignment_constraint = this->_mesh_conc->compute_constraint();
+
+        //  return _alignment_constraint;
+
+        //}
+        ///**
+        // * \brief Computes the (mesh alignment) constraint on every cell
+        // *
+        // * \param[in] constraint_at_cells
+        // * Array to receive the constraint violation on every cell
+        // *
+        // * \returns The sum of the constraint violation over all cells.
+        // */
+        //DataType compute_constraint(CoordType* constraint_at_cells)
+        //{
+        //  XASSERT(this->_mesh_conc != nullptr);
+
+        //  _alignment_constraint = this->_mesh_conc->compute_constraint(constraint_at_cells);
+
+        //  return _alignment_constraint;
+        //}
+
         /// \copydoc BaseClass::init()
         virtual void init() override
         {
           // Write any potential changes to the mesh
           this->buffer_to_mesh();
 
+          // Compute distances if necessary
+          if( (this->_scale_computation == ScaleComputation::iter_concentration) ||
+              (_penalty_param > DataType(0)))
+              {
+                if(_mesh_conc == nullptr)
+                  throw InternalError(__func__,__FILE__,__LINE__,
+                  "Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
+                  stringify_fp_sci(_penalty_param)+", but no concentration function was given");
+
+                _mesh_conc->compute_dist();
+              }
+
           // Compute desired element size distribution
-          this->compute_scales_init();
+          this->_compute_scales_init();
         }
 
         /**
@@ -578,7 +681,21 @@ namespace FEAT
             assembler->second->assemble(it.second, _trafo_space);
           }
 
-          compute_scales_iter();
+          if( (this->_scale_computation == ScaleComputation::iter_concentration) ||
+              (_penalty_param > DataType(0)))
+              {
+                if(_mesh_conc == nullptr)
+                  throw InternalError(__func__,__FILE__,__LINE__,
+                  "Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
+                  stringify_fp_sci(_penalty_param)+", but no concentration function was given");
+
+                _mesh_conc->compute_dist();
+              }
+
+          if(_penalty_param > DataType(0))
+            _alignment_constraint = this->_mesh_conc->compute_constraint();
+
+          _compute_scales_iter();
         }
 
         /**
@@ -656,21 +773,38 @@ namespace FEAT
          * The functional value
          *
          */
-        virtual CoordType compute_func() const = 0;
+        virtual CoordType compute_func() = 0;
 
         /**
-         * \brief Computes the functional value on the current mesh.
+         * \brief Computes the functional value parts on every cell
+         *
+         * \param[in] func_norm
+         * Array to receive the Frobenius norm part of the functional value on every cell.
+         *
+         * \param[in] func_det
+         * Array to receive the det part of the functional value on every cell.
+         *
+         * \param[in] func_rec_det
+         * Array to receive the 1/det part of the functional value on every cell.
          *
          * \returns
-         * The functional value
-         *
+         * The functional value, summed up over all parts and cells.
          */
-        virtual CoordType compute_func(CoordType* DOXY(func_norm), CoordType* DOXY(func_det), CoordType* DOXY(func_rec_det)) const = 0;
+        virtual CoordType compute_func_cellwise(CoordType* DOXY(func_norm), CoordType* DOXY(func_det), CoordType* DOXY(func_rec_det)) const = 0;
 
         /**
          * \brief Computes the gradient of the functional with regard to the nodal coordinates.
          *
          * Usually, prepare() should be called before calling this.
+         *
+         */
+        virtual void compute_grad(VectorTypeL&) = 0;
+
+        /**
+         * \brief Computes the gradient of the functional with regard to the nodal coordinates.
+         *
+         * Usually, prepare() should be called before calling this. This const version does not increase the gradient
+         * evaluation counter.
          *
          */
         virtual void compute_grad(VectorTypeL&) const = 0;
@@ -684,8 +818,10 @@ namespace FEAT
           RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, *(this->get_mesh()));
         }
 
+      protected:
+
         /// \brief Computes the weights _lambda according to the current mesh
-        virtual void compute_lambda_cellsize()
+        virtual void _compute_lambda_cellsize()
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
@@ -695,12 +831,13 @@ namespace FEAT
         }
 
         /// \brief Computes the uniformly distributed weights _lambda.
-        virtual void compute_lambda_uniform()
+        virtual void _compute_lambda_uniform()
         {
           _lambda.format(CoordType(1));
         }
 
-        virtual void compute_lambda_conc()
+        /// \brief Computes _lambda according to the concentration function given by _mesh_conc
+        virtual void _compute_lambda_conc()
         {
           if(_mesh_conc == nullptr)
             throw InternalError(__func__,__FILE__,__LINE__,
@@ -714,7 +851,7 @@ namespace FEAT
 
         }
         /// \brief Computes the weights mu
-        virtual void compute_mu()
+        virtual void _compute_mu()
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
@@ -730,7 +867,7 @@ namespace FEAT
          *
          * To be called from init(). This consists of first computing _lambda and then _h.
          */
-        virtual void compute_scales_init()
+        virtual void _compute_scales_init()
         {
           switch(_scale_computation)
           {
@@ -739,11 +876,11 @@ namespace FEAT
             case ScaleComputation::once_concentration:
               return;
             case ScaleComputation::current_cellsize:
-              compute_lambda_cellsize();
+              _compute_lambda_cellsize();
               break;
             case ScaleComputation::current_concentration:
             case ScaleComputation::iter_concentration:
-              compute_lambda_conc();
+              _compute_lambda_conc();
               break;
             default:
               return;
@@ -771,12 +908,12 @@ namespace FEAT
          *
          * To be called from prepare(). This consists of first computing _lambda and then _h.
          */
-        virtual void compute_scales_iter()
+        virtual void _compute_scales_iter()
         {
           switch(_scale_computation)
           {
             case ScaleComputation::iter_concentration:
-              compute_lambda_conc();
+              _compute_lambda_conc();
               break;
             default:
               return;
@@ -802,18 +939,18 @@ namespace FEAT
          *
          * To be called from a constructor. This consists of first computing _lambda and then _h.
          */
-        virtual void compute_scales_once()
+        virtual void _compute_scales_once()
         {
           switch(_scale_computation)
           {
             case ScaleComputation::once_uniform:
-              compute_lambda_uniform();
+              _compute_lambda_uniform();
               break;
             case ScaleComputation::once_cellsize:
-              compute_lambda_cellsize();
+              _compute_lambda_cellsize();
               break;
             case ScaleComputation::once_concentration:
-              compute_lambda_conc();
+              _compute_lambda_conc();
               break;
             default:
               return;
@@ -930,69 +1067,23 @@ namespace FEAT
         }
 
         /// \copydoc HyperelasticityFunctionalBase::compute_func()
-        virtual CoordType compute_func()
+        virtual CoordType compute_func() override
         {
           // Increase number of functional evaluations
           this->_num_func_evals++;
 
-          return static_cast<const HyperelasticityFunctional*>(this)->compute_func();
-        }
+          DataType fval(static_cast<const HyperelasticityFunctional*>(this)->_compute_func_intern());
 
-        /// \copydoc HyperelasticityFunctionalBase::compute_func()
-        virtual CoordType compute_func() const override
-        {
-          CoordType fval(0);
-          // Total number of cells in the mesh
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-
-          // Index set for local/global numbering
-          const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
-
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
-          // Local cell dimensions for passing to other routines
-          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
-
-          // Compute the functional value for each cell
-          for(Index cell(0); cell < ncells; ++cell)
+          if(this->_penalty_param > DataType(0))
           {
-            h = this->_h(cell);
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
-
-            fval += this->_mu(cell) * this->_functional->compute_local_functional(x,h);
+            XASSERT(this->_mesh_conc != nullptr);
+            fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
           }
-
           return fval;
-        } // compute_func
-
-        /**
-         * \brief Computes the functional value on the current mesh.
-         *
-         * \param[in] func_norm
-         * The contribution of the Frobenius norm for each cell
-         *
-         * \param[in] func_det
-         * The contribution of the det term for each cell
-         *
-         * \param[in] func_rec_det
-         * The contribution of the 1/det term for each cell
-         *
-         * \returns
-         * The functional value
-         *
-         * Debug variant that saves the different contributions for each cell.
-         */
-        virtual CoordType compute_func(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det)
-        {
-          // Increase number of functional evaluations
-          this->_num_func_evals++;
-
-          return static_cast<const HyperelasticityFunctional*>(this)->compute_func(func_norm, func_det, func_rec_det);
         }
 
         /// \copydoc compute_func(CoordType*,CoordType*,CoordType*)
-        virtual CoordType compute_func(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det) const override
+        virtual CoordType compute_func_cellwise(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det) const override
         {
           CoordType fval(0);
           // Total number of cells in the mesh
@@ -1033,8 +1124,9 @@ namespace FEAT
           return fval;
         } // compute_func
 
+
         /// \copydoc BaseClass::compute_grad(VectorTypeL&)
-        virtual void compute_grad(VectorTypeL& grad)
+        virtual void compute_grad(VectorTypeL& grad) override
         {
           // Increase number of functional evaluations
           this->_num_grad_evals++;
@@ -1042,17 +1134,54 @@ namespace FEAT
           static_cast<const HyperelasticityFunctional*>(this)->compute_grad(grad);
         }
 
-        /// \copydoc compute_grad()
+        /// \copydoc BaseClass::compute_grad(VectorTypeL&)
         virtual void compute_grad(VectorTypeL& grad) const override
         {
           if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
-            compute_grad_with_conc(grad);
+            _compute_grad_with_conc(grad);
           else
-            compute_grad_without_conc(grad);
+            _compute_grad_without_conc(grad);
+
+          if(this->_penalty_param > DataType(0))
+          {
+            XASSERTM(this->_mesh_conc != nullptr,
+            "You need a mesh concentration function for imposing a mesh alignment constraint!");
+            this->_mesh_conc->add_constraint_grad(grad, this->_alignment_constraint, this->_penalty_param);
+          }
         }
 
+      protected:
+        /// \copydoc HyperelasticityFunctionalBase::compute_func()
+        virtual CoordType _compute_func_intern() const
+        {
+          CoordType fval(0);
+          // Total number of cells in the mesh
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          // Local cell dimensions for passing to other routines
+          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            h = this->_h(cell);
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+
+            fval += this->_mu(cell) * this->_functional->compute_local_functional(x,h);
+          }
+
+          return fval;
+        } // compute_func
+
+
         /// \copydoc BaseClass::compute_grad()
-        virtual void compute_grad_with_conc(VectorTypeL& grad) const
+        virtual void _compute_grad_with_conc(VectorTypeL& grad) const
         {
           XASSERTM(this->_mesh_conc != nullptr, "You need a mesh concentration function for this.");
 
@@ -1100,7 +1229,7 @@ namespace FEAT
         } // compute_grad_with_conc
 
         /// \copydoc BaseClass::compute_grad()
-        virtual void compute_grad_without_conc(VectorTypeL& grad) const
+        virtual void _compute_grad_without_conc(VectorTypeL& grad) const
         {
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
@@ -1143,6 +1272,7 @@ namespace FEAT
 
     }; // class HyperelasticityFunctional
 
+    /// \cond internal
     extern template class HyperelasticityFunctional
     <
       Mem::Main, double, Index,
@@ -1198,6 +1328,7 @@ namespace FEAT
       Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>,
       Meshopt::RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, FEAT::Meshopt::RumpfFunctional_D2>
     >;
+    /// \endcond
 
   } // namespace Meshopt
 } // namespace FEAT

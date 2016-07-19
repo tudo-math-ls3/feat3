@@ -12,6 +12,7 @@
 #include <kernel/solver/nlsd.hpp>
 #include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/pcg.hpp>
+#include <kernel/solver/qpenalty.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
@@ -463,7 +464,7 @@ namespace FEAT
         >
         static std::shared_ptr<Solver::IterativeSolver<SolverVectorType_>>
         create_nonlinear_optimiser( std::deque<SystemLevelType_*> & system_levels,
-        std::deque<TransferLevelType_*>& DOXY(transfer_levels),
+        std::deque<TransferLevelType_*>& transfer_levels, // unused except for passing to create_nonlinear_optimiser
         PropertyMap* base, String solver_name,
         std::shared_ptr
         <
@@ -483,7 +484,25 @@ namespace FEAT
             throw InternalError(__func__, __FILE__, __LINE__, "no type key found in property map: " + solver_name + "!");
           String solver_type = solver_p.first;
 
-          if (solver_type == "ALGLIBMinLBFGS")
+          if(solver_type == "QPenalty")
+          {
+            // Create inner solver first
+            auto inner_solver_p = section->query("inner_solver");
+            // Safety catches for recursions
+            XASSERTM(inner_solver_p.second, "QPenalty solver section is missing mandatory inner_solver key.");
+            XASSERTM(inner_solver_p.first != "QPenalty", "QPenalty cannot be the inner solver for QPenalty.");
+
+            std::shared_ptr<Solver::IterativeSolver<SolverVectorType_> > inner_solver(nullptr);
+            inner_solver = create_nonlinear_optimiser(system_levels, transfer_levels, base, inner_solver_p.first,
+            precon);
+
+            result = Solver::new_qpenalty(derefer<SolverVectorType_>
+                (system_levels.back()->op_sys, nullptr), inner_solver);
+
+            configure_iterative_solver(section, result);
+
+          }
+          else if(solver_type == "ALGLIBMinLBFGS")
           {
 #ifndef FEAT_HAVE_ALGLIB
             throw InternalError(__func__,__FILE__,__LINE__,

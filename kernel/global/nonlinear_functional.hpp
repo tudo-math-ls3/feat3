@@ -279,6 +279,26 @@ namespace FEAT
           return my_fval;
         }
 
+        DataType get_penalty_param() const
+        {
+          return _nonlinear_functional.get_penalty_param();
+        }
+
+        void set_penalty_param(const DataType fac)
+        {
+          _nonlinear_functional.set_penalty_param(fac);
+        }
+
+        DataType get_constraint()
+        {
+          return _nonlinear_functional.get_constraint();
+        }
+
+        DataType compute_constraint()
+        {
+          return _nonlinear_functional.compute_constraint();
+        }
+
         /**
          * \brief Computes the functional's gradient at the current state
          *

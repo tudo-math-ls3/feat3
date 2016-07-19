@@ -350,6 +350,11 @@ namespace FEAT
           if(scale_computation_p.second)
             scale_computation << scale_computation_p.first;
 
+          int align_mesh(0);
+          auto align_mesh_p = hyperelasticity_config_section->query("align_mesh");
+          if(align_mesh_p.second)
+            align_mesh = std::stoi(align_mesh_p.first);
+
           // Get the solver config section
           auto solver_p = hyperelasticity_config_section->query("solver_config");
           if(!solver_p.second)
@@ -364,7 +369,8 @@ namespace FEAT
               mesh_conc_func(nullptr);
 
             if( scale_computation == FEAT::Meshopt::ScaleComputation::current_concentration ||
-              scale_computation == FEAT::Meshopt::ScaleComputation::iter_concentration)
+              scale_computation == FEAT::Meshopt::ScaleComputation::iter_concentration ||
+              align_mesh == 1)
               {
                 auto conc_func_section_p = hyperelasticity_config_section->query("conc_function");
                 XASSERTM(conc_func_section_p.second, "conc_function missing!");
@@ -372,12 +378,11 @@ namespace FEAT
                   create(conc_func_section_p.first, meshopt_config);
               }
 
-
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_, Trafo_,
             SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
               (dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config, my_functional,
-              scale_computation, mesh_conc_func);
+              scale_computation, mesh_conc_func, DT_(align_mesh));
           }
           else
             throw InternalError(__func__,__FILE__,__LINE__,

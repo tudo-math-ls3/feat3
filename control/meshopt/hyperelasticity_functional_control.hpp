@@ -201,7 +201,15 @@ namespace FEAT
                 _assembler_levels.at(i+1)->assemble_system_transfer(*_transfer_levels.at(i), *_assembler_levels.at(i));
               }
 
-              precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl);
+              //auto solver_section_p = solver_config.query_se(solver_name);
+              //if(!solver_section_p.second)
+              //  throw InternalError(__func__,__FILE__,__LINE__,"Could not find section for solver "+solver_name);
+
+              auto* solver_section = solver_config.query_section(solver_name);
+              if(solver_section == nullptr)
+                throw InternalError(__func__,__FILE__,__LINE__,"Could not find section for solver "+solver_name);
+
+              precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);
 
               solver = Control::MeshoptSolverFactory::create_nonlinear_optimiser
                 (_system_levels, _transfer_levels, &solver_config, solver_name, precond);
@@ -341,13 +349,13 @@ namespace FEAT
             Geometry::ExportVTK<MeshType>& exporter, const int deque_position) const override
           {
             const auto& sys_lvl = this->_system_levels.at(size_t(deque_position));
+            (*(sys_lvl->op_sys)).add_to_vtk_exporter(exporter);
 
             auto grad = sys_lvl->op_sys.create_vector_r();
             sys_lvl->op_sys.compute_grad(grad);
             sys_lvl->filter_sys.filter_def(grad);
             exporter.add_vertex_vector("grad", *grad);
 
-            (*(sys_lvl->op_sys)).add_to_vtk_exporter(exporter);
 
             for(auto& it:(*(sys_lvl->filter_sys)).template at<0>())
             {

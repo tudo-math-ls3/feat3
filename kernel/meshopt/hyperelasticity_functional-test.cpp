@@ -146,7 +146,7 @@ template
       solver->correct(new_coords, rhs);
 
       // Compute functional value post optimisation
-      DataType fval_post = rumpflpumpfl.compute_func(&func_norm, &func_det, &func_rec_det);
+      DataType fval_post = rumpflpumpfl.compute_func_cellwise(&func_norm, &func_det, &func_rec_det);
 
       const DataType eps = Math::pow(Math::eps<DataType>(),DataType(0.5));
 
@@ -169,7 +169,7 @@ template
       solver->correct(new_coords, rhs);
 
       // Compute new functional value
-      fval_post = rumpflpumpfl.compute_func(&func_norm, &func_det, &func_rec_det);
+      fval_post = rumpflpumpfl.compute_func_cellwise(&func_norm, &func_det, &func_rec_det);
 
       // With the new functional, the functional value should still have decreased
       TEST_CHECK(fval_pre > fval_post);
