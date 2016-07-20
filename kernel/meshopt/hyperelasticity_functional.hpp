@@ -591,7 +591,7 @@ namespace FEAT
          *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
          * \f]
          * so we compute the 1-norm of the vector
-         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i)} \right| \f$.
+         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \f$.
          *
          * \returns The relative cell size quality indicator.
          *
