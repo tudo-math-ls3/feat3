@@ -14,12 +14,11 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::Benchmark;
 
 template<typename Algo_, SparseLayoutId, typename DT_, typename IT_>
-class BlockProductMatVecBench;
+struct BlockProductMatVecBench;
 
 template<typename DT_, typename IT_>
-class BlockProductMatVecBench<Algo::Generic, SparseLayoutId::lt_csr, DT_, IT_>
+struct BlockProductMatVecBench<Algo::Generic, SparseLayoutId::lt_csr, DT_, IT_>
 {
-  public:
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
   {
@@ -37,9 +36,8 @@ class BlockProductMatVecBench<Algo::Generic, SparseLayoutId::lt_csr, DT_, IT_>
 };
 
 template<typename DT_, typename IT_>
-class BlockProductMatVecBench<Algo::MKL, SparseLayoutId::lt_csr, DT_, IT_>
+struct BlockProductMatVecBench<Algo::MKL, SparseLayoutId::lt_csr, DT_, IT_>
 {
-  public:
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
   {
@@ -57,9 +55,8 @@ class BlockProductMatVecBench<Algo::MKL, SparseLayoutId::lt_csr, DT_, IT_>
 };
 
 template<typename DT_, typename IT_>
-class BlockProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_csr, DT_, IT_>
+struct BlockProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_csr, DT_, IT_>
 {
-  public:
   static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
     SparseMatrixCSR<Mem::CUDA, DT_, IT_> & A)
   {

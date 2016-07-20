@@ -12,12 +12,11 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::Benchmark;
 
 template<typename Algo_, typename DT_, typename IT_>
-class AxpyBench;
+struct AxpyBench;
 
 template<typename DT_, typename IT_>
-class AxpyBench<Algo::Generic, DT_, IT_>
+struct AxpyBench<Algo::Generic, DT_, IT_>
 {
-  public:
   static void f(const DenseVector<Mem::Main, DT_, IT_> & x, DenseVector<Mem::Main, DT_, IT_> & y, DT_ s)
   {
     Arch::Axpy<Mem::Main>::dv_generic(y.elements(), s, x.elements(), y.elements(), x.size());
@@ -25,9 +24,8 @@ class AxpyBench<Algo::Generic, DT_, IT_>
 };
 
 template<typename DT_, typename IT_>
-class AxpyBench<Algo::MKL, DT_, IT_>
+struct AxpyBench<Algo::MKL, DT_, IT_>
 {
-  public:
   static void f(const DenseVector<Mem::Main, DT_, IT_> & x, DenseVector<Mem::Main, DT_, IT_> & y, DT_ s)
   {
     Arch::Axpy<Mem::Main>::dv_mkl(y.elements(), s, x.elements(), y.elements(), x.size());
@@ -35,9 +33,8 @@ class AxpyBench<Algo::MKL, DT_, IT_>
 };
 
 template<typename DT_, typename IT_>
-class AxpyBench<Algo::CUDA, DT_, IT_>
+struct AxpyBench<Algo::CUDA, DT_, IT_>
 {
-  public:
   static void f(const DenseVector<Mem::CUDA, DT_, IT_> & x, DenseVector<Mem::CUDA, DT_, IT_> & y, DT_ s)
   {
     Arch::Axpy<Mem::CUDA>::dv(y.elements(), s, x.elements(), y.elements(), x.size());
