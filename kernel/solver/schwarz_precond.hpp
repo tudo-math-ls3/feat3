@@ -87,12 +87,6 @@ namespace FEAT
         _local_solver->init_numeric();
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-        _local_solver->init_branch(parent + "::" + this->name());
-      }
-
       virtual void done_numeric() override
       {
         _local_solver->done_numeric();
@@ -115,10 +109,16 @@ namespace FEAT
 
       virtual Status apply(GlobalVectorType& vec_cor, const GlobalVectorType& vec_def) override
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         // apply local solver
+        Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_local_solver->name()));
         Status status = _local_solver->apply(*vec_cor, *vec_def);
         if(!status_success(status))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
           return status;
+        }
 
         // synchronise
         vec_cor.sync_1();
@@ -127,6 +127,7 @@ namespace FEAT
         _filter.filter_cor(vec_cor);
 
         // okay
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
         return status;
       }
     }; // class SchwarzPrecond<...>

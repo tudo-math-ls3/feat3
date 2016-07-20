@@ -474,7 +474,7 @@ namespace FEAT
         {
         }
 
-        void init_solvers()
+        void init_symbolic()
         {
           // build unique solver list
           unique_solvers.clear();
@@ -482,17 +482,7 @@ namespace FEAT
           _push_solver(level->get_smoother_pre().get());
           _push_solver(level->get_smoother_post().get());
           _push_solver(level->get_smoother_peak().get());
-        }
 
-        void init_branch(const String parent)
-        {
-          // initialise all unique solvers in forward order
-          for(auto it = unique_solvers.begin(); it != unique_solvers.end(); ++it)
-            (*it)->init_branch(parent);
-        }
-
-        void init_symbolic()
-        {
           // initialise all unique solvers in forward order
           for(auto it = unique_solvers.begin(); it != unique_solvers.end(); ++it)
             (*it)->init_symbolic();
@@ -574,8 +564,6 @@ namespace FEAT
     protected:
       /// the deque of all level info objects
       std::deque<LevelInfo> _levels;
-      /// specifies whether init_branch() has been called
-      bool _have_init_branch;
       /// specifies whether init_symbolic() has been called
       bool _have_init_symbolic;
       /// specifies whether init_numeric() has been called
@@ -587,7 +575,6 @@ namespace FEAT
        */
       MultiGridHierarchy() :
         _levels(),
-        _have_init_branch(false),
         _have_init_symbolic(false),
         _have_init_numeric(false)
       {
@@ -611,7 +598,6 @@ namespace FEAT
        */
       void push_level(std::shared_ptr<LevelType> level)
       {
-        XASSERTM(!_have_init_branch,   "cannot push new level, init_branch() was already called");
         XASSERTM(!_have_init_symbolic, "cannot push new level, init_symbolic() was already called");
         XASSERTM(!_have_init_numeric,  "cannot push new level, init_numeric() was already called");
         _levels.push_back(LevelInfo(level));
@@ -726,21 +712,6 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialise solver branch description
-       */
-      void init_branch(String parent = "")
-      {
-        // loop over all levels in forward order
-        for(auto it = _levels.begin(); it != _levels.end(); ++it)
-        {
-          it->init_solvers();
-          it->init_branch(parent);
-        }
-
-        _have_init_branch = true;
-      }
-
-      /**
        * \brief Symbolic initialisation method
        *
        * This method is called to perform symbolic initialisation of the sub-solvers
@@ -748,7 +719,6 @@ namespace FEAT
        */
       void init_symbolic()
       {
-        XASSERTM(_have_init_branch, "init_branch() has not yet been called");
         XASSERTM(!_have_init_symbolic, "init_symbolic() was already called");
         XASSERTM(!_have_init_numeric, "init_numeric() was already called");
 
@@ -818,14 +788,12 @@ namespace FEAT
        *
        * This function performs both the symbolic and numeric initialisation, i.e. it simply performs
          \verbatim
-         this->init_branch();
          this->init_symbolic();
          this->init_numeric();
          \endverbatim
        */
       void init()
       {
-        init_branch();
         init_symbolic();
         init_numeric();
       }
@@ -940,8 +908,10 @@ namespace FEAT
       std::vector<double> _toes;
       /// array containing toe of mpi execution for each processed level
       std::vector<double> _mpi_execs;
-      /// array containing toe of mpi wait for each processed level
-      std::vector<double> _mpi_waits;
+      /// array containing toe of mpi wait reduction for each processed level
+      std::vector<double> _mpi_waits_reduction;
+      /// array containing toe of mpi wait spmv for each processed level
+      std::vector<double> _mpi_waits_spmv;
 
     public:
       /**
@@ -1047,13 +1017,7 @@ namespace FEAT
        */
       virtual String name() const override
       {
-        return "MultiGrid";
-      }
-
-      /// \todo implement this correctly
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
+        return "MultiGrid-" + stringify(_cycle);
       }
 
       /**
@@ -1081,7 +1045,8 @@ namespace FEAT
         // allocate statistics vectors
         _toes.resize(std::size_t(num_lvls), 0.0);
         _mpi_execs.resize(std::size_t(num_lvls), 0.0);
-        _mpi_waits.resize(std::size_t(num_lvls), 0.0);
+        _mpi_waits_reduction.resize(std::size_t(num_lvls), 0.0);
+        _mpi_waits_spmv.resize(std::size_t(num_lvls), 0.0);
       }
 
       /**
@@ -1095,7 +1060,8 @@ namespace FEAT
        */
       virtual void done_symbolic() override
       {
-        _mpi_waits.clear();
+        _mpi_waits_reduction.clear();
+        _mpi_waits_spmv.clear();
         _mpi_execs.clear();
         _toes.clear();
         _counters.clear();
@@ -1181,17 +1147,15 @@ namespace FEAT
        */
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        // insert -1 to signal new starting cycle
-        Statistics::add_solver_toe(this->_branch, double(-1));
-        Statistics::add_solver_mpi_execute(this->_branch, double(-1));
-        Statistics::add_solver_mpi_wait(this->_branch, double(-1));
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
         // reset statistics counters
         for(std::size_t i(0); i <= std::size_t(_top_level); ++i)
         {
-          _toes[i] = 0.0;
-          _mpi_execs[i] = 0.0;
-          _mpi_waits[i] = 0.0;
+          _toes.at(i) = 0.0;
+          _mpi_execs.at(i) = 0.0;
+          _mpi_waits_reduction.at(i) = 0.0;
+          _mpi_waits_spmv.at(i) = 0.0;
         }
 
         // get a reference to the finest level
@@ -1218,6 +1182,7 @@ namespace FEAT
 
         default:
           // whoops...
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 1));
           status = Status::aborted;
           break;
         }
@@ -1228,12 +1193,12 @@ namespace FEAT
         // propagate solver statistics
         for(std::size_t i(0); i <= std::size_t(_top_level); ++i)
         {
-          Statistics::add_solver_toe(this->_branch, _toes.at(i));
-          Statistics::add_solver_mpi_execute(this->_branch, _mpi_execs.at(i));
-          Statistics::add_solver_mpi_wait(this->_branch, _mpi_waits.at(i));
+          Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), i, _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i),
+                _mpi_waits_spmv.at(i)));
         }
 
         // okay
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));
         return status;
       }
 
@@ -1437,6 +1402,7 @@ namespace FEAT
         // if the have a coarse grid solver, apply it
         if(coarse_solver)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallCoarseSolver>(this->name(), coarse_solver->name()));
           if(!status_success(coarse_solver->apply(lvl_crs.vec_sol, lvl_crs.vec_rhs)))
             return Status::aborted;
         }
@@ -1455,7 +1421,8 @@ namespace FEAT
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
         _mpi_execs.at(std::size_t(_crs_level)) = mpi_exec_stop - mpi_exec_start;
-        _mpi_waits.at(std::size_t(_crs_level)) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+        _mpi_waits_reduction.at(std::size_t(_crs_level)) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
+        _mpi_waits_spmv.at(std::size_t(_crs_level)) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
         return Status::success;
       }
@@ -1470,6 +1437,7 @@ namespace FEAT
         const FilterType& system_filter = lvl.level->get_system_filter();
 
         // apply peak-smoother
+        Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother.name()));
         if(!status_success(smoother.apply(lvl.vec_cor, lvl.vec_def)))
           return false;
 
@@ -1544,7 +1512,8 @@ namespace FEAT
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
         _mpi_execs.at(std::size_t(cur_lvl)) = mpi_exec_stop - mpi_exec_start;
-        _mpi_waits.at(std::size_t(cur_lvl)) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+        _mpi_waits_reduction.at(std::size_t(cur_lvl)) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
+        _mpi_waits_spmv.at(std::size_t(cur_lvl)) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
         return Status::success;
       }
@@ -1595,6 +1564,7 @@ namespace FEAT
             if(smoother)
             {
               // apply pre-smoother
+              Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
               if(!status_success(smoother->apply(lvl_f.vec_sol, lvl_f.vec_rhs)))
                 return Status::aborted;
 
@@ -1615,6 +1585,7 @@ namespace FEAT
           system_filter_f.filter_def(lvl_f.vec_def);
 
           // restrict onto coarse level
+          Statistics::add_solver_expression(std::make_shared<ExpressionRestriction>(this->name(), i));
           rest_operator->apply(lvl_c.vec_rhs, lvl_f.vec_def);
 
           // filter coarse fefect
@@ -1626,7 +1597,8 @@ namespace FEAT
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           _mpi_execs.at((size_t)i) = mpi_exec_stop - mpi_exec_start;
-          _mpi_waits.at((size_t)i) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+          _mpi_waits_reduction.at((size_t)i) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
+          _mpi_waits_spmv.at((size_t)i) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
           // descent to prior level
         }
@@ -1666,6 +1638,7 @@ namespace FEAT
           XASSERTM(prol_operator != nullptr, "prolongation operator is missing");
 
           // prolongate coarse grid solution
+          Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
           prol_operator->apply(lvl_f.vec_cor, lvl_c.vec_sol);
 
           // apply correction filter
@@ -1687,6 +1660,7 @@ namespace FEAT
             system_filter_f.filter_def(lvl_f.vec_def);
 
             // apply post-smoother
+            Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
             if(!status_success(smoother->apply(lvl_f.vec_cor, lvl_f.vec_def)))
               return Status::aborted;
 
@@ -1700,7 +1674,8 @@ namespace FEAT
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           _mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
-          _mpi_waits.at((size_t)i) += (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+          _mpi_waits_reduction.at((size_t)i) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
+          _mpi_waits_spmv.at((size_t)i) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
           // ascend to next level
         }
@@ -1759,6 +1734,16 @@ namespace FEAT
       typedef MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> BaseClass;
 
       /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the solver.
+       */
+      virtual String name() const override
+      {
+        return "ScaRCMultiGrid-" + stringify(this->_cycle);
+      }
+
+      /**
        * \brief Prolongates from the coarse level onto the current level
        *
        * \param[in] cur_lvl
@@ -1790,6 +1775,7 @@ namespace FEAT
           XASSERTM(prol_operator != nullptr, "prolongation operator is missing");
 
           // prolongate coarse grid solution
+          Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
           prol_operator->apply(lvl_f.vec_cor, lvl_c.vec_sol);
 
           // apply correction filter
@@ -1815,6 +1801,7 @@ namespace FEAT
             system_filter_f.filter_def(lvl_f.vec_def);
 
             // apply post-smoother
+            Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
             if(!status_success(smoother->apply(lvl_f.vec_cor, lvl_f.vec_def)))
               return Status::aborted;
 
@@ -1828,7 +1815,8 @@ namespace FEAT
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           this->_mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
-          this->_mpi_waits.at((size_t)i) += (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+          this->_mpi_waits_reduction.at((size_t)i) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
+          this->_mpi_waits_spmv.at((size_t)i) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
           // ascend to next level
         }

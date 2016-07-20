@@ -466,7 +466,7 @@ namespace PoissonDirichlet2D
 
     double solver_toe(at.elapsed_now());
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-    system_levels, transfer_levels, outer_krylov, domain);
+    system_levels, transfer_levels, domain);
 
     // release solver
     outer_krylov->done();

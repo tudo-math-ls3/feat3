@@ -389,7 +389,7 @@ namespace FEAT
             if(calc_def)
               me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
 
-            Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
+            //Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
 
             // plot?
             if(me->_plot)
@@ -866,7 +866,7 @@ namespace FEAT
             if(calc_def)
               me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
 
-            Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
+            //Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
 
             // plot?
             if(me->_plot)

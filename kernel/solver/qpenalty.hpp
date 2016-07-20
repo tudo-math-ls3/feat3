@@ -242,12 +242,12 @@ namespace FEAT
         // store new defect
         this->_def_init = this->_def_cur = def_init_;
         // insert special toe to signal new start of solver
-        Statistics::add_solver_toe(this->_branch, double(-1));
-        Statistics::add_solver_mpi_execute(this->_branch, double(-1));
-        Statistics::add_solver_mpi_wait(this->_branch, double(-1));
+        //Statistics::add_solver_toe(this->_branch, double(-1));
+        //Statistics::add_solver_mpi_execute(this->_branch, double(-1));
+        //Statistics::add_solver_mpi_wait(this->_branch, double(-1));
         //insert -1 as first defect, to signalize a new starting solver iteration run
-        Statistics::add_solver_defect(this->_branch, double(-1));
-        Statistics::add_solver_defect(this->_branch, double(this->_def_init));
+        //Statistics::add_solver_defect(this->_branch, double(-1));
+        //Statistics::add_solver_defect(this->_branch, double(this->_def_init));
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
 

@@ -350,7 +350,7 @@ namespace PoissonDirichlet2D
     double solver_toe(bt.elapsed(at));
 
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-      system_levels, transfer_levels, solver, domain);
+      system_levels, transfer_levels, domain);
 
     // release solver
     if(!solver->is_converged())

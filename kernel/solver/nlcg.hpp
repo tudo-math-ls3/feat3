@@ -606,7 +606,7 @@ namespace FEAT
           if(calc_def)
             this->_def_cur = this->_calc_def_norm(vec_r, vec_sol);
 
-          Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+          //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
           // plot?
           if(this->_plot)

@@ -193,13 +193,6 @@ namespace FEAT
         }
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-        _solver_a->init_branch(parent + "::" + this->name());
-        _solver_s->init_branch(parent + "::" + this->name());
-      }
-
       virtual void done_numeric() override
       {
         if(_auto_init_s)
@@ -237,6 +230,7 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         // fetch the references
         VectorTypeV& tmp_v = this->_vec_tmp_v;
         VectorTypeP& tmp_p = this->_vec_tmp_p;
@@ -250,20 +244,33 @@ namespace FEAT
         {
         case SchurType::diagonal:
           // solve A*u_v = f_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, rhs_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // solve S*u_p = f_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, rhs_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
 
         case SchurType::lower:
           // solve A*u_v = f_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, rhs_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_p := f_p - D*u_v
           this->_matrix_d.apply(tmp_p, sol_v, rhs_p, -DataType(1));
@@ -272,16 +279,25 @@ namespace FEAT
           this->_filter_p.filter_def(tmp_p);
 
           // solve S*u_p = g_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, tmp_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
 
         case SchurType::upper:
           // solve S*u_p = f_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, rhs_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_v := f_v - B*u_p
           this->_matrix_b.apply(tmp_v, sol_p, rhs_v, -DataType(1));
@@ -290,18 +306,27 @@ namespace FEAT
           this->_filter_v.filter_def(tmp_v);
 
           // solve A*u_v = g_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, tmp_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
 
         case SchurType::full:
           // Note: We will use the first component of the solution vector here.
           //       It will be overwritten by the third solution step below.
           // solve A*u_v = f_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, rhs_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_p := f_p - D*u_v
           this->_matrix_d.apply(tmp_p, sol_v, rhs_p, -DataType(1));
@@ -310,8 +335,12 @@ namespace FEAT
           this->_filter_p.filter_def(tmp_p);
 
           // solve S*u_p = g_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, tmp_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_v := f_v - B*u_p
           this->_matrix_b.apply(tmp_v, sol_p, rhs_v, -DataType(1));
@@ -320,14 +349,20 @@ namespace FEAT
           this->_filter_v.filter_def(tmp_v);
 
           // solve A*u_v = g_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, tmp_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
         }
 
         // we should never come out here...
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
         return Status::aborted;
       }
     }; // class SchurPrecond<...>
@@ -466,13 +501,6 @@ namespace FEAT
         }
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-        _solver_a->init_branch(parent + "::" + this->name());
-        _solver_s->init_branch(parent + "::" + this->name());
-      }
-
       virtual void done_numeric() override
       {
         if(_auto_init_s)
@@ -514,6 +542,7 @@ namespace FEAT
 
       virtual Status apply(GlobalVectorType& vec_cor, const GlobalVectorType& vec_def) override
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         // first of all, copy RHS
         (*_vec_rhs_v).copy((*vec_def).template at<0>());
         (*_vec_rhs_p).copy((*vec_def).template at<1>());
@@ -523,20 +552,32 @@ namespace FEAT
         {
         case SchurType::diagonal:
           // solve A*u_v = f_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_rhs_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // solve S*u_p = f_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_rhs_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
           break;
 
         case SchurType::lower:
           // solve A*u_v = f_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_rhs_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_p := f_p - D*u_v
           _matrix_d.apply(_vec_def_p, _vec_sol_v, _vec_rhs_p, -DataType(1));
@@ -545,16 +586,24 @@ namespace FEAT
           _filter_p.filter_def(_vec_def_p);
 
           // solve S*u_p = g_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_def_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
           break;
 
         case SchurType::upper:
           // solve S*u_p = f_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_rhs_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_v := f_v - B*u_p
           _matrix_b.apply(_vec_def_v, _vec_sol_p, _vec_rhs_v, -DataType(1));
@@ -563,8 +612,12 @@ namespace FEAT
           _filter_v.filter_def(_vec_def_v);
 
           // solve A*u_v = g_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_def_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
           break;
@@ -573,8 +626,12 @@ namespace FEAT
           // Note: We will use the first component of the solution vector here.
           //       It will be overwritten by the third solution step below.
           // solve A*u_v = f_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_rhs_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_p := f_p - D*u_v
           _matrix_d.apply(_vec_def_p, _vec_sol_v, _vec_rhs_p, -DataType(1));
@@ -583,8 +640,12 @@ namespace FEAT
           _filter_p.filter_def(_vec_def_p);
 
           // solve S*u_p = g_p
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_def_p)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // compute g_v := f_v - B*u_p
           _matrix_b.apply(_vec_def_v, _vec_sol_p, _vec_rhs_v, -DataType(1));
@@ -593,8 +654,12 @@ namespace FEAT
           _filter_v.filter_def(_vec_def_v);
 
           // solve A*u_v = g_v
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_def_v)))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
             return Status::aborted;
+          }
 
           // okay
           break;
@@ -605,6 +670,7 @@ namespace FEAT
         (*vec_cor).template at<1>().copy(*_vec_sol_p);
 
         // okay
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
         return Status::success;
       }
     }; // class SchurPrecond<...>

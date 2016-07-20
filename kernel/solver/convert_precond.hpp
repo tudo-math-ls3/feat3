@@ -64,13 +64,6 @@ namespace FEAT
         return "Convert";
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-        if(_inner_solver)
-          _inner_solver->init_branch(parent + "::" + this->name());
-      }
-
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
@@ -114,13 +107,22 @@ namespace FEAT
 
       virtual Status apply(VectorTypeOuter& vec_cor, const VectorTypeOuter& vec_def) override
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         VectorTypeInner vec_def_inner;
         vec_def_inner.convert(vec_def);
         VectorTypeInner vec_cor_inner(vec_def_inner.clone(LAFEM::CloneMode::Layout));
 
-        _inner_solver->apply(vec_cor_inner, vec_def_inner);
+        Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_inner_solver->name()));
+        Status status = _inner_solver->apply(vec_cor_inner, vec_def_inner);
+        if(!status_success(status))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
+          return status;
+        }
 
         vec_cor.convert(vec_cor_inner);
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
         return Status::success;
       }
     }; // class ConvertPrecond<...>
@@ -179,13 +181,6 @@ namespace FEAT
         return "Convert";
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-        if(_inner_solver)
-          _inner_solver->init_branch(parent + "::" + this->name());
-      }
-
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
@@ -229,13 +224,22 @@ namespace FEAT
 
       virtual Status apply(VectorTypeOuter& vec_cor, const VectorTypeOuter& vec_def) override
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         VectorTypeInner vec_def_inner;
         vec_def_inner.convert(vec_def_inner.get_gate(), vec_def);
         VectorTypeInner vec_cor_inner(vec_def_inner.clone(LAFEM::CloneMode::Layout));
 
-        _inner_solver->apply(vec_cor_inner, vec_def_inner);
+        Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_inner_solver->name()));
+        Status status _inner_solver->apply(vec_cor_inner, vec_def_inner);
+        if(!status_success(status))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
+          return status;
+        }
 
         vec_cor.convert(vec_cor.get_gate(), vec_cor_inner);
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
         return Status::success;
       }
     }; // class ConvertPrecond<...>

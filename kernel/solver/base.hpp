@@ -159,11 +159,6 @@ namespace FEAT
     template<typename Vector_>
     class SolverBase
     {
-    protected:
-
-      /// Description of this solvers branch, with itself at the leaf.
-      String _branch;
-
     public:
 
       /// virtual destructor
@@ -188,19 +183,6 @@ namespace FEAT
        */
       virtual void init_numeric()
       {
-      }
-
-      /** \brief Initialise solver branch description
-       *
-       * This method initialises the object's absolute path in the complete solver tree.
-       * When called from the solver tree's root object, the parent parameter can be used to distinguish different
-       * solver trees from each other, e.g. in multiphysics environments.
-       *
-       * \param[in] parent The absolute tree path to the objects parent node.
-       */
-      virtual void init_branch(String parent = "")
-      {
-        _branch = parent + "::" + name();
       }
 
       /**
@@ -228,14 +210,12 @@ namespace FEAT
          \verbatim
          this->init_symbolic();
          this->init_numeric();
-         this->init_branch();
          \endverbatim
        */
       virtual void init()
       {
         init_symbolic();
         init_numeric();
-        init_branch();
       }
 
       /**
@@ -273,12 +253,6 @@ namespace FEAT
        * \returns A string describing the solver.
        */
       virtual String name() const = 0;
-
-      /// Returns the solvers name with its complete branch in the solver tree.
-      String get_solver_branch() const
-      {
-        return _branch;
-      }
 
       /**
        * \brief Solver application method
@@ -374,7 +348,7 @@ namespace FEAT
     class IterationStats
     {
     private:
-      const String _branch;
+      const String _solver_name;
       TimeStamp _at;
       TimeStamp _bt;
       double _mpi_execute_start;
@@ -396,7 +370,7 @@ namespace FEAT
        */
       template<typename Vector_>
       explicit IterationStats(const SolverBase<Vector_>& solver) :
-        _branch(solver.get_solver_branch())
+        _solver_name(solver.name())
       {
         _mpi_execute_start = Statistics::get_time_mpi_execute();
         _mpi_wait_start_reduction    = Statistics::get_time_mpi_wait_reduction();
@@ -422,9 +396,8 @@ namespace FEAT
         _mpi_execute_stop = Statistics::get_time_mpi_execute();
         _mpi_wait_stop_reduction    = Statistics::get_time_mpi_wait_reduction();
         _mpi_wait_stop_spmv    = Statistics::get_time_mpi_wait_spmv();
-        Statistics::add_solver_toe(this->_branch, _bt.elapsed(_at));
-        Statistics::add_solver_mpi_execute(this->_branch, _mpi_execute_stop - _mpi_execute_start);
-        Statistics::add_solver_mpi_wait(this->_branch, (_mpi_wait_stop_reduction - _mpi_wait_start_reduction) + (_mpi_wait_stop_spmv - _mpi_wait_start_spmv));
+        Statistics::add_solver_expression(std::make_shared<ExpressionTimings>(_solver_name, _bt.elapsed(_at), _mpi_execute_stop - _mpi_execute_start,
+          _mpi_wait_stop_reduction - _mpi_wait_start_reduction, _mpi_wait_stop_spmv - _mpi_wait_start_spmv));
       }
     }; // class IterationStats
   } // namespace Solver

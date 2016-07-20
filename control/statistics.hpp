@@ -23,15 +23,13 @@ namespace FEAT
          * \param shape_dimension The maximum dimension of the used shapes
          * \param system_levels The system level hierarchy
          * \param transfer_levels The transfer level hierarchy
-         * \param solver The solver tree
          * \param domain The domain
          *
          */
-        template <typename SystemLevelType_, typename TransferLevelType_, typename DomainType_, typename SolverType_>
+        template <typename SystemLevelType_, typename TransferLevelType_, typename DomainType_>
         static void report(double solver_toe, int statistics_check, int shape_dimension,
         std::deque<SystemLevelType_*> & system_levels,
         std::deque<TransferLevelType_*> & transfer_levels,
-        SolverType_ & solver,
         DomainType_ & domain)
         {
           Index rank(Util::Comm::rank());
@@ -86,7 +84,8 @@ namespace FEAT
             std::cout << String("TOE partition:").pad_back(20) << FEAT::Statistics::toe_partition << std::endl;
             std::cout << String("TOE assembly:").pad_back(20) << FEAT::Statistics::toe_assembly << std::endl;
             std::cout << String("TOE solve:").pad_back(20) << FEAT::Statistics::toe_solve << std::endl;
-            std::cout << std::endl << solver->get_formatted_solver_tree().trim() << std::endl;
+            std::cout << std::endl << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
+
             String flops = FEAT::Statistics::get_formatted_flops(solver_toe, nranks);
             std::cout<<flops<<std::endl<<std::endl;
             std::cout<<op_timings<<std::endl<<std::endl;
@@ -105,9 +104,10 @@ namespace FEAT
           }
           if (statistics_check > 0) // provided parameter full or whatever
           {
-            FEAT::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size,
+            /// \todo reimplement method based on expressions
+            /*FEAT::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size,
             domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension), (*system_levels.back()->matrix_sys).columns(),
-            (*system_levels.back()->matrix_sys).used_elements());
+            (*system_levels.back()->matrix_sys).used_elements());*/
           }
         }
 

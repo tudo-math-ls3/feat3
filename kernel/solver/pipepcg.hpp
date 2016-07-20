@@ -133,6 +133,8 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         const MatrixType& matrix(this->_system_matrix);
         const FilterType& filter(this->_system_filter);
         VectorType& vec_r(this->_vec_r);
@@ -154,10 +156,16 @@ namespace FEAT
 
         Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
+        }
 
         if(!this->_apply_precond(vec_u, vec_r, filter))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
           return Status::aborted;
+        }
 
         matrix.apply(vec_w, vec_u);
         filter.filter_def(vec_w);
@@ -172,7 +180,10 @@ namespace FEAT
           auto dot_delta = vec_w.dot_async(vec_u);
 
           if(!this->_apply_precond(vec_m, vec_w, filter))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           matrix.apply(vec_n, vec_m);
           filter.filter_def(vec_n);
@@ -183,7 +194,10 @@ namespace FEAT
           /// set new defect with our own method, to not use synchronous _set_new_defect method
           status = _update_defect(norm_def_cur->wait());
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           if (this->_num_iter == 1) // num_iter has already been increased to 1 by previous _update_defect call
           {
@@ -226,6 +240,7 @@ namespace FEAT
         }
 
         // we should never reach this point...
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
         return Status::undefined;
       }
 
@@ -239,7 +254,7 @@ namespace FEAT
 
         this->_def_cur = def_cur_norm;
 
-        Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+        Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
 
         // plot?
         if(this->_plot)

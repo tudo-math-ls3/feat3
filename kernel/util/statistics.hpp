@@ -7,32 +7,17 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/kahan_summation.hpp>
 #include <kernel/util/comm_base.hpp>
+#include <kernel/solver/expression.hpp>
 
 #include <list>
 #include <map>
 #include <time.h>
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 namespace FEAT
 {
-  /// Defect norm and time of execution for all iterations of a solver execution
-  struct SolverStatistics
-  {
-    ///contains def_init and def_cur per iteration, implicitly contains the iteration count, too.
-    /// \todo use proper datatype via template parameter, eg quad for quad based solvers
-    std::vector<double> defect;
-
-    /// Time of each iteration in seconds
-    std::vector<double> toe;
-
-    /// Time of mpi execution of each iteration in seconds
-    std::vector<double> mpi_execute;
-
-    /// Time of mpi wait of each iteration in seconds
-    std::vector<double> mpi_wait;
-  };
-
   /**
    * \brief Statistics collection class
    *
@@ -67,10 +52,10 @@ namespace FEAT
       /// global time of execution for mpi related idle/wait tasks of spmv operations
       static KahanAccumulation _time_mpi_wait_spmv;
 
-      /// map of SolverStatistics and their corresponding solver name
-      static std::map<FEAT::String, SolverStatistics> _solver_statistics;
+      /// a consecutive list of all solver actions
+      static std::list<std::shared_ptr<Solver::ExpressionBase>> _solver_expressions;
 
-      static String _format_solver_statistics(String branch, SolverStatistics & stat)
+      /*static String _format_solver_statistics(String branch, SolverStatistics & stat)
       {
         String result;
 
@@ -121,7 +106,7 @@ namespace FEAT
         }
 
         return result;
-      }
+      }*/
 
     public:
 
@@ -227,119 +212,30 @@ namespace FEAT
         return _time_mpi_wait_spmv.sum;
       }
 
-      /// add toe statistics entry for specific solver (branch name)
-      inline static void add_solver_toe(String solver, double seconds)
+      inline static void add_solver_expression(std::shared_ptr<Solver::ExpressionBase> expression)
       {
-        auto it = _solver_statistics.find(solver);
-
-        if (it != _solver_statistics.end())
-        {
-          it->second.toe.push_back(seconds);
-        }
-        else
-        {
-          SolverStatistics temp;
-          temp.toe.push_back(seconds);
-          _solver_statistics[solver] = temp;
-        }
+        _solver_expressions.push_back(expression);
       }
 
-      /// add mpi execute toe statistics entry for specific solver (branch name)
-      inline static void add_solver_mpi_execute(String solver, double seconds)
-      {
-        auto it = _solver_statistics.find(solver);
+      /**
+       * \brief Returns a descriptive string of the complete solver tree.
+       *
+       * Create and format a string describing the complete solver tree.
+       *
+       * \note This method makes some simplifications, e.g. stating only one smoother
+       * for the complete FEAT::Solver::BasicVCycle.
+       *
+       * \note The solver must have been executed (successfully) at least one time after the last reset_solver_statistics() call.
+       */
+      static String get_formatted_solver_tree();
 
-        if (it != _solver_statistics.end())
-        {
-          it->second.mpi_execute.push_back(seconds);
-        }
-        else
-        {
-          SolverStatistics temp;
-          temp.mpi_execute.push_back(seconds);
-          _solver_statistics[solver] = temp;
-        }
-      }
-
-      /// add mpi execute toe statistics entry for specific solver (branch name)
-      inline static void add_solver_mpi_wait(String solver, double seconds)
-      {
-        auto it = _solver_statistics.find(solver);
-
-        if (it != _solver_statistics.end())
-        {
-          it->second.mpi_wait.push_back(seconds);
-        }
-        else
-        {
-          SolverStatistics temp;
-          temp.mpi_wait.push_back(seconds);
-          _solver_statistics[solver] = temp;
-        }
-      }
-
-      /// add defect norm statistics entry for specific solver (branch name)
-      inline static void add_solver_defect(String solver, double defect)
-      {
-        auto it = _solver_statistics.find(solver);
-        if (it != _solver_statistics.end())
-        {
-          it->second.defect.push_back(defect);
-        }
-        else
-        {
-          SolverStatistics temp;
-          temp.defect.push_back(defect);
-          _solver_statistics[solver] = temp;
-        }
-      }
+      /// print out the complete solver expression list
+      static void print_solver_expressions();
 
       ///reset solver statistics (toe / defect norm)
       inline static void reset_solver_statistics()
       {
-        _solver_statistics.clear();
-      }
-
-      /**
-       * \brief Generate output with detailed solver statistics
-       *
-       * The generated String contains detailed detailed defect norms and execution times
-       * for each used solver.
-       *
-       * The output per solver contains the following informations:
-       * - solver name (branch name)
-       * - defect norm of each iteration
-       * - time of exection of each iteration
-       *
-       * \note All FEAT::Solver::IterativeSolver instances contain the initial defect norm as the first iteration defect norm.
-       *
-       * \note The FEAT::Solver::BasicVCycle prints its TOE from coarse to fine level.
-       */
-      static String get_formatted_solvers()
-      {
-        String result;
-
-        for (auto stat : _solver_statistics)
-        {
-          result += _format_solver_statistics(stat.first, stat.second);
-          result += "\n";
-        }
-
-        return result;
-      }
-
-      /**
-       * \copydoc get_formatted_solvers()
-       *
-       * \param[in] branch The solver (as complete branch name) that shall be used as the tree's root.
-       */
-      static String get_formatted_solver(String branch)
-      {
-        auto it = _solver_statistics.find(branch);
-        if (it == _solver_statistics.end())
-          throw InternalError("solver with branch " + branch + " not found!");
-        else
-          return _format_solver_statistics(branch, it->second);
+        _solver_expressions.clear();
       }
 
       /*
@@ -376,6 +272,7 @@ namespace FEAT
         _time_mpi_wait_spmv.correction = 0.;
       }
 
+      /*
       static void write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename = "solver_stats");
 
       static void write_out_solver_statistics(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename = "solver_stats")
@@ -480,7 +377,7 @@ namespace FEAT
         }
 
         file.close();
-      }
+      }*/
   };
 } // namespace FEAT
 

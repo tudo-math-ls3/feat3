@@ -99,23 +99,6 @@ namespace FEAT
         return "PCGNR";
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch();
-        if(_precond_r != _precond_l)
-        {
-          if(_precond_l)
-            _precond_l->init_branch(parent + "::" + this->name() + "[L]");
-          if(_precond_r)
-            _precond_r->init_branch(parent + "::" + this->name() + "[R]");
-        }
-        else if(_precond_l)
-        {
-          // _precond_l and _precond_r refer to the same object
-          _precond_l->init_branch(parent + "::" + this->name());
-        }
-      }
-
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
@@ -205,7 +188,10 @@ namespace FEAT
       bool _apply_precond_l(VectorType& vec_cor, const VectorType& vec_def)
       {
         if(_precond_l)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_precond_l->name()));
           return status_success(_precond_l->apply(vec_cor, vec_def));
+        }
         vec_cor.copy(vec_def);
         this->_system_filter.filter_cor(vec_cor);
         return true;
@@ -214,7 +200,10 @@ namespace FEAT
       bool _apply_precond_r(VectorType& vec_cor, const VectorType& vec_def)
       {
         if(_precond_r)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_precond_r->name()));
           return status_success(_precond_r->apply(vec_cor, vec_def));
+        }
         vec_cor.copy(vec_def);
         this->_system_filter.filter_cor(vec_cor);
         return true;
@@ -222,6 +211,8 @@ namespace FEAT
 
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         const MatrixType& matrix(this->_system_matrix);
         const MatrixType& transp(this->_transp_matrix);
         const FilterType& filter(this->_system_filter);
@@ -238,12 +229,18 @@ namespace FEAT
         // r[0] := b - A*x[0]
         Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
+        }
 
         // apply left preconditioner to defect vector
         // p[0] := M_L^{-1} * r[0]
         if(!this->_apply_precond_l(vec_p, vec_r))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
           return Status::aborted;
+        }
 
         // apply transposed matrix
         // s[0] := A^T * p[0]
@@ -252,7 +249,10 @@ namespace FEAT
         // apply right preconditioner
         // q[0] := M_R^{-1} * s[0]
         if(!this->_apply_precond_r(vec_q, vec_s))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
           return Status::aborted;
+        }
 
         // compute initial gamma
         // gamma[0] := < s[0], q[0] >
@@ -269,7 +269,10 @@ namespace FEAT
 
           // z[k] := M_L^{-1} * y[k]
           if(!this->_apply_precond_l(vec_z, vec_y))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           // compute alpha
           // alpha[k] := gamma[k] / < y[k], z[k] >
@@ -286,7 +289,10 @@ namespace FEAT
           // compute defect norm and check for convergence
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           // p[k+1] := p[k] - alpha[k] * z[k]
           vec_p.axpy(vec_z, vec_p, -alpha);
@@ -297,7 +303,10 @@ namespace FEAT
 
           // t[k+1] := M_R^{-1} * s[k+1]
           if(!this->_apply_precond_r(vec_t, vec_s))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           // compute new gamma
           // gamma[k+1] := < s[k+1], t[k+1] >
@@ -314,6 +323,7 @@ namespace FEAT
         }
 
         // we should never reach this point...
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
         return Status::undefined;
       }
     }; // class PCGNR<...>

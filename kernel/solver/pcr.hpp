@@ -119,6 +119,7 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         const MatrixType& matrix(this->_system_matrix);
         const FilterType& filter(this->_system_filter);
         VectorType& vec_p(this->_vec_p);
@@ -141,12 +142,18 @@ namespace FEAT
         // r[0] := b - A*x[0]
         Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
+        }
 
         // apply preconditioner to defect vector:
         // s[0] := M^{-1} * r[0]
         if(!this->_apply_precond(vec_s, vec_r, filter))
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
           return Status::aborted;
+        }
 
         // compute initial p and q
         // p[0] := s[0]
@@ -167,7 +174,10 @@ namespace FEAT
 
           // z[k] := M^{-1} * q[k]
           if(!this->_apply_precond(vec_z, vec_q, filter))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           // compute alpha
           // alpha[k] := gamma[k] / < z[k], q[k] >
@@ -184,7 +194,10 @@ namespace FEAT
           // compute defect norm and check for convergence
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           // update preconditioned residual vector
           // s[k+1] := s[k] - alpha[k] * z[k]
@@ -212,7 +225,10 @@ namespace FEAT
         }
 
         // we should never reach this point...
-        return Status::undefined;
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
+          return Status::undefined;
+        }
       }
     }; // class PCR<...>
 

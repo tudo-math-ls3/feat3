@@ -136,6 +136,7 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         VectorType& vec_r        (this->_vec_r);
         VectorType& vec_r_tilde  (this->_vec_r_tilde);
         VectorType& vec_r_tilde_0(this->_vec_r_tilde_0);
@@ -169,7 +170,10 @@ namespace FEAT
 
           // apply preconditioner
           if(!this->_apply_precond(vec_r_tilde_0, vec_r, fil_sys))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
           //fil_sys.filter_cor(vec_r_tilde_0);
 
           vec_r_tilde.copy(vec_r_tilde_0);
@@ -186,7 +190,10 @@ namespace FEAT
             fil_sys.filter_def(vec_v);
             // apply preconditioner
             if(!this->_apply_precond(vec_v_tilde, vec_v, fil_sys))
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
             //fil_sys.filter_cor(vec_v_tilde);
 
             gamma_tilde = vec_v_tilde.dot(vec_r_tilde_0);
@@ -228,7 +235,10 @@ namespace FEAT
 
             // apply preconditioner
             if(!this->_apply_precond(vec_t_tilde, vec_t, fil_sys))
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
             //fil_sys.filter_cor(vec_t_tilde);
 
             gamma_tilde = vec_t_tilde.dot(vec_t_tilde);
@@ -253,6 +263,7 @@ namespace FEAT
             if (status == Status::success)
             {
               //std::cout << "Breakpoint 5 (converged)" << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
               return status;
             }
 
@@ -270,6 +281,7 @@ namespace FEAT
         }
 
         // finished
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
         return status;
       }
     }; // class BiCGStab<...>

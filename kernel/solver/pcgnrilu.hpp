@@ -180,6 +180,8 @@ namespace FEAT
 
       virtual Status _apply_intern(VectorType& vec_x, const VectorType& DOXY(vec_b))
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         const MatrixType& matrix(this->_system_matrix);
         const MatrixType& transp(this->_transp_matrix);
         const FilterType& filter(this->_system_filter);
@@ -196,7 +198,10 @@ namespace FEAT
         // r[0] := b - A*x[0]
         Status status = this->_set_initial_defect(vec_r, vec_x);
         if(status != Status::progress)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
+        }
 
         // apply left preconditioner to defect vector
         // p[0] := (L*L^T)^{-1} r[0]
@@ -245,7 +250,10 @@ namespace FEAT
           // compute defect norm
           status = this->_set_new_defect(vec_r, vec_x);
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           // p[k+1] := p[k] - alpha[k] * z[k]
           vec_p.axpy(vec_z, vec_p, -alpha);
@@ -273,6 +281,7 @@ namespace FEAT
         }
 
         // we should never reach this point...
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
         return Status::undefined;
       }
     }; // class PCGNRILU<...>

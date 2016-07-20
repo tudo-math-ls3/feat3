@@ -268,37 +268,6 @@ namespace FEAT
         }
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-
-        // loop over all level
-        for(auto it = system_levels.begin(); it != system_levels.end(); ++it)
-        {
-          if(it == system_levels.begin())
-          {
-            if((*it)->coarse_solver)
-            {
-              (*it)->coarse_solver->init_branch(parent + "::" + this->name());
-            }
-          }
-          else
-          {
-            if((*it)->pre_smoother)
-            {
-              (*it)->pre_smoother->init_branch(parent + "::" + this->name());
-            }
-            if((*it)->post_smoother)
-            {
-              if((*it)->post_smoother != (*it)->pre_smoother)
-              {
-                (*it)->post_smoother->init_branch(parent + "::" + this->name());
-              }
-            }
-          }
-        }
-      }
-
       virtual void done_numeric() override
       {
         // loop over all level
@@ -390,17 +359,16 @@ namespace FEAT
         // get the number of levels
         const int nl = int(system_levels.size());
 
-        // insert -1 to signal new starting v cycle
-        Statistics::add_solver_toe(this->_branch, double(-1));
-        Statistics::add_solver_mpi_execute(this->_branch, double(-1));
-        Statistics::add_solver_mpi_wait(this->_branch, double(-1));
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
         // array containing toe for each processed level
         std::vector<double> toes((size_t)nl, double(0));
         // array containing toe of mpi execution for each processed level
         std::vector<double> mpi_executes((size_t)nl, double(0));
-        // array containing toe of mpi wait for each processed level
-        std::vector<double> mpi_waits((size_t)nl, double(0));
+        // array containing toe of mpi wait reduction for each processed level
+        std::vector<double> mpi_waits_reduction((size_t)nl, double(0));
+        // array containing toe of mpi wait spmv for each processed level
+        std::vector<double> mpi_waits_spmv((size_t)nl, double(0));
 
         // copy RHS vector
         system_levels.back()->vec_rhs.copy(vec_def);
@@ -424,6 +392,7 @@ namespace FEAT
           if(lvl.pre_smoother)
           {
             // apply pre-smoother
+            Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), lvl.pre_smoother->name()));
             if(!status_success(lvl.pre_smoother->apply(lvl.vec_sol, lvl.vec_rhs)))
               return Status::aborted;
 
@@ -443,6 +412,7 @@ namespace FEAT
           lvl.filter.filter_def(lvl.vec_def);
 
           // restrict onto coarse level
+          Statistics::add_solver_expression(std::make_shared<ExpressionRestriction>(this->name(), i));
           trs.rest.apply(lvl_c.vec_rhs, lvl.vec_def);
 
           // filter coarse fefect
@@ -454,7 +424,8 @@ namespace FEAT
           mpi_executes.at((size_t)i) = mpi_execute_stop - mpi_execute_start;
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
-          mpi_waits.at((size_t)i) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+          mpi_waits_reduction.at((size_t)i) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
+          mpi_waits_spmv.at((size_t)i) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
           // descent to prior level
         }
@@ -471,6 +442,7 @@ namespace FEAT
           // if the have a coarse grid solver, apply it
           if(lvl.coarse_solver)
           {
+            Statistics::add_solver_expression(std::make_shared<ExpressionCallCoarseSolver>(this->name(), lvl.coarse_solver->name()));
             if(!status_success(lvl.coarse_solver->apply(lvl.vec_sol, lvl.vec_rhs)))
               return Status::aborted;
           }
@@ -489,7 +461,8 @@ namespace FEAT
           mpi_executes.at(0) = mpi_execute_stop - mpi_execute_start;
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
-          mpi_waits.at(0) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+          mpi_waits_reduction.at(0) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
+          mpi_waits_spmv.at(0) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
         }
 
         // prolongation loop
@@ -508,6 +481,7 @@ namespace FEAT
           TransferLevel& trs = *transfer_levels.at(std::size_t(i-1));
 
           // prolongate coarse grid solution
+          Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
           trs.prol.apply(lvl.vec_cor, lvl_c.vec_sol);
 
           // apply correction filter
@@ -526,6 +500,7 @@ namespace FEAT
             lvl.filter.filter_def(lvl.vec_def);
 
             // apply post-smoother
+            Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), lvl.post_smoother->name()));
             if(!status_success(lvl.post_smoother->apply(lvl.vec_cor, lvl.vec_def)))
               return Status::aborted;
 
@@ -542,7 +517,8 @@ namespace FEAT
           mpi_executes.at((size_t)i) += mpi_execute_stop - mpi_execute_start;
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
-          mpi_waits.at((size_t)i) += (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
+          mpi_waits_reduction.at((size_t)i) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
+          mpi_waits_spmv.at((size_t)i) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
 
           // ascend to next level
         }
@@ -552,12 +528,12 @@ namespace FEAT
 
         for (int i(0) ; i < nl ; ++i)
         {
-          Statistics::add_solver_toe(this->_branch, toes.at((size_t)i));
-          Statistics::add_solver_mpi_execute(this->_branch, mpi_executes.at((size_t)i));
-          Statistics::add_solver_mpi_wait(this->_branch, mpi_waits.at((size_t)i));
+          Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), i, toes.at((size_t)i), mpi_executes.at((size_t)i), mpi_waits_reduction.at((size_t)i),
+                mpi_waits_spmv.at((size_t)i)));
         }
 
         // okay
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));
         return Status::success;
       }
     }; // class BasicVCycle<...>

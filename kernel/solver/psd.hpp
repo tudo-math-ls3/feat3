@@ -116,6 +116,8 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
         const MatrixType& matrix(this->_system_matrix);
         const FilterType& filter(this->_system_filter);
         VectorType& vec_r(this->_vec_r);
@@ -126,7 +128,10 @@ namespace FEAT
         // r[0] := b - A*x[0]
         Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
+        }
 
         // start iterating
         while(status == Status::progress)
@@ -136,7 +141,10 @@ namespace FEAT
           // apply preconditioner to defect vector
           // z[k] := M^{-1} * r[k]
           if(!this->_apply_precond(vec_z, vec_r, filter))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           // q[k] := A*z[k]
           matrix.apply(vec_q, vec_z);
@@ -158,6 +166,7 @@ namespace FEAT
         }
 
         // we should never reach this point...
+        Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
         return Status::undefined;
       }
     }; // class PSD<...>

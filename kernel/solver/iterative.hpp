@@ -329,15 +329,9 @@ namespace FEAT
       {
         // store new defect
         this->_def_init = this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
-        // insert special toe to signal new start of solver
-        Statistics::add_solver_toe(this->_branch, double(-1));
-        Statistics::add_solver_mpi_execute(this->_branch, double(-1));
-        Statistics::add_solver_mpi_wait(this->_branch, double(-1));
-        //insert -1 as first defect, to signalize a new starting solver iteration run
-        Statistics::add_solver_defect(this->_branch, double(-1));
-        Statistics::add_solver_defect(this->_branch, double(this->_def_init));
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
+        Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
         // plot?
         if(this->_plot)
@@ -391,9 +385,10 @@ namespace FEAT
 
         // compute new defect
         if(calc_def)
+        {
+          Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
           this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
-
-        Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+        }
 
         // plot?
         if(this->_plot)
@@ -532,13 +527,6 @@ namespace FEAT
           _precond->init_numeric();
       }
 
-      virtual void init_branch(String parent = "") override
-      {
-        BaseClass::init_branch(parent);
-        if(_precond)
-          _precond->init_branch(parent + "::" + this->name());
-      }
-
       virtual void done_numeric() override
       {
         if(_precond)
@@ -592,6 +580,7 @@ namespace FEAT
       {
         if(this->_precond)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_precond->name()));
           return status_success(this->_precond->apply(vec_cor, vec_def));
         }
         else

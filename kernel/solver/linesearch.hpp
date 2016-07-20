@@ -551,7 +551,7 @@ namespace FEAT
             alpha_hidate = - this->_vec_grad.dot(dir)/dir.dot(this->_vec_tmp);
             alpha += alpha_hidate;
 
-            Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+            //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
             sol.axpy(dir, this->_vec_initial_sol, alpha);
 
             // plot?
@@ -791,7 +791,7 @@ namespace FEAT
             // Update the solution
             sol.axpy(dir, this->_vec_initial_sol, alpha);
 
-            Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+            //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
             // plot?
             if(this->_plot)
@@ -1139,7 +1139,7 @@ namespace FEAT
             df = this->_vec_grad.dot(vec_dir);
             this->_def_cur = Math::abs(df);
 
-            Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+            //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
             // plot?
             if(this->_plot)
