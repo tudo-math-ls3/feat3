@@ -8,6 +8,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/global/gate.hpp>
@@ -65,7 +66,7 @@ namespace FEAT
           typedef MeshoptSystemLevel<Mem_, DT_, IT_, OperatorType, Global::Matrix> SystemLevelType;
 
           /// Inter-level transfer matrix
-          typedef TransferMatrixBlocked<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
+          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
           /// Type to do all inter level information transfer
           typedef MeshoptTransferLevel<SystemLevelType, TransferMatrixType> TransferLevelType;
 

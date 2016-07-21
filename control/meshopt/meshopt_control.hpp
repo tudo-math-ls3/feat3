@@ -9,6 +9,7 @@
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/geometry/mesh_file_writer.hpp>
 #include <kernel/global/filter.hpp>
@@ -26,82 +27,6 @@ namespace FEAT
   {
     namespace Meshopt
     {
-      /**
-       * \brief Transfermatrix for blocked vector types, i.e. DenseVectorBlocked
-       *
-       * \tparam Mem_
-       * The memory architecture of the vectors to transfer
-       *
-       * \tparam DT_
-       * Floating point datatype for the vectors to transfer
-       *
-       * \tparam IT_
-       * Index type for the vectors to transfer
-       *
-       * \tparam BlockSize_
-       * Size of the vector's blocks
-       *
-       * This class acts as a wrapper around a standard SparseMatrixBCSR transfermatrix, pretending to be a
-       * SparseMatrixBCSR. This works because the inter-level transfer is just a multiplication with the
-       * transfer matrix, and SparseMatrixCSR can be multiplied with a DenseVectorBlocked in the obvious and
-       * desired fashion. The only pitfall is that the corresponding routine only accepts inputs of type
-       * TransferMatrix::VectorTypeR.
-       *
-       * \author Jordi Paul
-       *
-       */
-      template<typename Mem_, typename DT_, typename IT_, int BlockSize_>
-      class TransferMatrixBlocked : public LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>
-      {
-        public:
-          /// The memory architecture
-          typedef Mem_ MemType;
-          /// The floating point datatype
-          typedef DT_ DataType;
-          /// The index type
-          typedef IT_ IndexType;
-
-          /// The block height the TransferMatrixBlocked pretends to have
-          static constexpr int BlockHeight = BlockSize_;
-          /// The block width the TransferMatrixBlocked pretends to have
-          static constexpr int BlockWidth = BlockSize_;
-
-          /// The real type of the underlying matrix
-          typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> BaseClass;
-          /// What this matrix pretends to be
-          typedef LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, BlockSize_, BlockSize_> PretendType;
-
-          /// Vector type accepted for multiplication form the left
-          typedef typename PretendType::VectorTypeL VectorTypeL;
-          /// Vector type accepted for multiplication form the right
-          typedef typename PretendType::VectorTypeR VectorTypeR;
-
-          /// Inherit base class constructors
-          using BaseClass::BaseClass;
-
-          /**
-           * \brief Returns a new compatible vector for left-multiplication
-           *
-           * \returns An empty left-vector
-           *
-           */
-          VectorTypeL create_vector_l() const
-          {
-            return VectorTypeL(this->rows());
-          }
-
-          /**
-           * \brief Returns a new compatible vector for right-multiplication
-           *
-           * \returns An empty right-vector
-           *
-           */
-          VectorTypeR create_vector_r() const
-          {
-            return VectorTypeR(this->columns());
-          }
-      };
-
       /// \cond internal
       /// Forward declarations
       template<typename>

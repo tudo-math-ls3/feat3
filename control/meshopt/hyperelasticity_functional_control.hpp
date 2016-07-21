@@ -10,6 +10,8 @@
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
 
+#include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
+
 #include <control/domain/domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_precond_factory.hpp>
@@ -80,7 +82,7 @@ namespace FEAT
           using LocalQualityFunctionalType = Hyperelasticity_<A, B, C, Trafo_>;
 
           /// Inter level transfer matrix
-          typedef TransferMatrixBlocked<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
+          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
 
           /// The system level type, holding all information about the nonlinear system of equations
           typedef MeshoptSystemLevel
