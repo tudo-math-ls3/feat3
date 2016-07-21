@@ -137,7 +137,7 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_rb_d(double(0.8),Index(40),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.33),Index(52),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_bs_d(double(0.33),Index(57),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 nlcg_s_hb_d(float(1),Index(14),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
@@ -502,5 +502,5 @@ ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFun
 alg_mincg_rb_d(double(0.8), Index(41), NLCGDirectionUpdate::DYHSHybrid);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_mincg_bs_d(double(0.33), Index(53), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_bs_d(double(0.33), Index(58), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAT_HAVE_ALGLIB
