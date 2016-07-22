@@ -609,6 +609,7 @@ namespace FEAT
           DataType best_sign(_orientation*Math::huge<DataType>());
 
           WorldPoint projected(DataType(0));
+          WorldPoint best_nu(DataType(0));
 
           // loop over all line segments
           for(Index i(0); (i+1) < Index(this->_vtx_ptr.size()); ++i)
@@ -623,12 +624,14 @@ namespace FEAT
 
             // compute squared distance to original point
             DataType my_distance_sqr(difference.norm_euclid_sqr());
+            WorldPoint nu(get_normal_on_segment(i, t));
 
             // If we have a point inside this segment we are happy and can leave
             if(my_distance_sqr <= Math::sqr(Math::eps<DataType>()))
             {
               best_distance_sqr = DataType(0);
-              best_sign = DataType(0);
+              best_nu = nu;
+              best_sign = -DataType(1);
               break;
             }
 
@@ -636,7 +639,6 @@ namespace FEAT
             if(_closed)
             {
               // Compute normal so we can compute the sign
-              WorldPoint nu(get_normal_on_segment(i, t));
               my_sign = Math::signum(Tiny::dot(nu, difference));
 
               // If the sign is 0, the projected point lies in the continuation of the current segment, meaning
@@ -668,28 +670,29 @@ namespace FEAT
             // Update the projection candidate iff it is the first segment, or the distance is lower. In the case
             // of a closed polyline, we only accept better points with a lower sign (once outside - always outside)
             // to avoid problems due to strongly varying normals
-            if(i == Index(0))
+            if(i == Index(0) || (my_distance_sqr <= best_distance_sqr))
             {
               best_distance_sqr = my_distance_sqr;
-              grad_dist = difference;
+              best_nu = nu;
               best_sign = my_sign;
-            }
-            else if ( (my_distance_sqr <= best_distance_sqr))
-            {
-              best_distance_sqr = my_distance_sqr;
               grad_dist = difference;
-              best_sign = my_sign;
             }
           }
 
-          // If the distance is too small, we set the gradient vector to zero because we cannot normalise it anyway
-          if(best_distance_sqr <= Math::sqr(Math::eps<DataType>()))
-            grad_dist.format(DataType(0));
+          // If the point was far enough away from the interface, we can normalise the difference vector
+          if(best_distance_sqr > Math::sqr(Math::eps<DataType>()))
+          {
+            ASSERT(best_sign != DataType(0));
+            grad_dist.normalise();
+            grad_dist *= -best_sign;
+          }
+          // If we are too close, we take the normal in the projected point. We do not ALWAYS do this because the
+          // projected point might be where the normal is discontinuous, but in this case it is ok.
           else
           {
+            grad_dist = DataType(-1)*best_nu;
             grad_dist.normalise();
-            if(best_sign != DataType(0))
-              grad_dist *= best_sign;
+            ASSERT(Math::abs(grad_dist.norm_euclid()-DataType(1)) < Math::eps<DataType>());
           }
 
           return best_sign*Math::sqrt(best_distance_sqr);
