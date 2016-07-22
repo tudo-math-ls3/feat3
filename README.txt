@@ -20,6 +20,13 @@ This will automagically detect a proper tool/setting setup and build all FEAT co
 To check if your system created a correct FEAT binary, you can run a set of unittests with the additional command
 ctest
 
+=== DOCUMENATION ===
+A comprehensive doxygen documentation is available in the doc/html folder, after issueing the
+make doc
+command ( do not forget the ./configure command, if not already configured).
+
+The tutorial folder contains some sample applications with extensive in code documentation.
+
 === ADDITIONAL SOFTWARE SUPPORT ===
 OpenMPI 1.8.5+
 MPICH 3.2+
@@ -29,4 +36,4 @@ Ninja 1.6+
 Valgrind 3.10+
 Score-P 1.4.2+
 
-Alglib, Fparser, Umfpack and Parmetis are downloaded and build automatically.
+Alglib, Fparser, Umfpack and Parmetis are downloaded and build automatically, when included in the configure flags.
