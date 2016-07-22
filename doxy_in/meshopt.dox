@@ -3,9 +3,9 @@
 
 \section basic_overview Basic overview
 
-The Meshopt namespace contains all tools for mesh optimisation and mesh smoothing. These two terms are used synonymously. The baseclass is \ref FEAT::Meshopt::MeshSmoother and shall be used for illustrational purposes in this section.
+The Meshopt namespace contains all tools for mesh optimisation (sometimes also called <i> mesh smoothing </i>). These two terms are used synonymously. The baseclass is \ref FEAT::Meshopt::MeshQualityFunctional and shall be used for illustrational purposes in this section.
 
-A MeshSmoother always refers to exactly one mesh, contains a reference to it and can modify exactly this mesh and nothing more. The main use cases are:
+A MeshQualityFunctional measures the quality of a mesh in some sense and can be used in conjuction with a (non-)linear solver to <i>optimise</i> the mesh by minimising the functional value. It always refers to exactly one mesh (through a FEAT::Geometry::RootMeshNode), contains a pointer to it and can modify exactly this mesh and nothing more. The main use cases are:
 
  -# The mesh is moving, where only the boundary movement is known (i.e. decoupled fluid-structure interactions, Navier Stokes with free capillary boundary etc.).
 
@@ -15,40 +15,37 @@ A MeshSmoother always refers to exactly one mesh, contains a reference to it and
   \f[ - \Delta u = 0 ~ \mathrm{in} ~ \Omega, u = u_D ~\mathrm{on}~ \partial \Omega \f]
   with finite element tools on the FE space the transformation is from, where \f$ u_D \f$ are the new boundary coordinates. The solution then contains the new vertex coordinates in the interiour.
 
-  This is also called Laplacian smoothing and is done by the \ref FEAT::Meshopt::LaplaceSmoother. The boundary coordinates \f$ u_D \f$ are then the trace of the FE function \f$ u \f$ on \f$ \partial \Omega \f$ and the solving of the above problem was the application of one possible inverse trace operator. The solution is also the minimiser of the harmonic energy on the space with the appropriate boundary values.
+  This is also called <i>Laplacian smoothing</i> and is nothing more than minimising the harmonic energy of the transformation which satisfies the appropriate boundary conditions. This is implemented in \ref FEAT::Meshopt::LaplaceFunctional. The boundary coordinates \f$ u_D \f$ are then the trace of the FE function \f$ u \f$ on \f$ \partial \Omega \f$ and the solving of the above problem was the application of one possible inverse trace operator. The solution is also the minimiser of the harmonic energy on the space with the appropriate boundary values.
 
  -# A given mesh is to be improved according to some quality measure.
 
   This quality measure needs to be a functional defined in terms geometric quantities. There are some regularity assumptions that need to hold, i.e. we need to be able to compute the first order derivatives with regard to the mesh vertices.
 
-  One example is \e r-adaptivity, where mesh vertices are moved so that the mesh's cells are smaller in a region of interest (also called mesh condensation). This is implemented in the \ref FEAT::Meshopt::RumpfSmootherLevelsetConcAnalytic class, which uses an explicitly given analytic levelset function to define the region of interest (i.e. a circle), a mesh concentration function which maps a distance to a desired cell volume and then minimises a highly nonlinear polyconvex energy functional to obtain an optimised mesh.
+  One example is \e r-adaptivity, where mesh vertices are moved so that the mesh's cells are smaller in a region of interest (also called mesh condensation). This is implemented in the \ref FEAT::Meshopt::HyperelasticityFunctional class, which makes use of the FEAT::Meshopt::MeshConcentrationFunction class for describing the desired cell size distribution over the domain. At the moment, this can be done by adding charts derived FEAT::Geometry::Atlas::ChartBase to the FEAT::Geometry::Atlas that is contained in the FEAT::Geometry::RootMeshNode in the quality functional, and using those to describe surfaces or boundaries. The distance to those boundaries can then be used in the FEAT::Meshopt::MeshConcentrationFunction to govern the desired cell size distribution.
 
  -# For a given mesh and an implicitly defined surface, mesh vertices/edges/faces are to be aligned to the surface
 
-  This is usually used in conjunction with a quality measure that makes sure the alignment does not lead to a deterioration of the mesh. This functionality is implemented i.e. in the class FEAT::Meshopt::RumpfSmootherLevelSet. How well this works depends on the shape type (\ref FEAT::Shape) of the mesh. Due to topological reasons, alignment to facets is possible for FEAT::Shape::Simplex, but not for FEAT::Shape::Hypercube, although alignment to mesh vertices is possible in that case.
+  This is usually used in conjunction with a quality measure that makes sure the alignment does not lead to a deterioration of the mesh. This functionality is implemented i.e. in the class FEAT::Meshopt::HyperelasticityFunctional. How well this works depends on the shape type (\ref FEAT::Shape) of the mesh. Due to topological reasons, alignment to facets is possible for FEAT::Shape::Simplex, but not for FEAT::Shape::Hypercube, although alignment to mesh vertices is possible in that case.
 
 These use cases are in no way disjoint: There are cases of moving meshes with an implicitly defined surface, to which the mesh needs to be aligned and also condensated near the surface, all while ensuring that the mesh does not deteriorate.
 
 \section workflow Workflow
 
-After using a suitable constructor to build a MeshSmoother, one usually has to call init(), which performs all one-time initialisations. A call to prepare() then prepares the MeshSmoother for its application to the mesh, which can be performed by then calling optimise(). In the case of nonlinear MeshSmoothers (i.e. FEAT::Meshopt::RumpfSmoother), prepare() needs to be called in each iteration. To illustrate this:
- - for FEAT::Meshopt::LaplaceSmoother (or any linear variational smoother), init() performs the symbolic assembly of the system matrix. prepare() performs the numeric assembly and thus needs to be called whenever the mesh changes
- - for FEAT::Meshopt::RumpfSmootherLevelsetConcAnalytic(), init() and prepare() perform the same operations, like evaluating the distance to the implicitly defined surface, computing the mesh concentration and from this, the target cell sizes.
+It is recommended to use all classes derived from MeshQualityFunctional through their respective <i>control classes</i> from the FEAT::Control::Meshopt namespace, namely FEAT::Control::Meshopt::DuDvFunctionalControl and FEAT::Control::Meshopt::HyperelasticityFunctionalControl. The easiest way to configure and use them is through configuration files which can be read at startup time to create FEAT::PropertyMap s, which can be used in the FEAT::Control::Meshopt::ControlFactory to create these objects at runtime. Their basic interface is made available through a FEAT::Control::Meshopt::MeshoptControlBase base class pointer and should be sufficient to access and use the underlying object. Examples of this can be found in the applications folder (i.e. meshopt_r_adapt-app, meshopt_boundary-app, meshopt_refinement-app), while the (more primitive) meshopt_hyperelasticity_resize-app uses the FEAT::Meshopt::HyperelasticityFunctional directly. The solver used by these objects are created using the FEAT::Control::MeshoptSolverFactory and the FEAT::Control::Meshopt::MeshoptPrecondFactory. Note that this makes heavy use of the classes from the FEAT::Control::Domain namespace.
 
-Every MeshSmoother has a copy of the mesh's coordinates calls \c _coords. This can be modified from outside (i.e. to set the boundary conditions \f$ u_D \f$) and is used in the mesh optimisation process. When optimise() finishes, this is copied back to the the underlying mesh, although in the case of nonlinear iterations (where terms have to be evaluated on the mesh returned by the last iteration) it can happen earlier.
+After creating a control object \c meshopt_ctrl from a Control::DomainControl, its \c prepare() function needs to be called before optimising the mesh by calling \c meshopt_ctrl->optimise().
+One can write the current mesh coordinates to the object's buffer using meshopt_ctrl->mesh_to_buffer() and get a reference to the buffer by meshopt_ctrl->get_coords(). One can call <c>auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep)</c>  to obtain a deep copy of the mesh's vertex coordinates, manipulate them, and then call \c meshopt_ctrl->prepare(old_coords) to prepare the functional.
+
+If we have a FEAT::Geometry::ExportVTK object for writing the date to a .vtu file, we can simply call \c meshopt_ctrl->add_to_vtk_exporter to add the relevant data to it. Refer to the class documentation for details.
 
 \section imp_classes Implemented classes
 
-Currently there are two main classes of MeshSmoothers:
- -# Linear variational mesh smoothers, which solve a linear PDE problem using finite elements, like
-  - FEAT::Meshopt::LaplaceSmoother
-  - FEAT::Meshopt::DuDvSmoother
+Currently there are two main classes of MeshQualityFunctionals:
+ -# Quadratic mesh quality functionals, for which a linear PDE problem is solved using finite elements. This only supports the computation of extension operators.
+  - FEAT::Meshopt::DuDvFunctional
 
- -# Rumpf smoothers, which minimise highly nonlinear polyconvex energy functionals, see \cite Rum96, like
-  - FEAT::Meshopt::RumpfSmoother
-  - FEAT::Meshopt::RumpfSmootherLevelset
-  - FEAT::Meshopt::RumpfSmootherLevelsetAnalytic
-  - FEAT::Meshopt::RumpfSmootherLevelsetConcAnalytic
+ -# Nonlinear functionals based on the polyconvex stored-energy functionals for hyperelastic materials, see \cite Rum96. These support computation of extension operators, \e r-adaptivity and \e mesh alignment.
+  - FEAT::Meshopt::HyperelasticityFunctional
 
 For more information on mesh optimisation, refer to \cite HR11.
 
