@@ -647,14 +647,14 @@ namespace FEAT
               // so the same situation will arise in the next iteration anyway.
               if(my_sign == DataType(0))
               {
-                if(Math::abs(t) < Math::eps<DataType>())
+                if(Math::abs(t) < Math::sqrt(Math::eps<DataType>()))
                 {
                   Index other_segment;
                   (i == Index(0)) ? other_segment = Index(this->_vtx_ptr.size()-2) : other_segment = i-Index(1);
                   WorldPoint other_nu(get_normal_on_segment(other_segment, DataType(1)));
                   my_sign = Math::signum(Tiny::dot(difference, other_nu));
                 }
-                else if(Math::abs(t - DataType(1)) < Math::eps<DataType>())
+                else if(Math::abs(t - DataType(1)) < Math::sqrt(Math::eps<DataType>()))
                 {
                   Index other_segment;
                   (i == Index(this->_vtx_ptr.size()-2)) ? other_segment = Index(0) : other_segment = i+Index(1);
@@ -667,10 +667,8 @@ namespace FEAT
               }
             }
 
-            // Update the projection candidate iff it is the first segment, or the distance is lower. In the case
-            // of a closed polyline, we only accept better points with a lower sign (once outside - always outside)
-            // to avoid problems due to strongly varying normals
-            if(i == Index(0) || (my_distance_sqr <= best_distance_sqr))
+            // Update the projection candidate iff it is the first segment, or the distance is lower
+            if(i == Index(0) || (my_distance_sqr < best_distance_sqr))
             {
               best_distance_sqr = my_distance_sqr;
               best_nu = nu;
@@ -682,7 +680,7 @@ namespace FEAT
           // If the point was far enough away from the interface, we can normalise the difference vector
           if(best_distance_sqr > Math::sqr(Math::eps<DataType>()))
           {
-            ASSERT(best_sign != DataType(0));
+            XASSERT(best_sign != DataType(0));
             grad_dist.normalise();
             grad_dist *= -best_sign;
           }
@@ -690,9 +688,10 @@ namespace FEAT
           // projected point might be where the normal is discontinuous, but in this case it is ok.
           else
           {
+            XASSERT(best_sign != DataType(0));
             grad_dist = DataType(-1)*best_nu;
             grad_dist.normalise();
-            ASSERT(Math::abs(grad_dist.norm_euclid()-DataType(1)) < Math::eps<DataType>());
+            XASSERT(Math::abs(grad_dist.norm_euclid()-DataType(1)) < Math::sqrt(Math::eps<DataType>()));
           }
 
           return best_sign*Math::sqrt(best_distance_sqr);
