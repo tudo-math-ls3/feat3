@@ -30,6 +30,28 @@ namespace FEAT
       template<typename>
       class DuDvFunctionalAssemblerLevel;
 
+      /**
+       * \brief Control class for DuDvFunctionals
+       *
+       * \tparam Mem_
+       * The memory architecture of the local DuDvFunctional
+       *
+       * \tparam DT_
+       * The floating point precision for the solver
+       *
+       * \tparam IT_
+       * Index type
+       *
+       * \tparam DomainControl_
+       * The domain control type this is based on
+       *
+       * \tparam Trafo_
+       * The mesh's underlying transformation. At the time of writing, there is only Trafo::Standard, which means
+       * P1/Q1 transformation.
+       *
+       * \author Jordi Paul
+       *
+       */
       template<typename Mem_, typename DT_, typename IT_, typename DomainControl_, typename Trafo_>
       class DuDvFunctionalControl
       : public MeshoptControlBase<DomainControl_, Trafo_>

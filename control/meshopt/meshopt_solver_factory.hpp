@@ -23,6 +23,9 @@ namespace FEAT
 {
   namespace Control
   {
+    /**
+     * \brief Wrapper class for routines creating linear and nonlinear solver for mesh optimisation
+     */
     struct MeshoptSolverFactory
     {
       private:

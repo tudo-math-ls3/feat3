@@ -47,6 +47,9 @@ namespace FEAT
        *
        * \note Local Hyperelastiticy functionals are only implemented for Mem::Main,
        * \see FEAT::Meshopt::HyperElasticityFunctionalBase
+       *
+       * \author Jordi Paul
+       *
        */
       template
       <

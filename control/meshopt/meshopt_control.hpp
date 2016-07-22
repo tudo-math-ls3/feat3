@@ -285,6 +285,17 @@ namespace FEAT
 
       }; // class MeshoptSystemLevel<...>
 
+      /**
+       * \brief Structures for transfering data between mesh levels
+       *
+       * \tparam SystemLevel_
+       * The system level type
+       *
+       * \tparam TransferMatrix_
+       * The transfer matrix type
+       *
+       *
+       */
       template<typename SystemLevel_, typename TransferMatrix_>
       class MeshoptTransferLevel
       {
@@ -305,6 +316,9 @@ namespace FEAT
           GlobalSystemTransferMatrix prol_sys, rest_sys;
 
         public:
+          /**
+           * \brief Constructor
+           */
           explicit MeshoptTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
             level_coarse(lvl_coarse),
             level_fine(lvl_fine),
@@ -313,6 +327,9 @@ namespace FEAT
             {
             }
 
+          /**
+           * \brief Virtual destructor
+           */
           virtual ~MeshoptTransferLevel()
           {
           }
