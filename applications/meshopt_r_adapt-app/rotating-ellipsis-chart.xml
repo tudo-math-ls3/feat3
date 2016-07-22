@@ -1,0 +1,23 @@
+<FeatMeshFile version="1">
+  <Info>
+   Chart for ellipsis approximated by Bezier splines
+  </Info>
+  <Chart name="rotating_ellipsis">
+    <Spline dim="2" size="5" type="closed" orientation="1">
+      <Points>
+        2 0.21875 0.50000 0.21875 0.31250 0.31250 0.12500
+        2 0.50000 0.12500 0.68750 0.12500 0.78125 0.31250
+        2 0.78125 0.50000 0.78125 0.68750 0.68750 0.87500
+        2 0.50000 0.87500 0.31250 0.87500 0.21875 0.68750
+        0 0.21875 0.50000
+      </Points>
+      <Params>
+        0
+        1
+        2
+        3
+        4
+      </Params>
+    </Spline>
+  </Chart>
+</FeatMeshFile>
