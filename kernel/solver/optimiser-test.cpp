@@ -131,22 +131,22 @@ class NLCGTest:
 };
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f(float(0.5),Index(12),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_hb_f(float(0.5),Index(13),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_rb_d(double(0.8),Index(40),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.33),Index(57),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_bs_d(double(0.33),Index(58),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_s_hb_d(float(1),Index(14),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
+nlcg_s_hb_d(float(0.9),Index(14),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_s_bs_d(double(0.19), Index(69), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
 
-NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_d(float(0.5), Index(35),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
+NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
+nlcg_nr_rb_d(double(0.5), Index(35),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_hessian_rb_d(double(1), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
@@ -496,7 +496,7 @@ class ALGLIBMinCGTest:
 };
 
 ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-alg_mincg_hb_f(float(0.6), Index(13), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_hb_f(float(0.6), Index(14), NLCGDirectionUpdate::DaiYuan);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 alg_mincg_rb_d(double(0.8), Index(41), NLCGDirectionUpdate::DYHSHybrid);
