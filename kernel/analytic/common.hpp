@@ -8,6 +8,7 @@
 
 // includes, system
 #include <initializer_list>
+#include <deque>
 #include <vector>
 
 namespace FEAT
@@ -1940,6 +1941,214 @@ namespace FEAT
        * \author Jordi Paul
        */
       using RosenbrockFunction = StaticWrapperFunction<2, RosenbrockStatic, true, true, true>;
+
+      /**
+       * \brief 2D Parabolic Profile function base-class
+       *
+       * This class represents a parabolic profile along a 2D line segment, which is given
+       * by the coordinates (x_0, y_0) and (x_1, y_1).
+       *
+       * More precisely: For a given point (x,y) let \f$ t\in(0,1) \f$ denote the interpolation
+       * parameter of the orthonal projection of (x,y) onto the line segment, then the
+       * parabolic profile function value is given by \f$4 v_{max} t (t-1)\f$.
+       *
+       * \author Peter Zajac
+       */
+      class ParProfileBase :
+        public Analytic::Function
+      {
+      public:
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+
+      protected:
+        // coordinates of line segment
+        Real _x0, _y0, _x1, _y1;
+        // maximum value
+        Real _vmax;
+
+      public:
+        /**
+         * \brief Default Constructor
+         *
+         * This constructor initialises a parabolic profile along the segment (0,0)-(0,1)
+         * with maximum value 1.
+         */
+        ParProfileBase() :
+          _x0(0.0), _y0(0.0), _x1(0.0), _y1(1.0), _vmax(1.0)
+        {
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] x0, y0
+         * Coordinates of the first segment point.
+         *
+         * \param[in] x1, y1
+         * Coordinates of the second segment point.
+         *
+         * \param[in] vmax
+         * Maximum value of the parabolic profile.
+         */
+        explicit ParProfileBase(Real x0, Real y0, Real x1, Real y1, Real vmax = Real(1.0)) :
+          _x0(x0), _y0(y0), _x1(x1), _y1(y1), _vmax(vmax)
+        {
+        }
+
+        /**
+         * \brief Parses the profile parameters from a string.
+         *
+         * This function can be used to parse the configuration for the parabolic profile
+         * from a string, which may e.g. be read from the command line or a text file.
+         *
+         * The supported syntax for the string is
+         * \f[(x_0 y_0 , x_1 y_1)\f]
+         * or
+         * \f[(x_0 y_0 , x_1 y_1 , v_{max})\f]
+         *
+         * \param[in] sbc
+         * The string to be parsed.
+         *
+         * \returns
+         * \c true, if the string was parsed successfully, otherwise \c false.
+         */
+        bool parse(const String& sbc)
+        {
+          auto li = sbc.find_first_of('(');
+          auto ri = sbc.find_last_of(')');
+          if((li == sbc.npos) || (ri == sbc.npos))
+            return false;
+
+          std::deque<String> sv, sv0, sv1;
+          sbc.substr(li+1, ri-li-1).split_by_charset(sv, ",");
+          if((sv.size() < std::size_t(2)) || (sv.size() > std::size_t(3)))
+            return false;
+
+          sv[0].trim().split_by_charset(sv0);
+          sv[1].trim().split_by_charset(sv1);
+          if(sv0.size() != std::size_t(2)) return false;
+          if(sv1.size() != std::size_t(2)) return false;
+
+          if(!sv0[0].parse(_x0)) return false;
+          if(!sv0[1].parse(_y0)) return false;
+          if(!sv1[0].parse(_x1)) return false;
+          if(!sv1[1].parse(_y1)) return false;
+
+          if((sv.size() == std::size_t(3)) && !sv.back().parse(_vmax))
+            return false;
+
+          return true;
+        }
+      }; // class ParProfileBase
+
+      /**
+       * \brief 2D Scalar Parabolic Profile function
+       *
+       * This class represents a scalar parabolic profile along a 2D line segment,
+       * which is given by the coordinates (x_0, y_0) and (x_1, y_1).
+       *
+       * \author Peter Zajac
+       */
+      class ParProfileScalar :
+        public ParProfileBase
+      {
+      public:
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+
+        using ParProfileBase::ParProfileBase;
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        protected:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+
+          PointType _vo, _ve;
+          DataType _den, _vmax;
+
+        public:
+          explicit Evaluator(const ParProfileScalar& function)
+          {
+            _vo[0] = DataType(function._x0);
+            _vo[1] = DataType(function._y0);
+            _ve[0] = DataType(function._x1 - function._x0);
+            _ve[1] = DataType(function._y1 - function._y0);
+            _den = DataType(1) / Tiny::dot(_ve, _ve);
+            _vmax = DataType(function._vmax);
+          }
+
+          void value(ValueType& val, const PointType& point)
+          {
+            // project point onto line segment
+            DataType x = Math::clamp(Tiny::dot(point - _vo, _ve) * _den, DataType(0), DataType(1));
+            // compute function value
+            val = _vmax * DataType(4) * x * (DataType(1) - x);
+          }
+        };
+      }; // class ParProfileScalar
+
+      /**
+       * \brief 2D Vector-Valued Parabolic Profile function
+       *
+       * This class represents a parabolic profile vector field along a 2D line segment,
+       * which is given by the coordinates (x_0, y_0) and (x_1, y_1).
+       *
+       * \author Peter Zajac
+       */
+      class ParProfileVector :
+        public ParProfileBase
+      {
+      public:
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Vector<2> ImageType;
+        static constexpr bool can_value = true;
+
+        using ParProfileBase::ParProfileBase;
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        protected:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+
+          PointType _vo, _ve, _vn;
+          DataType _den, _vmax;
+
+        public:
+          explicit Evaluator(const ParProfileVector& function)
+          {
+            _vo[0] = DataType(function._x0);
+            _vo[1] = DataType(function._y0);
+            _ve[0] = DataType(function._x1 - function._x0);
+            _ve[1] = DataType(function._y1 - function._y0);
+            _vn[0] =  _ve[1];
+            _vn[1] = -_ve[0];
+            _vn.normalise();
+            _den = DataType(1) / Tiny::dot(_ve, _ve);
+            _vmax = DataType(function._vmax);
+          }
+
+          void value(ValueType& val, const PointType& point)
+          {
+            // project point onto line segment
+            DataType x = Math::clamp(Tiny::dot(point - _vo, _ve) * _den, DataType(0), DataType(1));
+            // compute function value
+            DataType v = _vmax * DataType(4) * x * (DataType(1) - x);
+            val[0] = _vn[0] * v;
+            val[1] = _vn[1] * v;
+          }
+        };
+      }; // class ParProfileVector
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT
