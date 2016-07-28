@@ -496,6 +496,9 @@ for branch in branch_names:
   if is_found("icpc"):
     run_test("icc-debug" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
     run_test("icc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
+  if is_found("pgc++"):
+    run_test("pgi-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+    run_test("pgi-opt" + addition + quadmath_add, branch, myDB, extra_opts)
 
   if is_found("mpic++"):
     if is_found("g++"):
@@ -507,3 +510,6 @@ for branch in branch_names:
     if is_found("icpc"):
       run_test("mpi-icc-debug" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
       run_test("mpi-icc-opt" + lto + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
+    if is_found("pgc++"):
+      run_test("mpi-pgi-debug" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
+      run_test("mpi-pgi-opt" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
