@@ -421,7 +421,7 @@ namespace FEAT
         uint64_t count; // subvector count
         file.read((char *)&count, (long)(sizeof(uint64_t)));
         //if (count != num_blocks)
-        //  throw InternalError(__func__, __FILE__, __LINE__, "TupleVector file read in component count missmatch: class has " + stringify(num_blocks) + "- " + stringify(count) + " read in!");
+        //  throw InternalError(__func__, __FILE__, __LINE__, "TupleVector file read in component count mismatch: class has " + stringify(num_blocks) + "- " + stringify(count) + " read in!");
 
         _read_from_binary(file);
       }
@@ -816,7 +816,7 @@ namespace FEAT
         uint64_t count; // subvector count
         file.read((char *)&count, (long)(sizeof(uint64_t)));
         if (count != 1)
-          throw InternalError(__func__, __FILE__, __LINE__, "PowerVector file read in component count missmatch: class has 1 - " + stringify(count) + " read in!");
+          throw InternalError(__func__, __FILE__, __LINE__, "PowerVector file read in component count mismatch: class has 1 - " + stringify(count) + " read in!");
 
         _read_from_binary(file);
       }

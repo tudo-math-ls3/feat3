@@ -39,9 +39,9 @@ namespace FEAT
     class ScalarBasicSystemLevel
     {
     public:
-      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType missmatch!");
-      static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType missmatch!");
-      static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType missmatch!");
+      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType mismatch!");
+      static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType mismatch!");
+      static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType mismatch!");
 
       // basic types
       typedef MemType_ MemType;

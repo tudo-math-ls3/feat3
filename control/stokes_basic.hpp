@@ -51,9 +51,9 @@ namespace FEAT
       typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     struct StokesBasicSystemLevel
     {
-      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType missmatch!");
-      static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType missmatch!");
-      static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType missmatch!");
+      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType mismatch!");
+      static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType mismatch!");
+      static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType mismatch!");
 
       // basic types
       static constexpr int dim = dim_;

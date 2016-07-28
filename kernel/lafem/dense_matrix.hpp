@@ -425,9 +425,9 @@ namespace FEAT
 
       void multiply(DenseMatrix & x, DenseMatrix & y)
       {
-        XASSERTM(x.columns() == y.rows(), "dimension missmatch!");
-        XASSERTM(this->rows() == x.rows(), "dimension missmatch!");
-        XASSERTM(this->columns() == y.columns(), "dimension missmatch!");
+        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
+        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
+        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
 
         Arch::ProductMatMat<Mem_>::dense(this->elements(), x.elements(),
                                          y.elements(), this->rows(), this->columns(), x.columns());

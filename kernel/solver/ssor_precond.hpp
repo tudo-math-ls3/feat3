@@ -182,8 +182,8 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size missmatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size missmatch!");
+        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
@@ -298,8 +298,8 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size missmatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size missmatch!");
+        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 

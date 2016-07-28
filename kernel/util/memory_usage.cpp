@@ -52,7 +52,7 @@ namespace FEAT
           std::vector<String> v;
           line.split_by_charset(v);
           if (v.at(v.size()-1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.current_physical = std::stoul(v.at(v.size()-2));
           info.current_physical *= 1024;
           continue;
@@ -63,7 +63,7 @@ namespace FEAT
           std::vector<String> v;
           line.split_by_charset(v);
           if (v.at(v.size()-1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.peak_physical = std::stoul(v.at(v.size()-2));
           info.peak_physical *= 1024;
           continue;
@@ -74,7 +74,7 @@ namespace FEAT
           std::vector<String> v;
           line.split_by_charset(v);
           if (v.at(v.size()-1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.current_virtual = std::stoul(v.at(v.size()-2));
           info.current_virtual *= 1024;
           continue;
@@ -85,7 +85,7 @@ namespace FEAT
           std::vector<String> v;
           line.split_by_charset(v);
           if (v.at(v.size()-1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.peak_virtual = std::stoul(v.at(v.size()-2));
           info.peak_virtual *= 1024;
           continue;
@@ -96,7 +96,7 @@ namespace FEAT
           std::vector<String> v;
           line.split_by_charset(v);
           if (v.at(v.size()-1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.current_swap = std::stoul(v.at(v.size()-2));
           info.current_swap *= 1024;
           continue;
