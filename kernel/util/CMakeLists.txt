@@ -25,6 +25,11 @@ endif (FEAT_COTIRE)
 
 #link against mpi if available
 TARGET_LINK_LIBRARIES(kernel-util ${MPI_C_LIBRARIES})
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+  TARGET_LINK_LIBRARIES(kernel-util -lexecinfo)
+endif()
+
 if(MPI_C_COMPILE_FLAGS)
   set_target_properties(kernel-util PROPERTIES
     COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
