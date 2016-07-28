@@ -85,12 +85,13 @@ int run(Solver_& solver, Operator_& op)
   FunctionType my_function;
 
   solver->init();
-  solver->set_max_iter(100);
+  solver->set_max_iter(10000);
   solver->set_tol_fval(DataType(0));
   solver->set_tol_step(Math::eps<DataType>());
-  //solver->set_tol_abs(Math::eps<DataType>());
+  solver->set_tol_abs(Math::sqrt(Math::eps<DataType>()));
   solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
-  solver->set_tol_rel(Math::eps<DataType>());
+  //solver->set_tol_abs(Math::eps<DataType>());
+  //solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
   std::cout << "Using solver " << solver->get_formatted_solver_tree() << std::endl;
 
@@ -212,8 +213,6 @@ int run(Solver_& solver, Operator_& op)
   // Clean up
   delete mesh;
 
-  st = solver->correct(sol, rhs);
-
   // Print solver summary
   std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
   std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
@@ -302,6 +301,7 @@ int main(int argc, char* argv[])
   args.support("linesearch");
   args.support("precon");
   args.support("solver");
+  args.support("steplength");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
@@ -342,6 +342,16 @@ int main(int argc, char* argv[])
     {
       my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter);
       my_linesearch->set_max_iter(20);
+    }
+    else if(linesearch_name== "FixedStepLinesearch")
+    {
+      DataType steplength(1);
+      auto* steplength_pair(args.query("steplength"));
+
+      if(steplength_pair != nullptr)
+        steplength = DataType(std::stod(steplength_pair->second.front()));
+
+      my_linesearch = new_fixed_step_linesearch(my_op, my_filter, steplength);
     }
 
     // The default is no preconditioner
@@ -386,6 +396,16 @@ int main(int argc, char* argv[])
       my_linesearch = new_secant_linesearch(my_op, my_filter);
     else if(linesearch_name== "StrongWolfeLinesearch")
       my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter);
+    else if(linesearch_name== "FixedStepLinesearch")
+    {
+      DataType steplength(1);
+      auto* steplength_pair(args.query("steplength"));
+
+      if(steplength_pair != nullptr)
+        steplength = DataType(std::stod(steplength_pair->second.front()));
+
+      my_linesearch = new_fixed_step_linesearch(my_op, my_filter, steplength);
+    }
 
     // The default is no preconditioner
     String precon_name("none");

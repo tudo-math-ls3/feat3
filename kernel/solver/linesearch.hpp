@@ -274,6 +274,115 @@ namespace FEAT
     }; // class Linesearch
 
     /**
+     * \brief Fixed step line search
+     *
+     * This does not perform a line search, it just returns a constant step size
+     *
+     */
+    template<typename Operator_, typename Filter_>
+    class FixedStepLinesearch : public Linesearch<Operator_, Filter_>
+    {
+      public:
+        /// Filter type to be applied to the gradient of the operator
+        typedef Filter_ FilterType;
+        /// Input vector type for the operator's gradient
+        typedef typename Operator_::VectorTypeR VectorType;
+        /// Underlying floating point type
+        typedef typename Operator_::DataType DataType;
+        /// Our base class
+        typedef Linesearch<Operator_, Filter_> BaseClass;
+
+      private:
+        DataType _steplength;
+
+      public:
+        /**
+         * \brief Standard constructor
+         *
+         * \param[in, out] op_
+         * The (nonlinear) operator. Cannot be const because it saves its own state
+         *
+         * \param[in] filter_
+         * Filter to apply to the operator's gradient
+         *
+         * \param[in] keep_iterates
+         * Keep all iterates in a std::deque. Defaults to false.
+         *
+         */
+        explicit FixedStepLinesearch(Operator_& op_, Filter_& filter_, const DataType steplength_,
+        bool keep_iterates = false) :
+          BaseClass("FS-LS", op_, filter_, keep_iterates),
+          _steplength(steplength_)
+          {
+            this->set_max_iter(0);
+            this->_alpha_min = _steplength;
+          }
+
+        /// \copydoc ~BaseClass()
+        virtual ~FixedStepLinesearch()
+        {
+        }
+
+        /// \copydoc BaseClass::name()
+        virtual String name() const override
+        {
+          return "Fixed-Step-Linesearch";
+        }
+
+        /// \copydoc BaseClass::get_rel_update()
+        virtual DataType get_rel_update() override
+        {
+          return _steplength;
+        }
+
+        /**
+         * \brief Applies the solver, setting the initial guess to zero.
+         *
+         * \param[out] vec_cor
+         * Solution, gets zeroed
+         *
+         * \param[in] vec_dir
+         * Search direction
+         *
+         * \returns The solver status (success, max_iter, stagnated)
+         */
+        virtual Status apply(VectorType& vec_cor, const VectorType& vec_dir) override
+        {
+          // clear solution vector
+          vec_cor.format();
+          vec_cor.axpy(vec_dir, vec_cor, _steplength);
+
+          this->_op.prepare(vec_cor, this->_filter);
+
+          return Status::success;
+        }
+
+        /**
+         * \brief Applies the solver, making use of an initial guess
+         *
+         * \param[out] vec_sol
+         * Initial guess, gets overwritten by the solution
+         *
+         * \param[in] vec_dir
+         * Search direction
+         *
+         * \returns The solver status (success, max_iter, stagnated)
+         */
+        virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
+        {
+          vec_sol.axpy(vec_dir, vec_sol, _steplength);
+
+          this->_op.prepare(vec_sol, this->_filter);
+
+          this->_fval_min = this->_op.compute_func();
+          this->_op.compute_grad(this->_vec_grad);
+          this->_filter.filter_def(this->_vec_grad);
+
+          return Status::success;
+        }
+    }; // class FixedStepLinesearch
+
+    /**
      * \brief Newton Raphson linesearch
      *
      * \tparam Operator_
@@ -1532,6 +1641,31 @@ namespace FEAT
         }
 
     }; // class StrongWolfeLinesearch
+
+    /**
+     * \brief Creates a new FixedStepLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] steplength
+     * The step length the "line search" is to take
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new FixedStepLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<FixedStepLinesearch<Operator_, Filter_>> new_fixed_step_linesearch(
+      Operator_& op, Filter_& filter, typename Operator_::DataType steplength, bool keep_iterates = false)
+      {
+        return std::make_shared<FixedStepLinesearch<Operator_, Filter_>>(op, filter, steplength, keep_iterates);
+      }
 
     /**
      * \brief Creates a new NewtonRaphsonLinesearch object
