@@ -132,11 +132,6 @@ namespace FEAT
 
             if(_lbfgs_dim == alglib::ae_int_t(0))
               _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), _op.columns()));
-
-            // ALGLIB's optimiser only know an absolute tolerance. We usually want to work with a relative one, which
-            // is done through minlbfgsrequesttermination() from the _log callback function. So we set tol_abs to
-            // zero, which can be overwritten with the set_tol_abs function of this class.
-            set_tol_abs(DataType(0));
           }
 
         /**
@@ -593,10 +588,6 @@ namespace FEAT
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
 
-            // ALGLIB's optimiser only know an absolute tolerance. We usually want to work with a relative one, which
-            // is done through mincgrequesttermination() from the _log callback function. So we set tol_abs to zero,
-            // which can be overwritten with the set_tol_abs function of this class.
-            set_tol_abs(DataType(0));
           }
 
         /**
