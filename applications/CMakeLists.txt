@@ -19,6 +19,7 @@ SET (app_list
   #  foundation_global_ops_synch_scal_test-app
   foundation_psystem_test-app
   meshopt_hyperelasticity_resize-app
+  navier_stokes_cp2d_q2q1
   parti_poisson_dirichlet_2d
   poisson_dirichlet_2d
   poisson_neumann_2d
