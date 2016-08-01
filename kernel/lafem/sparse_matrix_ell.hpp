@@ -1900,7 +1900,13 @@ namespace FEAT
        */
       void transpose(const SparseMatrixELL & x)
       {
-        SparseMatrixELL<Mem::Main, DT_, IT_> tx;
+        SparseMatrixCSR<Mem::Main, DT_, IT_> t;
+        t.convert(x);
+        t = t.transpose();
+        this->convert(t);
+
+        /// \todo fix and use broken ell transpose (current result not usable by apply methods)
+        /*SparseMatrixELL<Mem::Main, DT_, IT_> tx;
         tx.convert(x);
 
         const Index txrows(tx.rows());
@@ -1968,7 +1974,7 @@ namespace FEAT
         }
 
         SparseMatrixELL<Mem::Main, DT_, IT_> t(txcolumns, txrows, txused_elements, tval, tcol_ind, tcs, tcl, trl, tC);
-        this->assign(t);
+        this->assign(t);*/
       }
 
       /**
