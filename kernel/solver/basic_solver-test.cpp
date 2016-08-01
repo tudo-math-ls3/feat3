@@ -20,6 +20,7 @@
 #include <kernel/solver/spai_precond.hpp>
 #include <kernel/solver/matrix_precond.hpp>
 #include <kernel/solver/pcgnr.hpp>
+#include <kernel/solver/pcgnrilu.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -202,6 +203,12 @@ public:
       PCGNR<MatrixType, FilterType> solver(matrix, filter, precon_l, precon_r);
       test_solver("PCGNR-JAC-JAC", solver, vec_sol, vec_ref, vec_rhs, 43);
     }
+
+    // test PCGNRILU
+    {
+      PCGNRILU<MatrixType, FilterType> solver(matrix, filter, 0);
+      test_solver("PCGNRILU", solver, vec_sol, vec_ref, vec_rhs, 31);
+    }
   }
 };
 
@@ -344,6 +351,14 @@ public:
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
+
+    // test PCGNR-Jac-Jac
+    {
+      auto precon_l = Solver::new_jacobi_precond(matrix, filter);
+      auto precon_r = Solver::new_jacobi_precond(matrix, filter);
+      PCGNR<MatrixType, FilterType> solver(matrix, filter, precon_l, precon_r);
+      test_solver("PCGNR-JAC-JAC", solver, vec_sol, vec_ref, vec_rhs, 43);
     }
 
 #ifdef FEAT_HAVE_CUSOLVER
