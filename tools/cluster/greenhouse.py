@@ -24,7 +24,7 @@ for i in range(1, 5):
     f.write("mpirun -np " + str(i*16) + " --map-by node ~/feat/trunk/applications/poisson_dirichlet_2d  --level " +  str(9) + " 3 --part_min_elems 500" + os.linesep)
 
   #sbatch
-  subprocess.call(["cat", "temp"])
+  subprocess.call(["qsub", "temp"])
   time.sleep(1)
 
 os.remove("temp")
