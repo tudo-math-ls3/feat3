@@ -720,6 +720,9 @@ namespace FEAT
       typedef SparseMatrixCSR<Mem_, DT_, IT_> MirrorMatrixType;
 
       /// corresponding vector
+      typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> VectorType;
+
+      /// our buffer vector type
       typedef DenseVector<Mem_, DT_, IT_> BufferVectorType;
 
     protected:
@@ -836,7 +839,7 @@ namespace FEAT
       /**
        * \brief Creates a new buffer vector.
        */
-       BufferVectorType create_buffer_vector() const
+      BufferVectorType create_buffer_vector() const
       {
         return BufferVectorType(Index(BlockSize)*_mirror_gather.rows(), false);
       }
@@ -844,7 +847,7 @@ namespace FEAT
       /**
        * \brief Creates a new (local) vector.
        */
-      DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>create_vector() const
+      DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> create_vector() const
       {
         return DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>(_mirror_gather.columns());
       }
