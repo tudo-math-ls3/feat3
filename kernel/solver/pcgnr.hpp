@@ -342,12 +342,12 @@ namespace FEAT
     inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter)
     {
-      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, nullptr);
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter);
     }
     template<typename Matrix_, typename Filter_, typename PrecondL_, typename PrecondR_>
     inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<PrecondL_> precond_l)
+      std::shared_ptr<PrecondL_> precond_l,
       std::shared_ptr<PrecondR_> precond_r)
     {
       return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
