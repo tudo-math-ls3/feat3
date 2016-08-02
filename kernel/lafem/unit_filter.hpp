@@ -37,6 +37,10 @@ namespace FEAT
       /// our supported vector type
       typedef DenseVector<MemType, DataType, IndexType> VectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using FilterType = class UnitFilter<Mem2_, DT2_, IT2_>;
+
     private:
       /// SparseVector, containing all entries of the unit filter
       SparseVector<Mem_, DT_, IT_> _sv;

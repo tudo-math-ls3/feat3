@@ -36,6 +36,10 @@ namespace FEAT
       /// our supported vector type
       typedef DenseVector<MemType, DataType, IndexType> VectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DataType_, typename IT2_ = IndexType_>
+      using FilterType = class NoneFilter<Mem2_, DT2_, IT2_>;
+
       /// \brief Creates a (empty) clone of itself
       NoneFilter clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
       {
