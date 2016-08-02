@@ -169,7 +169,7 @@ namespace FEAT
               // trial function loop
               for(int j(0); j < num_loc_pres_dofs; ++j)
               {
-                const DataType pv = -trafo_data.jac_det * cubature_rule.get_weight(pt) * pres_data.phi[j].value;
+                const DataType pv = trafo_data.jac_det * cubature_rule.get_weight(pt) * pres_data.phi[j].value;
 
                 // dimension loop
                 for(int k(0); k < dim_; ++k)
