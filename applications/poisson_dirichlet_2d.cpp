@@ -287,8 +287,30 @@ namespace PoissonDirichlet2D
       std::cout<<"Solving linear system..."<<std::endl;
     }
 
-    // retrieve solver
-    auto solver = scalar_solver.create_default_solver();
+    //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
+    auto mgv = std::make_shared<
+      Solver::BasicVCycle<
+      typename decltype(scalar_solver)::GlobalSystemMatrixSolve,
+      typename decltype(scalar_solver)::GlobalSystemFilterSolve,
+      typename decltype(scalar_solver)::TransferLevelTypeSolve::GlobalSystemTransferMatrix
+        > >();
+
+    auto coarse_precond = Solver::new_jacobi_precond(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, 0.7);
+    auto coarse_solver = Solver::new_richardson(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, 1.0, coarse_precond);
+    coarse_solver->set_min_iter(4);
+    coarse_solver->set_max_iter(4);
+    mgv->set_coarse_level(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, coarse_solver);
+
+    auto jt = scalar_solver.get_transfer_levels_solve().begin();
+    for (auto it = ++scalar_solver.get_system_levels_solve().begin(); it != scalar_solver.get_system_levels_solve().end(); ++it, ++jt)
+    {
+      auto jac_smoother = Solver::new_jacobi_precond((*it)->matrix_sys, (*it)->filter_sys, 0.7);
+      auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);
+      smoother->set_min_iter(4);
+      smoother->set_max_iter(4);
+      mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
+    }
+    auto solver = Solver::new_pcg(scalar_solver.get_system_levels_solve().back()->matrix_sys, scalar_solver.get_system_levels_solve().back()->filter_sys, mgv);
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -305,7 +327,8 @@ namespace PoissonDirichlet2D
     TimeStamp at;
 
     // solve
-    Solver::Status result = scalar_solver.solve();
+    auto result = Solver::solve(*solver, scalar_solver.get_vec_sol_solve(), scalar_solver.get_vec_rhs_solve(), scalar_solver.get_system_levels_solve().back()->matrix_sys,
+        scalar_solver.get_system_levels_solve().back()->filter_sys);
 
     if (!Solver::status_success(result))
     {

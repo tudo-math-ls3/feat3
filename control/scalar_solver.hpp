@@ -359,7 +359,6 @@ namespace FEAT
 
 
       private:
-        std::shared_ptr<Solver::SolverBase<GlobalSystemVectorSolve> > _solver;
         std::deque<SystemLevelTypeSolve*> _system_levels_solve;
         std::deque<TransferLevelTypeSolve*> _transfer_levels_solve;
 
@@ -382,8 +381,7 @@ namespace FEAT
          * \param[in] vec_rhs The assembled right hand side
          */
         explicit ScalarSolver(std::deque<SystemLevelType_*> & system_levels, std::deque<TransferLevelType_*> & transfer_levels,
-          typename SystemLevelType_::GlobalSystemVector & vec_sol, typename SystemLevelType_::GlobalSystemVector & vec_rhs) :
-          _solver(nullptr)
+          typename SystemLevelType_::GlobalSystemVector & vec_sol, typename SystemLevelType_::GlobalSystemVector & vec_rhs)
         {
           for (Index i(0); i < system_levels.size(); ++i)
           {
@@ -424,65 +422,6 @@ namespace FEAT
           return t;
         }*/
 
-        /// Returns an already created solver, or nullptr
-        std::shared_ptr<Solver::SolverBase<GlobalSystemVectorSolve> > operator*()
-        {
-          return _solver;
-        }
-
-        /**
-         * \brief Retrieve our solver pointer
-         *
-         * \note The solver will be created the first time this method is called.
-         * \note The user is responsible to call init and done methods of the solver object where necessary.
-         */
-        std::shared_ptr<Solver::IterativeSolver<GlobalSystemVectorSolve> > create_default_solver()
-        {
-          if (_solver == nullptr)
-          {
-              //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
-              auto mgv = std::make_shared<
-                Solver::BasicVCycle<
-                GlobalSystemMatrixSolve,
-                GlobalSystemFilterSolve,
-                typename TransferLevelTypeSolve::GlobalSystemTransferMatrix
-              > >();
-
-              auto coarse_precond = Solver::new_jacobi_precond(_system_levels_solve.front()->matrix_sys, _system_levels_solve.front()->filter_sys, 0.7);
-              auto coarse_solver = Solver::new_richardson(_system_levels_solve.front()->matrix_sys, _system_levels_solve.front()->filter_sys, 1.0, coarse_precond);
-              coarse_solver->set_min_iter(4);
-              coarse_solver->set_max_iter(4);
-              mgv->set_coarse_level(_system_levels_solve.front()->matrix_sys, _system_levels_solve.front()->filter_sys, coarse_solver);
-
-              auto jt = _transfer_levels_solve.begin();
-              for (auto it = ++_system_levels_solve.begin(); it != _system_levels_solve.end(); ++it, ++jt)
-              {
-                auto jac_smoother = Solver::new_jacobi_precond((*it)->matrix_sys, (*it)->filter_sys, 0.7);
-                auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);
-                smoother->set_min_iter(4);
-                smoother->set_max_iter(4);
-                mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
-              }
-              auto solver = Solver::new_pcg(_system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys, mgv);
-              _solver = solver;
-              return solver;
-          }
-          else
-            throw InternalError(__func__, __FILE__, __LINE__, "cannot create solver object twice!");
-        }
-
-        /**
-         * \brief Create solver tree based on PropertyMap
-         *
-         * \param[in] pmbase A pointer to the PropertyMap that contains all solver related informations
-         * \param[in] pmbase_name The name of the solver tree's root section
-         */
-        std::shared_ptr<Solver::SolverBase<GlobalSystemVectorSolve> > create_solver(PropertyMap * pmbase, String pmbase_name)
-        {
-          _solver = Control::SolverFactory::create_scalar_solver(_system_levels_solve, _transfer_levels_solve, pmbase, pmbase_name);
-          return _solver;
-        }
-
         /// Retrieve system_levels_solve
         std::deque<SystemLevelTypeSolve*> & get_system_levels_solve()
         {
@@ -505,15 +444,6 @@ namespace FEAT
         GlobalSystemVectorSolve & get_vec_rhs_solve()
         {
           return _vec_rhs_solve;
-        }
-
-        /// execute the instances own solver
-        Solver::Status solve()
-        {
-          if (_solver)
-            return Solver::solve(*_solver, _vec_sol_solve, _vec_rhs_solve, _system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys);
-          else
-            throw InternalError(__func__, __FILE__, __LINE__, "calling solve with no solver allocated!");
         }
 
     }; // ScalarSolver
