@@ -333,55 +333,55 @@ namespace FEAT
       {
       }
 
-      /// \copydocy MultiGridLevelBase::get_system_matrix()
+      /// \copydoc MultiGridLevelBase::get_system_matrix()
       virtual const SystemMatrixType& get_system_matrix() const override
       {
         return system_matrix;
       }
 
-      /// \copydocy MultiGridLevelBase::get_system_filter()
+      /// \copydoc MultiGridLevelBase::get_system_filter()
       virtual const SystemFilterType& get_system_filter() const override
       {
         return system_filter;
       }
 
-      /// \copydocy MultiGridLevelBase::get_prol_operator()
+      /// \copydoc MultiGridLevelBase::get_prol_operator()
       virtual const ProlOperatorType* get_prol_operator() const override
       {
         return prol_operator;
       }
 
-      /// \copydocy MultiGridLevelBase::get_rest_operator()
+      /// \copydoc MultiGridLevelBase::get_rest_operator()
       virtual const RestOperatorType* get_rest_operator() const override
       {
         return rest_operator;
       }
 
-      /// \copydocy MultiGridLevelBase::get_coarse_solver()
+      /// \copydoc MultiGridLevelBase::get_coarse_solver()
       virtual std::shared_ptr<SolverType> get_coarse_solver() override
       {
         return coarse_solver;
       }
 
-      /// \copydocy MultiGridLevelBase::get_smoother_pre()
+      /// \copydoc MultiGridLevelBase::get_smoother_pre()
       virtual std::shared_ptr<SolverType> get_smoother_pre() override
       {
         return smoother_pre;
       }
 
-      /// \copydocy MultiGridLevelBase::get_smoother_post()
+      /// \copydoc MultiGridLevelBase::get_smoother_post()
       virtual std::shared_ptr<SolverType> get_smoother_post() override
       {
         return smoother_post;
       }
 
-      /// \copydocy MultiGridLevelBase::get_smoother_peak()
+      /// \copydoc MultiGridLevelBase::get_smoother_peak()
       virtual std::shared_ptr<SolverType> get_smoother_peak() override
       {
         return smoother_peak;
       }
 
-      /// \copydocy MultiGridLevelBase::get_alpha_adaptive_coarse_correction()
+      /// \copydoc MultiGridLevelBase::get_alpha_adaptive_coarse_correction()
       virtual typename BaseClass::SystemMatrixType::DataType get_alpha_adaptive_coarse_correction() override
       {
         return alpha_adaptive_coarse_correction;
