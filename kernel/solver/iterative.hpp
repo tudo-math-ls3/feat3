@@ -553,6 +553,7 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
+      /// \copydoc BaseClass::get_formatted_solver_tree()
       virtual String get_formatted_solver_tree() const override
       {
         String result;

@@ -257,7 +257,7 @@ namespace FEAT
           return "NLCG";
         }
 
-        /// \copydoc BaseClass::get_formatted_solver_tree()
+        /// \copydoc Solver::Base::get_formatted_solver_tree()
         virtual String get_formatted_solver_tree() const override
         {
           String result(name());
@@ -368,9 +368,9 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
-          /// p[k+1] <- r[k+1] + _beta * p[k+1]
+          // p[k+1] <- r[k+1] + _beta * p[k+1]
           DataType beta;
-          /// eta[k] = <r[k], p[k]>
+          // eta[k] = <r[k], p[k]>
           DataType eta;
           // Reset member variables in the LineSearch
           _linesearch->reset();
@@ -693,7 +693,7 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          *
-         * \returns The new \$f \beta_{DY}\f$
+         * \returns The new \f$ \beta_{DY}\f$
          */
         DataType dai_yuan(const DataType gamma) const
         {
@@ -722,7 +722,7 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          *
-         * \returns The new \$f \beta_{DYHS}\f$
+         * \returns The new \f$ \beta_{DYHS}\f$
          */
         DataType dy_hs_hybrid(const DataType gamma) const
         {
@@ -757,7 +757,7 @@ namespace FEAT
          *   \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
          * \f]
          *
-         * \returns The new \$f \beta_{FR}\f$
+         * \returns The new \f$ \beta_{FR}\f$
          */
         DataType fletcher_reeves(const DataType gamma, const DataType gamma_prev) const
         {
@@ -792,7 +792,7 @@ namespace FEAT
          * \warning This update strategy needs more precision in the linesearch than all others and is not very
          * efficient in the current implementation. This serves more as a starting point for further improvement.
          *
-         * \returns The new \$f \beta_{HZ}\f$
+         * \returns The new \f$ \beta_{HZ}\f$
          */
         DataType hager_zhang(const DataType gamma) const
         {
@@ -831,7 +831,7 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          *
-         * \returns The new \$f \beta_{HS}\f$
+         * \returns The new \f$ \beta_{HS}\f$
          */
         DataType hestenes_stiefel() const
         {
@@ -856,7 +856,7 @@ namespace FEAT
          *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
          * \f}
          *
-         * \returns The new \$f \beta_{PRP+}\f$
+         * \returns The new \f$ \beta_{PRP+}\f$
          */
         DataType polak_ribiere(const DataType gamma_prev) const
         {
