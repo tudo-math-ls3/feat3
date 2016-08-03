@@ -17,13 +17,13 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/precon_wrapper.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
+#include <kernel/solver/multigrid.hpp>
 #include <kernel/util/mpi_cout.hpp>
 
 #include <control/domain/partitioner_domain_control.hpp>
@@ -288,10 +288,11 @@ namespace PoissonDirichlet2D
     }
 
     //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
-    auto mgv = std::make_shared<
-      Solver::BasicVCycle<
+    auto multigrid_hierarchy = std::make_shared<
+      Solver::MultiGridHierarchy<
       typename decltype(scalar_solver)::GlobalSystemMatrixSolve,
       typename decltype(scalar_solver)::GlobalSystemFilterSolve,
+      typename decltype(scalar_solver)::TransferLevelTypeSolve::GlobalSystemTransferMatrix,
       typename decltype(scalar_solver)::TransferLevelTypeSolve::GlobalSystemTransferMatrix
         > >();
 
@@ -299,7 +300,7 @@ namespace PoissonDirichlet2D
     auto coarse_solver = Solver::new_richardson(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, 1.0, coarse_precond);
     coarse_solver->set_min_iter(4);
     coarse_solver->set_max_iter(4);
-    mgv->set_coarse_level(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, coarse_solver);
+    multigrid_hierarchy->push_level(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, coarse_solver);
 
     auto jt = scalar_solver.get_transfer_levels_solve().begin();
     for (auto it = ++scalar_solver.get_system_levels_solve().begin(); it != scalar_solver.get_system_levels_solve().end(); ++it, ++jt)
@@ -308,9 +309,12 @@ namespace PoissonDirichlet2D
       auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);
       smoother->set_min_iter(4);
       smoother->set_max_iter(4);
-      mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
+      multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother, smoother);
     }
+    multigrid_hierarchy->init();
+    auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
     auto solver = Solver::new_pcg(scalar_solver.get_system_levels_solve().back()->matrix_sys, scalar_solver.get_system_levels_solve().back()->filter_sys, mgv);
+
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -342,6 +346,7 @@ namespace PoissonDirichlet2D
 
     // release solver
     solver->done();
+    multigrid_hierarchy->done();
 
     // download solution
     vec_sol.convert(&system_levels.back()->gate_sys, scalar_solver.get_vec_sol_solve());
