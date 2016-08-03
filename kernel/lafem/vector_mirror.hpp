@@ -833,7 +833,7 @@ namespace FEAT
        */
       Index size() const
       {
-        return _mirror_gather.rows();
+        return Index(BlockSize)*_mirror_gather.rows();
       }
 
       /**
