@@ -48,9 +48,8 @@ int main(int argc, char ** argv)
     SparseMatrixCSR<Mem::Main, double, Index> best;
     best.clone(orig, CloneMode::Deep);
 
-    auto csr = orig.clone(CloneMode::Deep);
     Permutation perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_default);
-    csr = orig.clone(CloneMode::Deep);
+    auto csr = orig.clone(CloneMode::Deep);
     csr.permute(perm, perm);
     Index test_radius;
     Index test_radius_index;

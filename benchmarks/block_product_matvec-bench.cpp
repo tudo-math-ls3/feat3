@@ -108,7 +108,7 @@ void run()
     DenseVectorBlocked<Mem::Main, DT_, IT_, Blocksize_> bmain(size);
     for (Index i (0) ; i < bmain.size() ; ++i)
     {
-      auto temp = bmain(i);
+      typename std::remove_const<decltype(bmain(i))>::type  temp;
       temp = DT_(i%100) / DT_(100);
       bmain(i, temp);
     }

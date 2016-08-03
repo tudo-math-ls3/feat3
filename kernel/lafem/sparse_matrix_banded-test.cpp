@@ -170,7 +170,7 @@ public:
   {
   }
 
-  SparseMatrixBandedApplyTest(const Index opt)
+  explicit SparseMatrixBandedApplyTest(const Index opt)
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedApplyTest: "
                                             + stringify(opt) + " offsets"), _opt(opt)
   {
