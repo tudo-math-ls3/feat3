@@ -1389,13 +1389,13 @@ namespace FEAT
           // <<<<< DEBUG <<<<<
 
           // prolongate to current peak-level without post-smoothing
-          this->_apply_prol(peak_lvl, false);
+          this->_apply_prol(Index(peak_lvl), false);
 
           // apply peak-smoother
-          this->_apply_smooth_peak(peak_lvl);
+          this->_apply_smooth_peak(Index(peak_lvl));
 
           // restrict from current peak-level without pre-smoothing
-          this->_apply_rest(peak_lvl, false);
+          this->_apply_rest(Index(peak_lvl), false);
 
           // solve coarse level
           this->_apply_coarse();
