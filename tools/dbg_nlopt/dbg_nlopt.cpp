@@ -93,7 +93,6 @@ int run(Solver_& solver, Operator_& op)
   //solver->set_tol_abs(Math::eps<DataType>());
   //solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
-  std::cout << "Using solver " << solver->get_formatted_solver_tree() << std::endl;
 
   // This will hold the solution
   auto sol = op.create_vector_r();
@@ -214,6 +213,7 @@ int run(Solver_& solver, Operator_& op)
   delete mesh;
 
   // Print solver summary
+  std::cout << std::endl << "Using solver " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
   std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
   std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
   std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;

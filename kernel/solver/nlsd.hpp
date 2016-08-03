@@ -151,18 +151,6 @@ namespace FEAT
           return "NLSD";
         }
 
-        /// \copydoc BaseClass::get_formatted_solver_tree()
-        virtual String get_formatted_solver_tree() const override
-        {
-          String result(name());
-          result += "( "+_linesearch->get_formatted_solver_tree();
-          if(_precond != nullptr)
-            result += " "+_precond->get_formatted_solver_tree();
-          result += " )";
-          return result;
-        }
-
-
         /**
          * \brief Sets the tolerance for function value improvement
          *
@@ -246,6 +234,8 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
           // Reset member variables in the LineSearch
           _linesearch->reset();
 
@@ -255,7 +245,10 @@ namespace FEAT
           // compute initial defect
           Status status = this->_set_initial_defect(this->_vec_r, vec_sol);
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           this->_fval = this->_op.compute_func();
           // The first direction has to be the steepest descent direction
@@ -264,7 +257,10 @@ namespace FEAT
           // apply preconditioner to defect vector
           //if(!this->_apply_precond(this->_vec_tmp, this->_vec_r, this->_filter))
           if(!this->_apply_precond(this->_vec_p, this->_vec_r, this->_filter))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           // Compute initial eta = <d, r>
           DataType eta(this->_vec_p.dot(this->_vec_r));
@@ -304,7 +300,10 @@ namespace FEAT
             status = this->_set_new_defect(this->_vec_r, vec_sol);
 
             if(status != Status::progress)
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
               return status;
+            }
 
             // Re-assemble preconditioner if necessary
             if(this->_precond != nullptr)
@@ -312,7 +311,10 @@ namespace FEAT
 
             // apply preconditioner
             if(!this->_apply_precond(_vec_p, _vec_r, this->_filter))
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
 
             // Compute new eta
             eta = this->_vec_p.dot(this->_vec_r);
@@ -326,6 +328,7 @@ namespace FEAT
           }
 
           // We should never come to this point
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
           return Status::undefined;
         }
 
@@ -357,7 +360,10 @@ namespace FEAT
 
           // compute new defect
           if(calc_def)
+          {
             this->_def_cur = this->_calc_def_norm(vec_r, vec_sol);
+            Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
+          }
 
           //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 

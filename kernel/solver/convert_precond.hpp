@@ -92,19 +92,6 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formatted_solver_tree() const override
-      {
-        String result;
-        result += this->name();
-        if(_inner_solver)
-        {
-          result += " ( ";
-          result += _inner_solver->get_formatted_solver_tree();
-          result += " ) ";
-        }
-        return result;
-      }
-
       virtual Status apply(VectorTypeOuter& vec_cor, const VectorTypeOuter& vec_def) override
       {
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
@@ -207,19 +194,6 @@ namespace FEAT
         if(_inner_solver)
           _inner_solver->done_symbolic();
         BaseClass::done_symbolic();
-      }
-
-      virtual String get_formatted_solver_tree() const override
-      {
-        String result;
-        result += this->name();
-        if(_inner_solver)
-        {
-          result += " ( ";
-          result += _inner_solver->get_formatted_solver_tree();
-          result += " ) ";
-        }
-        return result;
       }
 
       virtual Status apply(VectorTypeOuter& vec_cor, const VectorTypeOuter& vec_def) override

@@ -96,14 +96,6 @@ namespace FEAT
           return "QPenalty";
         }
 
-        /// \copydoc BaseClass::get_formatted_solver_tree()
-        virtual String get_formatted_solver_tree() const override
-        {
-          String result(name());
-          result += " ( "+_inner_solver->get_formatted_solver_tree()+" )";
-          return result;
-        }
-
         /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
         {
@@ -157,6 +149,8 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
           const Index inner_iter_digits(Math::ilog10(_inner_solver->get_max_iter()));
 
           DataType penalty_param(1);
@@ -175,7 +169,10 @@ namespace FEAT
 
             Status inner_st(_inner_solver->correct(vec_sol, vec_rhs));
             if(inner_st == Status::aborted)
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
 
             // After the inner solver was called, the constraint is already there so we can just get() it
             this->_def_cur = _op.get_constraint();
@@ -196,35 +193,54 @@ namespace FEAT
 
             // ensure that the defect is neither NaN nor infinity
             if(!Math::isfinite(this->_def_cur))
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
 
             // is diverged?
             if(this->is_diverged())
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::diverged, this->get_num_iter()));
               return Status::diverged;
+            }
 
             // minimum number of iterations performed?
             if(this->_num_iter < this->_min_iter)
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::progress, this->get_num_iter()));
               return Status::progress;
+            }
 
             // maximum number of iterations performed?
             if(this->_num_iter >= this->_max_iter)
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::max_iter, this->get_num_iter()));
               return Status::max_iter;
+            }
 
             // Check for convergence
             if(this->is_converged())
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
+            }
 
             // Increment for the penalty factor by at least factor 5, very arbitrary
             penalty_param = DataType(5)*Math::sqr(penalty_param)
               *Math::max(Math::sqr( def_old/this->_def_cur),DataType(1));
 
             if(penalty_param >= _tol_penalty)
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
               return Status::stagnated;
+            }
 
             _op.set_penalty_param(penalty_param);
           }
 
           // We should never come to this point
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
           return Status::undefined;
         }
 
@@ -250,6 +266,7 @@ namespace FEAT
         //Statistics::add_solver_defect(this->_branch, double(this->_def_init));
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
+        Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
         // plot?
         if(this->_plot)

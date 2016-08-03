@@ -174,10 +174,10 @@ template
       nullptr*/); // no preconditioner
 
     solver->init();
-    std::cout << "Using solver " << solver->get_formatted_solver_tree() << std::endl;
     solver->set_plot(true);
     solver->correct(new_coords, rhs);
     solver->done();
+    std::cout << std::endl << "Using solver: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
 
     fval = rumpflpumpfl.compute_func_cellwise(func_norm, func_det, func_rec_det);
     std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;

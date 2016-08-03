@@ -497,6 +497,8 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& sol, const VectorType& dir)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
           Status status(Status::progress);
           this->_num_iter = Index(0);
 
@@ -580,12 +582,16 @@ namespace FEAT
             if(status != Status::progress)
             {
               sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
-              return status;
+              {
+                Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
+                return status;
+              }
             }
 
           }
 
           // We should never come to this point
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
           return Status::undefined;
         }
 
@@ -713,6 +719,8 @@ namespace FEAT
         /// \copydoc NewtonRaphsonLinesearch::_apply_intern()
         virtual Status _apply_intern(VectorType& sol, const VectorType& dir)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
           // compute initial defect
           Status status(Status::progress);
           this->_num_iter = Index(0);
@@ -770,17 +778,24 @@ namespace FEAT
 
             // ensure that the defect is neither NaN nor infinity
             if(!Math::isfinite(this->_def_cur))
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
 
             // is diverged?
             if(this->is_diverged())
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::diverged, this->get_num_iter()));
               return Status::diverged;
+            }
 
             // Check if the diffence in etas is too small, thus leading to a huge update of relative size > sqrt(eps)
             if(Math::abs(_eta - eta_prev) < Math::abs(alpha*_eta)*this->_norm_dir*Math::sqrt(Math::eps<DataType>()))
             {
               // If we are not successful, update the solution with the best step found so far
               sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
               return Status::stagnated;
             }
 
@@ -838,10 +853,12 @@ namespace FEAT
             if(status != Status::progress)
             {
               sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
               return status;
             }
 
           }
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
           return Status::undefined;
         }
 
@@ -1040,6 +1057,8 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_dir)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
           static constexpr DataType extrapolation_width = DataType(4);
           Status status(Status::progress);
 
@@ -1268,6 +1287,7 @@ namespace FEAT
             this->_filter.filter_def(this->_vec_grad);
           }
 
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
         }
 

@@ -328,32 +328,6 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formatted_solver_tree() const override
-      {
-        String result;
-        result += this->name();
-        result += " ( ";
-        if(system_levels.back()->pre_smoother)
-        {
-          result += "S: " + system_levels.back()->pre_smoother->get_formatted_solver_tree() + " / ";
-        }
-        else
-        {
-          result += "S: None / ";
-        }
-
-        if(system_levels.front()->coarse_solver)
-        {
-          result += "C: " + system_levels.front()->coarse_solver->get_formatted_solver_tree();
-        }
-        else
-        {
-          result += "C: Identity";
-        }
-        result += " ) ";
-        return result;
-      }
-
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // get the number of levels

@@ -257,17 +257,6 @@ namespace FEAT
           return "NLCG";
         }
 
-        /// \copydoc Solver::Base::get_formatted_solver_tree()
-        virtual String get_formatted_solver_tree() const override
-        {
-          String result(name());
-          result += " ( "+stringify(_direction_update)+", "+_linesearch->get_formatted_solver_tree();
-          if(_precond != nullptr)
-            result += " "+_precond->get_formatted_solver_tree();
-          result += " )";
-          return result;
-        }
-
         /**
          * \brief Sets the tolerance for function value improvement
          *
@@ -368,6 +357,8 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+
           // p[k+1] <- r[k+1] + _beta * p[k+1]
           DataType beta;
           // eta[k] = <r[k], p[k]>
@@ -383,11 +374,17 @@ namespace FEAT
           // Compute initial defect
           Status status = this->_set_initial_defect(this->_vec_r, vec_sol);
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           // apply preconditioner to defect vector
           if(!this->_apply_precond(this->_vec_z, this->_vec_r, this->_filter))
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
+          }
 
           // The first direction has to be the (preconditioned) steepest descent direction
           this->_vec_p.clone(this->_vec_z);
@@ -425,7 +422,10 @@ namespace FEAT
           DataType gamma_prev(0);
 
           if(this->_def_init <= this->_tol_rel)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
             return Status::success;
+          }
 
           Index its_since_restart(0);
           _num_restarts = Index(0);
@@ -459,7 +459,10 @@ namespace FEAT
             status = this->_set_new_defect(this->_vec_r, vec_sol);
 
             if(status != Status::progress)
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
               return status;
+            }
 
             // Update preconditioner if necessary
             if(this->_precond != nullptr)
@@ -467,7 +470,10 @@ namespace FEAT
 
             // apply preconditioner
             if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
+            {
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
+            }
 
             // Save old gamma and compute new
             gamma_prev = gamma;
@@ -537,6 +543,7 @@ namespace FEAT
           }
 
           // We should never come to this point
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
           return Status::undefined;
         }
 
@@ -604,7 +611,10 @@ namespace FEAT
 
           // compute new defect
           if(calc_def)
+          {
             this->_def_cur = this->_calc_def_norm(vec_r, vec_sol);
+            Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
+          }
 
           //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 

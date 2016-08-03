@@ -386,8 +386,8 @@ namespace FEAT
         // compute new defect
         if(calc_def)
         {
-          Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
           this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+          Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
         }
 
         // plot?
@@ -539,20 +539,6 @@ namespace FEAT
         if(_precond)
           _precond->done_symbolic();
         BaseClass::done_symbolic();
-      }
-
-      /// \copydoc BaseClass::get_formatted_solver_tree()
-      virtual String get_formatted_solver_tree() const override
-      {
-        String result;
-        result += this->name();
-        if(_precond)
-        {
-          result += " ( ";
-          result += _precond->get_formatted_solver_tree();
-          result += " ) ";
-        }
-        return result;
       }
 
     protected:

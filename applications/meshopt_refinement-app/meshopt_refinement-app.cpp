@@ -190,7 +190,10 @@ struct MeshoptRefinementApp
     TimeStamp post_opt;
 
     if(Util::Comm::rank() == 0)
+    {
+      std::cout << std::endl << "Using solver: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
       std::cout << "Solve time: " << post_opt.elapsed(pre_opt) << std::endl;
+    }
 
     // Write output again
     if(write_vtk)

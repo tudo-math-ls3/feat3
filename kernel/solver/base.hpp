@@ -234,20 +234,6 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns a descriptive string of the complete solver tree.
-       *
-       * Create and format a string describing the complete solver tree,
-       * placing the called object at the root.
-       *
-       * \note This method makes some simplifications, e.g. stating only one smoother
-       * for the complete FEAT::Solver::BasicVCycle.
-       */
-      virtual String get_formatted_solver_tree() const
-      {
-        return this->name();
-      }
-
-      /**
        * \brief Returns a descriptive string.
        *
        * \returns A string describing the solver.

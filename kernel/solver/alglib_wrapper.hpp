@@ -182,14 +182,6 @@ namespace FEAT
           return "ALGLIBMinLBFGS";
         }
 
-        /// \copydoc BaseClass::get_formatted_solver_tree()
-        virtual String get_formatted_solver_tree() const override
-        {
-          String result(name());
-          result += " ( StrongWolfeLinesearch )";
-          return result;
-        }
-
         /**
          * \copydoc BaseClass::set_max_iter()
          */
@@ -302,6 +294,7 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
           // Write initial guess to iterates if desired
           if(iterates != nullptr)
@@ -313,7 +306,10 @@ namespace FEAT
           // compute initial defect
           Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
           if(status != Status::progress)
+          {
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
+          }
 
           // Copy initial guess to optimisation state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
@@ -333,29 +329,38 @@ namespace FEAT
           {
             case(-8):
               //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(-7):
               //std::cout << "ALGLIB: Gradient verification failed." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(1):
               //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(2):
               //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(4):
               //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(5):
               //std::cout << "ALGLIB: Maximum number of iterations" << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::max_iter, this->get_num_iter()));
               return Status::max_iter;
             case(7):
               //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
               return Status::stagnated;
             case(8):
               //std::cout << "ALGLIB: Stopped by user" << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             default:
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
               return Status::undefined;
           }
         }
@@ -657,15 +662,6 @@ namespace FEAT
         virtual String name() const override
         {
           return "ALGLIBMinCG";
-        }
-
-        /// \copydoc BaseClass::get_formatted_solver_tree()
-        virtual String get_formatted_solver_tree() const override
-        {
-          String result(name());
-          result += " ( "+stringify(_direction_update)+", StrongWolfeLinesearch";
-          result += " )";
-          return result;
         }
 
         /**

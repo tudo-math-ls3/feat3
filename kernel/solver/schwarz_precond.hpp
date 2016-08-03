@@ -97,16 +97,6 @@ namespace FEAT
         _local_solver->done_symbolic();
       }
 
-      virtual String get_formatted_solver_tree() const override
-      {
-        String result;
-        result += this->name();
-        result += " ( ";
-        result += _local_solver->get_formatted_solver_tree();
-        result += " ) ";
-        return result;
-      }
-
       virtual Status apply(GlobalVectorType& vec_cor, const GlobalVectorType& vec_def) override
       {
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
