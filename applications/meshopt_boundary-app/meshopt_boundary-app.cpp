@@ -412,6 +412,9 @@ struct MeshoptBoundaryApp
     }
 
     delete[] todo_boundary;
+    old_coords.clear();
+    new_coords.clear();
+    mesh_velocity.clear();
 
     if(Util::Comm::rank() == 0)
     {
@@ -728,7 +731,6 @@ int main(int argc, char* argv[])
       midpoint(0) = DataType(std::stod(midpoint_deque.front()));
       midpoint(1) = DataType(std::stod(midpoint_deque.back()));
     }
-
 
     ret = MeshoptBoundaryApp<MemType, DataType, IndexType, S2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
