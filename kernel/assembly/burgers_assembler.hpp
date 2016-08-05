@@ -100,7 +100,6 @@ namespace FEAT
         const DataType_ scale_vector = DataType_(1)
         ) const
       {
-        typedef Space_ SpaceType;
         typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
         typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
 
@@ -151,7 +150,7 @@ namespace FEAT
         typename VectorType::GatherAxpy gather_conv(convect);
 
         // get maximum number of local dofs
-        static constexpr int max_local_dofs = space_eval.max_local_dofs;
+        static constexpr int max_local_dofs = AsmTraits::max_local_test_dofs;
 
         // create local matrix data
         typedef Tiny::Matrix<DataType, dim_, dim_> MatrixValue;

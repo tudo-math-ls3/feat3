@@ -159,6 +159,11 @@ namespace FEAT
       /// trafo image dimension
       static constexpr int image_dim = TrafoEvaluator::image_dim;
 
+      /// maximum local dofs
+      static constexpr int max_local_test_dofs  = TestEvaluator::max_local_dofs;
+      static constexpr int max_local_trial_dofs = TrialEvaluator::max_local_dofs;
+      static constexpr int max_local_mult_dofs  = MultEvaluator::max_local_dofs;
+
       /// local vector type
       typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
       typedef LocalVectorType LocalTestVectorType;
@@ -282,6 +287,11 @@ namespace FEAT
       static constexpr int domain_dim = TrafoEvaluator::domain_dim;
       /// trafo image dimension
       static constexpr int image_dim = TrafoEvaluator::image_dim;
+
+      /// maximum local dofs
+      static constexpr int max_local_test_dofs  = TestEvaluator::max_local_dofs;
+      static constexpr int max_local_trial_dofs = TrialEvaluator::max_local_dofs;
+      static constexpr int max_local_mult_dofs  = MultEvaluator::max_local_dofs;
 
       /// local vector type
       typedef Tiny::Vector<DataType, TestEvaluator::max_local_dofs> LocalTestVectorType;
@@ -422,6 +432,11 @@ namespace FEAT
       static constexpr int domain_dim = TrafoEvaluator::domain_dim;
       /// trafo image dimension
       static constexpr int image_dim = TrafoEvaluator::image_dim;
+
+      /// maximum local dofs
+      static constexpr int max_local_test_dofs  = TestEvaluator::max_local_dofs;
+      static constexpr int max_local_trial_dofs = TrialEvaluator::max_local_dofs;
+      static constexpr int max_local_mult_dofs  = MultEvaluator::max_local_dofs;
 
       /// local vector type
       typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> FunctionalValueType;

@@ -104,8 +104,8 @@ namespace FEAT
         typename AsmTraits::TrialEvalData pres_data;
 
         // maximum number of dofs
-        static constexpr int max_velo_dofs = velo_eval.max_local_dofs;
-        static constexpr int max_pres_dofs = pres_eval.max_local_dofs;
+        static constexpr int max_velo_dofs = AsmTraits::max_local_test_dofs;
+        static constexpr int max_pres_dofs = AsmTraits::max_local_trial_dofs;
 
         // create local matrix data
         //typename AsmTraits::LocalMatrixType lmd;
