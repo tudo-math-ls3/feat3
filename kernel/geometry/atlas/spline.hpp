@@ -672,15 +672,15 @@ namespace FEAT
             {
               best_distance_sqr = my_distance_sqr;
               best_nu = nu;
+              // best_sign can be 0 if this happens for i==0
               best_sign = my_sign;
               grad_dist = difference;
             }
           }
 
           // If the point was far enough away from the interface, we can normalise the difference vector
-          if(best_distance_sqr > Math::sqr(Math::eps<DataType>()))
+          if(best_distance_sqr > Math::sqr(Math::eps<DataType>()) && best_sign != DataType(0))
           {
-            XASSERT(best_sign != DataType(0));
             grad_dist.normalise();
             grad_dist *= -best_sign;
           }
@@ -688,7 +688,6 @@ namespace FEAT
           // projected point might be where the normal is discontinuous, but in this case it is ok.
           else
           {
-            XASSERT(best_sign != DataType(0));
             grad_dist = DataType(-1)*best_nu;
             grad_dist.normalise();
             XASSERT(Math::abs(grad_dist.norm_euclid()-DataType(1)) < Math::sqrt(Math::eps<DataType>()));
