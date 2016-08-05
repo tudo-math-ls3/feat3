@@ -589,7 +589,7 @@ struct MeshoptScrewsApp
         }
       }
 
-      if(min_angle < DT_(1))
+      if(min_angle < DT_(0.1))
       {
         Util::mpi_cout("Mesh deteriorated, stopping.\n");
         return_value = 1;
