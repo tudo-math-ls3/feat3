@@ -7226,4 +7226,9 @@
       359    0
     </Topology>
   </MeshPart>
+  <MeshPart name="outer_single" parent="root" topology="none" size="   1   0">
+    <Mapping dim="0">
+      720
+    </Mapping>
+  </MeshPart>
 </FeatMeshFile>
