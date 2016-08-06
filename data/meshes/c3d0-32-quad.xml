@@ -1,0 +1,274 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This mesh is the 2D plane of the C3D0 benchmark aka
+    the 3D "flow around a cylinder" benchark, which can be
+    used to generate a 3D hexa mesh using the mesh-extruder tool.
+    Note that the domain is slightly different from the 2D case.
+    This mesh consists of 32 quadrilateral cells.
+  </Info>
+  <Chart name="circle">
+    <Circle radius="0.05" midpoint="0.5 0.2" domain="0.5 -0.5" />
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="45 77 32">
+    <Vertices>
+      0.00 0.00
+      0.00 0.10
+      0.00 0.20
+      0.00 0.30
+      0.00 0.41
+      0.25 0.00
+      0.25 0.10
+      0.25 0.20
+      0.25 0.30
+      0.25 0.41
+      0.38 0.20
+      0.45 0.20
+      0.50 0.00
+      0.50 0.08
+      0.50 0.15
+      0.50 0.25
+      0.50 0.32
+      0.50 0.41
+      0.55 0.20
+      0.62 0.20
+      0.75 0.00
+      0.75 0.10
+      0.75 0.20
+      0.75 0.30
+      0.75 0.41
+      1.10 0.00
+      1.10 0.10
+      1.10 0.20
+      1.10 0.30
+      1.10 0.41
+      1.50 0.00
+      1.50 0.10
+      1.50 0.20
+      1.50 0.30
+      1.50 0.41
+      2.00 0.00
+      2.00 0.10
+      2.00 0.20
+      2.00 0.30
+      2.00 0.41
+      2.50 0.00
+      2.50 0.10
+      2.50 0.20
+      2.50 0.30
+      2.50 0.41
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+      0 5
+      1 6
+      2 7
+      3 8
+      4 9
+      5 6
+      6 7
+      7 8
+      8 9
+      5 12
+      6 13
+      7 10
+      8 16
+      9 17
+      10 13
+      11 14
+      10 11
+      11 15
+      10 16
+      12 13
+      13 14
+      15 16
+      16 17
+      13 19
+      14 18
+      18 19
+      15 18
+      16 19
+      12 20
+      13 21
+      19 22
+      16 23
+      17 24
+      20 21
+      21 22
+      22 23
+      23 24
+      20 25
+      21 26
+      22 27
+      23 28
+      24 29
+      25 26
+      26 27
+      27 28
+      28 29
+      25 30
+      26 31
+      27 32
+      28 33
+      29 34
+      30 31
+      31 32
+      32 33
+      33 34
+      30 35
+      31 36
+      32 37
+      33 38
+      34 39
+      35 36
+      36 37
+      37 38
+      38 39
+      35 40
+      36 41
+      37 42
+      38 43
+      39 44
+      40 41
+      41 42
+      42 43
+      43 44
+    </Topology>
+    <Topology dim="2">
+      0 5 1 6
+      1 6 2 7
+      2 7 3 8
+      3 8 4 9
+      5 12 6 13
+      6 13 7 10
+      7 10 8 16
+      8 16 9 17
+      10 13 11 14
+      11 15 10 16
+      13 19 14 18
+      15 18 16 19
+      12 20 13 21
+      13 21 19 22
+      19 22 16 23
+      16 23 17 24
+      20 25 21 26
+      21 26 22 27
+      22 27 23 28
+      23 28 24 29
+      25 30 26 31
+      26 31 27 32
+      27 32 28 33
+      28 33 29 34
+      30 35 31 36
+      31 36 32 37
+      32 37 33 38
+      33 38 34 39
+      35 40 36 41
+      36 41 37 42
+      37 42 38 43
+      38 43 39 44
+    </Topology>
+  </Mesh>
+  <MeshPart name="left" parent="root" topology="none" size="5 4">
+    <Mapping dim="0">
+      4
+      3
+      2
+      1
+      0
+    </Mapping>
+    <Mapping dim="1">
+      3
+      2
+      1
+      0
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="right" parent="root" topology="none" size="5 4">
+    <Mapping dim="0">
+      40
+      41
+      42
+      43
+      44
+    </Mapping>
+    <Mapping dim="1">
+      73
+      74
+      75
+      76
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bottom" parent="root" topology="none" size="8 7">
+    <Mapping dim="0">
+      0
+      5
+      12
+      20
+      25
+      30
+      35
+      40
+    </Mapping>
+    <Mapping dim="1">
+      4
+      13
+      32
+      41
+      50
+      59
+      68
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="top" parent="root" topology="none" size="8 7">
+    <Mapping dim="0">
+      44
+      39
+      34
+      29
+      24
+      17
+      9
+      4
+    </Mapping>
+    <Mapping dim="1">
+      72
+      63
+      54
+      45
+      36
+      17
+      8
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="circle" parent="root" chart="circle" topology="full" size="5 4">
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Mapping dim="0">
+      11
+      15
+      18
+      14
+      11
+    </Mapping>
+    <Mapping dim="1">
+      21
+      30
+      28
+      19
+    </Mapping>
+    <Attribute name="param" dim="1">
+      0
+      0.25
+      0.5
+      0.75
+      1
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
