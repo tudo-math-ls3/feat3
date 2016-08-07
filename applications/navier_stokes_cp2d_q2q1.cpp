@@ -19,7 +19,7 @@
 // equations with an inflow and and outflow region without any external forces, moving
 // boundaries or any other fancy stuff.
 //
-// This application has three pre-configured benchmark problems, which can be launched
+// This application has four pre-configured benchmark problems, which can be launched
 // by specifying the "--setup <config>" command line arguments, where <config> specifies
 // one of the following:
 //
@@ -37,6 +37,11 @@
 // Loads the famous "Flow-Around-A-Cylinder" problem (non-steady version).
 // This is the problem which generates the fancy "Von-Karman vortex shedding".
 // In contrast to the previous problems, this solution is periodic.
+//
+// --setup c2d0
+// Same as 'bench1', but uses the 'c2d0-32-quad' mesh (32 quads) instead of the
+// 'bench1' mesh (130) quads. Also uses level 5 instead of level 4 by default due
+// to the coarser base mesh.
 //
 // Moreover, this application can be configured by specifying further options, which can
 // be used to define new (non-preconfigured) problems or override the pre-defined settings.
@@ -141,7 +146,7 @@
 //
 // These two multigrid solvers are configured by the same set of options with slightly
 // different names: options for the A-solver are postfixed by "-a", whereas options for
-// the S-solver are postfixed by '-s'.
+// the S-solver are postfixed by "-s".
 //
 // The '--max-iter-[a|s] <N>' option sets the maximum allowed multigrid iterations.
 // Default: 25 for A-solver, 50 for S-solver
@@ -359,6 +364,8 @@ namespace NaverStokesCP2D
           setup_nozzle();
         else if(s.compare_no_case("bench1") == 0)
           setup_bench1();
+        else if(s.compare_no_case("c2d0") == 0)
+          setup_c2d0();
         else
         {
           Util::mpi_cout("ERROR: unknown setup '" + s + "'");
@@ -472,6 +479,24 @@ namespace NaverStokesCP2D
       part_name_out = "right";
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(4);
+      nu = 1E-3;
+      ix0 = 0.0;
+      iy0 = 0.0;
+      ix1 = 0.0;
+      iy1 = 0.41;
+      vmax = 1.5;
+      time_max = 3.0;
+      time_steps = max_time_steps = 4500;
+    }
+
+    // Setup: flow around a cylinder
+    void setup_c2d0()
+    {
+      mesh_file = "c2d0-32-quad.xml";
+      part_name_in = "bnd:l";
+      part_name_out = "bnd:r";
+      level_min = level_min_in = Index(0);
+      level_max = level_max_in = Index(5);
       nu = 1E-3;
       ix0 = 0.0;
       iy0 = 0.0;
@@ -1279,7 +1304,8 @@ namespace NaverStokesCP2D
     args.support("setup", "<config>\nLoads a pre-defined configuration:\n"
       "square    Poiseuille-Flow on Unit-Square\n"
       "nozzle    Jet-Flow through Nozzle domain\n"
-      "bench1    Nonsteady Flow Around A Cylinder\n"
+      "bench1    Nonsteady Flow Around A Cylinder (bench1 mesh)\n"
+      "c2d0      Nonsteady Flow Around A Cylinder (c2d0 mesh)\n"
       );
     args.support("deformation", "\nUse deformation tensor instead of gradient tensor.\n");
     args.support("nu <nu>", "\nSets the viscosity parameter.\n");
