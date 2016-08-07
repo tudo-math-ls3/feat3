@@ -367,6 +367,7 @@ namespace NaverStokesCP2D
       }
       deformation = (args.check("deformation") >= 0);
       args.parse("mesh-path", mesh_path);
+      args.parse("mesh-file", mesh_file);
       if(args.parse("vtk", vtk_name, vtk_step) == 1)
         vtk_step = 1; // vtk-name given, but not vtk-step, so set to 1
       args.parse("level", level_max_in, level_min_in);
@@ -679,6 +680,9 @@ namespace NaverStokesCP2D
   template<typename MeshType_>
   void run(const int rank, const int nprocs, const Config& cfg, Control::Domain::DomainControl<MeshType_>& domain)
   {
+    // create a time-stamp
+    TimeStamp stamp_start;
+
     // define our mesh type
     typedef MeshType_ MeshType;
 
@@ -971,7 +975,8 @@ namespace NaverStokesCP2D
       head += String("Def-V").pad_back(nf) + " ";
       head += String("Def-P").pad_back(nf) + "   ";
       head += String("IT-A").pad_front(4) + " ";
-      head += String("IT-S").pad_front(4);
+      head += String("IT-S").pad_front(4) + "   ";
+      head += String("Runtime    ");
       std::cout << head << std::endl;
       std::cout << String(head.size(), '-') << std::endl;
     }
@@ -1153,7 +1158,8 @@ namespace NaverStokesCP2D
           line += stringify_fp_sci(def_nl2_p, 3);
           line += " | ";
           line += stringify(iter_v).pad_front(4) + " ";
-          line += stringify(iter_p).pad_front(4);
+          line += stringify(iter_p).pad_front(4) + " | ";
+          line += stamp_start.elapsed_string_now();
           std::cout << line << std::endl;
         }
       } // non-linear loop
