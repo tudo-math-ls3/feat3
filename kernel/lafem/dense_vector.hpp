@@ -231,7 +231,6 @@ namespace FEAT
       explicit DenseVector() :
         Container<Mem_, DT_, IT_> (0)
       {
-        this->_scalar_index.push_back(0);
       }
 
       /**
@@ -248,8 +247,6 @@ namespace FEAT
         Container<Mem_, DT_, IT_>(size_in)
       {
         XASSERTM(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
-
-        this->_scalar_index.push_back(0);
 
         if (pinned_allocation)
         {
@@ -279,7 +276,6 @@ namespace FEAT
       explicit DenseVector(Index size_in, DT_ value) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        this->_scalar_index.push_back(0);
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
         this->_elements_size.push_back(size_in);
 
@@ -299,7 +295,6 @@ namespace FEAT
       explicit DenseVector(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        this->_scalar_index.push_back(0);
         this->_elements.push_back(data);
         this->_elements_size.push_back(size_in);
 
@@ -325,7 +320,8 @@ namespace FEAT
       {
         XASSERTM(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds original vector size!");
 
-        this->_scalar_index.push_back(1);
+        this->_foreign_memory = true;
+
         DT_ * te(const_cast<DT_*>(dv_in.elements()));
         this->_elements.push_back(te + offset_in);
         this->_elements_size.push_back(size_in);
@@ -342,7 +338,6 @@ namespace FEAT
       explicit DenseVector(const DenseVectorBlocked<Mem_, DT_, IT_, BS_> & other) :
         Container<Mem_, DT_, IT_>(other.template size<Perspective::pod>())
       {
-        this->_scalar_index.push_back(0);
         convert(other);
       }
 
@@ -402,19 +397,9 @@ namespace FEAT
 
       /**
        * \brief Destructor
-       *
-       * Destroys the DenseVector and releases all of its used arrays if its not marked a range vector.
        */
       virtual ~DenseVector()
       {
-        // avoid releasing memory by base class destructor, because we do not own the referenced memory
-        if (this->_scalar_index.size() > 0 && this->_scalar_index.at(1) == 1)
-        {
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            this->_elements.at(i) = nullptr;
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            this->_indices.at(i) = nullptr;
-        }
       }
 
       /**
@@ -471,7 +456,6 @@ namespace FEAT
         this->clear();
 
         this->_scalar_index.push_back(other.template size<Perspective::pod>());
-        this->_scalar_index.push_back(0);
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(this->size());
 
@@ -628,7 +612,6 @@ namespace FEAT
       {
         this->clear();
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
 
         Index rows;
         String line;
@@ -708,7 +691,6 @@ namespace FEAT
       void read_from_exp(std::istream& file)
       {
         this->clear();
-        this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
 
         std::vector<DT_> data;

@@ -53,14 +53,19 @@ public:
     }
 
     DenseVector<Mem_, DT_, IT_> a(10, DT_(7));
-    TEST_CHECK_EQUAL(a.bytes(), 10 * sizeof(DT_) + 2 * sizeof(Index));
+    TEST_CHECK_EQUAL(a.bytes(), 10 * sizeof(DT_) + 1 * sizeof(Index));
     DenseVector<Mem_, DT_, IT_> b(10, DT_(5));
     b(7, DT_(42));
     TEST_CHECK_EQUAL(b(7), DT_(42));
     TEST_CHECK_EQUAL(b(3), DT_(5));
+
     DenseVector<Mem_, DT_, IT_> b_r(b, 5, 3);
     TEST_CHECK_EQUAL(b_r(0), b(0+3));
     TEST_CHECK_EQUAL(b_r(4), b(4+3));
+    auto b_rc = b_r.clone();
+    TEST_CHECK_EQUAL(b_rc(0), b(0+3));
+    TEST_CHECK_EQUAL(b_rc(4), b(4+3));
+
     DenseVector<Mem_, DT_, IT_> c(b.clone());
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));

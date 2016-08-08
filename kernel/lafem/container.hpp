@@ -139,6 +139,8 @@ namespace FEAT
       std::vector<Index> _scalar_index;
       /// List of scalars with datatype DT_
       std::vector<DT_> _scalar_dt;
+      /// do we use memory that we did not allocate, nor are we allowed to free it - this mostly holds true, if the container is a ranged slice of another one
+      bool _foreign_memory;
 
       void _copy_content(const Container & other, bool full)
       {
@@ -591,7 +593,8 @@ namespace FEAT
        *
        * Creates a container with a given size.
        */
-      explicit Container(Index size_in)
+      explicit Container(Index size_in) :
+        _foreign_memory(false)
       {
         _scalar_index.push_back(size_in);
       }
@@ -603,10 +606,13 @@ namespace FEAT
        */
       virtual ~Container()
       {
-        for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(_elements.at(i));
-        for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(_indices.at(i));
+        if(! _foreign_memory)
+        {
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Mem_>::release_memory(_elements.at(i));
+          for (Index i(0) ; i < _indices.size() ; ++i)
+            MemoryPool<Mem_>::release_memory(_indices.at(i));
+        }
       }
 
       /**
@@ -622,7 +628,8 @@ namespace FEAT
         _elements_size(std::move(other._elements_size)),
         _indices_size(std::move(other._indices_size)),
         _scalar_index(std::move(other._scalar_index)),
-        _scalar_dt(std::move(other._scalar_dt))
+        _scalar_dt(std::move(other._scalar_dt)),
+        _foreign_memory(other._foreign_memory)
       {
         other._elements.clear();
         other._indices.clear();
@@ -650,10 +657,13 @@ namespace FEAT
        */
       virtual void clear()
       {
-        for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
-        for (Index i(0) ; i < _indices.size() ; ++i)
+        if (! _foreign_memory)
+        {
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < _indices.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+        }
 
         this->_elements.clear();
         this->_indices.clear();
@@ -661,6 +671,7 @@ namespace FEAT
         this->_indices_size.clear();
         this->_scalar_index.clear();
         this->_scalar_dt.clear();
+        this->_foreign_memory = false;
       }
 
       /** \brief Clone operation
@@ -770,6 +781,8 @@ namespace FEAT
         this->_indices_size = std::move(other._indices_size);
         this->_scalar_index = std::move(other._scalar_index);
         this->_scalar_dt = std::move(other._scalar_dt);
+
+        this->_foreign_memory = other._foreign_memory;
       }
 
       /**
