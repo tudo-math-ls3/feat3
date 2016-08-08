@@ -139,7 +139,7 @@ struct MeshoptScrewsApp
   static int run(const String& meshopt_section_key, PropertyMap* meshopt_config, PropertyMap* solver_config,
   Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader,
   int lvl_max, int lvl_min, const DataType delta_t, const DataType t_end,
-  const bool write_vtk, const bool test_mode)
+  const bool write_vtk, const Index vtk_freq, const bool test_mode)
   {
     XASSERT(delta_t > DataType(0));
     XASSERT(t_end >= DataType(0));
@@ -401,6 +401,8 @@ struct MeshoptScrewsApp
       alpha = -DataType(2)*pi*time;
       DataType delta_alpha = alpha - alpha_old;
 
+      bool abort(false);
+
       if(Util::Comm::rank() == 0)
         std::cout << "Timestep " << n << ": t = " << stringify_fp_fix(time) <<
           ", angle = " << stringify_fp_fix(alpha/(DataType(2)*pi)*DataType(360))  << " degrees" <<std::endl;
@@ -491,40 +493,6 @@ struct MeshoptScrewsApp
       if(Util::Comm::rank() == 0)
         std::cout << "max. mesh velocity: " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
-      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
-
-      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
-
-      if(write_vtk)
-      {
-        String vtk_name(file_basename+"_post_"+stringify(n));
-
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
-        // Add mesh velocity
-        exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
-        // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
-        // Write the file
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-
-        if(extruder.extruded_mesh_node != nullptr)
-        {
-          extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
-          // Create a VTK exporter for our mesh
-          String extruded_vtk_name = String(file_basename+"_post_extruded_"+stringify(n));
-
-          Util::mpi_cout("Writing "+extruded_vtk_name+"\n");
-
-          Geometry::ExportVTK<ExtrudedMeshType> extruded_exporter(*(extruder.extruded_mesh_node->get_mesh()));
-          extruded_exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-        }
-      }
-
       // Compute quality indicators
       {
         min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
@@ -557,44 +525,44 @@ struct MeshoptScrewsApp
         }
       }
 
-      // Compute quality indicators
-      {
-        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
-
-        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
-
-#ifdef FEAT_HAVE_MPI
-        DT_ min_quality_snd(min_quality);
-        Util::Comm::allreduce(&min_quality_snd, &min_quality, Index(1), Util::CommOperationMin());
-
-        DT_ min_angle_snd(min_angle);
-        Util::Comm::allreduce(&min_angle_snd, &min_angle, Index(1), Util::CommOperationMin());
-#endif
-
-        DT_ lambda_min;
-        DT_ lambda_max;
-        DT_ vol_min;
-        DT_ vol_max;
-        cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
-
-        if(Util::Comm::rank() == 0)
-        {
-          std::cout << "Quality indicator: " << stringify_fp_sci(min_quality) <<
-            " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
-          std::cout << "Cell size defect: " << stringify_fp_sci(cell_size_defect) <<
-            " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
-            " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
-        }
-      }
-
       if(min_angle < DT_(0.1))
       {
         Util::mpi_cout("Mesh deteriorated, stopping.\n");
         return_value = 1;
-        break;
+        abort = true;
       }
+
+      if(write_vtk)
+      {
+        if( (n%vtk_freq == 0) || abort )
+        {
+          String vtk_name(file_basename+"_post_"+stringify(n));
+
+          Util::mpi_cout("Writing "+vtk_name+"\n");
+
+          // Create a VTK exporter for our mesh
+          Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
+          // Add mesh velocity
+          exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
+          // Add everything from the MeshoptControl
+          meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
+          // Write the file
+          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+
+          if(extruder.extruded_mesh_node != nullptr)
+          {
+            extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
+            // Create a VTK exporter for our mesh
+            String extruded_vtk_name = String(file_basename+"_post_extruded_"+stringify(n));
+
+            Util::mpi_cout("Writing "+extruded_vtk_name+"\n");
+
+            Geometry::ExportVTK<ExtrudedMeshType> extruded_exporter(*(extruder.extruded_mesh_node->get_mesh()));
+            extruded_exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+          }
+        }
+      }
+
 
       // Check for the hard coded settings for test mode
       if(test_mode)
@@ -606,6 +574,9 @@ struct MeshoptScrewsApp
           "Final min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
         }
       }
+
+      if(abort)
+        break;
 
     } // time loop
 
@@ -669,6 +640,8 @@ int main(int argc, char* argv[])
   String mesh_type("");
   // Do we want to write vtk files. Read from the command line arguments
   bool write_vtk(false);
+  // If write_vtk is set, we write out every vtk_freq time steps
+  Index vtk_freq(1);
   // Is the application running as a test? Read from the command line arguments
   bool test_mode(false);
 
@@ -713,7 +686,14 @@ int main(int argc, char* argv[])
   {
     // Check if we want to write vtk files
     if(args.check("vtk") >= 0 )
+    {
       write_vtk = true;
+
+      if(args.check("vtk") > 1)
+        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --vtk");
+
+      args.parse("vtk",vtk_freq);
+    }
 
     // Read the application config file on rank 0
     if(Util::Comm::rank() == 0)
@@ -889,14 +869,14 @@ int main(int argc, char* argv[])
   {
     ret = MeshoptScrewsApp<MemType, DataType, IndexType, H2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, write_vtk, test_mode);
+      lvl_max, lvl_min, delta_t, t_end, write_vtk, vtk_freq, test_mode);
   }
 
   if(mesh_type == "conformal:simplex:2:2")
   {
     ret = MeshoptScrewsApp<MemType, DataType, IndexType, S2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, write_vtk, test_mode);
+      lvl_max, lvl_min, delta_t, t_end, write_vtk, vtk_freq, test_mode);
   }
 
   delete application_config;

@@ -69,7 +69,7 @@ struct MeshoptBoundaryApp
   Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader,
   int lvl_max, int lvl_min, const DataType delta_t, const DataType t_end,
   Tiny::Vector<DT_, MeshType::world_dim> midpoint,
-  const bool write_vtk, const bool test_mode)
+  const bool write_vtk, const Index vtk_freq, const bool test_mode)
   {
     XASSERT(delta_t > DataType(0));
     XASSERT(t_end >= DataType(0));
@@ -125,7 +125,7 @@ struct MeshoptBoundaryApp
     auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
 
     // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
-    auto mesh_velocity = meshopt_ctrl->get_coords().clone();
+    auto mesh_velocity = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
 
     auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
 
@@ -284,12 +284,14 @@ struct MeshoptBoundaryApp
       if(Util::Comm::rank() == 0)
         std::cout << "Timestep " << n << " t = " << stringify_fp_fix(time) <<std::endl;
 
+      bool abort(false);
+
       // Save old vertex coordinates
       meshopt_ctrl->mesh_to_buffer();
       old_coords.clone(meshopt_ctrl->get_coords());
 
       // Get coords for modification
-      auto& coords = (meshopt_ctrl->get_coords());
+      auto coords = (meshopt_ctrl->get_coords()).clone(LAFEM::CloneMode::Deep);
       auto& coords_loc = *coords;
 
       for(Index i(0); i < (*old_coords).size(); ++i)
@@ -342,22 +344,6 @@ struct MeshoptBoundaryApp
       if(Util::Comm::rank() == 0)
         std::cout << "max. mesh velocity: " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
-      if(write_vtk)
-      {
-        String vtk_name(file_basename+"_post_"+stringify(n));
-
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
-        // Add mesh velocity
-        exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
-        // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
-        // Write the file
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-      }
-
       // Compute quality indicators
       {
         min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
@@ -394,8 +380,27 @@ struct MeshoptBoundaryApp
       {
         Util::mpi_cout("Mesh deteriorated, stopping.\n");
         return_value = 1;
-        break;
+        abort = true;
       }
+
+      if(write_vtk && ( (n%vtk_freq == 0) || abort ))
+      {
+        String vtk_name(file_basename+"_post_"+stringify(n));
+
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
+        // Add mesh velocity
+        exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
+        // Add everything from the MeshoptControl
+        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
+        // Write the file
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+      }
+
+      if(abort)
+        break;
 
     } // time loop
 
@@ -476,6 +481,8 @@ int main(int argc, char* argv[])
   String mesh_type("");
   // Do we want to write vtk files. Read from the command line arguments
   bool write_vtk(false);
+  // If write_vtk is set, we write out every vtk_freq time steps
+  Index vtk_freq(1);
   // Is the application running as a test? Read from the command line arguments
   bool test_mode(false);
 
@@ -520,7 +527,14 @@ int main(int argc, char* argv[])
   {
     // Check if we want to write vtk files
     if(args.check("vtk") >= 0 )
+    {
       write_vtk = true;
+
+      if(args.check("vtk") > 1)
+        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --vtk");
+
+      args.parse("vtk",vtk_freq);
+    }
 
     // Read the application config file on rank 0
     if(Util::Comm::rank() == 0)
@@ -720,7 +734,7 @@ int main(int argc, char* argv[])
 
     ret = MeshoptBoundaryApp<MemType, DataType, IndexType, H2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, midpoint, write_vtk, test_mode);
+      lvl_max, lvl_min, delta_t, t_end, midpoint, write_vtk, vtk_freq, test_mode);
   }
   else if(mesh_type == "conformal:simplex:2:2")
   {
@@ -734,7 +748,7 @@ int main(int argc, char* argv[])
 
     ret = MeshoptBoundaryApp<MemType, DataType, IndexType, S2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, midpoint, write_vtk, test_mode);
+      lvl_max, lvl_min, delta_t, t_end, midpoint, write_vtk, vtk_freq, test_mode);
   }
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandlet mesh type "+mesh_type);
@@ -760,7 +774,7 @@ static void display_help()
     std::cout << " --application_config: Path to the application configuration file" << std::endl;
     std::cout << "Optional arguments:" << std::endl;
     std::cout << " --testmode: Run as a test. Ignores configuration files and uses hard coded settings." << std::endl;
-    std::cout << " --vtk: If this is set, vtk files are written" << std::endl;
+    std::cout << " --vtk <FREQ>: If this is set, vtk files are written every <FREQ> time steps." << std::endl;
     std::cout << " --help: Displays this text" << std::endl;
   }
 }

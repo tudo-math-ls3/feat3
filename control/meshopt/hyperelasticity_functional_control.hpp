@@ -274,7 +274,8 @@ namespace FEAT
           virtual void buffer_to_mesh() override
           {
             // Write from control object to local mesh quality functional
-            (*(_system_levels.back()->op_sys)).get_coords().clone(*(_system_levels.back()->coords_buffer));
+            (*(_system_levels.back()->op_sys)).get_coords().clone(*(_system_levels.back()->coords_buffer),
+            LAFEM::CloneMode::Deep);
             // Write finest level
             (*(_system_levels.back()->op_sys)).buffer_to_mesh();
 
@@ -331,7 +332,7 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer
                 vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level);
             }
 
           }
@@ -381,19 +382,23 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer vec_buf;
               vec_buf.convert(*vec_state);
 
+              typename SystemLevelType::LocalCoordsBuffer bla(vec_buf, ndofs, Index(0));
+
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
               // Lagrange elements (just discard the additional information from the fine level), but not clear in
               // the generic case. So we use an evil hack here:
               // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
               // the fine level vector.
+              //typename SystemLevelType::GlobalCoordsBuffer
+              //  global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
               typename SystemLevelType::GlobalCoordsBuffer
-                global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
+                global_vec_level( &(_system_levels.at(level)->gate_sys), bla.clone(LAFEM::CloneMode::Deep));
 
-              _system_levels.at(level)->op_sys.prepare
-                (global_vec_level, _system_levels.at(level)->filter_sys);
+              //_system_levels.at(level)->op_sys.prepare
+              //  (global_vec_level, _system_levels.at(level)->filter_sys);
 
-              (*(_system_levels.at(level)->op_sys)).init();
+              //(*(_system_levels.at(level)->op_sys)).init();
             }
           }
 
@@ -406,8 +411,8 @@ namespace FEAT
             AssemblerLevelType& the_asm_level = *_assembler_levels.back();
 
             // create our RHS and SOL vectors
-            typename SystemLevelType::GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
-            typename SystemLevelType::GlobalSystemVectorL vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+            typename SystemLevelType::GlobalSystemVectorR vec_rhs(the_asm_level.assemble_rhs_vector(the_system_level));
+            typename SystemLevelType::GlobalSystemVectorL vec_sol(the_asm_level.assemble_sol_vector(the_system_level));
 
             Statistics::reset_flops();
             Statistics::reset_times();
@@ -424,6 +429,7 @@ namespace FEAT
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;
 
+            // Call prepare again as this writes the last solution to the mesh and adapts it again
             prepare(vec_sol);
 
             // Print solver summary
@@ -436,9 +442,11 @@ namespace FEAT
               std::cout <<  " (grad) / " << the_system_level.op_sys.get_num_hess_evals() << " (hess)" << std::endl;
             }
 
-            (*the_system_level.coords_buffer).convert(*vec_sol);
+            // Update the control object's buffer
+            mesh_to_buffer();
+            //vec_rhs.clear();
+            //vec_sol.clear();
 
-            buffer_to_mesh();
           }
 
       }; // class HyperelasticityFunctionalControl

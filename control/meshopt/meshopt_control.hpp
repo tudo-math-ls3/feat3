@@ -281,6 +281,7 @@ namespace FEAT
            */
           virtual ~MeshoptSystemLevel()
           {
+            coords_buffer.clear();
           }
 
       }; // class MeshoptSystemLevel<...>
@@ -617,7 +618,8 @@ namespace FEAT
           typename SystemLevel_::GlobalSystemVectorR assemble_sol_vector(SystemLevel_& sys_level)
           {
             XASSERTM(!(*sys_level.op_sys).empty(), "assemble_sol_vector for empty operator");
-            typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.coords_buffer.clone());
+            typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.op_sys.create_vector_r());
+            vec_sol.clone(sys_level.coords_buffer, LAFEM::CloneMode::Deep);
 
             return vec_sol;
           }

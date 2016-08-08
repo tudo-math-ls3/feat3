@@ -664,7 +664,6 @@ namespace FEAT
 
           // The slip filter contains the outer unit normal, so reassemble it
           auto& slip_filters = filter.template at<0>();
-
           for(const auto& it:slip_filters)
             this->_mesh_node->adapt_by_name(it.first);
 

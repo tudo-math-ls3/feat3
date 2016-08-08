@@ -689,13 +689,13 @@ namespace FEAT
         {
           XASSERT(_mesh_node != nullptr);
 
-          if(Util::Comm::size()!=1)
-            throw InternalError(__func__,__FILE__,__LINE__,"In parallel, this requires grad_conc to be a type 1 vector, which is not implemented yet.");
-
           _grad_h.format();
 
           if(_func.use_derivative)
           {
+
+            if(Util::Comm::size()!=1)
+              throw InternalError(__func__,__FILE__,__LINE__,"In parallel, this requires grad_conc to be a type 1 vector, which is not implemented yet.");
 
             CoordType sum_det = RefCellTrafo_::compute_sum_det(coords, *(_mesh_node->get_mesh()));
             RefCellTrafo_::compute_grad_sum_det(_grad_sum_det, coords, *(_mesh_node->get_mesh()));
