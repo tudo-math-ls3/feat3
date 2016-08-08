@@ -163,6 +163,8 @@
 // Furthermore, it is possible to use a simple (one-grid) damped Jacobi-Iteration instead
 // of multigrid as the A-solver. This can be achieved by supplying the '--no-multigrid-a' option.
 //
+// Furthermore, it is possible to use a simple (one-grid) damped Jacobi-Iteration instead
+// of multigrid as the S-solver. This can be achieved by supplying the '--no-multigrid-s' option.
 //
 // VTK-Export Options
 // ------------------
@@ -293,6 +295,9 @@ namespace NaverStokesCP2D
     // use multigrid for A-solver ?
     bool multigrid_a;
 
+    // use multigrid for S-solver ?
+    bool multigrid_s;
+
     // maximum number of iterations for velocity mg
     Index max_iter_a;
 
@@ -339,6 +344,7 @@ namespace NaverStokesCP2D
       nonlin_steps(1),
       dpm_steps(1),
       multigrid_a(false),
+      multigrid_s(false),
       max_iter_a(25),
       tol_rel_a(1E-5),
       smooth_steps_a(4),
@@ -391,6 +397,7 @@ namespace NaverStokesCP2D
       args.parse("nl-steps", nonlin_steps);
       args.parse("dpm-steps", dpm_steps);
       multigrid_a = (args.check("no-multigrid-a") < 0);
+      multigrid_s = (args.check("no-multigrid-s") < 0);
       args.parse("max-iter-a", max_iter_a);
       args.parse("tol-rel-a", tol_rel_a);
       args.parse("smooth-a", smooth_steps_a);
@@ -424,10 +431,11 @@ namespace NaverStokesCP2D
       dump_line("Max Time-Steps", max_time_steps);
       dump_line("Non-Linear Steps", nonlin_steps);
       dump_line("Linear DPM Steps", dpm_steps);
-      dump_line("A: Solver", (multigrid_a ? "Multigrid" : "Jacobi"));
+      dump_line("A: Solver", (multigrid_a ? "Rich-Multigrid" : "Rich-Jacobi"));
       dump_line("A: Max-Iter", max_iter_a);
       dump_line("A: Tol-Rel", tol_rel_a);
       dump_line("A: Smooth Steps", smooth_steps_a);
+      dump_line("S: Solver", (multigrid_s ? "PCG-Multigrid" : "PCG-Jacobi"));
       dump_line("A: Smooth Damp", smooth_damp_a);
       dump_line("S: Max-Iter", max_iter_s);
       dump_line("S: Tol-Rel", tol_rel_s);
@@ -882,30 +890,33 @@ namespace NaverStokesCP2D
       typename TransferLevelType::GlobalPresTransferMatrix
       >>();
 
-    // set up pressure coarse grid solver
+    if (cfg.multigrid_s)
     {
-      auto& lvl = *system_levels.front();
-      auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-      auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
-      cgs->set_max_iter(cfg.smooth_steps_s);
-      cgs->set_min_iter(cfg.smooth_steps_s);
+      // set up pressure coarse grid solver
+      {
+        auto& lvl = *system_levels.front();
+        auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
+        auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+        cgs->set_max_iter(cfg.smooth_steps_s);
+        cgs->set_min_iter(cfg.smooth_steps_s);
 
-      multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, cgs);
-    }
+        multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, cgs);
+      }
 
-    // loop over all finer levels
-    for(Index i(1); i < num_levels; ++i)
-    {
-      auto& lvl = *system_levels.at(std::size_t(i));
-      auto& trs = *transfer_levels.at(std::size_t(i-1));
-      auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-      auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
-      smoother->set_max_iter(cfg.smooth_steps_s);
-      smoother->set_min_iter(cfg.smooth_steps_s);
-      multigrid_hierarchy_pres->push_level(
-        lvl.matrix_s, lvl.filter_pres_unit,
-        trs.prol_pres, trs.rest_pres,
-        smoother, smoother, smoother);
+      // loop over all finer levels
+      for(Index i(1); i < num_levels; ++i)
+      {
+        auto& lvl = *system_levels.at(std::size_t(i));
+        auto& trs = *transfer_levels.at(std::size_t(i-1));
+        auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
+        auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+        smoother->set_max_iter(cfg.smooth_steps_s);
+        smoother->set_min_iter(cfg.smooth_steps_s);
+        multigrid_hierarchy_pres->push_level(
+            lvl.matrix_s, lvl.filter_pres_unit,
+            trs.prol_pres, trs.rest_pres,
+            smoother, smoother, smoother);
+      }
     }
 
     /* ***************************************************************************************** */
@@ -940,17 +951,30 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
+    // create a PCG-MG for the pressure
     std::shared_ptr<Solver::IterativeSolver<GlobalPresVector>> solver_s;
 
-    // create a PCG-MG for the pressure
-    auto multigrid_pres = Solver::new_multigrid(multigrid_hierarchy_pres);
-    solver_s = Solver::new_pcg(matrix_s, filter_p, multigrid_pres);
+    if(cfg.multigrid_s)
+    {
+      // use Multigrid
+      auto multigrid_pres = Solver::new_multigrid(multigrid_hierarchy_pres);
+      solver_s = Solver::new_pcg(matrix_s, filter_p, multigrid_pres);
+    }
+    else
+    {
+      // Use PCG-Jacobi
+      auto jac = Solver::new_jacobi_precond(matrix_s, filter_p);
+      solver_s = Solver::new_pcg(matrix_s, filter_p, jac);
+    }
 
     solver_s->set_max_iter(cfg.max_iter_s);
     solver_s->set_tol_rel(cfg.tol_rel_s);
 
     // for the pressure multigrid, we can perform full initialisation:
-    multigrid_hierarchy_pres->init();
+    if(cfg.multigrid_s)
+    {
+      multigrid_hierarchy_pres->init();
+    }
     solver_s->init();
 
     /* ***************************************************************************************** */
@@ -1233,7 +1257,10 @@ namespace NaverStokesCP2D
 
     // release pressure solvers
     solver_s->done();
-    multigrid_hierarchy_pres->done();
+    if(cfg.multigrid_s)
+    {
+      multigrid_hierarchy_pres->done();
+    }
 
     // release velocity solvers
     solver_a->done_symbolic();
@@ -1327,6 +1354,7 @@ namespace NaverStokesCP2D
     args.support("tol-rel-a", "<eps>\nSets the relative tolerative for the A-Solver.\nDefault: 1E-5\n");
     args.support("smooth-a", "<N>\nSets the number of smoothing steps for the A-Solver.\nDefault: 4\n");
     args.support("damp-a", "<omega>\nSets the smoother daming parameter for the A-Solver.\nDefault: 0.7\n");
+    args.support("no-multigrid-s", "\nUse Jacobi instead of Multigrid as S-Solver.\n");
     args.support("max-iter-s", "<N>\nSets the maximum number of allowed iterations for the S-Solver.\nDefault: 50\n");
     args.support("tol-rel-s", "<eps>\nSets the relative tolerative for the S-Solver.\nDefault: 1E-5\n");
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
