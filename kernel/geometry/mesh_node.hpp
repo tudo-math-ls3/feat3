@@ -763,7 +763,17 @@ namespace FEAT
         // Step 1: create mesh part of the patch
         MeshPartType* patch_mesh_part = nullptr;
         {
+          // create a factory for our partition
           PatchMeshPartFactory<MeshType> part_factory(rank, ranks_at_elem);
+
+          // ensure that the partition is not empty
+          if(part_factory.empty())
+          {
+            String msg("Rank ");
+            msg += stringify(rank);
+            msg += " received empty patch from partitioner!";
+            throw InternalError(__func__, __FILE__, __LINE__, msg);
+          }
 
           // create patch mesh part
           patch_mesh_part = new MeshPartType(part_factory);

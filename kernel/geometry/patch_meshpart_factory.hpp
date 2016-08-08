@@ -88,6 +88,14 @@ namespace FEAT
         }
 
         /**
+         * \brief Checks whether the patch is empty.
+         */
+        bool empty() const
+        {
+          return _cells_patch.empty();
+        }
+
+        /**
          * \brief Returns the number of entities.
          *
          * \param[in] dim
