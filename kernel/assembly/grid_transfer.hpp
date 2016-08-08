@@ -213,14 +213,27 @@ namespace FEAT
             fine_trafo_eval.finish();
 
             // invert fine mesh mass matrix
-            DataType det = Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
-            if(!Math::isnormal(det))
-            {
-              throw InternalError(__func__,__FILE__,__LINE__,"Local Mass Matrix inversion failed!");
-            }
+            Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
+
+            // Note:
+            // Usually, one would check whether the determinant returned by the invert_matrix
+            // function is normal. However, this can lead to false alerts when assembling in
+            // single precision, as the mass matrix entries are of magnitude h^2 (in 2D), i.e.
+            // the determinant can become subnormal or even (numerically) zero although the
+            // condition number of the matrix is still fine and the inversion was successful.
+            // Therefore, we first multiply the (hopefully) inverted mass matrix by the
+            // inter-level mass matrix and check whether the Frobenius norm of the result
+            // is normal. If our matrix inversion failed, the result is virtually guaranteed
+            // to be garbage, so this should serve well enough as a sanity check.
 
             // compute X := M^{-1}*N
             lid.set_mat_mat_mult(mass, lmd);
+
+            // sanity check for matrix inversion
+            if(!Math::isnormal(lid.norm_frobenius()))
+            {
+              throw InternalError(__func__,__FILE__,__LINE__,"Local Mass Matrix inversion failed!");
+            }
 
             // prepare fine mesh dof-mapping
             fine_dof_mapping.prepare(fcell);
