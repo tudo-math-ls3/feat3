@@ -158,7 +158,7 @@
 // Default: 4 for both A- and S-solver
 //
 // The '--damp-[a|s] <omega>' option sets the damping parameter for the smoother.
-// Default: 0.7 for both A- and S-solver
+// Default: 0.5 for both A- and S-solver
 //
 // Furthermore, it is possible to use a simple (one-grid) damped Jacobi-Iteration instead
 // of multigrid as the A-solver. This can be achieved by supplying the '--no-multigrid-a' option.
@@ -349,11 +349,11 @@ namespace NaverStokesCP2D
       max_iter_a(25),
       tol_rel_a(1E-5),
       smooth_steps_a(4),
-      smooth_damp_a(0.7),
+      smooth_damp_a(0.5),
       max_iter_s(50),
       tol_rel_s(1E-5),
       smooth_steps_s(4),
-      smooth_damp_s(0.7)
+      smooth_damp_s(0.5)
     {
       const char* mpath = getenv("FEAT3_PATH_MESHES");
       if(mpath != nullptr)
@@ -1350,16 +1350,16 @@ namespace NaverStokesCP2D
     args.support("mesh-path", "<path>\nSpecifies the path of the directory containing the mesh file.\n");
     args.support("nl-steps", "<N>\nSets the number of non-linear iterations per time-step.\nDefault: 1\n");
     args.support("dpm-steps", "<N>\nSets the number of Discrete-Projection-Method steps per non-linear step.\nDefault: 1\n");
-    args.support("no-multigrid-a", "\nUse Jacobi instead of Multigrid as A-Solver.\n");
+    args.support("no-multigrid-a", "\nUse BiCGStab-Jacobi instead of Multigrid as A-Solver.\n");
     args.support("max-iter-a", "<N>\nSets the maximum number of allowed iterations for the A-Solver.\nDefault: 25\n");
     args.support("tol-rel-a", "<eps>\nSets the relative tolerative for the A-Solver.\nDefault: 1E-5\n");
     args.support("smooth-a", "<N>\nSets the number of smoothing steps for the A-Solver.\nDefault: 4\n");
-    args.support("damp-a", "<omega>\nSets the smoother daming parameter for the A-Solver.\nDefault: 0.7\n");
-    args.support("no-multigrid-s", "\nUse Jacobi instead of Multigrid as S-Solver.\n");
+    args.support("damp-a", "<omega>\nSets the smoother daming parameter for the A-Solver.\nDefault: 0.5\n");
+    args.support("no-multigrid-s", "\nUse PCG-Jacobi instead of Multigrid as S-Solver.\n");
     args.support("max-iter-s", "<N>\nSets the maximum number of allowed iterations for the S-Solver.\nDefault: 50\n");
     args.support("tol-rel-s", "<eps>\nSets the relative tolerative for the S-Solver.\nDefault: 1E-5\n");
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
-    args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.7\n");
+    args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.5\n");
 
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))
