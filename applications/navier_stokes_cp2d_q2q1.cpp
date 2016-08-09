@@ -194,6 +194,7 @@
 #include <kernel/assembly/burgers_assembler.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/pcg.hpp>
+#include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 
@@ -431,7 +432,7 @@ namespace NaverStokesCP2D
       dump_line("Max Time-Steps", max_time_steps);
       dump_line("Non-Linear Steps", nonlin_steps);
       dump_line("Linear DPM Steps", dpm_steps);
-      dump_line("A: Solver", (multigrid_a ? "Rich-Multigrid" : "Rich-Jacobi"));
+      dump_line("A: Solver", (multigrid_a ? "Rich-Multigrid" : "BiCGStab-Jacobi"));
       dump_line("A: Max-Iter", max_iter_a);
       dump_line("A: Tol-Rel", tol_rel_a);
       dump_line("A: Smooth Steps", smooth_steps_a);
@@ -932,9 +933,9 @@ namespace NaverStokesCP2D
     }
     else
     {
-      // use Richardson-Jacobi
+      // use BiCGStab-Jacobi
       auto jac = Solver::new_jacobi_precond(the_system_level.matrix_a, the_system_level.filter_velo);
-      solver_a = Solver::new_richardson(matrix_a, filter_v, cfg.smooth_damp_a, jac);
+      solver_a = Solver::new_bicgstab(matrix_a, filter_v, jac);
     }
 
     solver_a->set_max_iter(cfg.max_iter_a);
