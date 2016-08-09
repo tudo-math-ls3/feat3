@@ -1037,7 +1037,7 @@ namespace NaverStokesCP2D
       {
         // Phase 1: compute convection vector
         // extrapolate previous time-step solution in first NL step
-        if((time_step > Index(1)) && (nonlin_step == Index(0)))
+        if((time_step > Index(2)) && (nonlin_step == Index(0)))
         {
           // linear extrapolation of solution in time
           vec_conv.scale(vec_sol_v_1, DataType(2));
