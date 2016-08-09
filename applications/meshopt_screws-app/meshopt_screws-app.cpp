@@ -410,10 +410,8 @@ struct MeshoptScrewsApp
       // Save old vertex coordinates
       meshopt_ctrl->mesh_to_buffer();
       old_coords.clone(meshopt_ctrl->get_coords());
-
-      // Get coords for modification
-      auto& coords = (meshopt_ctrl->get_coords());
-      auto& coords_loc = *coords;
+      new_coords.clone(meshopt_ctrl->get_coords());
+      auto& coords_loc(*new_coords);
 
       // Rotate the charts
       rotation_angles(0) = delta_alpha;
@@ -438,17 +436,17 @@ struct MeshoptScrewsApp
         WorldPoint tmp(DataType(0));
         WorldPoint tmp2(DataType(0));
 
-          for(Index i(0); i < inner_indices->get_num_entities(); ++i)
-          {
-            // Index of boundary vertex i in the mesh
-            Index j(inner_indices->operator[](i));
-            // Translate the point to the centre of rotation
-            tmp = coords_loc(j) - centre_inner;
-            // Rotate
-            tmp2.set_vec_mat_mult(tmp, rot);
-            // Translate the point by the new centre of rotation
-            coords_loc(j, centre_inner + tmp2);
-          }
+        for(Index i(0); i < inner_indices->get_num_entities(); ++i)
+        {
+          // Index of boundary vertex i in the mesh
+          Index j(inner_indices->operator[](i));
+          // Translate the point to the centre of rotation
+          tmp = coords_loc(j) - centre_inner;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          // Translate the point by the new centre of rotation
+          coords_loc(j, centre_inner + tmp2);
+        }
       }
 
       // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
@@ -477,7 +475,7 @@ struct MeshoptScrewsApp
       }
 
       // Now prepare the functional
-      meshopt_ctrl->prepare(coords);
+      meshopt_ctrl->prepare(new_coords);
 
       meshopt_ctrl->optimise();
 
@@ -532,37 +530,33 @@ struct MeshoptScrewsApp
         abort = true;
       }
 
-      if(write_vtk)
+      if(write_vtk && ( (n%vtk_freq == 0) || abort ) )
       {
-        if( (n%vtk_freq == 0) || abort )
+        String vtk_name(file_basename+"_post_"+stringify(n));
+
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
+        // Add mesh velocity
+        exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
+        // Add everything from the MeshoptControl
+        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
+        // Write the file
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+
+        if(extruder.extruded_mesh_node != nullptr)
         {
-          String vtk_name(file_basename+"_post_"+stringify(n));
-
-          Util::mpi_cout("Writing "+vtk_name+"\n");
-
+          extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
           // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
-          // Add mesh velocity
-          exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
-          // Add everything from the MeshoptControl
-          meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
-          // Write the file
-          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+          String extruded_vtk_name = String(file_basename+"_post_extruded_"+stringify(n));
 
-          if(extruder.extruded_mesh_node != nullptr)
-          {
-            extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
-            // Create a VTK exporter for our mesh
-            String extruded_vtk_name = String(file_basename+"_post_extruded_"+stringify(n));
+          Util::mpi_cout("Writing "+extruded_vtk_name+"\n");
 
-            Util::mpi_cout("Writing "+extruded_vtk_name+"\n");
-
-            Geometry::ExportVTK<ExtrudedMeshType> extruded_exporter(*(extruder.extruded_mesh_node->get_mesh()));
-            extruded_exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-          }
+          Geometry::ExportVTK<ExtrudedMeshType> extruded_exporter(*(extruder.extruded_mesh_node->get_mesh()));
+          extruded_exporter.write(extruded_vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         }
       }
-
 
       // Check for the hard coded settings for test mode
       if(test_mode)

@@ -373,16 +373,17 @@ namespace FEAT
           /// \copydoc BaseClass::prepare()
           virtual void prepare(const typename SystemLevelType::GlobalSystemVectorR& vec_state) override
           {
+            // Get the coordinates on the finest level
+            typename SystemLevelType::LocalCoordsBuffer& finest_coords(*(_system_levels.back()->coords_buffer));
 
-            for(size_t level(num_levels); level > 0; )
+            // Set the coordinates on the finest level
+            finest_coords.clone(*vec_state, LAFEM::CloneMode::Deep);
+
+            // Now do it for all other levels
+            for(size_t level(num_levels-1); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
-
-              typename SystemLevelType::LocalCoordsBuffer vec_buf;
-              vec_buf.convert(*vec_state);
-
-              typename SystemLevelType::LocalCoordsBuffer bla(vec_buf, ndofs, Index(0));
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -390,15 +391,20 @@ namespace FEAT
               // the generic case. So we use an evil hack here:
               // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
               // the fine level vector.
-              //typename SystemLevelType::GlobalCoordsBuffer
-              //  global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
+              typename SystemLevelType::LocalCoordsBuffer this_level_coords(finest_coords, ndofs, Index(0));
+              typename SystemLevelType::LocalCoordsBuffer tmp(this_level_coords.clone(LAFEM::CloneMode::Deep));
               typename SystemLevelType::GlobalCoordsBuffer
-                global_vec_level( &(_system_levels.at(level)->gate_sys), bla.clone(LAFEM::CloneMode::Deep));
+                global_vec_level( &(_system_levels.at(level)->gate_sys), std::move(tmp));
+              // todo: Change the above to this as soon as the range based constructor is fixed
+              //typename SystemLevelType::GlobalCoordsBuffer
+              //  global_vec_level( &(_system_levels.at(level)->gate_sys), finest_coords, ndofs, Index(0));
 
-              //_system_levels.at(level)->op_sys.prepare
-              //  (global_vec_level, _system_levels.at(level)->filter_sys);
+              _system_levels.at(level)->op_sys.prepare
+                (global_vec_level, _system_levels.at(level)->filter_sys);
 
-              //(*(_system_levels.at(level)->op_sys)).init();
+              // todo: remove this as soon as the range based constructor is fixed
+              global_vec_level.clear();
+
             }
           }
 
@@ -423,14 +429,14 @@ namespace FEAT
             // solve
             //Solver::solve(*solver, vec_sol, vec_rhs, the_system_level.op_sys, the_system_level.filter_sys);
             the_system_level.op_sys.reset_num_evals();
-            //if(precond != nullptr)
-            //  precond->init_numeric();
+            if(precond != nullptr)
+              precond->init_numeric();
 
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;
 
-            // Call prepare again as this writes the last solution to the mesh and adapts it again
-            prepare(vec_sol);
+            // Update the control object's buffer because the next initial guess depends on it
+            mesh_to_buffer();
 
             // Print solver summary
             if(Util::Comm::rank() == 0)
@@ -441,11 +447,6 @@ namespace FEAT
               std::cout << "Needed evaluations: " << the_system_level.op_sys.get_num_func_evals() << " (func) / " << the_system_level.op_sys.get_num_grad_evals();
               std::cout <<  " (grad) / " << the_system_level.op_sys.get_num_hess_evals() << " (hess)" << std::endl;
             }
-
-            // Update the control object's buffer
-            mesh_to_buffer();
-            //vec_rhs.clear();
-            //vec_sol.clear();
 
           }
 
