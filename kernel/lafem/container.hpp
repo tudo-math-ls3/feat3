@@ -689,6 +689,8 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a lafem container!");
         }
 
+        XASSERTM(other._foreign_memory == false || clone_mode == CloneMode::Deep, "Must use deep cloning with ranged based source containers");
+
         this->clear();
 
         this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());

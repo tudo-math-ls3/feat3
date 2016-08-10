@@ -159,7 +159,7 @@ namespace FEAT
         return *this;
       }
 
-      InsertWeakClone ( DenseMatrix )
+      InsertDeepClone ( DenseMatrix )
 
       /** \brief Shallow copy operation
        *

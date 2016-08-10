@@ -416,7 +416,7 @@ namespace FEAT
         return *this;
       }
 
-      InsertWeakClone( DenseVector )
+      InsertDeepClone( DenseVector )
 
       /** \brief Shallow copy operation
        *
