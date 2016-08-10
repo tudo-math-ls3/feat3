@@ -391,20 +391,11 @@ namespace FEAT
               // the generic case. So we use an evil hack here:
               // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
               // the fine level vector.
-              typename SystemLevelType::LocalCoordsBuffer this_level_coords(finest_coords, ndofs, Index(0));
-              typename SystemLevelType::LocalCoordsBuffer tmp(this_level_coords.clone(LAFEM::CloneMode::Deep));
               typename SystemLevelType::GlobalCoordsBuffer
-                global_vec_level( &(_system_levels.at(level)->gate_sys), std::move(tmp));
-              // todo: Change the above to this as soon as the range based constructor is fixed
-              //typename SystemLevelType::GlobalCoordsBuffer
-              //  global_vec_level( &(_system_levels.at(level)->gate_sys), finest_coords, ndofs, Index(0));
+                global_vec_level( &(_system_levels.at(level)->gate_sys), finest_coords, ndofs, Index(0));
 
               _system_levels.at(level)->op_sys.prepare
                 (global_vec_level, _system_levels.at(level)->filter_sys);
-
-              // todo: remove this as soon as the range based constructor is fixed
-              global_vec_level.clear();
-
             }
           }
 
