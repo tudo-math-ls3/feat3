@@ -373,6 +373,10 @@ namespace FEAT
           /// \copydoc BaseClass::prepare()
           virtual void prepare(const typename SystemLevelType::GlobalSystemVectorR& vec_state) override
           {
+            // Prepare the preconditioner before updating the status
+            if(precond != nullptr)
+              precond->init_numeric();
+
             // Get the coordinates on the finest level
             typename SystemLevelType::LocalCoordsBuffer& finest_coords(*(_system_levels.back()->coords_buffer));
 
@@ -420,9 +424,6 @@ namespace FEAT
             // solve
             //Solver::solve(*solver, vec_sol, vec_rhs, the_system_level.op_sys, the_system_level.filter_sys);
             the_system_level.op_sys.reset_num_evals();
-            if(precond != nullptr)
-              precond->init_numeric();
-
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;
 

@@ -100,12 +100,22 @@ struct MeshoptRefinementApp
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
       dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
 
+    // Save original coordinates
+    meshopt_ctrl->mesh_to_buffer();
+    auto original_coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
+
     // Adapt the finest level
     dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
 
+    // Save new coordinates. We need them for calling prepare() to set the initial guess
     meshopt_ctrl->mesh_to_buffer();
-    auto new_coords = meshopt_ctrl->get_coords().clone();
+    auto new_coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
 
+    // Reset the mesh to the original coordinates so the preconditioner works on the undeformed mesh
+    meshopt_ctrl->get_coords().clone(original_coords, LAFEM::CloneMode::Deep);
+    meshopt_ctrl->buffer_to_mesh();
+
+    // Now call prepare
     meshopt_ctrl->prepare(new_coords);
 
     // Write initial vtk output
