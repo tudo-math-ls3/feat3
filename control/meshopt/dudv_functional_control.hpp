@@ -229,7 +229,8 @@ namespace FEAT
           virtual void buffer_to_mesh() override
           {
             // Write from control object to local mesh quality functional
-            (*(_system_levels.back()->op_sys)).get_coords().clone(*(_system_levels.back()->coords_buffer));
+            (*(_system_levels.back()->op_sys)).get_coords().clone(
+              *(_system_levels.back()->coords_buffer), LAFEM::CloneMode::Deep);
             // Write finest level
             (*(_system_levels.back()->op_sys)).buffer_to_mesh();
 
@@ -302,6 +303,13 @@ namespace FEAT
             return dirichlet_boundaries;
           }
 
+          /**
+           * \brief Numerically assembles the functional for evaluation
+           *
+           * This is mainly for using this functional as a preconditioner for the HyperelasticityFunctional so it
+           * can be called separately.
+           *
+           */
           virtual void init_numeric()
           {
             for(size_t lvl(0); lvl < size_t(num_levels); ++lvl)
@@ -337,6 +345,17 @@ namespace FEAT
 
           }
 
+          /**
+           * \brief Applies the inverse of this functional's gradient to a right hand side
+           *
+           * \param[in,out] vec_sol
+           * Initial guess, gets overwritten with the solution.
+           *
+           * \param[in] vec_rhs
+           * Right hand side.
+           *
+           * This is for using this functional as a preconditioner i.e. for the HyperelasticityFunctional
+           */
           virtual Solver::Status apply(GlobalSystemVectorR& vec_sol, const GlobalSystemVectorL& vec_rhs)
           {
             // Get our global system matrix and filter
@@ -349,6 +368,9 @@ namespace FEAT
           /// \copydoc BaseClass()::optimise()
           virtual void optimise() override
           {
+            // Reassemble the system matrix
+            init_numeric();
+
             // fetch our finest levels
             //DomainLevelType& the_domain_level = *domain_levels.back();
             SystemLevelType& the_system_level = *_system_levels.back();
@@ -360,31 +382,60 @@ namespace FEAT
             // solve
             this->apply(vec_sol, vec_rhs);
 
+            // Write the solution to the control object's buffer and the buffer to mesh
             (*the_system_level.coords_buffer).convert(*vec_sol);
             buffer_to_mesh();
 
+            // Call prepare again to project the slip boundaries
             prepare(vec_sol);
 
           }
 
       };
 
+      /**
+       * \copydoc Control::Meshopt::MeshoptAssemblerLevel
+       */
       template<typename Space_>
       class DuDvFunctionalAssemblerLevel : public MeshoptAssemblerLevel<Space_>
       {
         public:
+          /// Our baseclass
           typedef Control::Meshopt::MeshoptAssemblerLevel<Space_> BaseClass;
+          /// Type of the underlying transformation
           typedef typename BaseClass::TrafoType TrafoType;
-
+          /// The shape dimension of the mesh's cells
           static constexpr int shape_dim = BaseClass::MeshType::ShapeType::dimension;
 
           // Copy baseclass constructors
           using BaseClass::BaseClass;
 
+          /**
+           * \brief Assembles the system matrix on the given system level
+           *
+           * This is just a wrapper around the local functional's routine
+           */
           template<typename SystemLevel_>
           void assemble_system_matrix(SystemLevel_& sys_level)
           {
             (*(sys_level.op_sys)).assemble_system_matrix();
+          }
+
+          /**
+           * \brief Assembles the initial guess on the given system level
+           *
+           * This just copies the mesh's vertex coordinates and filters them.
+           */
+          template<typename SystemLevel_>
+          typename SystemLevel_::GlobalSystemVectorR assemble_sol_vector(SystemLevel_& sys_level)
+          {
+            XASSERTM(!(*sys_level.op_sys).empty(), "assemble_sol_vector for empty operator");
+            typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.op_sys.create_vector_r());
+            vec_sol.clone(sys_level.coords_buffer, LAFEM::CloneMode::Deep);
+
+            sys_level.filter_sys.filter_sol(vec_sol);
+
+            return vec_sol;
           }
       }; // class DuDvFunctionalAssemblerLevel
 

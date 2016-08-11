@@ -249,9 +249,7 @@ namespace FEAT
           XASSERT(_slip_asm != nullptr);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
-          {
             _lambda(cell, _trafo->template compute_vol<typename MeshType::ShapeType>(cell));
-          }
 
           auto& dirichlet_filters = filter.template at<1>();
 
