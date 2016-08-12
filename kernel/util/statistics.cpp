@@ -15,7 +15,8 @@ KahanAccumulation Statistics::_time_precon;
 KahanAccumulation Statistics::_time_mpi_execute;
 KahanAccumulation Statistics::_time_mpi_wait_reduction;
 KahanAccumulation Statistics::_time_mpi_wait_spmv;
-std::list<std::shared_ptr<Solver::ExpressionBase>> Statistics::_solver_expressions;
+std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> Statistics::_solver_expressions;
+String Statistics::expression_target = "default";
 double Statistics::toe_partition;
 double Statistics::toe_assembly;
 double Statistics::toe_solve;
@@ -25,19 +26,19 @@ String Statistics::get_formatted_solver_tree()
   std::list<String> names;
   std::list<int> found; //number of found preconds / smoothers / coarse solvers. 0 = nothing found, 1 = smoother / s found, 2 = coarse solver / a found, 3 = all found
 
-  if (_solver_expressions.front()->get_type() != Solver::ExpressionType::start_solve)
+  if (_solver_expressions[expression_target].front()->get_type() != Solver::ExpressionType::start_solve)
   {
     throw InternalError(__func__, __FILE__, __LINE__, "Should never happen - _solver_expressions list did not start with start solve expression!");
   }
 
   // process the very first entry, e.g. the outer most solver
-  auto it = _solver_expressions.begin();
+  auto it = _solver_expressions[expression_target].begin();
   String tree((*it)->solver_name);
   names.push_back((*it)->solver_name);
   found.push_back(0);
 
   // process current last element in the list, until no element needs to be processed
-  while (names.size() > 0 && it != _solver_expressions.end())
+  while (names.size() > 0 && it != _solver_expressions[expression_target].end())
   {
     ++it;
 
@@ -45,7 +46,7 @@ String Statistics::get_formatted_solver_tree()
     // if smoother and coarse solver have been found, skip everything until solver end statement has been found
     if (names.back().starts_with("MultiGrid") || names.back().starts_with("VCycle") || names.back().starts_with("ScaRCMultiGrid"))
     {
-      while (it != _solver_expressions.end())
+      while (it != _solver_expressions[expression_target].end())
       {
         auto expression = *it;
 
@@ -108,7 +109,7 @@ String Statistics::get_formatted_solver_tree()
     // if both have been found, skip everything until solver end statement has been found
     else if (names.back().starts_with("Schur"))
     {
-      while (it != _solver_expressions.end())
+      while (it != _solver_expressions[expression_target].end())
       {
         auto expression = *it;
 
@@ -183,7 +184,7 @@ String Statistics::get_formatted_solver_tree()
     // if both have been found, skip everything until solver end statement has been found
     else if (names.back().starts_with("PCGNR"))
     {
-      while (it != _solver_expressions.end())
+      while (it != _solver_expressions[expression_target].end())
       {
         auto expression = *it;
 
@@ -257,7 +258,7 @@ String Statistics::get_formatted_solver_tree()
     else
     {
       // the current solver is not of multigrid or schur type, i.e. is uses at most one preconditioner, search for its call or the solvers end.
-      while (it != _solver_expressions.end())
+      while (it != _solver_expressions[expression_target].end())
       {
         auto expression = *it;
 
@@ -309,7 +310,7 @@ void Statistics::print_solver_expressions()
 {
   size_t padding(0);
 
-  for (auto expression : _solver_expressions)
+  for (auto expression : _solver_expressions[expression_target])
   {
     switch (expression->get_type())
     {

@@ -53,7 +53,7 @@ namespace FEAT
       static KahanAccumulation _time_mpi_wait_spmv;
 
       /// a consecutive list of all solver actions
-      static std::list<std::shared_ptr<Solver::ExpressionBase>> _solver_expressions;
+      static std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> _solver_expressions;
 
       /*static String _format_solver_statistics(String branch, SolverStatistics & stat)
       {
@@ -116,6 +116,9 @@ namespace FEAT
       static double toe_assembly;
       /// time of solution in seconds, needs initialisation
       static double toe_solve;
+      /// the current solver's descriptive string
+      static String expression_target;
+
 
       /// Reset all internal counters (flops/times/solver_statistics)
       static void reset()
@@ -214,7 +217,7 @@ namespace FEAT
 
       inline static void add_solver_expression(std::shared_ptr<Solver::ExpressionBase> expression)
       {
-        _solver_expressions.push_back(expression);
+        _solver_expressions[expression_target].push_back(expression);
       }
 
       /**

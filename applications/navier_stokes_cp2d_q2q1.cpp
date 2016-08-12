@@ -1040,6 +1040,9 @@ namespace NaverStokesCP2D
     // time-step loop
     for(Index time_step(1); time_step <= cfg.max_time_steps; ++time_step)
     {
+      // clear all solver statistics from previous time steps, thus preventing the list to grow forever
+      FEAT::Statistics::reset_solver_statistics();
+
       // compute current time
       const DataType cur_time = DataType(time_step) * delta_t;
 
@@ -1131,6 +1134,7 @@ namespace NaverStokesCP2D
         for(Index dpm_step(0); ; ++dpm_step)
         {
           // solve velocity system
+          FEAT::Statistics::expression_target = "solver_a";
           watch_solver_a.start();
           Solver::Status status_a = solver_a->apply(vec_cor_v, vec_def_v);
           watch_solver_a.stop();
@@ -1156,6 +1160,7 @@ namespace NaverStokesCP2D
           watch_calc_def.stop();
 
           // solve pressure system
+          FEAT::Statistics::expression_target = "solver_s";
           watch_solver_s.start();
           Solver::Status status_s = solver_s->apply(vec_cor_p, vec_def_p);
           watch_solver_s.stop();
@@ -1288,6 +1293,13 @@ namespace NaverStokesCP2D
       dump_time("Solver-S Time", t_solver_s, t_total);
       dump_time("VTK-Write Time", t_vtk, t_total);
       dump_time("Other Time", t_total-t_sum, t_total);
+
+      FEAT::Statistics::expression_target = "solver_a";
+      Util::mpi_cout("\nsolver_a:\n");
+      Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+      FEAT::Statistics::expression_target = "solver_s";
+      Util::mpi_cout("solver_s:\n");
+      Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
     }
 
     /* ***************************************************************************************** */
