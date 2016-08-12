@@ -58,23 +58,23 @@ namespace FEAT
           Util::Comm::allreduce(&cells_fine_local, &cells_fine_max, 1, Util::CommOperationMax());
           Util::Comm::allreduce(&cells_fine_local, &cells_fine_min, 1, Util::CommOperationMin());
 
-          Index dofs_coarse_local = system_levels.front()->matrix_sys.columns();
+          Index dofs_coarse_local = (*system_levels.front()->matrix_sys).columns();
           Index dofs_coarse_max;
           Index dofs_coarse_min;
           Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_max, 1, Util::CommOperationMax());
           Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_min, 1, Util::CommOperationMin());
-          Index dofs_fine_local = system_levels.back()->matrix_sys.columns();
+          Index dofs_fine_local = (*system_levels.back()->matrix_sys).columns();
           Index dofs_fine_max;
           Index dofs_fine_min;
           Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_max, 1, Util::CommOperationMax());
           Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_min, 1, Util::CommOperationMin());
 
-          Index nzes_coarse_local = system_levels.front()->matrix_sys.used_elements();
+          Index nzes_coarse_local = (*system_levels.front()->matrix_sys).used_elements();
           Index nzes_coarse_max;
           Index nzes_coarse_min;
           Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_max, 1, Util::CommOperationMax());
           Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_min, 1, Util::CommOperationMin());
-          Index nzes_fine_local = system_levels.back()->matrix_sys.used_elements();
+          Index nzes_fine_local = (*system_levels.back()->matrix_sys).used_elements();
           Index nzes_fine_max;
           Index nzes_fine_min;
           Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_max, 1, Util::CommOperationMax());
@@ -106,8 +106,8 @@ namespace FEAT
           if (statistics_check > 0) // provided parameter full or whatever
           {
             FEAT::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size,
-            domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension), system_levels.back()->matrix_sys.columns(),
-            system_levels.back()->matrix_sys.used_elements());
+            domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension), (*system_levels.back()->matrix_sys).columns(),
+            (*system_levels.back()->matrix_sys).used_elements());
           }
         }
 
