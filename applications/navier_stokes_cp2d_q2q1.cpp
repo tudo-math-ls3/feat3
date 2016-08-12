@@ -944,10 +944,8 @@ namespace NaverStokesCP2D
     // for the velocity multigrid/solver, we can only perform symbolic initialisation up to now:
     if(cfg.multigrid_a)
     {
-      multigrid_hierarchy_velo->init_branch();
       multigrid_hierarchy_velo->init_symbolic();
     }
-    solver_a->init_branch();
     solver_a->init_symbolic();
 
     /* ***************************************************************************************** */
