@@ -220,6 +220,11 @@ namespace FEAT
         _solver_expressions[expression_target].push_back(expression);
       }
 
+      static const std::list<std::shared_ptr<Solver::ExpressionBase>> & get_solver_expressions()
+      {
+        return _solver_expressions[expression_target];
+      }
+
       /**
        * \brief Returns a descriptive string of the complete solver tree.
        *

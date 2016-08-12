@@ -325,6 +325,9 @@ namespace NaverStokesCP2D
     // damping parameter for pressure smoother
     Real smooth_damp_s;
 
+    // enables verbose statistics output
+    bool statistics;
+
   public:
     Config() :
       level_min_in(0),
@@ -353,7 +356,8 @@ namespace NaverStokesCP2D
       max_iter_s(50),
       tol_rel_s(1E-5),
       smooth_steps_s(4),
-      smooth_damp_s(0.5)
+      smooth_damp_s(0.5),
+      statistics(false)
     {
       const char* mpath = getenv("FEAT3_PATH_MESHES");
       if(mpath != nullptr)
@@ -407,6 +411,7 @@ namespace NaverStokesCP2D
       args.parse("tol-rel-s", tol_rel_s);
       args.parse("smooth-s", smooth_steps_s);
       args.parse("damp-s", smooth_damp_s);
+      statistics = args.check("statistics") >= 0;
 
       return true;
     }
@@ -442,6 +447,7 @@ namespace NaverStokesCP2D
       dump_line("S: Tol-Rel", tol_rel_s);
       dump_line("S: Smooth Steps", smooth_steps_s);
       dump_line("S: Smooth Damp", smooth_damp_s);
+      dump_line("Statistics", statistics);
     }
 
     // Setup: Poiseuille-Flow on unit-square
@@ -554,6 +560,12 @@ namespace NaverStokesCP2D
     GlobalSystemFilter filter_sys;
     GlobalVeloFilter filter_velo;
     GlobalPresUnitFilter filter_pres_unit;
+
+    /// \brief Returns the total amount of bytes allocated.
+    std::size_t bytes() const
+    {
+      return this->filter_sys.bytes() + BaseClass::bytes();
+    }
   }; // class NavierStokesBlockedSystemLevel
 
   /**
@@ -709,6 +721,147 @@ namespace NaverStokesCP2D
       burgers_mat.assemble(this->space_velo, this->cubature, vec_cv, &(*matrix_a), nullptr);
     }
   }; // class NavierStokesBlockedAssemblerLevel
+
+  template <typename SystemLevelType, typename TransferLevelType, typename MeshType>
+  void report_statistics(double t_total, std::deque<SystemLevelType*> & system_levels, std::deque<TransferLevelType*> & transfer_levels,
+      Control::Domain::DomainControl<MeshType>& domain, int nprocs)
+  {
+    /// \todo cover exactly all la op timings (some are not timed yet in the application) and replace t_total by them
+    double solver_toe = t_total; //t_solver_a + t_solver_s + t_calc_def;
+    int shape_dimension = MeshType::ShapeType::dimension;
+
+    //until now, system matrix is empty, so we need to compile it first
+    system_levels.front()->compile_system_matrix();
+    system_levels.back()->compile_system_matrix();
+
+    FEAT::Statistics::expression_target = "solver_a";
+    Util::mpi_cout("\nsolver_a:\n");
+    Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+    FEAT::Statistics::expression_target = "solver_s";
+    Util::mpi_cout("solver_s:\n");
+    Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+
+    std::size_t la_size(0);
+    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { la_size += n->bytes(); });
+    std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType * n) { la_size += n->bytes(); });
+    std::size_t mpi_size(0);
+    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { mpi_size += n->gate_sys.bytes(); });
+    String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
+
+    Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
+    Index cells_coarse_max;
+    Index cells_coarse_min;
+    Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_min, 1, Util::CommOperationMin());
+    Index cells_fine_local = domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension);
+    Index cells_fine_max;
+    Index cells_fine_min;
+    Util::Comm::allreduce(&cells_fine_local, &cells_fine_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&cells_fine_local, &cells_fine_min, 1, Util::CommOperationMin());
+
+    Index dofs_coarse_local = (*system_levels.front()->matrix_sys).columns();
+    Index dofs_coarse_max;
+    Index dofs_coarse_min;
+    Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_min, 1, Util::CommOperationMin());
+    Index dofs_fine_local = (*system_levels.back()->matrix_sys).columns();
+    Index dofs_fine_max;
+    Index dofs_fine_min;
+    Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_min, 1, Util::CommOperationMin());
+
+    Index nzes_coarse_local = (*system_levels.front()->matrix_a).used_elements() + (*system_levels.front()->matrix_s).used_elements();
+    Index nzes_coarse_max;
+    Index nzes_coarse_min;
+    Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_min, 1, Util::CommOperationMin());
+    Index nzes_fine_local = (*system_levels.back()->matrix_a).used_elements() + (*system_levels.back()->matrix_s).used_elements();
+    Index nzes_fine_max;
+    Index nzes_fine_min;
+    Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_min, 1, Util::CommOperationMin());
+
+    double solver_a_mpi_wait_reduction(0.);
+    double solver_a_mpi_wait_spmv(0.);
+    FEAT::Statistics::expression_target = "solver_a";
+    auto& expressions_a = FEAT::Statistics::get_solver_expressions();
+    for (auto& expression : expressions_a)
+    {
+      if (expression->get_type() == FEAT::Solver::ExpressionType::timings)
+      {
+        auto t = dynamic_cast<Solver::ExpressionTimings*>(expression.get());
+        solver_a_mpi_wait_reduction += t->mpi_wait_reduction;
+        solver_a_mpi_wait_spmv += t->mpi_wait_spmv;
+      }
+      if (expression->get_type() == FEAT::Solver::ExpressionType::level_timings)
+      {
+        auto t = dynamic_cast<Solver::ExpressionLevelTimings*>(expression.get());
+        solver_a_mpi_wait_reduction += t->mpi_wait_reduction;
+        solver_a_mpi_wait_spmv += t->mpi_wait_spmv;
+      }
+    }
+    double solver_a_mpi_wait_reduction_max;
+    double solver_a_mpi_wait_reduction_min;
+    Util::Comm::allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_min, 1, Util::CommOperationMin());
+    double solver_a_mpi_wait_spmv_max;
+    double solver_a_mpi_wait_spmv_min;
+    Util::Comm::allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_min, 1, Util::CommOperationMin());
+
+    double solver_s_mpi_wait_reduction(0.);
+    double solver_s_mpi_wait_spmv(0.);
+    FEAT::Statistics::expression_target = "solver_s";
+    auto& expressions_s = FEAT::Statistics::get_solver_expressions();
+    for (auto& expression : expressions_s)
+    {
+      if (expression->get_type() == FEAT::Solver::ExpressionType::timings)
+      {
+        auto t = dynamic_cast<Solver::ExpressionTimings*>(expression.get());
+        solver_s_mpi_wait_reduction += t->mpi_wait_reduction;
+        solver_s_mpi_wait_spmv += t->mpi_wait_spmv;
+      }
+      if (expression->get_type() == FEAT::Solver::ExpressionType::level_timings)
+      {
+        auto t = dynamic_cast<Solver::ExpressionLevelTimings*>(expression.get());
+        solver_s_mpi_wait_reduction += t->mpi_wait_reduction;
+        solver_s_mpi_wait_spmv += t->mpi_wait_spmv;
+      }
+    }
+    double solver_s_mpi_wait_reduction_max;
+    double solver_s_mpi_wait_reduction_min;
+    Util::Comm::allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_min, 1, Util::CommOperationMin());
+    double solver_s_mpi_wait_spmv_max;
+    double solver_s_mpi_wait_spmv_min;
+    Util::Comm::allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_max, 1, Util::CommOperationMax());
+    Util::Comm::allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_min, 1, Util::CommOperationMin());
+
+    String flops = FEAT::Statistics::get_formatted_flops(solver_toe, (Index)nprocs);
+    Util::mpi_cout(flops + "\n\n");
+    Util::mpi_cout(op_timings + "\n");
+    Util::mpi_cout("solver_a\n");
+    Util::mpi_cout(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_reduction_max) + ", min: " + stringify(solver_a_mpi_wait_reduction_min) + ", local: " +
+        stringify(solver_a_mpi_wait_reduction) + "\n");
+    Util::mpi_cout(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_spmv_max) + ", min: " + stringify(solver_a_mpi_wait_spmv_min) + ", local: " +
+        stringify(solver_a_mpi_wait_spmv) + "\n");
+    Util::mpi_cout("solver_s\n");
+    Util::mpi_cout(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_reduction_max) + ", min: " + stringify(solver_s_mpi_wait_reduction_min) + ", local: " +
+        stringify(solver_s_mpi_wait_reduction) + "\n");
+    Util::mpi_cout(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_spmv_max) + ", min: " + stringify(solver_s_mpi_wait_spmv_min) + ", local: " +
+        stringify(solver_s_mpi_wait_spmv) + "\n\n");
+    Util::mpi_cout(String("Domain size:").pad_back(20) + stringify(double(domain.bytes())  / (1024. * 1024.))  + " MByte\n");
+    Util::mpi_cout(String("MPI size:").pad_back(20) + stringify(double(mpi_size) / (1024. * 1024.)) + " MByte\n");
+    Util::mpi_cout(String("LA size:").pad_back(20) + stringify(double(la_size) / (1024. * 1024.)) + " MByte\n\n");
+    Util::mpi_cout(Util::get_formatted_memory_usage() + "\n");
+    Util::mpi_cout(String("#Mesh cells:").pad_back(20) + "coarse " + stringify(cells_coarse_max) + "/" + stringify(cells_coarse_min) + ", fine " +
+        stringify(cells_fine_max) + "/" + stringify(cells_fine_min) + "\n");
+    Util::mpi_cout(String("#DOFs:").pad_back(20) + "coarse " + stringify(dofs_coarse_max) + "/" + stringify(dofs_coarse_min) + ", fine " +
+        stringify(dofs_fine_max) + "/" + stringify(dofs_fine_min) + "\n");
+    Util::mpi_cout(String("#NZEs").pad_back(20) + "coarse " + stringify(nzes_coarse_max) + "/" + stringify(nzes_coarse_min) + ", fine " +
+        stringify(nzes_fine_max) + "/" + stringify(nzes_fine_min) + "\n");
+    Util::mpi_cout("\n");
+  }
 
 
   template<typename MeshType_>
@@ -1037,10 +1190,12 @@ namespace NaverStokesCP2D
     // keep track whether something failed miserably...
     bool failure = false;
 
+    Statistics::reset();
+
     // time-step loop
     for(Index time_step(1); time_step <= cfg.max_time_steps; ++time_step)
     {
-      // clear all solver statistics from previous time steps, thus preventing the list to grow forever
+      // clear all solver statistics from previous time steps, thus preventing the list to grow forever, until we need to gather everything
       FEAT::Statistics::reset_solver_statistics();
 
       // compute current time
@@ -1271,18 +1426,19 @@ namespace NaverStokesCP2D
     if(cfg.multigrid_a)
       multigrid_hierarchy_velo->done_symbolic();
 
+    double t_total = watch_total.elapsed();
+    double t_asm_mat = watch_asm_mat.elapsed();
+    double t_asm_rhs = watch_asm_rhs.elapsed();
+    double t_calc_def = watch_calc_def.elapsed();
+    double t_sol_init = watch_sol_init.elapsed();
+    double t_solver_a = watch_solver_a.elapsed();
+    double t_solver_s = watch_solver_s.elapsed();
+    double t_vtk = watch_vtk.elapsed();
+    double t_sum = t_asm_mat + t_asm_rhs + t_calc_def + t_sol_init + t_solver_a + t_solver_s + t_vtk;
+
     // write timings
     if(rank == 0)
     {
-      double t_total = watch_total.elapsed();
-      double t_asm_mat = watch_asm_mat.elapsed();
-      double t_asm_rhs = watch_asm_rhs.elapsed();
-      double t_calc_def = watch_calc_def.elapsed();
-      double t_sol_init = watch_sol_init.elapsed();
-      double t_solver_a = watch_solver_a.elapsed();
-      double t_solver_s = watch_solver_s.elapsed();
-      double t_vtk = watch_vtk.elapsed();
-      double t_sum = t_asm_mat + t_asm_rhs + t_calc_def + t_sol_init + t_solver_a + t_solver_s + t_vtk;
       Util::mpi_cout("\n\n");
       dump_time("Total Solver Time", t_total, t_total);
       dump_time("Matrix Assembly Time", t_asm_mat, t_total);
@@ -1293,13 +1449,11 @@ namespace NaverStokesCP2D
       dump_time("Solver-S Time", t_solver_s, t_total);
       dump_time("VTK-Write Time", t_vtk, t_total);
       dump_time("Other Time", t_total-t_sum, t_total);
+    }
 
-      FEAT::Statistics::expression_target = "solver_a";
-      Util::mpi_cout("\nsolver_a:\n");
-      Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
-      FEAT::Statistics::expression_target = "solver_s";
-      Util::mpi_cout("solver_s:\n");
-      Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+    if (cfg.statistics)
+    {
+      report_statistics(t_total, system_levels, transfer_levels, domain, nprocs);
     }
 
     /* ***************************************************************************************** */
@@ -1370,6 +1524,7 @@ namespace NaverStokesCP2D
     args.support("tol-rel-s", "<eps>\nSets the relative tolerative for the S-Solver.\nDefault: 1E-5\n");
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
     args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.5\n");
+    args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete stastistics dump");
 
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))

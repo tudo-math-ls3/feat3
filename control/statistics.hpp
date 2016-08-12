@@ -97,10 +97,6 @@ namespace FEAT
             std::cout<<String("#DOFs:").pad_back(20) << "coarse " << dofs_coarse_max << "/" << dofs_coarse_min << ", fine " << dofs_fine_max << "/" << dofs_fine_min << std::endl;
             std::cout<<String("#NZEs").pad_back(20) << "coarse " << nzes_coarse_max << "/" << nzes_coarse_min << ", fine " << nzes_fine_max << "/" << nzes_fine_min << std::endl;
             std::cout<<std::endl;
-            /*if (statistics_check > 0) // provided parameter full or whatever
-            {
-              std::cout<<FEAT::Statistics::get_formatted_solvers();
-            }*/
           }
           if (statistics_check > 0) // provided parameter full or whatever
           {

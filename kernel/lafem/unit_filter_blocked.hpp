@@ -141,6 +141,12 @@ namespace FEAT
         _sv.clear();
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _sv.bytes();
+      }
+
       /// \cond internal
       SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector()
       {

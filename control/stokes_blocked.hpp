@@ -115,6 +115,12 @@ namespace FEAT
       {
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->matrix_sys.bytes () + this->matrix_s.bytes();
+      }
+
       void compile_system_matrix()
       {
         (*matrix_sys).block_a() = (*matrix_a).clone(LAFEM::CloneMode::Shallow);
