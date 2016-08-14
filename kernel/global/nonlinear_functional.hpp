@@ -55,12 +55,6 @@ namespace FEAT
         /// The global nonlinear functional's Blockwidth ist the same as the local nonlinear functional's
         static constexpr int BlockWidth = LocalNonlinearFunctional_::BlockWidth;
 
-      private:
-        /// Number of columns = number of input variables of the global functional
-        Index _columns;
-        /// Number of rows = number of output variables of the global functional's gradient
-        Index _rows;
-
       protected:
         /// Gate for syncing row vectors
         GateRowType* _row_gate;
@@ -83,8 +77,6 @@ namespace FEAT
          */
         template<typename... Args_>
         explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate, Args_&&... args) :
-          _columns(0),
-          _rows(0),
           _row_gate(row_gate),
           _col_gate(col_gate),
           _nonlinear_functional(std::forward<Args_>(args)...)
@@ -236,32 +228,33 @@ namespace FEAT
         /**
          * \brief Gets the number of columns
          *
-         * \return A const reference to the number of columns
+         * \warning In parallel, this requires communication and is very expensive, so use sparingly!
+         *
+         * \returns The number of colums
          */
         Index columns()
         {
-          if(_columns == Index(0))
-          {
-            // Compute total number of rows and columns
-            auto vec_r = create_vector_r();
-            vec_r.format(DataType(1));
+          // Compute total number of rows and columns
+          auto vec_r = create_vector_r();
+          vec_r.format(DataType(1));
 
-            _columns = Index(vec_r.norm2sqr());
-            _rows = _columns;
-
-          }
-
-          return _columns;
+          return Index(vec_r.norm2sqr());
         }
 
         /**
          * \brief Gets the number of rows
          *
-         * \return A const reference to the number of columns
+         * \warning In parallel, this requires communication and is very expensive, so use sparingly!
+         *
+         * \returns The number of colums
          */
         Index rows()
         {
-          return columns();
+          // Compute total number of rows and rows
+          auto vec_l = create_vector_l();
+          vec_l.format(DataType(1));
+
+          return Index(vec_l.norm2sqr());
         }
 
         /**
