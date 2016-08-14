@@ -62,6 +62,11 @@ namespace FEAT
               auto slip_list_p = precon_section->query("slip_boundaries");
               slip_list_p.first.split_by_charset(precon_slip_list, " ");
 
+              bool fixed_reference_domain(false);
+              auto fixed_reference_domain_p = precon_section->query("fixed_reference_domain");
+              if(fixed_reference_domain_p.second)
+                fixed_reference_domain = (std::stoi(fixed_reference_domain_p.first) == 1);
+
               typedef DuDvFunctionalControl
               <
                 typename MeshoptCtrl_::MemType,
@@ -72,7 +77,8 @@ namespace FEAT
               > PreconControlType;
 
               result = Solver::new_nonlinear_operator_precond_wrapper<PreconControlType>
-                (dom_ctrl, precon_dirichlet_list, precon_slip_list, precon_solver_p.first, solver_config);
+                (dom_ctrl, precon_dirichlet_list, precon_slip_list, precon_solver_p.first, solver_config,
+                fixed_reference_domain);
             }
             else if(precon_p.first != "none")
               throw InternalError(__func__,__FILE__,__LINE__,

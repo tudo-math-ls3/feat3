@@ -380,9 +380,10 @@ namespace FEAT
          *
          * \returns The number of columns.
          */
+        template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
         Index columns() const
         {
-          return sys_matrix.columns();
+          return sys_matrix.template columns<perspective_>();
         }
 
         /**
@@ -390,9 +391,10 @@ namespace FEAT
          *
          * \returns The number of rows.
          */
+        template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
         Index rows() const
         {
-          return sys_matrix.rows();
+          return sys_matrix.template rows<perspective_>();
         }
 
         /// \copydoc MatrixType::apply()

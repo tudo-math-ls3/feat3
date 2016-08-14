@@ -4,6 +4,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/util/mpi_cout.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>

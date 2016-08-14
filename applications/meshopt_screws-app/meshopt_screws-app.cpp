@@ -574,6 +574,9 @@ struct MeshoptScrewsApp
 
     } // time loop
 
+    Util::mpi_cout("Finished!\n");
+    meshopt_ctrl->print();
+
     if(Util::Comm::rank() == 0)
     {
       TimeStamp bt;

@@ -140,6 +140,16 @@ namespace FEAT
           virtual std::deque<String> get_dirichlet_boundaries() const = 0;
 
           /**
+           * \brief Gets the names of all slip boundaries
+           *
+           * Note that each name refers to a boundary, but that boundary does not necessaryly have to be present due
+           * to partitioning etc.
+           *
+           * \returns A deque of Strings with all slip boundary names
+           */
+          virtual std::deque<String> get_slip_boundaries() const = 0;
+
+          /**
            * \brief Returns a descriptive String
            *
            * \returns The class name as String
@@ -153,6 +163,12 @@ namespace FEAT
             (Geometry::ExportVTK<typename Trafo_::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
           {
           }
+
+          /**
+           * \brief Prints settings of the control object
+           */
+          virtual void print() const = 0;
+
 
       }; // class MeshoptControlBase
 

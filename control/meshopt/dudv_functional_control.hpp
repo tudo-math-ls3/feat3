@@ -77,10 +77,6 @@ namespace FEAT
           /// Our base class
           typedef MeshoptControlBase<DomainControl_, Trafo_> BaseClass;
 
-          //typedef FEAT::Meshopt::DuDvFunctional<Mem_, DT_, IT_, Trafo_> MeshQualityFunctional;
-          //typedef MeshoptSystemLevel<Mem_, DT_, IT_, MeshQualityFunctional::template MatrixTemplate, Global::Matrix>
-          //  SystemLevelType;
-
           /// Template-alias away the Trafo so the SystemLevel can take it as a template template parameter
           template<typename A, typename B, typename C>
           using OperatorType =  FEAT::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
@@ -113,19 +109,22 @@ namespace FEAT
           PropertyMap& solver_config;
           /// The name of the section from solver_config we want to use
           String solver_name;
-
+          /// The solver
           std::shared_ptr<Solver::SolverBase<GlobalSystemVectorR>> solver;
+          /// Whether to reassemble the system matrix in every call of optimise
+          const bool fixed_reference_domain;
 
           explicit DuDvFunctionalControl(
             DomainControl_& dom_ctrl, const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
-            const String& solver_name_, PropertyMap& solver_config_):
+            const String& solver_name_, PropertyMap& solver_config_, bool fixed_reference_domain_):
             _assembler_levels(),
             _system_levels(),
             _transfer_levels(),
             num_levels(dom_ctrl.get_levels().size()),
             solver_config(solver_config_),
             solver_name(solver_name_),
-            solver(nullptr)
+            solver(nullptr),
+            fixed_reference_domain(fixed_reference_domain_)
             {
               XASSERT(num_levels > Index(0));
 
@@ -208,6 +207,21 @@ namespace FEAT
           virtual String name() const override
           {
             return "DuDvFunctionalControl<>";
+          }
+
+          /// \copydoc BaseClass::print()
+          virtual void print() const override
+          {
+            Util::mpi_cout(name()+" settings:\n");
+            Util::dump_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
+            Util::dump_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
+            Util::dump_line("Fixed reference domain",fixed_reference_domain);
+            for(const auto& it : get_dirichlet_boundaries())
+              Util::dump_line("Displacement BC on",it);
+            for(const auto& it : get_slip_boundaries())
+              Util::dump_line("Unilateral BC of place on",it);
+            Util::dump_line("Solver",solver->get_formatted_solver_tree());
+            Util::dump_line("DoF",_system_levels.back()->op_sys.columns());
           }
 
           /// \copydoc BaseClass::compute_cell_size_defect()
@@ -302,6 +316,17 @@ namespace FEAT
             return dirichlet_boundaries;
           }
 
+          /// \copydoc BaseClass::get_slip_boundaries()
+          virtual std::deque<String> get_slip_boundaries() const override
+          {
+            std::deque<String> slip_boundaries;
+
+            for(const auto& it:_assembler_levels.back()->slip_asm)
+              slip_boundaries.push_back(it.first);
+
+            return slip_boundaries;
+          }
+
           /**
            * \brief Numerically assembles the functional for evaluation
            *
@@ -320,13 +345,13 @@ namespace FEAT
           /// \copydoc BaseClass::prepare()
           virtual void prepare(const GlobalSystemVectorR& vec_state) override
           {
+            typename SystemLevelType::LocalCoordsBuffer vec_buf;
+            vec_buf.convert(*vec_state);
+
             for(size_t level(num_levels); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
-
-              typename SystemLevelType::LocalCoordsBuffer vec_buf(ndofs, DT_(0));
-              vec_buf.convert(*vec_state);
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous

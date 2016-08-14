@@ -258,6 +258,9 @@ struct MeshoptRefinementApp
       }
     }
 
+    Util::mpi_cout("Finished!\n");
+    meshopt_ctrl->print();
+
     return 0;
 
   }

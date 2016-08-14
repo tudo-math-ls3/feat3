@@ -4,6 +4,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <iostream>
 
@@ -90,8 +91,11 @@ namespace FEAT
         /// \brief Print basic information
         void print()
         {
-          std::cout << "fac_norm = " << stringify_fp_sci(_fac_norm) << ", fac_det = " << stringify_fp_sci(_fac_det) << ", fac_rec_det = " << stringify_fp_sci(_fac_rec_det) << std::endl;
-          std::cout << "fac_cof =  " << stringify_fp_sci(_fac_cof) << ", fac_reg = " << stringify_fp_sci(_fac_reg) << std::endl;
+          Util::mpi_cout_pad_line("fac_norm",stringify_fp_sci(_fac_norm));
+          Util::mpi_cout_pad_line("fac_det",stringify_fp_sci(_fac_det));
+          Util::mpi_cout_pad_line("fac_rec_det",stringify_fp_sci(_fac_rec_det));
+          Util::mpi_cout_pad_line("fac_cof",stringify_fp_sci(_fac_cof));
+          Util::mpi_cout_pad_line("fac_reg",stringify_fp_sci(_fac_reg));
         }
 
     };

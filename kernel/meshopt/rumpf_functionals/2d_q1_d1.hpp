@@ -64,7 +64,7 @@ namespace FEAT
          */
         void print()
         {
-          std::cout << name() << std::endl;
+          Util::mpi_cout(name()+" settings:\n");
           BaseClass::print();
         }
 

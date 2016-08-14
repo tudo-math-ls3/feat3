@@ -494,15 +494,10 @@ namespace FEAT
          */
         virtual void print()
         {
-          std::cout << "scale computation:" << _scale_computation << std::endl;
-          if(!_dirichlet_asm.empty())
-          {
-            std::cout << "Dirichlet boundaries:";
-            for(const auto& it:_dirichlet_asm)
-              std::cout << " " << it.first;
-            std::cout << std::endl;
-          }
+          Util::mpi_cout_pad_line("Scale computation",_scale_computation);
           _functional->print();
+          //if(_mesh_conc != nullptr)
+          //  _mesh_conc->print();
         }
 
         /// \copydoc BaseClass::add_to_vtk_exporter()
@@ -646,7 +641,7 @@ namespace FEAT
          */
         virtual void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
-          this->_coords_buffer.clone(vec_state);
+          this->_coords_buffer.clone(vec_state, LAFEM::CloneMode::Deep);
           this->buffer_to_mesh();
 
           //auto& dirichlet_filters = filter.template at<1>();
@@ -1061,7 +1056,7 @@ namespace FEAT
          */
         virtual void print() override
         {
-          std::cout << name() << std::endl;
+          Util::mpi_cout(name()+" settings:\n");
           BaseClass::print();
         }
 

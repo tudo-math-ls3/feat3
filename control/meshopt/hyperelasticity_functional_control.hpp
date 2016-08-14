@@ -263,6 +263,21 @@ namespace FEAT
             return "HyperelasticityFunctionalControl<>";
           }
 
+          /// \copydoc BaseClass::print()
+          virtual void print() const override
+          {
+            Util::mpi_cout(name()+" settings:\n");
+            Util::dump_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
+            Util::dump_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
+            for(const auto& it : get_dirichlet_boundaries())
+              Util::dump_line("Displacement BC on",it);
+            for(const auto& it : get_slip_boundaries())
+              Util::dump_line("Unilateral BC of place on",it);
+            Util::dump_line("Solver",solver->get_formatted_solver_tree());
+            Util::dump_line("DoF",_system_levels.back()->op_sys.columns());
+            (*(_system_levels.back()->op_sys)).print();
+          }
+
           /// \copydoc BaseClass::get_coords()
           virtual typename SystemLevelType::GlobalCoordsBuffer& get_coords() override
           {
@@ -347,6 +362,17 @@ namespace FEAT
             return dirichlet_boundaries;
           }
 
+          /// \copydoc BaseClass::get_slip_boundaries()
+          virtual std::deque<String> get_slip_boundaries() const override
+          {
+            std::deque<String> slip_boundaries;
+
+            for(const auto& it:_assembler_levels.back()->slip_asm)
+              slip_boundaries.push_back(it.first);
+
+            return slip_boundaries;
+          }
+
           /// \copydoc BaseClass::add_to_vtk_exporter()
           virtual void add_to_vtk_exporter(
             Geometry::ExportVTK<MeshType>& exporter, const int deque_position) const override
@@ -376,14 +402,10 @@ namespace FEAT
             if(precond != nullptr)
               precond->init_numeric();
 
-            // Get the coordinates on the finest level
-            typename SystemLevelType::LocalCoordsBuffer& finest_coords(*(_system_levels.back()->coords_buffer));
+            typename SystemLevelType::LocalCoordsBuffer vec_buf;
+            vec_buf.convert(*vec_state);
 
-            // Set the coordinates on the finest level
-            finest_coords.clone(*vec_state, LAFEM::CloneMode::Deep);
-
-            // Now do it for all other levels
-            for(size_t level(num_levels-1); level > 0; )
+            for(size_t level(num_levels); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
@@ -395,7 +417,7 @@ namespace FEAT
               // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
               // the fine level vector.
               typename SystemLevelType::GlobalCoordsBuffer
-                global_vec_level( &(_system_levels.at(level)->gate_sys), finest_coords, ndofs, Index(0));
+                global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
 
               _system_levels.at(level)->op_sys.prepare
                 (global_vec_level, _system_levels.at(level)->filter_sys);

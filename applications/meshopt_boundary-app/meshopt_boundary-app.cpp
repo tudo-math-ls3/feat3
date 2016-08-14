@@ -404,6 +404,9 @@ struct MeshoptBoundaryApp
 
     } // time loop
 
+    Util::mpi_cout("Finished!\n");
+    meshopt_ctrl->print();
+
     // Check for the hard coded settings for test mode
     if(test_mode)
     {

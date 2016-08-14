@@ -131,8 +131,14 @@ namespace FEAT
           auto solver_p = dudv_config_section->query("solver_config");
           XASSERTM(solver_p.second, "DuDv config section is missing solver entry!");
 
+          bool fixed_reference_domain(false);
+          auto fixed_reference_domain_p = dudv_config_section->query("fixed_reference_domain");
+          if(fixed_reference_domain_p.second)
+            fixed_reference_domain = (std::stoi(fixed_reference_domain_p.first) == 1);
+
           typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_, Trafo_> DuDvCtrl;
-          result = std::make_shared<DuDvCtrl>(dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config);
+          result = std::make_shared<DuDvCtrl>(
+            dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config, fixed_reference_domain);
 
           return result;
         } // create_dudv_control

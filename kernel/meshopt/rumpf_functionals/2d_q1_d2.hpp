@@ -60,6 +60,15 @@ namespace FEAT
         }
 
         /**
+         * \brief Prints object parameters
+         */
+        void print()
+        {
+          Util::mpi_cout(name()+" settings:\n");
+          BaseClass::print();
+        }
+
+        /**
          * \brief Computes value the Rumpf functional on one element.
          **/
         DataType compute_local_functional(const Tx& x, const Th& h)
