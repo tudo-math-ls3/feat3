@@ -300,7 +300,7 @@ struct MeshoptRAdaptApp
 
       // Save old vertex coordinates
       meshopt_ctrl->mesh_to_buffer();
-      old_coords.clone(meshopt_ctrl->get_coords());
+      old_coords.copy(meshopt_ctrl->get_coords());
 
       for(auto& it:dom_ctrl.get_atlas()->get_mesh_chart_map())
       {
@@ -330,10 +330,10 @@ struct MeshoptRAdaptApp
       }
 
       //// Get coords for modification
-      auto coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
+      new_coords.copy(meshopt_ctrl->get_coords());
 
       // Now prepare the functional
-      meshopt_ctrl->prepare(coords);
+      meshopt_ctrl->prepare(new_coords);
 
       meshopt_ctrl->optimise();
 

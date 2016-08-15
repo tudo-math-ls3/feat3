@@ -112,7 +112,7 @@ struct MeshoptRefinementApp
     auto new_coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
 
     // Reset the mesh to the original coordinates so the preconditioner works on the undeformed mesh
-    meshopt_ctrl->get_coords().clone(original_coords, LAFEM::CloneMode::Deep);
+    meshopt_ctrl->get_coords().copy(original_coords);
     meshopt_ctrl->buffer_to_mesh();
 
     // Now call prepare

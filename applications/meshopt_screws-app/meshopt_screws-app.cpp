@@ -409,8 +409,8 @@ struct MeshoptScrewsApp
 
       // Save old vertex coordinates
       meshopt_ctrl->mesh_to_buffer();
-      old_coords.clone(meshopt_ctrl->get_coords());
-      new_coords.clone(meshopt_ctrl->get_coords());
+      old_coords.copy(meshopt_ctrl->get_coords());
+      new_coords.copy(meshopt_ctrl->get_coords());
       auto& coords_loc(*new_coords);
 
       // Rotate the charts

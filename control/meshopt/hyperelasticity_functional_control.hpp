@@ -194,7 +194,6 @@ namespace FEAT
               for(Index i(0); i < num_levels; ++i)
               {
                 _assembler_levels.at(i)->assemble_gates(layer, *_system_levels.at(i));
-                _assembler_levels.at(i)->assemble_coords_buffer(*_system_levels.at(i));
                 // Assemble the system filter, all homogeneous
                 _assembler_levels.at(i)->assemble_system_filter(*_system_levels.at(i));
               }
@@ -267,14 +266,14 @@ namespace FEAT
           virtual void print() const override
           {
             Util::mpi_cout(name()+" settings:\n");
-            Util::dump_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
-            Util::dump_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
+            Util::mpi_cout_pad_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
+            Util::mpi_cout_pad_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
             for(const auto& it : get_dirichlet_boundaries())
-              Util::dump_line("Displacement BC on",it);
+              Util::mpi_cout_pad_line("Displacement BC on",it);
             for(const auto& it : get_slip_boundaries())
-              Util::dump_line("Unilateral BC of place on",it);
-            Util::dump_line("Solver",solver->get_formatted_solver_tree());
-            Util::dump_line("DoF",_system_levels.back()->op_sys.columns());
+              Util::mpi_cout_pad_line("Unilateral BC of place on",it);
+            Util::mpi_cout_pad_line("Solver",solver->get_formatted_solver_tree());
+            Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
             (*(_system_levels.back()->op_sys)).print();
           }
 
@@ -287,15 +286,11 @@ namespace FEAT
           /// \copydoc BaseClass::buffer_to_mesh()
           virtual void buffer_to_mesh() override
           {
-            // Write from control object to local mesh quality functional
-            (*(_system_levels.back()->op_sys)).get_coords().clone(*(_system_levels.back()->coords_buffer),
-            LAFEM::CloneMode::Deep);
             // Write finest level
             (*(_system_levels.back()->op_sys)).buffer_to_mesh();
 
             // Get the coords buffer on the finest level
-            const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
-            const auto& coords_buffer_loc = *coords_buffer;
+            const auto& coords_buffer_loc = *(_system_levels.back()->coords_buffer);
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(num_levels-1); level > 0; )
@@ -312,10 +307,9 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer
                 vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+              (*(_system_levels.at(level)->op_sys)).get_coords().copy(vec_level);
               (*(_system_levels.at(level)->op_sys)).buffer_to_mesh();
             }
-
           }
 
           /// \copydoc BaseClass::mesh_to_buffer()
@@ -323,13 +317,9 @@ namespace FEAT
           {
             // Write finest level
             (*(_system_levels.back()->op_sys)).mesh_to_buffer();
-            // Write from local mesh quality functional to control object
-            (*(_system_levels.back()->coords_buffer)).clone(
-              (*(_system_levels.back()->op_sys)).get_coords(), LAFEM::CloneMode::Deep);
 
             // Get the coords buffer on the finest level
-            const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
-            const auto& coords_buffer_loc = *coords_buffer;
+            const auto& coords_buffer_loc = *(_system_levels.back()->coords_buffer);
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(num_levels-1); level > 0; )
@@ -346,7 +336,7 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer
                 vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level);
+              (*(_system_levels.at(level)->op_sys)).get_coords().copy(vec_level);
             }
 
           }
@@ -384,7 +374,6 @@ namespace FEAT
             sys_lvl->op_sys.compute_grad(grad);
             sys_lvl->filter_sys.filter_def(grad);
             exporter.add_vertex_vector("grad", *grad);
-
 
             for(auto& it:(*(sys_lvl->filter_sys)).template at<0>())
             {
@@ -448,8 +437,8 @@ namespace FEAT
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;
 
-            // Update the control object's buffer because the next initial guess depends on it
-            mesh_to_buffer();
+            // Updates the mesh beyond the finest level etc.
+            prepare(vec_sol);
 
             // Print solver summary
             if(Util::Comm::rank() == 0)

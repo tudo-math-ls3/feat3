@@ -150,20 +150,13 @@ namespace FEAT
               }
 
               for(Index i(0); i < num_levels; ++i)
-              {
                 _assembler_levels.at(i)->assemble_gates(layer, *_system_levels.at(i));
-                _assembler_levels.at(i)->assemble_coords_buffer(*_system_levels.at(i));
-              }
 
               for(Index i(0); (i+1) < num_levels; ++i)
-              {
                 _assembler_levels.at(i+1)->assemble_system_transfer(*_transfer_levels.at(i), *_assembler_levels.at(i));
-              }
 
               for(Index i(0); i < num_levels; ++i)
-              {
                 _assembler_levels.at(i)->assemble_system_matrix(*_system_levels.at(i));
-              }
 
               // create our solver
               solver = Control::MeshoptSolverFactory::create_linear_solver
@@ -213,15 +206,15 @@ namespace FEAT
           virtual void print() const override
           {
             Util::mpi_cout(name()+" settings:\n");
-            Util::dump_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
-            Util::dump_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
-            Util::dump_line("Fixed reference domain",fixed_reference_domain);
+            Util::mpi_cout_pad_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
+            Util::mpi_cout_pad_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
+            Util::mpi_cout_pad_line("Fixed reference domain",fixed_reference_domain);
             for(const auto& it : get_dirichlet_boundaries())
-              Util::dump_line("Displacement BC on",it);
+              Util::mpi_cout_pad_line("Displacement BC on",it);
             for(const auto& it : get_slip_boundaries())
-              Util::dump_line("Unilateral BC of place on",it);
-            Util::dump_line("Solver",solver->get_formatted_solver_tree());
-            Util::dump_line("DoF",_system_levels.back()->op_sys.columns());
+              Util::mpi_cout_pad_line("Unilateral BC of place on",it);
+            Util::mpi_cout_pad_line("Solver",solver->get_formatted_solver_tree());
+            Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
           }
 
           /// \copydoc BaseClass::compute_cell_size_defect()
@@ -241,15 +234,11 @@ namespace FEAT
           /// \copydoc BaseClass::buffer_to_mesh()
           virtual void buffer_to_mesh() override
           {
-            // Write from control object to local mesh quality functional
-            (*(_system_levels.back()->op_sys)).get_coords().clone(
-              *(_system_levels.back()->coords_buffer), LAFEM::CloneMode::Deep);
             // Write finest level
             (*(_system_levels.back()->op_sys)).buffer_to_mesh();
 
             // Get the coords buffer on the finest level
-            const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
-            const auto& coords_buffer_loc = *coords_buffer;
+            const auto& coords_buffer_loc = (*(_system_levels.back()->op_sys)).get_coords();
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(num_levels-1); level > 0; )
@@ -266,10 +255,9 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer
                 vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+              (*(_system_levels.at(level)->op_sys)).get_coords().copy(vec_level);
               (*(_system_levels.at(level)->op_sys)).buffer_to_mesh();
             }
-
           }
 
           /// \copydoc BaseClass::mesh_to_buffer()
@@ -277,13 +265,9 @@ namespace FEAT
           {
             // Write finest level
             (*(_system_levels.back()->op_sys)).mesh_to_buffer();
-            // Write from local mesh quality functional to control object
-            (*(_system_levels.back()->coords_buffer)).clone(
-              (*(_system_levels.back()->op_sys)).get_coords(), LAFEM::CloneMode::Deep);
 
             // Get the coords buffer on the finest level
-            const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
-            const auto& coords_buffer_loc = *coords_buffer;
+            const auto& coords_buffer_loc = *(_system_levels.back()->coords_buffer);
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(num_levels-1); level > 0; )
@@ -300,7 +284,7 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer
                 vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+              (*(_system_levels.at(level)->op_sys)).get_coords().copy(vec_level);
             }
 
           }
@@ -337,9 +321,7 @@ namespace FEAT
           virtual void init_numeric()
           {
             for(size_t lvl(0); lvl < size_t(num_levels); ++lvl)
-            {
               _assembler_levels.at(lvl)->assemble_system_matrix(*(_system_levels.at(lvl)));
-            }
           }
 
           /// \copydoc BaseClass::prepare()
@@ -400,14 +382,18 @@ namespace FEAT
             SystemLevelType& the_system_level = *_system_levels.back();
             AssemblerLevelType& the_asm_level = *_assembler_levels.back();
 
-            // create our RHS and SOL vectors
+            // Create our RHS and SOL vectors
             GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
             GlobalSystemVectorL vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+
             // solve
             this->apply(vec_sol, vec_rhs);
 
             // Write the solution to the control object's buffer and the buffer to mesh
-            (*the_system_level.coords_buffer).convert(*vec_sol);
+            typename SystemLevelType::LocalCoordsBuffer vec_buf;
+            vec_buf.convert(*vec_sol);
+            (*(the_system_level.coords_buffer)).copy(vec_buf);
+
             buffer_to_mesh();
 
             // Call prepare again to project the slip boundaries

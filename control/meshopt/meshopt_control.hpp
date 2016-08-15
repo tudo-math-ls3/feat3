@@ -1,4 +1,3 @@
-#pragma once
 #ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
 #define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
@@ -259,10 +258,10 @@ namespace FEAT
           SystemGate gate_sys;
           /// The global filter
           GlobalSystemFilter filter_sys;
-          /// Buffer vector for copying coordinates back and forth
-          GlobalCoordsBuffer coords_buffer;
           /// The global system matrix
           GlobalQualityFunctional op_sys;
+          /// This contains a shallow copy of the operator's coords_buffer
+          GlobalCoordsBuffer coords_buffer;
 
         public:
           /**
@@ -279,8 +278,8 @@ namespace FEAT
           Args_&&... args) :
             gate_sys(),
             filter_sys(),
-            coords_buffer(&gate_sys),
-            op_sys(&gate_sys, &gate_sys, /*filter_sys,*/ std::forward<Args_>(args)...)
+            op_sys(&gate_sys, &gate_sys, /*filter_sys,*/ std::forward<Args_>(args)...),
+            coords_buffer(&gate_sys, (*op_sys).get_coords().clone(LAFEM::CloneMode::Shallow))
             {
 
               LocalSlipFilterSequence slip_sequence(slip_list);
@@ -297,7 +296,6 @@ namespace FEAT
            */
           virtual ~MeshoptSystemLevel()
           {
-            coords_buffer.clear();
           }
 
       }; // class MeshoptSystemLevel<...>
@@ -458,17 +456,6 @@ namespace FEAT
            */
           virtual ~MeshoptAssemblerLevel()
           {
-          }
-
-          template<typename SystemLevel_>
-          void assemble_coords_buffer(SystemLevel_& sys_level)
-          {
-            typename SystemLevel_::GlobalCoordsBuffer& global_coords_buffer(sys_level.coords_buffer);
-
-            typename SystemLevel_::LocalCoordsBuffer& local_coords_buffer = *global_coords_buffer;
-
-            if(local_coords_buffer.size() != trafo_space.get_num_dofs())
-              local_coords_buffer = std::move(typename SystemLevel_::LocalCoordsBuffer(trafo_space.get_num_dofs()));
           }
 
           template<typename SystemLevel_>

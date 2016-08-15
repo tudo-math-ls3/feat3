@@ -288,11 +288,11 @@ struct MeshoptBoundaryApp
 
       // Save old vertex coordinates
       meshopt_ctrl->mesh_to_buffer();
-      old_coords.clone(meshopt_ctrl->get_coords());
+      old_coords.copy(meshopt_ctrl->get_coords());
 
       // Get coords for modification
-      auto coords = (meshopt_ctrl->get_coords()).clone(LAFEM::CloneMode::Deep);
-      auto& coords_loc = *coords;
+      new_coords.copy(meshopt_ctrl->get_coords());
+      auto& coords_loc = *new_coords;
 
       for(Index i(0); i < (*old_coords).size(); ++i)
         todo_boundary[i] = true;
@@ -329,7 +329,7 @@ struct MeshoptBoundaryApp
         }
       }
 
-      meshopt_ctrl->prepare(coords);
+      meshopt_ctrl->prepare(new_coords);
       meshopt_ctrl->optimise();
 
       // Compute mesh velocity

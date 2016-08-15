@@ -641,7 +641,13 @@ namespace FEAT
          */
         virtual void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
-          this->_coords_buffer.clone(vec_state, LAFEM::CloneMode::Deep);
+
+          // Download state if neccessary
+          CoordsBufferType vec_buf;
+          vec_buf.convert(vec_state);
+
+          // Copy to buffer and mesh
+          this->_coords_buffer.copy(vec_state);
           this->buffer_to_mesh();
 
           //auto& dirichlet_filters = filter.template at<1>();
@@ -662,6 +668,7 @@ namespace FEAT
           for(const auto& it:slip_filters)
             this->_mesh_node->adapt_by_name(it.first);
 
+          // Copy back to the buffer as adaption might have changed the mesh
           this->mesh_to_buffer();
 
           for(auto& it : slip_filters)
@@ -841,7 +848,7 @@ namespace FEAT
           _mesh_conc->compute_conc();
           _mesh_conc->compute_grad_h(this->get_coords());
 
-          _lambda.clone(_mesh_conc->get_conc(), LAFEM::CloneMode::Deep);
+          _lambda.copy(_mesh_conc->get_conc());
 
         }
         /// \brief Computes the weights mu
