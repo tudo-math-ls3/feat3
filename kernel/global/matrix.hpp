@@ -91,46 +91,59 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the total number of rows in this matrix.
+       * \brief Gets the total number of columns in this matrix
        *
-       * \returns Matrix row count if perspective_ = false.
-       * \returns Raw matrix row count if perspective_ = true.
+       * \warning In parallel, this requires communication and is very expensive, so use sparingly!
+       * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
+       *
+       * \returns The number of colums
        */
-      template <LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
-      Index rows() const
+      Index columns()
       {
-        return _matrix.template rows<perspective_>();
+        // Compute total number of rows and columns
+        auto vec_r = create_vector_r();
+        vec_r.format(DataType(1));
 
+        return Index(vec_r.norm2sqr());
       }
 
       /**
-       * \brief Returns the total number of columns in this matrix.
+       * \brief Gets the total number of rows in this matrix
        *
-       * \returns Matrix column count if perspective_ = false.
-       * \returns Raw matrix column count if perspective_ = true.
+       * \warning In parallel, this requires communication and is very expensive, so use sparingly!
+       * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
+       *
+       * \returns The number of colums
        */
-      template <LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
-      Index columns() const
+      Index rows()
       {
-        return _matrix.template columns<perspective_>();
+        // Compute total number of rows and rows
+        auto vec_l = create_vector_l();
+        vec_l.format(DataType(1));
+
+        return Index(vec_l.norm2sqr());
       }
 
       /**
        * \brief Returns the total number of non-zeros in this matrix.
        *
-       * \returns Matrix non zero element count if perspective_ = false.
-       * \returns Raw matrix non zero element count if perspective_ = true.
+       * \note This always returns the raw (or POD - Plain Old Data) count, as everything else is ambiguous.
+       *
+       * \returns The total number of nonzeros in this matrix
        */
-      template <LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
       Index used_elements() const
       {
-        return _matrix.template used_elements<perspective_>();
+        Index my_used_elements(_matrix.template used_elements<LAFEM::Perspective::pod>());
+        Util::Comm::allreduce(&my_used_elements, &my_used_elements, 1, Util::CommOperationSum());
+        return my_used_elements;
       }
 
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return _matrix.bytes();
+        size_t my_bytes(_matrix.bytes());
+        Util::Comm::allreduce(&my_bytes, &my_bytes, 1, Util::CommOperationSum());
+        return my_bytes;
       }
 
       void extract_diag(VectorTypeL& diag, bool sync = true) const
