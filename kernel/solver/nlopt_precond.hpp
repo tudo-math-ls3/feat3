@@ -155,7 +155,14 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Solver::Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          return _op.apply(vec_cor, vec_def);
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), _op.name()));
+
+          Solver::Status st(_op.apply(vec_cor, vec_def));
+
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), st, 1));
+
+          return st;
         }
 
         virtual void print() const override

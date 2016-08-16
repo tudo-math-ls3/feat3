@@ -183,15 +183,28 @@ namespace FEAT
         }
 
         /**
-         * \copydoc BaseClass::set_max_iter()
+         * \brief Gets the tolerance for function value improvement
+         *
+         * The convergence check is against the maximum of the absolute and relative function value.
+         *
+         * \returns The function value improvement tolerance
          */
-        void set_max_iter(Index max_iter)
+        DataType get_tol_fval()
         {
-          this->_max_iter = max_iter;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
+          return _tol_fval;
+        }
+
+        /**
+         * \brief Gets the tolerance for the linesearch step size
+         *
+         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
+         * update will fail to produce a new search direction so the solver has to be terminated.
+         *
+         * \returns The function value improvement tolerance
+         */
+        DataType get_tol_step()
+        {
+          return _tol_step;
         }
 
         /**
@@ -206,6 +219,18 @@ namespace FEAT
         void set_tol_fval(DataType tol_fval)
         {
           _tol_fval = tol_fval;
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+        /**
+         * \copydoc BaseClass::set_max_iter()
+         */
+        void set_max_iter(Index max_iter)
+        {
+          this->_max_iter = max_iter;
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
           // second argument
           alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
@@ -305,6 +330,7 @@ namespace FEAT
 
           // compute initial defect
           Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
+
           if(status != Status::progress)
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
@@ -392,9 +418,11 @@ namespace FEAT
 
             // compute new defect
             if(calc_def)
+            {
               me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
-
-            //Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
+              Statistics::add_solver_expression(
+                std::make_shared<ExpressionDefect>(me->name(), me->_def_cur, me->get_num_iter()));
+            }
 
             // plot?
             if(me->_plot)
@@ -665,6 +693,31 @@ namespace FEAT
         }
 
         /**
+         * \brief Gets the tolerance for function value improvement
+         *
+         * The convergence check is against the maximum of the absolute and relative function value.
+         *
+         * \returns The function value improvement tolerance
+         */
+        DataType get_tol_fval()
+        {
+          return _tol_fval;
+        }
+
+        /**
+         * \brief Gets the tolerance for the linesearch step size
+         *
+         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
+         * update will fail to produce a new search direction so the solver has to be terminated.
+         *
+         * \returns The function value improvement tolerance
+         */
+        DataType get_tol_step()
+        {
+          return _tol_step;
+        }
+
+        /**
          * \copydoc BaseClass::set_max_iter()
          */
         void set_max_iter(Index max_iter)
@@ -777,6 +830,7 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
           // Write initial guess to iterates if desired
           if(iterates != nullptr)
@@ -786,6 +840,7 @@ namespace FEAT
           }
           // compute initial defect
           Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
+
           if(status != Status::progress)
             return status;
 
@@ -806,29 +861,38 @@ namespace FEAT
           {
             case(-8):
               //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(-7):
               //std::cout << "ALGLIB: Gradient verification failed." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(1):
               //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(2):
               //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(4):
               //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(5):
               //std::cout << "ALGLIB: Maximum number of iterations" << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::max_iter, this->get_num_iter()));
               return Status::max_iter;
             case(7):
               //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
               return Status::stagnated;
             case(8):
               //std::cout << "ALGLIB: Stopped by user" << std::endl;
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             default:
+              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
               return Status::undefined;
           }
         }
@@ -860,9 +924,11 @@ namespace FEAT
 
             // compute new defect
             if(calc_def)
+            {
               me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
-
-            //Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
+              Statistics::add_solver_expression(
+                std::make_shared<ExpressionDefect>(me->name(), me->_def_cur, me->get_num_iter()));
+            }
 
             // plot?
             if(me->_plot)

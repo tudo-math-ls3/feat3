@@ -118,8 +118,13 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), _op.name()));
+
           vec_cor(0, _inv_hessian*vec_def(0));
           this->_filter.filter_cor(vec_cor);
+
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));
 
           return Status::success;
         }
@@ -289,8 +294,13 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
+          Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), _op.name()));
+
           vec_cor(0, _inv_hessian*vec_def(0));
           this->_filter.filter_cor(vec_cor);
+
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));
 
           return Status::success;
         }

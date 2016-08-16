@@ -258,6 +258,31 @@ namespace FEAT
         }
 
         /**
+         * \brief Gets the tolerance for function value improvement
+         *
+         * The convergence check is against the maximum of the absolute and relative function value.
+         *
+         * \returns The function value improvement tolerance
+         */
+        DataType get_tol_fval()
+        {
+          return _tol_fval;
+        }
+
+        /**
+         * \brief Gets the tolerance for the linesearch step size
+         *
+         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
+         * update will fail to produce a new search direction so the NLSD has to be terminated.
+         *
+         * \returns The function value improvement tolerance
+         */
+        DataType get_tol_step()
+        {
+          return _tol_step;
+        }
+
+        /**
          * \brief Sets the tolerance for function value improvement
          *
          * \param[in] tol_fval
@@ -272,7 +297,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Sets the tolerance for the linesearch step size.
+         * \brief Sets the tolerance for the linesearch step size
          *
          * \param[in] tol_step
          * New tolerance for the linesearch step size.
