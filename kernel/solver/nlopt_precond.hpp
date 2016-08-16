@@ -3,6 +3,7 @@
 #define KERNEL_SOLVER_NLOPT_PRECOND 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
+#include <kernel/util/mpi_cout.hpp>
 
 namespace FEAT
 {
@@ -80,7 +81,9 @@ namespace FEAT
          *
          * \returns The Solver::Status of the application of the preconditioner.
          */
-        virtual Status apply(VectorType& DOXY(vec_cor), const VectorType& DOXY(vec_def)) override =0;
+        virtual Status apply(VectorType& DOXY(vec_cor), const VectorType& DOXY(vec_def)) override = 0;
+
+        virtual void print() const = 0;
 
     }; // class NLOptPrecond
 
@@ -153,6 +156,12 @@ namespace FEAT
         virtual Solver::Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
           return _op.apply(vec_cor, vec_def);
+        }
+
+        virtual void print() const override
+        {
+          Util::mpi_cout(name()+" settings:\n");
+          _op.print();
         }
 
     }; // class NonlinearOperatorPrecondWrapper

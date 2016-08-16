@@ -272,9 +272,16 @@ namespace FEAT
               Util::mpi_cout_pad_line("Displacement BC on",it);
             for(const auto& it : get_slip_boundaries())
               Util::mpi_cout_pad_line("Unilateral BC of place on",it);
-            Util::mpi_cout_pad_line("Solver",solver->get_formatted_solver_tree());
+
             Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
             (*(_system_levels.back()->op_sys)).print();
+
+            Util::mpi_cout_pad_line("Solver",solver->get_formatted_solver_tree());
+            if(precond != nullptr)
+            {
+              Util::mpi_cout("Preconditioner:\n");
+              precond->print();
+            }
           }
 
           /// \copydoc BaseClass::get_coords()

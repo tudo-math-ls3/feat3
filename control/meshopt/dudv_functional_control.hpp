@@ -144,9 +144,7 @@ namespace FEAT
                 (*(_system_levels.at(i)->op_sys)).init();
 
                 if(i > 0)
-                {
                   _transfer_levels.push_back(new TransferLevelType(*_system_levels.at(i-1), *_system_levels.at(i)));
-                }
               }
 
               for(Index i(0); i < num_levels; ++i)
@@ -320,8 +318,11 @@ namespace FEAT
            */
           virtual void init_numeric()
           {
-            for(size_t lvl(0); lvl < size_t(num_levels); ++lvl)
-              _assembler_levels.at(lvl)->assemble_system_matrix(*(_system_levels.at(lvl)));
+            if(!fixed_reference_domain)
+            {
+              for(size_t lvl(0); lvl < size_t(num_levels); ++lvl)
+                _assembler_levels.at(lvl)->assemble_system_matrix(*(_system_levels.at(lvl)));
+            }
           }
 
           /// \copydoc BaseClass::prepare()

@@ -105,7 +105,7 @@ namespace FEAT
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "Hessian";
+          return "HessianPrecond";
         }
 
         /// \copydoc BaseClass::prepare()
@@ -122,6 +122,12 @@ namespace FEAT
           this->_filter.filter_cor(vec_cor);
 
           return Status::success;
+        }
+
+        /// \copydoc BaseClass::print()
+        virtual void print() const override
+        {
+          Util::mpi_cout(name());
         }
     };
     /// \endcond
@@ -250,7 +256,7 @@ namespace FEAT
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "ApproximateHessian";
+          return "ApproximateHessianPrecond";
         }
 
         //virtual void init_symbolic() override
@@ -287,6 +293,12 @@ namespace FEAT
           this->_filter.filter_cor(vec_cor);
 
           return Status::success;
+        }
+
+        /// \copydoc BaseClass::print()
+        virtual void print() const override
+        {
+          Util::mpi_cout(name());
         }
     };
     /// \endcond
