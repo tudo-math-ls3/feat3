@@ -26,6 +26,12 @@ String Statistics::get_formatted_solver_tree()
   std::list<String> names;
   std::list<int> found; //number of found preconds / smoothers / coarse solvers. 0 = nothing found, 1 = smoother / s found, 2 = coarse solver / a found, 3 = all found
 
+  if(_solver_expressions.count(expression_target) == 0)
+  {
+    throw InternalError(__func__, __FILE__, __LINE__,
+    "expression_target "+expression_target+" not present in _solver_expressions");
+  }
+
   if (_solver_expressions[expression_target].front()->get_type() != Solver::ExpressionType::start_solve)
   {
     throw InternalError(__func__, __FILE__, __LINE__, "Should never happen - _solver_expressions list did not start with start solve expression!");
