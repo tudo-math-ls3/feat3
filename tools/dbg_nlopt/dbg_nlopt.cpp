@@ -15,6 +15,7 @@
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/runtime.hpp>
 
@@ -116,7 +117,6 @@ int run(Solver_& solver, Operator_& op)
     if(dist  < min_dist)
       min_dist = dist;
   }
-  std::cout << "Found solution " << sol << ", distance to nearest minimum: " << stringify_fp_sci(min_dist) << std::endl;
 
   // Print solver summary
   std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
@@ -126,6 +126,8 @@ int run(Solver_& solver, Operator_& op)
   std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
 
   String filename("");
+
+  std::cout << "Found solution " << sol << ", distance to nearest minimum: " << stringify_fp_sci(min_dist) << std::endl;
 
   // Write the iterates to file if we can
   if(solver->iterates != nullptr)
@@ -213,13 +215,23 @@ int run(Solver_& solver, Operator_& op)
   delete mesh;
 
   // Print solver summary
-  std::cout << std::endl << "Using solver " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
+  std::cout << "Used solver " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
   std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
   std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
   std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
   std::cout << "Needed evaluations: " << op.get_num_func_evals() << " (func) / " << op.get_num_grad_evals();
   std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
+  solver->set_max_iter(10000);
+  solver->set_tol_fval(DataType(0));
+  solver->set_tol_step(Math::eps<DataType>());
+  solver->set_tol_abs(Math::sqrt(Math::eps<DataType>()));
+  solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
 
+  Util::mpi_cout_pad_line("max_iter",solver->get_max_iter());
+  Util::mpi_cout_pad_line("tol_abs",solver->get_tol_abs());
+  Util::mpi_cout_pad_line("tol_rel",solver->get_tol_rel());
+  Util::mpi_cout_pad_line("tol_step",solver->get_tol_step());
+  Util::mpi_cout_pad_line("tol_fval",solver->get_tol_fval());
 
   // Finish the solver
   solver->done();
