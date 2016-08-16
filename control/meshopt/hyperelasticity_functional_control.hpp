@@ -268,6 +268,7 @@ namespace FEAT
             Util::mpi_cout(name()+" settings:\n");
             Util::mpi_cout_pad_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
             Util::mpi_cout_pad_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
+
             for(const auto& it : get_dirichlet_boundaries())
               Util::mpi_cout_pad_line("Displacement BC on",it);
             for(const auto& it : get_slip_boundaries())
@@ -275,11 +276,20 @@ namespace FEAT
 
             Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
             (*(_system_levels.back()->op_sys)).print();
+            Util::mpi_cout("\n");
 
-            Util::mpi_cout_pad_line("Solver",solver->get_formatted_solver_tree());
+            FEAT::Statistics::expression_target = name();
+            try
+            {
+              Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+            }
+            catch(std::exception& e)
+            {
+            }
+
             if(precond != nullptr)
             {
-              Util::mpi_cout("Preconditioner:\n");
+              Util::mpi_cout("Nonlinear preconditioner:\n");
               precond->print();
             }
           }
@@ -432,14 +442,14 @@ namespace FEAT
             typename SystemLevelType::GlobalSystemVectorR vec_rhs(the_asm_level.assemble_rhs_vector(the_system_level));
             typename SystemLevelType::GlobalSystemVectorL vec_sol(the_asm_level.assemble_sol_vector(the_system_level));
 
-            Statistics::reset_flops();
-            Statistics::reset_times();
-            Statistics::reset_solver_statistics();
-
             TimeStamp at;
 
             // solve
             //Solver::solve(*solver, vec_sol, vec_rhs, the_system_level.op_sys, the_system_level.filter_sys);
+
+            // Let it be knownst to Statistics that it was Us who called the solver
+            FEAT::Statistics::expression_target = name();
+
             the_system_level.op_sys.reset_num_evals();
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;

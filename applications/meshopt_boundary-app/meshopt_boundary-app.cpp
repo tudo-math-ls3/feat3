@@ -284,6 +284,9 @@ struct MeshoptBoundaryApp
       if(Util::Comm::rank() == 0)
         std::cout << "Timestep " << n << " t = " << stringify_fp_fix(time) <<std::endl;
 
+      // Clear statistics data so it does not eat us alive
+      FEAT::Statistics::reset_solver_statistics();
+
       bool abort(false);
 
       // Save old vertex coordinates

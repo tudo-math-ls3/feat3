@@ -115,6 +115,11 @@ namespace FEAT
           {
           }
 
+        static String name()
+        {
+          return "AnalyticFunctionOperator";
+        }
+
         /**
          * \brief Creates an empty L-vector of appropriate size
          *

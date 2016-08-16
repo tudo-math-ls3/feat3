@@ -288,6 +288,9 @@ struct MeshoptRAdaptApp
       n++;
       time+= delta_t;
 
+      // Clear statistics data so it does not eat us alive
+      FEAT::Statistics::reset_solver_statistics();
+
       bool abort(false);
 
       WorldPoint old_midpoint(midpoint);

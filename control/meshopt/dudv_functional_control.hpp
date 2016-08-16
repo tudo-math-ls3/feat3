@@ -211,8 +211,17 @@ namespace FEAT
               Util::mpi_cout_pad_line("Displacement BC on",it);
             for(const auto& it : get_slip_boundaries())
               Util::mpi_cout_pad_line("Unilateral BC of place on",it);
-            Util::mpi_cout_pad_line("Solver",solver->get_formatted_solver_tree());
             Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
+
+            FEAT::Statistics::expression_target = name();
+            try
+            {
+              Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+            }
+            catch(std::exception& e)
+            {
+            }
+
           }
 
           /// \copydoc BaseClass::compute_cell_size_defect()
@@ -386,6 +395,9 @@ namespace FEAT
             // Create our RHS and SOL vectors
             GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
             GlobalSystemVectorL vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+
+            // Let it be knownst to Statitics that it was Us who called the solver
+            FEAT::Statistics::expression_target = name();
 
             // solve
             this->apply(vec_sol, vec_rhs);
