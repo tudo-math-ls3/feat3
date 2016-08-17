@@ -299,6 +299,9 @@ namespace FEAT
             copy_idx(mesh->get_index_set<3,1>(), e_s2);
             copy_idx(mesh->get_index_set<3,2>(), t_s2);
             break;
+
+          default:
+            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
         }
         // okay
         return mesh;
@@ -1058,6 +1061,8 @@ namespace FEAT
               throw String("Triangle-At-Tetrahedron index set refinement failure");
             break;
 
+          default:
+            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
         } //switch
       } // validate_refined_tetra_mesh_3d
 

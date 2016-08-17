@@ -344,6 +344,8 @@ namespace FEAT
             copy_idx(mesh->get_index_set<3,1>(), e_c2);
             copy_idx(mesh->get_index_set<3,2>(), q_c2);
             break;
+          default:
+            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
         }
         // okay
         return mesh;
@@ -1229,6 +1231,9 @@ namespace FEAT
             if(!comp_idx(mesh.get_index_set<3,2>(), q_c2))
               throw String("Quad-At-Cube index set refinement failure");
             break;
+
+          default:
+            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
 
         } //switch
       } // validate_refined_hexa_mesh_3d
