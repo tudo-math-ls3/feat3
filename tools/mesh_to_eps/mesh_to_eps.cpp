@@ -84,9 +84,6 @@ int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* cha
   // choose adapt mode
   const AdaptMode adapt_mode = adapt ? AdaptMode::chart : AdaptMode::none;
 
-  // get all mesh part names
-  std::deque<String> part_names = node->get_mesh_part_names();
-
   // refine
   for(Index lvl(0); lvl <= lvl_max; ++lvl)
   {
