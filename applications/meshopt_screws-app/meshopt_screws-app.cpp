@@ -39,6 +39,8 @@ struct MeshExtrudeHelper
     {
     }
 
+  MeshExtrudeHelper(const MeshExtrudeHelper&) = delete;
+
   ~MeshExtrudeHelper()
   {
   }
@@ -69,6 +71,8 @@ struct MeshExtrudeHelper<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,Coord_>
     mesh_extruder.extrude_atlas(*extruded_atlas, *(rmn->get_atlas()));
     mesh_extruder.extrude_root_node(*extruded_mesh_node, *rmn, extruded_atlas);
   }
+
+  MeshExtrudeHelper(const MeshExtrudeHelper&) = delete;
 
   ~MeshExtrudeHelper()
   {
