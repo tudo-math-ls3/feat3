@@ -42,16 +42,17 @@ public:
 
   void hexa_index_tree_test() const
   {
-    // create mesh and index-trees
-    HexaMesh* mesh = create_tetris_mesh_3d();
-    HEdgeIndexTree* edge_tree;
-    QuadIndexTree* quad_tree;
 
     try
     {
       // typedef index set type
       typedef IndexSet<2> IndexSetTypeEV;
       typedef IndexSet<4> IndexSetTypeQV;
+
+      // create mesh and index-trees
+      HexaMesh* mesh = create_tetris_mesh_3d();
+      HEdgeIndexTree* edge_tree;
+      QuadIndexTree* quad_tree;
 
       // fetch the quad-vertex- and the edge-vertex-index set
       const IndexSetTypeEV& index_set_e_v = mesh->get_index_set<1,0>();
@@ -84,16 +85,17 @@ public:
 
   void tetra_index_tree_test() const
   {
-    // create mesh
-    TetraMesh* mesh = create_big_tetra_mesh_3d();
-    SEdgeIndexTree* edge_tree = nullptr;
-    TriaIndexTree* tria_tree = nullptr;
 
     try
     {
       // typedef index set type
       typedef IndexSet<2> IndexSetTypeEV;
       typedef IndexSet<3> IndexSetTypeTV;
+
+      // create mesh
+      TetraMesh* mesh = create_big_tetra_mesh_3d();
+      SEdgeIndexTree* edge_tree = nullptr;
+      TriaIndexTree* tria_tree = nullptr;
 
       // fetch the triangle-vertex- and the edge-vertex index set
       const IndexSetTypeEV& index_set_e_v = mesh->get_index_set<1,0>();
@@ -131,11 +133,6 @@ public:
     typedef IndexCalculator<Shape::Hypercube<3>, 1> Cube_Edge_Calc;
     typedef IndexCalculator<Shape::Hypercube<3>, 2> Cube_Quad_Calc;
 
-    // create mesh
-    HexaMesh* mesh = create_big_tetris_mesh_3d();
-    HEdgeIndexTree* edge_tree = nullptr;
-    QuadIndexTree* quad_tree = nullptr;
-
     try
     {
       // typedef index set types
@@ -148,6 +145,11 @@ public:
       typedef IndexSet<12> IndexSetTypeCE;
 
       typedef IndexSet<6> IndexSetTypeCQ;
+
+      // create mesh
+      HexaMesh* mesh = create_big_tetris_mesh_3d();
+      HEdgeIndexTree* edge_tree = nullptr;
+      QuadIndexTree* quad_tree = nullptr;
 
       // fetch the index sets
       const IndexSetTypeEV& index_set_e_v = mesh->get_index_set<1,0>();
@@ -197,11 +199,6 @@ public:
     typedef IndexCalculator<Shape::Simplex<3>, 1> Tetra_Edge_Calc;
     typedef IndexCalculator<Shape::Simplex<3>, 2> Tetra_Tria_Calc;
 
-    // create mesh
-    TetraMesh* mesh = create_really_big_tetra_mesh_3d();
-    SEdgeIndexTree* edge_tree = nullptr;
-    TriaIndexTree* tria_tree = nullptr;
-
     try
     {
 
@@ -215,6 +212,11 @@ public:
       typedef IndexSet<6> IndexSetTypeSE;
 
       typedef IndexSet<4> IndexSetTypeST;
+
+      // create mesh
+      TetraMesh* mesh = create_really_big_tetra_mesh_3d();
+      SEdgeIndexTree* edge_tree = nullptr;
+      TriaIndexTree* tria_tree = nullptr;
 
       // fetch the index sets
       const IndexSetTypeEV& index_set_e_v = mesh->get_index_set<1,0>();
