@@ -584,6 +584,38 @@ struct MeshoptScrewsApp
     Util::mpi_cout("Finished!\n");
     meshopt_ctrl->print();
 
+    // Write final vtk output
+    if(write_vtk)
+    {
+      int deque_position(0);
+      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      {
+        int lvl_index((*it)->get_level_index());
+
+        String vtk_name = String(file_basename+"_final_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+
+        ++deque_position;
+      }
+
+      if(extruder.extruded_mesh_node != nullptr)
+      {
+        // Create a VTK exporter for our mesh
+        String vtk_name = String(file_basename+"_final_extruded");
+
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+      }
+    } // writing initial output
+
+
     if(Util::Comm::rank() == 0)
     {
       TimeStamp bt;
@@ -960,7 +992,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[pcg]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "max_iter = 10" << std::endl;
+  iss << "max_iter = 100" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
 }

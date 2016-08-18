@@ -6,6 +6,7 @@ dirichlet_boundaries = outer
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
+fixed_reference_domain = 1
 dirichlet_boundaries = outer
 
 [DuDvDefaultParameters]

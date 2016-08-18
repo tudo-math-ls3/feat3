@@ -415,6 +415,27 @@ struct MeshoptRAdaptApp
     Util::mpi_cout("Finished!\n");
     meshopt_ctrl->print();
 
+    // Write final vtk output
+    if(write_vtk)
+    {
+      int deque_position(0);
+      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      {
+        int lvl_index((*it)->get_level_index());
+
+        String vtk_name = String(file_basename+"_final_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+
+        ++deque_position;
+      }
+
+    }
+
     // Check for the hard coded settings for test mode
     if(test_mode)
     {

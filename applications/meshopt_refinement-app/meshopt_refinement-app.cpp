@@ -622,6 +622,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
   iss << "[DuDvPrecon]" << std::endl;
   iss << "type = DuDvPrecon" << std::endl;
   iss << "dirichlet_boundaries = outer" << std::endl;
+  iss << "fixed_reference_domain = 1" << std::endl;
   iss << "linear_solver = PCG-MGV" << std::endl;
 
   iss << "[PCG-MGV]" << std::endl;

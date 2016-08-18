@@ -4,12 +4,13 @@ config_section = HyperelasticityDefaultParameters
 dirichlet_boundaries = top bottom left right
 
 [DuDvDefault]
-type = DuDvFunctional
+type = DuDv
 config_section = DuDvDefaultParameters
 dirichlet_boundaries = top bottom left right
 
 [DuDvDefaultParameters]
 solver_config = PCG-MGV
+dirichlet_boundaries = bottom top left right
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional

@@ -1,9 +1,8 @@
 [ALGLIBMinLBFGS]
 type = ALGLIBMinLBFGS
 plot = 1
-tol_abs = 1e-8
 tol_rel = 1e-8
-max_iter = 500
+max_iter = 20000
 precon = none
 lbfgs_dim = 10
 keep_iterates = 0
@@ -11,22 +10,28 @@ keep_iterates = 0
 [ALGLIBMinCG]
 type = ALGLIBMinCG
 plot = 1
-tol_abs = 1e-8
 tol_rel = 1e-8
-max_iter = 500
-direction_update = DaiYuan
+max_iter = 20000
+direction_update = DYHSHybrid
 keep_iterates = 0
 
 [NLCG]
 type = NLCG
 precon = none
 plot = 1
-tol_abs = 1e-8
 tol_rel = 1e-8
-max_iter = 10000
+max_iter = 20000
 linesearch = StrongWolfeLinesearch
-direction_update = DaiYuan
+direction_update = DYHSHybrid
 keep_iterates = 0
+
+[QPenalty]
+type = QPenalty
+max_iter = 10
+tol_rel = 1e+5
+tol_abs = 1e-8
+plot = 1
+inner_solver = NLCG
 
 [DuDvPrecon]
 type = DuDvPrecon
@@ -51,7 +56,7 @@ keep_iterates = 0
 
 [PCG-MGV]
 type = pcg
-max_iter = 100
+max_iter = 500
 tol_rel = 1e-8
 plot = 1
 precon = mgv
@@ -73,6 +78,6 @@ coarse = pcg
 
 [pcg]
 type = pcg
-max_iter = 10
+max_iter = 1000
 tol_rel = 1e-8
 precon = jac
