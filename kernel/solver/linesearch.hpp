@@ -502,7 +502,7 @@ namespace FEAT
           Status status(Status::progress);
           this->_num_iter = Index(0);
 
-          this->_vec_initial_sol.clone(sol);
+          this->_vec_initial_sol.copy(sol);
 
           // Norm of the search direction
           this->_norm_dir = dir.norm2();
@@ -725,7 +725,7 @@ namespace FEAT
           Status status(Status::progress);
           this->_num_iter = Index(0);
 
-          this->_vec_initial_sol.clone(sol);
+          this->_vec_initial_sol.copy(sol);
 
           // Norm of the search direction
           this->_norm_dir = dir.norm2();
@@ -1065,7 +1065,7 @@ namespace FEAT
           this->_num_iter = Index(0);
 
           // Save the intial state
-          this->_vec_initial_sol = vec_sol.clone(LAFEM::CloneMode::Deep);
+          this->_vec_initial_sol.copy(vec_sol);
           // Norm of the search direction vector. It was normalised befor, but there might be rounding errors
           this->_norm_dir = vec_dir.norm2();
           // Norm of the initial guess

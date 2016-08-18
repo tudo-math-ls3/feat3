@@ -412,7 +412,7 @@ namespace FEAT
           }
 
           // The first direction has to be the (preconditioned) steepest descent direction
-          this->_vec_p.clone(this->_vec_z);
+          this->_vec_p.copy(this->_vec_z);
 
           // First scale so that all entries are |.| < 1
           this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
@@ -437,7 +437,7 @@ namespace FEAT
           // If the preconditioner was not pd in the first step, reset the search direction to steepest descent
           if(eta <= DataType(0))
           {
-            this->_vec_p.clone(this->_vec_r);
+            this->_vec_p.copy(this->_vec_r);
             this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
             this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
           }
@@ -460,9 +460,14 @@ namespace FEAT
           {
             IterationStats stat(*this);
 
+            // Clear statistics if we have a preconditioner. Otherwise this tends to overflow the main memory if the
+            // preconditioner does too many iterations
+            // \todo: fix this
+            //FEAT::Statistics::reset_solver_statistics();
+
             _fval_prev = _fval;
 
-            this->_vec_y.clone(this->_vec_r);
+            this->_vec_y.copy(this->_vec_r);
 
             // Copy information to the linesearch
             _linesearch->set_initial_fval(this->_fval);
@@ -534,7 +539,7 @@ namespace FEAT
             // We need to check beta again here as some direction updates might set it to zero
             // Discard the old search direction and perform (preconditioned) steepest descent
             if(beta == DataType(0))
-              this->_vec_p.clone(this->_vec_z);
+              this->_vec_p.copy(this->_vec_z);
             else
               this->_vec_p.axpy(this->_vec_p, this->_vec_z, beta);
 
@@ -559,7 +564,7 @@ namespace FEAT
             // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
             if(eta <= DataType(0))
             {
-              this->_vec_p.clone(this->_vec_r);
+              this->_vec_p.copy(this->_vec_r);
               this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
               this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
               //return Status::aborted;
@@ -694,7 +699,7 @@ namespace FEAT
           if( (_linesearch->get_rel_update() <= this->_tol_step))
           {
             //std::cout << "update step stagnation: " << _linesearch->get_rel_update() << " <= " << this->_tol_step << std::endl;
-            //vec_sol.clone(_linesearch->get_initial_sol());
+            //vec_sol.copy(_linesearch->get_initial_sol());
             return Status::success;
           }
 

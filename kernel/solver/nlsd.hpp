@@ -277,7 +277,7 @@ namespace FEAT
 
           this->_fval = this->_op.compute_func();
           // The first direction has to be the steepest descent direction
-          this->_vec_p.clone(this->_vec_r);
+          this->_vec_p.copy(this->_vec_r);
 
           // apply preconditioner to defect vector
           //if(!this->_apply_precond(this->_vec_tmp, this->_vec_r, this->_filter))
@@ -294,7 +294,7 @@ namespace FEAT
           // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
           if(eta <= DataType(0))
           {
-            this->_vec_p.clone(this->_vec_r);
+            this->_vec_p.copy(this->_vec_r);
           }
 
           // start iterating
@@ -348,7 +348,7 @@ namespace FEAT
             // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
             if(eta <= DataType(0))
             {
-              this->_vec_p.clone(this->_vec_r);
+              this->_vec_p.copy(this->_vec_r);
             }
           }
 
