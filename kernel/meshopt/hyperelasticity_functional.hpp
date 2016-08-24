@@ -44,6 +44,7 @@ namespace FEAT
       once_uniform,
       once_cellsize,
       once_concentration,
+      current_uniform,
       current_cellsize,
       current_concentration,
       iter_concentration,
@@ -65,6 +66,8 @@ namespace FEAT
           return os << "once_cellsize";
         case ScaleComputation::once_concentration:
           return os << "once_concentration";
+        case ScaleComputation::current_uniform:
+          return os << "current_uniform";
         case ScaleComputation::current_cellsize:
           return os << "current_cellsize";
         case ScaleComputation::current_concentration:
@@ -86,6 +89,8 @@ namespace FEAT
         scale_computation = ScaleComputation::once_cellsize;
       else if(sc_name == "once_concentration")
         scale_computation = ScaleComputation::once_concentration;
+      else if(sc_name == "current_uniform")
+        scale_computation = ScaleComputation::current_uniform;
       else if(sc_name == "current_cellsize")
         scale_computation = ScaleComputation::current_cellsize;
       else if(sc_name == "current_concentration")
@@ -876,6 +881,9 @@ namespace FEAT
             case ScaleComputation::once_cellsize:
             case ScaleComputation::once_concentration:
               return;
+            case ScaleComputation::current_uniform:
+              _compute_lambda_uniform();
+              break;
             case ScaleComputation::current_cellsize:
               _compute_lambda_cellsize();
               break;
