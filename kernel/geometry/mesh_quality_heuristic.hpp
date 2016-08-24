@@ -100,11 +100,13 @@ namespace FEAT
       }
 
       template<typename IdxType_, typename VtxType_>
-      static typename VtxType_::CoordType compute(const IdxType_& idx, const VtxType_& vtx)
+      static void compute(typename VtxType_::CoordType& qual_min, typename VtxType_::CoordType& qual_sum,
+      const IdxType_& idx, const VtxType_& vtx)
       {
         typedef typename VtxType_::CoordType CoordType;
 
-        CoordType rho_max(Math::eps<CoordType>());
+        CoordType rho_min(Math::huge<CoordType>());
+        CoordType rho_sum(0);
         CoordType diam(0);
         CoordType vol(0);
 
@@ -132,11 +134,15 @@ namespace FEAT
           CoordType h2(A[0].norm_euclid());
           diam = Math::max(diam, h2);
 
-          rho_max = Math::max(rho_max, diam/vol);
+          CoordType my_rho(vol/diam);
+
+          rho_sum += my_rho;
+          rho_min = Math::min(rho_min, my_rho);
         }
         // We want the quality to go to zero if rho_max goes to infinity, so we take 1/rho_max. The absolute minimum
         // of rho is for the triangle with all angles = 60 degrees, so we scale with its rho for normalisation.
-        return Math::sqrt(CoordType(2)/Math::sqrt(CoordType(3)))/rho_max;
+        qual_min = Math::sqrt(CoordType(2)/Math::sqrt(CoordType(3)))*rho_min;
+        qual_sum = Math::sqrt(CoordType(2)/Math::sqrt(CoordType(3)))*rho_sum;
       }
 
     };
@@ -193,12 +199,15 @@ namespace FEAT
       }
 
       template<typename IdxType_, typename VtxType_>
-      static typename VtxType_::CoordType compute(const IdxType_& idx, const VtxType_& vtx)
+      static void compute(typename VtxType_::CoordType& qual_min, typename VtxType_::CoordType& qual_sum,
+      const IdxType_& idx, const VtxType_& vtx)
       {
 
         typedef typename VtxType_::CoordType CoordType;
 
-        CoordType quality(Math::huge<CoordType>());
+        qual_min = Math::huge<CoordType>();
+        qual_sum = CoordType(0);
+
         for(Index cell(0); cell < idx.get_num_entities(); ++cell)
         {
           CoordType gamma(0);
@@ -251,10 +260,12 @@ namespace FEAT
 
           ASSERT(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
 
-          quality = Math::min(quality, h_min/h_max*Math::sqrt(CoordType(1)-gamma ));
+          CoordType my_qual(h_min/h_max*Math::sqrt(CoordType(1) - gamma));
+
+          qual_min = Math::min(qual_min, my_qual);
+          qual_sum += my_qual;
 
         }
-        return quality;
       }
     };
     /// \endcond

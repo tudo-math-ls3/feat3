@@ -215,10 +215,6 @@ struct MeshoptScrewsApp
     //const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
     auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer_screw");
 
-    // For test_mode = true
-    DT_ min_quality(0);
-    DT_ min_angle(0);
-    DT_ cell_size_defect(0);
     // Write initial vtk output
     if(write_vtk)
     {
@@ -250,22 +246,26 @@ struct MeshoptScrewsApp
       }
     } // writing initial output
 
+    // For test_mode = true these have to have function global scope
+    DT_ qual_min(0);
+    DT_ qual_sum(0);
+    DT_ angle_min(0);
+    DT_ cell_size_defect(0);
     // Compute quality indicators
     {
-      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+      Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+      angle_min = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
 #ifdef FEAT_HAVE_MPI
-      DT_ min_quality_snd(min_quality);
-      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+      Util::Comm::allreduce(&qual_min, &qual_min, 1, Util::CommOperationMin());
+      Util::Comm::allreduce(&qual_sum, &qual_sum, 1, Util::CommOperationSum());
 
-      DT_ min_angle_snd(min_angle);
-      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
-
+      Util::Comm::allreduce(&angle_min, &angle_min, 1, Util::CommOperationMin());
 #endif
+      DataType qual_avg(qual_sum/DataType(ncells));
 
       DT_ lambda_min;
       DT_ lambda_max;
@@ -275,8 +275,8 @@ struct MeshoptScrewsApp
 
       if(Util::Comm::rank() == 0)
       {
-        std::cout << "Pre initial quality indicator: " << stringify_fp_sci(min_quality) <<
-          " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Pre initial quality indicator: " << stringify_fp_sci(qual_min) <<
+          " / " << stringify_fp_sci(qual_avg) << " minimum angle: " << stringify_fp_fix(angle_min) << std::endl;
         std::cout << "Pre initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
           " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
           " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
@@ -286,11 +286,11 @@ struct MeshoptScrewsApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      if( min_angle < DT_(10))
+      if( angle_min < DT_(10))
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
-        "Initial min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
+        "Initial min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(angle_min));
       }
     }
 
@@ -341,19 +341,19 @@ struct MeshoptScrewsApp
 
     // Compute quality indicators
     {
-      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+      Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+      angle_min = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
 #ifdef FEAT_HAVE_MPI
-      DT_ min_quality_snd(min_quality);
-      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+      Util::Comm::allreduce(&qual_min, &qual_min, 1, Util::CommOperationMin());
+      Util::Comm::allreduce(&qual_sum, &qual_sum, 1, Util::CommOperationSum());
 
-      DT_ min_angle_snd(min_angle);
-      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+      Util::Comm::allreduce(&angle_min, &angle_min, 1, Util::CommOperationMin());
 #endif
+      DataType qual_avg(qual_sum/DataType(ncells));
 
       DT_ lambda_min;
       DT_ lambda_max;
@@ -363,8 +363,8 @@ struct MeshoptScrewsApp
 
       if(Util::Comm::rank() == 0)
       {
-        std::cout << "Post initial quality indicator: " << stringify_fp_sci(min_quality) <<
-          " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Post initial quality indicator: " << stringify_fp_sci(qual_min) <<
+          " / " << stringify_fp_sci(qual_avg ) << " minimum angle: " << stringify_fp_fix(angle_min) << std::endl;
         std::cout << "Post initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
           " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
           " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
@@ -374,11 +374,11 @@ struct MeshoptScrewsApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      if( min_angle < DT_(10))
+      if( angle_min < DT_(10))
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
-        "Post Initial min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
+        "Post Initial min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(angle_min));
       }
     }
 
@@ -500,19 +500,19 @@ struct MeshoptScrewsApp
 
       // Compute quality indicators
       {
-        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+        Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        angle_min = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
           finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
 #ifdef FEAT_HAVE_MPI
-        DT_ min_quality_snd(min_quality);
-        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&qual_min, &qual_min, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&qual_sum, &qual_sum, 1, Util::CommOperationSum());
 
-        DT_ min_angle_snd(min_angle);
-        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&angle_min, &angle_min, 1, Util::CommOperationMin());
 #endif
+        DataType qual_avg(qual_sum/DataType(ncells));
 
         DT_ lambda_min;
         DT_ lambda_max;
@@ -522,15 +522,15 @@ struct MeshoptScrewsApp
 
         if(Util::Comm::rank() == 0)
         {
-          std::cout << "Quality indicator: " << stringify_fp_sci(min_quality) <<
-            " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+          std::cout << "Quality indicator: " << stringify_fp_sci(qual_min) <<
+            " / " << stringify_fp_sci(qual_avg ) << " minimum angle: " << stringify_fp_fix(angle_min) << std::endl;
           std::cout << "Cell size defect: " << stringify_fp_sci(cell_size_defect) <<
             " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
             " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
         }
       }
 
-      if(min_angle < DT_(0.1))
+      if(angle_min < DT_(0.1))
       {
         Util::mpi_cout("Mesh deteriorated, stopping.\n");
         return_value = 1;
@@ -568,11 +568,11 @@ struct MeshoptScrewsApp
       // Check for the hard coded settings for test mode
       if(test_mode)
       {
-        if( min_angle < DT_(9.8))
+        if( angle_min < DT_(9.8))
         {
           Util::mpi_cout("FAILED:");
           throw InternalError(__func__,__FILE__,__LINE__,
-          "Final min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
+          "Final min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(angle_min));
         }
       }
 
