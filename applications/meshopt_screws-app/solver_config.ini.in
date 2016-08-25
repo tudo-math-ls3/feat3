@@ -89,5 +89,5 @@ coarse = pcg
 
 [pcgsmoother]
 type = pcg
-min_iter = 5
-max_iter = 5
+min_iter = 4
+max_iter = 4

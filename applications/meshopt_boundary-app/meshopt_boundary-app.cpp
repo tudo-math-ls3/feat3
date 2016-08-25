@@ -831,6 +831,7 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "[DuDvDefault]" << std::endl;
   iss << "type = DuDv" << std::endl;
   iss << "config_section = DuDvDefaultParameters" << std::endl;
+  iss << "fixed_reference_domain = 1" << std::endl;
   iss << "dirichlet_boundaries = outer" << std::endl;
 
   iss << "[DuDvDefaultParameters]" << std::endl;
@@ -844,7 +845,7 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "fac_det = 1.0" << std::endl;
   iss << "fac_cof = 0.0" << std::endl;
   iss << "fac_reg = 1e-8" << std::endl;
-  iss << "scale_computation = once_uniform" << std::endl;
+  iss << "scale_computation = current_uniform" << std::endl;
 }
 
 static void read_test_mode_solver_config(std::stringstream& iss)
@@ -862,6 +863,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
   iss << "[DuDvPrecon]" << std::endl;
   iss << "type = DuDvPrecon" << std::endl;
   iss << "dirichlet_boundaries = outer" << std::endl;
+  iss << "fixed_reference_domain = 1" << std::endl;
   iss << "linear_solver = PCG-MGV" << std::endl;
 
   iss << "[PCG-MGV]" << std::endl;

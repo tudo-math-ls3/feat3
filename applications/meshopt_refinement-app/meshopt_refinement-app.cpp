@@ -87,7 +87,7 @@ struct MeshoptRefinementApp
     // Print level information
     if(Util::Comm::rank() == 0)
     {
-      std::cout << name() << " settings: " << std::endl;
+      std::cout << name() << " settings:" << std::endl;
       std::cout << "LVL-MAX: " <<
         dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
       std::cout << " LVL-MIN: " <<
@@ -109,15 +109,9 @@ struct MeshoptRefinementApp
     // Save new coordinates. We need them for calling prepare() to set the initial guess
     meshopt_ctrl->mesh_to_buffer();
     auto new_coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
-    Util::mpi_cout("Set new_coords - precon matrix on original domain\n");
     meshopt_ctrl->prepare(new_coords);
 
-    //// Reset the mesh to the original coordinates so the preconditioner works on the undeformed mesh
-    //meshopt_ctrl->get_coords().copy(original_coords);
-    //meshopt_ctrl->buffer_to_mesh();
-
     // Now call prepare
-    Util::mpi_cout("Second prepare - precon matrix on initial guess domain\n");
     meshopt_ctrl->prepare(new_coords);
 
     // Write initial vtk output
@@ -192,11 +186,7 @@ struct MeshoptRefinementApp
     meshopt_ctrl->optimise();
     TimeStamp post_opt;
 
-    if(Util::Comm::rank() == 0)
-    {
-      std::cout << std::endl << "Using solver: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
-      std::cout << "Solve time: " << post_opt.elapsed(pre_opt) << std::endl;
-    }
+    Util::mpi_cout("Solve time: "+stringify(post_opt.elapsed(pre_opt))+"\n");
 
     // Write output again
     if(write_vtk)
@@ -253,7 +243,7 @@ struct MeshoptRefinementApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      if( Math::abs(angle_min - DT_(67.349782)) > Math::pow(Math::eps<DT_>(),0.25))
+      if( Math::abs(angle_min - DT_(60.756633)) > Math::pow(Math::eps<DT_>(),0.25))
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
@@ -607,7 +597,7 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "fac_det = 1.0" << std::endl;
   iss << "fac_cof = 0.0" << std::endl;
   iss << "fac_reg = 1e-8" << std::endl;
-  iss << "scale_computation = once_uniform" << std::endl;
+  iss << "scale_computation = current_uniform" << std::endl;
 }
 
 static void read_test_mode_solver_config(std::stringstream& iss)

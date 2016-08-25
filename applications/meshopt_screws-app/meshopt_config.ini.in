@@ -7,11 +7,11 @@ slip_boundaries = inner
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
+fixed_reference_domain = 0
 dirichlet_boundaries = inner outer
 
 [DuDvDefaultParameters]
 solver_config = PCG-MGV
-fixed_reference_domain = 0
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional
