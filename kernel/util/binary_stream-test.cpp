@@ -58,6 +58,28 @@ public:
     // check stream position
     TEST_CHECK_EQUAL(size_t(bs.tellg()), 2*sizeof(uint32_t));
 
+    // make a copy of the stream by writing
+    BinaryStream bs_copy1;
+    bs.write_stream(bs_copy1);
+
+    // check for equal size
+    TEST_CHECK_EQUAL(bs.size(), bs_copy1.size());
+
+    // check for equal content
+    for(std::size_t i(0); i < 2*sizeof(uint32_t); ++i)
+      TEST_CHECK_EQUAL(bs.data()[i], bs_copy1.data()[i]);
+
+    // make a copy of the stream by reading
+    BinaryStream bs_copy2;
+    bs_copy2.read_stream(bs);
+
+    // check for equal size
+    TEST_CHECK_EQUAL(bs.size(), bs_copy2.size());
+
+    // check for equal content
+    for(std::size_t i(0); i < 2*sizeof(uint32_t); ++i)
+      TEST_CHECK_EQUAL(bs.data()[i], bs_copy2.data()[i]);
+
     // seek to begin
     bs.seekg(0);
 

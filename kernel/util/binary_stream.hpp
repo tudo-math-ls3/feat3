@@ -226,6 +226,53 @@ namespace FEAT
     {
       return _buffer.container();
     }
+
+    /**
+     * \brief Reads the content of a binary input stream.
+     *
+     * This function copies the content of the input stream into this
+     * binary stream object. The previous content of this binary stream
+     * (if any) is discarded.
+     *
+     * \param[in] is
+     * The input stream from which to read.
+     */
+    void read_stream(std::istream& is)
+    {
+      clear();
+
+      // seek to end of file
+      is.seekg(std::streamoff(0), std::ios_base::end);
+
+      // get filesize
+      const std::streampos filesize = is.tellg();
+
+      // seek to beginning of file
+      is.seekg(std::streamoff(0), std::ios_base::beg);
+
+      // get our stream container
+      std::vector<char>& content = _buffer.container();
+
+      // resize container
+      content.resize(std::size_t(filesize));
+
+      // read into our stream buffer
+      is.read(content.data(), filesize);
+    }
+
+    /**
+     * \brief Writes the content to a binary output stream.
+     *
+     * This function writes the content of this binary stream at the
+     * current position of the output stream object.
+     *
+     * \param[in] os
+     * The output stream to which to write to.
+     */
+    void write_stream(std::ostream& os) const
+    {
+      os.write(data(), size());
+    }
   }; // class BinaryStream
 } // namespace FEAT
 #endif // KERNEL_UTIL_BINARY_STREAM_HPP
