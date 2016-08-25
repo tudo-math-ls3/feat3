@@ -87,6 +87,11 @@ namespace FEAT
     class Communicator
     {
       public:
+        Communicator() :
+          _comm(MPI_COMM_WORLD)
+        {
+        }
+
         explicit Communicator(MPI_Comm comm) :
           _comm(comm)
         {
@@ -714,6 +719,10 @@ namespace FEAT
     class Communicator
     {
       public:
+        Communicator()
+        {
+        }
+
         explicit Communicator(Index comm) :
           _comm(comm)
         {
