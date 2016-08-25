@@ -6,6 +6,7 @@
 #include<kernel/util/time_stamp.hpp>
 #include<kernel/util/statistics.hpp>
 #include<kernel/util/assertion.hpp>
+#include <kernel/util/binary_stream.hpp>
 
 #include<iostream> // for std::istream
 #include<cstring>  // for std::strcpy
@@ -655,6 +656,36 @@ namespace FEAT
           }
         }
 
+        static void synch_binarystream(BinaryStream& bs, const Communicator comm = Communicator(MPI_COMM_WORLD))
+        {
+          Index my_rank(Util::Comm::rank(comm));
+          Index size = Index(0);
+
+          // get a reference to the stream's internal vector container
+          std::vector<char>& data = bs.container();
+
+          // Get size to broadcast
+          if(my_rank == 0)
+          {
+            size = Index(data.size());
+          }
+
+          // synchronize length
+          Util::Comm::bcast(&size, 1, 0, comm);
+
+          if(size > Index(0))
+          {
+            // allocate
+            if(my_rank != 0)
+            {
+              data.resize(std::size_t(size));
+            }
+
+            // bcast data
+            Util::Comm::bcast(data.data(), size, 0, comm);
+          }
+        }
+
         static inline Index rank(Communicator c = Communicator(MPI_COMM_WORLD))
         {
           int r;
@@ -937,6 +968,10 @@ namespace FEAT
         }
 
         static void synch_stringstream(std::stringstream& DOXY(iss), Communicator DOXY(comm) = Communicator(0))
+        {
+        }
+
+        static void synch_binarystream(BinaryStream& DOXY(iss), Communicator DOXY(comm) = Communicator(0))
         {
         }
         //TODO
