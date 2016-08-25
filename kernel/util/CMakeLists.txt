@@ -6,6 +6,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # list of util source files
 ADD_LIBRARY(kernel-util STATIC
   assertion.cpp
+  dist_file_io.cpp
   exception.cpp
   environment.cpp
   function_scheduler.cpp
