@@ -617,8 +617,9 @@ namespace FEAT
           this->buffer_to_mesh();
 
           // Compute distances if necessary
-          if( (this->_scale_computation == ScaleComputation::iter_concentration) ||
-              (_penalty_param > DataType(0)))
+          if((this->_scale_computation == ScaleComputation::current_concentration) ||
+            (this->_scale_computation == ScaleComputation::iter_concentration) ||
+              (_penalty_param > DataType(0)) )
               {
                 if(_mesh_conc == nullptr)
                   throw InternalError(__func__,__FILE__,__LINE__,
