@@ -158,6 +158,31 @@ namespace FEAT
   }; // class FileNotFound
 
   /**
+   * \brief File-Not-Created exception
+   *
+   * This exception is thrown when a file could not be created.
+   *
+   * \author Peter Zajac
+   */
+  class FileNotCreated :
+    public FileError
+  {
+  public:
+    /**
+     * \brief Constructor
+     * \param[in] filename
+     * The name (and path) of the file that could not be created.
+     */
+    explicit FileNotCreated(const String& filename) :
+      FileError("Could not create file: '" + filename + "'")
+    {
+    }
+    virtual ~FileNotCreated() throw()
+    {
+    }
+  }; // class FileNotCreated
+
+  /**
    * \brief Syntax Error exception class
    *
    * This class derives from FEAT::Exception and is thrown by the parser classes when a syntax error
