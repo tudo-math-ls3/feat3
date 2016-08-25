@@ -73,6 +73,16 @@ namespace FEAT
         return _data.data();
       }
 
+      std::vector<char>& container()
+      {
+        return _data;
+      }
+
+      const std::vector<char>& container() const
+      {
+        return _data;
+      }
+
     protected:
       virtual std::streamsize xsputn(const char* ptr, std::streamsize count) override
       {
@@ -197,6 +207,24 @@ namespace FEAT
     const char* data() const
     {
       return _buffer.data();
+    }
+
+    /**
+     * \brief Returns a reference to the internal vector container.
+     * \returns A reference to the internal vector container.
+     */
+    std::vector<char>& container()
+    {
+      return _buffer.container();
+    }
+
+    /**
+     * \brief Returns a reference to the internal vector container.
+     * \returns A reference to the internal vector container.
+     */
+    const std::vector<char>& container() const
+    {
+      return _buffer.container();
     }
   }; // class BinaryStream
 } // namespace FEAT
