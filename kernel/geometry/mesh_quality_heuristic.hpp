@@ -72,7 +72,8 @@ namespace FEAT
 
         typedef typename VtxType_::CoordType CoordType;
 
-        CoordType angle(Math::huge<CoordType>());
+        CoordType min_angle(Math::huge<CoordType>());
+        CoordType max_angle(0);
         for(Index cell(0); cell < idx.get_num_entities(); ++cell)
         {
           Index i0(idx(cell,Index(0)));
@@ -93,10 +94,13 @@ namespace FEAT
 
           ASSERT(Math::abs(a0+a1+a2-Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
 
-          angle = Math::min(angle,Math::min(a2,Math::min(a0,a1)));
+          min_angle = Math::min(min_angle,Math::min(a2,Math::min(a0,a1)));
+          max_angle = Math::max(max_angle,Math::max(a2,Math::max(a0,a1)));
         }
 
-        return angle*(CoordType(360))/(CoordType(2)*Math::pi<CoordType>());
+        CoordType worst_angle(Math::min(min_angle, Math::abs(Math::pi<CoordType>() - max_angle)));
+
+        return worst_angle*(CoordType(360))/(CoordType(2)*Math::pi<CoordType>());
       }
 
       template<typename IdxType_, typename VtxType_>
@@ -162,7 +166,8 @@ namespace FEAT
 
         typedef typename VtxType_::CoordType CoordType;
 
-        CoordType worst_angle(Math::huge<CoordType>());
+        CoordType min_angle(Math::huge<CoordType>());
+        CoordType max_angle(0);
         for(Index cell(0); cell < idx.get_num_entities(); ++cell)
         {
 
@@ -182,19 +187,26 @@ namespace FEAT
           CoordType h3(v3.norm_euclid());
 
           CoordType a0 = Math::acos(Tiny::dot(v2,v0)/(h2*h0));
-          worst_angle = Math::min(worst_angle, Math::abs(a0));
+          min_angle = Math::min(min_angle, Math::abs(a0));
+          max_angle = Math::max(max_angle, Math::abs(a0));
 
           CoordType a1 = Math::acos( - Tiny::dot(v0,v3)/(h0*h3));
-          worst_angle = Math::min(worst_angle, Math::abs(a1));
+          min_angle = Math::min(min_angle, Math::abs(a1));
+          max_angle = Math::max(max_angle, Math::abs(a1));
 
           CoordType a2 = Math::acos( - Tiny::dot(v1,v2)/(h1*h2));
-          worst_angle = Math::min(worst_angle, Math::abs(a2));
+          min_angle = Math::min(min_angle, Math::abs(a2));
+          max_angle = Math::max(max_angle, Math::abs(a2));
 
           CoordType a3 = Math::acos( Tiny::dot(v3,v1)/(h3*h1));
-          worst_angle = Math::min(worst_angle, Math::abs(a3));
+          min_angle = Math::min(min_angle, Math::abs(a3));
+          max_angle = Math::max(max_angle, Math::abs(a3));
 
           ASSERT(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
         }
+
+        CoordType worst_angle(Math::min(min_angle, Math::abs(Math::pi<CoordType>() - max_angle)));
+
         return worst_angle*(CoordType(360))/(CoordType(2)*Math::pi<CoordType>());
       }
 
