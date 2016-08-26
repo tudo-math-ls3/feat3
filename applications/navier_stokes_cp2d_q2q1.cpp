@@ -198,7 +198,7 @@
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 
-#include <control/domain/partitioner_domain_control.hpp>
+#include <control/domain/parti_domain_control.hpp>
 #include <control/stokes_blocked.hpp>
 #include <control/statistics.hpp>
 
@@ -1501,6 +1501,9 @@ namespace NaverStokesCP2D
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
     args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.5\n");
     args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete stastistics dump");
+    args.support("parti-type");
+    args.support("parti-name");
+    args.support("parti-rank-elems");
 
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))
@@ -1555,11 +1558,6 @@ namespace NaverStokesCP2D
     if(!cfg.parse_args(args))
       FEAT::Runtime::abort();
 
-    // build the mesh file path
-    String meshfile = cfg.mesh_path + "/" + cfg.mesh_file;
-    int lvl_min = int(cfg.level_min_in);
-    int lvl_max = int(cfg.level_max_in);
-
 #ifndef DEBUG
     try
 #endif
@@ -1568,19 +1566,29 @@ namespace NaverStokesCP2D
 
       // let's create our domain
       Util::mpi_cout("\nPreparing domain...\n");
-      int rank_elems(4);
-      args.parse("rank-elems", rank_elems);
-      Index min_elems_partitioner = Index(nprocs * rank_elems);
 
+      // create our domain control
+      Control::Domain::PartiDomainControl<MeshType> domain;
+
+      // let the controller parse its arguments
+      if(!domain.parse_args(args))
+      {
+        FEAT::Runtime::abort();
+      }
+
+      // read the base-mesh
+      domain.read_mesh(cfg.mesh_path + "/" + cfg.mesh_file);
       TimeStamp stamp_partition;
-#ifdef FEAT_HAVE_PARMETIS
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, min_elems_partitioner, meshfile);
-#elif defined(FEAT_HAVE_MPI)
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, min_elems_partitioner, meshfile);
-#else
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, min_elems_partitioner, meshfile);
-#endif
+
+      // try to create the partition
+      domain.create_partition();
+
       Statistics::toe_partition = stamp_partition.elapsed_now();
+
+      Util::mpi_cout("Creating mesh hierarchy...\n");
+
+      // create the level hierarchy
+      domain.create_hierarchy(int(cfg.level_max_in), int(cfg.level_min_in));
 
       // store levels after partitioning
       cfg.level_max = Index(domain.get_levels().back()->get_level_index());

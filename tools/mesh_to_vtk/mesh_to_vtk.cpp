@@ -48,6 +48,7 @@ int run_xml(Geometry::MeshFileReader& mesh_reader, const String& filename, Index
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
   Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
+  Geometry::PartitionSet part_set;
 
   // try to parse the mesh file
 #ifndef DEBUG
@@ -56,7 +57,7 @@ int run_xml(Geometry::MeshFileReader& mesh_reader, const String& filename, Index
   {
     std::cout << "Parsing mesh files..." << std::endl;
     // Now parse the mesh file
-    mesh_reader.parse(*node, *atlas);
+    mesh_reader.parse(*node, *atlas, &part_set);
   }
 #ifndef DEBUG
   catch(std::exception& exc)
@@ -141,6 +142,32 @@ int run_xml(Geometry::MeshFileReader& mesh_reader, const String& filename, Index
         exporter.add_vertex_scalar("dist_"+it.first, distances);
       }
       delete[] distances;
+    }
+
+    // loop over all partitions
+    for(const auto& part : part_set.get_partitions())
+    {
+      // does this partition refer to the current level?
+      if(Index(part.get_level()) != lvl)
+        continue;
+
+      // allocate and fill rank vector
+      std::vector<double> r(std::size_t(node->get_mesh()->get_num_entities(Mesh_::shape_dim)), -1.0);
+      for(Index i(0); i < part.size(); ++i)
+      {
+        auto it = part.get_patches().image_begin(i);
+        auto jt = part.get_patches().image_end(i);
+        for(; it != jt; ++it )
+          r[*it] = double(i);
+      }
+
+      // build the name:
+      String name = "partition:";
+      if(!part.get_name().empty())
+        name += part.get_name() + ":";
+      name += stringify(part.size());
+
+      exporter.add_cell_scalar(name, r.data());
     }
 
     exporter.write(vtkname);

@@ -8,6 +8,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/index_calculator.hpp>
+#include <kernel/geometry/partition_set.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
 #include <sstream>
@@ -34,8 +35,6 @@ namespace FEAT
 
     /**
      * \brief Quadrilateral-to-Hexahedral mesh extruder
-     *
-     * \todo implement generation of zmin- and zmax-meshparts
      *
      * \author Peter Zajac
      */
@@ -518,6 +517,60 @@ namespace FEAT
             }
             (*hexa_attrib)[vo+i][quad_num_coords] = z;
           }
+        }
+      }
+
+      void extrude_partition(Partition& hexa_parti, const Partition& quad_parti) const
+      {
+        XASSERTM(quad_parti.get_overlap() == 0, "cannot extrude partitions with non-zero overlap");
+
+        const Adjacency::Graph& quad_graph = quad_parti.get_patches();
+
+        const Index num_patches = quad_parti.get_num_patches();
+        const Index quad_num_elems = quad_parti.get_num_elements();
+
+        // allocate adjacency graph
+        Adjacency::Graph hexa_graph(quad_graph.get_num_nodes_domain(),
+          _slices * quad_graph.get_num_nodes_image(), _slices * quad_graph.get_num_indices());
+
+        // get arrays
+        const Index* q_ptr = quad_graph.get_domain_ptr();
+        const Index* q_idx = quad_graph.get_image_idx();
+        Index* h_ptr = hexa_graph.get_domain_ptr();
+        Index* h_idx = hexa_graph.get_image_idx();
+
+        // loop over all patches
+        h_ptr[0] = Index(0);
+        for(Index i(0); i < num_patches; ++i)
+        {
+          Index hp = h_ptr[i];
+          // loop over all elements in patch
+          for(Index j(q_ptr[i]); j < q_ptr[i+1]; ++j)
+          {
+            // add the element for each slice
+            for(Index k(0); k < _slices; ++k, ++hp)
+              h_idx[hp] = (k*quad_num_elems) + q_idx[j];
+          }
+          h_ptr[i+1] = hp;
+        }
+
+        // create the partition
+        hexa_parti = Partition(std::move(hexa_graph), quad_parti.get_name(),
+          quad_parti.get_priority(), quad_parti.get_level(), 0);
+      }
+
+      void extrude_partition_set(PartitionSet& hexa_part_set, const PartitionSet& quad_part_set) const
+      {
+        const auto& quad_parts = quad_part_set.get_partitions();
+        for(auto it = quad_parts.begin(); it != quad_parts.end(); ++it)
+        {
+          // skip partitons with non-zero overlap
+          if(it->get_overlap() > 0)
+            continue;
+
+          Partition hexa_parti;
+          extrude_partition(hexa_parti, *it);
+          hexa_part_set.add_partition(std::move(hexa_parti));
         }
       }
 

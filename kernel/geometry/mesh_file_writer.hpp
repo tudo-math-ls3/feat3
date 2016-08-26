@@ -6,6 +6,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/partition_set.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
 namespace FEAT
@@ -269,10 +270,45 @@ namespace FEAT
         _os << _sindent << "</MeshPart>" << std::endl;
       }
 
+      void write_partition(const Partition& partition)
+      {
+        _os << _sindent << "<Partition";
+        if(!partition.get_name().empty())
+          _os << " name=\"" << partition.get_name() << "\"";
+        _os << " priority=\"" << partition.get_priority() << "\"";
+        _os << " level=\"" << partition.get_level() << "\"";
+        _os << " overlap=\"" << partition.get_overlap() << "\"";
+        _os << " size=\"" << partition.get_num_patches() << ' ' << partition.get_num_elements() << "\"";
+        _os << ">" << std::endl;
+        push_indent();
+
+        // loop over all patches
+        const Adjacency::Graph& graph = partition.get_patches();
+        for(Index i(0); i < graph.get_num_nodes_domain(); ++i)
+        {
+          _os << _sindent << "<Patch rank=\"" << i << "\" size=\"" << graph.degree(i) << "\">" << std::endl;
+          push_indent();
+          for(auto it = graph.image_begin(i); it != graph.image_end(i); ++it)
+            _os << _sindent << (*it) << std::endl;
+          pop_indent();
+          _os << _sindent << "</Patch>" << std::endl;
+        }
+
+        pop_indent();
+        _os << _sindent << "</Partition>" << std::endl;
+      }
+
+      void write_partition_set(const PartitionSet& part_set)
+      {
+        for(const auto& p : part_set.get_partitions())
+          write_partition(p);
+      }
+
       template<typename RootMesh_>
       void write(
         const RootMeshNode<RootMesh_>* mesh_node,
         const MeshAtlas<RootMesh_>* mesh_atlas,
+        const PartitionSet* part_set,
         bool skip_internal_meshparts = true)
       {
         const RootMesh_* root_mesh(nullptr);
@@ -316,6 +352,12 @@ namespace FEAT
             String chart_name = mesh_node->find_mesh_part_chart_name(*it);
             write_meshpart(*meshpart, "root", *it, chart_name);
           }
+        }
+
+        // write partitions
+        if(part_set != nullptr)
+        {
+          write_partition_set(*part_set);
         }
 
         pop_indent();

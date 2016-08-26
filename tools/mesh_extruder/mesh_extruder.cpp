@@ -3,6 +3,7 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_file_writer.hpp>
 #include <kernel/geometry/mesh_extruder.hpp>
+#include <kernel/geometry/partition_set.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
 #include <iostream>
@@ -90,10 +91,12 @@ namespace MeshExtruderTool
     // input atlas and mesh node
     QuadAtlas quad_atlas;
     QuadNode quad_node(nullptr, &quad_atlas);
+    PartitionSet quad_part_set;
 
     // output atlas and mesh node
     HexaAtlas hexa_atlas;
     HexaNode hexa_node(nullptr, &hexa_atlas);
+    PartitionSet hexa_part_set;
 
     std::cout << "Reading input mesh file '" << ifilename << "'..." << std::endl;
     {
@@ -119,7 +122,7 @@ namespace MeshExtruderTool
       }
 
       // parse
-      mesh_reader.parse(quad_node, quad_atlas);
+      mesh_reader.parse(quad_node, quad_atlas, &quad_part_set);
     }
 
     // extrude
@@ -134,6 +137,10 @@ namespace MeshExtruderTool
       // extrude root mesh
       std::cout << "Extruding mesh node..." << std::endl;
       mesh_extruder.extrude_root_node(hexa_node, quad_node, &hexa_atlas);
+
+      // extrude partition set
+      std::cout << "Extruding partition set..." << std::endl;
+      mesh_extruder.extrude_partition_set(hexa_part_set, quad_part_set);
     }
 
     std::cout << "Writing output mesh file '" << ofilename << "'..." << std::endl;
@@ -150,7 +157,7 @@ namespace MeshExtruderTool
       MeshFileWriter mesh_writer(ofs);
 
       // write mesh and atlas
-      mesh_writer.write(&hexa_node, &hexa_atlas);
+      mesh_writer.write(&hexa_node, &hexa_atlas, &hexa_part_set);
     }
 
     // okay

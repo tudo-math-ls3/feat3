@@ -11,8 +11,10 @@
 #include <kernel/geometry/patch_halo_builder.hpp>
 #include <kernel/geometry/patch_meshpart_factory.hpp>
 #include <kernel/geometry/patch_meshpart_splitter.hpp>
+#include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/uni_edge_set.hpp>
 
 // includes, STL
 #include <map>
@@ -847,6 +849,108 @@ namespace FEAT
 
         // return patch mesh part
         return patch_node;
+      }
+
+      /**
+       * \brief Extracts a patch from a manual partition represented by a graph.
+       *
+       * This function also computes the communication ranks and tags.
+       *
+       * \param[out] comm_ranks
+       * The communication ranks vector for this rank.
+       *
+       * \param[out] comm_tags
+       * The communication tags vector for this rank.
+       *
+       * \param[in] elems_at_rank
+       * The elements-at-rank graph representing the partition
+       * from which the patch is to be extracted.
+       *
+       * \param[in] rank
+       * The rank of the patch to be created.
+       *
+       * \returns
+       * A new mesh node representing the extracted patch.
+       */
+      RootMeshNode* extract_patch(
+        std::vector<Index>& comm_ranks,
+        std::vector<Index>& comm_tags,
+        const Adjacency::Graph& elems_at_rank,
+        const Index rank)
+      {
+        // get dimensions of graph
+        //const Index num_ranks = elems_at_rank.get_num_nodes_domain();
+        const Index num_elems = elems_at_rank.get_num_nodes_image();
+
+        // get our mesh
+        const MeshType* mesh = this->get_mesh();
+        XASSERTM(mesh != nullptr, "mesh node has no mesh");
+
+        // validate element count
+        XASSERTM(num_elems == mesh->get_num_elements(), "mesh vs partition: element count mismatch");
+
+        // transpose for ranks-at-elem
+        Adjacency::Graph ranks_at_elem(Adjacency::rt_transpose, elems_at_rank);
+
+        // get vertices-at-element
+        const auto& verts_at_elem = mesh->template get_index_set<MeshType::shape_dim, 0>();
+
+        // build vertices-at-rank
+        Adjacency::Graph verts_at_rank(Adjacency::rt_injectify, elems_at_rank, verts_at_elem);
+
+        // transpose and build ranks-at-rank (via vertices)
+        Adjacency::Graph ranks_at_vert(Adjacency::rt_transpose, verts_at_rank);
+        Adjacency::Graph ranks_at_rank(Adjacency::rt_injectify, verts_at_rank, ranks_at_vert);
+
+        // compute uni-directional edge set
+        Adjacency::UniEdgeSet edge_set(ranks_at_rank);
+
+        // build comm ranks and tags
+        const Index* ptr = ranks_at_rank.get_domain_ptr();
+        const Index* idx = ranks_at_rank.get_image_idx();
+        for(Index i = ptr[rank]; i < ptr[rank+1]; ++i)
+        {
+          Index other = idx[i];
+          if(other == rank)
+            continue;
+          comm_ranks.push_back(other);
+
+          Index edge = edge_set.find_edge(rank, other);
+          XASSERTM(edge != ~Index(0), "could not find comm edge");
+          comm_tags.push_back(edge);
+        }
+
+        // okay, extract our patch
+        return extract_patch(rank, ranks_at_elem, comm_ranks);
+      }
+
+      /**
+       * \brief Extracts a patch from a manual partition
+       *
+       * This function also computes the communication ranks and tags.
+       *
+       * \param[out] comm_ranks
+       * The communication ranks vector for this rank.
+       *
+       * \param[out] comm_tags
+       * The communication tags vector for this rank.
+       *
+       * \param[in] partition
+       * The partition from which the patch is to be extracted.
+       *
+       * \param[in] rank
+       * The rank of the patch to be created.
+       *
+       * \returns
+       * A new mesh node representing the extracted patch.
+       */
+      RootMeshNode* extract_patch(
+        std::vector<Index>& comm_ranks,
+        std::vector<Index>& comm_tags,
+        const Partition& partition,
+        const Index rank)
+      {
+        return extract_patch(comm_ranks, comm_tags, partition.get_patches(), rank);
       }
 
       /**

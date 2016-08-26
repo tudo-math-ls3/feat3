@@ -6,27 +6,24 @@
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-//#include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/circle.hpp>
 #include <kernel/geometry/atlas/extrude.hpp>
-//#include <kernel/geometry/atlas/polyline.hpp>
 #include <kernel/geometry/atlas/spline.hpp>
 #include <kernel/geometry/atlas/surface_mesh.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
 #include <kernel/geometry/atlas/tube.hpp>
+#include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
 namespace FEAT
 {
   namespace Geometry
   {
-
     /// \cond internal
     // Forward declaration
     template<typename RootMesh_, int world_dim>
     struct DimensionalChartHelper;
     /// \endcond
-
 
 
     template<typename RootMesh_>
@@ -890,6 +887,193 @@ namespace FEAT
       }
     };
 
+    class PatchParser :
+      public Xml::MarkupParser
+    {
+    protected:
+      Adjacency::DynamicGraph& _patches;
+      Index _rank;
+      Index _size;
+      Index _read;
+
+    public:
+      explicit PatchParser(Adjacency::DynamicGraph& patches) :
+        _patches(patches),
+        _rank(~Index(0)),
+        _size(~Index(0)),
+        _read(Index(0))
+      {
+      }
+
+      virtual bool attribs(std::map<String,bool>& attrs) const override
+      {
+        attrs.emplace("rank", true);
+        attrs.emplace("size", true);
+        return true;
+      }
+
+      virtual void create(int iline, const String& sline, const String&, const std::map<String, String>& attrs, bool) override
+      {
+        // try to parse rank and size
+        if(!attrs.find("rank")->second.parse(_rank))
+          throw Xml::ContentError(iline, sline, "Cannot parse patch rank index");
+        if(!attrs.find("size")->second.parse(_size))
+          throw Xml::ContentError(iline, sline, "Cannot parse patch size");
+
+        // ensure that the rank is valid
+        if(_rank >= _patches.get_num_nodes_domain())
+          throw Xml::ContentError(iline, sline, "Patch rank index is out of bounds");
+      }
+
+      virtual void close(int iline, const String& sline) override
+      {
+        if(_read < _size)
+          throw Xml::GrammarError(iline, sline, "Invalid terminator; expected index");
+      }
+
+      virtual bool content(int iline, const String& sline) override
+      {
+        // make sure that we do not read more points than expected
+        if(_read >= _size)
+          throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
+
+        // try to parse element index
+        Index elem(0);
+        if(!sline.parse(elem))
+          throw Xml::ContentError(iline, sline, "Failed to parse element index");
+
+        if(elem >= _patches.get_num_nodes_image())
+          throw Xml::ContentError(iline, sline, "Patch element index is out of bounds");
+
+        // insert adjacency
+        _patches.insert(_rank, elem);
+
+        // okay, another one processed
+        ++_read;
+
+        return true;
+      }
+
+      virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String&) override
+      {
+        return nullptr;
+      }
+    }; // class PatchParser
+
+    class PartitionParser :
+      public Xml::MarkupParser
+    {
+    protected:
+      PartitionSet& _part_set;
+      String _name;
+      int _prio;
+      int _level;
+      int _overlap;
+      int _num_ranks, _num_elems;
+      Adjacency::DynamicGraph _patches;
+
+    public:
+      explicit PartitionParser(PartitionSet& part_set) :
+        _part_set(part_set),
+        _name(),
+        _prio(0),
+        _level(0),
+        _overlap(0),
+        _num_ranks(0),
+        _num_elems(0),
+        _patches()
+      {
+      }
+
+      virtual bool attribs(std::map<String,bool>& attrs) const override
+      {
+        attrs.emplace("size", true);
+        attrs.emplace("name", false);
+        attrs.emplace("priority", false);
+        attrs.emplace("level", false);
+        attrs.emplace("overlap", false);
+        return true;
+      }
+
+      virtual void create(int iline, const String& sline, const String&, const std::map<String, String>& attrs, bool) override
+      {
+        // split sizes
+        std::deque<String> ssize;
+        attrs.find("size")->second.split_by_charset(ssize);
+        if(ssize.size() != std::size_t(2))
+          throw Xml::ContentError(iline, sline, "Invalid partition size");
+
+        // parse sizes
+        if(!ssize.front().parse(_num_ranks))
+          throw Xml::ContentError(iline, sline, "Failed to parse partition rank count");
+        if(!ssize.back().parse(_num_elems))
+          throw Xml::ContentError(iline, sline, "Failed to parse partition element count");
+
+        // fetch name
+        {
+          auto it = attrs.find("name");
+          if(it != attrs.end())
+            _name = it->second;
+        }
+
+        // fetch priority
+        {
+          auto it = attrs.find("priority");
+          if(it != attrs.end())
+          {
+            if(!it->second.parse(_prio))
+              throw Xml::ContentError(iline, sline, "Cannot parse partition priority");
+          }
+        }
+
+        // fetch level
+        {
+          auto it = attrs.find("level");
+          if(it != attrs.end())
+          {
+            if(!it->second.parse(_level))
+              throw Xml::ContentError(iline, sline, "Cannot parse partition level");
+            if(_level < 0)
+              throw Xml::ContentError(iline, sline, "Invalid negative partition level");
+          }
+        }
+
+        // fetch overlap
+        {
+          auto it = attrs.find("overlap");
+          if(it != attrs.end())
+          {
+            if(!it->second.parse(_overlap))
+              throw Xml::ContentError(iline, sline, "Cannot parse partition overlap");
+            if(_overlap < 0)
+              throw Xml::ContentError(iline, sline, "Invalid negative partition overlap");
+          }
+        }
+
+        // okay, let's create a new partition
+        _patches = Adjacency::DynamicGraph(Index(_num_ranks), Index(_num_elems));
+      }
+
+      virtual void close(int, const String&) override
+      {
+        // add our partition to the set
+        _part_set.add_partition(Partition(_patches, _name, _prio, _level, _overlap));
+      }
+
+      virtual bool content(int, const String&) override
+      {
+        return false;
+      }
+
+      virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String& name) override
+      {
+        if(name == "Patch")
+          return std::make_shared<PatchParser>(_patches);
+
+        return nullptr;
+      }
+    }; // class PartitionParser
+
     template<typename RootMesh_>
     class MeshNodeParser :
       public Xml::MarkupParser
@@ -904,13 +1088,16 @@ namespace FEAT
       RootMeshNodeType& _root_node;
       /// mesh atlas
       MeshAtlasType& _mesh_atlas;
+      /// partition set
+      PartitionSet* _part_set;
       /// mesh declarator
       String _mesh_decl;
 
     public:
-      explicit MeshNodeParser(RootMeshNodeType& root_node, MeshAtlasType& mesh_atlas) :
+      explicit MeshNodeParser(RootMeshNodeType& root_node, MeshAtlasType& mesh_atlas, PartitionSet* part_set) :
         _root_node(root_node),
         _mesh_atlas(mesh_atlas),
+        _part_set(part_set),
         _mesh_decl()
       {
       }
@@ -981,6 +1168,17 @@ namespace FEAT
         {
           // valid meshpart markup
           return std::make_shared<MeshPartParser<RootMeshType>>(_root_node, _mesh_atlas);
+        }
+        if(name == "Partition")
+        {
+          // valid partition markup
+          if(_part_set != nullptr)
+            return std::make_shared<PartitionParser>(*_part_set);
+          else
+          {
+            // the user is not interested in partitions, so create a dummy parser
+            return std::make_shared<Xml::DummyParser>();
+          }
         }
 
         // anything else is invalid
@@ -1188,9 +1386,16 @@ namespace FEAT
        * \param[in,out] mesh_atlas
        * The mesh atlas into which charts are to be added. Is also used to search
        * for charts for mesh parts.
+       *
+       * \param[in,out]
+       * A pointer to the partition set that partitions are added to.
+       * May be \p nullptr, if the partitions are to be ignored.
        */
       template<typename RootMesh_>
-      void parse(RootMeshNode<RootMesh_>& root_mesh_node, MeshAtlas<RootMesh_>& mesh_atlas)
+      void parse(
+        RootMeshNode<RootMesh_>& root_mesh_node,
+        MeshAtlas<RootMesh_>& mesh_atlas,
+        PartitionSet* part_set = nullptr)
       {
         // read root markup unless it has already been read
         if(!_have_root_markup)
@@ -1200,7 +1405,7 @@ namespace FEAT
         for(auto it = _scanners.begin(); it != _scanners.end(); ++it)
         {
           // create a corresponding parser and scan
-          (*it)->set_root_parser(std::make_shared<MeshNodeParser<RootMesh_>>(root_mesh_node, mesh_atlas));
+          (*it)->set_root_parser(std::make_shared<MeshNodeParser<RootMesh_>>(root_mesh_node, mesh_atlas, part_set));
           (*it)->scan();
         }
       }

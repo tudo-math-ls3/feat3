@@ -26,7 +26,7 @@
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/util/mpi_cout.hpp>
 
-#include <control/domain/partitioner_domain_control.hpp>
+#include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
 #include <control/scalar_solver.hpp>
@@ -241,7 +241,6 @@ namespace PoissonDirichlet2D
 
     Util::mpi_cout("Assembling system filters...\n");
 
-
     for (Index i(0); i < num_levels; ++i)
     {
       asm_levels.at(i)->assemble_system_filter(*system_levels.at(i));
@@ -314,7 +313,6 @@ namespace PoissonDirichlet2D
     multigrid_hierarchy->init();
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
     auto solver = Solver::new_pcg(scalar_solver.get_system_levels_solve().back()->matrix_sys, scalar_solver.get_system_levels_solve().back()->filter_sys, mgv);
-
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -391,11 +389,11 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    if (args.check("test_iter") >= 0)
+    if (args.check("test-iter") >= 0)
     {
       int num_iter = (int)solver->get_num_iter();
       int iter_target;
-      args.parse("test_iter", iter_target);
+      args.parse("test-iter", iter_target);
       if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
       {
         std::cout<<"FAILED"<<std::endl;
@@ -446,9 +444,12 @@ namespace PoissonDirichlet2D
     args.support("vtk");
     args.support("statistics");
     args.support("mem");
-    args.support("part_min_elems");
-    args.support("meshfile");
-    args.support("test_iter");
+    args.support("min-rank-elems");
+    args.support("mesh");
+    args.support("test-iter");
+    args.support("parti-type");
+    args.support("parti-name");
+    args.support("parti-rank-elems");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -486,27 +487,40 @@ namespace PoissonDirichlet2D
 
       // let's create our domain
       Util::mpi_cout("Preparing domain...\n");
-      int min_elems_partitioner(nprocs * 4);
-      args.parse("part_min_elems", min_elems_partitioner);
 
-      // fetch the mandatory mesh filename
-      String meshfile;
-      if(args.parse("meshfile", meshfile) <= 0)
+      if(args.check("mesh") < 1)
       {
         if(rank == 0)
-          std::cerr << "ERROR: Mandatory option --meshfile is missing!" << std::endl;
+          std::cerr << "ERROR: Mandatory option --mesh is missing!" << std::endl;
         FEAT::Runtime::abort();
       }
 
+      // query mesh filename list
+      const std::deque<String>& mesh_filenames = args.query("mesh")->second;
+
+      // create our domain control
+      Control::Domain::PartiDomainControl<MeshType> domain;
+
+      // let the controller parse its arguments
+      if(!domain.parse_args(args))
+      {
+        FEAT::Runtime::abort();
+      }
+
+      // read the base-mesh
+      domain.read_mesh(mesh_filenames);
+
       TimeStamp stamp_partition;
-#ifdef FEAT_HAVE_PARMETIS
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#elif defined(FEAT_HAVE_MPI)
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#else
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#endif
+
+      // try to create the partition
+      domain.create_partition();
+
       Statistics::toe_partition = stamp_partition.elapsed_now();
+
+      Util::mpi_cout("Creating mesh hierarchy...\n");
+
+      // create the level hierarchy
+      domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
       Util::mpi_cout("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]\n");
