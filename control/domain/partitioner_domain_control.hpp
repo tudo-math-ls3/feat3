@@ -10,6 +10,7 @@
 #include <kernel/foundation/psynch.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/runtime.hpp>
 
 #include <control/domain/domain_control.hpp>
@@ -45,33 +46,18 @@ namespace FEAT
            * \brief Constructor that reads the base mesh from a file
            */
           explicit PartitionerDomainControl(int lvl_max, int lvl_min, Index min_elems_partitioner,
-          const String& meshfile, const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
+            const String& meshfile, const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
             _adapt_mode(adapt_mode)
           {
             std::stringstream synchstream;
 
-            //MASTER
-            if(Util::Comm::rank() == 0)
-            {
-              std::ifstream ifs(meshfile.c_str(), std::ios::binary);
-              if(!ifs.is_open())
-              {
-                throw FileNotFound(meshfile);
-              }
-              synchstream << ifs.rdbuf();
-            }
-
-            // Synchronise the mesh stream in parallel mode
-#ifdef FEAT_HAVE_MPI
-            //MASTER to ALL
-            Util::Comm::synch_stringstream(synchstream);
-#endif
+            // read common file for all ranks
+            DistFileIO::read_common(synchstream, meshfile);
 
             // Create MeshFileReader using the synched stream
             Geometry::MeshFileReader mesh_file_reader(synchstream);
 
             _create(lvl_max, lvl_min, min_elems_partitioner, &mesh_file_reader);
-
           }
 
           /**
@@ -81,8 +67,8 @@ namespace FEAT
            * synchronised before it was passes to it.
            */
           explicit PartitionerDomainControl(int lvl_max, int lvl_min, Index min_elems_partitioner,
-          Geometry::MeshFileReader* mesh_file_reader,
-          const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
+            Geometry::MeshFileReader* mesh_file_reader,
+            const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
             _adapt_mode(adapt_mode)
           {
             _create(lvl_max, lvl_min, min_elems_partitioner, mesh_file_reader, nullptr);
@@ -110,7 +96,7 @@ namespace FEAT
            * there.
            */
           void _create(int lvl_max, int lvl_min, const Index min_elems_partitioner,
-          Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader = nullptr)
+            Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader = nullptr)
           {
             XASSERT(mesh_file_reader != nullptr);
 
