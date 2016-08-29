@@ -1012,10 +1012,8 @@ namespace FEAT
       };
 
     protected:
-      /// The input stream to read from
-      std::istream& _istream;
-      /// Our Xml scanner object
-      Xml::Scanner _scanner;
+      /// Our Xml scanner objects
+      std::deque<std::shared_ptr<Xml::Scanner>> _scanners;
       /// Did we read the root markup yet?
       bool _have_root_markup;
       /// The parsed mesh type
@@ -1031,9 +1029,8 @@ namespace FEAT
       int _world_dim;
 
     public:
-      explicit MeshFileReader(std::istream& is) :
-        _istream(is),
-        _scanner(_istream),
+      /// default constuctor
+      explicit MeshFileReader() :
         _have_root_markup(false),
         _mesh_type_string(),
         _mesh_type(MeshType::unknown),
@@ -1041,7 +1038,18 @@ namespace FEAT
         _shape_dim(0),
         _world_dim(0)
       {
+      }
 
+      explicit MeshFileReader(std::istream& is) :
+        _have_root_markup(false),
+        _mesh_type_string(),
+        _mesh_type(MeshType::unknown),
+        _shape_type(ShapeType::unknown),
+        _shape_dim(0),
+        _world_dim(0)
+      {
+        // create a new scanner object
+        _scanners.push_back(std::make_shared<Xml::Scanner>(is));
       }
 
       MeshFileReader(const MeshFileReader&) = delete;
@@ -1049,6 +1057,14 @@ namespace FEAT
 
       virtual ~MeshFileReader()
       {
+      }
+
+      void add_stream(std::istream& is)
+      {
+        XASSERTM(!_have_root_markup, "cannot add new stream after reading root");
+
+        // create a new scanner object
+        _scanners.push_back(std::make_shared<Xml::Scanner>(is));
       }
 
       const String& get_meshtype_string() const
@@ -1081,61 +1097,82 @@ namespace FEAT
        */
       void read_root_markup()
       {
-        // try to read root node
-        _scanner.read_root();
+        XASSERTM(!_have_root_markup, "root has already been read");
 
-        // verify root marker
-        if(_scanner.get_cur_name() != "FeatMeshFile")
-          _scanner.throw_grammar("Invalid mesh file");
-
-        // get attributes
-        const auto& attr = _scanner.get_cur_attribs();
-
-        // check version attribute
-        auto it_v = attr.find("version");
-        if(it_v == attr.end())
-          _scanner.throw_grammar("Mesh file is missing mandatory attribute 'version'");
-        int iversion(0);
-        if(!(it_v->second.parse(iversion)))
-          _scanner.throw_grammar("Failed to parse mesh file version attribute");
-        if(iversion != 1)
-          _scanner.throw_grammar("Invalid mesh file version");
-
-        // check mesh attribute
-        auto it_m = attr.find("mesh");
-        if(it_m != attr.end())
+        // loop over all scanners
+        for(auto it = _scanners.begin(); it != _scanners.end(); ++it)
         {
-          // save the mesh type string
-          _mesh_type_string = it_m->second;
+          // get the scanner
+          Xml::Scanner& scanner = **it;
 
-          // split up mesh type string
-          std::deque<String> mts;
-          _mesh_type_string.split_by_charset(mts, ":");
+          // try to read root node
+          scanner.read_root();
 
-          if(mts.size() != std::size_t(4))
-            _scanner.throw_grammar("Mesh file root markup has invalid 'mesh' attribute");
+          // verify root marker
+          if(scanner.get_cur_name() != "FeatMeshFile")
+            scanner.throw_grammar("Invalid mesh file");
 
-          // check mesh type
-          if(mts.at(0) == "conformal")
-            _mesh_type = MeshType::conformal;
-          else
-            _scanner.throw_grammar("Invalid 'mesh' attribute mesh type");
+          // get attributes
+          const auto& attr = scanner.get_cur_attribs();
 
-          // check shape type
-          if(mts.at(1) == "simplex")
-            _shape_type = ShapeType::simplex;
-          else if(mts.at(1) == "hypercube")
-            _shape_type = ShapeType::hypercube;
-          else
-            _scanner.throw_grammar("Invalid 'mesh' attribute shape type");
+          // check version attribute
+          auto it_v = attr.find("version");
+          if(it_v == attr.end())
+            scanner.throw_grammar("Mesh file is missing mandatory attribute 'version'");
+          int iversion(0);
+          if(!(it_v->second.parse(iversion)))
+            scanner.throw_grammar("Failed to parse mesh file version attribute");
+          if(iversion != 1)
+            scanner.throw_grammar("Invalid mesh file version");
 
-          // parse shape dimension
-          if(!mts.at(2).parse(_shape_dim) || (_shape_dim <= 0))
-            _scanner.throw_content("Invalid 'mesh' attribute shape dimension");
+          // check mesh attribute
+          auto it_m = attr.find("mesh");
+          if(it_m != attr.end())
+          {
+            // did we read a mesh type already?
+            if(!_mesh_type_string.empty())
+            {
+              // make sure that the mesh types are identical
+              if(it_m->second != _mesh_type_string)
+                throw InternalError(__func__, __FILE__, __LINE__, "conflicting mesh types");
+            }
+            else
+            {
+              // save the mesh type string
+              _mesh_type_string = it_m->second;
 
-          // parse world dimension
-          if(!mts.at(3).parse(_world_dim) || (_world_dim <= 0))
-            _scanner.throw_content("Invalid 'mesh' attribute world dimension");
+              // split up mesh type string
+              std::deque<String> mts;
+              _mesh_type_string.split_by_charset(mts, ":");
+
+              if(mts.size() != std::size_t(4))
+                scanner.throw_grammar("Mesh file root markup has invalid 'mesh' attribute");
+
+              // check mesh type
+              if(mts.at(0) == "conformal")
+                _mesh_type = MeshType::conformal;
+              else
+                scanner.throw_grammar("Invalid 'mesh' attribute mesh type");
+
+              // check shape type
+              if(mts.at(1) == "simplex")
+                _shape_type = ShapeType::simplex;
+              else if(mts.at(1) == "hypercube")
+                _shape_type = ShapeType::hypercube;
+              else
+                scanner.throw_grammar("Invalid 'mesh' attribute shape type");
+
+              // parse shape dimension
+              if(!mts.at(2).parse(_shape_dim) || (_shape_dim <= 0))
+                scanner.throw_content("Invalid 'mesh' attribute shape dimension");
+
+              // parse world dimension
+              if(!mts.at(3).parse(_world_dim) || (_world_dim <= 0))
+                scanner.throw_content("Invalid 'mesh' attribute world dimension");
+            }
+          }
+
+          // continue with next stream
         }
 
         // alright, root markup read
@@ -1159,9 +1196,13 @@ namespace FEAT
         if(!_have_root_markup)
           read_root_markup();
 
-        // create a corresponding parser
-        _scanner.set_root_parser(std::make_shared<MeshNodeParser<RootMesh_>>(root_mesh_node, mesh_atlas));
-        _scanner.scan();
+        // loop over all scanners
+        for(auto it = _scanners.begin(); it != _scanners.end(); ++it)
+        {
+          // create a corresponding parser and scan
+          (*it)->set_root_parser(std::make_shared<MeshNodeParser<RootMesh_>>(root_mesh_node, mesh_atlas));
+          (*it)->scan();
+        }
       }
     }; // class MeshFileReader
 

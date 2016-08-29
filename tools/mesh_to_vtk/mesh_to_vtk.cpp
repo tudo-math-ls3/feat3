@@ -12,12 +12,14 @@ using namespace FEAT::Geometry;
 
 static void display_help()
 {
+  std::cout << std::endl;
   std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << std::endl;
   std::cout << std::endl;
   std::cout << "Mandatory arguments:" << std::endl;
-  std::cout << " --meshfile [path to mesh file]" << std::endl;
+  std::cout << " --mesh [path to mesh file(s)]" << std::endl;
+  std::cout << std::endl;
   std::cout << "Optional arguments:" << std::endl;
-  std::cout << " --chartfile [path to chart file]" <<  std::endl;
+  std::cout << " --vtk [path to vtk file]" << std::endl;
   std::cout << " --level [lvl_max lvl_min]" << std::endl;
   std::cout << " --no-adapt" << std::endl;
   std::cout << " --help: Displays this message" << std::endl;
@@ -41,26 +43,20 @@ String get_file_title(const String& filename)
 }
 
 template<typename Mesh_>
-int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* chart_reader,
-  const String& filename, Index lvl_min, Index lvl_max, bool adapt)
+int run_xml(Geometry::MeshFileReader& mesh_reader, const String& filename, Index lvl_min, Index lvl_max, bool adapt)
 {
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
   Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
-
-  XASSERT(mesh_reader != nullptr);
 
   // try to parse the mesh file
 #ifndef DEBUG
   try
 #endif
   {
-    // Parse the chart file first, if it was given
-    if(chart_reader != nullptr)
-      chart_reader->parse(*node, *atlas);
-
+    std::cout << "Parsing mesh files..." << std::endl;
     // Now parse the mesh file
-    mesh_reader->parse(*node, *atlas);
+    mesh_reader.parse(*node, *atlas);
   }
 #ifndef DEBUG
   catch(std::exception& exc)
@@ -100,7 +96,7 @@ int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* cha
       continue;
 
     // Create a VTK exporter for our mesh
-    FEAT::String vtkname = get_file_title(filename) + "." + stringify(lvl);
+    FEAT::String vtkname = filename + "." + stringify(lvl);
     std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
     Geometry::ExportVTK<Mesh_> exporter(*node->get_mesh());
 
@@ -156,7 +152,7 @@ int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* cha
   return 0;
 }
 
-int main(int argc, char* argv[])
+int run(int argc, char* argv[])
 {
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> S2M2D;
@@ -169,30 +165,19 @@ int main(int argc, char* argv[])
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> H2M3D;
   typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> H3M3D;
 
-  Runtime::initialise(argc, argv);
-
   SimpleArgParser args(argc, argv);
 
   // need help?
   if(args.check("help") > -1)
   {
     display_help();
-    return Runtime::finalise();
+    return 0;
   }
 
-  args.support("meshfile");
-  args.support("chartfile");
+  args.support("mesh");
+  args.support("vtk");
   args.support("level");
   args.support("no-adapt");
-
-  String chart_file_name("");
-  String mesh_file_name("");
-
-  Index lvl_min(0);
-  Index lvl_max(0);
-
-  Geometry::MeshFileReader* mesh_reader(nullptr);
-  Geometry::MeshFileReader* chart_reader(nullptr);
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
@@ -203,49 +188,11 @@ int main(int argc, char* argv[])
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
 
     display_help();
-
     return 1;
   }
 
-  if(args.check("meshfile")!=1)
-  {
-    std::cerr << "ERROR: You have to specify a mesh with --meshfile" << std::endl;
-    display_help();
-    return 1;
-  }
-
-  args.parse("meshfile", mesh_file_name);
-  std::ifstream ifs_mesh(mesh_file_name, std::ios_base::in);
-
-  if(!ifs_mesh.is_open() || !ifs_mesh.good())
-  {
-    std::cerr << "ERROR: Failed to open mesh file '" << mesh_file_name << "'" << std::endl;
-    return 1;
-  }
-  std::cout << "Reading mesh from " << mesh_file_name << std::endl;
-
-  // create a reader and read the root markup
-  mesh_reader = new Geometry::MeshFileReader(ifs_mesh);
-  // create input file stream
-  mesh_reader->read_root_markup();
-  // get mesh type
-  const String mtype = mesh_reader->get_meshtype_string();
-
-  // Create a MeshFileReader for the optional chart file
-  std::ifstream* ifs_chart(nullptr);
-  if(args.check("chartfile")==1)
-  {
-    args.parse("chartfile", chart_file_name);
-    ifs_chart = new std::ifstream(chart_file_name, std::ios_base::in);
-    if(!ifs_chart->is_open() || !ifs_chart->good())
-    {
-      std::cerr << std::endl << "ERROR: Failed to open chart file '" << chart_file_name << "'" << std::endl;
-      delete mesh_reader;
-      return 1;
-    }
-    std::cout << "Reading chart file from " << chart_file_name << std::endl;
-    chart_reader = new Geometry::MeshFileReader(*ifs_chart);
-  }
+  Index lvl_min(0);
+  Index lvl_max(0);
 
   if(args.check("level") > 0)
   {
@@ -254,36 +201,79 @@ int main(int argc, char* argv[])
 
   bool adapt = (args.check("no-adapt") < 0);
 
+  int num_mesh_files = args.check("mesh");
+  if(num_mesh_files < 1)
+  {
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << std::endl;
+    display_help();
+    return 1;
+  }
+
+  // get our filename deque
+  auto mpars = args.query("mesh");
+  XASSERT(mpars != nullptr);
+  const std::deque<String>& filenames = mpars->second;
+  std::deque<std::shared_ptr<std::ifstream>> streams;
+
+  // our VTK output filename
+  String vtk_name = get_file_title(filenames.back());
+  args.parse("vtk", vtk_name);
+
+  // create an empty mesh file reader
+  Geometry::MeshFileReader mesh_reader;
+
+  // open a stream for each filename
+  for(auto it = filenames.begin(); it != filenames.end(); ++it)
+  {
+    // try to open the file
+    streams.emplace_back(std::make_shared<std::ifstream>(*it, std::ios_base::in));
+    std::ifstream& ifs = *streams.back();
+    if(!ifs.is_open() || !ifs.good())
+    {
+      std::cerr << "ERROR: Failed to open mesh file '" << (*it) << "'" << std::endl;
+      return 1;
+    }
+
+    // add stream to reader
+    std::cout << "Adding '" << (*it) << "' to mesh file reader..." << std::endl;
+    mesh_reader.add_stream(ifs);
+  }
+
+  // read root markup
+  mesh_reader.read_root_markup();
+
+  // get mesh type
+  const String mtype = mesh_reader.get_meshtype_string();
+
+  std::cout << "Mesh Type: " << mtype << std::endl;
+
   int ret(1);
   if(mtype == "conformal:hypercube:1:1")
-    ret = run_xml<H1M1D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H1M1D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:1:2")
-    ret = run_xml<H1M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H1M2D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:1:3")
-    ret = run_xml<H1M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H1M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:2:2")
-    ret = run_xml<H2M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H2M2D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:2:3")
-    ret = run_xml<H2M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H2M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:3:3")
-    ret = run_xml<H3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H3M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:simplex:2:2")
-    ret = run_xml<S2M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<S2M2D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:simplex:2:3")
-    ret = run_xml<S2M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<S2M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:simplex:3:3")
-    ret = run_xml<S3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
-
-  // Clean up
-  if(ifs_chart != nullptr)
-    delete ifs_chart;
-  if(mesh_reader != nullptr)
-    delete mesh_reader;
-  if(chart_reader != nullptr)
-    delete chart_reader;
-
-  Runtime::finalise();
+    ret = run_xml<S3M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
 
   return ret;
+}
 
+int main(int argc, char* argv[])
+{
+  Runtime::initialise(argc, argv);
+  int ret = run(argc, argv);
+  Runtime::finalise();
+  return ret;
 }
