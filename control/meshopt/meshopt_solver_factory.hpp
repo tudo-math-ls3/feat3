@@ -66,6 +66,10 @@ namespace FEAT
           auto min_iter_p = section->get_entry("min_iter");
           if (min_iter_p.second)
             solver->set_min_iter(std::stoul(min_iter_p.first));
+
+          auto min_stag_iter_p = section->get_entry("min_stag_iter");
+          if (min_stag_iter_p.second)
+            solver->set_min_stag_iter(std::stoul(min_stag_iter_p.first));
         }
 
         template <typename VectorType_>
@@ -104,6 +108,10 @@ namespace FEAT
           auto min_iter_p = section->get_entry("min_iter");
           if (min_iter_p.second)
             solver->set_min_iter(std::stoul(min_iter_p.first));
+
+          auto min_stag_iter_p = section->get_entry("min_stag_iter");
+          if (min_stag_iter_p.second)
+            solver->set_min_stag_iter(std::stoul(min_stag_iter_p.first));
         }
 
         /// \todo make internal
