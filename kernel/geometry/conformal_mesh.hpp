@@ -200,6 +200,24 @@ namespace FEAT
         return _num_entities[dim];
       }
 
+      /**
+       * \brief Returns the number of vertices.
+       * \returns The number of vertices.
+       */
+      Index get_num_vertices() const
+      {
+        return _num_entities[0];
+      }
+
+      /**
+       * \brief Returns the number of elements.
+       * \returns The number of elements.
+       */
+      Index get_num_elements() const
+      {
+        return _num_entities[shape_dim];
+      }
+
       void fill_neighbours()
       {
         // Facet at cell index set
