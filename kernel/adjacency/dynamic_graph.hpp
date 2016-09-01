@@ -42,6 +42,13 @@ namespace FEAT
       IdxSetVec _indices;
 
     public:
+      /// default constructor
+      DynamicGraph() :
+        _num_nodes_domain(0),
+        _num_nodes_image(0)
+      {
+      }
+
       /**
        * \brief Constructor
        *
@@ -297,7 +304,7 @@ namespace FEAT
       template<typename Adjactor_>
       void compose(const Adjactor_& adjactor)
       {
-        ASSERT(_num_nodes_image <= adjactor.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(_num_nodes_image <= adjactor.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor_::ImageIterator AImIt;
 
