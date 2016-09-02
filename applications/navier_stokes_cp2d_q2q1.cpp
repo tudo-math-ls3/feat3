@@ -723,7 +723,7 @@ namespace NaverStokesCP2D
   }; // class NavierStokesBlockedAssemblerLevel
 
   template <typename SystemLevelType, typename TransferLevelType, typename MeshType>
-  void report_statistics(double t_total, std::deque<SystemLevelType*> & system_levels, std::deque<TransferLevelType*> & transfer_levels,
+  void report_statistics(double t_total, std::deque<std::shared_ptr<SystemLevelType>> & system_levels, std::deque<std::shared_ptr<TransferLevelType>> & transfer_levels,
       Control::Domain::DomainControl<MeshType>& domain, int nprocs)
   {
     /// \todo cover exactly all la op timings (some are not timed yet in the application) and replace t_total by them
@@ -738,10 +738,10 @@ namespace NaverStokesCP2D
     Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
 
     std::size_t la_size(0);
-    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { la_size += n->bytes(); });
-    std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType * n) { la_size += n->bytes(); });
+    std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { la_size += n->bytes(); });
+    std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (std::shared_ptr<TransferLevelType> n) { la_size += n->bytes(); });
     std::size_t mpi_size(0);
-    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { mpi_size += n->gate_sys.bytes(); });
+    std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { mpi_size += n->gate_sys.bytes(); });
     String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
 
     Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
@@ -900,9 +900,9 @@ namespace NaverStokesCP2D
     const DomainLayerType& layer = *domain.get_layers().back();
     const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
 
-    std::deque<AssemblerLevelType*> asm_levels;
-    std::deque<SystemLevelType*> system_levels;
-    std::deque<TransferLevelType*> transfer_levels;
+    std::deque<std::shared_ptr<AssemblerLevelType>> asm_levels;
+    std::deque<std::shared_ptr<SystemLevelType>> system_levels;
+    std::deque<std::shared_ptr<TransferLevelType>> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
@@ -913,11 +913,11 @@ namespace NaverStokesCP2D
     // create stokes and system levels
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
-      system_levels.push_back(new SystemLevelType());
+      asm_levels.push_back(std::make_shared<AssemblerLevelType>(*domain_levels.at(i)));
+      system_levels.push_back(std::make_shared<SystemLevelType>());
       if(i > 0)
       {
-        transfer_levels.push_back(new TransferLevelType(*system_levels.at(i-1), *system_levels.at(i)));
+        transfer_levels.push_back(std::make_shared<TransferLevelType>(*system_levels.at(i-1), *system_levels.at(i)));
       }
     }
 
@@ -1450,26 +1450,6 @@ namespace NaverStokesCP2D
     if (cfg.statistics)
     {
       report_statistics(t_total, system_levels, transfer_levels, domain, nprocs);
-    }
-
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-    // clean up
-    while(!transfer_levels.empty())
-    {
-      delete transfer_levels.back();
-      transfer_levels.pop_back();
-    }
-    while(!system_levels.empty())
-    {
-      delete system_levels.back();
-      system_levels.pop_back();
-    }
-    while(!asm_levels.empty())
-    {
-      delete asm_levels.back();
-      asm_levels.pop_back();
     }
   }
 
