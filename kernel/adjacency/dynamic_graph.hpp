@@ -182,7 +182,7 @@ namespace FEAT
       {
         DynamicGraph graph(_num_nodes_domain, _num_nodes_image);
         graph._indices = _indices;
-        return std::move(graph);
+        return graph;
       }
 
       /**
