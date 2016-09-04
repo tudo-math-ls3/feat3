@@ -1,0 +1,160 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This is the L-shape mesh consisting of three quadrilateral cells.
+  </Info>
+  <Chart name="outer">
+    <Spline dim="2" size="7" type="closed">
+      <Points>
+        0 -1 -1
+        0 1 -1
+        0 1 0
+        0 0 0
+        0 0 1
+        0 -1 1
+        0 -1 -1
+      </Points>
+      <Params>
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+      </Params>
+    </Spline>
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="8 10 3">
+    <Vertices>
+      -1 -1
+      0 -1
+      1 -1
+      -1 0
+      0 0
+      1 0
+      -1 1
+      0 1
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 5
+      5 4
+      4 7
+      7 6
+      6 3
+      3 0
+      1 4
+      3 4
+    </Topology>
+    <Topology dim="2">
+      0 1 3 4
+      1 2 4 5
+      3 4 6 7
+    </Topology>
+  </Mesh>
+  <MeshPart name="bottom" parent="root" chart="outer" topology="full" size="3 2">
+    <Mapping dim="0">
+      0
+      1
+      2
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      0.5
+      1
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="right" parent="root" chart="outer" topology="full" size="2 1">
+    <Mapping dim="0">
+      2
+      5
+    </Mapping>
+    <Mapping dim="1">
+      2
+    </Mapping>
+    <Topology dim="1">
+      0 1
+    </Topology>
+    <Attribute name="param" dim="1">
+      1
+      2
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="cutx" parent="root" chart="outer" topology="full" size="2 1">
+    <Mapping dim="0">
+      5
+      4
+    </Mapping>
+    <Mapping dim="1">
+      3
+    </Mapping>
+    <Topology dim="1">
+      0 1
+    </Topology>
+    <Attribute name="param" dim="1">
+      2
+      3
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="cuty" parent="root" chart="outer" topology="full" size="2 1">
+    <Mapping dim="0">
+      4
+      7
+    </Mapping>
+    <Mapping dim="1">
+      4
+    </Mapping>
+    <Topology dim="1">
+      0 1
+    </Topology>
+    <Attribute name="param" dim="1">
+      3
+      4
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="top" parent="root" chart="outer" topology="full" size="2 1">
+    <Mapping dim="0">
+      7
+      6
+    </Mapping>
+    <Mapping dim="1">
+      5
+    </Mapping>
+    <Topology dim="1">
+      0 1
+    </Topology>
+    <Attribute name="param" dim="1">
+      4
+      5
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="left" parent="root" chart="outer" topology="full" size="3 2">
+    <Mapping dim="0">
+      6
+      3
+      0
+    </Mapping>
+    <Mapping dim="1">
+      6
+      7
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      5
+      5.5
+      6
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
