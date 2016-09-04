@@ -731,8 +731,10 @@ namespace NaverStokesCP2D
     int shape_dimension = MeshType::ShapeType::dimension;
 
     //until now, system matrix is empty, so we need to compile it first
-    system_levels.front()->compile_system_matrix();
-    system_levels.back()->compile_system_matrix();
+    for (auto& system_level : system_levels)
+      system_level->compile_system_matrix();
+    for (auto& system_level : system_levels)
+      system_level->compile_system_matrix();
 
     FEAT::Statistics::expression_target = "solver_a";
     Util::mpi_cout("\nsolver_a:\n");
