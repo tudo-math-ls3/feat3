@@ -55,6 +55,16 @@ namespace FEAT
       };
 
     template <>
+      class MPIType<unsigned long long>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_UNSIGNED_LONG_LONG;
+          }
+      };
+
+    template <>
       class MPIType<unsigned>
       {
         public:
