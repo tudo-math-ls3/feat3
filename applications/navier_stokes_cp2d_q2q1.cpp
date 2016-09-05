@@ -730,12 +730,6 @@ namespace NaverStokesCP2D
     double solver_toe = t_total; //t_solver_a + t_solver_s + t_calc_def;
     int shape_dimension = MeshType::ShapeType::dimension;
 
-    //until now, system matrix is empty, so we need to compile it first
-    for (auto& system_level : system_levels)
-      system_level->compile_system_matrix();
-    for (auto& system_level : system_levels)
-      system_level->compile_system_matrix();
-
     FEAT::Statistics::expression_target = "solver_a";
     Util::mpi_cout("\nsolver_a:\n");
     Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
@@ -761,12 +755,12 @@ namespace NaverStokesCP2D
     Util::Comm::allreduce(&cells_fine_local, &cells_fine_max, 1, Util::CommOperationMax());
     Util::Comm::allreduce(&cells_fine_local, &cells_fine_min, 1, Util::CommOperationMin());
 
-    Index dofs_coarse_local = (*system_levels.front()->matrix_sys).columns();
+    Index dofs_coarse_local = (*system_levels.front()->matrix_a).columns() + (*system_levels.front()->matrix_s).columns();
     Index dofs_coarse_max;
     Index dofs_coarse_min;
     Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_max, 1, Util::CommOperationMax());
     Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_min, 1, Util::CommOperationMin());
-    Index dofs_fine_local = (*system_levels.back()->matrix_sys).columns();
+    Index dofs_fine_local = (*system_levels.back()->matrix_a).columns() + (*system_levels.back()->matrix_s).columns();
     Index dofs_fine_max;
     Index dofs_fine_min;
     Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_max, 1, Util::CommOperationMax());
