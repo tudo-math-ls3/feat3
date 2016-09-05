@@ -1162,8 +1162,8 @@ namespace FEAT
         // propagate solver statistics
         for(std::size_t i(0); i <= std::size_t(_top_level); ++i)
         {
-          Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), i, _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i),
-                _mpi_waits_spmv.at(i)));
+          Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), Index(i),
+            _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i), _mpi_waits_spmv.at(i)));
         }
 
         // okay
