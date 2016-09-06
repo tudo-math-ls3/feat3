@@ -172,7 +172,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return this->matrix_sys.bytes () + this->matrix_s.bytes() + filter_sys.bytes();
+        return (*this->matrix_sys).bytes () + (*this->matrix_s).bytes() + (*filter_sys).bytes();
       }
 
       /**
@@ -226,7 +226,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return this->matrix_sys.bytes () + this->matrix_s.bytes() + filter_sys.bytes();
+        return (*this->matrix_sys).bytes () + (*this->matrix_s).bytes() + (*filter_sys).bytes();
       }
 
       /**
@@ -291,7 +291,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return prol_sys.bytes () + rest_sys.bytes();
+        return (*prol_sys).bytes() + (*rest_sys).bytes();
       }
 
       /**

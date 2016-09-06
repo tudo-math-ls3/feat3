@@ -194,7 +194,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return prol_sys.bytes () + rest_sys.bytes();
+        return (*prol_sys).bytes() + (*rest_sys).bytes();
       }
 
       void compile_system_transfer()
