@@ -1754,7 +1754,11 @@ namespace FEAT
           auto alpha(lvl_f.level->get_alpha_adaptive_coarse_correction());
           decltype(lvl_f.vec_cor) tmp(lvl_f.vec_cor.size());
           lvl_f.level->get_system_matrix().apply(tmp, lvl_f.vec_cor);
-          alpha = lvl_f.vec_cor.dot(lvl_f.vec_def) / lvl_f.vec_cor.dot(tmp);
+          auto t = lvl_f.vec_cor.dot(tmp);
+          if (Math::abs(t) < 1e-13)
+            alpha = 1.;
+          else
+            alpha = lvl_f.vec_cor.dot(lvl_f.vec_def) / t;
           lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, alpha);
 
           // get our post-smoother
