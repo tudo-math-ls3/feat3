@@ -205,7 +205,7 @@ namespace FEAT
         VectorTypeInner vec_cor_inner(vec_def_inner.clone(LAFEM::CloneMode::Layout));
 
         Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_inner_solver->name()));
-        Status status _inner_solver->apply(vec_cor_inner, vec_def_inner);
+        Status status = _inner_solver->apply(vec_cor_inner, vec_def_inner);
         if(!status_success(status))
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
