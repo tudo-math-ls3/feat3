@@ -21,7 +21,9 @@ static void display_help()
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --vtk [path to vtk file]" << std::endl;
   std::cout << " --level [lvl_max lvl_min]" << std::endl;
-  std::cout << " --no-adapt" << std::endl;
+  std::cout << " --no-adapt: Do not adapt mesh after refinement" << std::endl;
+  std::cout << " --no-dist: Do not compute distance to charts" << std::endl;
+  std::cout << " --no-proj: Do not compute projection to charts" << std::endl;
   std::cout << " --help: Displays this message" << std::endl;
 }
 
@@ -43,8 +45,22 @@ String get_file_title(const String& filename)
 }
 
 template<typename Mesh_>
-int run_xml(Geometry::MeshFileReader& mesh_reader, const String& filename, Index lvl_min, Index lvl_max, bool adapt)
+int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const String& filename)
 {
+  // parse levels
+  Index lvl_min(0);
+  Index lvl_max(0);
+  args.parse("level", lvl_max, lvl_min);
+
+  // check for adaption
+  bool adapt = (args.check("no-adapt") < 0);
+
+  // compute distance functions?
+  bool calc_dist = (args.check("no-dist") < 0);
+
+  // compute projection fields?
+  bool calc_proj = (args.check("no-proj") < 0);
+
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
   Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
@@ -127,21 +143,59 @@ int run_xml(Geometry::MeshFileReader& mesh_reader, const String& filename, Index
     }
 
     // For every chart in the atlas, compute the distance of every mesh vertex to it
-    if(atlas != nullptr)
+    if(calc_dist)
     {
       const auto& vtx = node->get_mesh()->get_vertex_set();
 
-      typename Mesh_::CoordType* distances
-        (new typename Mesh_::CoordType[vtx.get_num_vertices()]);
+      std::vector<double> distances(vtx.get_num_vertices(), 0.0);
 
       for(const auto& it:atlas->get_mesh_chart_map())
       {
         for(Index i(0); i < vtx.get_num_vertices(); ++i)
           distances[i] = it.second->signed_dist(vtx[i]);
 
-        exporter.add_vertex_scalar("dist_"+it.first, distances);
+        exporter.add_vertex_scalar("dist:"+it.first, distances.data());
       }
-      delete[] distances;
+    }
+
+    // compute projection fields?
+    if(calc_proj)
+    {
+      typedef typename Mesh_::VertexSetType VertexSetType;
+      typedef typename VertexSetType::VertexType VertexType;
+
+      const auto& vtx = node->get_mesh()->get_vertex_set();
+
+      std::vector<double> prj_x(vtx.get_num_vertices(), 0.0);
+      std::vector<double> prj_y(vtx.get_num_vertices(), 0.0);
+      std::vector<double> prj_z(vtx.get_num_vertices(), 0.0);
+
+      Tiny::Vector<double, 3> pt;
+      pt[0] = pt[1] = pt[2] = 0.0;
+      auto& wpt = pt.template size_cast<Mesh_::world_dim>();
+
+      for(const auto& it : atlas->get_mesh_chart_map())
+      {
+        const auto& chart = *it.second;
+
+        // skip charts which cannot perform implicit projection
+        if(!chart.can_implicit())
+          continue;
+
+        for(Index i(0); i < vtx.get_num_vertices(); ++i)
+        {
+          // prject vertex
+          wpt = chart.project(vtx[i]);
+          // subtract vertex
+          wpt -= vtx[i];
+          // copy data
+          prj_x[i] = pt[0];
+          prj_y[i] = pt[1];
+          prj_z[i] = pt[2];
+        }
+
+        exporter.add_vertex_vector("proj:" + it.first, prj_x.data(), prj_y.data(), prj_z.data());
+      }
     }
 
     // loop over all partitions
@@ -205,6 +259,8 @@ int run(int argc, char* argv[])
   args.support("vtk");
   args.support("level");
   args.support("no-adapt");
+  args.support("no-dist");
+  args.support("no-proj");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
@@ -217,16 +273,6 @@ int run(int argc, char* argv[])
     display_help();
     return 1;
   }
-
-  Index lvl_min(0);
-  Index lvl_max(0);
-
-  if(args.check("level") > 0)
-  {
-    args.parse("level", lvl_max, lvl_min);
-  }
-
-  bool adapt = (args.check("no-adapt") < 0);
 
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
@@ -276,23 +322,23 @@ int run(int argc, char* argv[])
 
   int ret(1);
   if(mtype == "conformal:hypercube:1:1")
-    ret = run_xml<H1M1D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H1M1D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:1:2")
-    ret = run_xml<H1M2D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H1M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:1:3")
-    ret = run_xml<H1M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H1M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:2:2")
-    ret = run_xml<H2M2D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H2M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:2:3")
-    ret = run_xml<H2M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H2M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:3:3")
-    ret = run_xml<H3M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<H3M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:2:2")
-    ret = run_xml<S2M2D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<S2M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:2:3")
-    ret = run_xml<S2M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<S2M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:3:3")
-    ret = run_xml<S3M3D>(mesh_reader, vtk_name, lvl_min, lvl_max, adapt);
+    ret = run_xml<S3M3D>(args, mesh_reader, vtk_name);
 
   return ret;
 }

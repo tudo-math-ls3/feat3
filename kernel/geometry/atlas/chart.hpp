@@ -48,6 +48,29 @@ namespace FEAT
         {
           return std::size_t(0);
         }
+        /**
+         * \brief Specifies whether the chart can perform explicit projection.
+         *
+         * This function returns #is_explicit by default, but it may be
+         * overridden by the derived class in case that explicit projection
+         * can be disabled at runtime (e.g. due to missing parameters).
+         *
+         * \returns
+         * True if explicit projection is possible.
+         */
+        virtual bool can_explicit() const = 0;
+
+        /**
+         * \brief Specifies whether the chart can perform implicit projection.
+         *
+         * This function returns #is_implicit by default, but it may be
+         * overridden by the derived class in case that implicit projection
+         * can be disabled at runtime.
+         *
+         * \returns
+         * True if implicit projection is possible.
+         */
+        virtual bool can_implicit() const = 0;
 
         /**
          * \brief Adapts a mesh using this chart.
@@ -76,7 +99,6 @@ namespace FEAT
          *
          * \param[in] translation
          * The translation vector.
-         *
          */
         virtual void move_by(const WorldPoint& translation) = 0;
 
@@ -94,9 +116,30 @@ namespace FEAT
          *
          * For 2d, angles(0) defines the rotation around the y-axis. For 3d, angles(0) defines the rotation around
          * the x-axis, angles(1) the rotation arount the y-axis and angles(2) the rotation around the z-axis.
-         *
          */
         virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) = 0;
+
+        /**
+         * \brief Maps a parameter to a world point
+         *
+         * \param[in] param
+         * The parameter to be mapped.
+         *
+         * \returns
+         * The mapped world point.
+         */
+        virtual WorldPoint map(const WorldPoint& param) const = 0;
+
+        /**
+         * \brief Projects a point onto the chart
+         *
+         * \param[in] point
+         * The point to be projected.
+         *
+         * \returns
+         * The projected point.
+         */
+        virtual WorldPoint project(const WorldPoint& point) const = 0;
 
         /**
          * \brief Computes the distance of a point to this chart
@@ -176,6 +219,12 @@ namespace FEAT
           {
             return false;
           }
+
+          template<typename CT_, typename WP_>
+          static bool project(const CT_&, WP_&)
+          {
+            return false;
+          }
         };
 
         template<>
@@ -195,6 +244,13 @@ namespace FEAT
             // okay
             return true;
           }
+
+          template<typename CT_, typename WP_>
+          static bool project(const CT_& chart, WP_& wp)
+          {
+            chart.project_point(wp);
+            return true;
+          }
         };
 
         template<bool enable_>
@@ -202,6 +258,12 @@ namespace FEAT
         {
           template<typename CT_, typename MT_, typename PT_>
           static bool adapt(const CT_&, MT_&, const PT_&)
+          {
+            return false;
+          }
+
+          template<typename CT_, typename WP_, typename PP_>
+          static bool map(const CT_&, WP_&, const PP_&)
           {
             return false;
           }
@@ -249,13 +311,20 @@ namespace FEAT
             for(Index i(0); i < num_vtx; ++i)
             {
               // apply the chart's map function
-              chart.map(
+              chart.map_param(
                  reinterpret_cast<      WorldPoint&>(vtx[vidx[i]]),
                 *reinterpret_cast<const ParamPoint*>((*attrib)[i])
                 );
             }
 
             // okay
+            return true;
+          }
+
+          template<typename CT_, typename WP_, typename PP_>
+          static bool map(const CT_& chart, WP_& wp, const PP_& pp)
+          {
+            chart.map_param(wp, pp);
             return true;
           }
         };
@@ -326,32 +395,14 @@ namespace FEAT
         const Derived_& cast() const {return static_cast<const Derived_&>(*this);}
 
       public:
-        /**
-         * \brief Specifies whether the chart can perform explicit projection.
-         *
-         * This function returns #is_explicit by default, but it may be
-         * overridden by the derived class in case that explicit projection
-         * can be disabled at runtime (e.g. due to missing parameters).
-         *
-         * \returns
-         * True if explicit projection is possible.
-         */
-        bool can_explicit() const
+        /// \copydoc BaseClass::can_explicit()
+        virtual bool can_explicit() const override
         {
           return is_explicit;
         }
 
-        /**
-         * \brief Specifies whether the chart can perform implicit projection.
-         *
-         * This function returns #is_implicit by default, but it may be
-         * overridden by the derived class in case that implicit projection
-         * can be disabled at runtime.
-         *
-         * \returns
-         * True if implicit projection is possible.
-         */
-        bool can_implicit() const
+        /// \copydoc BaseClass::can_implicit()
+        virtual bool can_implicit() const override
         {
           return is_implicit;
         }
@@ -410,6 +461,25 @@ namespace FEAT
         virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
         {
           (this->cast()).rotate(centre, angles);
+        }
+
+        /// \copydoc BaseClass::map()
+        virtual WorldPoint map(const WorldPoint& param) const override
+        {
+          ASSERTM(is_explicit, "cannot map point: Chart is not explicit");
+          WorldPoint wp;
+          ParamPoint pp(param.template size_cast<param_dim>());
+          Intern::ExplicitChartHelper<is_explicit>::map(cast(), wp, pp);
+          return wp;
+        }
+
+        /// \copydoc BaseClass::project()
+        virtual WorldPoint project(const WorldPoint& point) const override
+        {
+          ASSERTM(is_implicit, "cannot project point: Chart is not implicit");
+          WorldPoint wp(point);
+          Intern::ImplicitChartHelper<is_implicit>::project(cast(), wp);
+          return wp;
         }
 
         /// \copydoc BaseClass::dist()

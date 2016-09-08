@@ -236,7 +236,7 @@ namespace FEAT
          * The parameter point to be mapped
          *
          */
-        void map(WorldPoint& point, const ParamPoint& param) const
+        void map_param(WorldPoint& point, const ParamPoint& param) const
         {
           // transform parameter to interval [0, 2*pi)
           CoordType x = (param[0] + _trafo_a) * _trafo_b;

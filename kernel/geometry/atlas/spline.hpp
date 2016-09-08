@@ -506,7 +506,7 @@ namespace FEAT
          * \param[in] param
          * The parameter point to be mapped
          */
-        void map(WorldPoint& point, const ParamPoint& param) const
+        void map_param(WorldPoint& point, const ParamPoint& param) const
         {
           XASSERTM(!this->_param.empty(), "Spline has no parameters");
 

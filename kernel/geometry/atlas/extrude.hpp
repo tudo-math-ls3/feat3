@@ -126,12 +126,12 @@ namespace FEAT
           }
         }
 
-        void map(WorldPoint& point, const ParamPoint& param) const
+        void map_param(WorldPoint& point, const ParamPoint& param) const
         {
           SubParamPoint sub_param;
           sub_param[0] = param[0];
           SubWorldPoint sub_point;
-          _sub_chart->map(sub_point, sub_param);
+          _sub_chart->map_param(sub_point, sub_param);
           point[0] = sub_point[0];
           point[1] = sub_point[1];
           point[2] = param[1]; // Z-coord
