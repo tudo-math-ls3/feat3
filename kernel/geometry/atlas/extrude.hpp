@@ -68,12 +68,12 @@ namespace FEAT
           _sub_chart = sub_chart;
         }
 
-        bool can_implicit() const
+        virtual bool can_implicit() const override
         {
           return _sub_chart->can_implicit();
         }
 
-        bool can_explicit() const
+        virtual bool can_explicit() const override
         {
           return _sub_chart->can_explicit();
         }

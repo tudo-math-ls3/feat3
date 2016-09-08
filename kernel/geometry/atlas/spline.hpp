@@ -160,7 +160,7 @@ namespace FEAT
           this->_param.push_back(param);
         }
 
-        bool can_explicit() const
+        virtual bool can_explicit() const override
         {
           return !_param.empty();
         }

@@ -161,9 +161,6 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     // compute projection fields?
     if(calc_proj)
     {
-      typedef typename Mesh_::VertexSetType VertexSetType;
-      typedef typename VertexSetType::VertexType VertexType;
-
       const auto& vtx = node->get_mesh()->get_vertex_set();
 
       std::vector<double> prj_x(vtx.get_num_vertices(), 0.0);

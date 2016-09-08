@@ -116,7 +116,7 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::can_explicit()
-        bool can_explicit() const
+        virtual bool can_explicit() const override
         {
           return _have_domain;
         }
