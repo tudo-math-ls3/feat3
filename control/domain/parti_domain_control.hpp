@@ -15,6 +15,7 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/partition_set.hpp>
+#include <kernel/geometry/parti_2lvl.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -58,6 +59,8 @@ namespace FEAT
         int _base_mesh_level;
         /// allow manual partitioner?
         bool _allow_parti_manual;
+        /// allow 2-level partitioner?
+        bool _allow_parti_2level;
         /// allow parmetis partitioner?
         bool _allow_parti_parmetis;
         /// allow fallback partitioner?
@@ -82,6 +85,7 @@ namespace FEAT
           _have_hierarchy(false),
           _base_mesh_level(0),
           _allow_parti_manual(true),
+          _allow_parti_2level(true),
           _allow_parti_parmetis(true),
           _allow_parti_fallback(true),
           _min_elems_per_rank(4),
@@ -137,6 +141,8 @@ namespace FEAT
               {
                 if(t == "manual")
                   _allow_parti_manual = true;
+                else if(t == "2level")
+                  _allow_parti_2level = true;
                 else if(t == "parmetis")
                   _allow_parti_parmetis = true;
                 else if(t == "fallback")
@@ -389,6 +395,12 @@ namespace FEAT
             _have_partition = true;
             return;
           }
+          // let's see whether we can apply the 2-level partitioner
+          if(_allow_parti_2level && _create_partition_2level())
+          {
+            _have_partition = true;
+            return;
+          }
           // next, let's give ParMETIS a try
           if(_allow_parti_parmetis && _create_partition_parmetis())
           {
@@ -554,7 +566,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Creates a patch from a manual partitioning.
+         * \brief Tries to create a patch by manual partitioning.
          *
          * This function tries to find a manual partitioning, i.e. a partitioning that has
          * been parsed from the input mesh files, that matches the number of processes in
@@ -615,6 +627,58 @@ namespace FEAT
           std::cout << std::endl;
           */
           // <<<<< DEBUG <<<<<
+
+          // push layer
+          this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
+
+          // okay
+          return true;
+        }
+
+        /**
+         * \brief Tries to create a patch by manual partitioning.
+         *
+         * This function tries to find a partitioning by exploiting the 2-level refinement
+         * algorithm.
+         *
+         * \note
+         * If necessary, this function will automatically refine the base-mesh.
+         *
+         * \returns
+         * \c true, if a suitable 2-level partitioning was found and the patch-mesh for the
+         * current rank has been created successfully, otherwise \c false.
+         */
+
+        bool _create_partition_2level()
+        {
+          // get rank and nprocs
+          Index rank = Util::Comm::rank();
+          Index nprocs = Util::Comm::size();
+
+          // create a 2-lvl partitioner
+          Geometry::Parti2Lvl<MeshType_> partitioner(*_base_mesh_node->get_mesh(), nprocs);
+
+          // successful?
+          if(!partitioner.success())
+            return false;
+
+          // get refinement level
+          Index ref_lvl = partitioner.parti_level();
+
+          if(rank == Index(0))
+            std::cout << "Found 2-level partition for base-mesh level " << ref_lvl << std::endl;
+
+          // refine base-mesh
+          _refine_base_mesh_to_level(int(ref_lvl));
+
+          // get the patch graph
+          Adjacency::Graph elems_at_rank(partitioner.build_elems_at_rank());
+
+          // comm ranks and tags
+          std::vector<Index> ranks, ctags;
+
+          // extract our patch
+          _patch_mesh_node = _base_mesh_node->extract_patch(ranks, ctags, elems_at_rank, rank);
 
           // push layer
           this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
