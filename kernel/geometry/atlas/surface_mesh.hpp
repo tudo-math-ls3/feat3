@@ -225,10 +225,10 @@ namespace FEAT
          */
         void project_point(WorldPoint& point) const
         {
-          CoordType signed_dist(0);
-          WorldPoint grad_dist(CoordType(0));
+          CoordType signed_distance(0);
+          WorldPoint grad_distance(CoordType(0));
 
-          project_point(point, signed_dist, grad_dist);
+          project_point(point, signed_distance, grad_distance);
 
         }
 
@@ -241,10 +241,10 @@ namespace FEAT
          * \param[in,out] signed_distance
          * The signed distance of the original to the projected point.
          *
-         * \param[in,out] grad_dist
+         * \param[in,out] grad_distance
          * Gradient of the distance function.
          */
-        void project_point(WorldPoint& point, CoordType& signed_distance, WorldPoint& grad_dist) const
+        void project_point(WorldPoint& point, CoordType& signed_distance, WorldPoint& grad_distance) const
         {
           // There is nothing to do if the surface mesh does not have any cells
           if(_surface_mesh->get_num_entities(SurfaceMeshType::shape_dim) == Index(0))
@@ -288,17 +288,17 @@ namespace FEAT
 
           projected_point += coeff0*vtx[idx(best_facet, Index(0))];
 
-          grad_dist = (projected_point - point);
-          signed_distance = grad_dist.norm_euclid();
+          grad_distance = (projected_point - point);
+          signed_distance = grad_distance.norm_euclid();
 
           // If the distance is too small, we set the gradient vector to zero
           if(signed_distance < Math::eps<CoordType>())
-            grad_dist.format(CoordType(0));
+            grad_distance.format(CoordType(0));
           else
           {
-            grad_dist.normalise();
+            grad_distance.normalise();
             WorldPoint nu(get_normal_on_tria(best_facet, coeffs));
-            signed_distance *= Math::signum(Tiny::dot(nu, grad_dist));
+            signed_distance *= Math::signum(Tiny::dot(nu, grad_distance));
           }
 
           point = projected_point;
@@ -517,16 +517,16 @@ namespace FEAT
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point) const
         {
-          WorldPoint grad_dist(CoordType(0));
-          return compute_dist(point, grad_dist);
+          WorldPoint grad_distance(CoordType(0));
+          return compute_dist(point, grad_distance);
         }
 
         /// \copydoc ChartBase::dist()
-        CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_distance) const
         {
           CoordType signed_distance(0);
           WorldPoint projected_point(point);
-          project_point(projected_point, signed_distance, grad_dist);
+          project_point(projected_point, signed_distance, grad_distance);
 
           return Math::abs(signed_distance);
         }
@@ -534,16 +534,16 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point) const
         {
-          WorldPoint grad_dist(CoordType(0));
-          return compute_signed_dist(point, grad_dist);
+          WorldPoint grad_distance(CoordType(0));
+          return compute_signed_dist(point, grad_distance);
         }
 
         /// \copydoc ChartBase::signed_dist()
-        CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_distance) const
         {
           CoordType signed_distance(0);
           WorldPoint projected_point(point);
-          project_point(projected_point, signed_distance, grad_dist);
+          project_point(projected_point, signed_distance, grad_distance);
 
           return signed_distance;
         }
