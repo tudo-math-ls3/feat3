@@ -127,7 +127,7 @@ namespace FEAT
          */
         bool parse_args(SimpleArgParser& args)
         {
-          // try to parse --part-type
+          // try to parse --parti-type
           {
             auto it = args.query("parti-type");
             if(it != nullptr)

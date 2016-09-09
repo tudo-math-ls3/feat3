@@ -30,7 +30,7 @@
 #include <kernel/global/synch_mat.hpp>
 #include <kernel/solver/multigrid.hpp>                     // NEW: for MultiGrid
 #include <control/statistics.hpp>
-#include <control/domain/partitioner_domain_control.hpp>
+#include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
 namespace PoissonDirichlet2D
@@ -568,8 +568,10 @@ namespace PoissonDirichlet2D
     args.support("vtk");
     args.support("statistics");
     args.support("mem");
-    args.support("part_min_elems");
-    args.support("meshfile");
+    args.support("mesh");
+    args.support("parti-type");
+    args.support("parti-name");
+    args.support("parti-rank-elems");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -607,24 +609,35 @@ namespace PoissonDirichlet2D
       {
         std::cout << "Preparing domain..." << std::endl;
       }
-      int min_elems_partitioner(nprocs * 4);
-      args.parse("part_min_elems", min_elems_partitioner);
-
-      // fetch the mandatory mesh filename
-      String meshfile;
-      if(args.parse("meshfile", meshfile) <= 0)
+      if(args.check("mesh") < 1)
       {
         if(rank == 0)
-          std::cerr << "ERROR: Mandatory option --meshfile is missing!" << std::endl;
+          std::cerr << "ERROR: Mandatory option --mesh is missing!" << std::endl;
         FEAT::Runtime::abort();
       }
-#ifdef FEAT_HAVE_PARMETIS
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#elif defined(FEAT_HAVE_MPI)
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#else
-      Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#endif
+
+      // query mesh filename list
+      const std::deque<String>& mesh_filenames = args.query("mesh")->second;
+
+      // create our domain control
+      Control::Domain::PartiDomainControl<MeshType> domain;
+
+      // let the controller parse its arguments
+      if(!domain.parse_args(args))
+      {
+        FEAT::Runtime::abort();
+      }
+
+      // read the base-mesh
+      domain.read_mesh(mesh_filenames);
+
+      // try to create the partition
+      domain.create_partition();
+
+      Util::mpi_cout("Creating mesh hierarchy...\n");
+
+      // create the level hierarchy
+      domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
       if (rank == 0)
