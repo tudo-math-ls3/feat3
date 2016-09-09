@@ -27,7 +27,7 @@ compiler bugs that would prevent you from successfully compiling FEAT.
 
 \subsection windows_prereqs_mpi Microsoft MPI
 If you want to make use of FEAT's parallel computing capability, you will also need to install the <b>Microsoft MPI</b>
-library as well as the ccorresponding SDK. Note that installing MPI is <b>not</b> mandatory, however, without this
+library as well as the corresponding SDK. Note that installing MPI is <b>not</b> mandatory, however, without this
 library, FEAT is limited to its "single-process" functionality.
 
 \note
@@ -84,7 +84,7 @@ following libraries, you will have to perform the following steps:
 - Download Link: http://www.alglib.net/download.php
 
 <b>Instructions:</b>
--# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty/ALGLIB</c>.
+-# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty\\ALGLIB</c>.
 -# After unpacking, the <c>thirdparty</c> directory should have the following sub-directory structure:
 \verbatim
 thirdparty
@@ -103,7 +103,7 @@ by and demonstrated in Tutorial 04.
 - Download Link: http://warp.povusers.org/FunctionParser
 
 <b>Instructions:</b>
--# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty/fparser</c>.
+-# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty\\fparser</c>.
 -# After unpacking, the <c>thirdparty</c> directory should have the following sub-directory structure:
 \verbatim
 thirdparty
@@ -123,7 +123,7 @@ parallel (i.e. MPI-based) applications.
 
 <b>Instructions:</b>
 -# Download the GZ-Archive and unpack its contents into the directory <c>thirdparty</c>.
--# Rename the sub-directory from <c>parmetis-4.0.3</c> to <c>parmetis</c>.
+-# Rename the sub-directory from <c>parmetis-4.0.3</c> (or whatever version you have downloaded) to <c>parmetis</c>.
 -# The <c>thirdparty</c> directory should now have the following sub-directory structure:
 \verbatim
 thirdparty
@@ -144,7 +144,7 @@ is used by the FEAT::Solver::Umfpack and FEAT::Solver::UmfpackMean classes.
 - Download Link: http://faculty.cse.tamu.edu/davis/suitesparse.html
 
 <b>Instructions:</b>
--# Download the GZ-Archive and unpack its contents into the directory <c>thirdparty/SuiteSparse</c>.
+-# Download the GZ-Archive and unpack its contents into the directory <c>thirdparty\\SuiteSparse</c>.
 -# After unpacking, the <c>thirdparty</c> directory should have the following sub-directory structure:
 \verbatim
 thirdparty
@@ -163,15 +163,16 @@ corresponding Visual Studio project and solution file. In contrast to the CMake-
 there is no "configure" script that will generate all required projects and solution in one step.
 
 Instead, you need to generate VS project and solution files for each desired application, tutorial or kernel test
-separately by using a tool named <c>vc14_gen</c>, which is located in the <c>tools/vc14_gen</c> directory.
+separately by using a tool named <c>vc14_gen</c>.
 Before you can use this tool, you need to compile it -- this step is described in the next sub-section.
 
 The usage and the behaviour of the tool depends on whether the desired target is a kernel test or any other sort of
 application (this includes tutorials and tools). The usage of the tool is also described in the following sub-sections.
 
 \subsection windows_vcgen_build Building the vc14_gen Tool
-Simply open the <c>vc14_gen.sln</c> solution file and build the solution. There is only one platform and one
-configuration available, so there is nothing special to keep in mind here.
+Simply open the <c>vc14_gen.sln</c> solution file, which is located in the <c>tools\\vc14_gen</c> directory, and build
+the solution. There is only one platform and one configuration available, so there is nothing special to keep in mind
+here.
 
 Once compiled, the command line binary <c>vc14_gen.exe</c> will appear in the FEAT root directory.
 

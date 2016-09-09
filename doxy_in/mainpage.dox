@@ -1,16 +1,15 @@
 /**
-\mainpage FEAT - Finite Element Analysis Tools
+\mainpage FEAT - Finite Element Analysis Toolbox
 
-\section main_sec_subsystems Subsystems
+\section main_sec_buildsys Build-System
+- \ref feat_for_windows
+
+\section main_sec_subsystems Kernel Subsystems
 The subsystems are in detail:
-\secreflist
-\refitem lafem_design LAFEM
-\refitem meshopt_design Meshopt
-\endsecreflist
+- \ref lafem_design
+- \ref meshopt_design
 
 \section main_sec_details Details about specific topics:
-\secreflist
-\refitem multigrid_design Multigrid Details
-\endsecreflist
+- \ref multigrid_design
 
 **/
