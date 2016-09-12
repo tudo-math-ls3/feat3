@@ -60,6 +60,37 @@ namespace FEAT
     {
       return static_cast<AdaptMode>(int(x) & int(y));
     }
+
+    /**
+     * \brief Streaming operator for AdaptModes
+     */
+    inline std::ostream& operator<<(std::ostream& os, AdaptMode mode)
+    {
+      switch(mode)
+      {
+        case AdaptMode::none:
+          return os << "none";
+        case AdaptMode::chart:
+          return os << "chart";
+        case AdaptMode::dual:
+          return os << "dual";
+        default:
+          return os << "-unknown-";
+      }
+    }
+
+    inline void operator<<(AdaptMode& mode, const String& mode_name)
+    {
+        if(mode_name == "none")
+          mode = AdaptMode::none;
+        else if(mode_name == "chart")
+          mode = AdaptMode::chart;
+        else if(mode_name == "dual")
+          mode = AdaptMode::dual;
+        else
+          throw InternalError(__func__, __FILE__, __LINE__, "Unknown AdaptMode identifier string "
+              +mode_name);
+    }
     /// \endcond
 
     /**
