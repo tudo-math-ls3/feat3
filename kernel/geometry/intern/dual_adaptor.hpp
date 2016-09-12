@@ -9,6 +9,7 @@ namespace FEAT
 {
   namespace Geometry
   {
+    /// \cond internal
     namespace Intern
     {
       template<typename Mesh_, typename Shape_ = typename Mesh_::ShapeType>
@@ -75,6 +76,7 @@ namespace FEAT
         }
       };
     } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAT
 

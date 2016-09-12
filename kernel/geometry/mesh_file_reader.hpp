@@ -25,7 +25,8 @@ namespace FEAT
     struct DimensionalChartHelper;
     /// \endcond
 
-
+    // Note: All the basic Parser classes are declared as internal.
+    /// \cond internal
     template<typename RootMesh_>
     class ChartParser :
       public Xml::MarkupParser
@@ -1186,26 +1187,45 @@ namespace FEAT
       }
     }; // class MeshFileParser
 
+    /// \endcond
+
     /**
      * \brief Mesh file reader class
      *
-     * This class implements the reader which parses the XML-based Feat mesh files.
+     * This class implements the reader which parses the XML-based FEAT mesh files
+     * into the corresponding Geometry class objects of type MeshAtlas, RootMeshNode and
+     * PartitionSet.
+     *
+     * The basic usage is as follows:
+     * -# Create an object of the class MeshFileReader
+     * -# Add all input file streams to the object by calling the add_stream() function.
+     * -# Read the root markup by calling the read_root_markup() function.
+     * -# Create MeshAtlas and RootMeshNode objects of the corresponding mesh- and shape-type.
+     * -# Parse the file contents into the corresponding MeshAtlas, RootMeshNode and PartitionSet objects
+     *    by calling the parse() function.
      *
      * \author Peter Zajac
      */
     class MeshFileReader
     {
     public:
+      /// mesh type enumeration
       enum class MeshType
       {
+        /// unknown mesh type
         unknown = 0,
+        /// conformal mesh type
         conformal
       };
 
+      /// shape type enumeration
       enum class ShapeType
       {
+        /// unknown shape type
         unknown = 0,
+        /// simplex shape type
         simplex,
+        /// hypercube shape type
         hypercube
       };
 
@@ -1238,6 +1258,12 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Input-Stream constructor
+       *
+       * \param[in] is
+       * The input stream that is to be parsed.
+       */
       explicit MeshFileReader(std::istream& is) :
         _have_root_markup(false),
         _mesh_type_string(),
@@ -1253,10 +1279,17 @@ namespace FEAT
       MeshFileReader(const MeshFileReader&) = delete;
       MeshFileReader& operator=(const MeshFileReader&) = delete;
 
+      /// virtual destructor
       virtual ~MeshFileReader()
       {
       }
 
+      /**
+       * \brief Adds an input stream to the list of streams to be parsed.
+       *
+       * \param[in] is
+       * The input stream that is to be added to the list.
+       */
       void add_stream(std::istream& is)
       {
         XASSERTM(!_have_root_markup, "cannot add new stream after reading root");
@@ -1265,26 +1298,76 @@ namespace FEAT
         _scanners.push_back(std::make_shared<Xml::Scanner>(is));
       }
 
+      /**
+       * \brief Returns the mesh-type string from the root markup node.
+       *
+       * \note
+       * This function can only be called after calling the #read_root_markup()
+       * function as it will always return an empty string otherwise.
+       *
+       * \returns
+       * The mesh-type string from the root markup node.
+       */
       const String& get_meshtype_string() const
       {
         return _mesh_type_string;
       }
 
+      /**
+       * \brief Returns the mesh-type from the root markup node.
+       *
+       * \note
+       * This function can only be called after calling the #read_root_markup()
+       * function as it will always return MeshType::unknown otherwise.
+       *
+       * \returns
+       * The mesh-type from the root markup node.
+       */
       MeshType get_mesh_type() const
       {
         return _mesh_type;
       }
 
+      /**
+       * \brief Returns the shape-type from the root markup node.
+       *
+       * \note
+       * This function can only be called after calling the #read_root_markup()
+       * function as it will always return ShapeType::unknown otherwise.
+       *
+       * \returns
+       * The shape-type from the root markup node.
+       */
       ShapeType get_shape_type() const
       {
         return _shape_type;
       }
 
+      /**
+       * \brief Returns the shape-dimension from the root markup node.
+       *
+       * \note
+       * This function can only be called after calling the #read_root_markup()
+       * function as it will always return 0 otherwise.
+       *
+       * \returns
+       * The shape-dimension from the root markup node.
+       */
       int get_shape_dim() const
       {
         return _shape_dim;
       }
 
+      /**
+       * \brief Returns the world-dimension from the root markup node.
+       *
+       * \note
+       * This function can only be called after calling the #read_root_markup()
+       * function as it will always return 0 otherwise.
+       *
+       * \returns
+       * The world-dimension from the root markup node.
+       */
       int get_world_dim() const
       {
         return _world_dim;

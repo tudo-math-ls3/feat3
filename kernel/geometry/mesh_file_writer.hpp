@@ -13,7 +13,7 @@ namespace FEAT
 {
   namespace Geometry
   {
-    /// \cond
+    /// \cond internal
     namespace Intern
     {
       template<typename Shape_, int dim_ = Shape_::dimension>
@@ -110,13 +110,26 @@ namespace FEAT
     } // namespace Intern
     /// \endcond
 
+    /**
+     * \brief Mesh file writer class
+     *
+     * This class implements a writer which can export objects of type
+     * MeshAtlas, RootMeshNode and PartitionSet (and all of their sub-objects)
+     * into the XML-based FEAT mesh file format.
+     *
+     * \author Peter Zajac
+     */
     class MeshFileWriter
     {
     protected:
+      /// the output stream to write to
       std::ostream& _os;
+      /// specifies whether indentation is to be used
       bool _indent;
+      /// the current indentation string
       String _sindent;
 
+      /// \cond internal
       template<int shape_dim_>
       static String aux_shape_string(const Shape::Hypercube<shape_dim_>&)
       {
@@ -134,8 +147,33 @@ namespace FEAT
       {
         return String("conformal:") + aux_shape_string(Shape_()) + ":" + stringify(int(Shape_::dimension)) + ":" + stringify(num_coords_);
       }
+      /// \endcond
+
+      /// increases the current indent by two spaces
+      void _push_indent()
+      {
+        if(_indent)
+          _sindent.resize(_sindent.size()+2, ' ');
+      }
+
+      /// decreases the current indent by two spaces
+      void _pop_indent()
+      {
+        if(_indent)
+          _sindent.resize(_sindent.size()-2);
+      }
 
     public:
+      /**
+       * \brief Creates a writer for a given output stream
+       *
+       * \param[in] os
+       * The output stream to write to.
+       *
+       * \param[in] indent
+       * Specifies whether indentation is to be used.
+       * Can be set to \c false to decrease the final file size.
+       */
       explicit MeshFileWriter(std::ostream& os, bool indent = true) :
         _os(os),
         _indent(indent)
@@ -144,31 +182,43 @@ namespace FEAT
           _sindent.reserve(32);
       }
 
+      /// virtual destructor
       virtual ~MeshFileWriter()
       {
       }
 
-      void push_indent()
-      {
-        if(_indent)
-          _sindent.resize(_sindent.size()+2, ' ');
-      }
-
-      void pop_indent()
-      {
-        if(_indent)
-          _sindent.resize(_sindent.size()-2);
-      }
-
+      /**
+       * \brief Writes a chart into the file.
+       *
+       * \param[in] chart
+       * The chart to be exported.
+       *
+       * \param[in] name
+       * The name of the chart.
+       */
       template<typename RootMesh_>
-      void write_charts(const MeshAtlas<RootMesh_>& mesh_atlas)
+      void write_chart(const Atlas::ChartBase<RootMesh_>& chart, const String& name)
       {
-        // get all charts
-        std::deque<String> names = mesh_atlas.get_chart_names();
-
         String sind(_sindent);
         if(_indent)
           sind.append("  ");
+
+        _os << _sindent << "<Chart name=\"" << name << "\">" << std::endl;
+        chart.write(_os, sind);
+        _os << _sindent << "</Chart>" << std::endl;
+      }
+
+      /**
+       * \brief Writes all charts of an atlas into the file
+       *
+       * \param[in] mesh_atlas
+       * The atlas whose charts are to be exported.
+       */
+      template<typename RootMesh_>
+      void write_atlas(const MeshAtlas<RootMesh_>& mesh_atlas)
+      {
+        // get all charts
+        std::deque<String> names = mesh_atlas.get_chart_names();
 
         // loop over all charts
         for(auto it = names.begin(); it != names.end(); ++it)
@@ -177,29 +227,16 @@ namespace FEAT
           if(chart == nullptr)
             throw InternalError(String("Chart '") + (*it) + "' not found in atlas");
 
-          _os << _sindent << "<Chart name=\"" << (*it) << "\">" << std::endl;
-          chart->write(_os, sind);
-          _os << _sindent << "</Chart>" << std::endl;
+          write_chart(*chart, *it);
         }
       }
 
-      template<int num_coords_, int stride_, typename Coord_>
-      void write_vertex_set(const VertexSet<num_coords_, stride_, Coord_>& vertex_set)
-      {
-        _os << _sindent << "<Vertices>" << std::endl;
-        push_indent();
-        for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
-        {
-          const auto& v = vertex_set[i];
-          _os << _sindent << v[0];
-          for(int j(1); j < num_coords_; ++j)
-            _os << ' ' << v[j];
-          _os << std::endl;
-        }
-        pop_indent();
-        _os << _sindent << "</Vertices>" << std::endl;
-      }
-
+      /**
+       * \brief Writes a (root) mesh into the file
+       *
+       * \param[in] mesh
+       * The (root) mesh to be exported.
+       */
       template<typename Shape_, int num_coords_, int stride_, typename Coord_>
       void write_mesh(const ConformalMesh<Shape_, num_coords_, stride_, Coord_>& mesh)
       {
@@ -209,34 +246,30 @@ namespace FEAT
         for(int i(1); i <= MeshType::shape_dim; ++i)
            _os << " " << mesh.get_num_entities(i);
         _os << "\">" << std::endl;
-        push_indent();
+        _push_indent();
 
-        write_vertex_set(mesh.get_vertex_set());
+        _write_vertex_set(mesh.get_vertex_set());
         Intern::TopoWriteHelper<Shape_>::write_topology(_os, mesh.get_index_set_holder(), _sindent, false);
 
-        pop_indent();
+        _pop_indent();
         _os << _sindent << "</Mesh>" << std::endl;
       }
 
-      template<typename Data_>
-      void write_attribute(const MeshAttribute<Data_>& attr, const String& name)
-      {
-        _os << _sindent << "<Attribute";
-        _os << " name=\"" << name << "\"";
-        _os << " dim=\"" << attr.get_num_coords() << "\"";
-        _os << ">" << std::endl;
-        push_indent();
-        for(Index i(0); i < attr.get_num_vertices(); ++i)
-        {
-          _os << _sindent << attr[i][0];
-          for(int j(1); j < attr.get_num_coords(); ++j)
-            _os << ' ' << attr[i][j];
-          _os << std::endl;
-        }
-        pop_indent();
-        _os << _sindent << "</Attribute>" << std::endl;
-      }
-
+      /**
+       * \brief Writes a mesh-part into the file
+       *
+       * \param[in] meshpart
+       * The mesh-part to be exported.
+       *
+       * \param[in] parent_name
+       * The name of the parent of the mesh-part.
+       *
+       * \param[in] part_name
+       * The name of the mesh-part
+       *
+       * \param[in] chart_name
+       * The name of the chart of the mesh-part.
+       */
       template<typename Mesh_>
       void write_meshpart(const MeshPart<Mesh_>& meshpart, const String& parent_name, const String& part_name, const String& chart_name)
       {
@@ -252,7 +285,7 @@ namespace FEAT
         for(int i(1); i <= ShapeType::dimension; ++i)
            _os << " " << meshpart.get_num_entities(i);
         _os << "\">" << std::endl;
-        push_indent();
+        _push_indent();
 
         // write mapping
         Intern::MappWriteHelper<ShapeType>::write_mapping(_os, meshpart.get_target_set_holder(), _sindent, true);
@@ -264,12 +297,18 @@ namespace FEAT
         // write attributes
         const auto& attrs = meshpart.get_mesh_attributes();
         for(auto it = attrs.begin(); it != attrs.end(); ++it)
-          write_attribute(*(it->second), it->first);
+          _write_attribute(*(it->second), it->first);
 
-        pop_indent();
+        _pop_indent();
         _os << _sindent << "</MeshPart>" << std::endl;
       }
 
+      /**
+       * \brief Writes a partition to the file
+       *
+       * \param[in] partition
+       * The partition to be exported-
+       */
       void write_partition(const Partition& partition)
       {
         _os << _sindent << "<Partition";
@@ -280,30 +319,55 @@ namespace FEAT
         _os << " overlap=\"" << partition.get_overlap() << "\"";
         _os << " size=\"" << partition.get_num_patches() << ' ' << partition.get_num_elements() << "\"";
         _os << ">" << std::endl;
-        push_indent();
+        _push_indent();
 
         // loop over all patches
         const Adjacency::Graph& graph = partition.get_patches();
         for(Index i(0); i < graph.get_num_nodes_domain(); ++i)
         {
           _os << _sindent << "<Patch rank=\"" << i << "\" size=\"" << graph.degree(i) << "\">" << std::endl;
-          push_indent();
+          _push_indent();
           for(auto it = graph.image_begin(i); it != graph.image_end(i); ++it)
             _os << _sindent << (*it) << std::endl;
-          pop_indent();
+          _pop_indent();
           _os << _sindent << "</Patch>" << std::endl;
         }
 
-        pop_indent();
+        _pop_indent();
         _os << _sindent << "</Partition>" << std::endl;
       }
 
+      /**
+       * \brief Writes all partitions of a partition set to the file
+       *
+       * \param[in] part_set
+       * The partition set whose partitions are to be exported.
+       */
       void write_partition_set(const PartitionSet& part_set)
       {
         for(const auto& p : part_set.get_partitions())
           write_partition(p);
       }
 
+      /**
+       * \brief Writes a full domain to the file
+       *
+       * \param[in] mesh_node
+       * A root mesh node whose mesh and child mesh-parts are to be exported.
+       * May be \c nullptr if no mesh or mesh-parts are to be exported.
+       *
+       * \param[in] mesh_atlas
+       * An mesh atlas whose charts are to be exported.
+       * May be \c nullptr if no charts are to be exported.
+       *
+       * \param[in] part_set
+       * A partition set whose partitions are to be exported.
+       * May be \c nullptr if no partitions are to be exported.
+       *
+       * \param[in] skip_internal_meshparts
+       * Specifies whether internal mesh-parts (e.g. comm halos or partition patches) are
+       * to be exported or not. Defaults to \c true, i.e. internal mesh parts are not exported by default.
+       */
       template<typename RootMesh_>
       void write(
         const RootMeshNode<RootMesh_>* mesh_node,
@@ -322,13 +386,13 @@ namespace FEAT
         _os << ">" << std::endl;
 
         // increase indent
-        push_indent();
+        _push_indent();
 
         // write mesh atlas
         if(mesh_atlas != nullptr)
         {
           // write atlas
-          write_charts(*mesh_atlas);
+          write_atlas(*mesh_atlas);
         }
 
         // write mesh node
@@ -360,10 +424,61 @@ namespace FEAT
           write_partition_set(*part_set);
         }
 
-        pop_indent();
+        _pop_indent();
 
         // write terminator
         _os << "</FeatMeshFile>" << std::endl;
+      }
+
+    protected:
+      /**
+       * \brief Writes a vertex-set of a mesh into the file
+       *
+       * \param[in] vertex_set
+       */
+      template<int num_coords_, int stride_, typename Coord_>
+      void _write_vertex_set(const VertexSet<num_coords_, stride_, Coord_>& vertex_set)
+      {
+        _os << _sindent << "<Vertices>" << std::endl;
+        _push_indent();
+        for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
+        {
+          const auto& v = vertex_set[i];
+          _os << _sindent << v[0];
+          for(int j(1); j < num_coords_; ++j)
+            _os << ' ' << v[j];
+          _os << std::endl;
+        }
+        _pop_indent();
+        _os << _sindent << "</Vertices>" << std::endl;
+      }
+
+      /**
+       * \brief Writes an attribte of a mesh part into the file
+       *
+       * \param[in] attr
+       * The attribute that is to be exported.
+       *
+       * \param[in] name
+       * The name of the attribute.
+       */
+      template<typename Data_>
+      void _write_attribute(const MeshAttribute<Data_>& attr, const String& name)
+      {
+        _os << _sindent << "<Attribute";
+        _os << " name=\"" << name << "\"";
+        _os << " dim=\"" << attr.get_num_coords() << "\"";
+        _os << ">" << std::endl;
+        _push_indent();
+        for(Index i(0); i < attr.get_num_vertices(); ++i)
+        {
+          _os << _sindent << attr[i][0];
+          for(int j(1); j < attr.get_num_coords(); ++j)
+            _os << ' ' << attr[i][j];
+          _os << std::endl;
+        }
+        _pop_indent();
+        _os << _sindent << "</Attribute>" << std::endl;
       }
     }; // class MeshFileWriter
   } // namespace Geometry

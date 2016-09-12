@@ -18,16 +18,17 @@ namespace FEAT
 {
   namespace Geometry
   {
-
-    // Forward declarations
+    /// \cond internal
     namespace Intern
     {
+      // Forward declarations
       template<int, int>
       struct TargetSetComputer;
 
       template<int>
       struct IndexSetFiller;
     }
+    /// \endcond
 
     /**
      * \brief Class template for partial meshes
