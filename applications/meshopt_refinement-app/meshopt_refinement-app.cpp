@@ -65,7 +65,7 @@ struct MeshoptRefinementApp
 
   static int run(const String& meshopt_section_key, PropertyMap* meshopt_config, PropertyMap* solver_config,
   Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader,
-  int lvl_max, int lvl_min, const bool write_vtk, const bool test_mode)
+  int lvl_max, int lvl_min, const Geometry::AdaptMode& adapt_mode, const bool write_vtk, const bool test_mode)
   {
     // Base for vtk filenames, we attach some more information to that
     String file_basename(name()+"_n"+stringify(Util::Comm::size()));
@@ -74,7 +74,7 @@ struct MeshoptRefinementApp
     Index part_min_elems(Util::Comm::size()*4);
 
     // Create the DomainControl with AdaptMode set to none
-    DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, Geometry::AdaptMode::none);
+    DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, adapt_mode);
     // Mesh on the finest level, mainly for computing quality indicators
     const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
@@ -505,6 +505,13 @@ int main(int argc, char* argv[])
   else
     lvl_max = std::stoi(lvl_max_p.first);
 
+  Geometry::AdaptMode adapt_mode;
+  auto adapt_mode_p = app_settings_section->query("adapt_mode");
+  if(!adapt_mode_p.second)
+    adapt_mode = Geometry::AdaptMode::none;
+  else
+    adapt_mode <<adapt_mode_p.first;
+
   // Get the mesh optimiser key from the application settings
   auto mesh_optimiser_key_p = app_settings_section->query("mesh_optimiser");
   XASSERTM(mesh_optimiser_key_p.second,
@@ -520,13 +527,13 @@ int main(int argc, char* argv[])
   {
     ret = MeshoptRefinementApp<MemType, DataType, IndexType, H2M2D>::run(
       mesh_optimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, write_vtk, test_mode);
+      lvl_max, lvl_min, adapt_mode, write_vtk, test_mode);
   }
   else if(mesh_type == "conformal:simplex:2:2")
   {
     ret = MeshoptRefinementApp<MemType, DataType, IndexType, S2M2D>::run(
       mesh_optimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, write_vtk, test_mode);
+      lvl_max, lvl_min, adapt_mode, write_vtk, test_mode);
   }
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type string "+mesh_type);
