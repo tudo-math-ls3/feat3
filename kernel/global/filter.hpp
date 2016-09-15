@@ -47,6 +47,21 @@ namespace FEAT
         this->_filter.convert(*other);
       }
 
+      Filter clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
+      {
+        return Filter(_filter.clone(mode));
+      }
+
+      void clone(const Filter& other, LAFEM::CloneMode mode = LAFEM::CloneMode::Weak)
+      {
+        if(&(*other) == &(*(*this)))
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a Global::Filter!");
+        }
+
+        *(*this) = (*other).clone(mode);
+      }
+
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
