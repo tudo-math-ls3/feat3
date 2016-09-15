@@ -223,6 +223,10 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class DenseVector<Mem2_, DT2_, IT2_>;
 
+      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+
       /**
        * \brief Constructor
        *

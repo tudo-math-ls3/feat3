@@ -66,6 +66,10 @@ namespace FEAT
       /// scatter-mirror matrix
       MirrorMatrixType _mirror_scatter;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DataType2_ = DataType_, typename IndexType2_ = IndexType_>
+      using ContainerType = class VectorMirror<Mem2_, DataType2_, IndexType2_>;
+
       /// default constructor
       VectorMirror() :
         _mirror_gather(),

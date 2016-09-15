@@ -40,6 +40,10 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DataType_, typename IT2_ = IndexType_>
       using FilterType = class NoneFilter<Mem2_, DT2_, IT2_>;
 
+      /// this typedef lets you create a filter with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+
       /// \brief Creates a (empty) clone of itself
       NoneFilter clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
       {

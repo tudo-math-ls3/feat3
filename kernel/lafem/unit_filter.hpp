@@ -41,6 +41,10 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using FilterType = class UnitFilter<Mem2_, DT2_, IT2_>;
 
+      /// this typedef lets you create a filter with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+
     private:
       /// SparseVector, containing all entries of the unit filter
       SparseVector<Mem_, DT_, IT_> _sv;

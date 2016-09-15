@@ -36,6 +36,15 @@ namespace FEAT
       typedef Gate<LocalVectorTypeL, RowMirror_> GateRowType;
       typedef Gate<LocalVectorTypeR, ColMirror_> GateColType;
 
+      /// Our 'base' class type
+      template <typename LocalMatrix2_, typename RowMirror2_ = RowMirror_, typename ColMirror2_ = ColMirror_>
+      using ContainerType = class Matrix<LocalMatrix2_, RowMirror2_, ColMirror2_>;
+
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = class Matrix<typename LocalMatrix_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename RowMirror_::template ContainerType<Mem2_, DataType2_, IndexType2_>,
+            typename ColMirror_::template ContainerType<Mem2_, DataType2_, IndexType2_> >;
+
     protected:
       GateRowType* _row_gate;
       GateColType* _col_gate;
