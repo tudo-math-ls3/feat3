@@ -111,7 +111,7 @@ namespace FEAT
        * \returns
        * The number of global dof contributions for the specified local dof.
        */
-      int get_num_contribs(int /*local_dof_idx*/) const
+      int get_num_contribs(int DOXY(local_dof_idx)) const
       {
         return 1;
       }
@@ -144,7 +144,7 @@ namespace FEAT
        * \returns
        * The mapped dof contribution index.
        */
-      Real get_weight(int /*local_dof_idx*/, int /*contrib_idx*/ = 0) const
+      Real get_weight(int DOXY(local_dof_idx), int DOXY(contrib_idx) = 0) const
       {
         return Real(1.0);
       }

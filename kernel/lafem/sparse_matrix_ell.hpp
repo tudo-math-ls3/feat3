@@ -409,7 +409,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] C chunk size (default = 32).
+       * \param[in] C_in chunk size (default = 32).
        *
        * Creates an empty non dimensional matrix.
        */
@@ -428,9 +428,9 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] rows The row count of the created matrix.
-       * \param[in] columns The column count of the created matrix.
-       * \param[in] C chunk size (default = 32).
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
+       * \param[in] C_in chunk size (default = 32).
        *
        * Creates an empty matrix.
        * Because SparseMatrixELL is a read-only container, it stays empty.
@@ -452,7 +452,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] layout The layout to be used.
+       * \param[in] layout_in The layout to be used.
        *
        * Creates an empty matrix with given layout.
        */
@@ -477,7 +477,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] other The source matrix.
-       * \param[in] C chunk size (default = 32).
+       * \param[in] C_in chunk size (default = 32).
        *
        * Creates a ELL matrix based on the source matrix.
        */
@@ -491,15 +491,15 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] rows The row count of the created matrix.
-       * \param[in] columns The column count of the created matrix.
-       * \param[in] used_elements number of non zero elements.
-       * \param[in] val Vector with data values.
-       * \param[in] col_ind Vector with column indices.
-       * \param[in] cs starting-offset of each chunk.
-       * \param[in] cl length of the longest row in each chunk.
-       * \param[in] rl length of each row.
-       * \param[in] C chunk size (default = 32).
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
+       * \param[in] used_elements_in number of non zero elements.
+       * \param[in] val_in Vector with data values.
+       * \param[in] col_ind_in Vector with column indices.
+       * \param[in] cs_in starting-offset of each chunk.
+       * \param[in] cl_in length of the longest row in each chunk.
+       * \param[in] rl_in length of each row.
+       * \param[in] C_in chunk size (default = 32).
        *
        * Creates a matrix with given dimensions and content.
        */
@@ -547,7 +547,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] graph The graph to create the matrix from
-       * \param[in] C chunk size (default = 32)
+       * \param[in] C_in chunk size (default = 32)
        *
        * Creates a ELL matrix based on a given adjacency graph, representing the sparsity pattern.
        */
@@ -624,7 +624,7 @@ namespace FEAT
        *
        * \param[in] mode The used file format.
        * \param[in] filename The source file.
-       * \param[in] C chunk size (default = 32).
+       * \param[in] C_in chunk size (default = 32).
        *
        * Creates a ELL matrix based on the source file.
        */
@@ -640,7 +640,7 @@ namespace FEAT
        *
        * \param[in] mode The used file format.
        * \param[in] file The source filestream.
-       * \param[in] C chunk size (default = 32).
+       * \param[in] C_in chunk size (default = 32).
        *
        * Creates a ELL matrix based on the source filestream.
        */
@@ -654,7 +654,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Creates a matrix from the given byte array.
        */
@@ -1153,7 +1153,7 @@ namespace FEAT
       /**
        * \brief Assignment operator
        *
-       * \param[in] layout A sparse matrix layout.
+       * \param[in] layout_in A sparse matrix layout.
        *
        * Assigns a new matrix layout, discarding all old data
        */
@@ -1188,7 +1188,7 @@ namespace FEAT
       /**
        * \brief Deserialisation of complete container entity.
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
@@ -1200,9 +1200,6 @@ namespace FEAT
 
       /**
        * \brief Serialisation of complete container entity.
-       *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[out] std::vector<char> A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *

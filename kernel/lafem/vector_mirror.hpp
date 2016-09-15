@@ -202,7 +202,7 @@ namespace FEAT
        * \param[in,out] buffer
        * A reference to a buffer vector.
        *
-       * \param[in] vector
+       * \param[in] mem_vector
        * A primal vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
@@ -233,7 +233,7 @@ namespace FEAT
        * \param[in,out] buffer
        * A reference to a buffer vector.
        *
-       * \param[in] vector
+       * \param[in] mem_vector
        * A primal vector whose entries are to be gathered.
        *
        * \param[in] alpha
@@ -267,7 +267,7 @@ namespace FEAT
       /**
        * \brief Performs a scatter-operation on a primal vector.
        *
-       * \param[in,out] vector
+       * \param[in,out] mem_vector
        * A reference to a primal vector.
        *
        * \param[in] buffer
@@ -303,7 +303,7 @@ namespace FEAT
       /**
        * \brief Performs a scatter-axpy-operation on a primal vector.
        *
-       * \param[in,out] vector
+       * \param[in,out] mem_vector
        * A reference to a primal vector.
        *
        * \param[in] buffer

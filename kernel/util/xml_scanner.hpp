@@ -476,7 +476,7 @@ namespace FEAT
        *
        * This function effectively just calls the three functions
        * - #read_root()
-       * - #set_root_parser(root_parser)
+       * - #set_root_parser()
        * - #scan()
        */
       void scan(std::shared_ptr<MarkupParser> root_parser);

@@ -104,7 +104,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] size The size of the created vector.
+       * \param[in] size_in The size of the created vector.
        *
        * Creates a vector with a given size.
        */
@@ -121,9 +121,9 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] size The size of the created vector.
-       * \param[in] elements A list of non zero elements.
-       * \param[in] indices A list of non zero element indices.
+       * \param[in] size_in The size of the created vector.
+       * \param[in] elements_in A list of non zero elements.
+       * \param[in] indices_in A list of non zero element indices.
        * \param[in] is_sorted Indicates, if the elements are sorted by their indices: is_sorted = true (default)
        *
        * Creates a vector with a given size.
@@ -155,7 +155,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Creates a vector from the given byte array.
        */
@@ -439,7 +439,7 @@ namespace FEAT
       /**
        * \brief Deserialisation of complete container entity.
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
@@ -451,9 +451,6 @@ namespace FEAT
 
       /**
        * \brief Serialisation of complete container entity.
-       *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[out] std::vector<char> A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *

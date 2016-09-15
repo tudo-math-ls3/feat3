@@ -359,7 +359,7 @@ namespace FEAT
        * This function computes the defect vector's norm, increments the iteration count,
        * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
        *
-       * \param[in] vector
+       * \param[in] vec_def
        * The new defect vector.
        *
        * \param[in] vec_sol

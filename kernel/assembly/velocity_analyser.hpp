@@ -96,7 +96,7 @@ namespace FEAT
        * \param[in] pad_size
        * The leading string padding size. Should be >= 10 to achieve vertical alignment.
        *
-       * \paran[in] pad_char
+       * \param[in] pad_char
        * The leading string padding character.
        *
        * \returns

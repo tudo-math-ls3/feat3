@@ -16,8 +16,8 @@ namespace FEAT
      * \f[
      *   x^* = \mathrm{argmin}_{x \in D} f(x) ~ \mathrm{subject~to~} \forall i \in E: c_i(x) = 0
      * \f]
-     * \f$ c_i \f$ are \emph{equality constraints} turning the minimisation of \f$ f \f$ into a
-     * \emph{constrained optimisation problem}. To solve this constrained problem, one can solve a series of
+     * \f$ c_i \f$ are <em>equality constraints</em> turning the minimisation of \f$ f \f$ into a
+     * <em>constrained optimisation problem</em>. To solve this constrained problem, one can solve a series of
      * unconstrained problems with the quadratic penalty iteration by defining the quadratic penalty function
      * \f[
      *   Q(x,\mu) := f(x) + \frac{\mu}{2} \sum_{i \in E} c_i^2(x)
@@ -32,7 +32,7 @@ namespace FEAT
      * All of this means that the Operator_ \f$ Q \f$ must be assembled anew in every iteration and the inner solver
      * needs to take care of this.
      *
-     * One critical part is the choice of $\mu_k$. It needs to start small (i.e. \mu_1 = 1) because the initial state
+     * One critical part is the choice of \f$\mu_k\f$. It needs to start small (i.e. \f$\mu_1 = 1\f$) because the initial state
      * might violate the constraints quite strongly. The rate of increase has to be fast enough that the number of
      * penalty iterations remains small (i.e. \f$ \leq 10 \f$), but the systematic ill-conditioning of the penalty
      * function means that we cannot be too quick about this. If the increase is too quick, the previous iterate will

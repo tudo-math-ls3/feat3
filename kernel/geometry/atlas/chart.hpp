@@ -48,27 +48,20 @@ namespace FEAT
         {
           return std::size_t(0);
         }
+
         /**
          * \brief Specifies whether the chart can perform explicit projection.
          *
-         * This function returns #is_explicit by default, but it may be
-         * overridden by the derived class in case that explicit projection
-         * can be disabled at runtime (e.g. due to missing parameters).
-         *
          * \returns
-         * True if explicit projection is possible.
+         * \c true if explicit projection is possible, otherwise \c false.
          */
         virtual bool can_explicit() const = 0;
 
         /**
          * \brief Specifies whether the chart can perform implicit projection.
          *
-         * This function returns #is_implicit by default, but it may be
-         * overridden by the derived class in case that implicit projection
-         * can be disabled at runtime.
-         *
          * \returns
-         * True if implicit projection is possible.
+         * \c true if implicit projection is possible, otherwise \c false.
          */
         virtual bool can_implicit() const = 0;
 

@@ -1470,7 +1470,7 @@ namespace FEAT
        * The mesh atlas into which charts are to be added. Is also used to search
        * for charts for mesh parts.
        *
-       * \param[in,out]
+       * \param[in,out] part_set
        * A pointer to the partition set that partitions are added to.
        * May be \p nullptr, if the partitions are to be ignored.
        */

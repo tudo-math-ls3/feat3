@@ -476,8 +476,8 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] rows The row count of the created matrix.
-       * \param[in] columns The column count of the created matrix.
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
        *
        * Creates a matrix with given dimensions.
        */
@@ -496,7 +496,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] layout The layout to be used.
+       * \param[in] layout_in The layout to be used.
        *
        * Creates an empty matrix with given layout.
        */
@@ -532,11 +532,11 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] rows The row count of the created matrix.
-       * \param[in] columns The column count of the created matrix.
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
        * \param[in] row_ind Vector with row indices.
        * \param[in] col_ind Vector with column indices.
-       * \param[in] val Vector with non zero elements.
+       * \param[in] val_in Vector with non zero elements.
        *
        * Creates a matrix with given dimensions and content.
        */
@@ -634,7 +634,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Creates a matrix from the given byte array.
        */
@@ -1008,7 +1008,7 @@ namespace FEAT
       /**
        * \brief Deserialisation of complete container entity.
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
@@ -1020,9 +1020,6 @@ namespace FEAT
 
       /**
        * \brief Serialisation of complete container entity.
-       *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[out] std::vector<char> A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *

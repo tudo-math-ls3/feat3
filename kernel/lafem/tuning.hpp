@@ -74,7 +74,6 @@ namespace FEAT
        * \brief Find optimal cuda runtime parameters
        *
        * \param[in] matrix The matrix to use for tuning.
-       * \param[in] vector The vector to use for tuning.
        *
        * Finds optimal cuda runtime parameters (cuda blocksize) for the given matrix and vector.
        * The blocksizes are set globally and are used by all following cuda operations.

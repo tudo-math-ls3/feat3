@@ -416,7 +416,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] layout The layout to be used.
+       * \param[in] layout_in The layout to be used.
        *
        * Creates an empty matrix with given layout.
        */
@@ -561,7 +561,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Creates a matrix from the given byte array.
        */
@@ -628,7 +628,7 @@ namespace FEAT
       /**
        * \brief Assignment operator
        *
-       * \param[in] layout A sparse matrix layout.
+       * \param[in] layout_in A sparse matrix layout.
        *
        * Assigns a new matrix layout, discarding all old data
        */
@@ -1065,7 +1065,7 @@ namespace FEAT
       /**
        * \brief Deserialisation of complete container entity.
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
@@ -1077,9 +1077,6 @@ namespace FEAT
 
       /**
        * \brief Serialisation of complete container entity.
-       *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[out] std::vector<char> A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *

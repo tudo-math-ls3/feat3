@@ -1203,7 +1203,7 @@ namespace FEAT
        * \brief Tiny::Matrix streaming operator
        *
        * \param[in] lhs The target stream.
-       * \param[in] b The matrix to be streamed.
+       * \param[in] A The matrix to be streamed.
        */
       friend std::ostream & operator<< (std::ostream & lhs, const Matrix& A)
       {

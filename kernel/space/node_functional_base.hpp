@@ -141,7 +141,7 @@ namespace FEAT
       template<
         typename NodeData_,
         typename Function_>
-      void operator()(NodeData_&, const Function_&) const
+      void operator()(NodeData_& DOXY(node_data), const Function_& DOXY(function)) const
       {
         throw InternalError("invalid call of NodeFunctionalNull::operator()()");
       }

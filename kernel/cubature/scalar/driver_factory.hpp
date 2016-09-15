@@ -197,11 +197,11 @@ namespace FEAT
          * \param[out] rule
          * The rule to be created.
          *
-         * \param[in] name
+         * \param[in] name_in
          * The name of the cubature rule to create.
          *
          * \returns
-         * \c true, if the cubature rule was created successfully, or \c false, if \p name is not
+         * \c true, if the cubature rule was created successfully, or \c false, if \p name_in is not
          * a valid name of the cubature rule implemented by this factory.
          */
         template<typename Weight_, typename Coord_>

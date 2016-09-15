@@ -84,7 +84,7 @@ namespace FEAT
       /**
        * \brief Constructor.
        *
-       * \param[in] size The size of the created filter.
+       * \param[in] size_in The size of the created filter.
        * \param[in] values DenseVector containing element values
        * \param[in] indices DenseVector containing element indices
        */

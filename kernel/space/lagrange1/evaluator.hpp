@@ -95,7 +95,7 @@ namespace FEAT
         /**
          * \brief Evaluates the basis function values on the reference cell.
          *
-         * \param[out] values
+         * \param[out] data
          * A reference to a basis value vector receiving the result.
          *
          * \param[in] point
@@ -198,7 +198,7 @@ namespace FEAT
         /**
          * \brief Evaluates the basis function values on the reference cell.
          *
-         * \param[out] values
+         * \param[out] data
          * A reference to a basis value vector receiving the result.
          *
          * \param[in] point
@@ -308,7 +308,7 @@ namespace FEAT
         /**
          * \brief Evaluates the basis function values on the reference cell.
          *
-         * \param[out] values
+         * \param[out] data
          * A reference to a basis value vector receiving the result.
          *
          * \param[in] point
@@ -406,7 +406,7 @@ namespace FEAT
         /**
          * \brief Evaluates the basis function values on the reference cell.
          *
-         * \param[out] values
+         * \param[out] data
          * A reference to a basis value vector receiving the result.
          *
          * \param[in] point
@@ -512,7 +512,7 @@ namespace FEAT
         /**
          * \brief Evaluates the basis function values on the reference cell.
          *
-         * \param[out] values
+         * \param[out] data
          * A reference to a basis value vector receiving the result.
          *
          * \param[in] point

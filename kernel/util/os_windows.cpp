@@ -77,7 +77,7 @@ namespace FEAT
       sim.si.SizeOfStruct = sizeof(SYMBOL_INFO);
 
       // initialise symbol table
-      SymInitialize(prc, NULL, TRUE);
+      SymInitialize(prc, nullptr, TRUE);
 
       // initialise the stack frame stuff
       STACKFRAME64 stack_frame;
@@ -106,8 +106,8 @@ namespace FEAT
       fprintf(stream,   "----------------------\n");
 
       // walk the stack
-      while (StackWalk64(machine_type, prc, thr, &stack_frame, &ctx, NULL,
-                         &SymFunctionTableAccess64, &SymGetModuleBase64, NULL) != FALSE)
+      while (StackWalk64(machine_type, prc, thr, &stack_frame, &ctx, nullptr,
+                         &SymFunctionTableAccess64, &SymGetModuleBase64, nullptr) != FALSE)
       {
         // get stack address
         addr = stack_frame.AddrPC.Offset;

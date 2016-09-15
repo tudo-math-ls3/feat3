@@ -215,7 +215,7 @@ namespace FEAT
       /**
        * \brief Retrieve a pointer to the data array.
        *
-       * \template perspective_ template parameter to choose the return value type
+       * \tparam perspective_ template parameter to choose the return value type
        *
        * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
        * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.

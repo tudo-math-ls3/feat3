@@ -67,9 +67,6 @@ namespace FEAT
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] omega
-     * The damping parameter for Jacobi.
-     *
      * \returns
      * A shared pointer to a new DiagonalPrecond object.
      */

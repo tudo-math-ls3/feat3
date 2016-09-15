@@ -801,7 +801,7 @@ namespace FEAT
      * \todo implement variant for SparseMatrixBCSR<Mem::Main,...>
      *
      * \author Dirk Ribbrock
-     * \auhtor Peter Zajac
+     * \author Peter Zajac
      */
     template<typename Matrix_, typename Filter_>
     class ILUPrecond;

@@ -120,8 +120,6 @@ The 'makefile' generator used by cmake.
 This section enlists the macros defined by the compiler detection headers to provide information about the compiler
 and its version being in use.
 
-For macros specifying the compiler's C++ language capabilities, see \ref preproc_sec_cpp_features
-
 <hr>
 \subsection ppm_feat_compiler FEAT_COMPILER
 This macro is defined by the compiler detection system and its value is a string literal specifying the name and

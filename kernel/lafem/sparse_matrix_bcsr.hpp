@@ -399,7 +399,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Creates a matrix from the given byte array.
        */
@@ -501,7 +501,7 @@ namespace FEAT
       /**
        * \brief Deserialisation of complete container entity.
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
@@ -513,9 +513,6 @@ namespace FEAT
 
       /**
        * \brief Serialisation of complete container entity.
-       *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[out] std::vector<char> A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *
@@ -576,7 +573,7 @@ namespace FEAT
         }
       }
 
-      /**
+      /*
        * \brief Read in matrix from MatrixMarket mtx file.
        *
        * \param[in] filename The file that shall be read in.
@@ -590,7 +587,7 @@ namespace FEAT
         file.close();
       }*/
 
-      /**
+      /*
        * \brief Read in matrix from MatrixMarket mtx stream.
        *
        * \param[in] file The stream that shall be read in.
@@ -976,7 +973,7 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element array.
        *
-       * \template perspective_ template parameter to choose the return value type
+       * \tparam perspective_ template parameter to choose the return value type
        *
        * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
        * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.

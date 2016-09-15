@@ -179,8 +179,8 @@ namespace FEAT
        * \param[in] space
        * A reference to the finite element space.
        *
-       * \param[in] data
-       * An array representing the coefficient vector of the finite element function.
+       * \param[in] v
+       * The blocked coefficient vector of the finite element function.
        */
       template<typename Space_, typename VectorType_>
       void write_values_blocked(String name, const Space_& space, const VectorType_& v)

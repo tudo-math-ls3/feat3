@@ -369,7 +369,7 @@ namespace FEAT
     }
 
     /**
-     * \briefs Pads the front of the string up to a desired length.
+     * \brief Pads the front of the string up to a desired length.
      *
      * This function returns a string that is front-padded with a specific character up to a desired minimum length.
      * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
@@ -392,7 +392,7 @@ namespace FEAT
     }
 
     /**
-     * \briefs Pads the back of the string up to a desired length.
+     * \brief Pads the back of the string up to a desired length.
      *
      * This function returns a string that is back-padded with a specific character up to a desired minimum length.
      * If the length of \c this already has the desired minimum lengh, this function returns \c *this.

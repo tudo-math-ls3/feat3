@@ -239,7 +239,7 @@ namespace FEAT
       /**
         * \brief CTOR
         *
-        * \param[in] id
+        * \param[in] id_in
         * the testcase's id string
         */
       explicit BaseTest(const String& id_in)
@@ -317,7 +317,7 @@ namespace FEAT
       /**
       * \brief CTOR
       *
-      * \param[in] id
+      * \param[in] id_id
       * the testcase's id string
       */
       explicit TaggedTest(const String & id_in)
@@ -350,7 +350,7 @@ namespace FEAT
       /**
       * \brief CTOR
       *
-      * \param[in] id
+      * \param[in] id_in
       * the testcase's id string
       */
       explicit FullTaggedTest(const String & id_in)

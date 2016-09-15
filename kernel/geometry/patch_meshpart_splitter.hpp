@@ -150,7 +150,7 @@ namespace FEAT
         /**
          * \brief Fills the attribute sets.
          *
-         * \param[in,out] ash
+         * \param[in,out] attribute_container
          * The attribute set holder whose attribute sets are to be filled.
          */
         virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
@@ -493,7 +493,6 @@ namespace FEAT
          *
          * \returns
          * true if the MeshPart does have a topology, false otherwise.
-         *
          */
         bool has_topology() const
         {
@@ -506,12 +505,11 @@ namespace FEAT
          * \tparam MeshAttributeContainer_
          * Type of the MeshAttributeContainer_.
          *
-         * \param[out] attribute_set_out
+         * \param[out] attribute_container_out
          * MeshAttributeContainer of the PatchMeshPart's MeshPart to be filled
          *
-         * \param[in] attribute_set_in
+         * \param[in] attribute_container_in
          * MeshAttributeContainer of the BaseMesh's MeshPart to restrict to the PatchMeshPart's MeshPart.
-         *
          */
         template<typename MeshAttributeContainer_>
         void fill_attribute_sets(

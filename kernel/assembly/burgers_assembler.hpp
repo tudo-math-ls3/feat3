@@ -71,7 +71,7 @@ namespace FEAT
        * \param[in] space
        * The velocity space.
        *
-       * \param[in] cubatue_factory
+       * \param[in] cubature_factory
        * The cubature factory to be used for integration.
        *
        * \param[in] convect

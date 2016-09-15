@@ -111,7 +111,7 @@ namespace FEAT
         return _col_mirror;
       }
 
-      /**
+      /*
        * \brief Creates a buffer matrix based on a template matrix.
        *
        * \param[in] tmpl_mat
@@ -189,7 +189,7 @@ namespace FEAT
        * \param[in,out] matrix
        * A reference to the operator matrix.
        *
-       * \param[in]
+       * \param[in] buffer
        * A reference to the buffer matrix whose entries are to be scattered.
        */
       template<
@@ -210,10 +210,10 @@ namespace FEAT
        * \param[in,out] matrix
        * A reference to the operator matrix.
        *
-       * \param[in]
+       * \param[in] buffer
        * A reference to the buffer matrix whose entries are to be scattered.
        *
-       * \param[in]
+       * \param[in] alpha
        * The scaling factor for the operation.
        */
       template<

@@ -832,18 +832,6 @@ namespace FEAT
       String _name;
 
     public:
-      /**
-       * \brief Constructor
-       *
-       * \param[in] mesh_extruder
-       * The object that defines the mesh extrusion.
-       *
-       * \param[in] quad_part
-       * The quadrilateral mesh-part that is to be extruded.
-       *
-       * \param[in] quad_parent
-       * The quadrilateral parent mesh of the to-be-extruded mesh part.
-       */
       explicit MeshPartSliceExtruderFactory(const MeshExtruderType& mesh_extruder, const QuadMesh& quad_parent, const String& name, const Index slice) :
         _mesh_extruder(mesh_extruder),
         _quad_parent(quad_parent),

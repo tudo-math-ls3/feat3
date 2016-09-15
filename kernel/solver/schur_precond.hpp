@@ -113,11 +113,11 @@ namespace FEAT
       /**
        * \brief Constructs a Schur-Complement preconditioner
        *
-       * \param[in] matrix
-       * The saddle-point system matrix.
+       * \param[in] matrix_a, matrix_b, matrix_d
+       * The three sub-matrices of the saddle-point matrix.
        *
-       * \param[in] filter
-       * The system filter.
+       * \param[in] filter_v, filter_p
+       * The velocity and pressure filter, resp.
        *
        * \param[in] solver_a
        * The solver representing \f$A^{-1}\f$.

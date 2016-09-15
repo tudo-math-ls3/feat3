@@ -347,7 +347,6 @@ namespace FEAT
        * The scaling factor for the bilinear operator.
        *
        * \author Jordi Paul
-       *
        */
       template
       <
@@ -513,7 +512,6 @@ namespace FEAT
        * The scaling factor for the bilinear operator.
        *
        * \author Jordi Paul
-       *
        */
       template
       <
@@ -670,8 +668,11 @@ namespace FEAT
        * \param[in] operat
        * A reference to the operator implementing the BilinearOperator interface to be assembled.
        *
-       * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
+       * \param[in] test_space
+       * A reference to the finite-element test-space to be used.
+       *
+       * \param[in] trial_space
+       * A reference to the finite-element trial-space to be used.
        *
        * \param[in] cubature_factory
        * A reference to the cubature factory to be used for integration.
@@ -680,7 +681,6 @@ namespace FEAT
        * The scaling factor for the bilinear operator.
        *
        * \author Jordi Paul
-       *
        */
       template
       <

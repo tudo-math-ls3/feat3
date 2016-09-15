@@ -25,7 +25,7 @@ namespace FEAT
    * The expression that is asserted.
    *
    * \param[in] expr_str
-   * The stringified expression, usually <c>#expr</c>.
+   * The stringified expression, usually <c>\#expr</c>.
    *
    * \param[in] func
    * The name of the function that contains the assertion, usually <c>__func__</c>.

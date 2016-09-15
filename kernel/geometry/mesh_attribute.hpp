@@ -80,27 +80,6 @@ namespace FEAT
         MeshAttribute& operator=(const MeshAttribute&) = delete;
         MeshAttribute& operator=(MeshAttribute&&) = delete;
 
-        ///**
-        // * \brief Move Constructor
-        // *
-        // * \param[in] other
-        // * The vertex set to be moved
-        // */
-        //MeshAttribute(MeshAttribute&& other) :
-        //  _num_vertices(other.get_num_vertices()),
-        //  _num_coords(other.get_num_coords()),
-        //  _stride(other.get_stride()),
-        //  _vertices(nullptr)
-        //  {
-        //    if((_num_vertices > 0) && (_num_coords > 0))
-        //      _vertices = other._vertices;
-
-        //    other._num_vertices = 0;
-        //    other._num_coords = 0;
-        //    other._stride = 0;
-        //    other._vertices = nullptr;
-        //  }
-
         /// virtual destructor
         virtual ~MeshAttribute()
         {

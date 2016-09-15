@@ -73,7 +73,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      void filter_rhs(VectorType&) const
+      void filter_rhs(VectorType& DOXY(vector)) const
       {
       }
 
@@ -83,7 +83,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      void filter_sol(VectorType&) const
+      void filter_sol(VectorType& DOXY(vector)) const
       {
       }
 
@@ -93,7 +93,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      void filter_def(VectorType&) const
+      void filter_def(VectorType& DOXY(vector)) const
       {
       }
 
@@ -103,7 +103,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      void filter_cor(VectorType&) const
+      void filter_cor(VectorType& DOXY(vector)) const
       {
       }
     }; // class NoneFilter<...>
@@ -161,7 +161,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      void filter_rhs(VectorType&) const
+      void filter_rhs(VectorType& DOXY(vector)) const
       {
       }
 
@@ -171,7 +171,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      void filter_sol(VectorType&) const
+      void filter_sol(VectorType& DOXY(vector)) const
       {
       }
 
@@ -181,7 +181,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      void filter_def(VectorType&) const
+      void filter_def(VectorType& DOXY(vector)) const
       {
       }
 
@@ -191,7 +191,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      void filter_cor(VectorType&) const
+      void filter_cor(VectorType& DOXY(vector)) const
       {
       }
     }; // class NoneFilterBlocked<...>

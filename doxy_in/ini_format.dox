@@ -183,7 +183,7 @@ The line containing the <c>\@include</c> statement must \e not contain comments,
 \e not denote the beginning of a comment in this case but is interpreted as part of the file's path instead.
 
 <b>Notes:</b>\n
-- Despite the obvious similarity to the <c>#include</c> statement of the C/C++ preprocessor, the INI parser does
+- Despite the obvious similarity to the <c>\#include</c> statement of the C/C++ preprocessor, the INI parser does
   not copy-&-paste the to-be-included-file's contents into the file containing the <c>\@include</c> statement,
   but instead separately parses the to-be-included-file and afterwards continues parsing the file containing the
   <c>\@include</c> statement (unless an error occured)

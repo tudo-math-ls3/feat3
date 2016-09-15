@@ -50,7 +50,7 @@ namespace FEAT
       }
 
       /** \copydoc DofMappingBase::get_index() */
-      Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
+      Index get_index(int local_dof_idx, int DOXY(contrib_idx) = 0) const
       {
         return Index(dofs_per_cell_) * this->_cell_index + Index(local_dof_idx);
       }
@@ -127,7 +127,7 @@ namespace FEAT
       }
 
       /** \copydoc DofMappingBase::get_index() */
-      Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
+      Index get_index(int local_dof_idx, int DOXY(contrib_idx) = 0) const
       {
         Index ldi_q = Index(local_dof_idx) / dofs_per_cell_;
         Index ldi_r = Index(local_dof_idx) % dofs_per_cell_;
@@ -232,7 +232,7 @@ namespace FEAT
       }
 
       /** \copydoc DofMappingBase::get_index() */
-      Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
+      Index get_index(int local_dof_idx, int DOXY(contrib_idx) = 0) const
       {
         ASSERTM((local_dof_idx >= 0) && (local_dof_idx < dof_count), "local dof-index out-of-range");
         return dof_idx[local_dof_idx];

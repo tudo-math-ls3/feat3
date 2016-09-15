@@ -24,7 +24,7 @@ namespace FEAT
       /**
        * \brief Generates an empty FE-style pointstar banded matrix
        *
-       * \param[in] FE_degree
+       * \param[in] fe_degree
        * Polynomial degree of the Finite Element discretisation.
        * I.e. FE_order=1 yields the so called Q1 Matrix with three tridiagonal bands.
        *

@@ -202,7 +202,7 @@ namespace FEAT
     /**
      * \brief Constructor
      *
-     * \param[in] message
+     * \param[in] message_in
      * A description of the syntax error.
      *
      * \param[in] filename
