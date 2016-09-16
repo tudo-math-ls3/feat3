@@ -26,6 +26,10 @@ namespace FEAT
       typedef typename LocalVector_::IndexType IndexType;
       typedef LocalVector_ LocalVectorType;
 
+      /// Our 'base' class type
+      template <typename LocalVector2_, typename Mirror2_ = Mirror_>
+      using ContainerType = class Vector<LocalVector2_, Mirror2_>;
+
     protected:
       GateType* _gate;
       LocalVector_ _vector;

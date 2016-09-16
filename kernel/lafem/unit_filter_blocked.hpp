@@ -53,6 +53,10 @@ namespace FEAT
       /// Our supported vector type
       typedef DenseVectorBlocked<MemType, DataType, IndexType, BlockSize> VectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using FilterType = class UnitFilterBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+
       static_assert(BlockSize > 1, "BlockSize has to be >= 2 in UnitFilterBlocked!");
 
     private:

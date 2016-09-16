@@ -43,6 +43,12 @@ namespace FEAT
 
       typedef typename First_::VectorType VectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = FilterChain<
+        typename First_::template FilterType<Mem2_, DT2_, IT2_>,
+        typename Rest_::template FilterType<Mem2_, DT2_, IT2_>...>;
+
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
                     "sub-filters have different mem-types");
@@ -201,6 +207,9 @@ namespace FEAT
       typedef typename First_::DataType DataType;
       /// sub-filter index-type
       typedef typename First_::IndexType IndexType;
+
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = class FilterChain<typename First_::template FilterType<Mem2_, DT2_, IT2_> >;
 
     protected:
       /// the first sub-filter

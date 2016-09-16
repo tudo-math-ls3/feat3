@@ -111,6 +111,10 @@ namespace FEAT
         /// The system matrix
         MatrixType sys_matrix;
 
+        /// Our 'base' class type
+        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+        using ContainerType = class DuDvFunctional<Mem2_, DT2_, IT2_, TrafoType_, MatrixType_ >;
+
       protected:
         /// The transformation defining the physical mesh
         TrafoType* _trafo;

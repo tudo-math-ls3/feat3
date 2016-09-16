@@ -80,6 +80,10 @@ namespace FEAT
         /// Our supported vector type
         typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> VectorType;
 
+        /// Our 'base' class type
+        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+          using FilterType = class SlipFilter<Mem2_, DT2_, IT2_, BlockSize_>;
+
         static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
 
       private:

@@ -56,6 +56,10 @@ namespace FEAT
       /// vector type
       typedef PowerVector<typename SubFilter_::VectorType, count_> VectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = class PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, count_>;
+
     protected:
       /// the first sub-filter
       SubFilterType _first;
@@ -223,6 +227,9 @@ namespace FEAT
       static constexpr int num_blocks = 1;
 
       typedef PowerVector<typename SubFilter_::VectorType, 1> VectorType;
+
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = class PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, Index(1)>;
 
     protected:
       SubFilterType _first;

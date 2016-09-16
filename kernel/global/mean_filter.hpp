@@ -28,6 +28,10 @@ namespace FEAT
       /// index-type typedef
       typedef typename VectorType::IndexType IndexType;
 
+      /// Our 'base' class type
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      using FilterType = class MeanFilter<Mem2_, DT2_, IT2_>;
+
     protected:
       /// primal weighting vector
       VectorType _vec_prim;

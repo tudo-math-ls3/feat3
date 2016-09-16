@@ -729,6 +729,10 @@ namespace FEAT
       /// our buffer vector type
       typedef DenseVector<Mem_, DT_, IT_> BufferVectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = class VectorMirrorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+
     protected:
       /// gather-mirror matrix
       MirrorMatrixType _mirror_gather;

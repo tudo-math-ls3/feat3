@@ -29,7 +29,7 @@ namespace FEAT
       typedef std::deque<std::pair<String, Filter_>> BaseClass;
 
       /// The type of the filter that gets applied in sequence
-      typedef Filter_ FilterType;
+      typedef Filter_ InnerFilterType;
       /// The filter's memory architecture type
       typedef typename Filter_::MemType MemType;
       /// The filter's floating point type
@@ -44,6 +44,10 @@ namespace FEAT
       typedef typename BaseClass::iterator iterator;
       /// Use the baseclass' const_iterator
       typedef typename BaseClass::const_iterator const_iterator;
+
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      using FilterType = class FilterSequence<typename Filter_::template FilterType<Mem2_, DT2_, IT2_> >;
 
     public:
       /// Empty default constructor
@@ -63,7 +67,7 @@ namespace FEAT
         for(auto it = ids_.begin(); it != ids_.end(); ++it)
         {
           String id(*it);
-          FilterType new_filter;
+          InnerFilterType new_filter;
           BaseClass::push_back(std::make_pair<String, Filter_>(std::move(id), std::move(new_filter)));
         }
       }
@@ -74,7 +78,7 @@ namespace FEAT
         FilterSequence result;
 
         for(auto& it = BaseClass::begin(); it != BaseClass::end(); ++it)
-          result.push_back(std::make_pair<String, FilterType>(it->first, it->second->clone(clone_mode)));
+          result.push_back(std::make_pair<String, InnerFilterType>(it->first, it->second->clone(clone_mode)));
 
         return result;
       }
@@ -85,7 +89,7 @@ namespace FEAT
         BaseClass::clear();
 
         for(const_iterator it(other.begin()); it != other.end(); ++it)
-          BaseClass::push_back(std::make_pair<String, FilterType>(it->first, it->second->clone(clone_mode)));
+          BaseClass::push_back(std::make_pair<String, InnerFilterType>(it->first, it->second->clone(clone_mode)));
 
       }
 
@@ -99,9 +103,9 @@ namespace FEAT
 
         for(const_iterator it(other.begin()); it != other.end(); ++it)
         {
-          FilterType new_filter;
+          InnerFilterType new_filter;
           new_filter.convert(*(it->second));
-          BaseClass::push_back(std::make_pair<String, FilterType>(it->first, new_filter));
+          BaseClass::push_back(std::make_pair<String, InnerFilterType>(it->first, new_filter));
         }
       }
 
