@@ -284,7 +284,8 @@ namespace FEAT
         /// The mesh concentration function (if any)
         std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
 
-        // This is public for debugging purposes
+        std::deque<VectorTypeR*> sync_vecs;
+
       protected:
         /// Weights for the local contributions to the global functional value.
         ScalarVectorType _mu;
@@ -344,6 +345,7 @@ namespace FEAT
           _slip_asm(slip_asm_),
           _functional(functional_),
           _mesh_conc(nullptr),
+          sync_vecs(),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -404,6 +406,7 @@ namespace FEAT
           _slip_asm(slip_asm_),
           _functional(functional_),
           _mesh_conc(nullptr),
+          sync_vecs(),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -424,6 +427,7 @@ namespace FEAT
             {
               _mesh_conc = mesh_conc_->create_empty_clone();
               _mesh_conc->set_mesh_node(rmn_);
+              _mesh_conc->add_sync_vecs(sync_vecs);
             }
 
             // Perform one time scal computation
@@ -647,6 +651,20 @@ namespace FEAT
          */
         virtual void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
+          prepare_pre_sync(vec_state, filter);
+          prepare_post_sync(vec_state, filter);
+        }
+
+        virtual void prepare_post_sync(const VectorTypeR& DOXY(vec_state), FilterType& DOXY(filter))
+        {
+          if(this->_scale_computation == ScaleComputation::iter_concentration)
+          {
+            _mesh_conc->compute_grad_h(this->get_coords());
+          }
+        }
+
+        virtual void prepare_pre_sync(const VectorTypeR& vec_state, FilterType& filter)
+        {
 
           // Download state if neccessary
           CoordsBufferType vec_buf;
@@ -699,10 +717,12 @@ namespace FEAT
                 _mesh_conc->compute_dist();
               }
 
+          _compute_scales_iter();
+
           if(_penalty_param > DataType(0))
             _alignment_constraint = this->_mesh_conc->compute_constraint();
 
-          _compute_scales_iter();
+
         }
 
         /**
@@ -846,13 +866,10 @@ namespace FEAT
         /// \brief Computes _lambda according to the concentration function given by _mesh_conc
         virtual void _compute_lambda_conc()
         {
-          if(_mesh_conc == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Scale computation set to "+stringify(_scale_computation)+", but no concentration function was given");
-
-          _mesh_conc->compute_dist();
           _mesh_conc->compute_conc();
-          _mesh_conc->compute_grad_h(this->get_coords());
+          _mesh_conc->compute_grad_conc();
+
+          _mesh_conc->compute_grad_sum_det(this->_coords_buffer);
 
           _lambda.copy(_mesh_conc->get_conc());
 

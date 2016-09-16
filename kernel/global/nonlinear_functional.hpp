@@ -185,7 +185,19 @@ namespace FEAT
          */
         void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
-          _nonlinear_functional.prepare(*vec_state, *filter);
+
+          // Prepare the patch local nonlinear functional, computing everything that does need synchronising
+          _nonlinear_functional.prepare_pre_sync(*vec_state, *filter);
+
+          // Synchronise the necessary parts
+          if(_col_gate != nullptr)
+          {
+            for(auto* it:_nonlinear_functional.sync_vecs)
+              _col_gate->sync_0(*it);
+          }
+
+          // Prepare the rest of the functional
+          _nonlinear_functional.prepare_post_sync(*vec_state, *filter);
 
           // Sync the filter vector in the SlipFilter
           if(_col_gate != nullptr )

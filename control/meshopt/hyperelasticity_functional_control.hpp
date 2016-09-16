@@ -428,7 +428,7 @@ namespace FEAT
               _system_levels.at(level)->op_sys.prepare
                 (global_vec_level, _system_levels.at(level)->filter_sys);
 
-              (*(_system_levels.at(level)->op_sys)).init();
+              //(*(_system_levels.at(level)->op_sys)).init();
             }
           }
 

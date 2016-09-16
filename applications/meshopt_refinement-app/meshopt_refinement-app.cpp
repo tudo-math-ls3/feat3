@@ -243,11 +243,11 @@ struct MeshoptRefinementApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      if( Math::abs(worst_angle - DT_(52.216179)) > Math::pow(Math::eps<DT_>(),0.25))
+      if( Math::abs(worst_angle - DT_(55.174022)) > Math::pow(Math::eps<DT_>(),0.25))
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
-        "Final worst angle should be "+stringify_fp_fix(67.349782)+" but is "+stringify_fp_fix(worst_angle));
+        "Final worst angle should be "+stringify_fp_fix(55.174022)+" but is "+stringify_fp_fix(worst_angle));
       }
     }
 
@@ -604,7 +604,7 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "fac_det = 1.0" << std::endl;
   iss << "fac_cof = 0.0" << std::endl;
   iss << "fac_reg = 1e-8" << std::endl;
-  iss << "scale_computation = current_uniform" << std::endl;
+  iss << "scale_computation = once_uniform" << std::endl;
 }
 
 static void read_test_mode_solver_config(std::stringstream& iss)

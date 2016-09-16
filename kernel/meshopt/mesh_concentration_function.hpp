@@ -342,6 +342,11 @@ namespace FEAT
         virtual void compute_conc() = 0;
 
         /**
+         * \brief Computes the gradient of the mesh concentration for each cell according to the distance information.
+         */
+        virtual void compute_grad_conc() = 0;
+
+        /**
          * \brief Computes the local gradient of the optimal scales
          *
          * \param[in] coords
@@ -393,9 +398,16 @@ namespace FEAT
         virtual const VectorType& get_grad_dist() const = 0;
 
         /**
-         * \brief Returns a const reference to the concentration
+         * \brief Returns a reference to gradient of the optimal scales wrt. the vertex coordinates
          *
-         * \returns A const reference to the concentration.
+         * \returns A reference to gradient of the optimal scales wrt. the vertex coordinates
+         */
+        virtual GradHType& get_grad_h() = 0;
+
+        /**
+         * \brief Returns a const reference to gradient of the optimal scales wrt. the vertex coordinates
+         *
+         * \returns A const reference to gradient of the optimal scales wrt. the vertex coordinates
          */
         virtual const GradHType& get_grad_h() const = 0;
 
@@ -424,10 +436,42 @@ namespace FEAT
          */
         virtual bool use_derivative() const = 0;
 
+        /**
+         * \brief Computes the surface alignment constraint
+         *
+         * \returns The surface alignment constraint
+         */
         virtual CoordType compute_constraint() const = 0;
+
+        /**
+         * \brief Computes the surface alignment constraint at every vertex
+         *
+         * \param[out] constraint_at_vtx
+         * The vector of constraints at every vertex.
+         *
+         * The is for post processing and debugging purposes.
+         *
+         */
         virtual CoordType compute_constraint(CoordType* DOXY(constraint_at_vtx)) const = 0;
+
+        /**
+         * \brief Adds the scaled gradient of the constraint wrt. the vertex coordinates
+         *
+         * \param[in,out] grad
+         * Vector to add the constraint gradient to.
+         *
+         * \param[in] constraint
+         * The current constraint value.
+         *
+         * \param[in] fac
+         * grad <- grad + fac * constraint_grad
+         *
+         */
         virtual void add_constraint_grad(VectorType& DOXY(grad), const CoordType DOXY(constraint), const CoordType DOXY(fac)) const = 0;
 
+        virtual void compute_grad_sum_det(const VectorType& DOXY(coords)) = 0;
+
+        virtual void add_sync_vecs(std::deque<VectorType*>& DOXY(sync_vecs)) = 0;
     };
 
     /**
@@ -482,7 +526,7 @@ namespace FEAT
         <MemType, CoordType, Index, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> GradHType;
         /// Type for one mesh vertex
         typedef Tiny::Vector<CoordType, MeshType::world_dim> WorldPoint;
-
+        /// Surface alignment penalty function
         typedef AlignmentPenalty<CoordType, ShapeType> PenaltyFunction;
 
       protected:
@@ -552,6 +596,15 @@ namespace FEAT
         {
         }
 
+        virtual void add_sync_vecs(std::deque<VectorType*>& sync_vecs) override
+        {
+          if(_func.use_derivative)
+          {
+            sync_vecs.push_back(&_grad_sum_det);
+            sync_vecs.push_back(&_grad_conc);
+          }
+        }
+
         /// \copydoc BaseClass::get_conc()
         virtual const ScalarVectorType& get_conc() const override
         {
@@ -568,6 +621,12 @@ namespace FEAT
         virtual const VectorType& get_grad_dist() const override
         {
           return _grad_dist;
+        }
+
+        /// \copydoc BaseClass::get_grad_h()
+        virtual GradHType& get_grad_h() override
+        {
+          return _grad_h;
         }
 
         /// \copydoc BaseClass::get_grad_h()
@@ -646,6 +705,14 @@ namespace FEAT
 #endif
         }
 
+        virtual void compute_grad_sum_det(const VectorType& coords) override
+        {
+          if(_func.use_derivative)
+          {
+            RefCellTrafo_::compute_grad_sum_det(_grad_sum_det, coords, *(_mesh_node->get_mesh()));
+          }
+        }
+
         /**
          * \brief Computes the local gradient of the concentration function wrt. the vertices
          *
@@ -693,14 +760,7 @@ namespace FEAT
 
           if(_func.use_derivative)
           {
-
-            if(Util::Comm::size()!=1)
-              throw InternalError(__func__,__FILE__,__LINE__,"In parallel, this requires grad_conc to be a type 1 vector, which is not implemented yet.");
-
             CoordType sum_det = RefCellTrafo_::compute_sum_det(coords, *(_mesh_node->get_mesh()));
-            RefCellTrafo_::compute_grad_sum_det(_grad_sum_det, coords, *(_mesh_node->get_mesh()));
-
-            compute_grad_conc();
 
             // Index set for local/global numbering
             auto& idx = _mesh_node->get_mesh()->template get_index_set<ShapeType::dimension,0>();
@@ -714,7 +774,7 @@ namespace FEAT
             // datatype
             FEAT::Tiny::Vector<CoordType, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> tmp(0);
 
-            CoordType exponent = CoordType(1)/CoordType(MeshType::world_dim) - CoordType(1);
+            CoordType exponent(CoordType(1)/CoordType(MeshType::world_dim) - CoordType(1));
 
             for(Index cell(0); cell < _mesh_node->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
             {
@@ -759,7 +819,7 @@ namespace FEAT
          * where \f$ i \f$ is the global index of the local vertex \f$ j \f$.
          *
          */
-        void compute_grad_conc()
+        virtual void compute_grad_conc() override
         {
           // Clear the old gradient
           _grad_conc.format();
@@ -983,6 +1043,7 @@ namespace FEAT
       protected:
         /// List of charts to compute the distance to
         std::deque<String> _chart_list;
+        /// How to mangle more than one distance (add, max, min)
         const String _operation;
 
       public:
@@ -1219,6 +1280,7 @@ namespace FEAT
               {
                 CoordType minval(0);
                 CoordType exponent(1);
+                bool use_derivative(true);
 
                 auto minval_p = my_section->query("minval");
                 if(minval_p.second)
@@ -1228,8 +1290,12 @@ namespace FEAT
                 if(exponent_p.second)
                   exponent = std::stod(exponent_p.first);
 
+                auto use_derivative_p = my_section->query("use_derivative");
+                if(use_derivative_p.second)
+                  use_derivative = (std::stoi(use_derivative_p.first) == 1);
+
                 typedef ConcentrationFunctionPowOfDist<CoordType> ElementalFunction;
-                ElementalFunction my_func(minval, exponent, true);
+                ElementalFunction my_func(minval, exponent, use_derivative);
 
                 auto real_result = std::make_shared<ChartDistanceFunction<ElementalFunction, Trafo_, RefCellTrafo_>>
                   (my_func, chart_list, operation);
