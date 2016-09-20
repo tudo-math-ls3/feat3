@@ -15,13 +15,15 @@ namespace FEAT
     ///type-0 to type-1 matrix conversion
     struct SynchMat1
     {
-      template<typename MT_, typename VMT_, template<typename, typename> class ST_>
+      template<typename MT_, typename VMT_, template<typename, typename> class ST_/*, typename LogT_*/>
       static MT_ exec(const MT_& origin,
                       const ST_<VMT_, std::allocator<VMT_> >& vec_mirrors_row,
                       const ST_<VMT_, std::allocator<VMT_> >& vec_mirrors_column,
                       const ST_<typename MT_::IndexType, std::allocator<typename MT_::IndexType> >& other_ranks,
                       const ST_<typename MT_::IndexType, std::allocator<typename MT_::IndexType> >& tags,
-                      Util::Communicator communicator = Util::Communicator(MPI_COMM_WORLD) )
+                      //LogT_* logger = nullptr,
+                      Util::Communicator communicator = Util::Communicator(MPI_COMM_WORLD)
+                      )
       {
         MT_ result;
         result.clone(origin);
@@ -45,10 +47,12 @@ namespace FEAT
           Assembly::MirrorAssembler::assemble_buffer_matrix(sendbuf_mat, mat_mirror, result);
           mat_mirror.gather(sendbuf_mat, result);
 
+          //logger->log(" sending ", sendbuf_mat);
+
           send_buf.push_back(sendbuf_mat.serialise());
         }
 
-        std::vector<Index> recv_msg_size(vec_mirrors_row.size());
+        Index* recv_msg_size = new Index[vec_mirrors_row.size()];
         for(Index i(0); i < vec_mirrors_row.size();i++)
         {
           Util::CommStatus ss;
@@ -70,7 +74,7 @@ namespace FEAT
 
           prerecvstatus.push_back(rs);
 
-          Util::Comm::recv(&recv_msg_size.at(i),
+          Util::Comm::recv(&recv_msg_size[i],
                       Index(1),
                       other_ranks.at(i),
                       prerecvstatus.at(i),
@@ -79,6 +83,8 @@ namespace FEAT
               );
         }
 
+        Util::Comm::barrier();
+
         for(Index i(0) ; i < vec_mirrors_row.size() ; ++i)
         {
 
@@ -86,10 +92,10 @@ namespace FEAT
 
           recvstatus.push_back(rs);
 
-          recv_buf.push_back(std::vector<char>(recv_msg_size.at(i)));
+          recv_buf.push_back(std::vector<char>(recv_msg_size[i]));
 
           Util::Comm::irecv(recv_buf.at(i).data(),
-                      Index(recv_msg_size.at(i)),
+                      Index(recv_msg_size[i]),
                       other_ranks.at(i),
                       recvrequests.at(i),
                       tags.at(i),
@@ -132,7 +138,8 @@ namespace FEAT
               if(recvflags[i] != 0)
               {
                 MT_ other_mat(recv_buf.at(i));
-                LAFEM::MatrixMirror<VMT_> mat_mirror(vec_mirrors_row.at(i), vec_mirrors_row.at(i));
+                //logger->log(" applying ", other_mat);
+                LAFEM::MatrixMirror<VMT_> mat_mirror(vec_mirrors_row.at(i), vec_mirrors_column.at(i));
                 mat_mirror.scatter_axpy(result, other_mat);
                 ++count;
                 taskflags[i] = 1;
@@ -150,6 +157,7 @@ namespace FEAT
 
         delete[] recvflags;
         delete[] taskflags;
+        delete[] recv_msg_size;
 
         return result;
       }

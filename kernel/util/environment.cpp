@@ -2,6 +2,7 @@
 #include <string>
 
 using namespace FEAT;
+using namespace Util;
 
 #ifdef FEAT_HAVE_MPI
     const Index Environment::MIN_TAG_UB = Index(32767); //given by MPI 3 standard

@@ -33,6 +33,8 @@
 #include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
+#include <kernel/util/whistle_punk.hpp>
+
 namespace PoissonDirichlet2D
 {
   using namespace FEAT;
@@ -330,6 +332,7 @@ namespace PoissonDirichlet2D
     GlobalSystemVectorSolve vec_sol_solve;
     vec_sol_solve.convert(&system_levels_solve.back()->gate_sys, vec_sol);
 
+    Util::WhistlePunk<> wp;
 
     ///Create local matrices
     auto kt(system_levels.begin());
@@ -339,7 +342,10 @@ namespace PoissonDirichlet2D
       auto& kt_ranks((*kt)->gate_sys._ranks);
       auto& kt_tags((*kt)->gate_sys._ctags);
       auto& kt_mirrors((*kt)->gate_sys._mirrors);
-      auto it_matrix(Global::SynchMat1::exec( *((*kt)->matrix_sys), kt_mirrors, kt_mirrors, kt_ranks, kt_tags));
+
+      wp.log(" A0: ", *((*kt)->matrix_sys));
+      auto it_matrix(Global::SynchMat1::exec( *((*kt)->matrix_sys), kt_mirrors, kt_mirrors, kt_ranks, kt_tags/*,&wp*/));
+      wp.log(" A1: ", it_matrix);
       LocalSystemMatrixSolve it_matrix_solve;
       it_matrix_solve.convert(it_matrix);
       local_matrices_solve.push_back(std::move(it_matrix_solve));
@@ -411,6 +417,7 @@ namespace PoissonDirichlet2D
 
       auto inner_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), DataType(1), inner_multigrid);
       inner_solver->init();
+      inner_solver->set_max_iter(2);
       inner_solver->set_plot(rank == 0);
 
       //auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
@@ -432,7 +439,7 @@ namespace PoissonDirichlet2D
 
     auto outer_multigrid = Solver::new_multigrid(
       outer_multigrid_hierarchy,
-      Solver::MultiGridCycle::V);
+      Solver::MultiGridCycle::W);
 
     auto outer_solver = Solver::new_richardson(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys, DataType(1), outer_multigrid);
     outer_multigrid_hierarchy->init();
@@ -441,18 +448,19 @@ namespace PoissonDirichlet2D
     // enable plotting
     outer_solver->set_plot(rank == 0);
 
-    auto outer_krylov(Solver::new_pcg(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys, outer_solver));
+    //auto outer_krylov(Solver::new_pcg(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys, outer_solver));
 
     // set tolerance
     outer_solver->set_tol_rel(1E-8);
-    outer_krylov->set_tol_rel(1E-8);
+    //outer_krylov->set_tol_rel(1E-8);
     //outer_solver->set_max_iter(1000);
-    outer_solver->set_max_iter(1);
-    outer_krylov->set_max_iter(1000);
+    outer_solver->set_max_iter(100);
+    //outer_krylov->set_max_iter(1000);
 
     // initialise
-    outer_krylov->set_plot(rank == 0);
-    outer_krylov->init();
+    //outer_krylov->set_plot(rank == 0);
+    //outer_krylov->init();
+    outer_solver->init();
 
     Statistics::reset_flops();
     Statistics::reset_times();
@@ -462,16 +470,18 @@ namespace PoissonDirichlet2D
 
     // solve
     //Solver::solve(*outer_solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
-    Solver::solve(*outer_krylov, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+    //Solver::solve(*outer_krylov, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+    Solver::solve(*outer_solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
 
     double solver_toe(at.elapsed_now());
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
     system_levels, transfer_levels, domain);
 
     // release solver
-    outer_krylov->done();
-    outer_multigrid_hierarchy->done();
-    inner_multigrid_hierarchy->done();
+    //outer_krylov->done();
+    outer_solver->done();
+    //outer_multigrid_hierarchy->done();
+    //inner_multigrid_hierarchy->done();
 
     // download solution
     vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
@@ -492,7 +502,7 @@ namespace PoissonDirichlet2D
     if (args.check("vtk") >= 0)
     {
       // build VTK name
-      String vtk_name = String("./poisson-dirichlet-2d");
+      String vtk_name = String("./scarckin-poisson-dirichlet-2d");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(nprocs);
 
@@ -515,6 +525,12 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
+
+    //logger ouput
+    wp.synch();
+
+    //if(Util::Comm::rank() == 0)
+    //  std::cout << wp.msg;
 
     // clean up
     while (!transfer_levels_solve.empty())

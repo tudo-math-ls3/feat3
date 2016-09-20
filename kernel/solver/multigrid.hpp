@@ -1754,11 +1754,18 @@ namespace FEAT
           auto alpha(lvl_f.level->get_alpha_adaptive_coarse_correction());
           decltype(lvl_f.vec_cor) tmp(lvl_f.vec_cor.size());
           lvl_f.level->get_system_matrix().apply(tmp, lvl_f.vec_cor);
+          system_filter_f.filter_def(tmp);
           auto t = lvl_f.vec_cor.dot(tmp);
-          if (Math::abs(t) < 1e-13)
-            alpha = 1.;
-          else
-            alpha = lvl_f.vec_cor.dot(lvl_f.vec_def) / t;
+
+          ///energy norm
+          alpha = lvl_f.vec_cor.dot(lvl_f.vec_def) / (Math::abs(t) < std::numeric_limits<decltype(alpha)>::epsilon() ? (t < 0 ? -std::numeric_limits<decltype(alpha)>::epsilon() : std::numeric_limits<decltype(alpha)>::epsilon()) : t);
+          ///defect norm
+          //alpha = lvl_f.vec_def.dot(lvl_f.vec_def) / (Math::abs(t) < std::numeric_limits<decltype(alpha)>::epsilon() ? (t < 0 ? -std::numeric_limits<decltype(alpha)>::epsilon() : std::numeric_limits<decltype(alpha)>::epsilon()) : t);
+          ///no adaption
+          //alpha = typename BaseClass::DataType(1.);
+
+          //std::cout << alpha << std::endl;
+
           lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, alpha);
 
           // get our post-smoother
