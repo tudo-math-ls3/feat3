@@ -279,7 +279,7 @@ namespace FEAT
             FEAT::Statistics::expression_target = name();
             try
             {
-              Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+              Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim());
             }
             catch(std::exception& e)
             {
@@ -290,6 +290,8 @@ namespace FEAT
               Util::mpi_cout("Nonlinear preconditioner:\n");
               precond->print();
             }
+
+            Util::mpi_cout("\n");
             (*(_system_levels.back()->op_sys)).print();
           }
 

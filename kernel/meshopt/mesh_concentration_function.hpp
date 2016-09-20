@@ -40,29 +40,28 @@ namespace FEAT
       typedef DT_ DataType;
       typedef Shape::Simplex<2> ShapeType;
 
-      template<typename Mesh_, typename Dist_>
-      static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist)
+      template<typename Mesh_, typename Dist_, typename EdgeFreqs_>
+      static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist, const EdgeFreqs_& edge_freqs)
       {
         DataType constraint(0);
         const auto edge_idx = mesh.template get_index_set<1,0>();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
-          constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
+          constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
             eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
         }
 
 #ifdef FEAT_HAVE_MPI
-        DataType constraint_snd(constraint);
-        Util::Comm::allreduce(&constraint_snd, &constraint, 1, Util::CommOperationSum());
+        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
 #endif
 
         // DEBUG
         return DataType(2)*constraint;
       }
 
-      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_>
+      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_, typename EdgeFreqs_>
       static void add_constraint_grad(
-        Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist, const GradDist_& grad_dist)
+        Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist, const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
       {
         const auto edge_idx = mesh.template get_index_set<1,0>();
         /// Type of a mesh vertex
@@ -81,11 +80,11 @@ namespace FEAT
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
           // DEBUG
-          grad(i, grad(i)+DataType(2)*grad_loc);
+          grad(i, grad(i) + edge_freqs(edge)*DataType(2)*grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
           // DEBUG
-          grad(j, grad(j)+DataType(2)*grad_loc);
+          grad(j, grad(j) + edge_freqs(edge)*DataType(2)*grad_loc);
         }
       }
 
@@ -116,8 +115,7 @@ namespace FEAT
         }
 
 #ifdef FEAT_HAVE_MPI
-        DataType constraint_snd(constraint);
-        Util::Comm::allreduce(&constraint_snd, &constraint, 1, Util::CommOperationSum());
+        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
 #endif
         return constraint;
       }
@@ -131,14 +129,14 @@ namespace FEAT
       typedef DT_ DataType;
       typedef Shape::Hypercube<2> ShapeType;
 
-      template<typename Mesh_, typename Dist_>
-      static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist)
+      template<typename Mesh_, typename Dist_, typename EdgeFreqs_>
+      static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist, const EdgeFreqs_& edge_freqs)
       {
         DataType constraint(0);
         const auto edge_idx = mesh.template get_index_set<1,0>();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
-          constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
+          constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
             eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
         }
 
@@ -152,8 +150,7 @@ namespace FEAT
         }
 
 #ifdef FEAT_HAVE_MPI
-        DataType constraint_snd(constraint);
-        Util::Comm::allreduce(&constraint_snd, &constraint, 1, Util::CommOperationSum());
+        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
 #endif
 
         // DEBUG
@@ -198,9 +195,10 @@ namespace FEAT
         return constraint;
       }
 
-      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_>
+      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_, typename EdgeFreqs_>
       static void add_constraint_grad(
-        Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist, const GradDist_& grad_dist)
+        Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist,
+        const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
       {
         const auto edge_idx = mesh.template get_index_set<1,0>();
         /// Type of a mesh vertex
@@ -219,11 +217,11 @@ namespace FEAT
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
           // DEBUG
-          grad(i, grad(i)+DataType(2)*grad_loc);
+          grad(i, grad(i) + edge_freqs(edge)*DataType(2)*grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
           // DEBUG
-          grad(j, grad(j)+DataType(2)*grad_loc);
+          grad(j, grad(j) + edge_freqs(edge)*DataType(2)*grad_loc);
         }
 
         const auto cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
@@ -549,6 +547,8 @@ namespace FEAT
         /// The scalar function mapping distance to concentration
         ElementalFunction _func;
 
+        /// For each edge, this contains 1/(# halos it is present in)
+        ScalarVectorType _edge_freqs;
         /// For all vertices, this holds their scalar "distance" to whatever
         ScalarVectorType _dist;
         /// For all vertices, this holds the gradient of the distance function
@@ -578,6 +578,7 @@ namespace FEAT
         MeshConcentrationFunction(const ElementalFunction& func_) :
           _mesh_node(nullptr),
           _func(func_),
+          _edge_freqs(),
           _dist(),
           _grad_dist(),
           _sum_conc(CoordType(0)),
@@ -588,7 +589,6 @@ namespace FEAT
           {
           }
 
-      protected:
         ///**
         // *
         // */
@@ -666,14 +666,28 @@ namespace FEAT
           _sum_conc = CoordType(0);
 
           Index ndofs(_mesh_node->get_mesh()->get_num_entities(0));
+          Index nedges(_mesh_node->get_mesh()->get_num_entities(1));
           Index ncells(_mesh_node->get_mesh()->get_num_entities(ShapeType::dimension));
 
+          _edge_freqs = ScalarVectorType(nedges, CoordType(1));
           _dist = ScalarVectorType(ndofs, CoordType(0));
           _grad_dist = VectorType(ndofs,CoordType(0));
           _conc = ScalarVectorType(ncells);
           _grad_conc = VectorType(ndofs, CoordType(0));
           _grad_h = GradHType(ncells,CoordType(0));
           _grad_sum_det = VectorType(ndofs, CoordType(0));
+
+          for(const auto& it: _mesh_node->get_mesh_part_names())
+          {
+            if(it.starts_with("_halo"))
+            {
+              const auto& edge_ts = _mesh_node->find_mesh_part(it)->template get_target_set<1>();
+              for(Index edge(0); edge < edge_ts.get_num_entities(); ++edge)
+                _edge_freqs(edge_ts[edge], _edge_freqs(edge_ts[edge])+CoordType(1));
+            }
+          }
+          _edge_freqs.component_invert(_edge_freqs, CoordType(1));
+
         }
 
         /// \copydoc BaseClass::use_derivative()
@@ -884,7 +898,7 @@ namespace FEAT
         /// \copydoc BaseClass::compute_constraint()
         virtual CoordType compute_constraint() const override
         {
-            return PenaltyFunction::compute_constraint(*(_mesh_node->get_mesh()), this->_dist);
+            return PenaltyFunction::compute_constraint(*(_mesh_node->get_mesh()), this->_dist, this->_edge_freqs);
         }
 
         virtual CoordType compute_constraint(CoordType* constraint_vec) const override
@@ -995,7 +1009,7 @@ namespace FEAT
           VectorType& grad, const CoordType alignment_fval, const CoordType penalty_param) const override
         {
           PenaltyFunction::add_constraint_grad(
-            grad, alignment_fval, penalty_param, *(_mesh_node->get_mesh()), _dist, _grad_dist);
+            grad, alignment_fval, penalty_param, *(_mesh_node->get_mesh()), _dist, _grad_dist, this->_edge_freqs);
         }
 
     }; // class MeshConcentrationFunction
@@ -1396,11 +1410,8 @@ namespace FEAT
 
         /**
          * \brief Empty destructor
-         *
-         * The shall be no classes derived from this, so this is non-virtual.
-         *
          */
-        ~ConcentrationFunctionDefault()
+        virtual ~ConcentrationFunctionDefault()
         {
         }
 
@@ -1420,7 +1431,7 @@ namespace FEAT
         virtual void print() const
         {
           Util::mpi_cout(name()+" settings:\n");
-          Util::mpi_cout_pad_line("Function:","c(d) = |d|\n");
+          Util::mpi_cout_pad_line("Function:","c(d) = |d|");
           Util::mpi_cout_pad_line("use_derivative:",use_derivative);
         }
 
@@ -1507,10 +1518,8 @@ namespace FEAT
         /**
          * \brief Empty destructor
          *
-         * The shall be no classes derived from this, so this is non-virtual.
-         *
          */
-        ~ConcentrationFunctionPowOfDist()
+        virtual ~ConcentrationFunctionPowOfDist()
         {
         }
 

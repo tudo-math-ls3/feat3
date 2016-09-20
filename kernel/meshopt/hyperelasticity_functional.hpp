@@ -283,7 +283,7 @@ namespace FEAT
         std::shared_ptr<FunctionalType> _functional;
         /// The mesh concentration function (if any)
         std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
-
+        /// These are the vectors that need to be synchronised (type-0 to type-1)
         std::deque<VectorTypeR*> sync_vecs;
 
       protected:
@@ -416,6 +416,9 @@ namespace FEAT
           _penalty_param(penalty_param_),
           _alignment_constraint(0)
           {
+
+            XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
+
             if(( _scale_computation == ScaleComputation::once_concentration ||
                   _scale_computation == ScaleComputation::current_concentration ||
                   _scale_computation == ScaleComputation::iter_concentration ) &&
