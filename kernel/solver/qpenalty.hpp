@@ -153,8 +153,6 @@ namespace FEAT
 
           const Index inner_iter_digits(Math::ilog10(_inner_solver->get_max_iter()));
 
-          DataType penalty_param(1);
-          _op.set_penalty_param(penalty_param);
           Status st(_set_initial_defect(_op.get_constraint()));
 
           IterationStats stat(*this);
@@ -176,9 +174,9 @@ namespace FEAT
 
             // After the inner solver was called, the constraint is already there so we can just get() it
             this->_def_cur = _op.get_constraint();
-            penalty_param = _op.get_penalty_param();
+            DataType penalty_param(_op.get_penalty_param());
 
-            if(Util::Comm::rank() == 0)
+            if(this->_plot)
             {
               std::cout << this->_plot_name
               << ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
@@ -268,7 +266,7 @@ namespace FEAT
         this->_num_stag_iter = Index(0);
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
-        // plot?
+        // Plot?
         if(this->_plot)
         {
           std::cout << this->_plot_name
@@ -276,11 +274,11 @@ namespace FEAT
             << " : " << stringify_fp_sci(this->_def_init) << std::endl;
         }
 
-        // ensure that the defect is neither NaN nor infinity
+        // Ensure that the defect is neither NaN nor infinity
         if(!Math::isfinite(this->_def_init))
           return Status::aborted;
 
-        // check if the initial defect is zero; we test against eps^2 here
+        // Check if the initial defect lower than the absolute tolerance
         if(this->_def_init <= this->_tol_abs)
           return Status::success;
 
