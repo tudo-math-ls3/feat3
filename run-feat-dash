@@ -197,7 +197,8 @@ def run_test(build_id, branch, myDB, extra_opts):
   if mpi_only:
     label_flag = "--label-regex mpi"
   else
-    label_flag = "--label-exclude mpi"
+    label_flag = ""
+  #  label_flag = "--label-exclude mpi"
   test_command = "ctest " + label_flag + " --output-on-failure --schedule-random --output-log " + dump_filename_full + ".ctest"
   test_output = get_output_utf8(test_command)
 
@@ -487,26 +488,27 @@ for branch in branch_names:
   run_test("guess", branch, myDB, extra_opts)
 
 #TODO valgrind/cudamemcheck mit opt ?
-  #if is_found ("valgrind") and is_found ("nvcc") and is_found("g++") and not novalgrind and not nocudamemcheck:
-  # run_test("gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-  if is_found ("valgrind") and is_found("g++") and not novalgrind:
-    addition_without_cuda = addition.replace("-cuda", "");
-    run_test("gcc-debug-valgrind" + addition_without_cuda + quadmath_add, branch, myDB, extra_opts)
-  if is_found ("nvcc") and is_found("g++") and not nocudamemcheck:
-    run_test("gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+  if not mpi_only:
+    #if is_found ("valgrind") and is_found ("nvcc") and is_found("g++") and not novalgrind and not nocudamemcheck:
+    # run_test("gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+    if is_found ("valgrind") and is_found("g++") and not novalgrind:
+      addition_without_cuda = addition.replace("-cuda", "");
+      run_test("gcc-debug-valgrind" + addition_without_cuda + quadmath_add, branch, myDB, extra_opts)
+    if is_found ("nvcc") and is_found("g++") and not nocudamemcheck:
+      run_test("gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
 
-  if is_found("g++"):
-    run_test("gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
-    run_test("gcc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts)
-  if is_found("clang++"):
-    run_test("clang-debug" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
-    run_test("clang-opt" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
-  if is_found("icpc"):
-    run_test("icc-debug" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
-    run_test("icc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
-  if is_found("pgc++"):
-    run_test("pgi-debug" + addition + quadmath_add, branch, myDB, extra_opts)
-    run_test("pgi-opt" + addition + quadmath_add, branch, myDB, extra_opts)
+    if is_found("g++"):
+      run_test("gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("gcc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts)
+    if is_found("clang++"):
+      run_test("clang-debug" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
+      run_test("clang-opt" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
+    if is_found("icpc"):
+      run_test("icc-debug" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
+      run_test("icc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
+    if is_found("pgc++"):
+      run_test("pgi-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("pgi-opt" + addition + quadmath_add, branch, myDB, extra_opts)
 
   if is_found("mpic++"):
     if is_found("g++"):
