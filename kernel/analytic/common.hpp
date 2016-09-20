@@ -2149,6 +2149,34 @@ namespace FEAT
           }
         };
       }; // class ParProfileVector
+
+      template<typename DT_>
+        class ExpScalarStatic
+        {
+          public:
+            static constexpr DT_ p = DT_(10);
+
+            static DT_ eval(DT_ x)
+            {
+              return (Math::exp(p) - Math::exp(p*x*x)) / (Math::exp(p) - DT_(1));
+            }
+
+            static DT_ der_x(DT_ x)
+            {
+              return -DT_(2)*p*x*Math::exp(p*x*x)/(Math::exp(p)-DT_(1));
+            }
+
+            static DT_ der_xx(DT_ x)
+            {
+              return -DT_(2)*p*Math::exp(p*x*x)*(DT_(2)*p*x*x+DT_(1))/(Math::exp(p)-DT_(1));
+            }
+        };
+
+      template<typename DataType_>
+        using ExpStatic = Analytic::Common::TensorStatic<ExpScalarStatic<DataType_>, DataType_>;
+
+      template<int dim_>
+        using ExpFunction = Analytic::StaticWrapperFunction<dim_, ExpStatic, true, true, true>;
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT
