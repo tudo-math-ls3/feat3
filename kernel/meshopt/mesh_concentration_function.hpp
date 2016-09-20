@@ -12,6 +12,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/comm_base.hpp>
 #include <kernel/util/property_map.hpp>
+#include <kernel/util/mpi_cout.hpp>
 
 #include <deque>
 
@@ -321,6 +322,11 @@ namespace FEAT
         }
 
         /**
+         * \brief Prints relevant information
+         */
+        virtual void print() const = 0;
+
+        /**
          * \brief Creates an empty clone of itself
          *
          * This function is handy for creating empty copies of objects of a derived class, which is used in
@@ -412,13 +418,6 @@ namespace FEAT
         virtual const GradHType& get_grad_h() const = 0;
 
         /**
-         * \brief Returns a descriptive String
-         *
-         * \returns The class name as String.
-         */
-        virtual String name() const = 0;
-
-        /**
          * \brief Sets this object's mesh node
          *
          * \param[in] mesh_node_
@@ -469,9 +468,24 @@ namespace FEAT
          */
         virtual void add_constraint_grad(VectorType& DOXY(grad), const CoordType DOXY(constraint), const CoordType DOXY(fac)) const = 0;
 
+        /**
+         * \brief Computes the gradient of the sum of all determinants of the trafo
+         *
+         * \param[in] coords
+         * Set of coordinates to compute the gradient for
+         *
+         */
         virtual void compute_grad_sum_det(const VectorType& DOXY(coords)) = 0;
 
+        /**
+         * \brief Adds pointers to vectors that need synchronising (type-0 to type-1 vectors)
+         *
+         * \param[in,out] sync_vecs
+         * deque holding pointers to all vector that need synchronising.
+         *
+         */
         virtual void add_sync_vecs(std::deque<VectorType*>& DOXY(sync_vecs)) = 0;
+
     };
 
     /**
@@ -596,6 +610,7 @@ namespace FEAT
         {
         }
 
+        /// \copydoc BaseClass::add_sync_vecs()
         virtual void add_sync_vecs(std::deque<VectorType*>& sync_vecs) override
         {
           if(_func.use_derivative)
@@ -635,6 +650,12 @@ namespace FEAT
           return _grad_h;
         }
 
+        /// copydoc BaseClass::print()
+        virtual void print() const override
+        {
+          _func.print();
+        }
+
         /// \copydoc BaseClass::set_mesh_node()
         virtual void set_mesh_node(const Geometry::RootMeshNode<MeshType>* mesh_node_) override
         {
@@ -653,12 +674,6 @@ namespace FEAT
           _grad_conc = VectorType(ndofs, CoordType(0));
           _grad_h = GradHType(ncells,CoordType(0));
           _grad_sum_det = VectorType(ndofs, CoordType(0));
-        }
-
-        /// \copydoc BaseClass::name()
-        virtual String name() const override
-        {
-          return "MeshConcentrationFunction<>";
         }
 
         /// \copydoc BaseClass::use_derivative()
@@ -705,6 +720,7 @@ namespace FEAT
 #endif
         }
 
+        /// \copydoc BaseClass:compute_grad_sum_det()
         virtual void compute_grad_sum_det(const VectorType& coords) override
         {
           if(_func.use_derivative)
@@ -1207,6 +1223,22 @@ namespace FEAT
             this->_grad_dist(i, my_dist_vec);
           }
         }
+
+        static String name()
+        {
+          return "ChartDistanceFunction<"+ElementalFunction::name()+">";
+        }
+
+        /// \copydoc BaseClass::print()
+        virtual void print() const override
+        {
+          Util::mpi_cout(name()+" settings:\n");
+          DirectBaseClass::print();
+          Util::mpi_cout_pad_line("Operation:",_operation);
+          for(const auto& it:_chart_list)
+            Util::mpi_cout_pad_line("DistanceChart:",it);
+        }
+
     }; // class ChartDistanceFunction
 
     /**
@@ -1373,6 +1405,26 @@ namespace FEAT
         }
 
         /**
+         * \brief Returns a descriptive String
+         *
+         * \returns The class name as String.
+         */
+        static String name()
+        {
+          return "ConcentrationFunctionDefault";
+        }
+
+        /**
+         * \brief Prints relevant information
+         */
+        virtual void print() const
+        {
+          Util::mpi_cout(name()+" settings:\n");
+          Util::mpi_cout_pad_line("Function:","c(d) = |d|\n");
+          Util::mpi_cout_pad_line("use_derivative:",use_derivative);
+        }
+
+        /**
          * \brief Computes the concentration according to a distance.
          *
          * \param[in] dist
@@ -1460,6 +1512,28 @@ namespace FEAT
          */
         ~ConcentrationFunctionPowOfDist()
         {
+        }
+
+        /**
+         * \brief Returns a descriptive String
+         *
+         * \returns The class name as String.
+         */
+        static String name()
+        {
+          return "ConcentrationFunctionPowOfDist";
+        }
+
+        /**
+         * \brief Prints relevant information
+         */
+        virtual void print() const
+        {
+          Util::mpi_cout(name()+" settings:\n");
+          Util::mpi_cout_pad_line("Function:","c(d) = (alpha + |d|)^beta");
+          Util::mpi_cout_pad_line("alpha:",_minval);
+          Util::mpi_cout_pad_line("beta:",_exponent);
+          Util::mpi_cout_pad_line("use_derivative:",use_derivative);
         }
 
         /**

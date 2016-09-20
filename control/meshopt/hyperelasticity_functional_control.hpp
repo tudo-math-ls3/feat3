@@ -275,8 +275,6 @@ namespace FEAT
               Util::mpi_cout_pad_line("Unilateral BC of place on",it);
 
             Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
-            (*(_system_levels.back()->op_sys)).print();
-            Util::mpi_cout("\n");
 
             FEAT::Statistics::expression_target = name();
             try
@@ -292,6 +290,7 @@ namespace FEAT
               Util::mpi_cout("Nonlinear preconditioner:\n");
               precond->print();
             }
+            (*(_system_levels.back()->op_sys)).print();
           }
 
           /// \copydoc BaseClass::get_coords()

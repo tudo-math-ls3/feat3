@@ -505,8 +505,8 @@ namespace FEAT
         {
           Util::mpi_cout_pad_line("Scale computation",_scale_computation);
           _functional->print();
-          //if(_mesh_conc != nullptr)
-          //  _mesh_conc->print();
+          if(_mesh_conc != nullptr)
+            _mesh_conc->print();
         }
 
         /// \copydoc BaseClass::add_to_vtk_exporter()
