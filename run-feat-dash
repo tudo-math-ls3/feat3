@@ -196,7 +196,7 @@ def run_test(build_id, branch, myDB, extra_opts):
 ######### TEST #####################
   if mpi_only:
     label_flag = "--label-regex mpi"
-  else
+  else:
     label_flag = ""
   #  label_flag = "--label-exclude mpi"
   test_command = "ctest " + label_flag + " --output-on-failure --schedule-random --output-log " + dump_filename_full + ".ctest"
