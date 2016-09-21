@@ -169,13 +169,17 @@ def run_test(build_id, branch, myDB, extra_opts):
         idx += 1
 
   if "ninja" in build_id:
-    make_command = "ninja -v -k 999 -l " + str(max(2, multiprocessing.cpu_count() - 2)) + " all tests"
+    ninja_target = " all"
+    if not mpi_only:
+      ninja_target += " tests"
+    make_command = "ninja -v -k 999 -l " + str(max(2, multiprocessing.cpu_count() - 2)) + ninja_target
     make_output = get_output_utf8(make_command)
   else:
     make_command = "make -j 4 -O -k all"
     make_output = get_output_utf8(make_command)
-    make_command = "make -j 4 -O -k tests"
-    make_output += get_output_utf8(make_command)
+    if not mpi_only:
+      make_command = "make -j 4 -O -k tests"
+      make_output += get_output_utf8(make_command)
 
   process_compiler_output("remark:", "warning", make_output)
   process_compiler_output("remark #", "warning", make_output)
