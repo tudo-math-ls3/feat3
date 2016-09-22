@@ -58,6 +58,8 @@ namespace FEAT
         OperatorType& _op;
         /// The inner solver for the penalised, unconstrained optimisation problem
         std::shared_ptr<IterativeSolver<VectorType>> _inner_solver;
+        /// We start with this initial penalty parameter
+        DataType _initial_penalty_param;
         /// Maximum value the penalty parameter is allowed to take
         DataType _tol_penalty;
 
@@ -71,10 +73,12 @@ namespace FEAT
          * \param[in] inner_solver
          * The solver for the inner penalised unconstrained optimisation problem
          */
-        explicit QPenalty(OperatorType& op, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
+        explicit QPenalty(OperatorType& op, std::shared_ptr<IterativeSolver<VectorType>> inner_solver,
+        DataType initial_penalty_param = DataType(1)) :
           BaseClass("QPenalty"),
           _op(op),
           _inner_solver(inner_solver),
+          _initial_penalty_param(initial_penalty_param),
           _tol_penalty(Math::pow(Math::huge<DataType>(), DataType(0.25)))
         {
         }
@@ -113,7 +117,7 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          _op.set_penalty_param(DataType(1));
+          _op.set_penalty_param(_initial_penalty_param);
 
           // clear solution vector
           vec_cor.format();
@@ -125,7 +129,7 @@ namespace FEAT
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
         {
-          _op.set_penalty_param(DataType(1));
+          _op.set_penalty_param(_initial_penalty_param);
 
           // apply
           Status st =_apply_intern(vec_sol, vec_rhs);
@@ -305,9 +309,11 @@ namespace FEAT
      */
     template<typename Operator_>
     inline std::shared_ptr<QPenalty<Operator_>> new_qpenalty( Operator_& op,
-    std::shared_ptr<IterativeSolver<typename Operator_::VectorTypeR>> inner_solver)
+    std::shared_ptr<IterativeSolver<typename Operator_::VectorTypeR>> inner_solver,
+    typename Operator_::VectorTypeR::DataType initial_penalty_param =
+    typename Operator_::VectorTypeR::DataType(1))
     {
-      return std::make_shared<QPenalty<Operator_>>(op, inner_solver);
+      return std::make_shared<QPenalty<Operator_>>(op, inner_solver, initial_penalty_param);
     }
   }
 } // namespace FEAT

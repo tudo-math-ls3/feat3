@@ -485,6 +485,7 @@ namespace FEAT
         {
           typedef typename SystemLevelType_::GlobalQualityFunctional OperatorType;
           typedef typename SystemLevelType_::GlobalSystemFilter FilterType;
+          typedef typename SolverVectorType_::DataType DataType;
 
           std::shared_ptr<Solver::IterativeSolver<SolverVectorType_> > result;
 
@@ -507,8 +508,14 @@ namespace FEAT
             inner_solver = create_nonlinear_optimiser(system_levels, transfer_levels, base, inner_solver_p.first,
             precon);
 
+
+            DataType initial_penalty_param(1);
+            auto initial_penalty_param_p = section->query("initial_penalty_param");
+            if(initial_penalty_param_p.second)
+              initial_penalty_param = DataType(std::stod(initial_penalty_param_p.first));
+
             result = Solver::new_qpenalty(derefer<SolverVectorType_>
-                (system_levels.back()->op_sys, nullptr), inner_solver);
+                (system_levels.back()->op_sys, nullptr), inner_solver, initial_penalty_param);
 
             configure_iterative_solver(section, result);
 
