@@ -276,29 +276,55 @@ namespace FEAT
          */
         DataType compute_func()
         {
-          DataType my_fval(_nonlinear_functional.compute_func());
+          // As the penalty term is quadratic, we have to compute the local functional values separately for summing
+          // them up over all ranks
+          DataType my_fval(_nonlinear_functional.compute_func_without_penalty());
 #ifdef FEAT_HAVE_MPI
-          DataType my_fval_send(my_fval);
-          Util::Comm::allreduce(&my_fval_send, &my_fval, 1, Util::CommOperationSum());
+          Util::Comm::allreduce(&my_fval, &my_fval, 1, Util::CommOperationSum());
 #endif
+          // Add the penalty term
+          if(get_penalty_param() > DataType(0))
+          {
+            DataType constraint(get_constraint());
+            my_fval += get_penalty_param()*DataType(0.5)*Math::sqr(constraint);
+          }
+
           return my_fval;
         }
 
+        /**
+         * \brief Get the penalty parameter from the local nonlinear functional
+         *
+         * \returns A copy of the local nonlinear functional's penalty parameter
+         */
         DataType get_penalty_param() const
         {
           return _nonlinear_functional.get_penalty_param();
         }
 
+        /**
+         * \brief Sets the local functional's penalty parameter
+         */
         void set_penalty_param(const DataType fac)
         {
           _nonlinear_functional.set_penalty_param(fac);
         }
 
+        /**
+         * \brief Get the constraint from the local nonlinear functional
+         *
+         * \returns A copy of the global nonlinear functional's constraint
+         */
         DataType get_constraint()
         {
           return _nonlinear_functional.get_constraint();
         }
 
+        /**
+         * \brief Computes the constraint and returns it
+         *
+         * \returns The global nonlinear functional's constraint
+         */
         DataType compute_constraint()
         {
           return _nonlinear_functional.compute_constraint();

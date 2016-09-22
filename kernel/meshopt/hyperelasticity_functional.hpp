@@ -1099,10 +1099,7 @@ namespace FEAT
         /// \copydoc HyperelasticityFunctionalBase::compute_func()
         virtual CoordType compute_func() override
         {
-          // Increase number of functional evaluations
-          this->_num_func_evals++;
-
-          DataType fval(static_cast<const HyperelasticityFunctional*>(this)->_compute_func_intern());
+          DataType fval(compute_func_without_penalty());
 
           if(this->_penalty_param > DataType(0))
           {
@@ -1111,6 +1108,37 @@ namespace FEAT
           }
           return fval;
         }
+
+        /// \copydoc HyperelasticityFunctionalBase::compute_func()
+        virtual CoordType compute_func_without_penalty()
+        {
+          // Increase number of functional evaluations
+          this->_num_func_evals++;
+
+          CoordType fval(0);
+          // Total number of cells in the mesh
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          // Local cell dimensions for passing to other routines
+          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            h = this->_h(cell);
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+
+            fval += this->_mu(cell) * this->_functional->compute_local_functional(x,h);
+          }
+
+          return fval;
+        } // compute_func
 
         /// \copydoc compute_func(CoordType*,CoordType*,CoordType*)
         virtual CoordType compute_func_cellwise(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det) const override
@@ -1181,35 +1209,6 @@ namespace FEAT
         }
 
       protected:
-        /// \copydoc HyperelasticityFunctionalBase::compute_func()
-        virtual CoordType _compute_func_intern() const
-        {
-          CoordType fval(0);
-          // Total number of cells in the mesh
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-
-          // Index set for local/global numbering
-          const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
-
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
-          // Local cell dimensions for passing to other routines
-          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
-
-          // Compute the functional value for each cell
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            h = this->_h(cell);
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
-
-            fval += this->_mu(cell) * this->_functional->compute_local_functional(x,h);
-          }
-
-          return fval;
-        } // compute_func
-
-
         /// \copydoc BaseClass::compute_grad()
         virtual void _compute_grad_with_conc(VectorTypeL& grad) const
         {

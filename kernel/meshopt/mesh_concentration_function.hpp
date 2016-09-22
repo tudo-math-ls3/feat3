@@ -54,38 +54,8 @@ namespace FEAT
 #ifdef FEAT_HAVE_MPI
         Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
 #endif
-
         // DEBUG
         return DataType(2)*constraint;
-      }
-
-      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_, typename EdgeFreqs_>
-      static void add_constraint_grad(
-        Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist, const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
-      {
-        const auto edge_idx = mesh.template get_index_set<1,0>();
-        /// Type of a mesh vertex
-        typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
-
-        WorldPoint grad_loc(DataType(0));
-
-        for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
-        {
-          Index i(edge_idx(edge,0));
-          Index j(edge_idx(edge,1));
-
-          auto dist_prod =  dist(i) * dist(j);
-          // Derivative of the heaviside function
-          auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
-
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i) + edge_freqs(edge)*DataType(2)*grad_loc);
-
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j) + edge_freqs(edge)*DataType(2)*grad_loc);
-        }
       }
 
       template<typename Mesh_, typename Dist_>
@@ -118,6 +88,35 @@ namespace FEAT
         Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
 #endif
         return constraint;
+      }
+
+      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_, typename EdgeFreqs_>
+      static void add_constraint_grad(
+        Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist, const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
+      {
+        const auto edge_idx = mesh.template get_index_set<1,0>();
+        /// Type of a mesh vertex
+        typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
+
+        WorldPoint grad_loc(DataType(0));
+
+        for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
+        {
+          Index i(edge_idx(edge,0));
+          Index j(edge_idx(edge,1));
+
+          auto dist_prod =  dist(i) * dist(j);
+          // Derivative of the heaviside function
+          auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
+
+          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
+          // DEBUG
+          grad(i, grad(i) + DataType(2)*edge_freqs(edge)*grad_loc);
+
+          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
+          // DEBUG
+          grad(j, grad(j) + DataType(2)*edge_freqs(edge)*grad_loc);
+        }
       }
 
     };
@@ -687,7 +686,6 @@ namespace FEAT
             }
           }
           _edge_freqs.component_invert(_edge_freqs, CoordType(1));
-
         }
 
         /// \copydoc BaseClass::use_derivative()
@@ -901,110 +899,14 @@ namespace FEAT
             return PenaltyFunction::compute_constraint(*(_mesh_node->get_mesh()), this->_dist, this->_edge_freqs);
         }
 
+        /// \copydoc BaseClass::compute_constraint()
         virtual CoordType compute_constraint(CoordType* constraint_vec) const override
         {
           XASSERT(constraint_vec != nullptr);
           return PenaltyFunction::compute_constraint(constraint_vec, *(_mesh_node->get_mesh()), this->_dist);
         }
 
-//        virtual CoordType compute_constraint(CoordType* constraint_vec) const override
-//        {
-//          XASSERT(constraint_vec != nullptr);
-//
-//          for(Index i(0); i < _mesh_node->get_mesh()->get_num_entities(0); ++i)
-//            constraint_vec[i] = CoordType(0);
-//
-//          CoordType constraint(0);
-//          const auto edge_idx = _mesh_node->get_mesh()->template get_index_set<1,0>();
-//          for(Index edge(0); edge < _mesh_node->get_mesh()->get_num_entities(1); ++edge)
-//          {
-//            Index i(edge_idx(edge,0));
-//            Index j(edge_idx(edge,1));
-//            CoordType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<CoordType>::
-//                eval(- _dist(i) * _dist(j)));
-//
-//            constraint_vec[i] += my_constraint;
-//            constraint_vec[j] += my_constraint;
-//
-//            constraint += my_constraint;
-//          }
-//
-//#ifdef FEAT_HAVE_MPI
-//          CoordType constraint_snd(constraint);
-//          Util::Comm::allreduce(&constraint_snd, &constraint, 1, Util::CommOperationSum());
-//#endif
-//          // DEBUG
-//          return CoordType(2)*constraint;
-//        }
-
-//        virtual CoordType compute_constraint() const override
-//        {
-//          typedef Geometry::Intern::FaceIndexMapping<ShapeType, 1, 0> FimType;
-//
-//          CoordType constraint(0);
-//          const auto idx = _mesh_node->get_mesh()->template get_index_set<MeshType::shape_dim,0>();
-//          for(Index cell(0); cell < _mesh_node->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
-//          {
-//            for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
-//            {
-//              //These are the indices of the vertices on edge
-//              int i(FimType::map(edge,0));
-//              int j(FimType::map(edge,1));
-//              CoordType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<CoordType>::
-//                  eval(- CoordType(1)*_dist(idx(cell, Index(i))) * _dist(idx(cell, Index(j)))) );
-//
-//              constraint += my_constraint;
-//            }
-//
-//          }
-//
-//#ifdef FEAT_HAVE_MPI
-//          CoordType constraint_snd(constraint);
-//          Util::Comm::allreduce(&constraint_snd, &constraint, 1, Util::CommOperationSum());
-//#endif
-//          return constraint;
-//        }
-
-        //virtual void add_constraint_grad(
-        //  VectorType& grad, const CoordType alignment_fval, const CoordType fac) const override
-        //{
-        //  typedef Geometry::Intern::FaceIndexMapping<ShapeType, 1, 0> FimType;
-
-        //  FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
-
-        //  const auto idx = _mesh_node->get_mesh()->template get_index_set<MeshType::shape_dim,0>();
-        //  for(Index cell(0); cell < _mesh_node->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
-        //  {
-        //    grad_loc.format(CoordType(0));
-
-        //    for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
-        //    {
-        //      //These are the indices of the vertices on edge
-        //      int i(FimType::map(edge,0));
-        //      int j(FimType::map(edge,1));
-
-        //      auto lvlset_prod = -CoordType(1) * _dist(idx(cell, Index(i))) * _dist(idx(cell, Index(j)));
-        //      // Derivative of the heaviside function
-        //      auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<CoordType>::der_x(lvlset_prod);
-        //      grad_loc[i] -= (CoordType(1) * fac * alignment_fval * heaviside_der * _dist(idx(cell, Index(j))))
-        //        * _grad_dist(idx(cell, Index(i))) ;
-        //      grad_loc[j] -= (CoordType(1) * fac * alignment_fval * heaviside_der * _dist(idx(cell, Index(i))))
-        //        * _grad_dist(idx(cell, Index(j))) ;
-        //    }
-
-        //    // Add local contributions to global gradient vector
-        //    for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-        //    {
-        //      // Global vertex/dof index
-        //      Index i(idx(cell,Index(j)));
-        //      Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
-        //      tmp += grad_loc[j];
-
-        //      grad(i,tmp);
-        //    }
-        //  }
-        //}
-
+        /// \copydoc BaseClass::add_constraint_grad()
         virtual void add_constraint_grad(
           VectorType& grad, const CoordType alignment_fval, const CoordType penalty_param) const override
         {
