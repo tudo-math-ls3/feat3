@@ -1,4 +1,4 @@
-<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+<FeatMeshFile version="1">
   <Chart name="moving_circle">
     <Circle radius="0.15" midpoint="0.75 0.5" domain="0 4" />
   </Chart>

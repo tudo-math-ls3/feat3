@@ -1,10 +1,14 @@
 [ApplicationSettings]
-mesh_file = ./unit-square-tria.xml
-chart_file = ./moving-circle-chart.xml
+mesh_files =  unit-square-tria.xml moving-circle-chart.xml
 meshopt_config_file = ./meshopt_config.ini
 solver_config_file = ./solver_config.ini
 mesh_optimiser = HyperelasticityDefault
-lvl_min = 0
-lvl_max = 5
 delta_t = 1e-2
-t_end = 100
+t_end = 1e0
+
+[DomainControlSettings]
+lvl_min = 2
+lvl_max = 3
+parti-type = parmetis fallback
+#parti-name = default
+parti-rank-elems = 4

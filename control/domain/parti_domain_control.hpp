@@ -51,11 +51,11 @@ namespace FEAT
         Geometry::AdaptMode _adapt_mode;
         /// specifies whether a mesh file has already been read
         bool _have_read_mesh;
-        /// specifies whether the base-mesh has been partitioned
+        /// specifies whether the base mesh has been partitioned
         bool _have_partition;
         /// specifies whether a mesh hierarchy has been created.
         bool _have_hierarchy;
-        /// our base-mesh level
+        /// our base mesh level
         int _base_mesh_level;
         /// allow manual partitioner?
         bool _allow_parti_manual;
@@ -71,7 +71,7 @@ namespace FEAT
         Index _min_elems_per_rank;
         /// our partition set for manual partitioning
         Geometry::PartitionSet _part_set;
-        /// our base-mesh node
+        /// our base mesh node
         MeshNodeType* _base_mesh_node;
         /// our patch-mesh node
         MeshNodeType* _patch_mesh_node;
@@ -131,7 +131,7 @@ namespace FEAT
          */
         bool parse_args(SimpleArgParser& args)
         {
-          // try to parse --parti-type
+          // Try to parse --parti-type (the partitioners we want)
           {
             auto it = args.query("parti-type");
             if(it != nullptr)
@@ -168,6 +168,55 @@ namespace FEAT
           // okay
           return true;
         }
+
+        bool parse_property_map(PropertyMap* property_map)
+        {
+          XASSERT(property_map != nullptr);
+
+          auto parti_type_p = property_map->query("parti-type");
+          if(parti_type_p.second)
+          {
+             _allow_parti_manual = _allow_parti_parmetis = _allow_parti_fallback = false;
+
+             std::deque<String> allowed_partitioners;
+             parti_type_p.first.split_by_charset(allowed_partitioners, " ");
+
+             for(const auto& t : allowed_partitioners)
+             {
+               if(t == "manual")
+                 _allow_parti_manual = true;
+               else if(t == "2level")
+                 _allow_parti_2level = true;
+               else if(t == "parmetis")
+                 _allow_parti_parmetis = true;
+               else if(t == "fallback")
+                 _allow_parti_fallback = true;
+               else
+               {
+                 if(Util::Comm::rank() == Index(0))
+                 {
+                   std::cerr << "ERROR: unknown partitioner type '" << t << "'" << std::endl;
+                   return false;
+                 }
+               }
+             }
+          }
+
+          auto parti_name_p = property_map->query("parti-name");
+          if(parti_name_p.second)
+          {
+            _manual_parti_name = parti_name_p.first;
+          }
+
+          auto parti_rank_elems_p = property_map->query("parti-rank-elems");
+          if(parti_rank_elems_p.second)
+          {
+            _min_elems_per_rank = Index(std::stoi(parti_rank_elems_p.first));
+          }
+
+          return true;
+
+        } // bool parse_property_map()
 
         /**
          * \brief Sets the adapt-mode for refinement
@@ -241,27 +290,27 @@ namespace FEAT
         }
 
         /**
-         * \brief Reads the base-mesh from a mesh reader object
+         * \brief Reads the base mesh from a mesh reader object
          *
          * \param[in] mesh_reader
-         * The reader object to read the base-mesh from.
+         * The reader object to read the base mesh from.
          */
         void read_mesh(Geometry::MeshFileReader& mesh_reader)
         {
           // make sure we did not already read a mesh
           XASSERTM(!_have_read_mesh, "domain control has already read a mesh");
 
-          // make sure we don't have a base-mesh node
+          // make sure we don't have a base mesh node
           XASSERTM(_base_mesh_node == nullptr, "domain control already has a base mesh");
 
           // create a new atlas unless we already have one
           if(this->_atlas == nullptr)
             this->_atlas = new AtlasType();
 
-          // create a base-mesh node
+          // create a base mesh node
           _base_mesh_node = new MeshNodeType(nullptr, this->_atlas);
 
-          // try to parse the atlas, the base-mesh and the partition set
+          // try to parse the atlas, the base mesh and the partition set
           mesh_reader.parse(*_base_mesh_node, *this->_atlas, &_part_set);
 
           // remember that we have read a mesh
@@ -269,12 +318,12 @@ namespace FEAT
         }
 
         /**
-         * \brief Reads the base-mesh from an input stream
+         * \brief Reads the base mesh from an input stream
          *
          * This function uses the Geometry::MeshFileReader to parse the input stream.
          *
          * \param[in] is
-         * The input stream from which to read the base-mesh.
+         * The input stream from which to read the base mesh.
          */
         void read_mesh(std::istream& is)
         {
@@ -283,7 +332,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Reads the base-mesh from a file
+         * \brief Reads the base mesh from a file
          *
          * This function uses the Geometry::MeshFileReader to parse the input file.
          *
@@ -302,7 +351,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Reads the base-mesh from a file sequence
+         * \brief Reads the base mesh from a file sequence
          *
          * This function uses the Geometry::MeshFileReader to parse the input files.
          *
@@ -338,14 +387,14 @@ namespace FEAT
         }
 
         /**
-         * \brief Tries to create a suitable partitioning of the base-mesh.
+         * \brief Tries to create a suitable partitioning of the base mesh.
          *
          * This function make uses of several strategies to find a suitable
-         * partitioning of the base-mesh matching the number of processes
+         * partitioning of the base mesh matching the number of processes
          * in a MPI-run.
          *
          * \attention
-         * This functions assumes that a valid base-mesh node has been already
+         * This functions assumes that a valid base mesh node has been already
          * read in from a (sequence of) input file(s) by using one of the
          * #read_mesh() functions.
          *
@@ -353,7 +402,7 @@ namespace FEAT
          * the following order:
          *
          * 1. This function checks if there is exactly 1 process in the MPI
-         *    world and, if so, uses the whole base-mesh as the one and only
+         *    world and, if so, uses the whole base mesh as the one and only
          *    patch.
          *
          * 2. Unless deactivated by the user, this function tries to find
@@ -373,8 +422,8 @@ namespace FEAT
          *
          * \note
          * This function (more precisely: one of its sub-functions) may
-         * automatically refine the base-mesh to higher level to ensure
-         * that the base-mesh has a sufficient number of elements so that
+         * automatically refine the base mesh to higher level to ensure
+         * that the base mesh has a sufficient number of elements so that
          * a partitioning strategy can yield something useful.
          *
          * \note
@@ -428,7 +477,7 @@ namespace FEAT
          * The desired minimum refinement level.
          *
          * \attention
-         * This function assumes that the base-mesh has already been read in
+         * This function assumes that the base mesh has already been read in
          * and (in a MPI-run) that a patch has been created by calling the
          * #create_partition() function.
          *
@@ -436,7 +485,7 @@ namespace FEAT
          * Note that both \p lvl_max and \p lvl_min are merely \b hints,
          * i.e. the resulting hierarchy \b may represent a different level
          * interval. This can happen if the partitioner already had to refine
-         * the input base-mesh to obtain a suitable partitioning.
+         * the input base mesh to obtain a suitable partitioning.
          */
         void create_hierarchy(int lvl_max, int lvl_min)
         {
@@ -493,7 +542,7 @@ namespace FEAT
 
       protected:
         /**
-         * \brief Auxiliary function: refines the base-mesh up to a specified level.
+         * \brief Auxiliary function: refines the base mesh up to a specified level.
          *
          * \param[in] level
          * The level unto which to refine to.
@@ -511,10 +560,10 @@ namespace FEAT
         }
 
         /**
-         * \brief Auxiliary function: refines the base-mesh until it has a minimum number of elements
+         * \brief Auxiliary function: refines the base mesh until it has a minimum number of elements
          *
          * \param[in] min_elements
-         * The minimum number of elements that the refined base-mesh needs to have.
+         * The minimum number of elements that the refined base mesh needs to have.
          */
         void _refine_base_mesh_to_min_elems(Index min_elements)
         {
@@ -531,13 +580,13 @@ namespace FEAT
         }
 
         /**
-         * \brief Creates a patch from the base-mesh
+         * \brief Creates a patch from the base mesh
          *
-         * This function "converts" the base-mesh node into a patch-mesh node.
+         * This function "converts" the base mesh node into a patch-mesh node.
          * This function can be used if the MPI-world consists of only 1 process.
          *
          * \returns
-         * \c true, if the MPI-world contains only 1 process and the base-mesh node
+         * \c true, if the MPI-world contains only 1 process and the base mesh node
          * has been converted to a patch-mesh node, otherwise \c false.
          */
         bool _create_partition_single_patch()
@@ -548,7 +597,7 @@ namespace FEAT
           if(Util::Comm::size() != Index(1))
             return false;
 
-          std::cout << "Using base-mesh as patch, because there is only one process..." << std::endl;
+          std::cout << "Using base mesh as patch, because there is only one process..." << std::endl;
 
           // copy our base mesh
           _patch_mesh_node = _base_mesh_node;
@@ -573,7 +622,7 @@ namespace FEAT
          * the MPI-world.
          *
          * \note
-         * If necessary, this function will automatically refine the base-mesh.
+         * If necessary, this function will automatically refine the base mesh.
          *
          * \returns
          * \c true, if a suitable manual partitioning was found and the patch-mesh for the
@@ -604,9 +653,9 @@ namespace FEAT
           }
 
           if(rank == Index(0))
-            std::cout << "Found manual partition '" << part->get_name() << "' for base-mesh level " << part->get_level() << std::endl;
+            std::cout << "Found manual partition '" << part->get_name() << "' for base mesh level " << part->get_level() << std::endl;
 
-          // refine up to required base-mesh level
+          // refine up to required base mesh level
           this->_refine_base_mesh_to_level(part->get_level());
 
           // comm ranks and tags
@@ -642,7 +691,7 @@ namespace FEAT
          * algorithm.
          *
          * \note
-         * If necessary, this function will automatically refine the base-mesh.
+         * If necessary, this function will automatically refine the base mesh.
          *
          * \returns
          * \c true, if a suitable 2-level partitioning was found and the patch-mesh for the
@@ -666,9 +715,9 @@ namespace FEAT
           Index ref_lvl = partitioner.parti_level();
 
           if(rank == Index(0))
-            std::cout << "Found 2-level partition for base-mesh level " << ref_lvl << std::endl;
+            std::cout << "Found 2-level partition for base mesh level " << ref_lvl << std::endl;
 
-          // refine base-mesh
+          // refine base mesh
           _refine_base_mesh_to_level(int(ref_lvl));
 
           // get the patch graph
@@ -694,7 +743,7 @@ namespace FEAT
          * and creates a patch-mesh node for the current process.
          *
          * \note
-         * If necessary, this function will automatically refine the base-mesh.
+         * If necessary, this function will automatically refine the base mesh.
          *
          * \note
          * This function always returns \c false if FEAT has not been configured
@@ -702,7 +751,7 @@ namespace FEAT
          *
          * \returns
          * \c true, if ParMETIS created a valid partitioning of the (possibly
-         * refined) base-mesh and the patch-mesh for the current process has
+         * refined) base mesh and the patch-mesh for the current process has
          * been created successfully, otherwise \c false.
          */
         bool _create_partition_parmetis()
@@ -721,10 +770,10 @@ namespace FEAT
          * and creates a patch-mesh node for the current process.
          *
          * \note
-         * If necessary, this function will automatically refine the base-mesh.
+         * If necessary, this function will automatically refine the base mesh.
          *
          * \returns
-         * \c true, if a valid partitioning of the (possibly refined) base-mesh and the
+         * \c true, if a valid partitioning of the (possibly refined) base mesh and the
          * patch-mesh for the current process have been created successfully, otherwise \c false.
          */
         bool _create_partition_fallback()
@@ -744,7 +793,7 @@ namespace FEAT
          * a partitioning and creates a patch-mesh node for the current process.
          *
          * \note
-         * If necessary, this function will automatically refine the base-mesh.
+         * If necessary, this function will automatically refine the base mesh.
          *
          * \tparam PExecutorT_
          * The foundation partitioner class to be used.
@@ -753,7 +802,7 @@ namespace FEAT
          * The name of the partitioner. This is only used for console output.
          *
          * \returns
-         * \c true, if a valid partitioning of the (possibly refined) base-mesh and the
+         * \c true, if a valid partitioning of the (possibly refined) base mesh and the
          * patch-mesh for the current process have been created successfully, otherwise \c false.
          */
         template<typename PExecutorT_>
@@ -764,13 +813,13 @@ namespace FEAT
           const Index rank = Util::Comm::rank();
           const Index nprocs = Util::Comm::size();
 
-          // refine base-mesh if necessary
+          // refine base mesh if necessary
           this->_refine_base_mesh_to_min_elems(_min_elems_per_rank * nprocs);
 
           if(rank == Index(0))
             std::cout << "Running " << parti_name << " partitioner on level " << _base_mesh_level << "..." << std::endl;
 
-          // get our base-mesh
+          // get our base mesh
           const MeshType_& base_root_mesh = *(this->_base_mesh_node->get_mesh());
 
           // get number of elements
