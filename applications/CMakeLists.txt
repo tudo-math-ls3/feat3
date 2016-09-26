@@ -376,36 +376,36 @@ SET_PROPERTY(TEST sleep11 PROPERTY LABELS "mpi")
 
 ###### parti_poisson
 
-if (FEAT_HAVE_MPI)
-  ADD_TEST(parti_poisson_dirichlet_2d_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target parti_poisson_dirichlet_2d
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 5 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-ADD_TEST(sleep12 sleep 2)
-SET_PROPERTY(TEST sleep12 PROPERTY LABELS "mpi")
-
-else (FEAT_HAVE_MPI)
-  ADD_TEST(parti_poisson_dirichlet_2d_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target parti_poisson_dirichlet_2d
-    --build-nocmake
-    --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (FEAT_HAVE_MPI)
-
-ADD_TEST(sleep13 sleep 2)
-SET_PROPERTY(TEST sleep13 PROPERTY LABELS "mpi")
+#if (FEAT_HAVE_MPI)
+#  ADD_TEST(parti_poisson_dirichlet_2d_mpi ${CMAKE_CTEST_COMMAND}
+#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+#    --build-generator ${CMAKE_GENERATOR}
+#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+#    --build-target parti_poisson_dirichlet_2d
+#    --build-nocmake
+#    --build-noclean
+#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 5 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
+#  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY LABELS "mpi")
+#  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+#
+#ADD_TEST(sleep12 sleep 2)
+#SET_PROPERTY(TEST sleep12 PROPERTY LABELS "mpi")
+#
+#else (FEAT_HAVE_MPI)
+#  ADD_TEST(parti_poisson_dirichlet_2d_serial ${CMAKE_CTEST_COMMAND}
+#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+#    --build-generator ${CMAKE_GENERATOR}
+#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+#    --build-target parti_poisson_dirichlet_2d
+#    --build-nocmake
+#    --build-noclean
+#    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
+#  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
+#  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+#endif (FEAT_HAVE_MPI)
+#
+#ADD_TEST(sleep13 sleep 2)
+#SET_PROPERTY(TEST sleep13 PROPERTY LABELS "mpi")
 
 ######################### scarckin_poisson
 if (FEAT_HAVE_MPI)
