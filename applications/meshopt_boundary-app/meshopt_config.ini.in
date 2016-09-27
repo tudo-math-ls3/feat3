@@ -1,15 +1,16 @@
 [HyperelasticityDefault]
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
-dirichlet_boundaries = outer
+dirichlet_boundaries = bottom top left right
 
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
-dirichlet_boundaries = outer
+dirichlet_boundaries = bottom top left right
 
 [DuDvDefaultParameters]
 solver_config = PCG-MGV
+fixed_reference_domain = 1
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional
