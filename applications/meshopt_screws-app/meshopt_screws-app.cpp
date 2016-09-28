@@ -12,18 +12,17 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
-#include <control/domain/partitioner_domain_control.hpp>
+#include <control/domain/parti_domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_control_factory.hpp>
 
 using namespace FEAT;
 
 static void display_help();
-static void read_test_mode_application_config(std::stringstream&);
-static void read_test_mode_meshopt_config(std::stringstream&);
-static void read_test_mode_solver_config(std::stringstream&);
-static void read_test_mode_mesh(std::stringstream&);
-static void read_test_mode_chart(std::stringstream&);
+static void read_test_application_config(std::stringstream&, const int);
+static void read_test_meshopt_config(std::stringstream&, const int);
+static void read_test_solver_config(std::stringstream&, const int);
+static void read_test_mesh_file_names(std::deque<String>&, const int);
 
 template<typename Mesh_>
 struct MeshExtrudeHelper
@@ -106,26 +105,18 @@ struct MeshoptScrewsApp
   /// The only transformation available is the standard P1 or Q1 transformation
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
 
-  /// This is how far the inner screw's centre deviates from the outer screw's
-  static constexpr DataType excentricity_inner = DataType(0.2833);
+  /// Type of the extruded mesh, which is Simplex<2> for Simplex<2> meshes (no extrusion) and Hypercube<3> for
+  /// Hypercube<2> meshes
+  typedef typename MeshExtrudeHelper<MeshType>::ExtrudedMeshType ExtrudedMeshType;
+
   /// Type for points in the mesh
   typedef Tiny::Vector<DataType, MeshType::world_dim> WorldPoint;
 
-#ifdef FEAT_HAVE_PARMETIS
-  // If we have ParMETIS, we can use it for partitioning
-  typedef Control::Domain::PartitionerDomainControl<
-    Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, Mesh_> DomCtrl;
-#else
-#ifdef FEAT_HAVE_MPI
-  // Otherwise we have to use the fallback partitioner
-  typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<DT_, IT_>, Mesh_> DomCtrl;
-#else
-  // If we are in serial mode, there is no partitioning
-  typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<DT_, IT_>, Mesh_> DomCtrl;
-#endif // FEAT_HAVE_MPI
-#endif // FEAT_HAVE_PARMETIS
+  /// Domain Control Type
+  typedef Control::Domain::PartiDomainControl<MeshType> DomCtrl;
 
-  typedef typename MeshExtrudeHelper<MeshType>::ExtrudedMeshType ExtrudedMeshType;
+  /// This is how far the inner screw's centre deviates from the outer screw's
+  static constexpr DataType excentricity_inner = DataType(0.2833);
 
   /**
    * \brief Returns a descriptive string
@@ -140,54 +131,123 @@ struct MeshoptScrewsApp
   /**
    * \brief The routine that does the actual work
    */
-  static int run(const String& meshopt_section_key, PropertyMap* meshopt_config, PropertyMap* solver_config,
-  Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader,
-  int lvl_max, int lvl_min, const DataType delta_t, const DataType t_end,
-  const bool write_vtk, const Index vtk_freq, const bool test_mode)
+  static int run(const SimpleArgParser& args, PropertyMap* application_config, PropertyMap* meshopt_config,
+  PropertyMap* solver_config, Geometry::MeshFileReader& mesh_file_reader)
   {
+
+    // Mininum refinement level, parsed from the application config file
+    int lvl_min(-1);
+    // Maximum refinement level, parsed from the application config file
+    int lvl_max(-1);
+    // Timestep size, parsed from the application config file
+    DataType delta_t(0);
+    // End time, parsed from the application config file
+    DataType t_end(0);
+    // Do we want to write vtk files. Read from the command line arguments
+    bool write_vtk(false);
+    // If write_vtk is set, we write out every vtk_freq time steps
+    Index vtk_freq(1);
+    // Is the application running as a test? Read from the command line arguments
+    int test_number(0);
+
+    // Check if we want to write vtk files and at what frequency
+    if(args.check("vtk") >= 0 )
+    {
+      write_vtk = true;
+
+      if(args.check("vtk") > 1)
+        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --vtk");
+
+      args.parse("vtk",vtk_freq);
+    }
+
+    // Check if we are to perform test 1 or test 2, if any
+    if( args.check("test") >=0 )
+    {
+      if(args.check("test") > 1)
+        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
+
+      args.parse("test",test_number);
+      if(test_number != 1 && test_number != 2)
+        throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
+    }
+
+    // Get the application settings section
+    auto app_settings_section = application_config->query_section("ApplicationSettings");
+    XASSERTM(app_settings_section != nullptr,
+    "Application config is missing the mandatory ApplicationSettings section!");
+
+    // Get timestep size
+    auto delta_t_p = app_settings_section->query("delta_t");
+    XASSERTM(delta_t_p.second, "ApplicationConfig section is missing the mandatory delta_t entry!");
+    delta_t = std::stod(delta_t_p.first);
     XASSERT(delta_t > DataType(0));
+
+    // Get end time
+    auto t_end_p = app_settings_section->query("t_end");
+    XASSERTM(delta_t_p.second, "ApplicationConfig section is missing the mandatory t_end entry!");
+    t_end = std::stod(t_end_p.first);
     XASSERT(t_end >= DataType(0));
 
-    int return_value(0);
+    // Get the mesh optimiser key from the application settings
+    auto meshoptimiser_key_p = app_settings_section->query("mesh_optimiser");
+    XASSERTM(meshoptimiser_key_p.second,
+    "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
+
+    // Get the centre of rotation, default to (0,0)^T
+    auto midpoint_p = app_settings_section->query("midpoint");
+    std::deque<String> midpoint_deque;
+    if(midpoint_p.second)
+    {
+      midpoint_p.first.split_by_charset(midpoint_deque," ");
+    }
+
+    Tiny::Vector<DataType,2> midpoint(DataType(0));
+    if(midpoint_deque.size() > size_t(0))
+    {
+      XASSERTM(midpoint_deque.size() == size_t(MeshType::world_dim),"midpoint has invalid number of components!");
+      for(size_t i(0); i < midpoint_deque.size(); ++i)
+      {
+        midpoint(int(i)) = DataType(std::stod(midpoint_deque.at(i)));
+      }
+    }
+
+    // Get the application settings section
+    auto domain_control_settings_section = application_config->query_section("DomainControlSettings");
+    XASSERTM(domain_control_settings_section != nullptr,
+    "DomainControl config is missing the mandatory DomainControlSettings section!");
+
+    // Get the coarse mesh and finest mesh levels from the application settings
+    auto lvl_min_p = domain_control_settings_section->query("lvl_min");
+    if(!lvl_min_p.second)
+      lvl_min = 0;
+    else
+      lvl_min = std::stoi(lvl_min_p.first);
+
+    auto lvl_max_p = domain_control_settings_section->query("lvl_max");
+    if(!lvl_max_p.second)
+      lvl_max = lvl_min;
+    else
+      lvl_max = std::stoi(lvl_max_p.first);
 
     TimeStamp at;
 
-    // Minimum number of cells we want to have in each patch
-    const Index part_min_elems(Util::Comm::size()*4);
-
-    DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader);
+    DomCtrl dom_ctrl;
+    dom_ctrl.read_mesh(mesh_file_reader);
+    dom_ctrl.parse_property_map(domain_control_settings_section);
+    dom_ctrl.create_partition();
+    dom_ctrl.create_hierarchy(lvl_max, lvl_min);
 
     // Mesh on the finest level, mainly for computing quality indicators
     const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
 #ifdef FEAT_HAVE_MPI
-    Index my_cells(ncells);
-    Util::Comm::allreduce(&my_cells, &ncells, 1, Util::CommOperationSum());
+    Util::Comm::allreduce(&ncells, &ncells, 1, Util::CommOperationSum());
 #endif
 
     MeshExtrudeHelper<MeshType> extruder(dom_ctrl.get_levels().back()->get_mesh_node(),
     Index(10*(lvl_max+1)), DataType(0), DataType(1), "bottom", "top");
-
-    // Print level information
-    if(Util::Comm::rank() == 0)
-    {
-      std::cout << name() << "settings: " << std::endl;
-      std::cout << "Timestep size: " << stringify_fp_fix(delta_t) << ", end time: " <<
-        stringify_fp_fix(t_end) << std::endl;
-      std::cout << "LVL-MAX: " <<
-        dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
-      std::cout << " LVL-MIN: " <<
-        dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-      std::cout << "Cells: " << ncells << std::endl;
-    }
-
-    // Create MeshoptControl
-    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
-    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
-      dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
-
-    String file_basename(name()+"_n"+stringify(Util::Comm::size()));
 
     // This is the centre reference point
     WorldPoint x_0(DataType(0));
@@ -215,6 +275,35 @@ struct MeshoptScrewsApp
     //const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
     auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer_screw");
 
+    // Print level information
+    if(Util::Comm::rank() == 0)
+    {
+      std::cout << name() << "settings:" << std::endl;
+      std::cout << "Timestep size: " << stringify_fp_fix(delta_t) << ", end time: " <<
+        stringify_fp_fix(t_end) << std::endl;
+      std::cout << "LVL-MAX: " <<
+        dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
+      std::cout << " LVL-MIN: " <<
+        dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
+      std::cout << "Cells: " << ncells << std::endl;
+    }
+
+    // Create MeshoptControl
+    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
+    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
+      dom_ctrl, meshoptimiser_key_p.first, meshopt_config, solver_config);
+
+    String file_basename(name()+"_n"+stringify(Util::Comm::size()));
+
+    // Copy the vertex coordinates to the buffer and get them via get_coords()
+    meshopt_ctrl->mesh_to_buffer();
+    // A copy of the old vertex coordinates is kept here
+    auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
+    auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
+
+    // Prepare the functional
+    meshopt_ctrl->prepare(old_coords);
+
     // Write initial vtk output
     if(write_vtk)
     {
@@ -234,27 +323,18 @@ struct MeshoptScrewsApp
         ++deque_position;
       }
 
-      if(extruder.extruded_mesh_node != nullptr)
-      {
-        // Create a VTK exporter for our mesh
-        String vtk_name = String(file_basename+"_pre_extruded");
+    }
 
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-      }
-    } // writing initial output
-
-    // For test_mode = true these have to have function global scope
+    // For the tests these have to have function global scope
     DT_ qual_min(0);
     DT_ qual_sum(0);
     DT_ worst_angle(0);
     DT_ cell_size_defect(0);
+
     // Compute quality indicators
     {
       Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
       worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
@@ -284,24 +364,25 @@ struct MeshoptScrewsApp
     }
 
     // Check for the hard coded settings for test mode
-    if(test_mode)
+    if(test_number == 1)
     {
-      if( Math::abs(worst_angle - DT_(7.618381)) > Math::pow(Math::eps<DT_>(), DT_(0.25)))
+      if( worst_angle < DT_(5.69))
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
-        "Initial worst angle should be >= "+stringify_fp_fix(7.618381)+ " but is "+stringify_fp_fix(worst_angle));
+        "Initial worst angle should be >= "+stringify_fp_fix(5.69)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
+      }
+      else if(test_number == 2)
+      {
+        if( worst_angle < DT_(2.83))
+        {
+          Util::mpi_cout("FAILED:");
+          throw InternalError(__func__,__FILE__,__LINE__,
+          "Initial worst angle should be >= "+stringify_fp_fix(2.83)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
+        }
       }
     }
 
-    // Copy the vertex coordinates to the buffer and get them via get_coords()
-    meshopt_ctrl->mesh_to_buffer();
-    // A copy of the old vertex coordinates is kept here
-    auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
-    auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
-
-    // Prepare the functional
-    meshopt_ctrl->prepare(old_coords);
     // Optimise the mesh
     meshopt_ctrl->optimise();
 
@@ -324,25 +405,12 @@ struct MeshoptScrewsApp
         ++deque_position;
       }
 
-      if(extruder.extruded_mesh_node != nullptr)
-      {
-        // Compute mesh quality and worst angle
-        extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
-
-        // Create a VTK exporter for our mesh
-        String vtk_name = String(file_basename+"_post_extruded");
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-      }
-
     }
 
     // Compute quality indicators
     {
       Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
       worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
@@ -372,13 +440,46 @@ struct MeshoptScrewsApp
     }
 
     // Check for the hard coded settings for test mode
-    if(test_mode)
+    if(test_number == 1)
     {
-      if( Math::abs(worst_angle - DT_(7.618381)) > Math::pow(Math::eps<DT_>(), DT_(0.25)))
+      if(worst_angle < DT_(5.69))
       {
-        Util::mpi_cout("FAILED:");
-        throw InternalError(__func__,__FILE__,__LINE__,
-        "Post initial worst angle should be >= "+stringify_fp_fix(7.618381)+ " but is "+stringify_fp_fix(worst_angle));
+        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(5.69)+
+            " but is "+stringify_fp_fix(worst_angle)+"\n");
+        return 1;
+      }
+      if(qual_min < DT_(2.5e-2))
+      {
+        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(2.5e-2)+
+            " but is "+stringify_fp_fix(qual_min)+"\n");
+        return 1;
+      }
+      if(cell_size_defect > DT_(2.5))
+      {
+        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(2.5)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"\n");
+        return 1;
+      }
+    }
+    else if(test_number == 2)
+    {
+      if(worst_angle < DT_(3.2))
+      {
+        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(3.2)+
+            " but is "+stringify_fp_fix(worst_angle)+"\n");
+        return 1;
+      }
+      if(qual_min < DT_(2.5e-1))
+      {
+        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(2.5e-1)+
+            " but is "+stringify_fp_fix(qual_min)+"\n");
+        return 1;
+      }
+      if(cell_size_defect > DT_(3.8e-1))
+      {
+        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(3.8e-1)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"\n");
+        return 1;
       }
     }
 
@@ -386,15 +487,18 @@ struct MeshoptScrewsApp
     DataType time(0);
     // Counter for timesteps
     Index n(0);
+
+    // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
+    auto mesh_velocity = meshopt_ctrl->get_coords().clone();
+
+    int return_value(0);
+
     // This is the absolute turning angle of the screws
     DataType alpha(0);
     // Need some pi for all the angles
     DataType pi(Math::pi<DataType>());
 
     WorldPoint rotation_angles(0);
-
-    // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
-    auto mesh_velocity = meshopt_ctrl->get_coords().clone();
 
     while(time < t_end)
     {
@@ -592,18 +696,30 @@ struct MeshoptScrewsApp
         ++deque_position;
       }
 
-      if(extruder.extruded_mesh_node != nullptr)
+    }
+
+    // Check for the hard coded settings for test mode
+    if(test_number == 1)
+    {
+      if(worst_angle < DT_(5.53))
       {
-        // Create a VTK exporter for our mesh
-        String vtk_name = String(file_basename+"_final_extruded");
-
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+        Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(5.53)+
+            " but is "+stringify_fp_fix(worst_angle)+"\n");
+        return 1;
       }
-    } // writing initial output
-
+      if(qual_min < DT_(2.51e-2))
+      {
+        Util::mpi_cout("FAILED: Final worst shape quality should be <= "+stringify_fp_fix(2.51e-2)+
+            " but is "+stringify_fp_fix(qual_min)+"\n");
+        return 1;
+      }
+      if(cell_size_defect > DT_(2.5))
+      {
+        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(2.5)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"\n");
+        return 1;
+      }
+    }
 
     if(Util::Comm::rank() == 0)
     {
@@ -611,22 +727,10 @@ struct MeshoptScrewsApp
       std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
     }
 
-    // Check for the hard coded settings for test mode
-    if(test_mode)
-    {
-      if( Math::abs(worst_angle - DT_(7.592201)) > Math::pow(Math::eps<DT_>(), DT_(0.25)))
-      {
-        Util::mpi_cout("FAILED:");
-        throw InternalError(__func__,__FILE__,__LINE__,
-        "Final worst angle should be >= "+stringify_fp_fix(7.605283)+ " but is "+stringify_fp_fix(worst_angle));
-      }
-    }
-
-
     return return_value;
 
   }
-}; // struct MeshSmootherApp
+}; // struct MeshoptScrewsApp
 
 int main(int argc, char* argv[])
 {
@@ -661,30 +765,14 @@ int main(int argc, char* argv[])
   }
 #endif
 
-  // Mininum refinement level, parsed from the application config file
-  int lvl_min(-1);
-  // Maximum refinement level, parsed from the application config file
-  int lvl_max(-1);
-  // Timestep size, parsed from the application config file
-  DataType delta_t(0);
-  // End time, parsed from the application config file
-  DataType t_end(0);
-  // Filename to read the mesh from, parsed from the application config file
-  String mesh_filename("");
-  // Filename to read the charts from (if any), parsed from the application config file
-  String chart_filename("");
+  // Filenames to read the mesh from, parsed from the application config file
+  std::deque<String> mesh_files;
   // String containing the mesh type, read from the header of the mesh file
   String mesh_type("");
-  // Do we want to write vtk files. Read from the command line arguments
-  bool write_vtk(false);
-  // If write_vtk is set, we write out every vtk_freq time steps
-  Index vtk_freq(1);
   // Is the application running as a test? Read from the command line arguments
-  bool test_mode(false);
+  int test_number(0);
 
   // Streams for synchronising information read from files
-  std::stringstream synchstream_mesh;
-  std::stringstream synchstream_chart;
   std::stringstream synchstream_app_config;
   std::stringstream synchstream_meshopt_config;
   std::stringstream synchstream_solver_config;
@@ -693,7 +781,7 @@ int main(int argc, char* argv[])
   SimpleArgParser args(argc, argv);
   args.support("application_config");
   args.support("help");
-  args.support("testmode");
+  args.support("test");
   args.support("vtk");
 
   if( args.check("help") > -1 || args.num_args()==1)
@@ -708,30 +796,27 @@ int main(int argc, char* argv[])
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
   }
 
-  if( args.check("testmode") >=0 )
+  if( args.check("test") >=0 )
   {
     Util::mpi_cout("Running in test mode, all other command line arguments and configuration files are ignored.\n");
-    test_mode = true;
+
+    if(args.check("test") > 1)
+      throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
+
+    args.parse("test",test_number);
+    if(test_number != 1 && test_number != 2)
+      throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
   }
 
-
-  // Application settings, has to be created here because it gets filled differently according to test_mode
+  // Application settings, has to be created here because it gets filled differently according to test
   PropertyMap* application_config = new PropertyMap;
 
+  // create a mesh file reader
+  Geometry::MeshFileReader mesh_file_reader;
+
   // If we are not in test mode, parse command line arguments, read files, synchronise streams
-  if(! test_mode)
+  if(test_number == 0)
   {
-    // Check if we want to write vtk files
-    if(args.check("vtk") >= 0 )
-    {
-      write_vtk = true;
-
-      if(args.check("vtk") > 1)
-        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --vtk");
-
-      args.parse("vtk",vtk_freq);
-    }
-
     // Read the application config file on rank 0
     if(Util::Comm::rank() == 0)
     {
@@ -768,36 +853,12 @@ int main(int argc, char* argv[])
     XASSERTM(app_settings_section != nullptr,
     "Application config is missing the mandatory ApplicationSettings section!");
 
+    auto mesh_files_p = app_settings_section->query("mesh_files");
+    mesh_files_p.first.split_by_charset(mesh_files, " ");
+
     // We read the files only on rank 0. After reading, we synchronise the streams like above.
     if(Util::Comm::rank() == 0)
     {
-      // Read the mesh file to stream
-      auto mesh_filename_p = app_settings_section->query("mesh_file");
-      XASSERTM(mesh_filename_p.second,
-      "ApplicationSettings section is missing the mandatory mesh_file entry!");
-      {
-        mesh_filename = mesh_filename_p.first;
-        std::ifstream ifs(mesh_filename);
-        if(!ifs.good())
-          throw FileNotFound(mesh_filename);
-
-        std::cout << "Reading mesh from file " << mesh_filename << std::endl;
-        synchstream_mesh << ifs.rdbuf();
-      }
-
-      // Read the chart file to stream
-      auto chart_filename_p = app_settings_section->query("chart_file");
-      if(chart_filename_p.second)
-      {
-        chart_filename = chart_filename_p.first;
-        std::ifstream ifs(chart_filename);
-        if(!ifs.good())
-          throw FileNotFound(chart_filename);
-
-        std::cout << "Reading charts from file " << chart_filename << std::endl;
-        synchstream_chart << ifs.rdbuf();
-      }
-
       // Read configuration for mesh optimisation to stream
       auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
       XASSERTM(meshopt_config_filename_p.second,
@@ -829,8 +890,6 @@ int main(int argc, char* argv[])
 
 #ifdef FEAT_HAVE_MPI
     // Synchronise all those streams in parallel mode
-    Util::Comm::synch_stringstream(synchstream_mesh);
-    Util::Comm::synch_stringstream(synchstream_chart);
     Util::Comm::synch_stringstream(synchstream_meshopt_config);
     Util::Comm::synch_stringstream(synchstream_solver_config);
 #endif
@@ -838,23 +897,16 @@ int main(int argc, char* argv[])
   // If we are in test mode, all streams are filled by the hard coded stuff below
   else
   {
-    read_test_mode_application_config(synchstream_app_config);
+    read_test_application_config(synchstream_app_config, test_number);
     // Parse the application config from the (synchronised) stream
     application_config->parse(synchstream_app_config, true);
 
-    read_test_mode_meshopt_config(synchstream_meshopt_config);
-    read_test_mode_solver_config(synchstream_solver_config);
-    read_test_mode_mesh(synchstream_mesh);
-    read_test_mode_chart(synchstream_chart);
+    read_test_meshopt_config(synchstream_meshopt_config, test_number);
+    read_test_solver_config(synchstream_solver_config, test_number);
+
+    read_test_mesh_file_names(mesh_files, test_number);
   }
-
-  // Create a MeshFileReader and parse the mesh stream
-  Geometry::MeshFileReader* mesh_file_reader(new Geometry::MeshFileReader(synchstream_mesh));
-  mesh_file_reader->read_root_markup();
-
-  Geometry::MeshFileReader* chart_file_reader(nullptr);
-  if(!synchstream_chart.str().empty())
-    chart_file_reader = new Geometry::MeshFileReader(synchstream_chart);
+  // Now we have all configurations in the corresponding streams and know the mesh file names
 
   // Create PropertyMaps and parse the configuration streams
   PropertyMap* meshopt_config = new PropertyMap;
@@ -863,175 +915,216 @@ int main(int argc, char* argv[])
   PropertyMap* solver_config = new PropertyMap;
   solver_config->parse(synchstream_solver_config, true);
 
-  // Get the application settings section
-  auto app_settings_section = application_config->query_section("ApplicationSettings");
-  XASSERTM(app_settings_section != nullptr,
-  "Application config is missing the mandatory ApplicationSettings section!");
+  std::deque<std::stringstream> mesh_streams(mesh_files.size());
 
-  // Get the coarse mesh and finest mesh levels from the application settings
-  auto lvl_min_p = app_settings_section->query("lvl_min");
-  if(!lvl_min_p.second)
-    lvl_min = 0;
-  else
-    lvl_min = std::stoi(lvl_min_p.first);
+  // read all files
+  for(std::size_t i(0); i < mesh_files.size(); ++i)
+  {
+    // read the stream
+    DistFileIO::read_common(mesh_streams.at(i), mesh_files.at(i));
 
-  auto lvl_max_p = app_settings_section->query("lvl_max");
-  if(!lvl_max_p.second)
-    lvl_max = lvl_min;
-  else
-    lvl_max = std::stoi(lvl_max_p.first);
-
-  // Get timestep size
-  auto delta_t_p = app_settings_section->query("delta_t");
-  XASSERTM(delta_t_p.second, "ApplicationConfig section is missing the mandatory delta_t entry!");
-  delta_t = std::stod(delta_t_p.first);
-
-  // Get end time
-  auto t_end_p = app_settings_section->query("t_end");
-  XASSERTM(delta_t_p.second, "ApplicationConfig section is missing the mandatory t_end entry!");
-  t_end = std::stod(t_end_p.first);
-
-  // Get the mesh optimiser key from the application settings
-  auto meshoptimiser_key_p = app_settings_section->query("mesh_optimiser");
-  XASSERTM(meshoptimiser_key_p.second,
-  "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
+    // add to mesh reader
+    mesh_file_reader.add_stream(mesh_streams.at(i));
+  }
 
   int ret(1);
 
   // Get the mesh type sting from the parsed mesh so we know with which template parameter to call the application
-  mesh_type = mesh_file_reader->get_meshtype_string();
+  mesh_file_reader.read_root_markup();
+  mesh_type = mesh_file_reader.get_meshtype_string();
 
   // Call the appropriate class' run() function
   if(mesh_type == "conformal:hypercube:2:2")
   {
     ret = MeshoptScrewsApp<MemType, DataType, IndexType, H2M2D>::run(
-      meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, write_vtk, vtk_freq, test_mode);
+      args, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
-
-  if(mesh_type == "conformal:simplex:2:2")
+  else if(mesh_type == "conformal:simplex:2:2")
   {
     ret = MeshoptScrewsApp<MemType, DataType, IndexType, S2M2D>::run(
-      meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, write_vtk, vtk_freq, test_mode);
+      args, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
+  else
+    throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
 
   delete application_config;
   delete meshopt_config;
   delete solver_config;
-  delete mesh_file_reader;
-  if(chart_file_reader != nullptr)
-    delete chart_file_reader;
 
   FEAT::Runtime::finalise();
   return ret;
+}
+
+static void read_test_application_config(std::stringstream& iss, const int test_number)
+{
+  if(test_number == 1)
+  {
+    iss << "[ApplicationSettings]" << std::endl;
+    iss << "mesh_optimiser = DuDvDefault" << std::endl;
+    iss << "solver_config_file = ./solver_config.ini" << std::endl;
+    iss << "delta_t = 1e-3" << std::endl;
+    iss << "t_end = 1e-3" << std::endl;
+    iss << "midpoint = 0.0 0.0" << std::endl;
+
+    iss << "[DomainControlSettings]" << std::endl;
+    iss << "parti-type = fallback parmetis" << std::endl;
+    iss << "parti-rank-elems = 4" << std::endl;
+    iss << "lvl_min = 0" << std::endl;
+    iss << "lvl_max = 2" << std::endl;
+  }
+  else if(test_number == 2)
+  {
+    iss << "[ApplicationSettings]" << std::endl;
+    iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
+    iss << "solver_config_file = ./solver_config.ini" << std::endl;
+    iss << "delta_t = 1e-4" << std::endl;
+    iss << "t_end = 0" << std::endl;
+    iss << "midpoint = 0.0 0.0" << std::endl;
+
+    iss << "[DomainControlSettings]" << std::endl;
+    iss << "parti-type = fallback parmetis" << std::endl;
+    iss << "parti-rank-elems = 4" << std::endl;
+    iss << "lvl_min = 0" << std::endl;
+    iss << "lvl_max = 0" << std::endl;
+  }
+  else
+    throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number: "+stringify(test_number));
+}
+
+static void read_test_meshopt_config(std::stringstream& iss, const int test_number)
+{
+  if(test_number == 1)
+  {
+    iss << "[DuDvDefault]" << std::endl;
+    iss << "type = DuDv" << std::endl;
+    iss << "config_section = DuDvDefaultParameters" << std::endl;
+    iss << "fixed_reference_domain = 1" << std::endl;
+    iss << "dirichlet_boundaries = inner outer" << std::endl;
+
+    iss << "[DuDvDefaultParameters]" << std::endl;
+    iss << "solver_config = PCG-MGV" << std::endl;
+  }
+  else if(test_number == 2)
+  {
+    iss << "[HyperElasticityDefault]" << std::endl;
+    iss << "type = Hyperelasticity" << std::endl;
+    iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
+    iss << "slip_boundaries = inner outer" << std::endl;
+
+    iss << "[HyperelasticityDefaultParameters]" << std::endl;
+    iss << "global_functional = HyperelasticityFunctional" << std::endl;
+    iss << "local_functional = RumpfFunctional_D2" << std::endl;
+    iss << "solver_config = NLCG" << std::endl;
+    iss << "fac_norm = 1e-1" << std::endl;
+    iss << "fac_det = 1.0" << std::endl;
+    iss << "fac_cof = 0.0" << std::endl;
+    iss << "fac_reg = 1e-8" << std::endl;
+    iss << "scale_computation = current_concentration" << std::endl;
+    iss << "conc_function = GapWidth" << std::endl;
+
+    iss << "[GapWidth]" << std::endl;
+    iss << "type = ChartDistance" << std::endl;
+    iss << "operation = add" << std::endl;
+    iss << "chart_list = inner_screw outer_screw" << std::endl;
+    iss << "function_type = default" << std::endl;
+
+  }
+  else
+    throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number "+stringify(test_number));
+}
+
+static void read_test_solver_config(std::stringstream& iss, const int test_number)
+{
+  if(test_number == 1)
+  {
+    iss << "[PCG-MGV]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 100" << std::endl;
+    iss << "min_stag_iter = 1" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "plot = 1" << std::endl;
+    iss << "precon = mgv" << std::endl;
+
+    iss << "[rich]" << std::endl;
+    iss << "type = richardson" << std::endl;
+    iss << "max_iter = 4" << std::endl;
+    iss << "min_iter = 4" << std::endl;
+    iss << "precon = jac" << std::endl;
+
+    iss << "[jac]" << std::endl;
+    iss << "type = jac" << std::endl;
+    iss << "omega = 0.5" << std::endl;
+
+    iss << "[mgv]" << std::endl;
+    iss << "type = mgv" << std::endl;
+    iss << "smoother = rich" << std::endl;
+    iss << "coarse = pcg" << std::endl;
+
+    iss << "[rich]" << std::endl;
+    iss << "type = richardson" << std::endl;
+    iss << "min_iter = 4" << std::endl;
+    iss << "max_iter = 4" << std::endl;
+    iss << "precon = jac" << std::endl;
+
+    iss << "[pcg]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 50" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "precon = jac" << std::endl;
+  }
+  else if (test_number == 2)
+  {
+    iss << "[NLCG]" << std::endl;
+    iss << "type = NLCG" << std::endl;
+    iss << "precon = none" << std::endl;
+    iss << "plot = 1" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "max_iter = 1000" << std::endl;
+    iss << "linesearch = StrongWolfeLinesearch" << std::endl;
+    iss << "direction_update = DYHSHybrid" << std::endl;
+    iss << "keep_iterates = 0" << std::endl;
+
+    iss << "[strongwolfelinesearch]" << std::endl;
+    iss << "type = StrongWolfeLinesearch" << std::endl;
+    iss << "plot = 0" << std::endl;
+    iss << "max_iter = 20" << std::endl;
+    iss << "tol_decrease = 1e-3" << std::endl;
+    iss << "tol_curvature = 0.3" << std::endl;
+    iss << "keep_iterates = 0" << std::endl;
+  }
+  else
+    throw InternalError(__func__,__FILE__,__LINE__,"Encountered unhandled test "+stringify(test_number));
+}
+
+static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int test_number)
+{
+  String mesh_filename(FEAT_SRC_DIR);
+  String chart_filename(mesh_filename+"/data/meshes/screws_2d_chart_bezier_24_28.xml");
+  mesh_files.push_back(chart_filename);
+
+  if(test_number == 1)
+    mesh_filename +="/data/meshes/screws_2d_mesh_quad_360_1.xml";
+  else if(test_number == 2)
+    mesh_filename +="/data/meshes/screws_2d_mesh_tria_360_1.xml";
+  else
+    throw InternalError(__func__,__FILE__,__LINE__,"Encountered unhandled test "+stringify(test_number));
+
+  mesh_files.push_back(mesh_filename);
 }
 
 static void display_help()
 {
   if(Util::Comm::rank() == 0)
   {
-    std::cout << "meshopt_screws-app: Two excentrically rotating screws"
+    std::cout << "meshopt_boundary-app: Moving the boundary of a mesh and computing an extension into the interiour"
     << std::endl;
     std::cout << "Mandatory arguments:" << std::endl;
     std::cout << " --application_config: Path to the application configuration file" << std::endl;
     std::cout << "Optional arguments:" << std::endl;
-    std::cout << " --testmode: Run as a test. Ignores configuration files and uses hard coded settings." << std::endl;
-    std::cout << " --vtk: If this is set, vtk files are written" << std::endl;
+    std::cout << " --test: Run as a test. Ignores configuration files and uses hard coded settings." << std::endl;
+    std::cout << " --test [1 or 2]: Run as a test. Ignores configuration files and uses hard coded settings. " <<
+      "Test 1 is quadrilateral cells, test 2 is triangular cells" << std::endl;
+    std::cout << " --vtk <FREQ>: If this is set, vtk files are written every <FREQ> time steps." << std::endl;
     std::cout << " --help: Displays this text" << std::endl;
   }
-}
-
-static void read_test_mode_application_config(std::stringstream& iss)
-{
-  iss << "[ApplicationSettings]" << std::endl;
-  iss << "mesh_file = ./screws_2d_mesh_quad_360_1.xml" << std::endl;
-  iss << "chart_file = ./screws_2d_chart_bezier_24_28.xml" << std::endl;
-  iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
-  iss << "mesh_optimiser = DuDvDefault" << std::endl;
-  iss << "solver_config_file = ./solver_config.ini" << std::endl;
-  iss << "lvl_min = 0" << std::endl;
-  iss << "lvl_max = 1" << std::endl;
-  iss << "delta_t = 1e-4" << std::endl;
-  iss << "t_end = 2e-4" << std::endl;
-}
-
-static void read_test_mode_meshopt_config(std::stringstream& iss)
-{
-  iss << "[DuDvDefault]" << std::endl;
-  iss << "type = DuDv" << std::endl;
-  iss << "config_section = DuDvDefaultParameters" << std::endl;
-  iss << "dirichlet_boundaries = inner outer" << std::endl;
-
-  iss << "[DuDvDefaultParameters]" << std::endl;
-  iss << "solver_config = PCG-MGV" << std::endl;
-}
-
-static void read_test_mode_solver_config(std::stringstream& iss)
-{
-  iss << "[PCG-MGV]" << std::endl;
-  iss << "type = pcg" << std::endl;
-  iss << "min_stag_iter = 2" << std::endl;
-  iss << "max_iter = 100" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  iss << "plot = 1" << std::endl;
-  iss << "precon = mgv" << std::endl;
-
-  iss << "[rich]" << std::endl;
-  iss << "type = richardson" << std::endl;
-  iss << "max_iter = 4" << std::endl;
-  iss << "min_iter = 4" << std::endl;
-  iss << "precon = jac" << std::endl;
-
-  iss << "[jac]" << std::endl;
-  iss << "type = jac" << std::endl;
-  iss << "omega = 0.5" << std::endl;
-
-  iss << "[mgv]" << std::endl;
-  iss << "type = mgv" << std::endl;
-  iss << "smoother = rich" << std::endl;
-  iss << "coarse = pcg" << std::endl;
-
-  iss << "[pcg]" << std::endl;
-  iss << "type = pcg" << std::endl;
-  iss << "max_iter = 100" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  iss << "precon = jac" << std::endl;
-}
-
-static void read_test_mode_mesh(std::stringstream& iss)
-{
-  if(Util::Comm::rank() == 0)
-  {
-    String mesh_filename(FEAT_SRC_DIR);
-    mesh_filename +="/data/meshes/screws_2d_mesh_quad_360_1.xml";
-
-    std::ifstream ifs(mesh_filename);
-    if(!ifs.good() || !ifs.is_open())
-      throw FileNotFound(mesh_filename);
-
-    iss << ifs.rdbuf();
-  }
-#ifdef FEAT_HAVE_MPI
-  Util::Comm::synch_stringstream(iss);
-#endif
-}
-
-// This does nothing as for the currently used mesh, there is no separate chart file" << std::endl;
-static void read_test_mode_chart(std::stringstream& iss)
-{
-  if(Util::Comm::rank() == 0)
-  {
-    String chart_filename(FEAT_SRC_DIR);
-    chart_filename+="/data/meshes/screws_2d_chart_bezier_24_28.xml";
-
-    std::ifstream ifs(chart_filename);
-    if(!ifs.good() || !ifs.is_open())
-      throw FileNotFound(chart_filename);
-
-    iss << ifs.rdbuf();
-  }
-#ifdef FEAT_HAVE_MPI
-  Util::Comm::synch_stringstream(iss);
-#endif
 }

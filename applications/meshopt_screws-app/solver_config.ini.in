@@ -1,18 +1,16 @@
 [ALGLIBMinLBFGS]
 type = ALGLIBMinLBFGS
 plot = 1
-max_iter = 1000
+max_iter = 30000
 tol_rel = 1e-8
-precon = none
 lbfgs_dim = 10
 keep_iterates = 0
 
 [ALGLIBMinCG]
 type = ALGLIBMinCG
-precon = none
 plot = 1
 tol_rel = 1e-8
-max_iter = 1000
+max_iter = 30000
 direction_update = DYHSHybrid
 keep_iterates = 0
 
@@ -21,29 +19,28 @@ type = NLCG
 precon = none
 plot = 1
 tol_rel = 1e-8
-max_iter = 1000
+max_iter = 30000
 linesearch = strongwolfelinesearch
 direction_update = DYHSHybrid
 keep_iterates = 0
 
 [DuDvPrecon]
 type = DuDvPrecon
-dirichlet_boundaries = outer
-fixed_reference_domain = 1
-linear_solver = PCG-MGV
+dirichlet_boundaries = inner outer
+linear_solver = PCG-Jacobi
 
 [PCG-MGV]
 type = pcg
 max_iter = 500
 tol_rel = 1e-8
 plot = 1
-precon = mgv
+precon = Richardson-MGV
 
 [Richardson-MGV]
 type = richardson
 plot = 1
 tol_rel = 1e-8
-max_iter = 1000
+max_iter = 1
 precon = mgv
 
 [strongwolfelinesearch]
@@ -52,13 +49,6 @@ plot = 0
 max_iter = 20
 tol_decrease = 1e-3
 tol_curvature = 0.3
-keep_iterates = 0
-
-[secantlinesearch]
-type = SecantLinesearch
-plot = 0
-initial_step = 1e-2
-max_iter = 100
 keep_iterates = 0
 
 [rich]
@@ -76,18 +66,13 @@ type = mgv
 smoother = rich
 coarse = pcg
 
+[cg]
+type = pcg
+min_iter = 4
+max_iter = 4
+
 [pcg]
 type = pcg
 max_iter = 1000
 tol_rel = 1e-8
 precon = jac
-
-[mgv-pcgsmoother]
-type = mgv
-smoother = pcgsmoother
-coarse = pcg
-
-[pcgsmoother]
-type = pcg
-min_iter = 4
-max_iter = 4
