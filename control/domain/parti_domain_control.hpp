@@ -169,6 +169,16 @@ namespace FEAT
           return true;
         }
 
+        /**
+         * \brief Parses the partitioner options from a PropertyMap
+         *
+         * \param[in] property_map
+         * Contains the configuration, e.g. read from a file
+         *
+         * \returns
+         * \c true, if the parsing was successful, or \c false,
+         * if at least one option was invalid.
+         */
         bool parse_property_map(PropertyMap* property_map)
         {
           XASSERT(property_map != nullptr);
