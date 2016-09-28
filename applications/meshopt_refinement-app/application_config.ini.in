@@ -1,7 +1,13 @@
 [ApplicationSettings]
-mesh_file = ./unit-circle-tria.xml
+mesh_files = ./unit-circle-tria.xml
 meshopt_config_file = ./meshopt_config.ini
 mesh_optimiser = HyperelasticityDefault
 solver_config_file = ./solver_config.ini
-lvl_min = 0
-lvl_max = 5
+
+[DomainControlSettings]
+lvl_min = 1
+lvl_max = 7
+adapt_mode = none
+parti-type = parmetis fallback
+#parti-name = default
+parti-rank-elems = 4
