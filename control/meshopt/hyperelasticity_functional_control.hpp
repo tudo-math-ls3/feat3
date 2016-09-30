@@ -429,7 +429,8 @@ namespace FEAT
               _system_levels.at(level)->op_sys.prepare
                 (global_vec_level, _system_levels.at(level)->filter_sys);
 
-              //(*(_system_levels.at(level)->op_sys)).init();
+              // Call init() here to recompute all scales with current_** ScaleComputation
+              (*(_system_levels.at(level)->op_sys)).init();
             }
           }
 
