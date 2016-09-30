@@ -147,7 +147,7 @@ gradR := simplify(tmp.e_inv/h[1]);</Text-field>
 </Group>
 <Group labelreference="L37">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">exponent_det:=1;
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">exponent_det:=2;
 det_A := eval(Determinant(gradR),h[1]=h[2])^exponent_det;</Text-field>
 </Input>
 </Group>
@@ -159,25 +159,38 @@ rec_det_A:=1/(tmp + sqrt(fac_reg^2 + tmp^2))^2;</Text-field>
 </Group>
 <Group labelreference="L66" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">der_h := ( fac_norm*diff(norm_A,h[1]) + fac_det*diff(det_A,h[2]) + fac_rec_det*diff(rec_det_A,h[2]) );</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">der_h_A := ( fac_norm*diff(norm_A,h[1]) + fac_det*diff(det_A,h[2]) + fac_rec_det*diff(rec_det_A,h[2]) );</Text-field>
 </Input>
 </Group>
-<Group labelreference="L75" drawlabel="true">
+<Group labelreference="L169" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">rumpf:=(fac_norm*norm_A + fac_det*det_A + fac_rec_det*rec_det_A);</Text-field>
-</Input>
-</Group>
-<Group labelreference="L40" drawlabel="true">
-<Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_rumpf := Matrix(nphi,d);
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_norm_A := Matrix(nphi,d);
 for i from 1 to nphi do
    for j from 1 to d do
-      grad_rumpf[i,j] := diff(rumpf,x[i,j]);
+      grad_norm_A[i,j] := fac_norm*diff(norm_A,x[i,j]);
    end do
 end do;</Text-field>
 </Input>
 </Group>
-<Group labelreference="L49" drawlabel="true">
+<Group labelreference="L171" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_det_A := Matrix(nphi,d);
+for i from 1 to nphi do
+   for j from 1 to d do
+      grad_det_A[i,j] := fac_det*diff(det_A,x[i,j]);
+   end do
+end do;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L40" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_rec_det_A := Matrix(nphi,d);
+for i from 1 to nphi do
+   for j from 1 to d do
+      grad_rec_det_A[i,j] := fac_rec_det*diff(rec_det_A,x[i,j]);
+   end do
+end do;</Text-field>
+</Input>
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font foreground="[0,0,0]"># Write generated C code to file
 # Use declare to avoid Maple explicitly casting stuff
@@ -188,27 +201,37 @@ writeto(&quot;maple_p1.txt&quot;);</Text-field>
 </Group>
 <Group labelreference="L8" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(norm_A,resultname=norm_, defaulttype=float);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(norm_A,resultname=norm, defaulttype=float);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L28">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(det_A,resultname=det_, declare=[fac_reg::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(det_A,resultname=det, declare=[fac_reg::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L72" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(rec_det_A,resultname=rec_det_, declare=[fac_reg::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(rec_det_A,resultname=rec_det, declare=[fac_reg::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L12" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(der_h, resultname=der_h_, declare=[fac_reg::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(der_h_A, resultname=der_h, declare=[fac_norm::numeric, fac_det::numeric, fac_rec_det::numeric, fac_reg::numeric]);</Text-field>
 </Input>
 </Group>
-<Group labelreference="L14">
+<Group labelreference="L175">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_rumpf,resultname=grad, declare=[fac_reg::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_norm_A,resultname=grad_norm, declare=[fac_reg::numeric]);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L173" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_det_A,resultname=grad_det, declare=[fac_reg::numeric]);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L14" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_rec_det_A,resultname=grad_rec_det, declare=[fac_reg::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L50" drawlabel="true">
@@ -290,6 +313,11 @@ C(eval(grad_h_eval_det, [fac_norm = 0, fac_det=1, fac_rec_det=0, h[1]=1, h[2]=1]
 </Input>
 </Group>
 <Group labelreference="L64" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_det_A;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L176" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
 </Input>

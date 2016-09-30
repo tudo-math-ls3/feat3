@@ -39,11 +39,11 @@ for num, dest_line in enumerate(dest_file, 1):
       replace_data = line.split()
       # Make sure there is enough data for [keyword, value] split
       if(len(replace_data)>1):
-        first, rest = replace_data[0], replace_data[1:]
+        first, rest = replace_data[0], replace_data[2:]
 	# If the keyword is right, replace set the output line to the one from the source file
         if dest_first == first:
           print "Replaced line ",  num,  " starting with",  dest_first
-          output_line = line
+          output_line = str(data[0])+' '+str(data[1])+' '+str(''.join(replace_data[2:])+"\n")
     # Rewind the source file
     source_file.seek(0)
 

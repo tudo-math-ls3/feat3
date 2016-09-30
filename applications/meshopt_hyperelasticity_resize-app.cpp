@@ -203,7 +203,7 @@ template
 // Template aliases to easier switch between variants
 
 template<typename A, typename B>
-using MyLocalFunctional = Meshopt::RumpfFunctional<A, B>;
+using MyLocalFunctional = Meshopt::RumpfFunctional_D2<A, B>;
 
 // For using the Q1 split functional, the functional is a bit more complicated
 template<typename A, typename B>

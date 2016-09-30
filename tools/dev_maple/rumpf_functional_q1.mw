@@ -107,25 +107,54 @@ hvec := Vector(d,symbol=h);
 <Font foreground="[0,0,0]"># xi is the vector of coordinates on the Rumpf reference element</Font>
 xivec := Vector(d,symbol=xi);
 <Font foreground="[0,0,0]"># Vertex coordinates of the Rumpf reference element</Font>
-xref:=Matrix([[-1,-1],[1,-1],[-1,1],[1,1]]);
+if(d=2) then
+  xref:=Matrix([[-1,-1],[1,-1],[-1,1],[1,1]]);
+elif(d=3) then
+  xref:=Matrix([ [-1,-1,-1], [1,-1,-1], [-1,1,-1], [1,1,-1], [-1,-1,1], [1,-1,1], [-1,1,1], [1,1,1] ]);
+end if;
 <Font foreground="[0,0,0]"># Vertex coordinates of the Rumpf reference element on the optimal scale</Font>
-xh := Matrix([ [-h[1],-h[2]],[h[1],-h[2]],[ -h[1],h[2]],[h[1],h[2]]]);</Text-field>
+if(d=2) then
+  xh := Matrix([ [-h[1],-h[2]],[h[1],-h[2]],[ -h[1],h[2]],[h[1],h[2]]]);
+elif(d=3) then
+  xh := Matrix([ [-h[1],-h[2], -h[3]], [h[1],-h[2], -h[3]],[ -h[1],h[2], -h[3]],[h[1],h[2], -h[3]], [-h[1],-h[2], h[3]], [h[1],-h[2], h[3]],[ -h[1],h[2], h[3]],[h[1],h[2], h[3]]]);
+end if;</Text-field>
 </Input>
 </Group>
 <Group labelreference="L5">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font foreground="[0,0,0]"># Bilinear basis functions for the transformation from the reference element to the physical element</Font>
-phi[1](xi) := 1/4*(1 - xi[1] + (-1 + xi[1])*xi[2]);
-phi[2](xi) := 1/4*(1 + xi[1] + (-1 - xi[1])*xi[2]);
-phi[3](xi) := 1/4*(1 - xi[1] + ( 1 - xi[1])*xi[2]);
-phi[4](xi) := 1/4*(1 + xi[1] + ( 1 + xi[1])*xi[2]);</Text-field>
+if(d=2) then
+  phi[1](xi) := 1/4*(1 - xi[1] + (-1 + xi[1])*xi[2]);
+  phi[2](xi) := 1/4*(1 + xi[1] + (-1 - xi[1])*xi[2]);
+  phi[3](xi) := 1/4*(1 - xi[1] + ( 1 - xi[1])*xi[2]);
+  phi[4](xi) := 1/4*(1 + xi[1] + ( 1 + xi[1])*xi[2]);
+elif (d=3) then
+  phi[1](xi) := 1/8*(1 - xi[1])*(1 - xi[2])*(1 - xi[3]);
+  phi[2](xi) := 1/8*(1 + xi[1])*(1 - xi[2])*(1 - xi[3]);
+  phi[3](xi) := 1/8*(1 - xi[1])*(1 + xi[2])*(1 - xi[3]);
+  phi[4](xi) := 1/8*(1 + xi[1])*(1 + xi[2])*(1 - xi[3]);
+  phi[5](xi) := 1/8*(1 - xi[1])*(1 - xi[2])*(1 + xi[3]);
+  phi[6](xi) := 1/8*(1 + xi[1])*(1 - xi[2])*(1 + xi[3]);
+  phi[7](xi) := 1/8*(1 - xi[1])*(1 + xi[2])*(1 + xi[3]);
+  phi[8](xi) := 1/8*(1 + xi[1])*(1 + xi[2])*(1 + xi[3]);
+end if;</Text-field>
 </Input>
 </Group>
-<Group labelreference="L6">
+<Group labelreference="L183">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font foreground="[0,0,0]"># R is the transformation from the Rumpf reference element to the physical element defined by x</Font>
+#xi=Vector([ xi[1]/h[1], xi[2]/h[2], xi[3]/h[3] ]);
+xhat:=Vector(d);
+for i from 1 to d do
+  xhat[i]:= xi[i]/h[i];
+end do</Text-field>
+</Input>
+</Group>
+<Group labelreference="L6" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">
 for j from 1 to d do
-  R[j](x,xi):= simplify(eval(add(phi[i]( xi )*xmat[i,j],i=1..nphi),xi=Vector([ xi[1]/h[1], xi[2]/h[2] ])));
+  R[j](x,xi):= simplify(eval(add(phi[i]( xi )*xmat[i,j],i=1..nphi), xi=xhat));
 end do;</Text-field>
 </Input>
 </Group>
@@ -149,7 +178,11 @@ integrand_det := simplify(Determinant(gradR(x,xi)))^exponent_det;
 <Font foreground="[0,0,0]"># Integrate det over the Rumpf reference cell
 # Divide by the scaled Rumpf reference cell's volume so the result is independent of the absolute scaling.
 # Otherwise the sum over all elements would vary with the refinement level</Font>
-det_A := (int(int(integrand_det,xi[1]=-h[1]..h[1]),xi[2]=-h[2]..h[2]))/(4*h[1]*h[2]);</Text-field>
+#det_A := (int(int(integrand_det,xi[1]=-h[1]..h[1]),xi[2]=-h[2]..h[2]))/(4*h[1]*h[2]);
+det_A := integrand_det/2^d;
+for i from 1 to d do
+  det_A := int(det_A, xi[i] = -h[i]..h[i])/h[i];
+end do;</Text-field>
 </Input>
 </Group>
 <Group labelreference="L130">
@@ -179,8 +212,7 @@ end do;
 <Font foreground="[0,0,0]"># This result should be scaled by the volume of the domain over which the integration was carried out,
 # but since we divide by that, too (see det_A), there is nothing more to do.
 # This would be the right thing to do, but Maple 16 cannot do it and gets stuck</Font>
-#rec_det_A := int(int(integrand_rec_det),xi[1]=-h[1]..h[1]),xi[2]=-h[2]..h[2])/(4*h[1]*h[2]);
-</Text-field>
+#rec_det_A := int(int(integrand_rec_det),xi[1]=-h[1]..h[1]),xi[2]=-h[2]..h[2])/(4*h[1]*h[2]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L11" drawlabel="true">
@@ -192,17 +224,32 @@ norm_A := ((int(int(integrand_norm,xi[1]=-h[1]..h[1]),xi[2]=-h[2]..h[2]))/(h[1]*
 #norm_A:= (int(int((a(x,xi)-2.)^2,xi[1]=-1..1),xi[2]=-1..1));</Text-field>
 </Input>
 </Group>
-<Group labelreference="L158">
+<Group labelreference="L175" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">rumpf:=fac_norm*norm_A + fac_det*det_A + fac_rec_det*rec_det_A;</Text-field>
-</Input>
-</Group>
-<Group labelreference="L167" drawlabel="true">
-<Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_rumpf := Matrix(nphi,d);
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_norm_A := Matrix(nphi,d);
 for i from 1 to d do
    for j from 1 to nphi do
-      grad_rumpf[j,i] := diff(rumpf,x[j,i]);
+      grad_norm_A[j,i] := fac_norm*diff(norm_A,x[j,i]);
+   end do
+end do;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L177" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_det_A := Matrix(nphi,d);
+for i from 1 to d do
+   for j from 1 to nphi do
+      grad_det_A[j,i] := fac_det*diff(det_A,x[j,i]);
+   end do
+end do;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L167" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_rec_det_A := Matrix(nphi,d);
+for i from 1 to d do
+   for j from 1 to nphi do
+      grad_rec_det_A[j,i] := fac_rec_det*diff(rec_det_A,x[j,i]);
    end do
 end do;</Text-field>
 </Input>
@@ -223,22 +270,32 @@ writeto(&quot;maple_q1.txt&quot;);</Text-field>
 </Group>
 <Group labelreference="L94">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C((det_A),resultname=det_, declare=[fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(det_A,resultname=det, declare=[fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L98" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C((rec_det_A),resultname=rec_det_, declare=[fac_reg::numeric, h::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(rec_det_A,resultname=rec_det, declare=[fac_reg::numeric, h::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L92" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C((norm_A),resultname=norm_, declare=[fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(norm_A,resultname=norm, declare=[fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
 </Input>
 </Group>
-<Group labelreference="L169" drawlabel="true">
+<Group labelreference="L179" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_rumpf,resultname=grad, declare=[fac_det::numeric, fac_rec_det::numeric, fac_norm::numeric, fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_norm_A,resultname=grad_norm, declare=[fac_det::numeric, fac_rec_det::numeric, fac_norm::numeric, fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L181" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_det_A,resultname=grad_det, declare=[fac_det::numeric, fac_rec_det::numeric, fac_norm::numeric, fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L169" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_rec_det_A,resultname=grad_rec_det, declare=[fac_det::numeric, fac_rec_det::numeric, fac_norm::numeric, fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L90" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
@@ -259,7 +316,8 @@ writeto(terminal);</Text-field>
 eval(norm_A,x=xh);
 <Font foreground="[0,0,0]"># h=1 and x = xref means that the transformation is the identity mapping from the vanilla reference cell to itself</Font>
 eval(eval(eval(norm_A,x=xref),h[1]=1),h[2]=1);
-<Font foreground="[0,0,0]"># Both should evaluate to 0</Font></Text-field>
+<Font foreground="[0,0,0]"># Both should evaluate to 0
+</Font></Text-field>
 </Input>
 </Group>
 <Group labelreference="L33" drawlabel="true">

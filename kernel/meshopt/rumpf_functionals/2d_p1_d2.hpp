@@ -5,7 +5,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/shape.hpp>
 #include <kernel/util/tiny_algebra.hpp>
-#include <kernel/meshopt/rumpf_functional.hpp>
+#include <kernel/meshopt//rumpf_functional.hpp>
 
 namespace FEAT
 {
@@ -14,12 +14,13 @@ namespace FEAT
     /// \cond internal
 
     /**
-     * \brief Rumpf functional, 2d P1, squared det terms
-     **/
+     * @brief Rumpf functional, 2d P1, quadratic det term
+     */
     template<typename DataType_>
     class RumpfFunctional_D2<DataType_, Shape::Simplex<2> > :
     public RumpfFunctionalBase<DataType_>
     {
+
       public:
         /// Our data type
         typedef DataType_ DataType;
@@ -29,7 +30,7 @@ namespace FEAT
         typedef RumpfFunctionalBase<DataType> BaseClass;
         /// Type for a pack of local vertex coordinates
         typedef Tiny::Matrix<DataType_, 3, 2> Tx;
-        /// Type for the local cell size
+        /// Type for the local cell sizes
         typedef Tiny::Vector<DataType_, 2> Th;
         /// Type for the gradient of the local cell sizes
         typedef Tiny::Vector<DataType_, 3*2> Tgradh;
@@ -71,7 +72,7 @@ namespace FEAT
 
         /**
          * \brief Computes value the Rumpf functional on one element.
-         **/
+         */
         DataType compute_local_functional(const Tx& x, const Th& h)
         {
           DataType norm_A = compute_norm_A(x,h);
@@ -107,13 +108,13 @@ namespace FEAT
 #if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
         DataType compute_det_A( const Tx& x, const Th& h)
 #else
-        DataType NOINLINE compute_det_A( const Tx& x, const Th& h)
+          DataType NOINLINE compute_det_A( const Tx& x, const Th& h)
 #endif
-        {
-          DataType det_;
-          det_ = DataType(4) / DataType(3) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4));
-          return det_;
-        }
+          {
+            DataType det(0);
+            det = DataType(4)/DataType(3)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1));
+            return det;
+          }
 
         /**
          * \brief Computes the 1/det term on one element
@@ -122,13 +123,13 @@ namespace FEAT
 #if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
         DataType compute_rec_det_A( const Tx& x, const Th& h)
 #else
-        DataType NOINLINE compute_rec_det_A( const Tx& x, const Th& h)
+          DataType NOINLINE compute_rec_det_A( const Tx& x, const Th& h)
 #endif
-        {
-          DataType rec_det_;
-          rec_det_ = Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(2));
-          return rec_det_;
-        }
+          {
+            DataType rec_det(0);
+            rec_det = Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(2));
+            return rec_det;
+          }
 
         /**
          * \brief Computes the Frobenius norm term for one cell
@@ -137,13 +138,13 @@ namespace FEAT
 #if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
         DataType compute_norm_A(const Tx& x, const Th& h)
 #else
-        DataType NOINLINE compute_norm_A(const Tx& x, const Th& h)
+          DataType NOINLINE compute_norm_A(const Tx& x, const Th& h)
 #endif
-        {
-          DataType norm_;
-          norm_ = DataType(4) / DataType(9) * Math::pow(DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2)), DataType(2)) * Math::pow(h(0), -DataType(4));
-          return norm_;
-        }
+          {
+            DataType norm(0);
+            norm = DataType(4)/DataType(9)*Math::pow(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)),DataType(2))/(h(0)*h(0)*h(0)*h(0));
+            return norm;
+          }
 
         /**
          * \brief Computes the functional gradient for one cell
@@ -152,23 +153,75 @@ namespace FEAT
 #if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
         void compute_local_grad(const Tx& x, const Th& h, Tx& grad)
 #else
-        void NOINLINE compute_local_grad(const Tx& x, const Th& h, Tx& grad)
+          void NOINLINE compute_local_grad(const Tx& x, const Th& h, Tx& grad)
 #endif
-        {
-          grad(0,0) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (x(1,1) - x(2,1)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (-DataType(4) * x(0,0) + DataType(2) * x(1,0) + DataType(2) * x(2,0)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(1,1) - x(2,1)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (x(1,1) - x(2,1)));
+          {
+            grad.format(DataType(0));
+            add_grad_norm(grad, x, h);
+            add_grad_det(grad, x, h);
+            add_grad_rec_det(grad, x, h);
 
-          grad(0,1) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (-x(1,0) + x(2,0)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (-DataType(4) * x(0,1) + DataType(2) * x(1,1) + DataType(2) * x(2,1)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (-x(1,0) + x(2,0)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (-x(1,0) + x(2,0)));
+            return;
+          }
 
-          grad(1,0) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (-x(0,1) + x(2,1)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (DataType(2) * x(0,0) - DataType(4) * x(1,0) + DataType(2) * x(2,0)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (-x(0,1) + x(2,1)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (-x(0,1) + x(2,1)));
+        /**
+         * \brief Computes the gradient of the Frobenius norm term
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        void add_grad_norm(Tx& grad_norm, const Tx& x, const Th& h)
+#else
+          void NOINLINE add_grad_norm(Tx& grad_norm, const Tx& x, const Th& h)
+#endif
+          {
+            grad_norm(0,0) += DataType(8)/DataType(9)*this->_fac_norm*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0)*h(0))*(-DataType(4)*x(0,0)+DataType(2)*x(1,0)+DataType(2)*x(2,0));
+            grad_norm(0,1) += DataType(8)/DataType(9)*this->_fac_norm*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0)*h(0))*(-DataType(4)*x(0,1)+DataType(2)*x(1,1)+DataType(2)*x(2,1));
+            grad_norm(1,0) += DataType(8)/DataType(9)*this->_fac_norm*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0)*h(0))*(DataType(2)*x(0,0)-DataType(4)*x(1,0)+DataType(2)*x(2,0));
+            grad_norm(1,1) += DataType(8)/DataType(9)*this->_fac_norm*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0)*h(0))*(DataType(2)*x(0,1)-DataType(4)*x(1,1)+DataType(2)*x(2,1));
+            grad_norm(2,0) += DataType(8)/DataType(9)*this->_fac_norm*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0)*h(0))*(DataType(2)*x(0,0)+DataType(2)*x(1,0)-DataType(4)*x(2,0));
+            grad_norm(2,1) += DataType(8)/DataType(9)*this->_fac_norm*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0)*h(0))*(DataType(2)*x(0,1)+DataType(2)*x(1,1)-DataType(4)*x(2,1));
+          }
 
-          grad(1,1) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (x(0,0) - x(2,0)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (DataType(2) * x(0,1) - DataType(4) * x(1,1) + DataType(2) * x(2,1)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) - x(2,0)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (x(0,0) - x(2,0)));
+        /**
+         * \brief Computes the gradient of the Frobenius norm term
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        void add_grad_det(Tx& grad_det, const Tx& x, const Th& h)
+#else
+          void NOINLINE add_grad_det(Tx& grad_det, const Tx& x, const Th& h)
+#endif
+          {
+            grad_det(0,0) += DataType(8)/DataType(3)*this->_fac_det*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(x(1,1)-x(2,1));
+            grad_det(0,1) += DataType(8)/DataType(3)*this->_fac_det*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(-x(1,0)+x(2,0));
+            grad_det(1,0) += DataType(8)/DataType(3)*this->_fac_det*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(-x(0,1)+x(2,1));
+            grad_det(1,1) += DataType(8)/DataType(3)*this->_fac_det*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(x(0,0)-x(2,0));
+            grad_det(2,0) += DataType(8)/DataType(3)*this->_fac_det*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(x(0,1)-x(1,1));
+            grad_det(2,1) += DataType(8)/DataType(3)*this->_fac_det*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(-x(0,0)+x(1,0));
+          }
 
-          grad(2,0) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (x(0,1) - x(1,1)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (DataType(2) * x(0,0) + DataType(2) * x(1,0) - DataType(4) * x(2,0)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,1) - x(1,1)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (x(0,1) - x(1,1)));
+        /**
+         * \brief Computes the gradient of the Frobenius norm term
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        void add_grad_rec_det(Tx& grad_rec_det, const Tx& x, const Th& h)
+#else
+          void NOINLINE add_grad_rec_det(Tx& grad_rec_det, const Tx& x, const Th& h)
+#endif
+          {
+            grad_rec_det(0,0) += -DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(1,1)-x(2,1))/Math::sqr(h(1))+DataType(4)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(x(1,1)-x(2,1)));
 
-          grad(2,1) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (-x(0,0) + x(1,0)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (DataType(2) * x(0,1) + DataType(2) * x(1,1) - DataType(4) * x(2,1)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (-x(0,0) + x(1,0)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (-x(0,0) + x(1,0)));
+            grad_rec_det(0,1) += -DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(-x(1,0)+x(2,0))/Math::sqr(h(1))+DataType(4)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(-x(1,0)+x(2,0)));
 
-          return;
-        }
+            grad_rec_det(1,0) += -DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(-x(0,1)+x(2,1))/Math::sqr(h(1))+DataType(4)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(-x(0,1)+x(2,1)));
+
+            grad_rec_det(1,1) += -DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)-x(2,0))/Math::sqr(h(1))+DataType(4)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(x(0,0)-x(2,0)));
+
+            grad_rec_det(2,0) += -DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,1)-x(1,1))/Math::sqr(h(1))+DataType(4)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(x(0,1)-x(1,1)));
+
+            grad_rec_det(2,1) += -DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(-x(0,0)+x(1,0))/Math::sqr(h(1))+DataType(4)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1)*h(1))*(-x(0,0)+x(1,0)));
+          }
 
         /**
          * \brief Adds the part coming from the chain rule involving h to the local gradient
@@ -177,20 +230,20 @@ namespace FEAT
 #if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
         void add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
 #else
-        void NOINLINE add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
+          void NOINLINE add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
 #endif
-        {
-          DataType der_h_(0);
-          der_h_ = this->_fac_norm * (DataType(16) / DataType(3) * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(3)) - DataType(16) / DataType(9) * Math::pow(DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2)), DataType(2)) * Math::pow(h(0), -DataType(5))) - DataType(16) / DataType(3) * this->_fac_det * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(5)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (-DataType(4) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1)) * Math::pow(h(1), -DataType(3)) - DataType(8) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(5)));
-
-          for(int i(0); i < Tx::m; ++i)
           {
-            for(int d(0); d < Tx::n; ++d)
+            DataType der_h(0);
+            der_h = this->_fac_norm*(DataType(16)/DataType(3)*(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)))/(h(0)*h(0)*h(0))-DataType(16)/DataType(9)*Math::pow(DataType(3)*Math::sqr(h(0))-DataType(2)*Math::sqr(x(0,0))+DataType(2)*x(0,0)*x(1,0)+DataType(2)*x(0,0)*x(2,0)-DataType(2)*Math::sqr(x(0,1))+DataType(2)*x(0,1)*x(1,1)+DataType(2)*x(0,1)*x(2,1)-DataType(2)*Math::sqr(x(1,0))+DataType(2)*x(1,0)*x(2,0)-DataType(2)*Math::sqr(x(1,1))+DataType(2)*x(1,1)*x(2,1)-DataType(2)*Math::sqr(x(2,0))-DataType(2)*Math::sqr(x(2,1)),DataType(2))/(h(0)*h(0)*h(0)*h(0)*h(0)))-DataType(16)/DataType(3)*this->_fac_det*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)*h(1))-DataType(2)*this->_fac_rec_det*Math::pow(DataType(2)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/Math::sqr(h(1))+Math::sqrt(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)))/DataType(3),-DataType(3))*(-DataType(4)/DataType(3)*Math::sqrt(DataType(3))*(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1))/(h(1)*h(1)*h(1))-DataType(8)*Math::pow(DataType(9)*this->_fac_reg*this->_fac_reg+DataType(12)*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)),-DataType(1)/DataType(2))*Math::pow(x(0,0)*x(1,1)-x(0,0)*x(2,1)-x(1,0)*x(0,1)+x(2,0)*x(0,1)+x(1,0)*x(2,1)-x(2,0)*x(1,1),DataType(2))/(h(1)*h(1)*h(1)*h(1)*h(1)));
+
+            for(int i(0); i < Tx::m; ++i)
             {
-              grad(i,d) += der_h_*grad_h(i*Tx::n + d);
+              for(int d(0); d < Tx::n; ++d)
+              {
+                grad(i,d) += der_h*grad_h(i*Tx::n + d);
+              }
             }
-          }
-        } // add_grad_h_part
+          } // add_grad_h_part
 
     }; // class RumpfFunctional_D2
     extern template class RumpfFunctional_D2<double, Shape::Simplex<2> >;

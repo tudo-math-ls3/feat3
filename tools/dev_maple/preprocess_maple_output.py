@@ -34,20 +34,24 @@ for line in source_file:
 
   output_line = line
 
-  # Replaces grad[i][j] by grad(i,j)
-  output_line = re.sub(r'grad\[(.)\]\[(.)\]', r'grad(\1,\2)', output_line)
   # Replaces grad_norm[i][j] by grad_norm(i,j)
   output_line = re.sub(r'grad_norm\[(.)\]\[(.)\]', r'grad_norm(\1,\2)', output_line)
+  output_line = re.sub(r'grad_det\[(.)\]\[(.)\]', r'grad_det(\1,\2)', output_line)
+  output_line = re.sub(r'grad_rec_det\[(.)\]\[(.)\]', r'grad_rec_det(\1,\2)', output_line)
   # Replaces x[i][j] by x(i,j)
   output_line = re.sub(r'x\[(.)\]\[(.)\]', r'x(\1,\2)', output_line)
   # Replaces h[i] by h(i)
   output_line = re.sub(r'h\[(.)\]', r'h(\1)', output_line)
+  output_line = re.sub(r'pow\(h\((.)\), 0\.2e1\)', r'Math::sqr(h(\1))', output_line)
+  output_line = re.sub(r'pow\(h\((.)\), 0\.3e1\)', r'h(\1)*h(\1)*h(\1)', output_line)
+  output_line = re.sub(r'pow\(h\((.)\), 0\.4e1\)', r'h(\1)*h(\1)*h(\1)*h(\1)', output_line)
+  output_line = re.sub(r'\* pow\(h\((.)\), -0\.2e1\)', r'/ Math::sqr(h(\1))', output_line)
+  output_line = re.sub(r'\* pow\(h\((.)\), -0\.3e1\)', r'/ (h(\1)*h(\1)*h(\1))', output_line)
+  output_line = re.sub(r'\* pow\(h\((.)\), -0\.4e1\)', r'/ (h(\1)*h(\1)*h(\1)*h(\1))', output_line)
+  output_line = re.sub(r'\* pow\(h\((.)\), -0\.5e1\)', r'/ (h(\1)*h(\1)*h(\1)*h(\1)*h(\1))', output_line)
+  output_line = re.sub(r'pow\(x\((.),(.)\), 0\.2e1\)', r'Math::sqr(x(\1,\2))', output_line)
   # Replace fac_reg by this->fac_reg
   output_line = re.sub(r'fac_', r'this->_fac_', output_line)
-  # Encloses the value of each assignment by DataType_( ), i.e. "norm_ = value;" -> "norm_ = DataType_(value);
-  #output_line = re.sub(r'(^.*=)(.*);', r'\1 DataType_(\2);', output_line)
-  # Transforms all occurences "gradij" -> "grad(i,j)"
-  #output_line = re.sub('(?<!_)grad(.)(.)',r"grad(\1,\2)",output_line)
   # Replace pow by FEAT2's Math::pow
   output_line = re.sub('pow',"Math::pow",output_line)
   # Replace sqrt by FEAT3's Math::sqrt
