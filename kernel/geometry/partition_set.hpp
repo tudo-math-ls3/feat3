@@ -31,8 +31,6 @@ namespace FEAT
       int _prio;
       /// the level that this partitioning refers to
       int _level;
-      /// the overlap overlap of this partition
-      int _overlap;
 
       /// our actual partitioning
       Adjacency::Graph _patches;
@@ -41,8 +39,7 @@ namespace FEAT
       /// default construcotr
       Partition() :
         _prio(0),
-        _level(0),
-        _overlap(0)
+        _level(0)
       {
       }
 
@@ -60,15 +57,11 @@ namespace FEAT
        *
        * \param[in] level_
        * The refinement level that the partition is defined on.
-       *
-       * \param[in] overlap_
-       * The overlap of the partition.
        */
-      explicit Partition(Adjacency::Graph&& graph_, const String& name_, int prio_ = 0, int level_ = 0, int overlap_ = 0) :
+      explicit Partition(Adjacency::Graph&& graph_, const String& name_, int prio_ = 0, int level_ = 0) :
         _name(name_),
         _prio(prio_),
         _level(level_),
-        _overlap(overlap_),
         _patches(std::forward<Adjacency::Graph>(graph_))
       {
       }
@@ -88,15 +81,11 @@ namespace FEAT
        *
        * \param[in] level_
        * The refinement level that the partition is defined on.
-       *
-       * \param[in] overlap_
-       * The overlap of the partition.
        */
-      explicit Partition(const Adjacency::DynamicGraph& graph_, const String& name_, int prio_ = 0, int level_ = 0, int overlap_ = 0) :
+      explicit Partition(const Adjacency::DynamicGraph& graph_, const String& name_, int prio_ = 0, int level_ = 0) :
         _name(name_),
         _prio(prio_),
         _level(level_),
-        _overlap(overlap_),
         _patches(Adjacency::rt_as_is, graph_)
       {
       }
@@ -106,7 +95,6 @@ namespace FEAT
         _name(other._name),
         _prio(other._prio),
         _level(other._level),
-        _overlap(other._overlap),
         _patches(std::forward<Adjacency::Graph>(other._patches))
       {
       }
@@ -119,7 +107,6 @@ namespace FEAT
         _name = other._name;
         _prio = other._prio;
         _level = other._level;
-        _overlap = other._overlap;
         _patches = std::forward<Adjacency::Graph>(other._patches);
         return *this;
       }
@@ -163,12 +150,6 @@ namespace FEAT
       int get_level() const
       {
         return _level;
-      }
-
-      /// \returns the overlap of the partition.
-      int get_overlap() const
-      {
-        return _overlap;
       }
 
       /// \returns the elements-at-rank adjacency graph of the partition.
@@ -231,9 +212,6 @@ namespace FEAT
        * The required name of the partition. If \p name is an empty string, the name
        * of a partition is considered irrelevant.
        *
-       * \param[in] overlap
-       * The required overlap of the partition.
-       *
        * \param[in] prio
        * The required minimal priority of the partition. Only partitions with a priority greater or
        * equal to \p prio are considered valid candidates.
@@ -242,15 +220,15 @@ namespace FEAT
        * A pointer to a Partition object that meets the requirements or \c nullptr,
        * if no suitable partition was found in the set.
        */
-      const Partition* find_partition(Index size, const String& name = "", int overlap = 0, int prio = 0) const
+      const Partition* find_partition(Index size, const String& name = "", int prio = 0) const
       {
         const Partition* part(nullptr);
 
         // loop over all partitions
         for(auto it = _parts.begin(); it != _parts.end(); ++it)
         {
-          // check size and overlap
-          if((it->size() != size) || (it->get_overlap() != overlap))
+          // check size
+          if(it->size() != size)
             continue;
 
           // check name

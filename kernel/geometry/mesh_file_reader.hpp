@@ -19,14 +19,13 @@ namespace FEAT
 {
   namespace Geometry
   {
+    // Note: All the basic Parser classes are declared as internal.
     /// \cond internal
+
     // Forward declaration
     template<typename RootMesh_, int world_dim>
     struct DimensionalChartHelper;
-    /// \endcond
 
-    // Note: All the basic Parser classes are declared as internal.
-    /// \cond internal
     template<typename RootMesh_>
     class ChartParser :
       public Xml::MarkupParser
@@ -169,7 +168,6 @@ namespace FEAT
       }
     };
 
-    /// \cond internal
     namespace Intern
     {
       template<typename Shape_, int dim_ = Shape_::dimension>
@@ -218,7 +216,6 @@ namespace FEAT
         }
       };
     } // namespace Intern
-    /// \endcond
 
     template<typename Shape_>
     class TopologyParser :
@@ -969,7 +966,6 @@ namespace FEAT
       String _name;
       int _prio;
       int _level;
-      int _overlap;
       int _num_ranks, _num_elems;
       Adjacency::DynamicGraph _patches;
 
@@ -979,7 +975,6 @@ namespace FEAT
         _name(),
         _prio(0),
         _level(0),
-        _overlap(0),
         _num_ranks(0),
         _num_elems(0),
         _patches()
@@ -992,7 +987,6 @@ namespace FEAT
         attrs.emplace("name", false);
         attrs.emplace("priority", false);
         attrs.emplace("level", false);
-        attrs.emplace("overlap", false);
         return true;
       }
 
@@ -1039,18 +1033,6 @@ namespace FEAT
           }
         }
 
-        // fetch overlap
-        {
-          auto it = attrs.find("overlap");
-          if(it != attrs.end())
-          {
-            if(!it->second.parse(_overlap))
-              throw Xml::ContentError(iline, sline, "Cannot parse partition overlap");
-            if(_overlap < 0)
-              throw Xml::ContentError(iline, sline, "Invalid negative partition overlap");
-          }
-        }
-
         // okay, let's create a new partition
         _patches = Adjacency::DynamicGraph(Index(_num_ranks), Index(_num_elems));
       }
@@ -1058,7 +1040,7 @@ namespace FEAT
       virtual void close(int, const String&) override
       {
         // add our partition to the set
-        _part_set.add_partition(Partition(_patches, _name, _prio, _level, _overlap));
+        _part_set.add_partition(Partition(_patches, _name, _prio, _level));
       }
 
       virtual bool content(int, const String&) override

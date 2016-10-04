@@ -269,7 +269,7 @@
       1
     </Attribute>
   </MeshPart>
-  <Partition name="auto" priority="1" level="0" overlap="0" size="2 32">
+  <Partition name="auto" priority="1" level="0" size="2 32">
     <Patch rank="0" size="16">
       0
       1
@@ -307,7 +307,7 @@
       31
     </Patch>
   </Partition>
-  <Partition name="auto" priority="1" level="0" overlap="0" size="4 32">
+  <Partition name="auto" priority="1" level="0" size="4 32">
     <Patch rank="0" size="8">
       0
       1
@@ -349,7 +349,7 @@
       31
     </Patch>
   </Partition>
-  <Partition name="auto" priority="1" level="0" overlap="0" size="8 32">
+  <Partition name="auto" priority="1" level="0" size="8 32">
     <Patch rank="0" size="4">
       0
       1
@@ -399,7 +399,7 @@
       31
     </Patch>
   </Partition>
-  <Partition name="other" priority="1" level="0" overlap="0" size="8 32">
+  <Partition name="other" priority="1" level="0" size="8 32">
     <Patch rank="0" size="4">
       0
       1
