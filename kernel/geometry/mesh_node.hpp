@@ -474,9 +474,10 @@ namespace FEAT
        */
       bool adapt_by_name(const String& part_name, bool recursive = false)
       {
-        // try to find the corresponding mesh_part node
+        // Try to find the corresponding mesh_part node
         MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
-        if(it == _mesh_part_nodes.end())
+        // Do not proceed if the mesh_part node does not exist or exists but is empty on the current patch
+        if(it == _mesh_part_nodes.end() || it->second.node->get_mesh() == nullptr)
           return false;
 
         // adapt child node
@@ -485,7 +486,7 @@ namespace FEAT
           it->second.node->adapt(true);
         }
 
-        // adapt this node
+        // Adapt this node if we have a chart
         if(it->second.chart != nullptr)
         {
           it->second.chart->adapt(*_mesh, *(it->second.node->get_mesh()));
