@@ -275,14 +275,19 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          // save defect
-          this->_vec_def.copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_def);
+
+          // Unused here
+          DataType fval(0);
 
           // clear solution vector
           vec_cor.format();
 
           this->_op.prepare(vec_cor, this->_filter);
+          this->_op.eval_fval_grad(fval, this->_vec_def);
+
+          // Copy back defect
+          this->_vec_def.copy(vec_def);
+          this->_filter.filter_def(this->_vec_def);
 
           // apply
           return _apply_intern(vec_cor);
@@ -291,9 +296,12 @@ namespace FEAT
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
+          // Unused here
+          DataType fval(0);
+
           this->_op.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.compute_grad(this->_vec_def);
+          this->_op.eval_fval_grad(fval, this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -459,7 +467,7 @@ namespace FEAT
          * \param[in] x
          * The state variable of the optimisation problem
          *
-         * \param[out] func
+         * \param[out] fval
          * The functional value
          *
          * \param[out] grad
@@ -469,7 +477,7 @@ namespace FEAT
          * this, as the function needs to be static because it gets passed around as a C-style function pointer
          *
          */
-        static void _func_grad(const alglib::real_1d_array& x, double& func, alglib::real_1d_array& grad, void* ptr)
+        static void _func_grad(const alglib::real_1d_array& x, double& fval, alglib::real_1d_array& grad, void* ptr)
         {
           // Downcast because we know what we are doing, right?
           ALGLIBMinLBFGS<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinLBFGS<OperatorType, FilterType>*>
@@ -481,12 +489,14 @@ namespace FEAT
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
             vec_tmp_elements[i] = DataType(x[i]);
 
+          DataType real_fval(0);
           // Prepare the operator
           me->_op.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
-          func = me->_op.compute_func();
-          me->_op.compute_grad(me->_vec_def);
+          me->_op.eval_fval_grad(real_fval, me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
+
+          fval = double(real_fval);
 
           // Copy the operator's gradient to ALGLIB's grad variable
           auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
@@ -785,14 +795,18 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          // save defect
-          this->_vec_def.copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_def);
+          // Unused here
+          DataType fval(0);
 
           // clear solution vector
           vec_cor.format();
 
           this->_op.prepare(vec_cor, this->_filter);
+          this->_op.eval_fval_grad(fval, this->_vec_def);
+
+          // Copy back defect
+          this->_vec_def.copy(vec_def);
+          this->_filter.filter_def(this->_vec_def);
 
           // apply
           return _apply_intern(vec_cor);
@@ -802,9 +816,12 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
 
+          // Unused here
+          DataType fval(0);
+
           this->_op.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.compute_grad(this->_vec_def);
+          this->_op.eval_fval_grad(fval, this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -967,7 +984,7 @@ namespace FEAT
          * \param[in] x
          * The state variable of the optimisation problem
          *
-         * \param[out] func
+         * \param[out] fval
          * The functional value
          *
          * \param[out] grad
@@ -977,26 +994,30 @@ namespace FEAT
          * this, as the function needs to be static because it gets passed around as a C-style function pointer
          *
          */
-        static void _func_grad(const alglib::real_1d_array& x, double& func, alglib::real_1d_array& grad, void* ptr)
+        static void _func_grad(const alglib::real_1d_array& x, double& fval, alglib::real_1d_array& grad, void* ptr)
         {
           // Downcast because we know what we are doing, right?
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
 
-          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template elements<LAFEM::Perspective::pod>();
+          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template
+            elements<LAFEM::Perspective::pod>();
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
             vec_tmp_elements[i] = DataType(x[i]);
 
+          DataType real_fval(0);
           // Prepare the operator
           me->_op.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
-          func = me->_op.compute_func();
-          me->_op.compute_grad(me->_vec_def);
+          me->_op.eval_fval_grad(real_fval, me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
+          fval = double(real_fval);
+
           // Copy the operator's gradient to ALGLIB's grad variable
-          auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
+          auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template
+            elements<LAFEM::Perspective::pod>();
 
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
             grad[i] = double(vec_def_elements[i]);

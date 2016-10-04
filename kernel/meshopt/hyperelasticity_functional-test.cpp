@@ -3,11 +3,18 @@
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/meshopt/hyperelasticity_functional.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+
+#include <kernel/meshopt/rumpf_functionals/2d_p1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1.hpp>
+
+#include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
+
+#include <kernel/meshopt/rumpf_functionals/3d_p1_unrolled.hpp>
+//#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
+
+//#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
+//#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
 
 #include <kernel/solver/linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
@@ -24,7 +31,7 @@ struct helperclass;
 /// \cond internal
 
 /**
- * \brief Test for Rumpf smoothers and functionals
+ * \brief Test for Hyperelasticity-based mesh optimisation
  *
  * The input mesh consists of a single Rumpf reference cell of some target scaling. This is then rescaled and the
  * mesh optimiser is supposed to scale it back to the original scaling.
@@ -41,7 +48,7 @@ template
   template<typename, typename> class FunctionalType_,
   template<typename ... > class MeshQualityFunctional_
   >
-  class HyperelasticityFunctionalTest_2d
+  class HyperelasticityFunctionalTest
   : public TestSystem::FullTaggedTest<Mem::Main, DT_, Index>
 {
   public:
@@ -56,7 +63,7 @@ template
     /// The FE space for the transformation
     typedef typename FEAT::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
     /// Our functional type
-    typedef FunctionalType_<DataType, ShapeType> FunctionalType;
+    typedef FunctionalType_<DataType, TrafoType> FunctionalType;
     /// The Rumpf smoother
     typedef MeshQualityFunctional_<MemType, DataType, IndexType, TrafoType, FunctionalType> MeshQualityFunctional;
     /// Filter for Dirichlet boundary conditions
@@ -66,22 +73,21 @@ template
     /// Combined filter
     typedef LAFEM::FilterChain<LAFEM::FilterSequence<SlipFilterType>, LAFEM::FilterSequence<DirichletFilterType>> FilterType;
 
+  private:
+    const int _exponent_det;
 
-    HyperelasticityFunctionalTest_2d() :
-      TestSystem::FullTaggedTest<MemType, DataType, IndexType>("hyperelasticity_functional_test")
+  public:
+    HyperelasticityFunctionalTest(int exponent_det) : TestSystem::FullTaggedTest<MemType, DataType, IndexType>
+    ("hyperelasticity_functional_test-"+FunctionalType::name()), _exponent_det(exponent_det)
       {
       }
 
     virtual void run() const override
     {
-
       // Create a single reference cell of the shape type
       Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
       // Create the mesh
       MeshType* mesh(new MeshType(mesh_factory));
-      // Trafo and trafo FE space
-      TrafoType trafo(*mesh);
-      TrafoSpace trafo_space(trafo);
       // The filters will be empty, but we still need the filter and assembler objects
       std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
       std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
@@ -90,44 +96,49 @@ template
       // Create the root mesh node
       Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
-      // Parameters for the local Rumpf functional
-      DataType fac_norm = DataType(1e0),fac_det = DataType(1), fac_cof = DataType(0), fac_reg(DataType(0e0));
+      // Parameters for the Rumpf functional
+      DataType fac_norm(1e-1);
+      DataType fac_det(2.5);
+      DataType fac_cof(MeshType::world_dim == 3);
+      DataType fac_reg(DataType(1e-8));
       // Create the functional with these parameters
-      auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg);
-
-      // Create the mesh quality functional
-      MeshQualityFunctional rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional);
-
-      // Vector for setting coordinates
-      auto new_coords = rumpflpumpfl.create_vector_r();
-
-      // First we scale the reference element and call compute_h(). This sets the optimal scales. Then we rescale the
-      // cell again WITHOUT calling compute_h(): this sets our initial state from which we start the optimisation.
-      // After optimisation, the original optimal scale should have been recovered.
+      auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg, _exponent_det);
 
       // Set optimal scale
-      DataType target_scaling(DataType(5.5));
-      helperclass<ShapeType>::buffer_to_mesh(new_coords, target_scaling);
+      DataType target_scaling(DataType(2.5));
+      helperclass<ShapeType>::set_coords(*(rmn->get_mesh()), target_scaling);
+
+      // Trafo and trafo FE space
+      TrafoType trafo(*(rmn->get_mesh()));
+      TrafoSpace trafo_space(trafo);
+
+      // Create the mesh quality functional
+      MeshQualityFunctional rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional, Meshopt::ScaleComputation::current_uniform);
+
       // init() sets the coordinates in the mesh and computes h
       rumpflpumpfl.init();
-      // Now set
-      rumpflpumpfl.prepare(new_coords, my_filter);
-      rumpflpumpfl.compute_h();
 
-      // Transform the cell to the initial state
-      DataType scaling(DataType(1.25));
-      helperclass<ShapeType>::buffer_to_mesh(new_coords, scaling);
-      rumpflpumpfl.prepare(new_coords, my_filter);
+      // Now set the initial state
+      auto& coords_buffer = rumpflpumpfl.get_coords();
+      coords_buffer.scale(coords_buffer, DataType(2));
+      rumpflpumpfl.buffer_to_mesh();
 
-      // For saving parts of the functional value
+      // Arrays for saving the contributions of the different Rumpf functional parts
       DataType func_norm;
+      DataType func_cof;
       DataType func_det;
-      DataType func_rec_det;
-
-      DataType fval_pre = rumpflpumpfl.compute_func();
 
       // Dummy vector for rhs
       auto rhs = rumpflpumpfl.create_vector_r();
+      // Vector to save the gradient in for visualisation
+      auto grad = rumpflpumpfl.create_vector_r();
+      // Solver vector containing the initial guess
+      auto new_coords = rumpflpumpfl.get_coords().clone(LAFEM::CloneMode::Deep);
+
+      // Compute initial functional value
+      DataType fval_pre(0);
+      rumpflpumpfl.eval_fval_cellwise(fval_pre, &func_norm, &func_cof, &func_det);
+
       // Create a solver
       auto linesearch = Solver::new_strong_wolfe_linesearch(rumpflpumpfl, my_filter);
 
@@ -136,40 +147,47 @@ template
         my_filter, // filter
         linesearch, // linesearch
         Solver::NLCGDirectionUpdate::DYHSHybrid, // search direction update
-        false); // do not keep iterates
-        //nullptr); // no preconditioner
+        false /*, // do not keep iterates
+                nullptr*/); // no preconditioner
 
       solver->init();
-      // Set very low relative tolerance, it's just one cell
+      solver->set_plot(true);
       solver->set_tol_rel(Math::eps<DataType>());
-      solver->set_plot(false);
       solver->correct(new_coords, rhs);
-
+      solver->done();
       // Compute functional value post optimisation
-      DataType fval_post = rumpflpumpfl.compute_func_cellwise(&func_norm, &func_det, &func_rec_det);
+      DataType fval_post(0);
+      rumpflpumpfl.eval_fval_cellwise(fval_post, &func_norm, &func_cof, &func_det);
 
       const DataType eps = Math::pow(Math::eps<DataType>(),DataType(0.5));
 
-      // Only check func_norm and func_det. Because of the different factors fac_rec_det depending on the
-      // functionals, func_rec_det is not the same in every case. If func_det==1, we have the correct volume anyway.
+      // Check functional value contributions
       TEST_CHECK(fval_pre > fval_post);
+      // Both of these should evaluate to 0
       TEST_CHECK_EQUAL_WITHIN_EPS(func_norm, DataType(0), eps);
-      TEST_CHECK_EQUAL_WITHIN_EPS(func_det, my_functional->_fac_det*DataType(1), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(func_cof, DataType(0), eps);
+      // Because of how the stability term depend on 1/det and det=1 for the identity mapping, this should be 2*fac_det
+      TEST_CHECK_EQUAL_WITHIN_EPS(func_det, fac_det*DataType(2), eps);
 
       // Now do the negative test: Change the functional in a nonsensical manner. Calling the optimiser should NOT
       // give the correctly scaled element
       my_functional->_fac_rec_det = DataType(0.6676);
 
       // Compute initial functional value
-      fval_pre = rumpflpumpfl.compute_func();
+      rumpflpumpfl.eval_fval_cellwise(fval_pre, &func_norm, &func_cof, &func_det);
 
       // Optimise again
       rumpflpumpfl.init();
       rumpflpumpfl.prepare(new_coords, my_filter);
+
+      solver->init();
+      solver->set_plot(true);
+      solver->set_tol_rel(Math::eps<DataType>());
       solver->correct(new_coords, rhs);
+      solver->done();
 
       // Compute new functional value
-      fval_post = rumpflpumpfl.compute_func_cellwise(&func_norm, &func_det, &func_rec_det);
+      rumpflpumpfl.eval_fval_cellwise(fval_post, &func_norm, &func_cof, &func_det);
 
       // With the new functional, the functional value should still have decreased
       TEST_CHECK(fval_pre > fval_post);
@@ -177,7 +195,6 @@ template
       TEST_CHECK(Math::abs(func_norm - DataType(0)) > eps);
       TEST_CHECK(Math::abs(func_det - my_functional->_fac_det*DataType(1)) > eps);
 
-      solver->done();
       delete rmn;
 
     }
@@ -186,39 +203,59 @@ template
 template<typename A, typename B, typename C, typename D, typename E>
 using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
 
-HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_1;
-HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional_D2, MyQualityFunctional> test_hc_2;
-HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s_1;
-HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional_D2, MyQualityFunctional> test_s_2;
+HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_1(1);
+HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_hc_1_u(1);
 
-template<typename A, typename B>
-using MyFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional>;
+HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_2(2);
+HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_hc_2_u(2);
 
-template<typename A, typename B>
-using MyFunctionalQ1Split_D2 = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional_D2>;
+HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s_1(1);
+HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s_1_u(1);
 
-HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_f_1;
-HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Split_D2, MyQualityFunctional> test_q1hack_d_2;
-HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_ds_1;
+HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s_2(2);
+HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s_s_2_u(2);
+
+HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s3_1(1);
+HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_1_u(1);
+HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s3_2(2);
+HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_2_u(2);
+
+//template<typename A, typename B>
+//using MyFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional>;
+//
+//template<typename A, typename B>
+//using MyFunctionalQ1Split_D2 = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional_D2>;
+//
+//HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_f_1;
+//HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, MyFunctionalQ1Split_D2, MyQualityFunctional> test_q1hack_d_2;
+//HyperelasticityFunctionalTest<double, Shape::Simplex<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_ds_1;
 
 /// \brief Specialisation for hypercubes
-template<int shape_dim_>
-struct helperclass< FEAT::Shape::Hypercube<shape_dim_> >
+template<int shape_dim>
+struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
 {
+  typedef FEAT::Shape::Hypercube<shape_dim> ShapeType;
   /// \brief Sets coordinates so we deal the the reference element
-  template<typename VectorType_, typename DataType_>
-  static void buffer_to_mesh(VectorType_& coords_, const DataType_& scaling)
+  template<typename DT_>
+  static void set_coords(Geometry::ConformalMesh<ShapeType, shape_dim, shape_dim, DT_>& mesh_, const DT_& scaling)
   {
-    for(Index i(0); i < Index(1 << shape_dim_); ++i)
-    {
-      Tiny::Vector<DataType_, VectorType_::BlockSize, VectorType_::BlockSize> tmp;
-      for(int d(0); d < shape_dim_; ++d)
-        tmp(d) = (DataType_(((i >> d) & 1) << 1) - DataType_(1)) * scaling ;
+    auto& coords = mesh_.get_vertex_set();
+    Tiny::Vector<DT_, shape_dim > tmp;
 
-      coords_(i, tmp);
+    for(Index i(0); i < Index(1 << shape_dim); ++i)
+    {
+      for(int d(0); d < shape_dim; ++d)
+        tmp(d) = (DT_(((i >> d) & 1) << 1) - DT_(1)) * scaling ;
+
+      coords[i] = tmp;
     }
   }
 
+  // Prints the ShapeType
+  static std::string print_typename()
+  {
+    return "Hypercube_" + stringify(shape_dim);
+  }
 };
 
 /// \brief Specialisation for 2d simplices
@@ -226,17 +263,60 @@ template<>
 struct helperclass< FEAT::Shape::Simplex<2> >
 {
   /// \brief Sets coordinates so we deal the the Rumpf reference element
-  template<typename VectorType_, typename DataType_>
-  static void buffer_to_mesh(VectorType_& coords_, const DataType_& scaling)
+  template<typename DT_>
+  static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<2>, 2, 2, DT_>& mesh_, const DT_& scaling)
   {
-    Tiny::Vector<DataType_, 2, 2> tmp(0);
-    coords_(0, tmp);
+    auto& coords = mesh_.get_vertex_set();
+    Tiny::Vector<DT_, 2> tmp(0);
+    coords[0] = tmp;
 
     tmp(0) = scaling;
-    coords_(1, tmp);
+    coords[1] = tmp;
 
-    tmp(0) = DataType_(0.5) * scaling;
-    tmp(1) = DataType_(0.5)*Math::sqrt(DataType_(3))*scaling;
-    coords_(2, tmp);
+    tmp(0) = DT_(0.5) * scaling;
+    tmp(1) = DT_(0.5)*Math::sqrt(DT_(3))*scaling;
+    coords[2] = tmp;
+  }
+
+  // Prints the ShapeType
+  static std::string print_typename()
+  {
+    return "Simplex_2";
+  }
+};
+
+/// \brief Specialisation for 3d simplices
+template<>
+struct helperclass< FEAT::Shape::Simplex<3> >
+{
+  /// \brief Sets coordinates so we deal the the Rumpf reference element
+  template<typename DT_>
+  static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<3>,3,3, DT_>& mesh_, const DT_& scaling)
+  {
+
+    auto& coords = mesh_.get_vertex_set();
+    Tiny::Vector<DT_, 3> tmp(0);
+    coords[0] = tmp;
+
+    tmp(0) = scaling;
+    tmp(1) = DT_(0);
+    tmp(2) = DT_(0);
+    coords[1] = tmp;
+
+    tmp(0) = DT_(0.5) * scaling;
+    tmp(1) = DT_(0.5)*Math::sqrt(DT_(3))*scaling;
+    tmp(2) = DT_(0);
+    coords[2] = tmp;
+
+    tmp(0) = DT_(0.5) * scaling;
+    tmp(1) = Math::sqrt(DT_(3))/DT_(6)*scaling;
+    tmp(2) = Math::sqrt(DT_(6))/DT_(3)*scaling;
+    coords[3] = tmp;
+  }
+
+  // Prints the ShapeType
+  static std::string print_typename()
+  {
+    return "Simplex_3";
   }
 };

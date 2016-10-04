@@ -215,29 +215,21 @@ namespace FEAT
         }
 
         /**
-         * \brief Evaluates the operator at the current state
-         *
-         * \returns The function value at the current state
-         */
-        typename EvalType::ValueType compute_func()
-        {
-          ++_num_func_evals;
-          typename EvalType::ValueType ret;
-          _func_eval.value(ret, _my_state);
-          return ret;
-        }
-
-        /**
          * \brief Evaluates the gradient of the operator at the current state
          *
-         * \param[out] vec_out
-         * The vector containing the gradient
+         * \param[out] fval
+         * The functional value.
+         *
+         * \param[out] grad
+         * The vector containing the gradient.
          */
-        void compute_grad(GradientType& vec_out)
+        void eval_fval_grad(typename EvalType::ValueType& fval, GradientType& grad)
         {
+          ++_num_func_evals;
           ++_num_grad_evals;
+          _func_eval.value(fval, _my_state);
           _func_eval.gradient(_my_grad, _my_state);
-          vec_out(0, _my_grad);
+          grad(0, _my_grad);
         }
 
         /**

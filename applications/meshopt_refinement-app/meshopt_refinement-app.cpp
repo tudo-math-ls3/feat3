@@ -312,9 +312,9 @@ struct MeshoptRefinementApp
             " but is "+stringify_fp_fix(worst_angle)+"\n");
         return 1;
       }
-      if(qual_min < DT_(4.21e-1))
+      if(qual_min < DT_(4.12e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(2.4e-1)+
+        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(4.12e-1)+
             " but is "+stringify_fp_fix(qual_min)+"\n");
         return 1;
       }
@@ -609,6 +609,11 @@ int run_app(int argc, char* argv[])
     ret = MeshoptRefinementApp<MemType, DataType, IndexType, S2M2D>::run(
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
+  //else if(mesh_type == "conformal:simplex:3:3")
+  //{
+  //  ret = MeshoptRefinementApp<MemType, DataType, IndexType, S3M3D>::run(
+  //    args, application_config, meshopt_config, solver_config, mesh_file_reader);
+  //}
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
 
@@ -676,6 +681,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
     iss << "fac_reg = 1e-8" << std::endl;
+    iss << "exponent_det = 1" << std::endl;
     iss << "scale_computation = once_uniform" << std::endl;
   }
   else if(test_number == 2)
@@ -687,12 +693,13 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
-    iss << "local_functional = RumpfFunctional_D2" << std::endl;
+    iss << "local_functional = RumpfFunctional" << std::endl;
     iss << "solver_config = NLCG" << std::endl;
     iss << "fac_norm = 1.0" << std::endl;
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
     iss << "fac_reg = 1e-8" << std::endl;
+    iss << "exponent_det = 2" << std::endl;
     iss << "scale_computation = current_uniform" << std::endl;
   }
   else

@@ -20,6 +20,8 @@ endif(FEAT_EICKT)
 
 ADD_LIBRARY(kernel-meshopt STATIC ${kernel-meshopt-list})
 
+TARGET_LINK_LIBRARIES (kernel-meshopt kernel-cubature kernel-geometry kernel-lafem kernel-util)
+
 # list of meshopt tests
 SET (test_list
     hyperelasticity_functional-test

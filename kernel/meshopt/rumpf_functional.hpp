@@ -29,7 +29,7 @@ namespace FEAT
         typedef DataType_ DataType;
       public:
         /// Factor for the Frobenius norm part in the mesh quality functional
-        DataType _fac_norm;
+        DataType _fac_frobenius;
         /// Factor for the det part in the mesh quality functional
         DataType _fac_det;
         /// Factor for the 1/det part in the mesh quality functional
@@ -43,7 +43,7 @@ namespace FEAT
          *
          * \details
          *
-         * \param[in] fac_norm_
+         * \param[in] fac_frobenius_
          * Factor for the Rumpf functional
          *
          * \param[in] fac_det_
@@ -60,12 +60,12 @@ namespace FEAT
          *
          */
         explicit RumpfFunctionalBase(
-          const DataType_ fac_norm_,
+          const DataType_ fac_frobenius_,
           const DataType_ fac_det_,
           const DataType_ fac_rec_det_,
           const DataType_ fac_cof_,
           const DataType_ fac_reg_) :
-          _fac_norm(fac_norm_),
+          _fac_frobenius(fac_frobenius_),
           _fac_det(fac_det_),
           _fac_rec_det(fac_rec_det_),
           _fac_cof(fac_cof_),
@@ -91,7 +91,7 @@ namespace FEAT
         /// \brief Print basic information
         void print()
         {
-          Util::mpi_cout_pad_line("fac_norm",stringify_fp_sci(_fac_norm));
+          Util::mpi_cout_pad_line("fac_frobenius",stringify_fp_sci(_fac_frobenius));
           Util::mpi_cout_pad_line("fac_det",stringify_fp_sci(_fac_det));
           Util::mpi_cout_pad_line("fac_rec_det",stringify_fp_sci(_fac_rec_det));
           Util::mpi_cout_pad_line("fac_cof",stringify_fp_sci(_fac_cof));
@@ -106,28 +106,43 @@ namespace FEAT
      * \tparam DataType_
      * Our data type
      *
-     * \tparam ShapeType_
-     * Shape type of the underlying transformation
+     * \tparam TrafoType_
+     * The transformation mapping reference cells to the mesh
      *
-     * The actual implementation has to be supplied by the specialisations in ShapeType_.
+     * The actual implementation has to be supplied by the specialisations in TrafoType_.
      *
      * A RumpfFunctional computes the cell local contribution to the local functional value and its gradient.
      * The basic archetype is of the form
      *
      * \f[
-     *   L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2 + fac\_det (\det \nabla R_K)^p
+     *   L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2
+     *                          + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2 +
+     *                          +fac\_det (\det \nabla R_K)^p
      *   + \frac{fac\_rec\_det}{\det \nabla R_K + \sqrt(\mathrm{fac\_reg}^2 + (\det \nabla R_K)^2)}
+     * \f]
+     *
+     * For the computation of the gradient of \f$ L \f$, we need to calculate some directional derivatives wrt.
+     * matrices.
+     *
+     * Let \f$ M: \mathbb{R} \to \mathbb{R}^{d \times d} be a matrix valued mapping. Then we have the following
+     * identities:
+     * \f{align*}
+     *    \frac{d}{dt}M(t)^{-1} = - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
+     *    \frac{d}{dt} \| M(t) \|_F^2 =  M(t) : \frac{d M}{d t}(t)\\
+     *    \frac{d}{dt} \mathrm{det}( M(t) ) =  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)\\
+     *    \frac{d}{dt} \mathrm{cof}( M(t) ) =  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{cof}(M(t))
+     *    - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{cof}(M(t))
      * \f]
      *
      */
 #ifndef DOXYGEN
-    template<typename DataType_, typename ShapeType_>
+    template<typename DataType_, typename TrafoType_>
     class RumpfFunctional;
     // Note:
     // The following block serves as an element interface documentation and is therefore only
     // visible to doxygen. The actual functionality has to be supplied by the implementation.
 #else
-    template<typename DataType_, typename ShapeType_>
+    template<typename DataType_, typename TrafoType_>
     class RumpfFunctional
     {
       /**
@@ -135,7 +150,7 @@ namespace FEAT
        *
        * \details
        *
-       * \param[in] fac_norm_
+       * \param[in] fac_frobenius_
        * Factor for the Rumpf functional
        *
        * \param[in] fac_det_
@@ -158,7 +173,7 @@ namespace FEAT
        *
        **/
       RumpfFunctional(
-        const DataType_ fac_norm_,
+        const DataType_ fac_frobenius_,
         const DataType_ fac_det_,
         const DataType_ fac_cof_,
         const DataType_ fac_reg_);
@@ -187,7 +202,7 @@ namespace FEAT
        *
        */
       template<typename Tx_, typename Th_>
-      DataType_ compute_local_functional(const Tx_& x, const Th_& h);
+      DataType_ eval_fval_grad(const Tx_& x, const Th_& h);
 
       /**
        * \copydoc compute_local_functional()
@@ -211,259 +226,11 @@ namespace FEAT
        *
        **/
       template<typename Tx_, typename Th_>
-      DataType_ compute_local_functional(const Tx_& x, const Th_& h,
+      DataType_ eval_fval_cellwise(const Tx_& x, const Th_& h,
       DataType_& func_norm,
       DataType_& func_det,
       DataType_& func_rec_det);
 
-      /**
-       * \brief Computes the det term on one element
-       *
-       * \tparam Tx_
-       * Type for the cell coordinates x
-       *
-       * \tparam Th_
-       * Type for the local mesh size
-       *
-       * \param[in] x
-       * (world_dim \f$ \times \f$ (number of vertices per cell)) - matrix that holds the local coordinates that
-       * define the cell \f$ K \f$.
-       *
-       * \param[in] h
-       * (world_dim) - vector that holds the dimensions of the target reference cell
-       *
-       * \returns
-       * The local contribution to the 1/det term
-       *
-       * Computes \f$ \int_K (det(A^T A))^{\frac{p}{2}} dx \f$ for the cell defined by the coordinates x with regard to the reference
-       * cell \f$ K^* \f$.
-       *
-       **/
-      template<typename Tx_, typename Th_ >
-      DataType_ compute_det_A( const Tx_& x, const Th_& h);
-
-      /**
-       * \brief Computes the 1/det term on one element
-       *
-       * \tparam Tx_
-       * Type for the cell coordinates x
-       *
-       * \tparam Th_
-       * Type for the local mesh size
-       *
-       * \param[in] x
-       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
-       * define the cell \f$ K \f$.
-       *
-       * \param[in] h
-       * (world_dim) - vector that holds the dimensions of the target reference cell
-       *
-       * \returns
-       * The local contribution to the 1/det term
-       *
-       * Computes \f$ \int_K \frac{1}{\sqrt{det(A^T A)} + \sqrt{det(A^T A) + fac_reg^2}} dx \f$ for the cell defined by the coordinates x with regard to the reference
-       * cell \f$ K^* \f$.
-       *
-       **/
-      template<typename Tx_, typename Th_ >
-      DataType_ compute_rec_det_A( const Tx_& x, const Th_& h);
-
-      /**
-       * \brief Computes the Frobenius norm term for one cell
-       *
-       * Computes \f$ \int_K \| A \|^2_F  dx \f$ for the cell defined by the coordinates x with regard to the reference
-       * cell \f$ K^* \f$.
-       *
-       * \tparam Tx_
-       * Type for the cell coordinates x
-       *
-       * \tparam Th_
-       * Type for the local mesh size h
-       *
-       * \param[in] x
-       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
-       * define the cell \f$ K \f$.
-       *
-       * \param[in] h
-       * (world_dim) - vector that holds the dimensions of the target reference cell
-       *
-       * \returns
-       * The local contribution to the Frobenius norm term
-       *
-       **/
-      template<typename Tx_, typename Th_ >
-      DataType_ compute_norm_A( const Tx_& x, const Th_& h);
-
-      /**
-       * \brief Computes the functional gradient for one cell
-       *
-       * Computes the functional gradient for the cell defined by the coordinates x with regard to the reference
-       * cell \f$ K^* \f$.
-       *
-       * \tparam Tx_
-       * Type for the cell coordinates x
-       *
-       * \tparam Th_
-       * Type for the local mesh size h
-       *
-       * \tparam Tgrad_
-       * Type for the local gradient matrix grad
-       *
-       * \param[in] x
-       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
-       * define the cell \f$ K \f$.
-       *
-       * \param[in] h
-       * (world_dim) - vector that holds the dimensions of the target reference cell
-       *
-       * \param[in] grad
-       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local contribution to the
-       * global functional gradient
-       *
-       * \returns
-       * The local contribution grad to global functional gradient
-       *
-       **/
-      template<typename Tx_, typename Th_, typename Tgrad_>
-      void compute_local_grad( const Tx_& x, const Th_& h, Tgrad_& grad);
-    };
-#endif
-
-    /**
-     * \brief Base class template for the levelset functionality of Rumpf functionals with levelsets
-     *
-     * This is completely seperate from RumpfFunctional.
-     *
-     * \tparam DataType_
-     * Our data type
-     *
-     * \tparam ShapeType_
-     * Shape type of the underlying transformation
-     *
-     * The actual implementation has to be supplied by the implementation. Currently, the generic implementation fits
-     * all shape types.
-     *
-     **/
-#ifndef DOXYGEN
-    template<typename DataType_, typename ShapeType_>
-    class RumpfFunctionalLevelset;
-    // Note:
-    // The following block serves as an element interface documentation and is therefore only
-    // visible to doxygen. The actual functionality has to be supplied by the implementation.
-    // Only components that are not present in the base class are documented here.
-#else
-    template<typename DataType_, typename ShapeType_>
-    class RumpfFunctionalLevelset
-    {
-      /**
-       * \brief Computes the additional levelset penalty term for the Rumpf functional
-       *
-       * \tparam Tl_
-       * Type for the object containing the local levelset values, i.e. FEAT::Tiny::Vector
-       *
-       * \param[in] lvlset_vals
-       * The values of the levelset function in the grid vertices for the current element
-       *
-       * \returns
-       * The local contribution to the global levelset penalty term
-       *
-       **/
-      template<typename Tl_>
-      DataType_ compute_lvlset_penalty(const Tl_& lvlset_vals);
-
-      /**
-       * \brief Adds the gradient of the additional levelset penalty term
-       *
-       * \tparam Tl_
-       * Type for the object containing the local levelset values, i.e. FEAT::Tiny::Vector
-       *
-       * \tparam Tlg_
-       * Type for the object containing the local levelset gradient values, i.e. FEAT::Tiny::Matrix
-       *
-       * \tparam Tgrad_
-       * Type for the object containing the functional gradient, i.e. FEAT::Tiny::Matrix
-       *
-       * \param[in] lvlset_vals
-       * The values of the levelset function in the grid vertices for the current element
-       *
-       * \param[in] lvlset_grad_vals
-       * The values of the levelset function's gradient in the grid vertices for the current element
-       *
-       * \param[in] grad
-       * Local functional gradient to which the gradient of the levelset penalty term is added
-       *
-       * \param[in] lvlset_constraint_last
-       * Last computed levelset constraint
-       *
-       **/
-      template<typename Tl_, typename Tlg_, typename Tgrad_>
-      void add_lvlset_penalty_grad(const Tl_& lvlset_vals, const Tlg_& lvlset_grad_vals, Tgrad_& grad, DataType_& lvlset_constraint_last);
-    };
-#endif
-    /**
-     * \brief Class template for Rumpf functionals splitting hypercubes into simplices
-     *
-     * Each Hypercube<d> is subdivided into d! simplices and the P1 functional is evaluated for each of the possible
-     * ways of performing that subdivision.
-     *
-     * \tparam DataType_
-     * Our data type
-     *
-     * \tparam ShapeType_
-     * Shape type of the underlying transformation
-     *
-     * \tparam BaseClass_
-     * The class of funtional that is to be used on each simplex
-     *
-     * The actual implementation has to be supplied by the implementation of specialisations in ShapeType_. Currently,
-     * this is basically a wrapper that makes specialisations in Hypercube<d> use the specialisation of BaseClass in
-     * Simplex<d>, to keep the template interface clean and the parameters consistent.
-     *
-     */
-    template<typename DataType_, typename ShapeType_, template<typename, typename> class BaseClass_>
-    class RumpfFunctionalQ1Split;
-
-    /// \cond internal
-    /**
-     * \brief Class template for Rumpf functionals with squared det and 1/det terms
-     *
-     * \tparam DataType_
-     * Our data type
-     *
-     * \tparam ShapeType_
-     * Shape type of the underlying transformation
-     *
-     * The actual implementation has to be supplied by the implementation of specialisations in ShapeType_.
-     *
-     **/
-    template<typename DataType_, typename ShapeType_>
-    class RumpfFunctional_D2;
-    /// \endcond
-
-    /**
-     * \brief Class template for Rumpf functionals aware of a concentration function
-     *
-     * The concentration function prescribes the mesh density by prescribing the local optimal scales.
-     *
-     * \tparam DataType_
-     * Our data type
-     *
-     * \tparam ShapeType_
-     * Shape type of the underlying transformation
-     *
-     * The actual implementation has to be supplied by the implementation of specialisations in ShapeType_.
-     *
-     **/
-#ifndef DOXYGEN
-    template<typename DataType_, typename ShapeType_>
-    class RumpfFunctionalConc;
-    // Note:
-    // The following block serves as an element interface documentation and is therefore only
-    // visible to doxygen. The actual functionality has to be supplied by the implementation.
-#else
-    template<typename DataType_, typename ShapeType_>
-    class RumpfFunctionalConc
-    {
       /**
        * \brief Adds the gradient h part to the local gradient
        *
@@ -519,14 +286,37 @@ namespace FEAT
        **/
       template<typename Tgrad_, typename Tx_, typename Th_, typename Tgradh_>
       void add_grad_h_part(Tgrad_& grad, const Tx_& x, const Th_& h, const Tgradh_& grad_h);
+
     };
 #endif
 
+    /**
+     * \brief Class template for Rumpf functionals splitting hypercubes into simplices
+     *
+     * Each Hypercube<d> is subdivided into d! simplices and the P1 functional is evaluated for each of the possible
+     * ways of performing that subdivision.
+     *
+     * \tparam DataType_
+     * Our data type
+     *
+     * \tparam ShapeType_
+     * Shape type of the underlying transformation
+     *
+     * \tparam BaseClass_
+     * The class of funtional that is to be used on each simplex
+     *
+     * The actual implementation has to be supplied by the implementation of specialisations in ShapeType_. Currently,
+     * this is basically a wrapper that makes specialisations in Hypercube<d> use the specialisation of BaseClass in
+     * Simplex<d>, to keep the template interface clean and the parameters consistent.
+     *
+     */
+    template<typename DataType_, typename ShapeType_, template<typename, typename> class BaseClass_>
+    class RumpfFunctionalQ1Split;
+
     /// \cond internal
     template<typename DataType_, typename ShapeType_>
-    class RumpfFunctionalConc_D2;
+    class RumpfFunctionalUnrolled;
     /// \endcond
-
   } // namespace Meshopt
 
 } // namespace FEAT

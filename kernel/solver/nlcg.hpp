@@ -314,15 +314,16 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          // save defect
-          this->_vec_r.copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_r);
-
           // clear solution vector
           vec_cor.format();
 
           // Evaluate the operator at the new state
           this->_op.prepare(vec_cor, this->_filter);
+          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
+
+          // Copy back given defect
+          this->_vec_r.copy(vec_def);
+          //this->_system_filter.filter_def(this->_vec_r);
 
           // Prepare the preconditioner (if any)
           if(this->_precond != nullptr)
@@ -339,9 +340,8 @@ namespace FEAT
           //std::cout << std::setprecision(16);
           // Evaluate the operator at the new state
           this->_op.prepare(vec_sol, this->_filter);
-
           // Compute defect
-          this->_op.compute_grad(this->_vec_r);
+          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
           this->_vec_r.scale(this->_vec_r,DataType(-1));
           this->_filter.filter_def(this->_vec_r);
 
@@ -394,9 +394,7 @@ namespace FEAT
           if(iterates != nullptr)
             iterates->push_back(std::move(vec_sol.clone()));
 
-          // Compute intitial function value
-          this->_fval = this->_op.compute_func();
-          // Compute initial defect
+          // Set initial defect. The defect vector was calculated in the calling function
           Status status = this->_set_initial_defect(this->_vec_r, vec_sol);
           if(status != Status::progress)
           {

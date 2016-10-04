@@ -152,6 +152,121 @@ namespace FEAT
     };
 
     template<>
+    struct MeshQualityHeuristic<Shape::Simplex<3>>
+    {
+
+      static String description()
+      {
+        return String("max( h(T) / vol(T)^1/2):");
+      }
+
+      template<typename IdxType_, typename VtxType_>
+      static typename VtxType_::CoordType angle(const IdxType_& idx, const VtxType_& vtx)
+      {
+
+        typedef typename VtxType_::CoordType CoordType;
+
+        Tiny::Matrix<CoordType, 6, VtxType_::num_coords> E(CoordType(0));
+        CoordType edgelengths[6];
+        CoordType angle[6];
+
+        CoordType min_angle(Math::huge<CoordType>());
+        CoordType max_angle(0);
+        for(Index cell(0); cell < idx.get_num_entities(); ++cell)
+        {
+          Index i0(idx(cell,Index(0)));
+          Index i1(idx(cell,Index(1)));
+          Index i2(idx(cell,Index(2)));
+          Index i3(idx(cell,Index(3)));
+
+          E[0] = vtx[i1] - vtx[i0];
+          E[1] = vtx[i2] - vtx[i0];
+          E[2] = vtx[i3] - vtx[i0];
+          E[3] = vtx[i2] - vtx[i1];
+          E[4] = vtx[i3] - vtx[i1];
+          E[5] = vtx[i3] - vtx[i2];
+
+          for(int i(0); i < 6; ++i)
+          {
+            edgelengths[i] = E[i].norm_euclid();
+          }
+
+          angle[0] = Math::acos(Tiny::dot(E[0],E[1])/(edgelengths[0]*edgelengths[1]));
+          angle[1] = Math::acos(Tiny::dot(E[0],E[2])/(edgelengths[0]*edgelengths[2]));
+          angle[2] = Math::acos(Tiny::dot(E[1],E[2])/(edgelengths[1]*edgelengths[2]));
+          angle[3] = Math::acos(Tiny::dot(E[3],E[4])/(edgelengths[3]*edgelengths[4]));
+          angle[4] = Math::acos(Tiny::dot(E[4],E[5])/(edgelengths[4]*edgelengths[5]));
+          angle[5] = Math::acos(Tiny::dot(E[0],E[4])/(edgelengths[0]*edgelengths[4]));
+
+          for(int i(0); i < 6; ++i)
+          {
+            min_angle = Math::min(min_angle,angle[i]);
+            max_angle = Math::max(max_angle,angle[i]);
+          }
+        }
+
+        CoordType worst_angle(Math::min(min_angle, Math::abs(Math::pi<CoordType>() - max_angle)));
+
+        return worst_angle*(CoordType(360))/(CoordType(2)*Math::pi<CoordType>());
+      }
+
+      template<typename IdxType_, typename VtxType_>
+      static void compute(typename VtxType_::CoordType& qual_min, typename VtxType_::CoordType& qual_sum,
+      const IdxType_& idx, const VtxType_& vtx)
+      {
+        typedef typename VtxType_::CoordType CoordType;
+
+        CoordType rho_min(Math::huge<CoordType>());
+        CoordType rho_sum(0);
+        CoordType diam(0);
+        CoordType vol(0);
+
+        Tiny::Matrix<CoordType, VtxType_::num_coords, VtxType_::num_coords> A(CoordType(0));
+        Tiny::Matrix<CoordType, 6, VtxType_::num_coords> E(CoordType(0));
+        CoordType edgelengths[6];
+
+        for(Index cell(0); cell < idx.get_num_entities(); ++cell)
+        {
+          diam = CoordType(0);
+
+          Index i0(idx(cell,Index(0)));
+          Index i1(idx(cell,Index(1)));
+          Index i2(idx(cell,Index(2)));
+          Index i3(idx(cell,Index(3)));
+
+          A[0] = vtx[i1] - vtx[i0];
+          A[1] = vtx[i2] - vtx[i0];
+          A[2] = vtx[i3] - vtx[i0];
+
+          vol = Math::sqrt(A.vol());
+
+          E[0] = vtx[i1] - vtx[i0];
+          E[1] = vtx[i2] - vtx[i0];
+          E[2] = vtx[i3] - vtx[i0];
+          E[3] = vtx[i2] - vtx[i1];
+          E[4] = vtx[i3] - vtx[i1];
+          E[5] = vtx[i3] - vtx[i2];
+
+          for(int i(0); i < 6; ++i)
+          {
+            edgelengths[i] = E[i].norm_euclid();
+            diam = Math::max(diam, edgelengths[i]);
+          }
+
+          CoordType my_rho(vol/diam);
+
+          rho_sum += my_rho;
+          rho_min = Math::min(rho_min, my_rho);
+        }
+        // We want the quality to go to zero if rho_max goes to infinity, so we take 1/rho_max. The absolute minimum
+        // of rho is for the triangle with all angles = 60 degrees, so we scale with its rho for normalisation.
+        qual_min = Math::sqrt(CoordType(2)/Math::sqrt(CoordType(3)))*rho_min;
+        qual_sum = Math::sqrt(CoordType(2)/Math::sqrt(CoordType(3)))*rho_sum;
+      }
+
+    };
+
+    template<>
     struct MeshQualityHeuristic<Shape::Hypercube<2>>
     {
 

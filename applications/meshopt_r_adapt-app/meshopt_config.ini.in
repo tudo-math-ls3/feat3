@@ -19,6 +19,7 @@ fac_norm = 1e-2
 fac_det = 1.0
 fac_cof = 0.0
 fac_reg = 1e-8
+exponent_det = 1
 scale_computation = iter_concentration
 conc_function = OuterDist
 # Use solver_config = QPenalty when setting this to 1

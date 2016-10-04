@@ -34,11 +34,11 @@ namespace FEAT
     template<typename DT_, typename ShapeType_>
     struct AlignmentPenalty;
 
-    template<typename DT_>
-    struct AlignmentPenalty<DT_, Shape::Simplex<2>>
+    template<typename DT_, int shape_dim>
+    struct AlignmentPenalty<DT_, Shape::Simplex<shape_dim>>
     {
       typedef DT_ DataType;
-      typedef Shape::Simplex<2> ShapeType;
+      typedef Shape::Simplex<shape_dim> ShapeType;
 
       template<typename Mesh_, typename Dist_, typename EdgeFreqs_>
       static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist, const EdgeFreqs_& edge_freqs)

@@ -388,8 +388,10 @@ namespace FEAT
             const auto& sys_lvl = this->_system_levels.at(size_t(deque_position));
             (*(sys_lvl->op_sys)).add_to_vtk_exporter(exporter);
 
+            DataType fval(0);
             auto grad = sys_lvl->op_sys.create_vector_r();
-            sys_lvl->op_sys.compute_grad(grad);
+
+            sys_lvl->op_sys.eval_fval_grad(fval, grad);
             sys_lvl->filter_sys.filter_def(grad);
             exporter.add_vertex_vector("grad", *grad);
 

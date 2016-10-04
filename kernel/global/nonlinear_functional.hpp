@@ -270,26 +270,34 @@ namespace FEAT
         }
 
         /**
-         * \brief Evaluates the functional at the current state
+         * \brief Computes the functional's value and gradient at the current state
          *
-         * \returns The sum of all local functional values.
+         * \param[out] fval
+         * The functional value
+         *
+         * \param[out] grad
+         * The vector receiving the synced gradient vector
+         *
          */
-        DataType compute_func()
+        void eval_fval_grad(DataType& fval, VectorTypeL& grad)
         {
           // As the penalty term is quadratic, we have to compute the local functional values separately for summing
           // them up over all ranks
-          DataType my_fval(_nonlinear_functional.compute_func_without_penalty());
+          const bool add_penalty_fval(false);
+          _nonlinear_functional.eval_fval_grad(fval, *grad, add_penalty_fval);
+
 #ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&my_fval, &my_fval, 1, Util::CommOperationSum());
+          Util::Comm::allreduce(&fval, &fval, 1, Util::CommOperationSum());
 #endif
           // Add the penalty term
           if(get_penalty_param() > DataType(0))
           {
             DataType constraint(get_constraint());
-            my_fval += get_penalty_param()*DataType(0.5)*Math::sqr(constraint);
+            fval += get_penalty_param()*DataType(0.5)*Math::sqr(constraint);
           }
 
-          return my_fval;
+          // Synchronise the gradient vector
+          grad.sync_0();
         }
 
         /**
@@ -328,19 +336,6 @@ namespace FEAT
         DataType compute_constraint()
         {
           return _nonlinear_functional.compute_constraint();
-        }
-
-        /**
-         * \brief Computes the functional's gradient at the current state
-         *
-         * \param[out] grad
-         * The vector receiving the synced gradient vector
-         *
-         */
-        void compute_grad(VectorTypeL& grad)
-        {
-          _nonlinear_functional.compute_grad(*grad);
-          grad.sync_0();
         }
 
         //void extract_diag(VectorTypeL& diag, bool sync = true) const

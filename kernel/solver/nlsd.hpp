@@ -208,18 +208,17 @@ namespace FEAT
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_r) override
         {
-          // save defect
-          this->_vec_r.copy(vec_r);
-          //this->_system_filter.filter_def(this->_vec_r);
-
-          // clear solution vector
+          // Clear solution vector
           vec_cor.format();
 
           this->_op.prepare(vec_cor, this->_filter);
+          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
+
+          // Copy back given defect
+          this->_vec_r.copy(vec_r);
 
           if(this->_precond != nullptr)
             this->_precond->prepare(vec_cor, this->_filter);
-
 
           // apply
           return _apply_intern(vec_cor);
@@ -229,8 +228,8 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
           this->_op.prepare(vec_sol, this->_filter);
-          // compute defect
-          this->_op.compute_grad(this->_vec_r);
+          // Compute functional value and gradient
+          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
           this->_vec_r.scale(this->_vec_r,DataType(-1));
           this->_filter.filter_def(this->_vec_r);
 
@@ -275,7 +274,6 @@ namespace FEAT
             return status;
           }
 
-          this->_fval = this->_op.compute_func();
           // The first direction has to be the steepest descent direction
           this->_vec_p.copy(this->_vec_r);
 

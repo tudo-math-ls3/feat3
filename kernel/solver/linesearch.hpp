@@ -373,9 +373,7 @@ namespace FEAT
           vec_sol.axpy(vec_dir, vec_sol, _steplength);
 
           this->_op.prepare(vec_sol, this->_filter);
-
-          this->_fval_min = this->_op.compute_func();
-          this->_op.compute_grad(this->_vec_grad);
+          this->_op.eval_fval_grad(this->_fval_min, this->_vec_grad);
           this->_filter.filter_def(this->_vec_grad);
 
           return Status::success;
@@ -532,9 +530,9 @@ namespace FEAT
             // Increase iteration count
             ++this->_num_iter;
 
+            DataType fval(0);
             this->_op.prepare(sol, this->_filter);
-            DataType fval = this->_op.compute_func();
-            this->_op.compute_grad(this->_vec_grad);
+            this->_op.eval_fval_grad(fval, this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
 
             if(fval < this->_fval_min)
@@ -758,9 +756,9 @@ namespace FEAT
             // Increase iteration count
             ++this->_num_iter;
 
+            DataType fval(0);
             this->_op.prepare(sol, this->_filter);
-            DataType fval = this->_op.compute_func();
-            this->_op.compute_grad(this->_vec_grad);
+            this->_op.eval_fval_grad(fval, this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
 
             if(fval < this->_fval_min)
@@ -1097,8 +1095,8 @@ namespace FEAT
           DataType df_lo(_delta_0);
 
           DataType alpha_hi(0);
-          DataType fval_hi(this->_fval_0); // = this->_op.compute_func();
-          DataType df_hi(_delta_0); // = this->_vec_grad.dot(vec_dir);
+          DataType fval_hi(this->_fval_0);
+          DataType df_hi(_delta_0);
 
           // Set the first step
           DataType alpha(_alpha_0);
@@ -1147,10 +1145,9 @@ namespace FEAT
 
             // Prepare and evaluate
             this->_op.prepare(vec_sol, this->_filter);
-            fval = this->_op.compute_func();
 
             // Compute and filter the gradient
-            this->_op.compute_grad(this->_vec_grad);
+            this->_op.eval_fval_grad(fval,this->_vec_grad);
             this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
@@ -1280,9 +1277,7 @@ namespace FEAT
 
             // Prepare and evaluate
             this->_op.prepare(vec_sol, this->_filter);
-
-            // Compute and filter the gradient
-            this->_op.compute_grad(this->_vec_grad);
+            this->_op.eval_fval_grad(fval, this->_vec_grad);
             this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
           }

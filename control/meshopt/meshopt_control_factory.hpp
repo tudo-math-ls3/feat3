@@ -4,14 +4,13 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
 
 #include <kernel/meshopt/hyperelasticity_functional.hpp>
 #include <kernel/meshopt/mesh_concentration_function.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
 
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_solver_factory.hpp>
@@ -125,8 +124,10 @@ namespace FEAT
 
           auto dudv_config_section = meshopt_config->query_section(config_section_p.first);
           if(dudv_config_section == nullptr)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "config_section "+config_section_p.first+" not found!");
+          }
 
           auto solver_p = dudv_config_section->query("solver_config");
           XASSERTM(solver_p.second, "DuDv config section is missing solver entry!");
@@ -134,7 +135,9 @@ namespace FEAT
           bool fixed_reference_domain(false);
           auto fixed_reference_domain_p = dudv_config_section->query("fixed_reference_domain");
           if(fixed_reference_domain_p.second)
+          {
             fixed_reference_domain = (std::stoi(fixed_reference_domain_p.first) == 1);
+          }
 
           typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_, Trafo_> DuDvCtrl;
           result = std::make_shared<DuDvCtrl>(
@@ -182,7 +185,7 @@ namespace FEAT
           DT_ fac_cof(0);
           DT_ fac_reg(0);
 
-          bool split_hypercubes(false);
+          //bool split_hypercubes(false);
 
           // Get Meshopt configuration section
           auto meshopt_section = meshopt_config->query_section(section_key);
@@ -204,8 +207,9 @@ namespace FEAT
           // Get the name of the MeshOptimiser configuration section
           auto config_section_p = meshopt_section->query("config_section");
           if(!config_section_p.second)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" not found");
+          {
+            throw InternalError(__func__,__FILE__,__LINE__, "config_section "+config_section_p.first+" not found");
+          }
 
           // Get the MeshOptimiser configuration section
           auto hyperelasticity_config_section = meshopt_config->query_section(config_section_p.first);
@@ -213,100 +217,126 @@ namespace FEAT
           // Get fac_norm
           auto fac_norm_p = hyperelasticity_config_section->query("fac_norm");
           if(!fac_norm_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "config_section "+config_section_p.first+" is missing fac_norm entry!");
+          }
           fac_norm = DT_(std::stod(fac_norm_p.first));
 
           // Get fac_det
           auto fac_det_p = hyperelasticity_config_section->query("fac_det");
           if(!fac_det_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "config_section "+config_section_p.first+" is missing fac_det entry!");
+          }
           fac_det = DT_(std::stod(fac_det_p.first));
 
           // Get fac_cof
           auto fac_cof_p = hyperelasticity_config_section->query("fac_cof");
           if(!fac_cof_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "config_section "+config_section_p.first+" is missing fac_cof entry!");
+          }
           fac_cof = DT_(std::stod(fac_cof_p.first));
 
           // Get fac_reg
           auto fac_reg_p = hyperelasticity_config_section->query("fac_reg");
           if(!fac_reg_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "config_section "+config_section_p.first+" is missing fac_reg entry!");
+          }
           fac_reg = DT_(std::stod(fac_reg_p.first));
 
           // Get the local functional
           auto local_functional_p = hyperelasticity_config_section->query("local_functional");
           if(!local_functional_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "config_section "+config_section_p.first+" is missing local_functional entry!");
+          }
+
+          // Get the handling of the 1/det term
+          int exponent_det(0);
+          auto exponent_det_p = hyperelasticity_config_section->query("exponent_det");
+          if(!exponent_det_p.second)
+          {
+            throw InternalError(__func__,__FILE__,__LINE__,
+            "config_section "+config_section_p.first+" is missing exponent_det entry!");
+          }
+          exponent_det = std::stoi(exponent_det_p.first);
 
           // Check if we want to split hypercubes into simplices for the evaluation of the local functional
-          auto split_hc_p = hyperelasticity_config_section->query("split_hypercubes");
-          if(split_hc_p.second)
-          split_hypercubes = (std::stoi(split_hc_p.first) == 1);
+          //auto split_hc_p = hyperelasticity_config_section->query("split_hypercubes");
+          //if(split_hc_p.second)
+          //split_hypercubes = (std::stoi(split_hc_p.first) == 1);
 
           // Get the local functional
           if(local_functional_p.first == "RumpfFunctional")
           {
+            // Disabled because there is no Q1Split in 3d at the moment. If you need Q1Split in 2d only, use the code below
             // If hypercubes are to be split into simplices for the evaluation of the functional, their (cell-) local
             // functional is different
-            if(split_hypercubes)
-            {
-              // The underlying functional is RumpfFunctional, and this is passed to the Split functional as parameter
-              typedef FEAT::Meshopt::RumpfFunctionalQ1Split
-              <
-                DT_,
-                typename MeshType::ShapeType,
-                FEAT::Meshopt::RumpfFunctional
-              > FunctionalType;
+            //if(split_hypercubes)
+            //{
+            //  // The underlying functional is RumpfFunctional, and this is passed to the Split functional as parameter
+            //  typedef FEAT::Meshopt::RumpfFunctionalQ1Split
+            //  <
+            //    DT_,
+            //    typename MeshType::ShapeType,
+            //    FEAT::Meshopt::RumpfFunctional
+            //  > FunctionalType;
 
+            //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+            //    (fac_norm, fac_det, fac_cof, fac_reg);
+            //  result = create_hyperelasticity_control_with_functional
+            //    (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
+            //}
+            //else
+            //{
+              typedef FEAT::Meshopt::RumpfFunctional<DT_, Trafo_> FunctionalType;
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-                (fac_norm, fac_det, fac_cof, fac_reg);
+                (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
+
               result = create_hyperelasticity_control_with_functional
                 (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
-            }
-            else
-            {
-              typedef FEAT::Meshopt::RumpfFunctional<DT_, typename MeshType::ShapeType> FunctionalType;
-              std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-                (fac_norm, fac_det, fac_cof, fac_reg);
-
-              result = create_hyperelasticity_control_with_functional
-                (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
-            }
+            //}
           }
-          else if(local_functional_p.first == "RumpfFunctional_D2")
+          // This is disabled because the ***Unrolled classes produce huge object files, slow code and are a pain to compile.
+          // If you need them for debugging purposes, use the code below
+          else if(local_functional_p.first == "RumpfFunctionalUnrolled")
           {
-            if(split_hypercubes)
-            {
-              // The underlying functional is RumpfFunctional_D2, and this is passed to the Split functional as parameter
-              typedef FEAT::Meshopt::RumpfFunctionalQ1Split
-              <
-                DT_,
-                typename MeshType::ShapeType,
-                FEAT::Meshopt::RumpfFunctional_D2
-              > FunctionalType;
+            //if(split_hypercubes)
+            //{
+            //  // The underlying functional is RumpfFunctional_D2, and this is passed to the Split functional as parameter
+            //  typedef FEAT::Meshopt::RumpfFunctionalQ1Split
+            //  <
+            //    DT_,
+            //    typename MeshType::ShapeType,
+            //    FEAT::Meshopt::RumpfFunctional_D2
+            //  > FunctionalType;
 
-              std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-                (fac_norm, fac_det, fac_cof, fac_reg);
-              result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section, meshopt_config,
-              solver_config, my_functional, dirichlet_list, slip_list);
-            }
-            else
-            {
-              typedef FEAT::Meshopt::RumpfFunctional_D2<DT_, typename MeshType::ShapeType> FunctionalType;
-              std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-                (fac_norm, fac_det, fac_cof, fac_reg);
-              result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section, meshopt_config,
-              solver_config, my_functional, dirichlet_list, slip_list);
-            }
+            //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+            //    (fac_norm, fac_det, fac_cof, fac_reg);
+            //  result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section, meshopt_config,
+            //  solver_config, my_functional, dirichlet_list, slip_list);
+            //}
+            //else
+            //{
+            typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, Trafo_> FunctionalType;
+            std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+              (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
+            result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
+            meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
+            //}
           }
           else
+          {
             throw InternalError(__func__,__FILE__,__LINE__,"Unhandled local_functional "+local_functional_p.first);
+          }
+
           return result;
         } // create_hyperelasticity_control
 
@@ -346,26 +376,34 @@ namespace FEAT
           // Get the global mesh quality functional
           auto global_functional_p = hyperelasticity_config_section->query("global_functional");
           if(!global_functional_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "Hyperelasticity config section is missing global_functional entry!");
+          }
 
           // Get scale computation type, default is once_uniform
           FEAT::Meshopt::ScaleComputation scale_computation(FEAT::Meshopt::ScaleComputation::once_uniform);
 
           auto scale_computation_p = hyperelasticity_config_section->query("scale_computation");
           if(scale_computation_p.second)
+          {
             scale_computation << scale_computation_p.first;
+          }
 
           int align_mesh(0);
           auto align_mesh_p = hyperelasticity_config_section->query("align_mesh");
           if(align_mesh_p.second)
+          {
             align_mesh = std::stoi(align_mesh_p.first);
+          }
 
           // Get the solver config section
           auto solver_p = hyperelasticity_config_section->query("solver_config");
           if(!solver_p.second)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "Hyperelasticity config section is missing solver entry!");
+          }
 
           if(global_functional_p.first == "HyperelasticityFunctional")
           {
@@ -375,14 +413,14 @@ namespace FEAT
               mesh_conc_func(nullptr);
 
             if( scale_computation == FEAT::Meshopt::ScaleComputation::current_concentration ||
-              scale_computation == FEAT::Meshopt::ScaleComputation::iter_concentration ||
-              align_mesh == 1)
-              {
-                auto conc_func_section_p = hyperelasticity_config_section->query("conc_function");
-                XASSERTM(conc_func_section_p.second, "conc_function missing!");
-                mesh_conc_func = FEAT::Meshopt::MeshConcentrationFunctionFactory<Trafo_, RefCellTrafo>::
-                  create(conc_func_section_p.first, meshopt_config);
-              }
+                scale_computation == FEAT::Meshopt::ScaleComputation::iter_concentration ||
+                align_mesh == 1)
+                {
+                  auto conc_func_section_p = hyperelasticity_config_section->query("conc_function");
+                  XASSERTM(conc_func_section_p.second, "conc_function missing!");
+                  mesh_conc_func = FEAT::Meshopt::MeshConcentrationFunctionFactory<Trafo_, RefCellTrafo>::
+                    create(conc_func_section_p.first, meshopt_config);
+                }
 
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_, Trafo_,
@@ -391,8 +429,9 @@ namespace FEAT
               scale_computation, mesh_conc_func, DT_(align_mesh));
           }
           else
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Unknown global_functional "+global_functional_p.first);
+          {
+            throw InternalError(__func__,__FILE__,__LINE__, "Unknown global_functional "+global_functional_p.first);
+          }
 
           return result;
         } // create_hyperelasticity_control_with_functional
@@ -410,17 +449,22 @@ namespace FEAT
 
           auto meshopt_section = meshopt_config->query_section(section_key);
           if(meshopt_section == nullptr)
+          {
             throw InternalError(__func__,__FILE__,__LINE__,
             "Meshopt config is missing the ["+section_key+"] section!");
+          }
           else
           {
             // Get mandatory quality functional entry
             auto type_p = meshopt_section->query("type");
             if(!type_p.second)
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "MeshOptimiser section is missing the mandatory type!");
+            {
+              throw InternalError(__func__,__FILE__,__LINE__, "MeshOptimiser section is missing the mandatory type!");
+            }
             else
+            {
               type = type_p.first;
+            }
 
             auto dirichlet_list_p = meshopt_section->query("dirichlet_boundaries");
             dirichlet_list_p.first.split_by_charset(dirichlet_list, " ");
@@ -440,7 +484,9 @@ namespace FEAT
           }
 
           if(result == nullptr)
+          {
             throw InternalError(__func__,__FILE__,__LINE__, "MeshOptimiser section has unhandled type "+type);
+          }
 
           return result;
         }

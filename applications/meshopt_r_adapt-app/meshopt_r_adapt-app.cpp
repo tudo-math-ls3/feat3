@@ -93,8 +93,6 @@ struct MeshoptRAdaptApp
     // Check if we are to perform test 1 or test 2, if any
     if( args.check("test") >=0 )
     {
-      Util::mpi_cout("Running in test mode, all other command line arguments and configuration files are ignored.\n");
-
       if(args.check("test") > 1)
         throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
 
@@ -320,43 +318,43 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if(worst_angle < DT_(51))
+      if(worst_angle < DT_(52))
       {
-        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(51)+
-            " but is "+stringify_fp_fix(worst_angle));
+        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(52)+
+            " but is "+stringify_fp_fix(worst_angle)+"!\n");
         return 1;
       }
-      if(qual_min < DT_(3.4e-1))
+      if(qual_min < DT_(3.8e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(3.4e-1)+
-            " but is "+stringify_fp_fix(qual_min));
+        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(3.8e-1)+
+            " but is "+stringify_fp_fix(qual_min)+"!\n");
         return 1;
       }
-      if(cell_size_defect > DT_(5.1e-2))
+      if(cell_size_defect > DT_(4.6e-2))
       {
-        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(5.1e-2)+
-            " but is "+stringify_fp_fix(cell_size_defect));
+        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(4.6e-2)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"!\n");
         return 1;
       }
     }
     else if(test_number == 2)
     {
-      if(worst_angle < DT_(26))
+      if(worst_angle < DT_(24))
       {
-        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(26)+
-            " but is "+stringify_fp_fix(worst_angle));
+        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(24)+
+            " but is "+stringify_fp_fix(worst_angle)+"!\n");
         return 1;
       }
-      if(qual_min < DT_(6e-1))
+      if(qual_min < DT_(5.8e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(6e-1)+
-            " but is "+stringify_fp_fix(qual_min));
+        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(5.8e-1)+
+            " but is "+stringify_fp_fix(qual_min)+"!\n");
         return 1;
       }
-      if(cell_size_defect > DT_(8.3e-2))
+      if(cell_size_defect > DT_(8.4e-2))
       {
-        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(8.3e-2)+
-            " but is "+stringify_fp_fix(cell_size_defect));
+        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(8.4e-2)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"!\n");
         return 1;
       }
     }
@@ -540,19 +538,19 @@ struct MeshoptRAdaptApp
       if(worst_angle < DT_(52))
       {
         Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(52)+
-            " but is "+stringify_fp_fix(worst_angle));
+            " but is "+stringify_fp_fix(worst_angle)+"!\n");
         return 1;
       }
-      if(qual_min < DT_(3.5e-1))
+      if(qual_min < DT_(3.7e-1))
       {
         Util::mpi_cout("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(3.5e-1)+
-            " but is "+stringify_fp_fix(qual_min));
+            " but is "+stringify_fp_fix(qual_min)+"!\n");
         return 1;
       }
-      if(cell_size_defect > DT_(5.5e-2))
+      if(cell_size_defect > DT_(4.6e-2))
       {
-        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(5.5e-2)+
-            " but is "+stringify_fp_fix(cell_size_defect));
+        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(4.6e-2)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"!\n");
         return 1;
       }
     }
@@ -561,19 +559,19 @@ struct MeshoptRAdaptApp
       if(worst_angle < DT_(28))
       {
         Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(28)+
-            " but is "+stringify_fp_fix(worst_angle));
+            " but is "+stringify_fp_fix(worst_angle)+"!\n");
         return 1;
       }
       if(qual_min < DT_(6.5e-1))
       {
         Util::mpi_cout("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(6.5e-1)+
-            " but is "+stringify_fp_fix(qual_min));
+            " but is "+stringify_fp_fix(qual_min)+"!\n");
         return 1;
       }
-      if(cell_size_defect > DT_(6.3e-2))
+      if(cell_size_defect > DT_(6.6e-2))
       {
-        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(6.3e-2)+
-            " but is "+stringify_fp_fix(cell_size_defect));
+        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(6.6e-2)+
+            " but is "+stringify_fp_fix(cell_size_defect)+"!\n");
         return 1;
       }
     }
@@ -866,6 +864,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
     iss << "fac_reg = 1e-8" << std::endl;
+    iss << "exponent_det = 1" << std::endl;
     iss << "scale_computation = iter_concentration" << std::endl;
     iss << "conc_function = OuterDist" << std::endl;
 
@@ -874,7 +873,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "chart_list = moving_circle" << std::endl;
     iss << "operation = min" << std::endl;
     iss << "function_type = PowOfDist" << std::endl;
-    iss << "minval = 1e-2" << std::endl;
+    iss << "minval = 2e-2" << std::endl;
     iss << "exponent = 0.5" << std::endl;
     iss << "use_derivative = 1" << std::endl;
   }
@@ -893,6 +892,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
     iss << "fac_reg = 1e-8" << std::endl;
+    iss << "exponent_det = 1" << std::endl;
     iss << "scale_computation = once_uniform" << std::endl;
     iss << "conc_function = OuterDist" << std::endl;
     iss << "align_mesh = 1" << std::endl;

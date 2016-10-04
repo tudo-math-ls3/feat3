@@ -6,6 +6,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/util/mpi_cout.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/meshopt/base.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 
@@ -215,32 +216,6 @@ namespace FEAT
         CoordType& vol_min, CoordType& vol_max) const = 0;
 
     }; // class MeshQualityFunctional
-
-    /// \cond internal
-    namespace Intern
-    {
-      /**
-       * \brief Information about the FE space the transformation belongs to
-       *
-       * \tparam Trafo_
-       * The transformation
-       */
-      template<typename Trafo_>
-      struct TrafoFE
-      {
-#ifdef DOXYGEN
-        /// Finite Element space the trafo belongs to
-        typedef ... Space;
-#endif
-      };
-
-      template<typename Mesh_>
-      struct TrafoFE<Trafo::Standard::Mapping<Mesh_>>
-      {
-        typedef Space::Lagrange1::Element<Trafo::Standard::Mapping<Mesh_>> Space;
-      };
-    }
-    /// \endcond
 
   } // namespace Meshopt
 } // namespace FEAT
