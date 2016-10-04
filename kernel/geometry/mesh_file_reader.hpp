@@ -13,12 +13,156 @@
 #include <kernel/geometry/atlas/sphere.hpp>
 #include <kernel/geometry/atlas/tube.hpp>
 #include <kernel/adjacency/dynamic_graph.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
 namespace FEAT
 {
   namespace Geometry
   {
+    /**
+     * \brief MeshNodeLinker Error class
+     *
+     * This exception is thrown by the MeshNodeLinker class if anything goes wrong.
+     *
+     * \author Peter Zajac
+     */
+    class MeshNodeLinkerError :
+      public Exception
+    {
+    public:
+      explicit MeshNodeLinkerError(const String& msg) :
+        Exception(msg)
+      {
+      }
+    }; // class MeshNodeLinkerError
+
+    /**
+     * \brief MeshNode liner class template
+     *
+     * This linker class is used by the MeshFileReader for various post-parse operations,
+     * such as deducting meshpart topologies or linking meshparts to their corresponding charts.
+     *
+     * \author Peter Zajac
+     */
+    template<typename RootMesh_>
+    class MeshNodeLinker
+    {
+    protected:
+      /// our mesh node
+      RootMeshNode<RootMesh_>& _mesh_node;
+      /// our atlas
+      MeshAtlas<RootMesh_>& _atlas;
+
+      // link mesh-parts to charts
+      std::deque<std::pair<String,String>> _meshpart_to_chart;
+      // deduct mesh-part topologies
+      std::deque<String> _meshpart_deduct_topo;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in,out] mesh_node
+       * The mesh node that the linker should operate on.
+       *
+       * \param[in,out] atlas
+       * The atlas that contains the charts.
+       */
+      explicit MeshNodeLinker(RootMeshNode<RootMesh_>& mesh_node, MeshAtlas<RootMesh_>& atlas) :
+        _mesh_node(mesh_node),
+        _atlas(atlas)
+      {
+      }
+
+      /**
+       * \brief Adds a task to link a meshpart to a chart.
+       *
+       * \param[in] meshpart
+       * The name of the meshpart that is to be linked to a chart.
+       *
+       * \param[in] chart
+       * The name of the chart that the meshpart is to be linked to.
+       */
+      void meshpart_link_to_chart(const String& meshpart, const String& chart)
+      {
+        _meshpart_to_chart.emplace_back(std::make_pair(meshpart, chart));
+      }
+
+      /**
+       * \brief Adds a task to deduct a meshpart topology from the root mesh.
+       *
+       * \param[in] meshpart
+       * The name of the meshpart whose topology is to be deducted from the root mesh.
+       */
+      void meshpart_deduct_topology(const String& meshpart)
+      {
+        _meshpart_deduct_topo.emplace_back(meshpart);
+      }
+
+      /**
+       * \brief Executes the linker.
+       *
+       * This function executes all the tasks that have been added to the linker.
+       */
+      void execute()
+      {
+        // link meshparts to charts
+        while(!_meshpart_to_chart.empty())
+        {
+          String mpart_name = _meshpart_to_chart.front().first;
+          String chart_name = _meshpart_to_chart.front().second;
+
+          // try to find the chart
+          const Atlas::ChartBase<RootMesh_>* chart = _atlas.find_mesh_chart(chart_name);
+          if(chart == nullptr)
+          {
+            String msg = String("Chart '") + chart_name + "' not found for meshpart '" + mpart_name + "'";
+            throw MeshNodeLinkerError(msg);
+          }
+
+          // set the chart
+          if(!_mesh_node.set_mesh_part_chart(mpart_name, chart_name, chart))
+          {
+            String msg = String("meshpart '" + mpart_name + "' not found");
+            throw MeshNodeLinkerError(msg);
+          }
+
+          // done
+          _meshpart_to_chart.pop_front();
+        }
+
+        // ger the root mesh (if it exists)
+        const RootMesh_* root_mesh = _mesh_node.get_mesh();
+
+        // deduct meshpart topologies
+        while(!_meshpart_deduct_topo.empty())
+        {
+          String mpart_name = _meshpart_deduct_topo.front();
+          MeshPart<RootMesh_>* mesh_part = _mesh_node.find_mesh_part(mpart_name);
+
+          if(mesh_part == nullptr)
+          {
+            String msg = String("meshpart '" + mpart_name + "' not found");
+            throw MeshNodeLinkerError(msg);
+          }
+
+          // make sure we have the root mesh
+          if(root_mesh == nullptr)
+          {
+            String msg = String("Cannot deduct topology for meshpart '") + mpart_name + "'; no root mesh found";
+            throw MeshNodeLinkerError(msg);
+          }
+
+          // Create the MeshPart's topology from the parent mesh's topology if told so
+          mesh_part->deduct_topology(*(root_mesh->get_topology()));
+
+          // done
+          _meshpart_deduct_topo.pop_front();
+        }
+      }
+    }; // class MeshNodeLinker
+
     // Note: All the basic Parser classes are declared as internal.
     /// \cond internal
 
@@ -711,7 +855,7 @@ namespace FEAT
 
     protected:
       RootMeshNode<MeshType>& _root_node;
-      MeshAtlas<MeshType>& _atlas;
+      MeshNodeLinker<MeshType>& _linker;
       MeshPartType* _mesh_part;
       ChartType* _chart;
       TopoType _topo_type;
@@ -721,9 +865,9 @@ namespace FEAT
       std::vector<Index> _sizes;
 
     public:
-      explicit MeshPartParser(RootMeshNode<MeshType>& root_node, MeshAtlas<MeshType>& atlas) :
+      explicit MeshPartParser(RootMeshNode<MeshType>& root_node, MeshNodeLinker<MeshType>& linker) :
         _root_node(root_node),
-        _atlas(atlas),
+        _linker(linker),
         _mesh_part(nullptr),
         _chart(nullptr),
         _topo_type(TopoType::none)
@@ -766,9 +910,7 @@ namespace FEAT
           {
             // try to find chart
             _chart_name = it->second;
-            _chart = _atlas.find_mesh_chart(_chart_name);
-            if(_chart == nullptr)
-              throw Xml::ContentError(iline, sline, "Unknown chart name: " + _chart_name);
+            _linker.meshpart_link_to_chart(_name, _chart_name);
           }
         }
 
@@ -783,7 +925,10 @@ namespace FEAT
         else if(stopo_type == "full")
           _topo_type = TopoType::full;
         else if(stopo_type == "parent")
+        {
           _topo_type = TopoType::parent;
+          _linker.meshpart_deduct_topology(_name);
+        }
         else
           throw Xml::ContentError(iline, sline, "Invalid topology attribute '" + stopo_type + "'");
 
@@ -840,11 +985,12 @@ namespace FEAT
         else if(_topo_type == TopoType::parent)
         {
           // Create the MeshPart's topology from the parent mesh's topology if told so
-          _mesh_part->deduct_topology(*(_root_node.get_mesh()->get_topology()));
+          //_mesh_part->deduct_topology(*(_root_node.get_mesh()->get_topology()));
+          //_linker.meshpart_deduct_topology(_name);
         }
 
         // Finally, insert mesh part into root node
-        _root_node.add_mesh_part(_name, _mesh_part, _chart_name, _chart);
+        _root_node.add_mesh_part(_name, _mesh_part/*, _chart_name, _chart*/);
 
         // Reset pointer
         _mesh_part = nullptr;
@@ -1073,14 +1219,17 @@ namespace FEAT
       MeshAtlasType& _mesh_atlas;
       /// partition set
       PartitionSet* _part_set;
+      /// mesh node linker
+      MeshNodeLinker<RootMesh_>& _linker;
       /// mesh declarator
       String _mesh_decl;
 
     public:
-      explicit MeshNodeParser(RootMeshNodeType& root_node, MeshAtlasType& mesh_atlas, PartitionSet* part_set) :
+      explicit MeshNodeParser(RootMeshNodeType& root_node, MeshAtlasType& mesh_atlas, PartitionSet* part_set,  MeshNodeLinker<RootMesh_>& linker) :
         _root_node(root_node),
         _mesh_atlas(mesh_atlas),
         _part_set(part_set),
+        _linker(linker),
         _mesh_decl()
       {
       }
@@ -1150,7 +1299,7 @@ namespace FEAT
         if(name == "MeshPart")
         {
           // valid meshpart markup
-          return std::make_shared<MeshPartParser<RootMeshType>>(_root_node, _mesh_atlas);
+          return std::make_shared<MeshPartParser<RootMeshType>>(_root_node, _linker);
         }
         if(name == "Partition")
         {
@@ -1167,7 +1316,7 @@ namespace FEAT
         // anything else is invalid
         return nullptr;
       }
-    }; // class MeshFileParser
+    }; // class MeshNodeParser
 
     /// \endcond
 
@@ -1445,6 +1594,43 @@ namespace FEAT
       /**
        * \brief Parses the mesh file into a mesh node and a mesh atlas.
        *
+       * \param[in,out] linker
+       * A linker that the post-parse tasks are to be added to.
+       *
+       * \param[in,out] root_mesh_node
+       * The root mesh node into which the mesh and the mesh parts are to be added.
+       *
+       * \param[in,out] mesh_atlas
+       * The mesh atlas into which charts are to be added. Is also used to search
+       * for charts for mesh parts.
+       *
+       * \param[in,out] part_set
+       * A pointer to the partition set that partitions are added to.
+       * May be \p nullptr, if the partitions are to be ignored.
+       */
+      template<typename RootMesh_>
+      void parse(
+        MeshNodeLinker<RootMesh_>& linker,
+        RootMeshNode<RootMesh_>& root_mesh_node,
+        MeshAtlas<RootMesh_>& mesh_atlas,
+        PartitionSet* part_set = nullptr)
+      {
+        // read root markup unless it has already been read
+        if(!_have_root_markup)
+          read_root_markup();
+
+        // loop over all scanners
+        for(auto it = _scanners.begin(); it != _scanners.end(); ++it)
+        {
+          // create a corresponding parser and scan
+          (*it)->set_root_parser(std::make_shared<MeshNodeParser<RootMesh_>>(root_mesh_node, mesh_atlas, part_set, linker));
+          (*it)->scan();
+        }
+      }
+
+      /**
+       * \brief Parses the mesh file into a mesh node and a mesh atlas.
+       *
        * \param[in,out] root_mesh_node
        * The root mesh node into which the mesh and the mesh parts are to be added.
        *
@@ -1462,17 +1648,14 @@ namespace FEAT
         MeshAtlas<RootMesh_>& mesh_atlas,
         PartitionSet* part_set = nullptr)
       {
-        // read root markup unless it has already been read
-        if(!_have_root_markup)
-          read_root_markup();
+        // create linker
+        MeshNodeLinker<RootMesh_> linker(root_mesh_node, mesh_atlas);
 
-        // loop over all scanners
-        for(auto it = _scanners.begin(); it != _scanners.end(); ++it)
-        {
-          // create a corresponding parser and scan
-          (*it)->set_root_parser(std::make_shared<MeshNodeParser<RootMesh_>>(root_mesh_node, mesh_atlas, part_set));
-          (*it)->scan();
-        }
+        // parse
+        parse(linker, root_mesh_node, mesh_atlas, part_set);
+
+        // execute linker
+        linker.execute();
       }
     }; // class MeshFileReader
 
