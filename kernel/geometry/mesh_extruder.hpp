@@ -522,8 +522,6 @@ namespace FEAT
 
       void extrude_partition(Partition& hexa_parti, const Partition& quad_parti) const
       {
-        XASSERTM(quad_parti.get_overlap() == 0, "cannot extrude partitions with non-zero overlap");
-
         const Adjacency::Graph& quad_graph = quad_parti.get_patches();
 
         const Index num_patches = quad_parti.get_num_patches();
@@ -556,7 +554,7 @@ namespace FEAT
 
         // create the partition
         hexa_parti = Partition(std::move(hexa_graph), quad_parti.get_name(),
-          quad_parti.get_priority(), quad_parti.get_level(), 0);
+          quad_parti.get_priority(), quad_parti.get_level());
       }
 
       void extrude_partition_set(PartitionSet& hexa_part_set, const PartitionSet& quad_part_set) const
@@ -564,10 +562,6 @@ namespace FEAT
         const auto& quad_parts = quad_part_set.get_partitions();
         for(auto it = quad_parts.begin(); it != quad_parts.end(); ++it)
         {
-          // skip partitons with non-zero overlap
-          if(it->get_overlap() > 0)
-            continue;
-
           Partition hexa_parti;
           extrude_partition(hexa_parti, *it);
           hexa_part_set.add_partition(std::move(hexa_parti));

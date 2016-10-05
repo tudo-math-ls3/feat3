@@ -316,7 +316,6 @@ namespace FEAT
           _os << " name=\"" << partition.get_name() << "\"";
         _os << " priority=\"" << partition.get_priority() << "\"";
         _os << " level=\"" << partition.get_level() << "\"";
-        _os << " overlap=\"" << partition.get_overlap() << "\"";
         _os << " size=\"" << partition.get_num_patches() << ' ' << partition.get_num_elements() << "\"";
         _os << ">" << std::endl;
         _push_indent();
