@@ -12,7 +12,7 @@ For information about legal ways to obtain a copy of Visual Studio, contact your
 - https://www.visualstudio.com/downloads/download-visual-studio-vs
 
 If you are a member of a university that cooperates with Microsoft (such as TU Dortmund), you may as well checkout
-Microsoft's official page https://www.dreamspark.com to obtain a student license for Visual Studio 2015.
+Microsoft's official page https://imagine.microsoft.com to obtain a student license for Visual Studio 2015.
 
 \note
 If you want compile 64-bit binaries, you may also have to manually select the <em>x64 Compilers and Tools</em> option
@@ -124,6 +124,8 @@ parallel (i.e. MPI-based) applications.
 <b>Instructions:</b>
 -# Download the GZ-Archive and unpack its contents into the directory <c>thirdparty</c>.
 -# Rename the sub-directory from <c>parmetis-4.0.3</c> (or whatever version you have downloaded) to <c>parmetis</c>.
+-# Execute the Python script <c>parmetis_patch_win.py</c> in the <c>thirdparty</c> directory.\n
+   <b>Note:</b> Without this patch, ParMETIS will not compile due to some incorrect preprocessor definitions.
 -# The <c>thirdparty</c> directory should now have the following sub-directory structure:
 \verbatim
 thirdparty
