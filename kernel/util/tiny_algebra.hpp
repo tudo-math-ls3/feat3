@@ -801,6 +801,24 @@ namespace FEAT
       }
 
       /**
+       * \brief Returns the Frobenius norm of the difference of this matrix and the identity matrix.
+       *
+       * \returns The Frobenius norm of the difference of this matrix and the identity matrix.
+       */
+      DataType norm_sub_id_frobenius() const
+      {
+        DataType r(0);
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            r += Math::sqr(v[i][j] - DataType(i == j ? 1 : 0));
+          }
+        }
+        return Math::sqrt(r);
+      }
+
+      /**
        * \brief Returns the trace of the matrix.
        *
        * This function computes and returns
@@ -1197,6 +1215,70 @@ namespace FEAT
       {
         format();
         return add_vec_tensor_mult(x, t, alpha);
+      }
+
+      /**
+       * \brief Sets this matrix to the identitiy matrix.
+       *
+       * \returns \p *this
+       */
+      Matrix& set_identity()
+      {
+        for(int i(0); i < m_; ++i)
+          for(int j(0); j < n_; ++j)
+            v[i][j] = (i == j ? T_(1) : T_(0));
+        return *this;
+      }
+
+      /**
+       * \brief Sets this matrix to a 2D rotation matrix.
+       *
+       * \param[in] angle
+       * Specifies the rotation angle in radians
+       *
+       * \returns \p *this
+       */
+      Matrix& set_rotation_2d(T_ angle)
+      {
+        static_assert((m_ == 2) && (n_ == 2), "this function works only for 2x2 matrices");
+        v[0][0] =  (v[1][1] = Math::cos(angle));
+        v[0][1] = -(v[1][0] = Math::sin(angle));
+        return *this;
+      }
+
+      /**
+       * \brief Sets this matrix to a 3D yaw-pitch-roll rotation matrix.
+       *
+       * This function sets a 3D rotation matrix by specifying the yaw, pitch and roll angles.
+       *
+       * The convention for the rotation is <b>Z-Y'-X''</b>, also known as <em>nautical angles</em>.
+       *
+       * \see
+       * - https://en.wikipedia.org/wiki/Euler_angles
+       * - https://en.wikipedia.org/wiki/Aircraft_principal_axes
+       * - http://planning.cs.uiuc.edu/node102.html
+       *
+       * \returns \p *this
+       */
+      Matrix& set_rotation_3d(T_ yaw, T_ pitch, T_ roll)
+      {
+        static_assert((m_ == 3) && (n_ == 3), "this function works only for 3x3 matrices");
+        const T_ cy = Math::cos(yaw);
+        const T_ sy = Math::sin(yaw);
+        const T_ cp = Math::cos(pitch);
+        const T_ sp = Math::sin(pitch);
+        const T_ cr = Math::cos(roll);
+        const T_ sr = Math::sin(roll);
+        v[0][0] = cy*cp;
+        v[0][1] = cy*sp*sr - sy*cr;
+        v[0][2] = cy*sp*cr + sy*sr;
+        v[1][0] = sy*cp;
+        v[1][1] = sy*sp*sr + cy*cr;
+        v[1][2] = sy*sp*cr - cy*sr;
+        v[2][0] = -sp;
+        v[2][1] = cp*sr;
+        v[2][2] = cp*cr;
+        return *this;
       }
 
       /**

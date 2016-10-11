@@ -31,6 +31,8 @@ namespace FEAT
       typedef Mesh_ MeshType;
       /// our chart base-class type
       typedef Atlas::ChartBase<MeshType> MeshChartType;
+      /// our vertex type (aka world point type)
+      typedef typename MeshType::VertexType VertexType;
 
     protected:
       /// our chart map type
@@ -159,6 +161,38 @@ namespace FEAT
         return (*it).second;
       }
 
+      /**
+       * \brief Applies a "proper rigid" transformation onto the atlas.
+       *
+       * Let \e v denote the \p origin world point, \e w the \p offset world point and \e R
+       * the rotation matrix corresponding to the \p angles, then this function applies the
+       * following transformation for any chart point \e x of the atlas:
+       *
+       *   \f[ x \mapsto w + R\cdot (x - v) \f]
+       *
+       * \param[in] origin
+       * The origin of the transformation. This is subtracted from any vertex before applying the
+       * rotation.
+       *
+       * \param[in] angles
+       * The angles of the rotation matrix.
+       * - 2D: the rotation angle in radians is stored as:
+       *   - angles(0): rotation angle
+       *   - angles(1): \e ignored
+       * - 3D: the rotation angles in radians stored as:
+       *   - angles(0): yaw angle
+       *   - angles(1): pitch angle
+       *   - angles(2): roll angle
+       *
+       * \param[in] offset
+       * The offset of the transformation. This is added to any vertex after applying the rotation.
+       */
+      void transform(const VertexType& origin, const VertexType& angles, const VertexType& offset)
+      {
+        // transform all charts
+        for(auto it = _chart_map.begin(); it != _chart_map.end(); ++it)
+          it->second->transform(origin, angles, offset);
+      }
     }; // class MeshAltas<...>
   } // namespace Geometry
 } // namespace FEAT

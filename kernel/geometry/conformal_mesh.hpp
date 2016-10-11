@@ -44,6 +44,9 @@ namespace FEAT
       /// Vertex set type
       typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
 
+      /// Vertex type
+      typedef typename VertexSetType::VertexType VertexType;
+
       /// index set holder type
       typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
@@ -315,6 +318,37 @@ namespace FEAT
         RedundantIndexSetBuilder<ShapeType>::compute(_index_set_holder);
         NumEntitiesExtractor<shape_dim>::set_num_entities(_index_set_holder, _num_entities);
         this->fill_neighbours();
+      }
+
+      /**
+       * \brief Applies a "proper rigid" transformation onto the mesh.
+       *
+       * Let \e v denote the \p origin world point, \e w the \p offset world point and \e R
+       * the rotation matrix corresponding to the \p angles, then this function applies the
+       * following transformation for any vertex \e x of the vertex set:
+       *
+       *   \f[ x \mapsto w + R\cdot (x - v) \f]
+       *
+       * \param[in] origin
+       * The origin of the transformation. This is subtracted from any vertex before applying the
+       * rotation.
+       *
+       * \param[in] angles
+       * The angles of the rotation matrix.
+       * - 2D: the rotation angle in radians is stored as:
+       *   - angles(0): rotation angle
+       *   - angles(1): \e ignored
+       * - 3D: the rotation angles in radians stored as:
+       *   - angles(0): yaw angle
+       *   - angles(1): pitch angle
+       *   - angles(2): roll angle
+       *
+       * \param[in] offset
+       * The offset of the transformation. This is added to any vertex after applying the rotation.
+       */
+      void transform(const VertexType& origin, const VertexType& angles, const VertexType& offset)
+      {
+        _vertex_set.transform(origin, angles, offset);
       }
 
       /**

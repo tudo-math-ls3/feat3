@@ -119,6 +119,9 @@ namespace FEAT
           XASSERT(_orientation == DataType(1) || _orientation == -DataType(1));
         }
 
+        // use default copy ctor; this one is required by the MeshExtruder !
+        Spline(const Spline&) = default;
+
         /** \copydoc ChartBase::get_type() */
         virtual String get_type() const override
         {
@@ -175,35 +178,19 @@ namespace FEAT
           return _world;
         }
 
-        /// \copydoc ChartBase::move_by()
-        virtual void move_by(const WorldPoint& translation) override
+        /// \copydoc ChartBase:transform()
+        virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
         {
-          for(auto& it : _world)
-            it += translation;
-        }
+          // create rotation matrix
+          Tiny::Matrix<DataType, 2, 2> rot;
+          rot.set_rotation_2d(angles(0));
 
-        /// \copydoc ChartBase::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
-        {
-          // This is the 2x2 matrix representing the turning by the angle angles(0)
-          Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
-
-          rot(0,0) = Math::cos(angles(0));
-          rot(0,1) = - Math::sin(angles(0));
-          rot(1,0) = -rot(0,1);
-          rot(1,1) = rot(0,0);
-
-          WorldPoint tmp0(DataType(0));
-          WorldPoint tmp1(DataType(0));
-
-          for(auto& it : _world)
+          // transform all world points
+          WorldPoint tmp;
+          for(auto& pt : _world)
           {
-            // Translate the point to the centre of rotation
-            tmp0 = it - centre;
-            // Rotate
-            tmp1.set_vec_mat_mult(tmp0, rot);
-            // Translate back
-            it = centre + tmp1;
+            tmp = pt - origin;
+            pt.set_mat_vec_mult(rot, tmp) += offset;
           }
         }
 

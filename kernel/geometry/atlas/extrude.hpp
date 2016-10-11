@@ -5,8 +5,6 @@
 #include <kernel/geometry/atlas/chart.hpp>
 // supported sub-charts:
 #include <kernel/geometry/atlas/circle.hpp>
-//#include <kernel/geometry/atlas/bezier.hpp>
-//#include <kernel/geometry/atlas/polyline.hpp>
 #include <kernel/geometry/atlas/spline.hpp>
 
 namespace FEAT
@@ -48,18 +46,54 @@ namespace FEAT
       //protected:
         /// our sub-chart object
         SubChart_* _sub_chart;
-        /// \todo trafo
+
+      protected:
+        /// the origin point
+        Tiny::Vector<CoordType, 2> _origin;
+        /// the offset point
+        Tiny::Vector<CoordType, 3> _offset;
+        /// the rotation matrix
+        Tiny::Matrix<CoordType, 3, 3> _rotation;
 
       public:
         explicit Extrude() :
           _sub_chart(nullptr)
         {
+          _origin.format();
+          _offset.format();
+          _rotation.set_identity();
+        }
+
+        explicit Extrude(SubChart_* sub_chart) :
+          _sub_chart(sub_chart)
+        {
+          _origin.format();
+          _offset.format();
+          _rotation.set_identity();
         }
 
         virtual ~Extrude()
         {
           if(_sub_chart != nullptr)
             delete _sub_chart;
+        }
+
+        void set_origin(CoordType x, CoordType y)
+        {
+          _origin[0] = x;
+          _origin[1] = y;
+        }
+
+        void set_offset(CoordType x, CoordType y, CoordType z)
+        {
+          _offset[0] = x;
+          _offset[1] = y;
+          _offset[2] = z;
+        }
+
+        void set_angles(CoordType yaw, CoordType pitch, CoordType roll)
+        {
+          _rotation.set_rotation_3d(yaw, pitch, roll);
         }
 
         void set_sub_chart(SubChart_* sub_chart)
@@ -78,42 +112,85 @@ namespace FEAT
           return _sub_chart->can_explicit();
         }
 
-        /// \copydoc ChartBase::move_by()
-        virtual void move_by(const WorldPoint& translation) override
+        void transform_2d_to_3d(WorldPoint& p, const SubWorldPoint& q, const CoordType z = CoordType(0)) const
         {
-          ASSERTM(Math::abs(translation[2]) < Math::eps<CoordType>(),
-          "Cannot translate ExtrudeChart in z-direction, it is infinite!");
-
-          SubWorldPoint sub_translation;
-          sub_translation[0] = translation[0];
-          sub_translation[1] = translation[1];
-          _sub_chart->move_by(sub_translation);
+          // apply our extrude transformation:
+          // p = w + R * (q - v)
+          WorldPoint x;
+          x[0] = q[0] - _origin[0];
+          x[1] = q[1] - _origin[1];
+          x[2] = z;
+          p.set_mat_vec_mult(_rotation, x);
+          p += _offset;
         }
 
-        /// \copydoc ChartBase::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
+        void transform_3d_to_2d(const WorldPoint& p, SubWorldPoint& q, CoordType& z) const
         {
-          XASSERTM(Math::abs(angles(1)) < Math::eps<CoordType>(), "More than one angle in extruded 2d rotation!");
-          XASSERTM(Math::abs(angles(2)) < Math::eps<CoordType>(), "More than one angle in extruded 2d rotation!");
-          SubWorldPoint sub_centre;
-          sub_centre[0] = centre[0];
-          sub_centre[1] = centre[1];
+          // apply our inverse extrude transformation:
+          // q = v + R^{-1} * (p - w)
+          WorldPoint x = p - _offset;
+          WorldPoint y;
+          // rotation matrices are orthogonal, i.e. R^{-1} = R^T
+          y.set_vec_mat_mult(x, _rotation);
+          q[0] = y[0] - _origin[0];
+          q[1] = y[1] - _origin[1];
+          z    = y[2];
+        }
 
-          SubWorldPoint sub_angles;
-          sub_angles[0] = angles[0];
-          sub_angles[1] = angles[1];
-          _sub_chart->rotate(sub_centre, sub_angles);
+        void transform_3d_to_2d(const WorldPoint& p, SubWorldPoint& q) const
+        {
+          CoordType z = CoordType(0);
+          transform_3d_to_2d(p, q, z);
+        }
+
+        virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
+        {
+          // the rotation matrix
+          Tiny::Matrix<CoordType, 3, 3> rotation;
+          rotation.set_rotation_3d(angles[0], angles[1], angles[2]);
+
+          // we now have 2 transformations:
+          // 1. from the extrude chart itself and
+          // 2. from the parameters given to this function
+          //
+          // The new extrusion chart transformation is given by the concatenation of the
+          // two above transformations:
+          //
+          //           v2 + R2 * ( (v1 + R1*(x - w1)) - w2)
+          //         = v2 + R2*(v1 - w2) + R2*R1*(x - w1)
+          //           \---------------/   \---/      \/
+          //                  v3             R3       w3
+          //
+          // where
+          //   vi = offset
+          //   Ri = rotation
+          //   wi = orgin
+
+          WorldPoint tmp1, tmp2;
+
+          // let us first update the offset vector v3:
+          // compute offset vector v3 := v2 + R1*(v1 - w2)
+          tmp1 = _offset - origin;
+          tmp2.set_mat_vec_mult(rotation, tmp1);
+          _offset = offset + tmp2;
+
+          // compute rotation matrix R3 := R2*R1
+          Tiny::Matrix<CoordType, 3, 3> old_rot(_rotation);
+          _rotation.set_mat_mat_mult(rotation, old_rot);
+
+          // our origin vector w3 remains the same (= w1)
         }
 
         void project_point(WorldPoint& point) const
         {
-          // extract sub-world
+          // transform to 2d
           SubWorldPoint sub_point;
-          sub_point[0] = point[0];
-          sub_point[1] = point[1];
+          CoordType z = CoordType(0);
+          transform_3d_to_2d(point, sub_point, z);
+          // project in 2d
           _sub_chart->project_point(sub_point);
-          point[0] = sub_point[0];
-          point[1] = sub_point[1];
+          // transform to 3d
+          transform_2d_to_3d(point, sub_point, z);
         }
 
         void project_meshpart(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
@@ -128,30 +205,31 @@ namespace FEAT
 
         void map_param(WorldPoint& point, const ParamPoint& param) const
         {
+          // map the parameter in 2D
           SubParamPoint sub_param;
           sub_param[0] = param[0];
           SubWorldPoint sub_point;
           _sub_chart->map_param(sub_point, sub_param);
-          point[0] = sub_point[0];
-          point[1] = sub_point[1];
-          point[2] = param[1]; // Z-coord
+          // transform to 3d
+          transform_2d_to_3d(point, sub_point, param[1]);
         }
 
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point) const
         {
+          // transform to 2d
           SubWorldPoint sub_point;
-          sub_point[0] = point[0];
-          sub_point[1] = point[1];
+          transform_3d_to_2d(point, sub_point);
           return _sub_chart->compute_dist(sub_point);
         }
 
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
+          // transform to 2d
           SubWorldPoint sub_point;
-          sub_point[0] = point[0];
-          sub_point[1] = point[1];
+          CoordType z = CoordType(0);
+          transform_3d_to_2d(point, sub_point, z);
 
           SubWorldPoint sub_grad_dist;
 
@@ -159,9 +237,8 @@ namespace FEAT
 
           ASSERT(my_dist >= CoordType(0));
 
-          grad_dist[0] = sub_grad_dist[0];
-          grad_dist[1] = sub_grad_dist[1];
-          grad_dist[2] = CoordType(0);
+          // transform to 3d
+          transform_2d_to_3d(grad_dist, sub_grad_dist, z);
 
           return my_dist;
         }
@@ -169,26 +246,26 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point) const
         {
+          // transform to 2d
           SubWorldPoint sub_point;
-          sub_point[0] = point[0];
-          sub_point[1] = point[1];
+          transform_3d_to_2d(point, sub_point);
           return _sub_chart->compute_signed_dist(sub_point);
         }
 
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
+          // transform to 2d
           SubWorldPoint sub_point;
-          sub_point[0] = point[0];
-          sub_point[1] = point[1];
+          CoordType z = CoordType(0);
+          transform_3d_to_2d(point, sub_point, z);
 
           SubWorldPoint sub_grad_dist;
 
           CoordType my_dist(_sub_chart->compute_dist(sub_point, sub_grad_dist));
 
-          grad_dist[0] = sub_grad_dist[0];
-          grad_dist[1] = sub_grad_dist[1];
-          grad_dist[2] = CoordType(0);
+          // transform to 3d
+          transform_2d_to_3d(grad_dist, sub_grad_dist, z);
 
           return my_dist;
         }
@@ -204,7 +281,60 @@ namespace FEAT
           if(!sind.empty())
             sind.append("  ");
 
-          os << sindent << "<Extrude>" << std::endl;
+          const CoordType tol = Math::pow(Math::eps<CoordType>(), CoordType(0.7));
+
+          os << sindent << "<Extrude";
+          if(_origin.norm_euclid_sqr() > tol)
+            os << " origin=\"" << _origin[0] << " " << _origin[1] << "\"";
+          if(_offset.norm_euclid_sqr() > tol)
+            os << " offset=\"" << _offset[0] << " " << _offset[1] << " " << _offset[2] << "\"";
+
+          // check whether our rotation matrix is the identitiy matrix
+          if(Math::sqr(_rotation.norm_sub_id_frobenius()) > tol)
+          {
+            // Now that's tricky: we have to reconstruct the yaw-pitch-roll angles
+            // from the rotation matrix:  see \cite Craig04, page 43, eq. (2.66) -- (2.68)
+            const CoordType pi = Math::pi<CoordType>();
+            const CoordType pi_2 = CoordType(0.5) * pi;
+            const CoordType r11 = _rotation(0,0);
+            const CoordType r12 = _rotation(0,1);
+            const CoordType r21 = _rotation(1,0);
+            const CoordType r22 = _rotation(1,1);
+            const CoordType r31 = _rotation(2,0);
+            const CoordType r32 = _rotation(2,1);
+            const CoordType r33 = _rotation(2,2);
+            CoordType ay = CoordType(0); // yaw   (in book: alpha)
+            CoordType ap = CoordType(0); // pitch (in book: beta)
+            CoordType ar = CoordType(0); // roll  (in book: gamma)
+
+            // determine the pitch first
+            ap = Math::atan2(-r31, Math::sqrt(r11*r11 + r21*r21));
+
+            // check pitch for "gimbal lock" angles +pi/2 and -pi/2
+            if(ap >= pi_2 - tol)
+            {
+              ap = pi_2;
+              ar = Math::atan2(r12, r22);
+            }
+            else if(ap <= -pi_2 + tol)
+            {
+              ap = -pi_2;
+              ar = -Math::atan2(r12, r22);
+            }
+            else // no gimbal lock
+            {
+              // Note: we can safely drop the "c\beta" denominators from the book,
+              // as these always cancel out by definition of atan2
+              ay = Math::atan2(r21, r11);
+              ar = Math::atan2(r32, r33);
+            }
+
+            // convert angles from radians to revolutions and write out
+            const CoordType mult = CoordType(0.5) / pi;
+            os << " angles=\"" << (mult*ay) << " " << (mult*ap) << " " << (mult*ar) << "\"";
+          }
+          os << ">" << std::endl;
+
           _sub_chart->write(os, sind);
           os << sindent << "</Extrude>" << std::endl;
         }
@@ -226,11 +356,23 @@ namespace FEAT
         public Xml::MarkupParser
       {
       private:
+        typedef typename ChartBase<Mesh_>::CoordType CoordType;
         ChartBase<Mesh_>*& _chart;
+        CoordType _ori_x, _ori_y;
+        CoordType _off_x, _off_y, _off_z;
+        CoordType _yaw, _pitch, _roll;
 
       public:
         explicit ExtrudeChartParser(ChartBase<Mesh_>*& chart) :
-          _chart(chart)
+          _chart(chart),
+          _ori_x(CoordType(0)),
+          _ori_y(CoordType(0)),
+          _off_x(CoordType(0)),
+          _off_y(CoordType(0)),
+          _off_z(CoordType(0)),
+          _yaw(CoordType(0)),
+          _pitch(CoordType(0)),
+          _roll(CoordType(0))
         {
         }
 
@@ -239,17 +381,66 @@ namespace FEAT
           // allowed for upwards compatibility
           attrs.emplace("origin", false);
           attrs.emplace("offset", false);
-          attrs.emplace("transform", false);
+          attrs.emplace("angles", false);
           return true;
         }
 
         virtual void create(
-          int,
-          const String& ,
+          int iline,
+          const String& sline,
           const String&,
-          const std::map<String, String>&,
+          const std::map<String, String>& attrs,
           bool) override
         {
+          // parse 2D origin (if given)
+          {
+            auto it = attrs.find("origin");
+            if(it != attrs.end())
+            {
+              std::deque<String> sori;
+              it->second.split_by_charset(sori);
+              if(sori.size() != std::size_t(2))
+                throw Xml::GrammarError(iline, sline, "Invalid Extrude chart origin attribute");
+              if(!sori.front().parse(_ori_x) || !sori.back().parse(_ori_y))
+                throw Xml::GrammarError(iline, sline, "'Failed to parse extrude origin attribute");
+
+            }
+          }
+
+          // parse 3D offset (if given)
+          {
+            auto it = attrs.find("offset");
+            if(it != attrs.end())
+            {
+              std::deque<String> soff;
+              it->second.split_by_charset(soff);
+              if(soff.size() != std::size_t(3))
+                throw Xml::GrammarError(iline, sline, "Invalid Extrude chart offset attribute");
+              if(!soff.at(0).parse(_off_x) || !soff.at(1).parse(_off_y) || !soff.at(2).parse(_off_z))
+                throw Xml::GrammarError(iline, sline, "'Failed to parse extrude offset attribute");
+
+            }
+          }
+
+          // parse angles (if given)
+          {
+            auto it = attrs.find("angles");
+            if(it != attrs.end())
+            {
+              std::deque<String> sang;
+              it->second.split_by_charset(sang);
+              if(sang.size() != std::size_t(3))
+                throw Xml::GrammarError(iline, sline, "Invalid Extrude chart angles attribute");
+              if(!sang.at(0).parse(_yaw) || !sang.at(1).parse(_pitch) || !sang.at(2).parse(_roll))
+                throw Xml::GrammarError(iline, sline, "'Failed to parse extrude angles attribute");
+
+              // Note: the angles are specifies in revolutions, but we need radians, so multiply by 2*pi
+              const CoordType mult = CoordType(2) * Math::pi<CoordType>();
+              _yaw *= mult;
+              _pitch *= mult;
+              _roll *= mult;
+            }
+          }
         }
 
         virtual void close(int iline, const String& sline) override
@@ -271,27 +462,21 @@ namespace FEAT
           typedef ConformalMesh<SubShapeType, 2, 2, CoordType> SubMeshType;
 
           // What have we here?
-          //if(name == "Bezier")
-          //{
-          //  auto* ext = new Extrude<Mesh_, Bezier<SubMeshType>>();
-          //  _chart = ext;
-          //  return std::make_shared<Atlas::BezierChartParser<SubMeshType, Bezier<SubMeshType>>>(ext->_sub_chart);
-          //}
           if(name == "Circle")
           {
             auto* ext = new Extrude<Mesh_, Circle<SubMeshType>>();
+            ext->set_origin(_ori_x, _ori_y);
+            ext->set_offset(_off_x, _off_y, _off_z);
+            ext->set_angles(_yaw, _pitch, _roll);
             _chart = ext;
             return std::make_shared<Atlas::CircleChartParser<SubMeshType, Circle<SubMeshType>>>(ext->_sub_chart);
           }
-          //if(name == "Polyline")
-          //{
-          //  auto* ext = new Extrude<Mesh_, Polyline<SubMeshType>>();
-          //  _chart = ext;
-          //  return std::make_shared<Atlas::PolylineChartParser<SubMeshType, Polyline<SubMeshType>>>(ext->_sub_chart);
-          //}
           if(name == "Spline")
           {
             auto* ext = new Extrude<Mesh_, Spline<SubMeshType>>();
+            ext->set_origin(_ori_x, _ori_y);
+            ext->set_offset(_off_x, _off_y, _off_z);
+            ext->set_angles(_yaw, _pitch, _roll);
             _chart = ext;
             return std::make_shared<Atlas::SplineChartParser<SubMeshType, Spline<SubMeshType>>>(ext->_sub_chart);
           }

@@ -78,6 +78,12 @@ namespace FEAT
       const CoordType _z_min, _z_max;
       /// mesh-part names for z-min/max boundary regions
       String _zmin_part_name, _zmax_part_name;
+      /// transformation origin
+      CoordType _origin_x, _origin_y;
+      /// transformation angles
+      CoordType _angle_y, _angle_p, _angle_r;
+      /// transformation offset
+      CoordType _offset_x, _offset_y, _offset_z;
 
     public:
       /**
@@ -99,10 +105,56 @@ namespace FEAT
         _z_min(z_min),
         _z_max(z_max),
         _zmin_part_name(zmin_part_name),
-        _zmax_part_name(zmax_part_name)
+        _zmax_part_name(zmax_part_name),
+        _origin_x(CoordType(0)),
+        _origin_y(CoordType(0)),
+        _angle_y(CoordType(0)),
+        _angle_p(CoordType(0)),
+        _angle_r(CoordType(0)),
+        _offset_x(CoordType(0)),
+        _offset_y(CoordType(0)),
+        _offset_z(CoordType(0))
       {
         XASSERT(slices > Index(0));
         XASSERT(z_min < z_max);
+      }
+
+      /**
+       * \brief Sets the transformation origin
+       *
+       * \param[in] x,y
+       * The coordinates of the 2D origin.
+       */
+      void set_origin(CoordType x, CoordType y)
+      {
+        _origin_x = x;
+        _origin_y = y;
+      }
+
+      /**
+       * \brief Sets the transformation angles
+       *
+       * \param[in] yaw, pitch, roll
+       * The yaw-pitch-roll angles for the transformation.
+       */
+      void set_angles(CoordType yaw, CoordType pitch, CoordType roll)
+      {
+        _angle_y = yaw;
+        _angle_p = pitch;
+        _angle_r = roll;
+      }
+
+      /**
+       * \brief Sets the transformation offset
+       *
+       * \param[in] x,y,z
+       * The coordinates of the 3D offset.
+       */
+      void set_offset(CoordType x, CoordType y, CoordType z)
+      {
+        _offset_x = x;
+        _offset_y = y;
+        _offset_z = z;
       }
 
       /**
@@ -125,6 +177,40 @@ namespace FEAT
       }
 
       /**
+       * \brief Tries to extrudes a quadrilateral mesh chart.
+       *
+       * \tparam SubChart_
+       * The type of the quadrilateral sub-chart that is to be tested.
+       *
+       * \param[out] hexa_chart
+       * A pointer to the hexa chart.
+       *
+       * \param[in] quad_chart
+       * The chart that is to be extruded.
+       *
+       * \returns
+       * \c true, if the chart was extruded, otherwise \c false.
+       */
+      template<typename SubChart_>
+      bool try_extrude_chart(HexaChart*& hexa_chart, const QuadChart& quad_chart) const
+      {
+        // try down-cast to sub-chart
+        const SubChart_* sub_chart = dynamic_cast<const SubChart_*>(&quad_chart);
+        if(sub_chart == nullptr)
+          return false;
+
+        // success; create the extured hexa chart
+        auto* the_chart = new Atlas::Extrude<HexaMesh, SubChart_>(new SubChart_(*sub_chart));
+        hexa_chart = the_chart;
+
+        // set our transformation
+        the_chart->set_origin(_origin_x, _origin_y);
+        the_chart->set_offset(_offset_x, _offset_y, _offset_z);
+        the_chart->set_angles(_angle_y, _angle_p, _angle_r);
+        return true;
+      }
+
+      /**
        * \brief Extrudes and returns a quadrilateral mesh chart.
        *
        * \param[in] quad_chart
@@ -135,26 +221,25 @@ namespace FEAT
        *
        * \attention
        * The returned object must be deleted by the caller or inserted into an atlas.
-       *
-       * \todo try to find a more elegant way for this...
        */
-      static HexaChart* extrude_chart(const QuadChart& quad_chart)
+      HexaChart* extrude_chart(const QuadChart& quad_chart) const
       {
-        // serialise quadrilateral chart
-        std::stringstream ioss;
-        ioss << "<Extrude>" << std::endl;
-        quad_chart.write(ioss, "");
-        ioss << "</Extrude>" << std::endl;
+        // The following ugly piece of code is a trial-&-error sequence using
+        // dynamic-cast to figure out the actual type of the 2D chart.
+        // That's not an elegant solution, but I don't have any other ideas...
 
-        // parse as extruded hexa chart
-        HexaChart* hexa_chart(nullptr);
-        {
-          Xml::Scanner scanner(ioss);
-          scanner.scan(std::make_shared<Atlas::ExtrudeChartParser<HexaMesh>>(hexa_chart));
-        }
+        HexaChart* hexa_chart = nullptr;
 
-        // return hexa chart
-        return hexa_chart;
+        // Is it a Circle chart?
+        if(this->template try_extrude_chart<Atlas::Circle<QuadMesh>>(hexa_chart, quad_chart))
+          return hexa_chart;
+
+        // Is it a Spline chart?
+        if(this->template try_extrude_chart<Atlas::Spline<QuadMesh>>(hexa_chart, quad_chart))
+          return hexa_chart;
+
+        // If we come out here then we failed to extrude the 2D chart for some reason...
+        throw InternalError(__func__, __FILE__, __LINE__, "Could not extrude 2D chart to 3D");
       }
 
       /**
@@ -169,7 +254,7 @@ namespace FEAT
        * \param[in] quad_atlas
        * The quadrilateral mesh atlas whose charts are to be extruded.
        */
-      static void extrude_atlas(HexaAtlas& hexa_atlas, const QuadAtlas& quad_atlas)
+      void extrude_atlas(HexaAtlas& hexa_atlas, const QuadAtlas& quad_atlas) const
       {
        // get chart names
         auto names = quad_atlas.get_chart_names();
@@ -205,6 +290,11 @@ namespace FEAT
         // validate vertex count in hexa vertex set
         XASSERT(hexa_vtx.get_num_vertices() == (quad_num_verts * (_slices+1)));
 
+        // compute rigid rotation matrix
+        Tiny::Matrix<CoordType, 3, 3> rotation;
+        rotation.set_rotation_3d(_angle_y, _angle_p, _angle_r);
+        Tiny::Vector<CoordType, 3> tmp1, tmp2;
+
         // loop over all slices
         for(Index j(0); j <= _slices; ++j)
         {
@@ -217,9 +307,14 @@ namespace FEAT
           // loop over all vertices
           for(Index i(0); i < quad_num_verts; ++i)
           {
-            hexa_vtx[vo+i][0] = quad_vtx[i][0];
-            hexa_vtx[vo+i][1] = quad_vtx[i][1];
-            hexa_vtx[vo+i][2] = z;
+            // apply our rigid transformation
+            tmp1[0] = quad_vtx[i][0] - _origin_x;
+            tmp1[1] = quad_vtx[i][1] - _origin_y;
+            tmp1[2] = z;
+            tmp2.set_mat_vec_mult(rotation, tmp1);
+            hexa_vtx[vo+i][0] = tmp2[0] + _offset_x;
+            hexa_vtx[vo+i][1] = tmp2[1] + _offset_y;
+            hexa_vtx[vo+i][2] = tmp2[2] + _offset_z;
           }
         }
       }

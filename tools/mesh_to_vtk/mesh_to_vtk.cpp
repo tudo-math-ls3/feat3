@@ -16,15 +16,48 @@ static void display_help()
   std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << std::endl;
   std::cout << std::endl;
   std::cout << "Mandatory arguments:" << std::endl;
-  std::cout << " --mesh [path to mesh file(s)]" << std::endl;
+  std::cout << "--------------------" << std::endl;
+  std::cout << " --mesh <path to mesh file(s)>" << std::endl;
+  std::cout << "Specifies the sequence of input mesh files paths." << std::endl;
   std::cout << std::endl;
   std::cout << "Optional arguments:" << std::endl;
-  std::cout << " --vtk [path to vtk file]" << std::endl;
-  std::cout << " --level [lvl_max lvl_min]" << std::endl;
-  std::cout << " --no-adapt: Do not adapt mesh after refinement" << std::endl;
-  std::cout << " --no-dist: Do not compute distance to charts" << std::endl;
-  std::cout << " --no-proj: Do not compute projection to charts" << std::endl;
-  std::cout << " --help: Displays this message" << std::endl;
+  std::cout << "-------------------" << std::endl;
+  std::cout << " --vtk <path to vtk file>" << std::endl;
+  std::cout << "Specifies the path of the output VTK file." << std::endl;
+  std::cout << "If not given, the name of the first input mesh file is used." << std::endl;
+  std::cout << std::endl;
+  std::cout << " --level [lvl_max [lvl_min]]" << std::endl;
+  std::cout << "Specifies the minimum and maximum refinement levels." << std::endl;
+  std::cout << "If not given, only level 0 is processed." << std::endl;
+  std::cout << std::endl;
+  std::cout << " --origin <x> [<y> [<z>]]" << std::endl;
+  std::cout << "Specifies the translation origin." << std::endl;
+  std::cout << "This translation is subtracted before applying the rotation." << std::endl;
+  std::cout << "If not given, all origins are set to 0." << std::endl;
+  std::cout << std::endl;
+  std::cout << " --angles <angle>" << std::endl;
+  std::cout << " --angles <yaw> <pitch> <roll>" << std::endl;
+  std::cout << "Specifies the rotation angle (2D) or the yaw-pitch-roll angles (3D)." << std::endl;
+  std::cout << "If not given, all angles are set to 0." << std::endl;
+  std::cout << "Note: all angles are given in revolutions (full turns):" << std::endl;
+  std::cout << "      1 revolution = 360 degrees = 2pi radians" << std::endl;
+  std::cout << std::endl;
+  std::cout << " --offset <x> [<y> [<z>]]" << std::endl;
+  std::cout << "Specifies the translation offset." << std::endl;
+  std::cout << "This translation is added after applying the rotation." << std::endl;
+  std::cout << "If not given, all offsets are set to 0." << std::endl;
+  std::cout << std::endl;
+  std::cout << " --no-adapt" << std::endl;
+  std::cout << "Do not adapt mesh after refinement." << std::endl;
+  std::cout << std::endl;
+  std::cout << " --no-dist" << std::endl;
+  std::cout << "Do not compute distance to charts." << std::endl;
+  std::cout << std::endl;
+  std::cout << " --no-proj" << std::endl;
+  std::cout << "Do not compute projection to charts" << std::endl;
+  std::cout << std::endl;
+  std::cout << " --help" << std::endl;
+  std::cout << "Displays this message" << std::endl;
 }
 
 String get_file_title(const String& filename)
@@ -44,9 +77,125 @@ String get_file_title(const String& filename)
     return filename.substr(p, q-p);
 }
 
+int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 1, 1>& offset, Tiny::Vector<Real, 1, 1>& origin, Tiny::Vector<Real, 1, 1>& /*angles*/)
+{
+  int noff = args.parse("offset", offset[0]);
+  int nori = args.parse("origin", origin[0]);
+  if(args.check("angles") >= 0)
+  {
+    std::cerr << "ERROR: option '--angles' is invalid for 1D meshes" << std::endl;
+    return -1;
+  }
+
+  // parse error?
+  if(noff < 0)
+  {
+    std::cerr << "ERROR: could not parse '--offset <x>' parameters" << std::endl;
+    return -1;
+  }
+  if(nori < 0)
+  {
+    std::cerr << "ERROR: could not parse '--origin <x>' parameters" << std::endl;
+    return -1;
+  }
+
+  // okay
+  return ((noff + nori) > 0) ? 1 : 0;
+}
+
+int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 2, 2>& offset, Tiny::Vector<Real, 2, 2>& origin, Tiny::Vector<Real, 2, 2>& angles)
+{
+  int noff = args.parse("offset", offset[0], offset[1]);
+  int nori = args.parse("origin", origin[0], origin[1]);
+  int nang = args.parse("angles", angles[0]);
+
+  // parse error?
+  if(noff < 0)
+  {
+    std::cerr << "ERROR: could not parse '--offset <x> <y>' parameters" << std::endl;
+    return -1;
+  }
+  if(nori < 0)
+  {
+    std::cerr << "ERROR: could not parse '--origin <x> <y>' parameters" << std::endl;
+    return -1;
+  }
+  if(nang < 0)
+  {
+    std::cerr << "ERROR: could not parse '--angles <angle>" << std::endl;
+    return -1;
+  }
+
+  // invalid argument count?
+  if((noff > 0) && (noff != 2))
+  {
+    std::cerr << "ERROR: invalid number of '--offset <x> <y>' parameters" << std::endl;
+    return -1;
+  }
+  if((nori > 0) && (nori != 2))
+  {
+    std::cerr << "ERROR: invalid number of '--origin <x> <y>' parameters" << std::endl;
+    return -1;
+  }
+  if((nang > 0) && (nang != 1))
+  {
+    std::cerr << "ERROR: invalid number of '--angles <angle>' parameters" << std::endl;
+    return -1;
+  }
+
+  // okay
+  return ((noff + nori + nang) > 0) ? 1 : 0;
+}
+
+int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 3, 3>& offset, Tiny::Vector<Real, 3, 3>& origin, Tiny::Vector<Real, 3, 3>& angles)
+{
+  int noff = args.parse("offset", offset[0], offset[1], offset[2]);
+  int nori = args.parse("origin", origin[0], origin[1], origin[2]);
+  int nang = args.parse("angles", angles[0], angles[1], angles[2]);
+
+  // parse error?
+  if(noff < 0)
+  {
+    std::cerr << "ERROR: could not parse '--offset <x> <y> <z>' parameters" << std::endl;
+    return -1;
+  }
+  if(nori < 0)
+  {
+    std::cerr << "ERROR: could not parse '--origin <x> <y> <z>' parameters" << std::endl;
+    return -1;
+  }
+  if(nang < 0)
+  {
+    std::cerr << "ERROR: could not parse '--angles <yaw> <pitch> <roll>' parameters" << std::endl;
+    return -1;
+  }
+
+  // invalid argument count?
+  if((noff > 0) && (noff != 3))
+  {
+    std::cerr << "ERROR: invalid number of '--offset <x> <y> <z>' parameters" << std::endl;
+    return -1;
+  }
+  if((nori > 0) && (nori != 3))
+  {
+    std::cerr << "ERROR: invalid number of '--origin <x> <y> <z>' parameters" << std::endl;
+    return -1;
+  }
+  if((nang > 0) && (nang != 3))
+  {
+    std::cerr << "ERROR: invalid number of '--angles <yaw> <pitch> <roll>' parameters" << std::endl;
+    return -1;
+  }
+
+  // okay
+  return ((noff + nori + nang) > 0) ? 1 : 0;
+}
+
 template<typename Mesh_>
 int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const String& filename)
 {
+  static constexpr int world_dim = Mesh_::world_dim;
+
   // parse levels
   Index lvl_min(0);
   Index lvl_max(0);
@@ -94,6 +243,21 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
   // choose adapt mode
   const AdaptMode adapt_mode = adapt ? AdaptMode::chart : AdaptMode::none;
+
+  // parse the transformation (if given)
+  Tiny::Vector<Real, world_dim> origin(Real(0)), offset(Real(0)), angles(Real(0));
+  int ntrafo = parse_trafo(args, offset, origin, angles);
+  if(ntrafo < 0)
+    return 1;
+  else if(ntrafo > 0)
+  {
+    // fractions to radians
+    angles *= Real(2) * Math::pi<Real>();
+
+    // transform atlas and root mesh
+    atlas->transform(origin, angles, offset);
+    node->get_mesh()->transform(origin, angles, offset);
+  }
 
   // get all mesh part names
   std::deque<String> part_names = node->get_mesh_part_names();
@@ -246,7 +410,7 @@ int run(int argc, char* argv[])
   SimpleArgParser args(argc, argv);
 
   // need help?
-  if(args.check("help") > -1)
+  if((argc < 2) || (args.check("help") > -1))
   {
     display_help();
     return 0;
@@ -258,6 +422,9 @@ int run(int argc, char* argv[])
   args.support("no-adapt");
   args.support("no-dist");
   args.support("no-proj");
+  args.support("angles");
+  args.support("offset");
+  args.support("origin");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();

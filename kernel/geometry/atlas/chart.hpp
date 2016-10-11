@@ -88,15 +88,57 @@ namespace FEAT
         virtual void adapt(PartType& mesh, const PartType& meshpart) const = 0;
 
         /**
+         * \brief Applies a "proper rigid" transformation onto the chart.
+         *
+         * Let \e v denote the \p origin world point, \e w the \p offset world point and \e R
+         * the rotation matrix corresponding to the \p angles, then this function applies the
+         * following transformation for any point \e x of the chart:
+         *
+         *   \f[ x \mapsto w + R\cdot (x - v) \f]
+         *
+         * \param[in] origin
+         * The origin of the transformation. This is subtracted from any point before applying the
+         * rotation.
+         *
+         * \param[in] angles
+         * The angles of the rotation matrix.
+         * - 2D: the rotation angle in radians is stored as:
+         *   - angles(0): rotation angle
+         *   - angles(1): -ignored-
+         * - 3D: the rotation angles in radians stored as:
+         *   - angles(0): yaw angle
+         *   - angles(1): pitch angle
+         *   - angles(2): roll angle
+         *
+         * \param[in] offset
+         * The offset of the transformation. This is added to any point after applying the rotation.
+         */
+        virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) = 0;
+
+        /**
          * \brief Moves the whole chart
+         *
+         * \deprecated Use transform() instead and set
+         * - origin = angles = 0
+         * - offset = translation
          *
          * \param[in] translation
          * The translation vector.
          */
-        virtual void move_by(const WorldPoint& translation) = 0;
+        virtual void move_by(const WorldPoint& translation)
+        {
+          WorldPoint origin, angles;
+          origin.format();
+          angles.format();
+          transform(origin, angles, translation);
+        }
 
         /**
          * \brief Performs a rigid body rotation of the whole chart
+         *
+         * \deprecated Use transform() instead and set
+         * - origin = offset = centre
+         * - angles = angles
          *
          * \param[in] centre
          * Point around which to rotate.
@@ -110,7 +152,10 @@ namespace FEAT
          * For 2d, angles(0) defines the rotation around the y-axis. For 3d, angles(0) defines the rotation around
          * the x-axis, angles(1) the rotation arount the y-axis and angles(2) the rotation around the z-axis.
          */
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) = 0;
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        {
+          transform(centre, angles, centre);
+        }
 
         /**
          * \brief Maps a parameter to a world point
@@ -442,18 +487,6 @@ namespace FEAT
         virtual void adapt(PartType& DOXY(parent_meshpart), const PartType& DOXY(meshpart)) const override
         {
           throw InternalError(__func__,__FILE__,__LINE__,"Adaption of MeshPart not possible yet");
-        }
-
-        /// \copydoc BaseClass::move_by()
-        virtual void move_by(const WorldPoint& translation) override
-        {
-          (this->cast()).move_by(translation);
-        }
-
-        /// \copydoc BaseClass::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
-        {
-          (this->cast()).rotate(centre, angles);
         }
 
         /// \copydoc BaseClass::map()

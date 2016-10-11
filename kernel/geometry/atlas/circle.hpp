@@ -115,39 +115,28 @@ namespace FEAT
           _midpoint[1] = mid_y;
         }
 
+        // use default copy ctor; this one is required by the MeshExtruder !
+        Circle(const Circle&) = default;
+
         /// \copydoc BaseClass::can_explicit()
         virtual bool can_explicit() const override
         {
           return _have_domain;
         }
 
-        /// \copydoc ChartBase::move_by()
-        virtual void move_by(const WorldPoint& translation) override
+        /// \copydoc ChartBase:transform()
+        virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
         {
-            _midpoint += translation;
-        }
+          // create rotation matrix
+          Tiny::Matrix<CoordType, 2, 2> rot;
+          rot.set_rotation_2d(angles(0));
 
-        /// \copydoc ChartBase::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
-        {
-          // This is the 2x2 matrix representing the turning by the angle angles(0)
-          Tiny::Matrix<CoordType, 2, 2> rot(CoordType(0));
+          // transform midpoint
+          WorldPoint tmp;
+          tmp = _midpoint - origin;
+          _midpoint.set_mat_vec_mult(rot, tmp) += offset;
 
-          rot(0,0) = Math::cos(angles(0));
-          rot(0,1) = - Math::sin(angles(0));
-          rot(1,0) = -rot(0,1);
-          rot(1,1) = rot(0,0);
-
-          WorldPoint tmp0(CoordType(0));
-          WorldPoint tmp1(CoordType(0));
-
-          // Translate the point to the centre of rotation
-          tmp0 = _midpoint - centre;
-          // Rotate
-          tmp1.set_vec_mat_mult(tmp0, rot);
-          // Translate the point by the new centre of rotation
-          _midpoint = centre + tmp1;
-
+          // transform domain
           if(_have_domain)
             _trafo_a += angles(0);
         }

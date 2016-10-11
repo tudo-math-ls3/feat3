@@ -11,7 +11,6 @@
 #include <kernel/geometry/atlas/spline.hpp>
 #include <kernel/geometry/atlas/surface_mesh.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
-#include <kernel/geometry/atlas/tube.hpp>
 #include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/xml_scanner.hpp>
@@ -1701,12 +1700,8 @@ namespace FEAT
       static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
       Atlas::ChartBase<RootMesh_>*& chart)
       {
-        //if(name == "Bezier")
-        //  return std::make_shared<Atlas::BezierChartParser<RootMesh_>>(chart);
         if(name == "Circle")
           return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(chart);
-        //if(name == "Polyline")
-        //  return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(chart);
         if(name == "Spline")
           return std::make_shared<Atlas::SplineChartParser<RootMesh_>>(chart);
 
@@ -1724,8 +1719,6 @@ namespace FEAT
           return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(chart);
         if(name == "SurfaceMesh")
           return std::make_shared<Atlas::SurfaceMeshChartParser<RootMesh_>>(chart);
-        // \todo: Implement TubeChartParser
-        //if(name == "Tube")       return std::make_shared<Atlas::TubeChartParser<RootMesh_>>(chart);
         if(name == "Extrude")
           return std::make_shared<Atlas::ExtrudeChartParser<RootMesh_>>(chart);
 
