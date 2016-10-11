@@ -122,7 +122,7 @@ namespace FEAT
           return msg;
         }
 #else
-        std::string synch(Util::Communicator /*c = Util::Communicator(0)*/)
+        std::string synch()
         {
           msg = std::string(stream.str());
           return msg;
