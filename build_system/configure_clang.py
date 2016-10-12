@@ -15,8 +15,11 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
 
   cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic"
 
-  if major == 3 and minor > 6:
+  if major > 3 or (major == 3 and minor > 6):
     cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"
+
+  if major > 3 or (major == 3 and minor >= 9):
+    cxxflags += " -Wcomma"
 
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
