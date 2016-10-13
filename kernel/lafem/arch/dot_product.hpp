@@ -44,8 +44,10 @@ namespace FEAT
         static double value_mkl(const double * const x, const double * const y, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template float DotProduct<Mem::Main>::value_generic(const float * const, const float * const, const Index);
       extern template double DotProduct<Mem::Main>::value_generic(const double * const, const double * const, const Index);
+#endif
 
       template <>
       struct DotProduct<Mem::CUDA>
@@ -84,8 +86,10 @@ namespace FEAT
         static double value_mkl(const double * const x, const double * const y, const double * const z, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template float TripleDotProduct<Mem::Main>::value_generic(const float * const, const float * const, const float * const, const Index);
       extern template double TripleDotProduct<Mem::Main>::value_generic(const double * const, const double * const, const double * const, const Index);
+#endif
 
       template <>
       struct TripleDotProduct<Mem::CUDA>

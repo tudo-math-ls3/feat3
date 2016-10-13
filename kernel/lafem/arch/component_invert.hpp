@@ -28,8 +28,10 @@ namespace FEAT
         static void value_generic(DT_* r, const DT_* const x, const DT_ s, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template void ComponentInvert<Mem::Main>::value_generic(float*, const float* const, const float, const Index);
       extern template void ComponentInvert<Mem::Main>::value_generic(double*, const double* const, const double, const Index);
+#endif
 
       template<>
       struct ComponentInvert<Mem::CUDA>

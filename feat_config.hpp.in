@@ -111,4 +111,7 @@
 /// Should we unroll all banded matrix kernels via template meta programming?
 #cmakedefine FEAT_UNROLL_BANDED
 
+/// Should we explicitly instantiate all common kernel templates
+#cmakedefine FEAT_EICKT
+
 #endif // FEAT_CONFIG_HPP

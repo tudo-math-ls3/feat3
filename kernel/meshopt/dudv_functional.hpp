@@ -455,6 +455,7 @@ namespace FEAT
 
     }; // class DuDvFunctional
 
+#ifdef FEAT_EICKT
     extern template class DuDvFunctional
     <
       Mem::Main, double, Index,
@@ -468,7 +469,7 @@ namespace FEAT
       Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
       LAFEM::SparseMatrixBCSR
     >;
-
+#endif // FEAT_EICKT
   } // namespace Meshopt
 } // namespace FEAT
 #endif // KERNEL_MESHOPT_DUDV_FUNCTIONAL_HPP

@@ -38,6 +38,7 @@ namespace FEAT
         static void filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue);
       };
 
+#ifdef FEAT_EICKT
       extern template void UnitFilter<Mem::Main>::filter_rhs_generic(float * v, const float * const sv_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void UnitFilter<Mem::Main>::filter_rhs_generic(double * v, const double * const sv_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void UnitFilter<Mem::Main>::filter_rhs_generic(float * v, const float * const sv_elements, const unsigned int * const sv_indices, const Index ue);
@@ -47,6 +48,7 @@ namespace FEAT
       extern template void UnitFilter<Mem::Main>::filter_def_generic(double * v, const unsigned long * const sv_indices, const Index ue);
       extern template void UnitFilter<Mem::Main>::filter_def_generic(float * v, const unsigned int * const sv_indices, const Index ue);
       extern template void UnitFilter<Mem::Main>::filter_def_generic(double * v, const unsigned int * const sv_indices, const Index ue);
+#endif
 
       template <>
       struct UnitFilter<Mem::CUDA>

@@ -40,6 +40,7 @@ namespace FEAT
           const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
       };
 
+#ifdef FEAT_EICKT
       extern template void Lumping<Mem::Main>::csr_generic(float *, const float * const, const Index * const, const Index * const, const Index);
       extern template void Lumping<Mem::Main>::csr_generic(double *, const double * const, const Index * const, const Index * const, const Index);
 
@@ -47,6 +48,7 @@ namespace FEAT
         const Index * const, const Index * const, Index, const Index);
       extern template void Lumping<Mem::Main>::ell_generic(double *, const double * const, const Index * const,
         const Index * const, const Index * const, Index, const Index);
+#endif
 
 
       template <>

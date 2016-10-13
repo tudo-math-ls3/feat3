@@ -417,10 +417,12 @@ namespace FEAT
 
     }; // RumpfTrafo<Simplex<2>>
 
+#ifdef FEAT_EICKT
     extern template struct RumpfTrafo<
       Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2, double>>, double >;
     extern template struct RumpfTrafo<
       Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,2, double>>, double >;
+#endif // FEAT_EICKT
 
     /// \endcond
   } // namespace Meshopt

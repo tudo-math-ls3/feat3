@@ -43,8 +43,10 @@ namespace FEAT
         static void value_mkl(double * r, const double * const x, const double, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template void Scale<Mem::Main>::value_generic(float *, const float * const, const float, const Index);
       extern template void Scale<Mem::Main>::value_generic(double *, const double * const, const double, const Index);
+#endif
 
       template <>
       struct Scale<Mem::CUDA>

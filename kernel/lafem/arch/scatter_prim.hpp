@@ -39,6 +39,13 @@ namespace FEAT
 
       };
 
+#ifdef FEAT_EICKT
+      extern template void ScatterPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned long*, const float*, const unsigned long*, const Index);
+      extern template void ScatterPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned long*, const double*, const unsigned long*, const Index);
+      extern template void ScatterPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned int*, const float*, const unsigned int*, const Index);
+      extern template void ScatterPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned int*, const double*, const unsigned int*, const Index);
+#endif
+
       template <>
       struct ScatterPrim<Mem::CUDA>
       {

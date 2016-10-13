@@ -1301,6 +1301,7 @@ namespace FEAT
 
     }; // class HyperelasticityFunctional
 
+#ifdef FEAT_EICKT
     /// \cond internal
     extern template class HyperelasticityFunctional
     <
@@ -1358,6 +1359,7 @@ namespace FEAT
       Meshopt::RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, FEAT::Meshopt::RumpfFunctional_D2>
     >;
     /// \endcond
+#endif // FEAT_EICKT
 
   } // namespace Meshopt
 } // namespace FEAT

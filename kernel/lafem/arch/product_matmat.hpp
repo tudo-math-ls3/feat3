@@ -44,8 +44,10 @@ namespace FEAT
 
       };
 
+#ifdef FEAT_EICKT
       extern template void ProductMatMat<Mem::Main>::dense_generic(float *, const float * const, const float * const, const Index, const Index, const Index);
       extern template void ProductMatMat<Mem::Main>::dense_generic(double *, const double * const, const double * const, const Index, const Index, const Index);
+#endif
 
       template <>
       struct ProductMatMat<Mem::CUDA>

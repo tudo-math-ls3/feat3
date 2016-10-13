@@ -41,6 +41,13 @@ namespace FEAT
 
       };
 
+#ifdef FEAT_EICKT
+      extern template void ScatterAxpyPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned long*, const float*, const unsigned long*, const float alpha, const Index);
+      extern template void ScatterAxpyPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned long*, const double*, const unsigned long*, const double alpha, const Index);
+      extern template void ScatterAxpyPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned int*, const float*, const unsigned int*, const float alpha, const Index);
+      extern template void ScatterAxpyPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned int*, const double*, const unsigned int*, const double alpha, const Index);
+#endif
+
       template <>
       struct ScatterAxpyPrim<Mem::CUDA>
       {

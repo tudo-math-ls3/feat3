@@ -246,7 +246,11 @@ namespace FEAT
           } // add_grad_h_part
 
     }; // class RumpfFunctional_D2
+
+#ifdef FEAT_EICKT
     extern template class RumpfFunctional_D2<double, Shape::Simplex<2> >;
+#endif // FEAT_EICKT
+
     /// \endcond
   } // namespace Meshopt
 } // namespace FEAT

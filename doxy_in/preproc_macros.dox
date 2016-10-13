@@ -261,6 +261,10 @@ at the beginning of the file.
 \subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
 This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
 
+<hr>
+\subsection ppm_feat_eickt FEAT_EICKT
+This macro can be defined to enable explicit instantiation of all common kernel templates.
+
 <hr><hr>
 \section preproc_sec_misc Miscellaneous Macros
 This section enlists various macros which do not fit into any other section.

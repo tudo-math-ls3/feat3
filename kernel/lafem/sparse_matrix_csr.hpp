@@ -2605,6 +2605,7 @@ namespace FEAT
       }
     }; //SparseMatrixCSR
 
+#ifdef FEAT_EICKT
     extern template class SparseMatrixCSR<Mem::Main, float, unsigned int>;
     extern template class SparseMatrixCSR<Mem::Main, double, unsigned int>;
     extern template class SparseMatrixCSR<Mem::Main, float, unsigned long>;
@@ -2615,6 +2616,8 @@ namespace FEAT
     extern template class SparseMatrixCSR<Mem::CUDA, float, unsigned long>;
     extern template class SparseMatrixCSR<Mem::CUDA, double, unsigned long>;
 #endif
+#endif
+
   } // namespace LAFEM
 } // namespace FEAT
 

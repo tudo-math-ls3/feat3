@@ -40,6 +40,7 @@ namespace FEAT
 
       // Do not instantiate the following templates as this is done in slip_filter_generic.cpp and then linked
       // into the shared library
+#ifdef FEAT_EICKT
       extern template void SlipFilter<Mem::Main>::filter_rhs_generic<float, unsigned long, 2>(float * v, const float * const nu_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void SlipFilter<Mem::Main>::filter_rhs_generic<double, unsigned long, 2>(double * v, const double * const nu_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void SlipFilter<Mem::Main>::filter_rhs_generic<float, unsigned int, 2>(float * v, const float * const nu_elements, const unsigned int * const sv_indices, const Index ue);
@@ -59,6 +60,7 @@ namespace FEAT
       extern template void SlipFilter<Mem::Main>::filter_def_generic<double, unsigned long, 3>(double * v, const double * const nu_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void SlipFilter<Mem::Main>::filter_def_generic<float, unsigned int, 3>(float * v, const float * const nu_elements, const unsigned int * const sv_indices, const Index ue);
       extern template void SlipFilter<Mem::Main>::filter_def_generic<double, unsigned int, 3>(double * v, const double * const nu_elements, const unsigned int * const sv_indices, const Index ue);
+#endif
 
       template <>
       struct SlipFilter<Mem::CUDA>

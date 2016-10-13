@@ -271,13 +271,15 @@ namespace FEAT
     };
 
     /// \compilerhack icc < 16.0 seems to be unable to deal with template template parameters and extern
+#ifdef FEAT_EICKT
 #if !(defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600))
     extern template class RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, RumpfFunctional>;
     extern template class RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, RumpfFunctional_D2>;
 
     extern template class RumpfFunctionalQ1Split<double, Shape::Simplex<2>, RumpfFunctional>;
     extern template class RumpfFunctionalQ1Split<double, Shape::Simplex<2>, RumpfFunctional_D2>;
-#endif
+#endif // mucho stuffo
+#endif // FEAT_EICKT
 
     /// \endcond
   } // namespace Meshopt

@@ -1305,6 +1305,7 @@ namespace FEAT
       }
     }; // class DenseVector<...>
 
+#ifdef FEAT_EICKT
     extern template class DenseVector<Mem::Main, float, unsigned int>;
     extern template class DenseVector<Mem::Main, double, unsigned int>;
     extern template class DenseVector<Mem::Main, float, unsigned long>;
@@ -1315,6 +1316,8 @@ namespace FEAT
     extern template class DenseVector<Mem::CUDA, float, unsigned long>;
     extern template class DenseVector<Mem::CUDA, double, unsigned long>;
 #endif
+#endif
+
   } // namespace LAFEM
 } // namespace FEAT
 

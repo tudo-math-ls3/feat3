@@ -43,8 +43,10 @@ namespace FEAT
         static void value_mkl(double * r, const double * const x, const double * const y, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template void Difference<Mem::Main>::value_generic(float *, const float * const, const float * const, const Index);
       extern template void Difference<Mem::Main>::value_generic(double *, const double * const, const double * const, const Index);
+#endif
 
       template <>
       struct Difference<Mem::CUDA>

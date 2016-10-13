@@ -7,11 +7,18 @@ ADD_SUBDIRECTORY( arch )
 
 # list of lafem source files
 SET (kernel-lafem-list
-  dense_vector.cpp
-  sparse_matrix_csr.cpp
-  sparse_matrix_ell.cpp
-  sparse_vector.cpp
+  empty_lafem.cpp
   )
+
+if (FEAT_EICKT)
+  set (kernel-lafem-list
+    ${kernel-lafem-list}
+    dense_vector-eickt.cpp
+    sparse_vector-eickt.cpp
+    sparse_matrix_csr-eickt.cpp
+    sparse_matrix_ell-eickt.cpp
+    )
+endif(FEAT_EICKT)
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 if (FEAT_COTIRE)

@@ -5,11 +5,18 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of meshopt tests
 SET (kernel-meshopt-list
-    dudv_functional.cpp
-    hyperelasticity_functional.cpp
-    rumpf_functional.cpp
-    rumpf_trafo.cpp
+    empty_meshopt.cpp
     )
+
+if (FEAT_EICKT)
+  set (kernel-meshopt-list
+    ${kernel-meshopt-list}
+      dudv_functional-eickt.cpp
+      hyperelasticity_functional-eickt.cpp
+      rumpf_functional-eickt.cpp
+      rumpf_trafo-eickt.cpp
+    )
+endif(FEAT_EICKT)
 
 ADD_LIBRARY(kernel-meshopt STATIC ${kernel-meshopt-list})
 

@@ -420,7 +420,7 @@ if (unroll_banded):
   extra_opts += " --unroll_banded "
 
 
-addition = ""
+addition = " --eickt"
 if is_found ("ninja"):
   addition += "-ninja"
 else:

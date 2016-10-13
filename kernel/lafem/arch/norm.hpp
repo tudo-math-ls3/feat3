@@ -42,8 +42,10 @@ namespace FEAT
         static double value_mkl(const double * const x, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template float Norm2<Mem::Main>::value_generic(const float * const, const Index);
       extern template double Norm2<Mem::Main>::value_generic(const double * const, const Index);
+#endif
 
       template <>
       struct Norm2<Mem::CUDA>

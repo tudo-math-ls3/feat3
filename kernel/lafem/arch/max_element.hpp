@@ -44,8 +44,10 @@ namespace FEAT
         static Index value_mkl(const double * const x, const Index size);
       };
 
+#ifdef FEAT_EICKT
       extern template Index MaxElement<Mem::Main>::value_generic(const float * const, const Index);
       extern template Index MaxElement<Mem::Main>::value_generic(const double * const, const Index);
+#endif
 
       template <>
       struct MaxElement<Mem::CUDA>

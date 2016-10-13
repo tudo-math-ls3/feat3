@@ -198,6 +198,7 @@ namespace FEAT
         static void dense_mkl(double * r, const double alpha, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns);
       };
 
+#ifdef FEAT_EICKT
       extern template void Axpy<Mem::Main>::dv_generic(float *, const float, const float * const, const float * const, const Index);
       extern template void Axpy<Mem::Main>::dv_generic(double *, const double, const double * const, const double * const, const Index);
 
@@ -221,6 +222,7 @@ namespace FEAT
 
       extern template void Axpy<Mem::Main>::dense_generic(float *, const float, const float * const, const float * const, const float * const, const Index, const Index);
       extern template void Axpy<Mem::Main>::dense_generic(double *, const double, const double * const, const double * const, const double * const, const Index, const Index);
+#endif
 
       template <>
       struct Axpy<Mem::CUDA>

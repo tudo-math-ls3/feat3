@@ -5,33 +5,40 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of arch source files
 SET (kernel-lafem-arch-list
-  axpy_generic.cpp
-  axpy_generic_ell.cpp
-  axpy_generic_banded.cpp
-  component_invert_generic.cpp
-  component_product_generic.cpp
-  defect_generic.cpp
-  defect_generic_ell.cpp
-  defect_generic_banded.cpp
-  diagonal_generic.cpp
-  difference_generic.cpp
-  dot_product_generic.cpp
-  lumping_generic.cpp
-  max_element_generic.cpp
-  norm_generic.cpp
-  product_matmat_generic.cpp
-  product_matvec_generic.cpp
-  product_matvec_generic_ell.cpp
-  product_matvec_generic_banded.cpp
-  scale_generic.cpp
-  scale_row_col_generic.cpp
-  scatter_axpy_prim_generic.cpp
-  scatter_prim_generic.cpp
-  slip_filter_generic.cpp
-  sum_generic.cpp
-  unit_filter_generic.cpp
-  unit_filter_blocked_generic.cpp
+  empty_lafem_arch.cpp
   )
+
+if (FEAT_EICKT)
+  SET (kernel-lafem-arch-list
+    ${kernel-lafem-arch-list}
+    axpy_generic-eickt.cpp
+    axpy_generic_ell-eickt.cpp
+    axpy_generic_banded-eickt.cpp
+    component_invert_generic-eickt.cpp
+    component_product_generic-eickt.cpp
+    defect_generic-eickt.cpp
+    defect_generic_ell-eickt.cpp
+    defect_generic_banded-eickt.cpp
+    diagonal_generic-eickt.cpp
+    difference_generic-eickt.cpp
+    dot_product_generic-eickt.cpp
+    lumping_generic-eickt.cpp
+    max_element_generic-eickt.cpp
+    norm_generic-eickt.cpp
+    product_matmat_generic-eickt.cpp
+    product_matvec_generic-eickt.cpp
+    product_matvec_generic_ell-eickt.cpp
+    product_matvec_generic_banded-eickt.cpp
+    scale_generic-eickt.cpp
+    scale_row_col_generic-eickt.cpp
+    scatter_axpy_prim_generic-eickt.cpp
+    scatter_prim_generic-eickt.cpp
+    slip_filter_generic-eickt.cpp
+    sum_generic-eickt.cpp
+    unit_filter_generic-eickt.cpp
+    unit_filter_blocked_generic-eickt.cpp
+    )
+endif (FEAT_EICKT)
 
 if (FEAT_HAVE_MKL)
   SET (kernel-lafem-arch-list ${kernel-lafem-arch-list}

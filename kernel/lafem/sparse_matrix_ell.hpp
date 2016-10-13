@@ -2325,6 +2325,7 @@ namespace FEAT
       }
     }; //class SparseMatrixELL
 
+#ifdef FEAT_EICKT
     extern template class SparseMatrixELL<Mem::Main, float, unsigned int>;
     extern template class SparseMatrixELL<Mem::Main, double, unsigned int>;
     extern template class SparseMatrixELL<Mem::Main, float, unsigned long>;
@@ -2334,6 +2335,7 @@ namespace FEAT
     extern template class SparseMatrixELL<Mem::Main, double, unsigned int>;
     extern template class SparseMatrixELL<Mem::Main, float, unsigned long>;
     extern template class SparseMatrixELL<Mem::Main, double, unsigned long>;
+#endif
 #endif
 
   } // namespace LAFEM

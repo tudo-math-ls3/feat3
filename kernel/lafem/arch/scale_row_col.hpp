@@ -48,6 +48,7 @@ namespace FEAT
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
       };
 
+#ifdef FEAT_EICKT
       extern template void ScaleRows<Mem::Main>::csr_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
       extern template void ScaleRows<Mem::Main>::csr_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
       extern template void ScaleRows<Mem::Main>::csr_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
@@ -62,6 +63,7 @@ namespace FEAT
       extern template void ScaleRows<Mem::Main>::ell_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
       extern template void ScaleRows<Mem::Main>::ell_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
       extern template void ScaleRows<Mem::Main>::ell_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+#endif
 
       template <>
       struct ScaleRows<Mem::CUDA>
@@ -113,6 +115,7 @@ namespace FEAT
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
       };
 
+#ifdef FEAT_EICKT
       extern template void ScaleCols<Mem::Main>::csr_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
       extern template void ScaleCols<Mem::Main>::csr_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
       extern template void ScaleCols<Mem::Main>::csr_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
@@ -127,6 +130,7 @@ namespace FEAT
       extern template void ScaleCols<Mem::Main>::ell_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
       extern template void ScaleCols<Mem::Main>::ell_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
       extern template void ScaleCols<Mem::Main>::ell_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+#endif
 
       template <>
       struct ScaleCols<Mem::CUDA>

@@ -156,6 +156,7 @@ namespace FEAT
         static void dense_mkl(double * r, const double * const rhs, const double * const val, const double * const x, const Index rows, const Index columns);
       }; //Defect<Main>
 
+#ifdef FEAT_EICKT
       extern template void Defect<Mem::Main>::csr_generic(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
       extern template void Defect<Mem::Main>::csr_generic(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
       extern template void Defect<Mem::Main>::csr_generic(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
@@ -176,6 +177,7 @@ namespace FEAT
 
       extern template void Defect<Mem::Main>::dense_generic(float *, const float * const, const float * const, const float * const, const Index, const Index);
       extern template void Defect<Mem::Main>::dense_generic(double *, const double * const, const double * const, const double * const, const Index, const Index);
+#endif
 
       template <>
       struct Defect<Mem::CUDA>
