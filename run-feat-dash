@@ -202,7 +202,7 @@ def run_test(build_id, branch, myDB, extra_opts):
   if mpi_only:
     label_flag = "--label-regex mpi"
   else:
-    label_flag = " --schedule-random " #"--label-exclude mpi"
+    label_flag = " --schedule-random --label-exclude sleep"
   test_command = "ctest " + label_flag + " --output-on-failure --output-log " + dump_filename_full + ".ctest"
   test_output = get_output_utf8(test_command)
 
