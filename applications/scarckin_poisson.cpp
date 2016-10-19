@@ -372,9 +372,9 @@ namespace PoissonDirichlet2D
     {
       auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
       auto local_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), 1.0, local_precond);
-      local_solver->set_max_iter(2);
-      //smoother->set_max_iter(4);
-      //smoother->set_min_iter(4);
+      //local_solver->set_max_iter(2);
+      local_solver->set_max_iter(4);
+      local_solver->set_min_iter(4);
       inner_multigrid_hierarchy->push_level(
         local_matrices_solve.at(level),     // the system matrix for this level
         *((*it)->filter_sys),     // the system filter for this level
@@ -417,7 +417,8 @@ namespace PoissonDirichlet2D
 
       auto inner_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), DataType(1), inner_multigrid);
       inner_solver->init();
-      inner_solver->set_max_iter(2);
+      //inner_solver->set_max_iter(2);
+      inner_solver->set_tol_rel(1e-1);
       inner_solver->set_plot(rank == 0);
 
       //auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
