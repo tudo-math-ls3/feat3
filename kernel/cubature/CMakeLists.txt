@@ -3,8 +3,20 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-#ADD_LIBRARY(kernel-cubature STATIC)
-#TARGET_LINK_LIBRARIES (kernel-cubature kernel-util)
+SET(kernel-cubature-list
+  empty_cubature.cpp
+)
+
+if (FEAT_EICKT)
+  SET(kernel-cubature-list
+    ${kernel-cubature-list}
+    dynamic_factory-eickt.cpp
+  )
+endif(FEAT_EICKT)
+
+ADD_LIBRARY(kernel-cubature STATIC ${kernel-cubature-list})
+
+TARGET_LINK_LIBRARIES (kernel-cubature kernel-util)
 
 # list of cubature tests
 SET (test_list

@@ -23,9 +23,9 @@ ADD_LIBRARY(feat STATIC archs.cpp)
 TARGET_LINK_LIBRARIES (feat
   kernel-adjacency
 # kernel-assembly
-# kernel-cubature
+  kernel-cubature
   kernel-foundation
-# kernel-geometry
+  kernel-geometry
   kernel-lafem
   kernel-meshopt
 # kernel-space

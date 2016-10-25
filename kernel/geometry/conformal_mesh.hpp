@@ -522,6 +522,18 @@ namespace FEAT
           ::refine(index_set_holder, _num_entities_coarse, _coarse_mesh.get_index_set_holder());
       }
     }; // class StandardRefinery<ConformalMesh<...>,Nil>
+
+#ifdef FEAT_EICKT
+    extern template class ConformalMesh<Shape::Simplex<2>, 2, 2, Real>;
+    extern template class ConformalMesh<Shape::Simplex<3>, 3, 3, Real>;
+    extern template class ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>;
+    extern template class ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>;
+
+    extern template class StandardRefinery<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+#endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT
 

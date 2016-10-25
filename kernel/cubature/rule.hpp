@@ -4,6 +4,7 @@
 
 // includes, FEAT
 #include <kernel/shape.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 
 // includes, system
 #include <utility> // for std::move
@@ -29,7 +30,7 @@ namespace FEAT
       typename Shape_,
       typename Weight_ = Real,
       typename Coord_ = Real,
-      typename Point_ = Coord_[Shape_::dimension]>
+      typename Point_ = Tiny::Vector<Coord_, Shape_::dimension>>
     class Rule
     {
     public:

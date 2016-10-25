@@ -1727,6 +1727,33 @@ namespace FEAT
     };
     /// \endcond
 
+#ifdef FEAT_EICKT
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>&,
+      PartitionSet*);
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>&,
+      PartitionSet*);
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>&,
+      PartitionSet*);
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>&,
+      PartitionSet*);
+#endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT
 

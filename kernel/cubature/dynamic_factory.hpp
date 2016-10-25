@@ -86,6 +86,17 @@ namespace FEAT
       };
       /// \endcond
     }; // class DynamicFactory<...>
+
+#ifdef FEAT_EICKT
+    extern template bool DynamicFactory::create<Shape::Simplex<2>, Real, Real, Tiny::Vector<Real, 2, 2>>
+      (Rule<Shape::Simplex<2>, Real, Real, Tiny::Vector<Real, 2, 2>>&) const;
+    extern template bool DynamicFactory::create<Shape::Simplex<3>, Real, Real, Tiny::Vector<Real, 3, 3>>
+      (Rule<Shape::Simplex<3>, Real, Real, Tiny::Vector<Real, 3, 3>>&) const;
+    extern template bool DynamicFactory::create<Shape::Hypercube<2>, Real, Real, Tiny::Vector<Real, 2, 2>>
+      (Rule<Shape::Hypercube<2>, Real, Real, Tiny::Vector<Real, 2, 2>>&) const;
+    extern template bool DynamicFactory::create<Shape::Hypercube<3>, Real, Real, Tiny::Vector<Real, 3, 3>>
+      (Rule<Shape::Hypercube<3>, Real, Real, Tiny::Vector<Real, 3, 3>>&) const;
+#endif // FEAT_EICKT
   } // namespace Cubature
 } // namespace FEAT
 

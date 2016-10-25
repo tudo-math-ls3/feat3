@@ -7,8 +7,23 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_SUBDIRECTORY( test_aux )
 
 # list of geometry source files and depenencies
-#ADD_LIBRARY(kernel-geometry STATIC)
-#TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
+SET(kernel-geometry-list
+  empty_geometry.cpp
+)
+
+if (FEAT_EICKT)
+  SET (kernel-geometry-list
+    ${kernel-geometry-list}
+    conformal_mesh-eickt.cpp
+    mesh_part-eickt.cpp
+    mesh_node-eickt.cpp
+    mesh_file_reader-eickt.cpp
+  )
+endif(FEAT_EICKT)
+
+ADD_LIBRARY(kernel-geometry STATIC ${kernel-geometry-list})
+
+TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 
 # list of geometry tests
 SET (test_list
