@@ -12,6 +12,8 @@
   <ItemGroup>
     <!-- exclude all test sources -->
     <FeatKernelExcludeSource Include="**\*-test*.cpp" />
+    <!-- exclude all EICKT sources -->
+    <FeatKernelExcludeSource Include="**\*-eickt.cpp" />
     <!-- exclude geometry test_aux sources -->
     <FeatKernelExcludeSource Include="geometry\test_aux\*.cpp" />
     <!-- exclude MKL sources unless the MKL backend is enabled -->
