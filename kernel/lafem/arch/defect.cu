@@ -276,6 +276,14 @@ void Defect<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * 
 template void Defect<Mem::CUDA>::csrb_intern(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index, const int);
 template void Defect<Mem::CUDA>::csrb_intern(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index, const int);
 
+template <typename DT_>
+void Defect<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements, const int blocksize)
+{
+  /// \todo implement
+}
+template void Defect<Mem::CUDA>::csrb_intern(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index, const int);
+template void Defect<Mem::CUDA>::csrb_intern(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index, const int);
+
 
 template <typename DT_, typename IT_>
 void Defect<Mem::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
