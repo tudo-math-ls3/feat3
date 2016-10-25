@@ -66,6 +66,25 @@ namespace FEAT
       using BaseClass::BaseClass;
 
       /**
+       * \brief Empty standard constructor
+       */
+      SparseMatrixBWrappedCSR()
+      {
+      }
+
+      /**
+       * \brief From-baseclass move constructor
+       *
+       * \param[in] other
+       * The object to construct from
+       *
+       */
+      explicit SparseMatrixBWrappedCSR(BaseClass&& other) :
+        BaseClass(std::forward<BaseClass>(other))
+      {
+      }
+
+      /**
        * \brief Returns a new compatible vector for left-multiplication
        *
        * \returns An empty left-vector
@@ -88,16 +107,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Move operator
+       * \brief Clone operation
        *
-       * \param[in] other The source matrix.
+       * \param[in] mode
+       * The LAFEM::CloneMode to use
        *
-       * Moves another matrix to the target matrix.
        */
-      SparseMatrixBWrappedCSR & operator= (SparseMatrixBWrappedCSR && other)
+      SparseMatrixBWrappedCSR clone(CloneMode mode = CloneMode::Weak) const
       {
-        BaseClass::operator=(std::forward<SparseMatrixBWrappedCSR>(other));
-        return *this;
+        return SparseMatrixBWrappedCSR(BaseClass::clone(mode));
       }
     };
   } // namespace LAFEM
