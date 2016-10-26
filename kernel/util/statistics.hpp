@@ -6,7 +6,6 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/kahan_summation.hpp>
-#include <kernel/util/comm_base.hpp>
 #include <kernel/solver/expression.hpp>
 
 #include <list>

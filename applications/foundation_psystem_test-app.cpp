@@ -1,6 +1,6 @@
 #include <kernel/base_header.hpp>
 
-#include <kernel/util/comm_base.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/psynch.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
@@ -46,8 +46,9 @@ TestResult<DT1_, DT2_, DT3_> test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ ep
 void check_psynch_presult()
 {
 #ifdef FEAT_HAVE_PARMETIS
-  typename PExecutorParmetis<ParmetisModePartKway>::PResult local(1);
-  local.get()[0] = Util::Comm::rank() == 0 ? 1 : 0;
+  Dist::Comm comm(Dist::Comm::world());
+  typename PExecutorParmetis<ParmetisModePartKway>::PResult local(1, comm);
+  local.get()[0] = comm.rank() == 0 ? 1 : 0;
 
   local.get_vtxdist()[0] = 0;
   local.get_vtxdist()[1] = 1;
@@ -63,13 +64,13 @@ void check_psynch_presult()
   for(unsigned long i(0) ; i < 2 ; ++i)
     if(!res[i].passed)
     {
-      std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "! (psynch) on rank " << Util::Comm::rank() << std::endl;
+      std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "! (psynch) on rank " << comm.rank() << std::endl;
       passed = false;
       break;
     }
 
   if(passed)
-    std::cout << "PASSED (rank " << Util::Comm::rank() <<"): foundation_psystem_test (psynch)" << std::endl;
+    std::cout << "PASSED (rank " << comm.rank() <<"): foundation_psystem_test (psynch)" << std::endl;
 
   delete[] res;
 #endif
@@ -78,18 +79,19 @@ void check_psynch_presult()
 void check_psynch_stringstream()
 {
 #ifdef FEAT_HAVE_PARMETIS
+  Dist::Comm comm(Dist::Comm::world());
   std::stringstream synchstream;
 
-  if(Util::Comm::rank() == 0)
+  if(comm.rank() == 0)
     synchstream << "MASTER";
 
-  Util::Comm::synch_stringstream(synchstream);
+  comm.bcast_stringstream(synchstream);
 
   if(synchstream.str() == "MASTER")
-    std::cout << "PASSED (rank " << Util::Comm::rank() <<"): foundation_psystem_test (psynch stringstream)" << std::endl;
+    std::cout << "PASSED (rank " << comm.rank() <<"): foundation_psystem_test (psynch stringstream)" << std::endl;
   else
   {
-      std::cout << "FAILED: (psynch stringstream) on rank " << Util::Comm::rank() << " is " << synchstream.str() << std::endl;
+      std::cout << "FAILED: (psynch stringstream) on rank " << comm.rank() << " is '" << synchstream.str() << "'" << std::endl;
   }
 #endif
 }
@@ -97,13 +99,14 @@ void check_psynch_stringstream()
 void check_psynch_meshstreamer()
 {
 #ifdef FEAT_HAVE_PARMETIS
+  Dist::Comm comm(Dist::Comm::world());
 
   std::stringstream synchstream;
   std::string file_prefix(FEAT_SRC_DIR);
   std::string filename(file_prefix);
   filename += "/data/meshes/bench1-quad.xml";
 
-  if(Util::Comm::rank() == 0)
+  if(comm.rank() == 0)
   {
     std::ifstream ifs(filename.c_str(), std::ios::binary);
     if(!ifs.is_open())
@@ -113,7 +116,7 @@ void check_psynch_meshstreamer()
     synchstream << ifs.rdbuf();
   }
 
-  Util::Comm::synch_stringstream(synchstream);
+  comm.bcast_stringstream(synchstream);
   Geometry::MeshFileReader mesh_file_reader(synchstream);
 
   // create an empty atlas and a root mesh node
@@ -123,7 +126,7 @@ void check_psynch_meshstreamer()
 
   mesh_file_reader.parse(*node, *atlas);
 
-  std::cout << "PASSED (rank " << Util::Comm::rank() <<"): foundation_psystem_test (psynch meshstreamer)" << std::endl;
+  std::cout << "PASSED (rank " << comm.rank() <<"): foundation_psystem_test (psynch meshstreamer)" << std::endl;
 
   delete node;
   delete atlas;
@@ -133,8 +136,9 @@ void check_psynch_meshstreamer()
 void check_pexecutor_rank_at_elem()
 {
 #ifdef FEAT_HAVE_PARMETIS
-  typename PExecutorParmetis<ParmetisModePartKway>::PResult local(1);
-  local.get()[0] = Util::Comm::rank() == 0 ? 1 : 0;
+  Dist::Comm comm(Dist::Comm::world());
+  typename PExecutorParmetis<ParmetisModePartKway>::PResult local(1, comm);
+  local.get()[0] = comm.rank() == 0 ? 1 : 0;
 
   local.get_vtxdist()[0] = 0;
   local.get_vtxdist()[1] = 1;
@@ -150,7 +154,7 @@ void check_pexecutor_rank_at_elem()
   for(unsigned long i(0) ; i < 2 ; ++i)
     if(!res[i].passed)
     {
-      std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "! (pexecutor, rank_at_elem) on rank " << Util::Comm::rank() << std::endl;
+      std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "! (pexecutor, rank_at_elem) on rank " << comm.rank() << std::endl;
       passed = false;
       break;
     }
@@ -158,7 +162,7 @@ void check_pexecutor_rank_at_elem()
   Adjacency::Graph graph(global.rank_at_element());
 
   if(passed)
-    std::cout << "PASSED (rank " << Util::Comm::rank() <<"): foundation_psystem_test (pexecutor, rank_at_elem)" << std::endl;
+    std::cout << "PASSED (rank " << comm.rank() <<"): foundation_psystem_test (pexecutor, rank_at_elem)" << std::endl;
 
   delete[] res;
 #endif

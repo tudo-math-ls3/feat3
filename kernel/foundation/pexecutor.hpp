@@ -3,7 +3,7 @@
 #define KERNEL_FOUNDATION_PEXECUTOR_HPP 1
 
 #include<kernel/base_header.hpp>
-#include<kernel/util/comm_base.hpp>
+#include<kernel/util/dist.hpp>
 #include<kernel/foundation/base.hpp>
 #include<kernel/foundation/pgraph.hpp>
 
@@ -31,15 +31,11 @@ namespace FEAT
             typedef IT_ IndexType;
 
             ///Alloc CTOR
-#ifdef FEAT_HAVE_MPI
-            PResult(IT_ s, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD)) :
-#else
-            PResult(IT_ s, Util::Communicator comm = Util::Communicator(0)) :
-#endif
+            PResult(IT_ s, const Dist::Comm& comm) :
               _size(s),
               _part(new IT_[Index(s)]),
-              _vtxdist(new IT_[Util::Comm::size(comm) + 1]),
-              _comm(comm),
+              _vtxdist(new IT_[std::size_t(comm.size() + 1)]),
+              _comm(&comm),
               _comm_ranks(),
               _comm_tags()
             {
@@ -55,9 +51,9 @@ namespace FEAT
               return _vtxdist;
             }
 
-            Util::Communicator get_comm() const
+            const Dist::Comm& get_comm() const
             {
-              return _comm;
+              return *_comm;
             }
 
             IT_ size() const
@@ -67,12 +63,12 @@ namespace FEAT
 
             PResult clone() const
             {
-              PResult result(_size, _comm);
+              PResult result(_size, *_comm);
 
               for(Index i(0) ; i < Index(_size) ; ++i)
                 result.get()[i] = _part[i];
 
-              for(Index i(0) ; i < Index(Util::Comm::size(_comm) + 1) ; ++i)
+              for(Index i(0) ; i < Index(_comm->size() + 1) ; ++i)
                 result.get_vtxdist()[i] = _vtxdist[i];
 
               result._comm_ranks = _comm_ranks;
@@ -127,7 +123,7 @@ namespace FEAT
               for(Index i(0) ; i < Index(_size) ; ++i)
                 part[i] = Index(_part[i]);
 
-              Adjacency::Graph result(Index(_size), Util::Comm::size(_comm), Index(_size), ptr, nullptr, part);
+              Adjacency::Graph result(Index(_size), Index(_comm->size()), Index(_size), ptr, nullptr, part);
 
               delete[] ptr;
               delete[] part;
@@ -174,7 +170,8 @@ namespace FEAT
             IT_* _part;
             IT_* _vtxdist;
 
-            Util::Communicator _comm;
+            // Note: this needs to be a pointer for the move-assignment op
+            const Dist::Comm* _comm;
 
             std::vector<Index> _comm_ranks;
             std::vector<Index> _comm_tags;
@@ -222,11 +219,11 @@ namespace FEAT
           {
             PResult result(g.get_num_vtx(), g.get_comm());
             ///fill secondary data needed for synch later
-            for(Index i(0) ; i < Util::Comm::size(g.get_comm()) + 1 ; ++i)
+            for(Index i(0) ; i < Index(g.get_comm().size()) + 1 ; ++i)
               result.get_vtxdist()[i] = g.get_vtxdist()[i];
 
-            for(Index i(0) ; i < g.get_vtxdist()[Util::Comm::rank(g.get_comm()) + 1] - g.get_vtxdist()[Util::Comm::rank(g.get_comm())]; ++i)
-              result.get()[i] = Util::Comm::rank(g.get_comm());
+            for(Index i(0) ; i < g.get_vtxdist()[g.get_comm().rank() + 1] - g.get_vtxdist()[g.get_comm().rank()]; ++i)
+              result.get()[i] = Index(g.get_comm().rank());
 
             return result;
           }
@@ -234,8 +231,8 @@ namespace FEAT
           static PResult& fill_comm_structs_global(PResult& synched_part, const PGraphT& base)
           {
             /// determine elems on this process (rank p)
-            const Index commsize(Util::Comm::size(synched_part.get_comm()));
-            Index p(Util::Comm::rank(synched_part.get_comm()));
+            const Index commsize = Index(synched_part.get_comm().size());
+            Index p = Index(synched_part.get_comm().rank());
             std::vector<Index> e_p;
             for(Index i(0) ; i < Index(synched_part.size()) ; ++i)
             {
@@ -266,13 +263,15 @@ namespace FEAT
             Index* part_sizes_recvbuf(new Index[commsize]);
             Index part_sizes_sendbuf(Index(e_p.size()));
 
-            Util::Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
+            //Util::Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
+            synched_part.get_comm().allgather(&part_sizes_sendbuf, std::size_t(1), part_sizes_recvbuf, std::size_t(1));
 
             //second, synchronize cr sizes
             Index* cr_sizes_recvbuf(new Index[commsize]);
             Index cr_sizes_sendbuf(Index(cr_p.size()));
 
-            Util::Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
+            //Util::Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
+            synched_part.get_comm().allgather(&cr_sizes_sendbuf, std::size_t(1), cr_sizes_recvbuf, std::size_t(1));
 
             //then, synchronize cr
             Index* sendbuf = cr_p.data();
@@ -304,7 +303,8 @@ namespace FEAT
               rdispls[i] = int(write_count);
             }
 
-            Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
+            //Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
+            synched_part.get_comm().alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls);
 
             std::vector<Index> p0;
             std::vector<Index> p1;
@@ -376,12 +376,15 @@ namespace FEAT
         {
           PResult result(g.get_num_vtx(), g.get_comm());
           ///fill secondary data needed for synch later
-          for(Index i(0) ; i < Util::Comm::size(g.get_comm()) + 1 ; ++i)
+          for(Index i(0) ; i < Index(g.get_comm().size()+1) ; ++i)
             result.get_vtxdist()[i] = g.get_vtxdist()[i];
 
           ///main partitioning algorithm
           if(g.ready_forexec)
           {
+            // Note: ParMETIS really wants a pointer to a MPI_Comm...
+            MPI_Comm mpi_comm = result.get_comm().mpi_comm();
+
             auto msg = ParMETIS_V3_PartKway(
                 g.get_vtxdist(),
                 g.get_xadj(),
@@ -397,7 +400,7 @@ namespace FEAT
                 g.get_options(),
                 &g.get_edgecut(),
                 result.get(),
-                result.get_comm().get_mpi_comm());
+                &mpi_comm);
 
             if(msg != METIS_OK)
               throw InternalError("METIS IS NOT OK WITH YOU!!!");
@@ -431,8 +434,8 @@ namespace FEAT
         static PResult& fill_comm_structs_global(PResult& synched_part, const PGraphParmetis& base)
         {
           /// determine elems on this process (rank p)
-          const Index commsize(Util::Comm::size(synched_part.get_comm()));
-          Index p(Util::Comm::rank(synched_part.get_comm()));
+          const Index commsize = Index(synched_part.get_comm().size());
+          Index p = Index(synched_part.get_comm().rank());
           std::vector<Index> e_p;
           for(Index i(0) ; i < Index(synched_part.size()) ; ++i)
           {
@@ -463,13 +466,15 @@ namespace FEAT
           Index* part_sizes_recvbuf(new Index[commsize]);
           Index part_sizes_sendbuf(Index(e_p.size()));
 
-          Util::Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
+          //Util::Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
+          synched_part.get_comm().allgather(&part_sizes_sendbuf, std::size_t(1), part_sizes_recvbuf, std::size_t(1));
 
           //second, synchronize cr sizes
           Index* cr_sizes_recvbuf(new Index[commsize]);
           Index cr_sizes_sendbuf(Index(cr_p.size()));
 
-          Util::Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
+          //Util::Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
+          synched_part.get_comm().allgather(&cr_sizes_sendbuf, std::size_t(1), cr_sizes_recvbuf, std::size_t(1));
 
           //then, synchronize cr
           Index* sendbuf = cr_p.data();
@@ -493,7 +498,8 @@ namespace FEAT
             rdispls[i] = int(write_count);
           }
 
-          Util::Comm::allgatherv(sendbuf, int(cr_p.size()), recvbuf, recvcounts, rdispls, synched_part.get_comm());
+          //Util::Comm::allgatherv(sendbuf, int(cr_p.size()), recvbuf, recvcounts, rdispls, synched_part.get_comm());
+          synched_part.get_comm().allgatherv(sendbuf, cr_p.size(), recvbuf, recvcounts, rdispls);
 
           std::vector<Index> p0;
           std::vector<Index> p1;

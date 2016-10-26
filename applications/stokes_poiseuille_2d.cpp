@@ -18,7 +18,7 @@
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/schur_precond.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
-#include <kernel/util/mpi_cout.hpp>
+#include <kernel/util/dist.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/stokes_basic.hpp>
@@ -194,7 +194,7 @@ namespace StokesPoiseuille2D
 
 
   template<typename MeshType_, typename TargetMatrixSolve_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -259,10 +259,7 @@ namespace StokesPoiseuille2D
 
     TimeStamp stamp_ass;
 
-    if(rank == 0)
-    {
-      std::cout << "Creating gates..." << std::endl;
-    }
+    comm.print("Creating gates...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -271,10 +268,7 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Assembling system matrices..." << std::endl;
-    }
+    comm.print("Assembling system matrices...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -286,10 +280,7 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Assembling system filters..." << std::endl;
-    }
+    comm.print("Assembling system filters...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -298,10 +289,7 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Assembling transfer matrices..." << std::endl;
-    }
+    comm.print("Assembling transfer matrices...");
 
     for(Index i(0); (i+1) < num_levels; ++i)
     {
@@ -333,12 +321,8 @@ namespace StokesPoiseuille2D
     typedef typename SystemLevelTypeSolve::GlobalVeloVector GlobalVeloVectorSolve;
     typedef typename SystemLevelTypeSolve::GlobalPresVector GlobalPresVectorSolve;
 
-    if (rank == 0)
-    {
-      std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
-        ", Mem:" << MemType::name() << " to " << SystemLevelTypeSolve::LocalScalarMatrix::name() << ", Mem:" <<
-        MemTypeSolve::name() << "..." << std::endl;
-    }
+    comm.print("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() + ", Mem:" + MemType::name() +
+        " to " + TargetMatrixSolve_::name() + ", Mem:" + TargetMatrixSolve_::MemType::name() + "...\n");
 
     //convert system and transfer levels
     for (Index i(0); i < num_levels; ++i)
@@ -427,7 +411,7 @@ namespace StokesPoiseuille2D
     auto solver = Solver::new_pcr(matrix_solve, filter_solve, schur);
 
     // enable plotting
-    solver->set_plot(rank == 0);
+    solver->set_plot(comm.rank() == 0);
 
     solver->set_max_iter(1000);
 
@@ -458,7 +442,7 @@ namespace StokesPoiseuille2D
 
     if(args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(rank == 0, the_system_level, vec_sol);
+      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol);
     }
 
     /* ***************************************************************************************** */
@@ -470,10 +454,10 @@ namespace StokesPoiseuille2D
       // build VTK name
       String vtk_name = String("./stokes-poiseuille-2d");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
-      vtk_name += "-n" + stringify(nprocs);
+      vtk_name += "-n" + stringify(comm.size());
 
       // write VTK file
-      the_asm_level.write_vtk(vtk_name, *vec_sol, rank, nprocs);
+      the_asm_level.write_vtk(vtk_name, *vec_sol, comm);
     }
 
     /* ***************************************************************************************** */
@@ -510,18 +494,13 @@ namespace StokesPoiseuille2D
     }
   }
 
-  int main(int argc, char* argv[])
+  void main(int argc, char* argv[])
   {
-    int rank = 0;
-    int nprocs = 0;
+    // create world communicator
+    Dist::Comm comm(Dist::Comm::world());
 
-    // initialise
-    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifdef FEAT_HAVE_MPI
-    if (rank == 0)
-    {
-      std::cout << "NUM-PROCS: " << nprocs << std::endl;
-    }
+    comm.print("NUM-PROCS: " + stringify(comm.size()));
 #endif
 
     // create arg parser
@@ -543,11 +522,9 @@ namespace StokesPoiseuille2D
     if (!unsupported.empty())
     {
       // print all unsupported options to cerr
-      if (rank == 0)
-      {
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
-      }
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        comm.print_cerr("ERROR: unknown option '--" + (*it).second + "'");
+
       // abort
       FEAT::Runtime::abort();
     }
@@ -570,8 +547,7 @@ namespace StokesPoiseuille2D
       TimeStamp stamp1;
       if(args.check("mesh") < 1)
       {
-        if(rank == 0)
-          std::cerr << "ERROR: Mandatory option --mesh is missing!" << std::endl;
+        comm.print_cerr("ERROR: Mandatory option --mesh is missing!");
         FEAT::Runtime::abort();
       }
 
@@ -579,7 +555,7 @@ namespace StokesPoiseuille2D
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain;
+      Control::Domain::PartiDomainControl<MeshType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -597,24 +573,24 @@ namespace StokesPoiseuille2D
 
       Statistics::toe_partition = stamp_partition.elapsed_now();
 
-      Util::mpi_cout("Creating mesh hierarchy...\n");
+      comm.print("Creating mesh hierarchy...");
 
       // create the level hierarchy
       domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
-      Util::mpi_cout("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]\n");
-      Util::mpi_cout("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]\n");
+      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
       // run our application
       if (mem_string == "main")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
       }
 #ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(comm., args, domain);
       }
 #endif
       else
@@ -628,11 +604,11 @@ namespace StokesPoiseuille2D
       long long time1 = stamp2.elapsed_micros(stamp1);
 
       // accumulate times over all processes
-      long long time2 = time1 * (long long)nprocs;
+      long long time2 = time1 * (long long)comm.size();
 
       // print time
-      Util::mpi_cout("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
-        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]\n");
+      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
+        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)
@@ -646,14 +622,12 @@ namespace StokesPoiseuille2D
       FEAT::Runtime::abort();
     }
 #endif // DEBUG
-
-    // okay
-    return FEAT::Runtime::finalise();
   }
-
 } // namespace StokesPoiseuille2D
 
 int main(int argc, char* argv[])
 {
-  return StokesPoiseuille2D::main(argc, argv);
+  FEAT::Runtime::initialise(argc, argv);
+  StokesPoiseuille2D::main(argc, argv);
+  return FEAT::Runtime::finalise();
 }

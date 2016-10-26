@@ -1,5 +1,6 @@
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/function_scheduler.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/solver/base.hpp>
 
 #include <queue>
@@ -460,46 +461,48 @@ String Statistics::get_formatted_times(double total_time)
 
   result += "\n";
 
+  Dist::Comm comm(Dist::Comm::world());
+
   double t_local = get_time_reduction();
   double t_max;
   double t_min;
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("Reductions:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_axpy();
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("Blas-1:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_spmv();
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("Blas-2:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_precon();
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("Precon Kernels:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_mpi_execute();
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("MPI Execution:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_mpi_wait_reduction();
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("MPI Wait Reduction:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_mpi_wait_spmv();
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("MPI Wait Blas-2:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = total_time - measured_time.sum;
-  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
-  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("Not covered:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
   return result;
 }

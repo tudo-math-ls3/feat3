@@ -143,7 +143,9 @@ namespace FEAT
       Index used_elements() const
       {
         Index my_used_elements(_matrix.template used_elements<LAFEM::Perspective::pod>());
-        Util::Comm::allreduce(&my_used_elements, &my_used_elements, 1, Util::CommOperationSum());
+        const Dist::Comm* comm = (_row_gate != nullptr ? _row_gate->get_comm() : (_col_gate != nullptr ? _col_gate->get_comm() : nullptr));
+        if((comm != nullptr) && (comm->size() > 1))
+          comm->allreduce(&my_used_elements, &my_used_elements, std::size_t(1), Dist::op_sum);
         return my_used_elements;
       }
 
@@ -151,7 +153,9 @@ namespace FEAT
       std::size_t bytes() const
       {
         size_t my_bytes(_matrix.bytes());
-        Util::Comm::allreduce(&my_bytes, &my_bytes, 1, Util::CommOperationSum());
+        const Dist::Comm* comm = (_row_gate != nullptr ? _row_gate->get_comm() : (_col_gate != nullptr ? _col_gate->get_comm() : nullptr));
+        if((comm != nullptr) && (comm->size() > 1))
+          comm->allreduce(&my_bytes, &my_bytes, std::size_t(1), Dist::op_sum);
         return my_bytes;
       }
 

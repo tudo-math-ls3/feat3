@@ -8,6 +8,7 @@
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/geometry/mesh_extruder.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
@@ -18,7 +19,7 @@
 
 using namespace FEAT;
 
-static void display_help();
+static void display_help(const Dist::Comm&);
 static void read_test_application_config(std::stringstream&, const int);
 static void read_test_meshopt_config(std::stringstream&, const int);
 static void read_test_solver_config(std::stringstream&, const int);
@@ -131,8 +132,8 @@ struct MeshoptScrewsApp
   /**
    * \brief The routine that does the actual work
    */
-  static int run(const SimpleArgParser& args, PropertyMap* application_config, PropertyMap* meshopt_config,
-  PropertyMap* solver_config, Geometry::MeshFileReader& mesh_file_reader)
+  static int run(const SimpleArgParser& args, Dist::Comm& comm, PropertyMap* application_config,
+    PropertyMap* meshopt_config, PropertyMap* solver_config, Geometry::MeshFileReader& mesh_file_reader)
   {
 
     // Mininum refinement level, parsed from the application config file
@@ -232,7 +233,7 @@ struct MeshoptScrewsApp
 
     TimeStamp at;
 
-    DomCtrl dom_ctrl;
+    DomCtrl dom_ctrl(comm);
     dom_ctrl.read_mesh(mesh_file_reader);
     dom_ctrl.parse_property_map(domain_control_settings_section);
     dom_ctrl.create_partition();
@@ -242,9 +243,7 @@ struct MeshoptScrewsApp
     const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
-#ifdef FEAT_HAVE_MPI
-    Util::Comm::allreduce(&ncells, &ncells, 1, Util::CommOperationSum());
-#endif
+    comm.allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
 
     MeshExtrudeHelper<MeshType> extruder(dom_ctrl.get_levels().back()->get_mesh_node(),
     Index(10*(lvl_max+1)), DataType(0), DataType(1), "bottom", "top");
@@ -276,7 +275,7 @@ struct MeshoptScrewsApp
     auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer_screw");
 
     // Print level information
-    if(Util::Comm::rank() == 0)
+    if(comm.rank() == 0)
     {
       std::cout << name() << "settings:" << std::endl;
       std::cout << "Timestep size: " << stringify_fp_fix(delta_t) << ", end time: " <<
@@ -293,7 +292,7 @@ struct MeshoptScrewsApp
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
       dom_ctrl, meshoptimiser_key_p.first, meshopt_config, solver_config);
 
-    String file_basename(name()+"_n"+stringify(Util::Comm::size()));
+    String file_basename(name()+"_n"+stringify(comm.size()));
 
     // Copy the vertex coordinates to the buffer and get them via get_coords()
     meshopt_ctrl->mesh_to_buffer();
@@ -318,7 +317,7 @@ struct MeshoptScrewsApp
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+        exporter.write(vtk_name, comm.rank(), comm.size());
 
         ++deque_position;
       }
@@ -339,12 +338,9 @@ struct MeshoptScrewsApp
       worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-#ifdef FEAT_HAVE_MPI
-      Util::Comm::allreduce(&qual_min, &qual_min, 1, Util::CommOperationMin());
-      Util::Comm::allreduce(&qual_sum, &qual_sum, 1, Util::CommOperationSum());
-
-      Util::Comm::allreduce(&worst_angle, &worst_angle, 1, Util::CommOperationMin());
-#endif
+      comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
+      comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
+      comm.allreduce(&worst_angle, &worst_angle, std::size_t(1), Dist::op_min);
       DataType qual_avg(qual_sum/DataType(ncells));
 
       DT_ lambda_min;
@@ -353,7 +349,7 @@ struct MeshoptScrewsApp
       DT_ vol_max;
       cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
 
-      if(Util::Comm::rank() == 0)
+      if(comm.rank() == 0)
       {
         std::cout << "Pre initial quality indicator: " << stringify_fp_sci(qual_min) <<
           " / " << stringify_fp_sci(qual_avg) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
@@ -400,7 +396,7 @@ struct MeshoptScrewsApp
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+        exporter.write(vtk_name, comm.rank(), comm.size());
 
         ++deque_position;
       }
@@ -415,12 +411,10 @@ struct MeshoptScrewsApp
       worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-#ifdef FEAT_HAVE_MPI
-      Util::Comm::allreduce(&qual_min, &qual_min, 1, Util::CommOperationMin());
-      Util::Comm::allreduce(&qual_sum, &qual_sum, 1, Util::CommOperationSum());
+      comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
+      comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
+      comm.allreduce(&worst_angle, &worst_angle, std::size_t(1), Dist::op_min);
 
-      Util::Comm::allreduce(&worst_angle, &worst_angle, 1, Util::CommOperationMin());
-#endif
       DataType qual_avg(qual_sum/DataType(ncells));
 
       DT_ lambda_min;
@@ -429,7 +423,7 @@ struct MeshoptScrewsApp
       DT_ vol_max;
       cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
 
-      if(Util::Comm::rank() == 0)
+      if(comm.rank() == 0)
       {
         std::cout << "Post initial quality indicator: " << stringify_fp_sci(qual_min) <<
           " / " << stringify_fp_sci(qual_avg ) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
@@ -514,7 +508,7 @@ struct MeshoptScrewsApp
 
       bool abort(false);
 
-      if(Util::Comm::rank() == 0)
+      if(comm.rank() == 0)
         std::cout << "Timestep " << n << ": t = " << stringify_fp_fix(time) <<
           ", angle = " << stringify_fp_fix(alpha/(DataType(2)*pi)*DataType(360))  << " degrees" <<std::endl;
 
@@ -599,7 +593,7 @@ struct MeshoptScrewsApp
       for(IT_ i(0); i < (*mesh_velocity).size(); ++i)
         max_mesh_velocity = Math::max(max_mesh_velocity, (*mesh_velocity)(i).norm_euclid());
 
-      if(Util::Comm::rank() == 0)
+      if(comm.rank() == 0)
         std::cout << "max. mesh velocity: " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
       // Compute quality indicators
@@ -610,12 +604,10 @@ struct MeshoptScrewsApp
         worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
           finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-#ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&qual_min, &qual_min, 1, Util::CommOperationMin());
-        Util::Comm::allreduce(&qual_sum, &qual_sum, 1, Util::CommOperationSum());
+        comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
+        comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
+        comm.allreduce(&worst_angle, &worst_angle, std::size_t(1), Dist::op_min);
 
-        Util::Comm::allreduce(&worst_angle, &worst_angle, 1, Util::CommOperationMin());
-#endif
         DataType qual_avg(qual_sum/DataType(ncells));
 
         DT_ lambda_min;
@@ -624,7 +616,7 @@ struct MeshoptScrewsApp
         DT_ vol_max;
         cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
 
-        if(Util::Comm::rank() == 0)
+        if(comm.rank() == 0)
         {
           std::cout << "Quality indicator: " << stringify_fp_sci(qual_min) <<
             " / " << stringify_fp_sci(qual_avg ) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
@@ -654,7 +646,7 @@ struct MeshoptScrewsApp
         // Add everything from the MeshoptControl
         meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
         // Write the file
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+        exporter.write(vtk_name, comm.rank(), comm.size());
 
         if(extruder.extruded_mesh_node != nullptr)
         {
@@ -665,7 +657,7 @@ struct MeshoptScrewsApp
           Util::mpi_cout("Writing "+extruded_vtk_name+"\n");
 
           Geometry::ExportVTK<ExtrudedMeshType> extruded_exporter(*(extruder.extruded_mesh_node->get_mesh()));
-          extruded_exporter.write(extruded_vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+          extruded_exporter.write(extruded_vtk_name, comm.rank(), comm.size());
         }
       }
 
@@ -691,7 +683,7 @@ struct MeshoptScrewsApp
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+        exporter.write(vtk_name, comm.rank(), comm.size());
 
         ++deque_position;
       }
@@ -721,7 +713,7 @@ struct MeshoptScrewsApp
       }
     }
 
-    if(Util::Comm::rank() == 0)
+    if(comm.rank() == 0)
     {
       TimeStamp bt;
       std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
@@ -732,7 +724,7 @@ struct MeshoptScrewsApp
   }
 }; // struct MeshoptScrewsApp
 
-int main(int argc, char* argv[])
+int run_app(int argc, char* argv[])
 {
   // Even though this *looks* configureable, it is not: All HyperelasticityFunctionals are implemented for Mem::Main
   // only
@@ -753,15 +745,13 @@ int main(int argc, char* argv[])
   //typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> H2M3D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> H3M3D;
 
-  int rank(0);
-  int nprocs(0);
+  // create world communicator
+  Dist::Comm comm(Dist::Comm::world());
 
-  // initialise
-  FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifdef FEAT_HAVE_MPI
-  if (rank == 0)
+  if (comm.rank() == 0)
   {
-    std::cout << "NUM-PROCS: " << nprocs << std::endl;
+    std::cout << "NUM-PROCS: " << comm.size() << std::endl;
   }
 #endif
 
@@ -785,7 +775,7 @@ int main(int argc, char* argv[])
   args.support("vtk");
 
   if( args.check("help") > -1 || args.num_args()==1)
-    display_help();
+    display_help(comm);
 
   // Get unsupported command line arguments
   std::deque<std::pair<int,String> > unsupported = args.query_unsupported();
@@ -818,7 +808,7 @@ int main(int argc, char* argv[])
   if(test_number == 0)
   {
     // Read the application config file on rank 0
-    if(Util::Comm::rank() == 0)
+    if(comm.rank() == 0)
     {
       // Input application configuration file name, required
       String application_config_filename("");
@@ -840,10 +830,8 @@ int main(int argc, char* argv[])
       }
     }
 
-#ifdef FEAT_HAVE_MPI
     // If we are in parallel mode, we need to synchronise the stream
-    Util::Comm::synch_stringstream(synchstream_app_config);
-#endif
+    comm.bcast_stringstream(synchstream_app_config);
 
     // Parse the application config from the (synchronised) stream
     application_config->parse(synchstream_app_config, true);
@@ -857,7 +845,7 @@ int main(int argc, char* argv[])
     mesh_files_p.first.split_by_charset(mesh_files, " ");
 
     // We read the files only on rank 0. After reading, we synchronise the streams like above.
-    if(Util::Comm::rank() == 0)
+    if(comm.rank() == 0)
     {
       // Read configuration for mesh optimisation to stream
       auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
@@ -886,13 +874,11 @@ int main(int argc, char* argv[])
           synchstream_solver_config << ifs.rdbuf();
         }
       }
-    } // Util::Comm::rank() == 0
+    } // comm.rank() == 0
 
-#ifdef FEAT_HAVE_MPI
     // Synchronise all those streams in parallel mode
-    Util::Comm::synch_stringstream(synchstream_meshopt_config);
-    Util::Comm::synch_stringstream(synchstream_solver_config);
-#endif
+    comm.bcast_stringstream(synchstream_meshopt_config);
+    comm.bcast_stringstream(synchstream_solver_config);
   }
   // If we are in test mode, all streams are filled by the hard coded stuff below
   else
@@ -937,12 +923,12 @@ int main(int argc, char* argv[])
   if(mesh_type == "conformal:hypercube:2:2")
   {
     ret = MeshoptScrewsApp<MemType, DataType, IndexType, H2M2D>::run(
-      args, application_config, meshopt_config, solver_config, mesh_file_reader);
+      args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
   else if(mesh_type == "conformal:simplex:2:2")
   {
     ret = MeshoptScrewsApp<MemType, DataType, IndexType, S2M2D>::run(
-      args, application_config, meshopt_config, solver_config, mesh_file_reader);
+      args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
@@ -951,6 +937,13 @@ int main(int argc, char* argv[])
   delete meshopt_config;
   delete solver_config;
 
+  return ret;
+}
+
+int main(int argc, char* argv[])
+{
+  FEAT::Runtime::initialise(argc, argv);
+  int ret = run_app(argc, argv);
   FEAT::Runtime::finalise();
   return ret;
 }
@@ -1112,9 +1105,9 @@ static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int 
   mesh_files.push_back(mesh_filename);
 }
 
-static void display_help()
+static void display_help(const Dist::Comm& comm)
 {
-  if(Util::Comm::rank() == 0)
+  if(comm.rank() == 0)
   {
     std::cout << "meshopt_boundary-app: Moving the boundary of a mesh and computing an extension into the interiour"
     << std::endl;

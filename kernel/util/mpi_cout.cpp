@@ -5,14 +5,12 @@
 using namespace FEAT;
 using namespace Util;
 
-void Util::mpi_cout(FEAT::String string,
-std::function<bool (Index, Index)> func)
+void Util::mpi_cout(FEAT::String string, std::function<bool (int, int)> func)
 {
-  Index rank(Comm::rank());
-  Index ranks(Comm::size());
+  Dist::Comm comm(Dist::Comm::world());
 
-  if (func(rank, ranks))
+  if (func(comm.rank(), comm.size()))
   {
-    std::cout<<string;
+    std::cout << string;
   }
 }

@@ -5,7 +5,7 @@
 #include<cstring>
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/base.hpp>
-#include<kernel/util/comm_base.hpp>
+#include<kernel/util/dist.hpp>
 #include<kernel/foundation/pgraph.hpp>
 #include<kernel/foundation/pexecutor.hpp>
 
@@ -36,7 +36,7 @@ namespace FEAT
 
           typename PExecutorT_::PResult::IndexType* sendbuf = local_partitioning_result.get();
 
-          const Index commsize(Util::Comm::size(local_partitioning_result.get_comm()));
+          const Index commsize = Index(local_partitioning_result.get_comm().size());
 
           typename PExecutorT_::PResult::IndexType* recvbuf(result.get());
 
@@ -53,10 +53,11 @@ namespace FEAT
             rdispls[i] = int(local_partitioning_result.get_vtxdist()[i]);
           }
 
-          int err(Util::Comm::allgatherv(sendbuf, int(local_partitioning_result.size()), recvbuf, recvcounts, rdispls, local_partitioning_result.get_comm()));
+          //int err(Util::Comm::allgatherv(sendbuf, int(local_partitioning_result.size()), recvbuf, recvcounts, rdispls, local_partitioning_result.get_comm()));
+          local_partitioning_result.get_comm().allgatherv(sendbuf, std::size_t(local_partitioning_result.size()), recvbuf, recvcounts, rdispls);
 
-          if(err != MPI_SUCCESS)
-            throw(InternalError("Synch during partitioning failed!"));
+          //if(err != MPI_SUCCESS)
+          //  throw(InternalError("Synch during partitioning failed!"));
 
           delete[] recvcounts;
           delete[] rdispls;

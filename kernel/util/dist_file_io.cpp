@@ -5,7 +5,7 @@
 
 namespace FEAT
 {
-  String DistFileIO::_rankname(const String& pattern, Index rank)
+  String DistFileIO::_rankname(const String& pattern, int rank)
   {
     // find the first asterisk in the filename
     const std::size_t p = pattern.find_first_of('*');
@@ -89,32 +89,31 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
 
-  void DistFileIO::read_common(std::stringstream& stream, const String& filename, Util::Communicator comm)
+  void DistFileIO::read_common(std::stringstream& stream, const String& filename, const Dist::Comm& comm)
   {
-
     // rank 0 reads the file
-    if(Util::Comm::rank() == 0)
+    if(comm.rank() == 0)
     {
       _read_file(stream, filename);
     }
 
     // synchronise
-    Util::Comm::synch_stringstream(stream, comm);
+    comm.bcast_stringstream(stream);
 
     // sanity check
     XASSERT(stream.good());
   }
 
-  void DistFileIO::read_common(BinaryStream& stream, const String& filename, Util::Communicator comm)
+  void DistFileIO::read_common(BinaryStream& stream, const String& filename, const Dist::Comm& comm)
   {
     // rank 0 reads the file
-    if(Util::Comm::rank() == 0)
+    if(comm.rank() == 0)
     {
       _read_file(stream, filename);
     }
 
     // synchronsise
-    Util::Comm::synch_binarystream(stream, comm);
+    comm.bcast_binarystream(stream);
 
     // seek to beginning
     stream.seekg(std::streamoff(0), std::ios_base::beg);
@@ -123,118 +122,118 @@ namespace FEAT
     XASSERT(stream.good());
   }
 
-  void DistFileIO::read_sequence(std::stringstream& stream, const String& pattern, Util::Communicator comm)
+  void DistFileIO::read_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm& comm)
   {
     // retrieve our rank and nprocs
-    Index rank = Util::Comm::rank(comm);
-    Index nprocs = Util::Comm::size(comm);
+    int rank = comm.rank();
+    int nprocs = comm.size();
 
     // build our filename
     String filename = _rankname(pattern, rank);
 
     // round-robin we go
-    for(Index i(0); i < nprocs; ++i)
+    for(int i(0); i < nprocs; ++i)
     {
       // is it our turn?
       if(i == rank)
       {
         _read_file(stream, filename);
       }
-      Util::Comm::barrier(comm);
+      comm.barrier();
     }
   }
 
-  void DistFileIO::read_sequence(BinaryStream& stream, const String& pattern, Util::Communicator comm)
+  void DistFileIO::read_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm& comm)
   {
     // retrieve our rank and nprocs
-    Index rank = Util::Comm::rank(comm);
-    Index nprocs = Util::Comm::size(comm);
+    int rank = comm.rank();
+    int nprocs = comm.size();
 
     // build our filename
     String filename = _rankname(pattern, rank);
 
     // round-robin we go
-    for(Index i(0); i < nprocs; ++i)
+    for(int i(0); i < nprocs; ++i)
     {
       // is it our turn?
       if(i == rank)
       {
         _read_file(stream, filename);
       }
-      Util::Comm::barrier(comm);
+      comm.barrier();
     }
   }
 
-  void DistFileIO::write_sequence(std::stringstream& stream, const String& pattern, bool truncate, Util::Communicator comm)
+  void DistFileIO::write_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm& comm, bool truncate)
   {
     // retrieve our rank and nprocs
-    Index rank = Util::Comm::rank(comm);
-    Index nprocs = Util::Comm::size(comm);
+    int rank = comm.rank();
+    int nprocs = comm.size();
 
     // build our filename
     String filename = _rankname(pattern, rank);
 
     // round-robin we go
-    for(Index i(0); i < nprocs; ++i)
+    for(int i(0); i < nprocs; ++i)
     {
       // is it our turn?
       if(i == rank)
       {
         _write_file(stream, filename, truncate);
       }
-      Util::Comm::barrier(comm);
+      comm.barrier();
     }
   }
 
-  void DistFileIO::write_sequence(BinaryStream& stream, const String& pattern, bool truncate, Util::Communicator comm)
+  void DistFileIO::write_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm& comm, bool truncate)
   {
     // retrieve our rank and nprocs
-    Index rank = Util::Comm::rank(comm);
-    Index nprocs = Util::Comm::size(comm);
+    int rank = comm.rank();
+    int nprocs = comm.size();
 
     // build our filename
     String filename = _rankname(pattern, rank);
 
     // round-robin we go
-    for(Index i(0); i < nprocs; ++i)
+    for(int i(0); i < nprocs; ++i)
     {
       // is it our turn?
       if(i == rank)
       {
         _write_file(stream, filename, truncate);
       }
-      Util::Comm::barrier(comm);
+      comm.barrier();
     }
   }
 
 #else // non-MPI implementation
 
-  void DistFileIO::read_common(std::stringstream& stream, const String& filename, Util::Communicator)
+  void DistFileIO::read_common(std::stringstream& stream, const String& filename, const Dist::Comm&)
   {
     _read_file(stream, filename);
   }
 
-  void DistFileIO::read_common(BinaryStream& stream, const String& filename, Util::Communicator)
+  void DistFileIO::read_common(BinaryStream& stream, const String& filename, const Dist::Comm&)
   {
     _read_file(stream, filename);
   }
 
-  void DistFileIO::read_sequence(std::stringstream& stream, const String& pattern, Util::Communicator)
+  void DistFileIO::read_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm&)
   {
     _read_file(stream, _rankname(pattern, Index(0)));
   }
 
-  void DistFileIO::read_sequence(BinaryStream& stream, const String& pattern, Util::Communicator)
+  void DistFileIO::read_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm&)
   {
     _read_file(stream, _rankname(pattern, Index(0)));
   }
 
-  void DistFileIO::write_sequence(std::stringstream& stream, const String& pattern, bool truncate, Util::Communicator)
+  void DistFileIO::write_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm&, bool truncate)
   {
     _write_file(stream, _rankname(pattern, Index(0)), truncate);
   }
 
-  void DistFileIO::write_sequence(BinaryStream& stream, const String& pattern, bool truncate, Util::Communicator)
+  void DistFileIO::write_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm&, bool truncate)
   {
     _write_file(stream, _rankname(pattern, Index(0)), truncate);
   }

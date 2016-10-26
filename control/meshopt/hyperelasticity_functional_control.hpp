@@ -281,7 +281,7 @@ namespace FEAT
             {
               Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim());
             }
-            catch(std::exception& e)
+            catch(std::exception& /*e*/)
             {
             }
 

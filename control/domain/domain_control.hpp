@@ -3,6 +3,7 @@
 #define CONTROL_DOMAIN_DOMAIN_CONTROL_HPP 1
 
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/math.hpp>
 
@@ -22,11 +23,13 @@ namespace FEAT
       class DomainLayer
       {
       protected:
+        Dist::Comm* _comm;
         std::vector<Index> _ranks;
         std::vector<Index> _ctags;
 
       public:
-        explicit DomainLayer(std::vector<Index>&& ranks, std::vector<Index>&& ctags) :
+        explicit DomainLayer(Dist::Comm* comm_, std::vector<Index>&& ranks, std::vector<Index>&& ctags) :
+          _comm(comm_),
           _ranks(std::forward<std::vector<Index>>(ranks)),
           _ctags(std::forward<std::vector<Index>>(ctags))
         {
@@ -55,6 +58,11 @@ namespace FEAT
         Index get_ctag(Index i) const
         {
           return _ctags.at(std::size_t(i));
+        }
+
+        const Dist::Comm* get_comm() const
+        {
+          return _comm;
         }
 
         const std::vector<Index>& get_ranks() const
@@ -148,12 +156,22 @@ namespace FEAT
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
 
       protected:
+        /// the main communicator
+        Dist::Comm* _comm;
+
         AtlasType* _atlas;
         std::deque<LayerType*> _layers;
         std::deque<LevelType*> _levels;
 
       public:
         DomainControl() :
+          _comm(nullptr),
+          _atlas(nullptr)
+        {
+        }
+
+        explicit DomainControl(Dist::Comm* comm_) :
+          _comm(comm_),
           _atlas(nullptr)
         {
         }

@@ -2,6 +2,7 @@
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -28,7 +29,7 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/spai_precond.hpp>
 #include <kernel/global/synch_mat.hpp>
-#include <kernel/solver/multigrid.hpp>                     // NEW: for MultiGrid
+#include <kernel/solver/multigrid.hpp>
 #include <control/statistics.hpp>
 #include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
@@ -170,7 +171,7 @@ namespace PoissonDirichlet2D
   };
 
   template<typename MeshType_, typename TargetMatrixSolve_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -233,10 +234,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Creating gates..." << std::endl;
-    }
+    comm.print("Creating gates...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -245,10 +243,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling system matrices..." << std::endl;
-    }
+    comm.print("Assembling system matrices...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -257,10 +252,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling system filters..." << std::endl;
-    }
+    comm.print("Assembling system filters...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -269,10 +261,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling transfer matrices..." << std::endl;
-    }
+    comm.print("Assembling transfer matrices...");
 
     for (Index i(0); (i + 1) < num_levels; ++i)
     {
@@ -302,12 +291,9 @@ namespace PoissonDirichlet2D
     typedef typename SystemLevelTypeSolve::LocalSystemMatrix LocalSystemMatrixSolve;
     typedef typename SystemLevelTypeSolve::LocalSystemFilter LocalSystemFilterSolve;
 
-    if (rank == 0)
-    {
-      std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
-        ", Mem:" << MemType::name() << " to " << SystemLevelTypeSolve::LocalScalarMatrix::name() << ", Mem:" <<
-        MemTypeSolve::name() << "..." << std::endl;
-    }
+    comm.print("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() +
+      ", Mem:" + MemType::name() + " to " + SystemLevelTypeSolve::LocalScalarMatrix::name() + ", Mem:" +
+      MemTypeSolve::name() + "...");
 
     //convert system and transfer levels
     for (Index i(0); i < num_levels; ++i)
@@ -340,11 +326,13 @@ namespace PoissonDirichlet2D
     for (auto it(system_levels_solve.begin()); it != system_levels_solve.end(); ++it, ++kt)
     {
       auto& kt_ranks((*kt)->gate_sys._ranks);
-      auto& kt_tags((*kt)->gate_sys._ctags);
       auto& kt_mirrors((*kt)->gate_sys._mirrors);
 
       wp.log(" A0: ", *((*kt)->matrix_sys));
-      auto it_matrix(Global::SynchMat1::exec( *((*kt)->matrix_sys), kt_mirrors, kt_mirrors, kt_ranks, kt_tags/*,&wp*/));
+      //auto it_matrix(Global::SynchMat1::exec( *((*kt)->matrix_sys), kt_mirrors, kt_mirrors, kt_ranks, kt_tags/*,&wp*/));
+      auto it_matrix = (*((*kt)->matrix_sys)).clone();
+      Global::synch_matrix(it_matrix, *layer.get_comm(), kt_ranks, kt_mirrors, kt_mirrors);
+
       wp.log(" A1: ", it_matrix);
       LocalSystemMatrixSolve it_matrix_solve;
       it_matrix_solve.convert(it_matrix);
@@ -419,7 +407,7 @@ namespace PoissonDirichlet2D
       inner_solver->init();
       //inner_solver->set_max_iter(2);
       inner_solver->set_tol_rel(1e-1);
-      inner_solver->set_plot(rank == 0);
+      inner_solver->set_plot(comm.rank() == 0);
 
       //auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
       //auto local_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), 1.0, local_precond);
@@ -447,7 +435,7 @@ namespace PoissonDirichlet2D
     //#### OUTER MG ####
 
     // enable plotting
-    outer_solver->set_plot(rank == 0);
+    outer_solver->set_plot(comm.rank() == 0);
 
     //auto outer_krylov(Solver::new_pcg(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys, outer_solver));
 
@@ -493,7 +481,7 @@ namespace PoissonDirichlet2D
 
     if (args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(rank == 0, the_system_level, vec_sol, sol_func);
+      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol, sol_func);
     }
 
     /* ***************************************************************************************** */
@@ -505,7 +493,7 @@ namespace PoissonDirichlet2D
       // build VTK name
       String vtk_name = String("./scarckin-poisson-dirichlet-2d");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
-      vtk_name += "-n" + stringify(nprocs);
+      vtk_name += "-n" + stringify(comm.size());
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
@@ -520,7 +508,7 @@ namespace PoissonDirichlet2D
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
-      exporter.write(vtk_name, rank, nprocs);
+      exporter.write(vtk_name, comm);
     }
 
     /* ***************************************************************************************** */
@@ -562,18 +550,13 @@ namespace PoissonDirichlet2D
     }
   }
 
-  int main(int argc, char* argv [])
+  void main(int argc, char* argv [])
   {
-    int rank = 0;
-    int nprocs = 0;
+    // create world communicator
+    Dist::Comm comm(Dist::Comm::world());
 
-    // initialise
-    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
-#ifndef SERIAL
-    if (rank == 0)
-    {
-      std::cout << "NUM-PROCS: " << nprocs << std::endl;
-    }
+#ifdef FEAT_HAVE_MPI
+    comm.print("NUM-PROCS: " + stringify(comm.size()));
 #endif
 
     // create arg parser
@@ -595,11 +578,8 @@ namespace PoissonDirichlet2D
     if (!unsupported.empty())
     {
       // print all unsupported options to cerr
-      if(rank == 0)
-      {
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
-      }
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
       // abort
       FEAT::Runtime::abort();
     }
@@ -622,14 +602,10 @@ namespace PoissonDirichlet2D
       TimeStamp stamp1;
 
       // let's create our domain
-      if (rank == 0)
-      {
-        std::cout << "Preparing domain..." << std::endl;
-      }
+      comm.print("Preparing domain...");
       if(args.check("mesh") < 1)
       {
-        if(rank == 0)
-          std::cerr << "ERROR: Mandatory option --mesh is missing!" << std::endl;
+        comm.print_cerr("ERROR: Mandatory option --mesh is missing!");
         FEAT::Runtime::abort();
       }
 
@@ -637,7 +613,7 @@ namespace PoissonDirichlet2D
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain;
+      Control::Domain::PartiDomainControl<MeshType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -651,27 +627,24 @@ namespace PoissonDirichlet2D
       // try to create the partition
       domain.create_partition();
 
-      Util::mpi_cout("Creating mesh hierarchy...\n");
+      comm.print("Creating mesh hierarchy...");
 
       // create the level hierarchy
       domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
-      if (rank == 0)
-      {
-        std::cout << "LVL-MIN: " << domain.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-        std::cout << "LVL-MAX: " << domain.get_levels().back()->get_level_index() << " [" << lvl_max << "]" << std::endl;
-      }
+      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
       // run our application
       if (mem_string == "main")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
       }
 #ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(comm, args, domain);
       }
 #endif
       else
@@ -685,15 +658,11 @@ namespace PoissonDirichlet2D
       long long time1 = stamp2.elapsed_micros(stamp1);
 
       // accumulate times over all processes
-      long long time2 = time1 * (long long) nprocs;
+      long long time2 = time1 * (long long) comm.size();
 
       // print time
-      if (rank == 0)
-      {
-        std::cout << "Run-Time: "
-          << TimeStamp::format_micros(time1, TimeFormat::m_s_m) << " ["
-          << TimeStamp::format_micros(time2, TimeFormat::m_s_m) << "]" << std::endl;
-      }
+      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
+        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)
@@ -707,13 +676,12 @@ namespace PoissonDirichlet2D
       FEAT::Runtime::abort();
     }
 #endif // DEBUG
-
-    // okay
-    return FEAT::Runtime::finalise();
   }
 } // namespace PoissonDirichlet2D
 
 int main(int argc, char* argv [])
 {
-  return PoissonDirichlet2D::main(argc, argv);
+  FEAT::Runtime::initialise(argc, argv);
+  PoissonDirichlet2D::main(argc, argv);
+  return FEAT::Runtime::finalise();
 }

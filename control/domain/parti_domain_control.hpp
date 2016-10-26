@@ -5,9 +5,9 @@
 #include <kernel/base_header.hpp>
 
 #include <kernel/util/comm_base.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/runtime.hpp>
-#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/foundation/pexecutor.hpp>
 #include <kernel/foundation/pgraph.hpp>
@@ -78,7 +78,8 @@ namespace FEAT
 
       public:
         /// default constructor
-        PartiDomainControl() :
+        explicit PartiDomainControl(Dist::Comm& comm) :
+          BaseClass(&comm),
           _adapt_mode(Geometry::AdaptMode::chart),
           _have_read_mesh(false),
           _have_partition(false),
@@ -149,11 +150,9 @@ namespace FEAT
                   _allow_parti_fallback = true;
                 else
                 {
-                  if(Util::Comm::rank() == Index(0))
-                  {
+                  if(this->_comm->rank() == 0)
                     std::cerr << "ERROR: unknown partitioner type '" << t << "'" << std::endl;
-                    return false;
-                  }
+                  return false;
                 }
               }
             }
@@ -203,11 +202,9 @@ namespace FEAT
                  _allow_parti_fallback = true;
                else
                {
-                 if(Util::Comm::rank() == Index(0))
-                 {
+                 if(this->_comm->rank() == 0)
                    std::cerr << "ERROR: unknown partitioner type '" << t << "'" << std::endl;
-                   return false;
-                 }
+                 return false;
                }
              }
           }
@@ -356,7 +353,7 @@ namespace FEAT
         void read_mesh(const String& filename)
         {
           std::stringstream stream;
-          DistFileIO::read_common(stream, filename);
+          DistFileIO::read_common(stream, filename, *(this->_comm));
           read_mesh(stream);
         }
 
@@ -386,7 +383,7 @@ namespace FEAT
           for(std::size_t i(0); i < num_files; ++i)
           {
             // read the stream
-            DistFileIO::read_common(streams.at(i), filenames.at(i));
+            DistFileIO::read_common(streams.at(i), filenames.at(i),  *(this->_comm));
 
             // add to mesh reader
             mesh_reader.add_stream(streams.at(i));
@@ -604,7 +601,7 @@ namespace FEAT
           XASSERT(_base_mesh_node != nullptr);
 
 #ifdef FEAT_HAVE_MPI
-          if(Util::Comm::size() != Index(1))
+          if(this->_comm->size() != 1)
             return false;
 
           std::cout << "Using base mesh as patch, because there is only one process..." << std::endl;
@@ -614,11 +611,12 @@ namespace FEAT
           _base_mesh_node = nullptr;
 #endif // FEAT_HAVE_MPI
 
+          /// \todo remove tags
           // comm ranks and tags
           std::vector<Index> ranks, ctags;
 
           // push layer
-          this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
+          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
 
           // okay
           return true;
@@ -641,8 +639,8 @@ namespace FEAT
         bool _create_partition_auto_manual()
         {
           // get rank and nprocs
-          Index rank = Util::Comm::rank();
-          Index nprocs = Util::Comm::size();
+          Index rank = Index(this->_comm->rank());
+          Index nprocs = Index(this->_comm->size());
 
           //if(rank == Index(0))
           //  std::cout << "Searching for suitable manual partition..." << std::endl;
@@ -688,7 +686,7 @@ namespace FEAT
           // <<<<< DEBUG <<<<<
 
           // push layer
-          this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
+          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
 
           // okay
           return true;
@@ -711,8 +709,8 @@ namespace FEAT
         bool _create_partition_2level()
         {
           // get rank and nprocs
-          Index rank = Util::Comm::rank();
-          Index nprocs = Util::Comm::size();
+          Index rank = Index(this->_comm->rank());
+          Index nprocs = Index(this->_comm->size());
 
           // create a 2-lvl partitioner
           Geometry::Parti2Lvl<MeshType_> partitioner(*_base_mesh_node->get_mesh(), nprocs);
@@ -740,7 +738,7 @@ namespace FEAT
           _patch_mesh_node = _base_mesh_node->extract_patch(ranks, ctags, elems_at_rank, rank);
 
           // push layer
-          this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
+          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
 
           // okay
           return true;
@@ -820,8 +818,9 @@ namespace FEAT
         {
           typedef PExecutorT_ PartT;
 
-          const Index rank = Util::Comm::rank();
-          const Index nprocs = Util::Comm::size();
+          // get rank and nprocs
+          const Index rank = Index(this->_comm->rank());
+          const Index nprocs = Index(this->_comm->size());
 
           // refine base mesh if necessary
           this->_refine_base_mesh_to_min_elems(_min_elems_per_rank * nprocs);
@@ -835,8 +834,9 @@ namespace FEAT
           // get number of elements
           const Index num_global_elements(base_root_mesh.get_num_entities(MeshType_::shape_dim));
 
+          /// \todo make PGraphT use Dist::Comm
           // allocate graph
-          typename PartT::PGraphT global_dual(base_root_mesh, num_global_elements, Util::Communicator(MPI_COMM_WORLD));
+          typename PartT::PGraphT global_dual(base_root_mesh, num_global_elements, *this->_comm);
 
           // local input for k-way partitioning
           auto local_dual(global_dual.create_local());
@@ -860,7 +860,7 @@ namespace FEAT
           _patch_mesh_node = this->_base_mesh_node->extract_patch(rank, ranks_at_elem, ranks);
 
           // push layer
-          this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
+          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
 
           // okay
           return true;

@@ -2,8 +2,8 @@
 #ifndef UTIL_GUARD_ENVIRONMENT_HPP
 #define UTIL_GUARD_ENVIRONMENT_HPP 1
 
-#include<kernel/base_header.hpp>
-#include<kernel/util/comm_base.hpp>
+#include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
 
 #ifdef FEAT_HAVE_MPI
 #include<mpi.h>

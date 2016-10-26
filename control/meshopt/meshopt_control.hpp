@@ -635,11 +635,14 @@ namespace FEAT
             // Create the scalar gate
             typename SystemLevel_::ScalarGate& gate_scalar = sys_level.gate_scalar;
 
+            // set the gate comm
+            gate_sys.set_comm(dom_layer.get_comm());
+            gate_scalar.set_comm(dom_layer.get_comm());
+
             // Loop over all ranks
             for(Index i(0); i < dom_layer.size(); ++i)
             {
               Index rank = dom_layer.get_rank(i);
-              Index ctag = dom_layer.get_ctag(i);
 
               // try to find our halo
               auto* halo = domain_level.find_halo_part(rank);
@@ -650,14 +653,14 @@ namespace FEAT
               Assembly::MirrorAssembler::assemble_mirror(sys_mirror, this->trafo_space, *halo);
 
               // push mirror into gates
-              gate_sys.push(rank, ctag, std::move(sys_mirror));
+              gate_sys.push(int(rank), std::move(sys_mirror));
 
               // assemble the scalar mirror
               typename SystemLevel_::ScalarMirror scalar_mirror;
               Assembly::MirrorAssembler::assemble_mirror(scalar_mirror, this->trafo_space, *halo);
 
               // push mirror into gates
-              gate_scalar.push(rank, ctag, std::move(scalar_mirror));
+              gate_scalar.push(int(rank), std::move(scalar_mirror));
             }
 
             // create local template vectors

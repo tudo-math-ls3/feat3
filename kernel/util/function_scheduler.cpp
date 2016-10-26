@@ -1,28 +1,31 @@
 #include <kernel/util/function_scheduler.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/dist.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Util;
 
 void FEAT::Util::schedule_function(std::function<void (void)> func, ScheduleMode mode)
 {
-  Index rank(Comm::rank());
-  Index ranks(Comm::size());
+  Dist::Comm comm(Dist::Comm::world());
+
+  int rank(comm.rank());
+  int ranks(comm.size());
 
   switch (mode)
   {
     case ScheduleMode::sequential:
       {
-        for (Index i(0) ; i < ranks ; ++i)
+        for (int i(0) ; i < ranks ; ++i)
         {
           if (i == rank)
           {
             func();
-            Comm::barrier();
+            comm.barrier();
           }
           else
           {
-            Comm::barrier();
+            comm.barrier();
           }
         }
       }
@@ -30,19 +33,19 @@ void FEAT::Util::schedule_function(std::function<void (void)> func, ScheduleMode
 
     case ScheduleMode::clustered:
       {
-        Index concurrent = 100;  /// \todo replace hardcoded number by entry from feat.ini
-        Index sweeps = (ranks / concurrent) + 1;
+        int concurrent = 100;  /// \todo replace hardcoded number by entry from feat.ini
+        int sweeps = (ranks / concurrent) + 1;
 
-        for (Index i(0) ; i < sweeps && i < ranks ; ++i)
+        for (int i(0) ; i < sweeps && i < ranks ; ++i)
         {
           if (rank >= i * concurrent && rank < (i+1) * concurrent)
           {
             func();
-            Comm::barrier();
+            comm.barrier();
           }
           else
           {
-            Comm::barrier();
+            comm.barrier();
           }
         }
       }

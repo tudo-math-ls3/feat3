@@ -4,7 +4,7 @@
 
 // includes, FEAT
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/global/synch_scal.hpp>
+#include <kernel/util/dist.hpp>
 
 namespace FEAT
 {
@@ -33,6 +33,8 @@ namespace FEAT
       using FilterType = class MeanFilter<Mem2_, DT2_, IT2_>;
 
     protected:
+      /// communicator
+      const Dist::Comm* _comm;
       /// primal weighting vector
       VectorType _vec_prim;
       /// dual weighting vector
@@ -45,6 +47,7 @@ namespace FEAT
     public:
       // default CTOR
       MeanFilter() :
+        _comm(nullptr),
         _vec_prim(),
         _vec_dual(),
         _vec_freq(),
@@ -61,16 +64,17 @@ namespace FEAT
        * \param[in] vec_freq
        * The frequency vector for the dot-product.
        */
-      explicit MeanFilter(VectorType&& vec_prim, VectorType&& vec_dual, VectorType&& vec_freq) :
+      explicit MeanFilter(VectorType&& vec_prim, VectorType&& vec_dual, VectorType&& vec_freq, const Dist::Comm* comm) :
+        _comm(comm),
         _vec_prim(std::forward<VectorType>(vec_prim)),
         _vec_dual(std::forward<VectorType>(vec_dual)),
         _vec_freq(std::forward<VectorType>(vec_freq)),
         _volume()
       {
-        if(!_vec_freq.empty())
+        if((!_vec_freq.empty()) && (_comm != nullptr))
         {
           _volume = _vec_freq.triple_dot(_vec_prim, _vec_dual);
-          _volume = Global::SynchScal0::value(_volume);
+          _comm->allreduce(&_volume, &_volume, std::size_t(1), Dist::op_sum);
         }
         else
           _volume = _vec_prim.dot(_vec_dual);
@@ -80,6 +84,7 @@ namespace FEAT
 
       /// move ctor
       MeanFilter(MeanFilter && other) :
+        _comm(other._comm),
         _vec_prim(std::move(other._vec_prim)),
         _vec_dual(std::move(other._vec_dual)),
         _vec_freq(std::move(other._vec_freq)),
@@ -92,6 +97,7 @@ namespace FEAT
       {
         if(this != &other)
         {
+          _comm = other._comm;
           _vec_prim = std::move(other._vec_prim);
           _vec_dual = std::move(other._vec_dual);
           _vec_freq = std::move(other._vec_freq);
@@ -111,7 +117,7 @@ namespace FEAT
        */
       MeanFilter clone(LAFEM::CloneMode clone_mode = LAFEM::CloneMode::Deep) const
       {
-        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _vec_freq.clone(clone_mode));
+        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _vec_freq.clone(clone_mode), _comm);
       }
 
       /**
@@ -120,6 +126,10 @@ namespace FEAT
        */
       void clone(const MeanFilter & other, LAFEM::CloneMode clone_mode = LAFEM::CloneMode::Deep)
       {
+        if(this == &other)
+          return;
+
+        _comm = other.get_comm();
         _vec_prim.clone(other.get_vec_prim(), clone_mode);
         _vec_dual.clone(other.get_vec_dual(), clone_mode);
         _vec_freq.clone(other.get_vec_freq(), clone_mode);
@@ -130,6 +140,10 @@ namespace FEAT
       template<typename Mem2_, typename DT2_, typename IT2_>
       void convert(const MeanFilter<Mem2_, DT2_, IT2_>& other)
       {
+        if((void*)this == (void*)&other)
+          return;
+
+        _comm = other.get_comm();
         _vec_prim.convert(other.get_vec_prim());
         _vec_dual.convert(other.get_vec_dual());
         _vec_freq.convert(other.get_vec_freq());
@@ -171,6 +185,11 @@ namespace FEAT
       {
         return _volume;
       }
+
+      const Dist::Comm* get_comm() const
+      {
+        return _comm;
+      }
       /// \endcond
 
       /**
@@ -183,12 +202,12 @@ namespace FEAT
       {
         // compute dual integral
         DataType integ = DataType(0);
-        if(_vec_freq.empty())
+        if(_vec_freq.empty() || (_comm == nullptr))
           integ = vector.dot(_vec_prim);
         else
         {
           integ = _vec_freq.triple_dot(vector, _vec_prim);
-          integ = Global::SynchScal0::value(integ);
+          _comm->allreduce(&integ, &integ, std::size_t(1), Dist::op_sum);
         }
         // subtract mean
         vector.axpy(_vec_dual, vector, -integ / _volume);
@@ -204,12 +223,12 @@ namespace FEAT
       {
         // compute primal integral
         DataType integ = DataType(0);
-        if(_vec_freq.empty())
+        if(_vec_freq.empty() || (_comm == nullptr))
           integ = vector.dot(_vec_dual);
         else
         {
           integ = _vec_freq.triple_dot(vector, _vec_dual);
-          integ = Global::SynchScal0::value(integ);
+          _comm->allreduce(&integ, &integ, std::size_t(1), Dist::op_sum);
         }
         // subtract mean
         vector.axpy(_vec_prim, vector, -integ / _volume);

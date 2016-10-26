@@ -3,10 +3,10 @@
 #define KERNEL_GLOBAL_GATE_HPP 1
 
 #include <kernel/base_header.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/global/synch_vec.hpp>
 #include <kernel/global/synch_scal.hpp>
-#include <kernel/global/ticket.hpp>
 
 namespace FEAT
 {
@@ -30,9 +30,14 @@ namespace FEAT
       typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> BufferVectorType;
       typedef Mirror_ MirrorType;
 
+      typedef std::shared_ptr<SynchScalarTicket<DataType>> ScalarTicketType;
+      typedef std::shared_ptr<SynchVectorTicket<LocalVector_, std::vector<Mirror_>>> VectorTicketType;
+
     public:
-      /// communication ranks and tags
-      mutable std::vector<Index> _ranks, _ctags;
+      /// our communicator
+      const Dist::Comm* _comm;
+      /// communication ranks
+      std::vector<int> _ranks;
       /// vector mirrors
       std::vector<Mirror_> _mirrors;
       /// frequency fector
@@ -47,7 +52,8 @@ namespace FEAT
       using GateTypeByMDI = class Gate<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
     public:
-      explicit Gate()
+      explicit Gate() :
+        _comm(nullptr)
       {
       }
 
@@ -55,15 +61,27 @@ namespace FEAT
       {
       }
 
+      const Dist::Comm* get_comm() const
+      {
+        return _comm;
+      }
+
+      void set_comm(const Dist::Comm* comm_)
+      {
+        _comm = comm_;
+      }
+
       template<typename LVT2_, typename MT2_>
       void convert(const Gate<LVT2_, MT2_>& other)
       {
+        if((void*)this == (void*)&other)
+          return;
+
         this->_ranks.clear();
-        this->_ctags.clear();
         this->_mirrors.clear();
 
+        this->_comm = other._comm;
         this->_ranks = other._ranks;
-        this->_ctags = other._ctags;
 
         for(auto& other_mirrors_i : other._mirrors)
         {
@@ -84,17 +102,15 @@ namespace FEAT
           temp += i.bytes();
         }
         temp += _freqs.bytes();
-        temp += _ranks.size() * sizeof(Index);
-        temp += _ctags.size() * sizeof(Index);
+        temp += _ranks.size() * sizeof(int);
 
         return temp;
       }
 
-      void push(Index rank, Index ctag, Mirror_&& mirror)
+      void push(int rank, Mirror_&& mirror)
       {
         // push rank and tags
         _ranks.push_back(rank);
-        _ctags.push_back(ctag);
 
         // push mirror
         _mirrors.push_back(std::move(mirror));
@@ -150,13 +166,12 @@ namespace FEAT
         if(_ranks.empty())
           return;
 
-        Global::SynchVec0::exec(
-            vector, _mirrors, _freqs, _ranks, _ctags);
+        synch_vector(vector, *_comm, _ranks, _mirrors);
       }
 
-      auto sync_0_async(LocalVector_& vector) const -> decltype(Global::SynchVec0Async::exec(vector, _mirrors, _freqs, _ranks, _ctags))
+      VectorTicketType sync_0_async(LocalVector_& vector) const
       {
-        return Global::SynchVec0Async::exec(vector, _mirrors, _freqs, _ranks, _ctags);
+        return std::make_shared<SynchVectorTicket<LocalVector_, Mirror_>>(vector, *_comm, _ranks, _mirrors);
       }
 
       /**
@@ -175,13 +190,14 @@ namespace FEAT
         if(_ranks.empty())
           return;
 
-        Global::SynchVec1::exec(
-            vector, _mirrors, _freqs, _ranks, _ctags);
+        from_1_to_0(vector);
+        synch_vector(vector, *_comm, _ranks, _mirrors);
       }
 
-      auto sync_1_async(LocalVector_& vector) const -> decltype(Global::SynchVec1Async::exec(vector, _mirrors, _freqs, _ranks, _ctags))
+      VectorTicketType sync_1_async(LocalVector_& vector) const
       {
-        return Global::SynchVec1Async::exec(vector, _mirrors, _freqs, _ranks, _ctags);
+        from_1_to_0(vector);
+        return sync_0_async(vector);
       }
 
       /**
@@ -200,7 +216,7 @@ namespace FEAT
         return sum(_freqs.triple_dot(x, y));
       }
 
-      std::shared_ptr<ScalTicket<DataType>> dot_async(const LocalVector_& x, const LocalVector_& y) const
+      ScalarTicketType dot_async(const LocalVector_& x, const LocalVector_& y) const
       {
         return sum_async(_freqs.triple_dot(x, y));
       }
@@ -216,15 +232,12 @@ namespace FEAT
        */
       DataType sum(DataType x) const
       {
-        if(_ranks.empty())
-          return x;
-        else
-          return Global::SynchScal0::value(x);
+        return synch_scalar(x, *_comm, Dist::op_sum, false);
       }
 
-      std::shared_ptr<ScalTicket<DataType>> sum_async(DataType x) const
+      ScalarTicketType sum_async(DataType x) const
       {
-        return Global::SynchScal0Async::value(x);
+        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_sum, false);
       }
 
       /**
@@ -241,14 +254,12 @@ namespace FEAT
        */
       DataType norm2(DataType x) const
       {
-        return Math::sqrt(sum(Math::sqr(x)));
+        return synch_scalar(x*x, *_comm, Dist::op_sum, true);
       }
 
-      std::shared_ptr<ScalTicket<DataType>> norm2_async(DataType x) const
+      ScalarTicketType norm2_async(DataType x) const
       {
-        auto ticket = sum_async(x);
-        ticket->sqrt = true;
-        return ticket;
+        return std::make_shared<SynchScalarTicket<DataType>>(x*x, *_comm, Dist::op_sum, true);
       }
 
       /**
@@ -258,19 +269,12 @@ namespace FEAT
        */
       DataType max_element(const LocalVector_ & x) const
       {
-        DataType t(x.max_element());
-        if(_ranks.empty())
-          return t;
-        else
-        {
-          return Global::SynchScal0::value(t, Util::CommOperationMax());
-        }
+        return synch_scalar(x.max_element(), *_comm, Dist::op_max);
       }
 
-      std::shared_ptr<ScalTicket<DataType>>  max_element_async(const LocalVector_ & x) const
+      ScalarTicketType  max_element_async(const LocalVector_ & x) const
       {
-        DataType t(x.max_element());
-        return Global::SynchScal0Async::value(t, Util::CommOperationMax());
+        return std::make_shared<SynchScalarTicket<DataType>>(x.max_element(), *_comm, Dist::op_max);
       }
     }; // class Gate<...>
   } // namespace Global

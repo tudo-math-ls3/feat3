@@ -6,7 +6,7 @@
 #include <kernel/util/binary_stream.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/comm_base.hpp>
+#include <kernel/util/dist.hpp>
 
 #include <sstream>
 
@@ -64,11 +64,13 @@ namespace FEAT
      *
      * \throws FileNotFound if the file could not be opened.
      */
-    static void read_common(
-      std::stringstream& stream,
-      const String& filename,
-      Util::Communicator comm = Util::Communicator()
-      );
+    static void read_common(std::stringstream& stream, const String& filename, const Dist::Comm& comm);
+
+    static void read_common(std::stringstream& stream, const String& filename)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      read_common(stream, filename, comm);
+    }
 
     /**
      * \brief Reads a common binary file for all ranks.
@@ -86,11 +88,13 @@ namespace FEAT
      *
      * \throws FileNotFound if the file could not be opened.
      */
-    static void read_common(
-      BinaryStream& stream,
-      const String& filename,
-      Util::Communicator comm = Util::Communicator()
-      );
+    static void read_common(BinaryStream& stream, const String& filename, const Dist::Comm& comm);
+
+    static void read_common(BinaryStream& stream, const String& filename)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      read_common(stream, filename, comm);
+    }
 
     /**
      * \brief Reads a rank-indexed text file sequence.
@@ -108,11 +112,14 @@ namespace FEAT
      *
      * \throws FileNotFound if the file could not be opened.
      */
-    static void read_sequence(
-      std::stringstream& stream,
-      const String& pattern,
-      Util::Communicator comm = Util::Communicator()
-      );
+    static void read_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm& comm);
+
+    static void read_sequence(std::stringstream& stream, const String& pattern)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      read_sequence(stream, pattern, comm);
+    }
+
 
     /**
      * \brief Reads a rank-indexed binary file sequence.
@@ -130,11 +137,13 @@ namespace FEAT
      *
      * \throws FileNotFound if the file could not be opened.
      */
-    static void read_sequence(
-      BinaryStream& stream,
-      const String& pattern,
-      Util::Communicator comm = Util::Communicator()
-      );
+    static void read_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm& comm);
+
+    static void read_sequence(BinaryStream& stream, const String& pattern)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      read_sequence(stream, pattern, comm);
+    }
 
     /**
      * \brief Writes a rank-indexed text file sequence.
@@ -150,12 +159,14 @@ namespace FEAT
      *
      * \throws FileNotCreated if the file could not be opened.
      */
-    static void write_sequence(
-      std::stringstream& stream,
-      const String& pattern,
-      bool truncate = true,
-      Util::Communicator comm = Util::Communicator()
-      );
+    static void write_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm& comm, bool truncate = true);
+
+    static void write_sequence(std::stringstream& stream, const String& pattern, bool truncate = true)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      write_sequence(stream, pattern, comm, truncate);
+    }
+
 
     /**
      * \brief Writes a rank-indexed binary file sequence.
@@ -173,16 +184,17 @@ namespace FEAT
      *
      * \throws FileNotCreated if the file could not be opened.
      */
-    static void write_sequence(
-      BinaryStream& stream,
-      const String& pattern,
-      bool truncate = true,
-      Util::Communicator comm = Util::Communicator()
-      );
+    static void write_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm& comm, bool truncate = true);
+
+    static void write_sequence(BinaryStream& stream, const String& pattern, bool truncate = true)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      write_sequence(stream, pattern, comm, truncate);
+    }
 
   protected:
     /// auxiliary function: build a rank filename from a pattern
-    static String _rankname(const String& pattern, Index rank);
+    static String _rankname(const String& pattern, int rank);
     /// auxiliary function: read a file into a string stream
     static void _read_file(std::stringstream& stream, const String& filename);
     /// auxiliary function: read a file into a binary stream

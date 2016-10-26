@@ -4,6 +4,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/comm_base.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -312,11 +313,13 @@ namespace FEAT
         // get our gate
         typename SystemLevel_::SystemGate& gate_sys = sys_level.gate_sys;
 
+        // set the gate comm
+        gate_sys.set_comm(dom_layer.get_comm());
+
         // loop over all ranks
         for(Index i(0); i < dom_layer.size(); ++i)
         {
           Index rank = dom_layer.get_rank(i);
-          Index ctag = dom_layer.get_ctag(i);
 
           // try to find our halo
           auto* halo = domain_level.find_halo_part(rank);
@@ -328,7 +331,7 @@ namespace FEAT
           Assembly::MirrorAssembler::assemble_mirror(mirror_sys, space, *halo);
 
           // push mirror into gate
-          gate_sys.push(rank,ctag, std::move(mirror_sys));
+          gate_sys.push(int(rank), std::move(mirror_sys));
         }
 
         // create local template vector

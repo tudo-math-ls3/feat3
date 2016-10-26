@@ -1,6 +1,7 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
@@ -185,7 +186,7 @@ namespace StokesVortex2D
       vec_glob_w.sync_0();
 
       // build the mean filter
-      fil_loc_p = MeanFilterType(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone());
+      fil_loc_p = MeanFilterType(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), sys_level.gate_pres.get_comm());
     }
 
     template<typename SystemLevel_>
@@ -282,7 +283,7 @@ namespace StokesVortex2D
   };
 
   template<typename MeshType_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -336,10 +337,7 @@ namespace StokesVortex2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Creating gates..." << std::endl;
-    }
+    comm.print("Creating gates...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -348,10 +346,7 @@ namespace StokesVortex2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Assembling system matrices..." << std::endl;
-    }
+    comm.print("Assembling system matrices...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -363,10 +358,7 @@ namespace StokesVortex2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Assembling system filters..." << std::endl;
-    }
+    comm.print("Assembling system filters...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -375,10 +367,7 @@ namespace StokesVortex2D
 
     /* ***************************************************************************************** */
 
-    if(rank == 0)
-    {
-      std::cout << "Assembling transfer matrices..." << std::endl;
-    }
+    comm.print("Assembling transfer matrices...");
 
     for(Index i(0); (i+1) < num_levels; ++i)
     {
@@ -488,7 +477,7 @@ namespace StokesVortex2D
     auto solver = Solver::new_richardson(matrix, filter, DataType(1), schur);
 
     // enable plotting
-    solver->set_plot(rank == 0);
+    solver->set_plot(comm.rank() == 0);
 
     // set tolerance
     solver->set_tol_rel(tol_rel);
@@ -510,7 +499,7 @@ namespace StokesVortex2D
 
     if(args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(rank == 0, the_system_level, vec_sol);
+      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol);
     }
 
     /* ***************************************************************************************** */
@@ -522,10 +511,10 @@ namespace StokesVortex2D
       // build VTK name
       String vtk_name = String("./stokes-vortex-2d");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
-      vtk_name += "-n" + stringify(nprocs);
+      vtk_name += "-n" + stringify(comm.size());
 
       // write VTK file
-      the_asm_level.write_vtk(vtk_name, *vec_sol, rank, nprocs);
+      the_asm_level.write_vtk(vtk_name, *vec_sol, comm);
     }
 
     /* ***************************************************************************************** */
@@ -550,18 +539,13 @@ namespace StokesVortex2D
     }
   }
 
-  int main(int argc, char* argv[])
+  void main(int argc, char* argv[])
   {
-    int rank = 0;
-    int nprocs = 0;
+    // create world communicator
+    Dist::Comm comm(Dist::Comm::world());
 
-    // initialise
-    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifdef FEAT_HAVE_MPI
-    if (rank == 0)
-    {
-      std::cout << "NUM-PROCS: " << nprocs << std::endl;
-    }
+    comm.print("NUM-PROCS: " + stringify(comm.size()));
 #endif
 
     // create arg parser
@@ -577,11 +561,9 @@ namespace StokesVortex2D
     if (!unsupported.empty())
     {
       // print all unsupported options to cerr
-      if (rank == 0)
-      {
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
-      }
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        comm.print_cerr("ERROR: unknown option '--" + (*it).second + "'");
+
       // abort
       FEAT::Runtime::abort();
     }
@@ -601,17 +583,14 @@ namespace StokesVortex2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Control::Domain::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
+      Control::Domain::UnitCubeDomainControl<MeshType> domain(&comm, lvl_max, lvl_min);
 
       // plot our levels
-      if(rank == 0)
-      {
-        std::cout << "LVL-MIN: " << domain.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-        std::cout << "LVL-MAX: " << domain.get_levels().back ()->get_level_index() << " [" << lvl_max << "]" << std::endl;
-      }
+      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
       // run our application
-      run(rank, nprocs, args, domain);
+      run(comm, args, domain);
 
       TimeStamp stamp2;
 
@@ -619,15 +598,12 @@ namespace StokesVortex2D
       long long time1 = stamp2.elapsed_micros(stamp1);
 
       // accumulate times over all processes
-      long long time2 = time1 * (long long)nprocs;
+      long long time2 = time1 * (long long)comm.size();
 
       // print time
-      if(rank == 0)
-      {
-        std::cout << "Run-Time: "
-          << TimeStamp::format_micros(time1, TimeFormat::m_s_m) << " ["
-          << TimeStamp::format_micros(time2, TimeFormat::m_s_m) << "]" << std::endl;
-      }
+      comm.print("Run-Time: "
+        + TimeStamp::format_micros(time1, TimeFormat::m_s_m) + " ["
+        + TimeStamp::format_micros(time2, TimeFormat::m_s_m) + "]");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)
@@ -641,14 +617,13 @@ namespace StokesVortex2D
       FEAT::Runtime::abort();
     }
 #endif // DEBUG
-
-    // okay
-    return FEAT::Runtime::finalise();
   }
 
 } // namespace StokesVortex2D
 
 int main(int argc, char* argv[])
 {
-  return StokesVortex2D::main(argc, argv);
+  FEAT::Runtime::initialise(argc, argv);
+  StokesVortex2D::main(argc, argv);
+  return FEAT::Runtime::finalise();
 }

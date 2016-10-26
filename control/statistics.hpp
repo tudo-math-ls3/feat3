@@ -3,7 +3,7 @@
 #define CONTROL_STATISTICS_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/comm_base.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/memory_usage.hpp>
 
@@ -32,8 +32,9 @@ namespace FEAT
         std::deque<TransferLevelType_*> & transfer_levels,
         DomainType_ & domain)
         {
-          Index rank(Util::Comm::rank());
-          Index nranks(Util::Comm::size());
+          Dist::Comm comm(Dist::Comm::world());
+          Index rank = Index(comm.rank());
+          Index nranks = Index(comm.size());
 
           FEAT::Statistics::toe_solve = solver_toe;
 
@@ -48,35 +49,35 @@ namespace FEAT
           Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
           Index cells_coarse_max;
           Index cells_coarse_min;
-          Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_max, 1, Util::CommOperationMax());
-          Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_min, 1, Util::CommOperationMin());
+          comm.allreduce(&cells_coarse_local, &cells_coarse_max, std::size_t(1), Dist::op_max);
+          comm.allreduce(&cells_coarse_local, &cells_coarse_min, std::size_t(1), Dist::op_min);
           Index cells_fine_local = domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension);
           Index cells_fine_max;
           Index cells_fine_min;
-          Util::Comm::allreduce(&cells_fine_local, &cells_fine_max, 1, Util::CommOperationMax());
-          Util::Comm::allreduce(&cells_fine_local, &cells_fine_min, 1, Util::CommOperationMin());
+          comm.allreduce(&cells_fine_local, &cells_fine_max, std::size_t(1), Dist::op_max);
+          comm.allreduce(&cells_fine_local, &cells_fine_min, std::size_t(1), Dist::op_min);
 
           Index dofs_coarse_local = (*system_levels.front()->matrix_sys).columns();
           Index dofs_coarse_max;
           Index dofs_coarse_min;
-          Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_max, 1, Util::CommOperationMax());
-          Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_min, 1, Util::CommOperationMin());
+          comm.allreduce(&dofs_coarse_local, &dofs_coarse_max, std::size_t(1), Dist::op_max);
+          comm.allreduce(&dofs_coarse_local, &dofs_coarse_min, std::size_t(1), Dist::op_min);
           Index dofs_fine_local = (*system_levels.back()->matrix_sys).columns();
           Index dofs_fine_max;
           Index dofs_fine_min;
-          Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_max, 1, Util::CommOperationMax());
-          Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_min, 1, Util::CommOperationMin());
+          comm.allreduce(&dofs_fine_local, &dofs_fine_max, std::size_t(1), Dist::op_max);
+          comm.allreduce(&dofs_fine_local, &dofs_fine_min, std::size_t(1), Dist::op_min);
 
           Index nzes_coarse_local = (*system_levels.front()->matrix_sys).used_elements();
           Index nzes_coarse_max;
           Index nzes_coarse_min;
-          Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_max, 1, Util::CommOperationMax());
-          Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_min, 1, Util::CommOperationMin());
+          comm.allreduce(&nzes_coarse_local, &nzes_coarse_max, std::size_t(1), Dist::op_max);
+          comm.allreduce(&nzes_coarse_local, &nzes_coarse_min, std::size_t(1), Dist::op_min);
           Index nzes_fine_local = (*system_levels.back()->matrix_sys).used_elements();
           Index nzes_fine_max;
           Index nzes_fine_min;
-          Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_max, 1, Util::CommOperationMax());
-          Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_min, 1, Util::CommOperationMin());
+          comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
+          comm.allreduce(&nzes_fine_local, &nzes_fine_min, std::size_t(1), Dist::op_min);
 
           if (rank == 0 && statistics_check >= 0)
           {

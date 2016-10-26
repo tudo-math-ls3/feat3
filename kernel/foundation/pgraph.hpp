@@ -4,7 +4,7 @@
 
 #include<memory>
 #include<kernel/base_header.hpp>
-#include<kernel/util/comm_base.hpp>
+#include<kernel/util/dist.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>
 #include<kernel/adjacency/graph.hpp>
 #include<kernel/shape.hpp>
@@ -28,18 +28,18 @@ namespace FEAT
       public:
         typedef IT_ IndexType;
 
-        PGraphBase(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_global_vtx, const Util::Communicator& comm) :
+        PGraphBase(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_global_vtx, const Dist::Comm& comm) :
           ready_forexec(false),
           ready_fordist(false),
           _num_local_dualvtx(num_local_dualvtx),
           _num_local_dualedges(num_local_dualedges),
-          _vtxdist(new IndexType[Index(Util::Comm::size(comm) + 1)]),
+          _vtxdist(new IndexType[Index(comm.size() + 1)]),
           _xadj(new IndexType[Index(num_local_dualvtx + 1)]),
           _adjncy(new IndexType[Index(2 * num_local_dualedges)]),
           _part(new IndexType[Index(num_local_dualvtx)]),
-          _comm(comm)
+          _comm(&comm)
         {
-          IndexType k = IndexType(Util::Comm::size(comm));
+          IndexType k = IndexType(comm.size());
           IndexType vtxdist_end(k + 1);
           IndexType n_local_avg((num_global_vtx - (num_global_vtx % k))/k);
           for(IndexType i(0) ; i < vtxdist_end - 1 ; ++i)
@@ -124,17 +124,13 @@ namespace FEAT
         virtual IndexType* get_part() const = 0;
 
         ///communicator used for (parallel) partitioning
-        virtual Util::Communicator get_comm() const = 0;
+        virtual const Dist::Comm& get_comm() const = 0;
 
         bool ready_forexec;
         bool ready_fordist;
 
         PGraphBase() :
-#ifdef FEAT_HAVE_MPI
-          _comm(Util::Communicator(MPI_COMM_WORLD))
-#else
-          _comm(Util::Communicator(0))
-#endif
+          _comm(nullptr)
         {
         }
 
@@ -150,7 +146,8 @@ namespace FEAT
         IndexType* _xadj;
         IndexType* _adjncy;
         IndexType* _part;
-        Util::Communicator _comm;
+        // Note: this needs to be a pointer for the move-assignment op
+        const Dist::Comm* _comm;
     };
 
     template<typename DT_, typename IT_>
@@ -160,7 +157,7 @@ namespace FEAT
         typedef IT_ IndexType;
         typedef DT_ DataType;
 
-        PGraphNONE(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Util::Communicator& comm) :
+        PGraphNONE(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Dist::Comm& comm) :
           PGraphBase<IndexType>(num_local_dualvtx, num_local_dualedges, num_globalvtx, comm)
         {
         }
@@ -206,8 +203,8 @@ namespace FEAT
           result._num_local_dualvtx = this->_num_local_dualvtx;
           result._num_local_dualedges = this->_num_local_dualedges;
 
-          result._vtxdist = new IndexType[Index(Util::Comm::size(this->_comm) + 1)];
-          for(Index i(0) ; i < Index(Util::Comm::size(this->_comm) + 1) ; ++i)
+          result._vtxdist = new IndexType[Index(this->_comm.size() + 1)];
+          for(Index i(0) ; i < Index(this->_comm.size() + 1) ; ++i)
             result._vtxdist[i] = this->_vtxdist[i];
 
           result._xadj = new IndexType[Index(this->_num_local_dualvtx + 1)];
@@ -228,7 +225,7 @@ namespace FEAT
         }
 
         template<typename SourceMeshT_>
-        PGraphNONE(const SourceMeshT_& source, Index num_globalvtx, Util::Communicator comm)
+        PGraphNONE(const SourceMeshT_& source, Index num_globalvtx, const Dist::Comm& comm)
         {
           ///get sizes of the dual graph to create
           IndexType num_dualvtx(IndexType(source.get_num_entities(SourceMeshT_::shape_dim)));
@@ -347,14 +344,9 @@ namespace FEAT
           return this->_part;
         }
 
-        virtual Util::Communicator get_comm()
+        virtual const Dist::Comm& get_comm() const override
         {
-          return this->_comm;
-        }
-
-        virtual Util::Communicator get_comm() const override
-        {
-          return this->_comm;
+          return *(this->_comm);
         }
 
         virtual ~PGraphNONE()
@@ -373,7 +365,7 @@ namespace FEAT
         typedef IT_ IndexType;
         typedef DT_ DataType;
 
-        PGraphFallback(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Util::Communicator& comm) :
+        PGraphFallback(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Dist::Comm& comm) :
           PGraphBase<IndexType>(num_local_dualvtx, num_local_dualedges, num_globalvtx, comm)
         {
         }
@@ -419,8 +411,8 @@ namespace FEAT
           result._num_local_dualvtx = this->_num_local_dualvtx;
           result._num_local_dualedges = this->_num_local_dualedges;
 
-          result._vtxdist = new IndexType[Index(Util::Comm::size(this->_comm) + 1)];
-          for(Index i(0) ; i < Index(Util::Comm::size(this->_comm) + 1) ; ++i)
+          result._vtxdist = new IndexType[Index(this->_comm->size() + 1)];
+          for(Index i(0) ; i < Index(this->_comm->size() + 1) ; ++i)
             result._vtxdist[i] = this->_vtxdist[i];
 
           result._xadj = new IndexType[Index(this->_num_local_dualvtx + 1)];
@@ -441,7 +433,7 @@ namespace FEAT
         }
 
         template<typename SourceMeshT_>
-        PGraphFallback(const SourceMeshT_& source, Index num_globalvtx, Util::Communicator comm)
+        PGraphFallback(const SourceMeshT_& source, Index num_globalvtx, const Dist::Comm& comm)
         {
           ///get sizes of the dual graph to create
           IndexType num_dualvtx(IndexType(source.get_num_entities(SourceMeshT_::shape_dim)));
@@ -509,7 +501,7 @@ namespace FEAT
         std::shared_ptr<PGraphBase<IndexType> > create_local() const override
         {
           ///get sizes of the dual graph to create
-          Index me(Util::Comm::rank(this->get_comm()));
+          Index me = Index(this->_comm->rank());
           Index start(Index(this->get_vtxdist()[me]));
           Index end(Index(this->get_vtxdist()[me + 1]));
           Index num_local_dualvtx(end - start);
@@ -607,14 +599,9 @@ namespace FEAT
           return this->_part;
         }
 
-        virtual Util::Communicator get_comm()
+        virtual const Dist::Comm& get_comm() const override
         {
-          return this->_comm;
-        }
-
-        virtual Util::Communicator get_comm() const override
-        {
-          return this->_comm;
+          return *(this->_comm);
         }
 
         virtual ~PGraphFallback()
@@ -633,13 +620,13 @@ namespace FEAT
         typedef PGraphBase<idx_t> BaseClass;
         typedef real_t DataType;
 
-        PGraphParmetis(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Util::Communicator& comm) :
+        PGraphParmetis(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Dist::Comm& comm) :
           PGraphBase(num_local_dualvtx, num_local_dualedges, num_globalvtx, comm),
           _vwgt(new IndexType[Index(num_local_dualvtx)]),
           _adjwgt(new IndexType[Index(2 * num_local_dualedges)]),
           _options(new IndexType[Index(3)]),
           _ncon(1),
-          _nparts(IndexType(Util::Comm::size(comm))),
+          _nparts(IndexType(comm.size())),
           _wgtflag(0),
           _numflag(0),
           _tpwgts(new DataType[Index(_ncon * _nparts)]),
@@ -724,8 +711,8 @@ namespace FEAT
           result._num_local_dualvtx = _num_local_dualvtx;
           result._num_local_dualedges = _num_local_dualedges;
 
-          result._vtxdist = new IndexType[Index(Util::Comm::size(_comm) + 1)];
-          for(Index i(0) ; i < Index(Util::Comm::size(_comm) + 1) ; ++i)
+          result._vtxdist = new IndexType[Index(_comm->size() + 1)];
+          for(Index i(0) ; i < Index(_comm->size() + 1) ; ++i)
             result._vtxdist[i] = _vtxdist[i];
 
           result._xadj = new IndexType[Index(_num_local_dualvtx + 1)];
@@ -771,7 +758,7 @@ namespace FEAT
         }
 
         template<typename SourceMeshT_>
-        PGraphParmetis(const SourceMeshT_& source, Index num_globalvtx, Util::Communicator comm)
+        PGraphParmetis(const SourceMeshT_& source, Index num_globalvtx, const Dist::Comm& comm)
         {
           ///get sizes of the dual graph to create
           IndexType num_dualvtx(IndexType(source.get_num_entities(SourceMeshT_::shape_dim)));
@@ -843,7 +830,7 @@ namespace FEAT
         std::shared_ptr<PGraphBase> create_local() const override
         {
           ///get sizes of the dual graph to create
-          Index me(Util::Comm::rank(this->get_comm()));
+          Index me = Index(this->get_comm().rank());
           Index start(Index(this->get_vtxdist()[me]));
           Index end(Index(this->get_vtxdist()[me + 1]));
           Index num_local_dualvtx(end - start);
@@ -942,14 +929,9 @@ namespace FEAT
           return this->_part;
         }
 
-        virtual Util::Communicator get_comm()
+        virtual const Dist::Comm& get_comm() const override
         {
-          return this->_comm;
-        }
-
-        virtual Util::Communicator get_comm() const override
-        {
-          return this->_comm;
+          return *(this->_comm);
         }
 
         virtual ~PGraphParmetis()

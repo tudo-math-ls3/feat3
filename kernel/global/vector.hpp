@@ -157,7 +157,7 @@ namespace FEAT
         return _vector.dot(*x);
       }
 
-      std::shared_ptr<ScalTicket<DataType>> dot_async(const Vector& x) const
+      std::shared_ptr<SynchScalarTicket<DataType>> dot_async(const Vector& x) const
       {
         return _gate->dot_async(_vector, *x);
       }
@@ -167,7 +167,7 @@ namespace FEAT
         return dot(*this);
       }
 
-      std::shared_ptr<ScalTicket<DataType>> norm2sqr_async() const
+      std::shared_ptr<SynchScalarTicket<DataType>> norm2sqr_async() const
       {
         return dot_async(*this);
       }
@@ -177,7 +177,7 @@ namespace FEAT
         return Math::sqrt(norm2sqr());
       }
 
-      std::shared_ptr<ScalTicket<DataType>> norm2_async() const
+      std::shared_ptr<SynchScalarTicket<DataType>> norm2_async() const
       {
         auto t = norm2sqr_async();
         t->sqrt = true;
@@ -201,7 +201,7 @@ namespace FEAT
         return _vector.max_element();
       }
 
-      std::shared_ptr<ScalTicket<DataType>> max_element_async() const
+      std::shared_ptr<SynchScalarTicket<DataType>> max_element_async() const
       {
         return _gate->max_element_async(_vector);
       }

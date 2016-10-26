@@ -15,7 +15,6 @@
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/runtime.hpp>
 
@@ -227,11 +226,11 @@ int run(Solver_& solver, Operator_& op)
   solver->set_tol_abs(Math::sqrt(Math::eps<DataType>()));
   solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
 
-  Util::mpi_cout_pad_line("max_iter",solver->get_max_iter());
-  Util::mpi_cout_pad_line("tol_abs",solver->get_tol_abs());
-  Util::mpi_cout_pad_line("tol_rel",solver->get_tol_rel());
-  Util::mpi_cout_pad_line("tol_step",solver->get_tol_step());
-  Util::mpi_cout_pad_line("tol_fval",solver->get_tol_fval());
+  std::cout << String("max_iter").pad_back(30, '.') << ": " << stringify(solver->get_max_iter()) << std::endl;
+  std::cout << String("tol_abs").pad_back(30, '.') << ": " << stringify(solver->get_tol_abs()) << std::endl;
+  std::cout << String("tol_rel").pad_back(30, '.') << ": " << stringify(solver->get_tol_rel()) << std::endl;
+  std::cout << String("tol_step").pad_back(30, '.') << ": " << stringify(solver->get_tol_step()) << std::endl;
+  std::cout << String("tol_fval").pad_back(30, '.') << ": " << stringify(solver->get_tol_fval()) << std::endl;
 
   // Finish the solver
   solver->done();

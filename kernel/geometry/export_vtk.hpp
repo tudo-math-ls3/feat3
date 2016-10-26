@@ -5,6 +5,8 @@
 // includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
+#include <kernel/util/dist.hpp>
+#include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/function_scheduler.hpp>
 
@@ -437,7 +439,7 @@ namespace FEAT
       void write(const String& filename, const int rank, const int nparts)
       {
         // call the standard serial write version if nparts < 1
-        if(nparts < 1)
+        if(nparts <= 1)
         {
           write(filename);
           return;
@@ -477,6 +479,71 @@ namespace FEAT
 
         // write PVTU file
         write_pvtu(ofs, file_title, nparts);
+
+        // and close
+        ofs.close();
+      }
+
+      /**
+       * \brief Writes out the data to a parallel XML-PVTU file.
+       *
+       * This function writes out the serial VTU file of the partition represented by this exporter object
+       * and, if the \p rank parameter is 0, also the corresponding parallel PVTU file.
+       *
+       * \param[in] filename
+       * The filename to which to export to. The extension is automatically appended to the filename.
+       *
+       * \param[in] comm
+       * The communicator of this exporter.
+       */
+      void write(const String& filename, const Dist::Comm& comm)
+      {
+        // call the standard serial write version if nparts < 1
+        if(comm.size() <= 1)
+        {
+          write(filename);
+          return;
+        }
+
+        const int rank = comm.rank();
+
+        // Add rank cell array since we're parallel if we come to here
+        double* rank_array = new double[_num_cells];
+        for(Index i(0); i < _num_cells; ++i)
+          rank_array[i] = double(rank);
+
+        add_cell_scalar("rank", rank_array);
+        delete[] rank_array;
+
+        // compute number of non-zero digits in (nparts-1) for padding
+        const std::size_t ndigits = Math::ilog10(std::size_t(comm.size()-1));
+
+        // write serial VTU file into a stringstream
+        std::stringstream stream;
+        write_vtu(stream);
+
+        // generate pattern for filename: "filename.#rank.vtu"
+        String pattern = filename + "." + String(ndigits, '*') + ".vtu";
+
+        // write distributed VTU files
+        DistFileIO::write_sequence(stream, pattern, comm);
+
+        // we're done unless we have rank = 0
+        if(rank != 0)
+          return;
+
+        // try to open our output file
+        String pvtu_name(filename + ".pvtu");
+        std::ofstream ofs(pvtu_name.c_str());
+        if(!(ofs.is_open() && ofs.good()))
+          throw FileError("Failed to create '" + pvtu_name + "'");
+
+        // extract the file title from our filename
+        std::size_t p = filename.find_last_of("\\/");
+        String file_title = filename.substr(p == filename.npos ? 0 : ++p);
+
+        // write PVTU file
+        write_pvtu(ofs, file_title, comm.size());
 
         // and close
         ofs.close();

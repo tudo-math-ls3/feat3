@@ -4,7 +4,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/comm_base.hpp>
+#include <kernel/util/dist.hpp>
 
 #include <functional>
 
@@ -14,8 +14,8 @@ namespace FEAT
   {
     /// Run cout if condition evaluates to true
     void mpi_cout(FEAT::String string,
-    std::function<bool (Index, Index)> func =
-    [](Index r, Index /*rs*/) -> bool{ return (r == 0); });
+    std::function<bool (int, int)> func =
+    [](int r, int /*rs*/) -> bool{ return (r == 0); });
 
     /**
      * \brief Pads mpi_cout output between two given strings to a given width
@@ -77,19 +77,18 @@ namespace FEAT
     template<typename DT_>
     static inline void mpi_cout_ordered(const DT_* val, const String& str= "", Index size = Index(1))
     {
-      Index* other_size(new Index[Util::Comm::size()]);
+      Dist::Comm comm(Dist::Comm::world());
 
 #ifdef FEAT_HAVE_MPI
-      DT_* buffer;
+      Index* other_size(new Index[comm.size()]);
+      DT_* buffer(nullptr);
       Index max_size(0);
 
-      // Ignore all comm statuses
-      CommStatusIgnore st;
       // This is the rank that receives everything
-      if(Util::Comm::rank() == Index(0))
+      if(comm.rank() == 0)
       {
         // First, write out our own stuff
-        std::cout << Util::Comm::rank() << " " << str << ": ";
+        std::cout << comm.rank() << " " << str << ": ";
 
         // Enclose within brackets if we write more than one value
         if(size > Index(1))
@@ -104,9 +103,9 @@ namespace FEAT
         std::cout << std::endl;
 
         // Get the sizes of what the other ranks want to send
-        for(Index r(1); r < Util::Comm::size(); ++r)
+        for(int r(1); r < comm.size(); ++r)
         {
-          Util::Comm::recv(&(other_size[r]), Index(1), r, st);
+          comm.recv(&(other_size[r]), std::size_t(1), r);
           if(other_size[r] > max_size)
             max_size = other_size[r];
         }
@@ -115,10 +114,9 @@ namespace FEAT
         buffer = new DT_[max_size];
 
         // Receive data from other ranks and print it
-        for(Index r(1); r < Util::Comm::size(); ++r)
+        for(int r(1); r < comm.size(); ++r)
         {
-
-          Util::Comm::recv(buffer, other_size[r], r, st);
+          comm.recv(buffer, std::size_t(other_size[r]), r);
 
           std::cout << r << " " << str << ": ";
 
@@ -135,27 +133,26 @@ namespace FEAT
             std::cout << " ]";
 
           std::cout << std::endl;
-
         }
-
       }
       // All other ranks
       else
       {
-        Comm::send(&size, Index(1), Index(0));
+        comm.send(&size, std::size_t(1), 0);
 
         // Because MPI doesn't care for const, we copy our data to the buffer here and send the buffer
         buffer = new DT_[size];
         for(Index i(0); i < size; ++i)
           buffer[i] = val[i];
 
-        Util::Comm::send(buffer, size, Index(0));
-
+        comm.send(buffer, std::size_t(size), 0);
       }
+
       delete[] buffer;
+      delete[] other_size;
 #else
       // Write out our own stuff
-      std::cout << Util::Comm::rank() << " " << str << ": ";
+      std::cout << "0 " << str << ": ";
 
       // Enclose within brackets if we write more than one value
       if(size > Index(1))
@@ -169,8 +166,6 @@ namespace FEAT
 
       std::cout << std::endl;
 #endif
-
-      delete[] other_size;
 
     } // void mpi_cout_ordered
 

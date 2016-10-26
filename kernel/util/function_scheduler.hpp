@@ -2,9 +2,8 @@
 #ifndef UTIL_GUARD_FUNCTION_SCHEDULER_HPP
 #define UTIL_GUARD_FUNCTION_SCHEDULER_HPP 1
 
-#include<kernel/base_header.hpp>
+#include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include<kernel/util/comm_base.hpp>
 
 #include <functional>
 

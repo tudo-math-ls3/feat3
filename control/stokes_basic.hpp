@@ -3,6 +3,7 @@
 #define CONTROL_STOKES_BASIC_HPP 1
 
 #include <kernel/base_header.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
@@ -360,11 +361,15 @@ namespace FEAT
         typename SystemLevel_::PresGate& gate_pres = sys_level.gate_pres;
         typename SystemLevel_::SystemGate& gate_sys  = sys_level.gate_sys;
 
+        // set the gate comm
+        gate_velo.set_comm(dom_layer.get_comm());
+        gate_pres.set_comm(dom_layer.get_comm());
+        gate_sys.set_comm(dom_layer.get_comm());
+
         // loop over all ranks
         for(Index i(0); i < dom_layer.size(); ++i)
         {
           Index rank = dom_layer.get_rank(i);
-          Index ctag = dom_layer.get_ctag(i);
 
           // try to find our halo
           auto* halo = domain_level.find_halo_part(rank);
@@ -386,9 +391,9 @@ namespace FEAT
           typename SystemLevel_::SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
 
           // push mirror into gates
-          gate_velo.push(rank, ctag, std::move(mirror_velo));
-          //gate_pres.push(rank, ctag, std::move(mirror_pres));
-          gate_sys.push(rank, ctag, std::move(mirror_sys));
+          gate_velo.push(int(rank), std::move(mirror_velo));
+          //gate_pres.push(rank, std::move(mirror_pres));
+          gate_sys.push(int(rank), std::move(mirror_sys));
         }
 
         // create local template vectors
@@ -636,7 +641,7 @@ namespace FEAT
       }
 
       template<typename SolVector_>
-      void write_vtk(const String& vtk_name, const SolVector_& vector, int rank, int nprocs) const
+      void write_vtk(const String& vtk_name, const SolVector_& vector, const Dist::Comm& comm) const
       {
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(this->mesh);
@@ -665,7 +670,7 @@ namespace FEAT
         exporter.add_cell_scalar("pressure", vtx_p.elements());
 
         // finally, write the VTK file
-        exporter.write(vtk_name, rank, nprocs);
+        exporter.write(vtk_name, comm);
       }
 
       template<typename SolVector_>

@@ -277,7 +277,6 @@ namespace FEAT
         for(Index i(0); i < dom_layer.size(); ++i)
         {
           Index rank = dom_layer.get_rank(i);
-          Index ctag = dom_layer.get_ctag(i);
 
           // try to find our halo
           auto* halo = domain_level.find_halo_part(rank);
@@ -296,9 +295,9 @@ namespace FEAT
           typename SystemLevel_::SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
 
           // push mirror into gates
-          gate_velo.push(rank, ctag, std::move(mirror_velo));
-          gate_pres.push(rank, ctag, std::move(mirror_pres));
-          gate_sys.push(rank, ctag, std::move(mirror_sys));
+          gate_velo.push(int(rank), std::move(mirror_velo));
+          gate_pres.push(int(rank), std::move(mirror_pres));
+          gate_sys.push(int(rank), std::move(mirror_sys));
         }
 
         // create local template vectors

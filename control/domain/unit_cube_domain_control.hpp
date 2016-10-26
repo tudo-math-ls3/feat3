@@ -23,10 +23,13 @@ namespace FEAT
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
 
       public:
-        explicit UnitCubeDomainControl(int rank, int nprocs, int lvl_max, int lvl_min = -1) :
-          BaseClass()
+        explicit UnitCubeDomainControl(Dist::Comm* comm, int lvl_max, int lvl_min = -1) :
+          BaseClass(comm)
         {
           typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
+
+          int rank = comm->rank();
+          int nprocs = comm->size();
 
           // communication data structures
           std::vector<Index> ranks, ctags;
@@ -36,7 +39,7 @@ namespace FEAT
           int lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(rank, Math::max(nprocs,1), mesh_node, ranks, ctags);
 
           // push layer
-          this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
+          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
 
           // adjust lvl_max and lvl_min
           lvl_max = Math::max(lvl_max, 0);

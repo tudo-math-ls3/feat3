@@ -24,7 +24,7 @@
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/multigrid.hpp>
-#include <kernel/util/mpi_cout.hpp>
+#include <kernel/util/dist.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
@@ -165,7 +165,7 @@ namespace PoissonDirichlet2D
   };
 
   template<typename MeshType_, typename TargetMatrixSolve_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -221,7 +221,7 @@ namespace PoissonDirichlet2D
 
     TimeStamp stamp_ass;
 
-    Util::mpi_cout("Creating gates..\n");
+    comm.print("Creating gates...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -230,7 +230,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Assembling system matrices...\n");
+    comm.print("Assembling system matrices...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -239,7 +239,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Assembling system filters...\n");
+    comm.print("Assembling system filters...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -248,7 +248,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Assembling transfer matrices...\n");
+    comm.print("Assembling transfer matrices...");
 
     for (Index i(0); (i + 1) < num_levels; ++i)
     {
@@ -275,16 +275,13 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() + ", Mem:" + MemType::name() +
+    comm.print("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() + ", Mem:" + MemType::name() +
         " to " + TargetMatrixSolve_::name() + ", Mem:" + TargetMatrixSolve_::MemType::name() + "...\n");
 
     // create system levels, transfer levels and vectors for linear solver
     Control::ScalarSolver<TargetMatrixSolve_, SystemLevelType, TransferLevelType> scalar_solver(system_levels, transfer_levels, vec_sol, vec_rhs);
 
-    if (rank == 0)
-    {
-      std::cout<<"Solving linear system..."<<std::endl;
-    }
+    comm.print("Solving linear system...");
 
     //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
     auto multigrid_hierarchy = std::make_shared<
@@ -315,7 +312,7 @@ namespace PoissonDirichlet2D
     auto solver = Solver::new_pcg(scalar_solver.get_system_levels_solve().back()->matrix_sys, scalar_solver.get_system_levels_solve().back()->filter_sys, mgv);
 
     // enable plotting
-    solver->set_plot(rank == 0);
+    solver->set_plot(comm.rank() == 0);
 
     // set tolerance
     solver->set_tol_rel(1E-8);
@@ -334,7 +331,7 @@ namespace PoissonDirichlet2D
 
     if (!Solver::status_success(result))
     {
-      std::cout<<"Solver execution FAILED, with status: " << result << std::endl;
+      comm.print("Solver execution FAILED, with status: " + stringify(result));
     }
 
     double solver_toe(at.elapsed_now());
@@ -355,7 +352,7 @@ namespace PoissonDirichlet2D
 
     if (args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(rank == 0, the_system_level, vec_sol, sol_func);
+      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol, sol_func);
     }
 
     /* ***************************************************************************************** */
@@ -367,7 +364,7 @@ namespace PoissonDirichlet2D
       // build VTK name
       String vtk_name = String("./poisson-dirichlet-2d");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
-      vtk_name += "-n" + stringify(nprocs);
+      vtk_name += "-n" + stringify(comm.size());
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
@@ -382,7 +379,7 @@ namespace PoissonDirichlet2D
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
-      exporter.write(vtk_name, rank, nprocs);
+      exporter.write(vtk_name, comm);
     }
 
     /* ***************************************************************************************** */
@@ -396,7 +393,7 @@ namespace PoissonDirichlet2D
       args.parse("test-iter", iter_target);
       if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
       {
-        std::cout<<"FAILED"<<std::endl;
+        comm.print("FAILED");
         throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
       }
 
@@ -424,15 +421,13 @@ namespace PoissonDirichlet2D
     }
   }
 
-  int main(int argc, char* argv [])
+  void main(int argc, char* argv [])
   {
-    int rank = 0;
-    int nprocs = 0;
+    // create world communicator
+    Dist::Comm comm(Dist::Comm::world());
 
-    // initialise
-    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifdef FEAT_HAVE_MPI
-    Util::mpi_cout("NUM-PROCS: " + stringify(nprocs) + "\n");
+    comm.print("NUM-PROCS: " + stringify(comm.size()));
 #endif
 
     // create arg parser
@@ -456,14 +451,12 @@ namespace PoissonDirichlet2D
     if (!unsupported.empty())
     {
       // print all unsupported options to cerr
-      if(rank == 0)
-      {
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        comm.print_cerr("ERROR: unknown option '--" + (*it).second + "'");
 
-        std::cerr << "Supported options are:" << std::endl;
-        std::cerr << args.get_supported_help() << std::endl;
-      }
+      comm.print_cerr("Supported Options are:");
+      comm.print_cerr(args.get_supported_help());
+
       // abort
       FEAT::Runtime::abort();
     }
@@ -486,12 +479,11 @@ namespace PoissonDirichlet2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Util::mpi_cout("Preparing domain...\n");
+      comm.print("Preparing domain...");
 
       if(args.check("mesh") < 1)
       {
-        if(rank == 0)
-          std::cerr << "ERROR: Mandatory option --mesh is missing!" << std::endl;
+        comm.print_cerr("ERROR: Mandatory option --mesh is missing!");
         FEAT::Runtime::abort();
       }
 
@@ -499,7 +491,7 @@ namespace PoissonDirichlet2D
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain;
+      Control::Domain::PartiDomainControl<MeshType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -517,24 +509,24 @@ namespace PoissonDirichlet2D
 
       Statistics::toe_partition = stamp_partition.elapsed_now();
 
-      Util::mpi_cout("Creating mesh hierarchy...\n");
+      comm.print("Creating mesh hierarchy...");
 
       // create the level hierarchy
       domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
-      Util::mpi_cout("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]\n");
-      Util::mpi_cout("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]\n");
+      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
       // run our application
       if (mem_string == "main")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
       }
 #ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(comm, args, domain);
       }
 #endif
       else
@@ -548,11 +540,11 @@ namespace PoissonDirichlet2D
       long long time1 = stamp2.elapsed_micros(stamp1);
 
       // accumulate times over all processes
-      long long time2 = time1 * (long long) nprocs;
+      long long time2 = time1 * (long long) comm.size();
 
       // print time
-      Util::mpi_cout("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
-        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]\n");
+      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
+        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)
@@ -566,13 +558,15 @@ namespace PoissonDirichlet2D
       FEAT::Runtime::abort();
     }
 #endif // DEBUG
-
-    // okay
-    return FEAT::Runtime::finalise();
   }
 } // namespace PoissonDirichlet2D
 
 int main(int argc, char* argv [])
 {
-  return PoissonDirichlet2D::main(argc, argv);
+  // initialise
+  FEAT::Runtime::initialise(argc, argv);
+
+  PoissonDirichlet2D::main(argc, argv);
+  // okay
+  return FEAT::Runtime::finalise();
 }

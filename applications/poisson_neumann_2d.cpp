@@ -1,5 +1,7 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
+#include <kernel/util/time_stamp.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -15,7 +17,6 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/util/time_stamp.hpp>
 #include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
@@ -95,7 +96,7 @@ namespace PoissonNeumann2D
       vec_glob_w.sync_0();
 
       // build the mean filter
-      fil_loc = MeanFilterType(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone());
+      fil_loc = MeanFilterType(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), sys_level.gate_sys.get_comm());
     }
 
 
@@ -152,7 +153,7 @@ namespace PoissonNeumann2D
   };
 
   template<typename MeshType_, typename TargetMatrixSolve_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -215,10 +216,7 @@ namespace PoissonNeumann2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Creating gates..." << std::endl;
-    }
+    comm.print("Creating gates...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -227,10 +225,7 @@ namespace PoissonNeumann2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling system matrices..." << std::endl;
-    }
+    comm.print("Assembling system matrices...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -239,10 +234,7 @@ namespace PoissonNeumann2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling system filters..." << std::endl;
-    }
+    comm.print("Assembling system filters...");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -251,10 +243,7 @@ namespace PoissonNeumann2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling transfer matrices..." << std::endl;
-    }
+    comm.print("Assembling transfer matrices...");
 
     for (Index i(0); (i + 1) < num_levels; ++i)
     {
@@ -284,12 +273,9 @@ namespace PoissonNeumann2D
     typedef typename SystemLevelTypeSolve::GlobalSystemMatrix GlobalSystemMatrixSolve;
     typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
 
-    if (rank == 0)
-    {
-      std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
-        ", Mem:" << MemType::name() << " to " << SystemLevelTypeSolve::LocalScalarMatrix::name() << ", Mem:" <<
-        MemTypeSolve::name() << "..." << std::endl;
-    }
+    comm.print("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() +
+      ", Mem:" + MemType::name() + " to " + SystemLevelTypeSolve::LocalScalarMatrix::name() + ", Mem:" +
+      MemTypeSolve::name() + "...");
 
     //convert system and transfer levels
     for (Index i(0); i < num_levels; ++i)
@@ -348,7 +334,7 @@ namespace PoissonNeumann2D
     //auto solver = Solver::new_richardson(matrix_solve, filter_solve, 1.0, mgv);
 
     // enable plotting
-    solver->set_plot(rank == 0);
+    solver->set_plot(comm.rank() == 0);
 
     // set tolerance
     solver->set_tol_rel(1E-8);
@@ -372,7 +358,7 @@ namespace PoissonNeumann2D
 
     if (args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(rank == 0, the_system_level, vec_sol, sol_func);
+      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol, sol_func);
     }
 
     /* ***************************************************************************************** */
@@ -384,7 +370,7 @@ namespace PoissonNeumann2D
       // build VTK name
       String vtk_name = String("./poisson-neumann-2d");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
-      vtk_name += "-n" + stringify(nprocs);
+      vtk_name += "-n" + stringify(comm.size());
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
@@ -399,7 +385,7 @@ namespace PoissonNeumann2D
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
-      exporter.write(vtk_name, rank, nprocs);
+      exporter.write(vtk_name, comm);
     }
 
     /* ***************************************************************************************** */
@@ -435,18 +421,14 @@ namespace PoissonNeumann2D
     }
   }
 
-  int main(int argc, char* argv [])
+  void main(int argc, char* argv [])
   {
-    int rank = 0;
-    int nprocs = 0;
+    // create world communicator
+    Dist::Comm comm(Dist::Comm::world());
 
     // initialise
-    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifdef FEAT_HAVE_MPI
-    if (rank == 0)
-    {
-      std::cout << "NUM-PROCS: " << nprocs << std::endl;
-    }
+    comm.print("NUM-PROCS: " + stringify(comm.size()));
 #endif
 
     // create arg parser
@@ -463,11 +445,8 @@ namespace PoissonNeumann2D
     if (!unsupported.empty())
     {
       // print all unsupported options to cerr
-      if (rank == 0)
-      {
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
-      }
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        comm.print_cerr("ERROR: unknown option '--" + (*it).second + "'");
       // abort
       FEAT::Runtime::abort();
     }
@@ -490,24 +469,21 @@ namespace PoissonNeumann2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Control::Domain::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
+      Control::Domain::UnitCubeDomainControl<MeshType> domain(&comm, lvl_max, lvl_min);
 
       // plot our levels
-      if (rank == 0)
-      {
-        std::cout << "LVL-MIN: " << domain.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-        std::cout << "LVL-MAX: " << domain.get_levels().back()->get_level_index() << " [" << lvl_max << "]" << std::endl;
-      }
+      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
       // run our application
       if (mem_string == "main")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
       }
 #ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(comm, args, domain);
       }
 #endif
       else
@@ -521,15 +497,12 @@ namespace PoissonNeumann2D
       long long time1 = stamp2.elapsed_micros(stamp1);
 
       // accumulate times over all processes
-      long long time2 = time1 * (long long) nprocs;
+      long long time2 = time1 * (long long) comm.size();
 
       // print time
-      if (rank == 0)
-      {
-        std::cout << "Run-Time: "
-          << TimeStamp::format_micros(time1, TimeFormat::m_s_m) << " ["
-          << TimeStamp::format_micros(time2, TimeFormat::m_s_m) << "]" << std::endl;
-      }
+      comm.print("Run-Time: "
+        + TimeStamp::format_micros(time1, TimeFormat::m_s_m) + " ["
+        + TimeStamp::format_micros(time2, TimeFormat::m_s_m) + "]");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)
@@ -543,13 +516,12 @@ namespace PoissonNeumann2D
       FEAT::Runtime::abort();
     }
 #endif // DEBUG
-
-    // okay
-    return FEAT::Runtime::finalise();
   }
 } // namespace PoissonNeumann2D
 
 int main(int argc, char* argv [])
 {
-  return PoissonNeumann2D::main(argc, argv);
+  FEAT::Runtime::initialise(argc, argv);
+  PoissonNeumann2D::main(argc, argv);
+  return FEAT::Runtime::finalise();
 }

@@ -726,6 +726,8 @@ namespace NaverStokesCP2D
   void report_statistics(double t_total, std::deque<std::shared_ptr<SystemLevelType>> & system_levels, std::deque<std::shared_ptr<TransferLevelType>> & transfer_levels,
       Control::Domain::DomainControl<MeshType>& domain, int nprocs)
   {
+    const Dist::Comm& comm = *domain.get_layers().front()->get_comm();
+
     /// \todo cover exactly all la op timings (some are not timed yet in the application) and replace t_total by them
     double solver_toe = t_total; //t_solver_a + t_solver_s + t_calc_def;
     int shape_dimension = MeshType::ShapeType::dimension;
@@ -747,35 +749,35 @@ namespace NaverStokesCP2D
     Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
     Index cells_coarse_max;
     Index cells_coarse_min;
-    Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_min, 1, Util::CommOperationMin());
+    comm.allreduce(&cells_coarse_local, &cells_coarse_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&cells_coarse_local, &cells_coarse_min, std::size_t(1), Dist::op_min);
     Index cells_fine_local = domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension);
     Index cells_fine_max;
     Index cells_fine_min;
-    Util::Comm::allreduce(&cells_fine_local, &cells_fine_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&cells_fine_local, &cells_fine_min, 1, Util::CommOperationMin());
+    comm.allreduce(&cells_fine_local, &cells_fine_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&cells_fine_local, &cells_fine_min, std::size_t(1), Dist::op_min);
 
     Index dofs_coarse_local = (*system_levels.front()->matrix_a).columns() + (*system_levels.front()->matrix_s).columns();
     Index dofs_coarse_max;
     Index dofs_coarse_min;
-    Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_min, 1, Util::CommOperationMin());
+    comm.allreduce(&dofs_coarse_local, &dofs_coarse_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&dofs_coarse_local, &dofs_coarse_min, std::size_t(1), Dist::op_min);
     Index dofs_fine_local = (*system_levels.back()->matrix_a).columns() + (*system_levels.back()->matrix_s).columns();
     Index dofs_fine_max;
     Index dofs_fine_min;
-    Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_min, 1, Util::CommOperationMin());
+    comm.allreduce(&dofs_fine_local, &dofs_fine_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&dofs_fine_local, &dofs_fine_min, std::size_t(1), Dist::op_min);
 
     Index nzes_coarse_local = (*system_levels.front()->matrix_a).used_elements() + (*system_levels.front()->matrix_s).used_elements();
     Index nzes_coarse_max;
     Index nzes_coarse_min;
-    Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_min, 1, Util::CommOperationMin());
+    comm.allreduce(&nzes_coarse_local, &nzes_coarse_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&nzes_coarse_local, &nzes_coarse_min, std::size_t(1), Dist::op_min);
     Index nzes_fine_local = (*system_levels.back()->matrix_a).used_elements() + (*system_levels.back()->matrix_s).used_elements();
     Index nzes_fine_max;
     Index nzes_fine_min;
-    Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_min, 1, Util::CommOperationMin());
+    comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&nzes_fine_local, &nzes_fine_min, std::size_t(1), Dist::op_min);
 
     double solver_a_mpi_wait_reduction(0.);
     double solver_a_mpi_wait_spmv(0.);
@@ -798,12 +800,12 @@ namespace NaverStokesCP2D
     }
     double solver_a_mpi_wait_reduction_max;
     double solver_a_mpi_wait_reduction_min;
-    Util::Comm::allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_min, 1, Util::CommOperationMin());
+    comm.allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_min, std::size_t(1), Dist::op_min);
     double solver_a_mpi_wait_spmv_max;
     double solver_a_mpi_wait_spmv_min;
-    Util::Comm::allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_min, 1, Util::CommOperationMin());
+    comm.allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_min, std::size_t(1), Dist::op_min);
 
     double solver_s_mpi_wait_reduction(0.);
     double solver_s_mpi_wait_spmv(0.);
@@ -826,12 +828,12 @@ namespace NaverStokesCP2D
     }
     double solver_s_mpi_wait_reduction_max;
     double solver_s_mpi_wait_reduction_min;
-    Util::Comm::allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_min, 1, Util::CommOperationMin());
+    comm.allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_min, std::size_t(1), Dist::op_min);
     double solver_s_mpi_wait_spmv_max;
     double solver_s_mpi_wait_spmv_min;
-    Util::Comm::allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_max, 1, Util::CommOperationMax());
-    Util::Comm::allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_min, 1, Util::CommOperationMin());
+    comm.allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_max, std::size_t(1), Dist::op_max);
+    comm.allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_min, std::size_t(1), Dist::op_min);
 
     String flops = FEAT::Statistics::get_formatted_flops(solver_toe, (Index)nprocs);
     Util::mpi_cout(flops + "\n\n");
@@ -1453,13 +1455,14 @@ namespace NaverStokesCP2D
     }
   }
 
-  int main(int argc, char* argv [])
+  void main(int argc, char* argv [])
   {
-    int rank = 0;
-    int nprocs = 0;
+    // create world communicator
+    Dist::Comm comm(Dist::Comm::world());
 
-    // initialise
-    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
+    int rank = comm.rank();
+    int nprocs = comm.size();
+
 #ifdef FEAT_HAVE_MPI
     Util::mpi_cout("NUM-PROCS: " + stringify(nprocs) + "\n");
 #endif
@@ -1529,7 +1532,7 @@ namespace NaverStokesCP2D
       {
         Util::mpi_cout("\nUse the option '--help' to display a list of all supported options.\n\n");
       }
-      return Runtime::finalise();
+      return;
     }
 
     // check for unsupported options
@@ -1568,7 +1571,7 @@ namespace NaverStokesCP2D
       Util::mpi_cout("\nPreparing domain...\n");
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain;
+      Control::Domain::PartiDomainControl<MeshType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -1626,12 +1629,13 @@ namespace NaverStokesCP2D
 #endif // DEBUG
 
     // okay
-    return FEAT::Runtime::finalise();
   }
 } // namespace NaverStokesCP2D
 
 
 int main(int argc, char* argv [])
 {
-  return NaverStokesCP2D::main(argc, argv);
+  FEAT::Runtime::initialise(argc, argv);
+  NaverStokesCP2D::main(argc, argv);
+  return FEAT::Runtime::finalise();
 }
