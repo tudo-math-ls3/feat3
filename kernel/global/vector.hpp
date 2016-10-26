@@ -30,6 +30,10 @@ namespace FEAT
       template <typename LocalVector2_, typename Mirror2_ = Mirror_>
       using ContainerType = class Vector<LocalVector2_, Mirror2_>;
 
+      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = class Vector<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
+
     protected:
       GateType* _gate;
       LocalVector_ _vector;

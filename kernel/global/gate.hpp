@@ -38,6 +38,14 @@ namespace FEAT
       /// frequency fector
       LocalVector_ _freqs;
 
+      /// Our 'base' class type
+      template <typename LocalMatrix2_, typename Mirror2_>
+      using GateType = class Gate<LocalMatrix2_, Mirror2_>;
+
+      /// this typedef lets you create a gate container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using GateTypeByMDI = class Gate<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
+
     public:
       explicit Gate()
       {

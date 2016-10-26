@@ -52,9 +52,9 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = TupleMirror<
-        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+      using MirrorType = TupleMirror<
+        typename First_::template MirrorType<Mem2_, DT2_, IT2_>,
+        typename Rest_::template MirrorType<Mem2_, DT2_, IT2_>...>;
 
     protected:
       /// the first sub-mirror
@@ -296,7 +296,7 @@ namespace FEAT
       typedef TupleVector<typename First_::VectorType> VectorType;
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class TupleMirror<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      using MirrorType = class TupleMirror<typename First_::template MirrorType<Mem2_, DT2_, IT2_> >;
 
     protected:
       First_ _first;

@@ -68,7 +68,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DataType2_ = DataType_, typename IndexType2_ = IndexType_>
-      using ContainerType = class VectorMirror<Mem2_, DataType2_, IndexType2_>;
+      using MirrorType = class VectorMirror<Mem2_, DataType2_, IndexType2_>;
 
       /// default constructor
       VectorMirror() :
@@ -731,15 +731,13 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = class VectorMirrorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+      using MirrorType = class VectorMirrorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
 
-    protected:
       /// gather-mirror matrix
       MirrorMatrixType _mirror_gather;
       /// scatter-mirror matrix
       MirrorMatrixType _mirror_scatter;
 
-    public:
       /// default constructor
       VectorMirrorBlocked() :
         _mirror_gather(),

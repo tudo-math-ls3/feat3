@@ -166,7 +166,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerMirror<typename SubMirrorType::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
+      using MirrorType = class PowerMirror<typename SubMirrorType::template MirrorType<Mem2_, DT2_, IT2_>, count_>;
 
       /// the one and only sub-mirror object
       SubMirrorType _sub_mirror;

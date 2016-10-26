@@ -27,7 +27,7 @@ namespace FEAT
      * \tparam BlockSize_
      * Size of the matrice's blocks
      *
-     * This class acts as a wrapper around a standard SparseMatrixBCSR  pretending to be a SparseMatrixBCSR.
+     * This class acts as a wrapper around a standard SparseMatrixCSR  pretending to be a SparseMatrixBCSR.
      * This is required i.e. for the inter-level transfer of vectors in multigrid. This operation is just a
      * multiplication with the transfer matrix, and SparseMatrixCSR can be multiplied with a DenseVectorBlocked
      * in the obvious and desired fashion. The only pitfall is that the corresponding routine only accepts inputs
@@ -64,6 +64,14 @@ namespace FEAT
 
       /// Inherit base class constructors
       using BaseClass::BaseClass;
+
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = class SparseMatrixBWrappedCSR<Mem2_, DT2_, IT2_, BlockSize_>;
+
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
 
       /**
        * \brief Empty standard constructor

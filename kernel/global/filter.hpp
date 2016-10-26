@@ -27,7 +27,7 @@ namespace FEAT
 
       /// this typedef lets you create a filter with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = class Filter<typename LocalFilter_::template FilterType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template ContainerType<Mem2_, DataType2_, IndexType2_> >;
+      using FilterTypeByMDI = class Filter<typename LocalFilter_::template FilterType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
     protected:
       LocalFilter_ _filter;
