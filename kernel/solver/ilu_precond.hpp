@@ -1024,6 +1024,78 @@ namespace FEAT
       }
     }; // class ILUPrecond<SparseMatrixCSR<Mem::CUDA,...>,...>
 
+    template<typename Filter_>
+    class ILUPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>, Filter_> :
+      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>::VectorTypeL>
+    {
+      public:
+      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int> MatrixType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef Filter_ FilterType;
+
+      explicit ILUPrecond(const MatrixType&, const FilterType&, const int = 0)
+      {
+      }
+
+      Status apply(VectorType &, const VectorType &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
+
+    template<typename Filter_>
+    class ILUPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long>, Filter_> :
+      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long>::VectorTypeL>
+    {
+      public:
+      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long> MatrixType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef Filter_ FilterType;
+
+      explicit ILUPrecond(const MatrixType&, const FilterType&, const int = 0)
+      {
+      }
+
+      Status apply(VectorType &, const VectorType &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
+
+    template<typename Filter_>
+    class ILUPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long>, Filter_> :
+      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long>::VectorTypeL>
+    {
+      public:
+      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long> MatrixType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef Filter_ FilterType;
+
+      explicit ILUPrecond(const MatrixType&, const FilterType&, const int = 0)
+      {
+      }
+
+      Status apply(VectorType &, const VectorType &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
+
     /**
      * \brief ILU(0) preconditioner implementation
      *

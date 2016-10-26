@@ -49,7 +49,7 @@ namespace FEAT
     protected:
       const MatrixType& _matrix;
       const FilterType& _filter;
-      double _omega;
+      DataType _omega;
 
       void _apply_intern(const LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
       {
@@ -317,6 +317,81 @@ namespace FEAT
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class SSORPrecond<SparseMatrixCSR<Mem::CUDA>>
+
+    template<typename Filter_>
+    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>, Filter_> :
+      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>::VectorTypeL>
+    {
+      public:
+      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int> MatrixType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::DataType DataType;
+
+      explicit SSORPrecond(const MatrixType&, const FilterType&, const DataType = DataType(1))
+      {
+      }
+
+      Status apply(VectorType &, const VectorType &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
+
+    template<typename Filter_>
+    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long>, Filter_> :
+      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long>::VectorTypeL>
+    {
+      public:
+      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long> MatrixType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::DataType DataType;
+
+      explicit SSORPrecond(const MatrixType&, const FilterType&, const DataType = DataType(1))
+      {
+      }
+
+      Status apply(VectorType &, const VectorType &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
+
+    template<typename Filter_>
+    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long>, Filter_> :
+      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long>::VectorTypeL>
+    {
+      public:
+      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long> MatrixType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::DataType DataType;
+
+      explicit SSORPrecond(const MatrixType&, const FilterType&, const DataType = DataType(1))
+      {
+      }
+
+      Status apply(VectorType &, const VectorType &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
 
     /**
      * \brief Creates a new SSORPrecond solver object
