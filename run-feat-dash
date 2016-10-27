@@ -419,7 +419,7 @@ if is_found ("nvcc"):
 if (unroll_banded):
   extra_opts += " --unroll_banded "
 
-
+addition = ""
 if is_found ("ninja"):
   addition += "-ninja"
 else:
