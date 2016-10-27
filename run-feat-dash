@@ -411,7 +411,7 @@ get_output("git fetch -v -p")
 raw_branches = get_output("git branch -a")
 raw_branches[:] = [s.strip("* ") for s in raw_branches]
 
-extra_opts = ""
+extra_opts = " --eickt"
 if cuda_host_compiler:
   extra_opts += " --cuda_host_compiler=" + cuda_host_compiler + " "
 if is_found ("nvcc"):
@@ -420,7 +420,6 @@ if (unroll_banded):
   extra_opts += " --unroll_banded "
 
 
-addition = " --eickt "
 if is_found ("ninja"):
   addition += "-ninja"
 else:
