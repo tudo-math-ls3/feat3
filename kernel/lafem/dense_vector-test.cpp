@@ -189,6 +189,9 @@ public:
     clone4(7, DT_(134));
     TEST_CHECK_EQUAL(clone4, clone1);
     TEST_CHECK_EQUAL((void*)clone4.elements(), (void*)clone1.elements());
+    auto clone5 = a.clone(CloneMode::Allocate);
+    TEST_CHECK_NOT_EQUAL(clone5, a);
+    TEST_CHECK_EQUAL(clone5.size(), a.size());
   }
 };
 DenseVectorTest<Mem::Main, float, unsigned int> cpu_dense_vector_test_float_uint;

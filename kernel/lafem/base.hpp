@@ -47,7 +47,8 @@ namespace FEAT
       Shallow = 0, /**< Share index and data arrays */
       Layout, /**< Share index arrays, allocate new data array */
       Weak, /**< Share index arrays, allocate new data array and copy content */
-      Deep /**< Allocate new index and data arrays and copy content */
+      Deep, /**< Allocate new index and data arrays and copy content */
+      Allocate, /**< Allocate new index and data arrays */
     };
 
     /**

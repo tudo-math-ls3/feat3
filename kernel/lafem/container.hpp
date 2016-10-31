@@ -699,18 +699,20 @@ namespace FEAT
         this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
 
 
-        if (clone_mode == CloneMode::Deep)
+        if (clone_mode == CloneMode::Deep || clone_mode == CloneMode::Allocate)
         {
           for (Index i(0) ; i < other._indices.size() ; ++i)
           {
             this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(this->_indices_size.at(i)));
-            MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
+            if (clone_mode == CloneMode::Deep)
+              MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
           }
 
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
             this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(this->_elements_size.at(i)));
-            MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+            if (clone_mode == CloneMode::Deep)
+              MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
           return;
