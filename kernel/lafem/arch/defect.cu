@@ -163,6 +163,35 @@ namespace FEAT
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemv failed with status code: " + stringify(status));
       }
+
+      template <typename DT_, typename IT_, int BlockSize_>
+      __global__ void cuda_defect_csrsb(DT_ * r, const DT_ * rhs, const DT_ * b, const DT_ * val, const IT_ * col_ind,
+                                              const IT_ * row_ptr, const Index count)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= count)
+          return;
+
+        DT_ bsum[BlockSize_];
+        for (int j(0) ; j < BlockSize_ ; ++j)
+        {
+          bsum[j] = DT_(0);
+        }
+        const IT_ end(row_ptr[idx + 1]);
+        for (IT_ i(row_ptr[idx]) ; i < end ; ++i)
+        {
+          const DT_ vali(val[i]);
+          const IT_ coli(col_ind[i] * BlockSize_);
+          for (int j(0) ; j < BlockSize_ ; ++j)
+          {
+            bsum[j] += vali * b[coli + j];
+          }
+        }
+        for (int j(0) ; j < BlockSize_ ; ++j)
+        {
+          r[idx * BlockSize_ + j] = rhs[idx * BlockSize_ + j] - bsum[j];
+        }
+      }
     }
   }
 }
@@ -283,6 +312,48 @@ void Defect<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * 
 }
 template void Defect<Mem::CUDA>::csrb_intern(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index, const int);
 template void Defect<Mem::CUDA>::csrb_intern(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index, const int);
+
+template <typename DT_, typename IT_, int BlockSize_>
+void Defect<Mem::CUDA>::csrsb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+{
+  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  FEAT::LAFEM::Intern::cuda_defect_csrsb<DT_, IT_, BlockSize_><<<grid, block>>>(r, rhs, x, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
+}
+template void Defect<Mem::CUDA>::csrsb<float, unsigned long, 1>
+  (float *, const float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<double, unsigned long, 1>
+  (double *, const double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<float, unsigned int, 1>
+  (float *, const float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<double, unsigned int, 1>
+  (double *, const double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<float, unsigned long, 2>
+  (float *, const float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<double, unsigned long, 2>
+  (double *, const double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<float, unsigned int, 2>
+  (float *, const float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<double, unsigned int, 2>
+  (double *, const double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<float, unsigned long, 3>
+  (float *, const float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<double, unsigned long, 3>
+  (double *, const double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<float, unsigned int, 3>
+  (float *, const float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csrsb<double, unsigned int, 3>
+  (double *, const double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
 
 template <typename DT_, typename IT_>

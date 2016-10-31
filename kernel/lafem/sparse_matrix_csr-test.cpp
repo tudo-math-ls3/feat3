@@ -471,6 +471,12 @@ SparseMatrixCSRBApplyTest<Mem::Main, float, unsigned long> sm_csrib_apply_test_f
 SparseMatrixCSRBApplyTest<Mem::Main, double, unsigned long> sm_csrib_apply_test_double_ulong;
 SparseMatrixCSRBApplyTest<Mem::Main, float, unsigned int> sm_csrib_apply_test_float_uint;
 SparseMatrixCSRBApplyTest<Mem::Main, double, unsigned int> sm_csrib_apply_test_double_uint;
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSRBApplyTest<Mem::CUDA, float, unsigned long> cuda_sm_csrib_apply_test_float_ulong;
+SparseMatrixCSRBApplyTest<Mem::CUDA, double, unsigned long> cuda_sm_csrib_apply_test_double_ulong;
+SparseMatrixCSRBApplyTest<Mem::CUDA, float, unsigned int> cuda_sm_csrib_apply_test_float_uint;
+SparseMatrixCSRBApplyTest<Mem::CUDA, double, unsigned int> cuda_sm_csrib_apply_test_double_uint;
+#endif
 
 
 template<
