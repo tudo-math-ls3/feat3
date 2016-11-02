@@ -127,6 +127,38 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(a.det(), dets[n_], tol);
   }
 
+
+  template<int n_>
+  void test_mat_cof_lehmer() const
+  {
+    // Set tolerance
+    const DataType_ tol(Math::pow(_eps, DataType_(0.75)));
+
+    // Initialise a Lehmer-Matrix
+    Matrix<DataType_, n_, n_> a, b, c;
+    _init_lehmer_mat(a);
+    _init_lehmer_inv(b);
+
+    // Set C to the cofactor matrix and subtract the analytic cofactor values. Since the Lehmer matrix is invertible,
+    // Cof(A) = 1/det(A) A^(-1)
+    c.set_cofactor(a);
+
+    DataType_ my_det = a.det();
+
+    // compute norm
+    DataType_ def = DataType_(0);
+    for(int i(0); i < n_; ++i)
+    {
+      for(int j(0); j < n_; ++j)
+      {
+        def = Math::max(def, Math::abs(c[i][j] - my_det*b[i][j]));
+      }
+    }
+
+    // check norm of error
+    TEST_CHECK_EQUAL_WITHIN_EPS(def, DataType_(0), tol);
+  }
+
   virtual void run() const override
   {
     // test matrix inversion
@@ -150,6 +182,15 @@ public:
     test_mat_det_lehmer<7>(); // generic
     test_mat_det_lehmer<8>(); // generic
     test_mat_det_lehmer<9>(); // generic
+
+    test_mat_cof_lehmer<2>(); // specialised
+    test_mat_cof_lehmer<3>(); // specialised
+    test_mat_cof_lehmer<4>(); // specialised
+    test_mat_cof_lehmer<5>(); // specialised
+    test_mat_cof_lehmer<6>(); // specialised
+    test_mat_cof_lehmer<7>(); // generic
+    test_mat_cof_lehmer<8>(); // generic
+    test_mat_cof_lehmer<9>(); // generic
   }
 };
 
