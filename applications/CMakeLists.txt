@@ -12,11 +12,6 @@ ADD_SUBDIRECTORY( meshopt_screws-app )
 
 # applications to build
 SET (app_list
-  #  foundation_global_ops_convex_2procs_test-app
-  #  foundation_global_ops_convex_4procs_test-app
-  #  foundation_global_ops_concave_3procs_test-app
-  #  foundation_global_ops_concave_4procs_test-app
-  #  foundation_global_ops_synch_scal_test-app
   foundation_psystem_test-app
   meshopt_hyperelasticity_resize-app
   navier_stokes_cp2d_q2q1
@@ -69,127 +64,6 @@ else (FEAT_HAVE_MPI)
   SET_PROPERTY(TEST foundation_psystem_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_psystem_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
-
-#if (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_convex_2procs_test-app_mpi ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_convex_2procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/foundation_global_ops_convex_2procs_test-app ${MPIEXEC_POSTFLAGS})
-#  SET_PROPERTY(TEST foundation_global_ops_convex_2procs_test-app_mpi PROPERTY LABELS "mpi")
-#  SET_PROPERTY(TEST foundation_global_ops_convex_2procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#else (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_convex_2procs_test-app_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_convex_2procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command "${FEAT_BINARY_DIR}/applications/foundation_global_ops_convex_2procs_test-app")
-#  SET_PROPERTY(TEST foundation_global_ops_convex_2procs_test-app_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST foundation_global_ops_convex_2procs_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#endif (FEAT_HAVE_MPI)
-
-#if (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_convex_4procs_test-app_mpi ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_convex_4procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/foundation_global_ops_convex_4procs_test-app ${MPIEXEC_POSTFLAGS})
-#  SET_PROPERTY(TEST foundation_global_ops_convex_4procs_test-app_mpi PROPERTY LABELS "mpi")
-#  SET_PROPERTY(TEST foundation_global_ops_convex_4procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#else (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_convex_4procs_test-app_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_convex_4procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command "${FEAT_BINARY_DIR}/applications/foundation_global_ops_convex_4procs_test-app")
-#  SET_PROPERTY(TEST foundation_global_ops_convex_4procs_test-app_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST foundation_global_ops_convex_4procs_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#endif (FEAT_HAVE_MPI)
-
-#if (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_concave_3procs_test-app_mpi ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_concave_3procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/foundation_global_ops_concave_3procs_test-app ${MPIEXEC_POSTFLAGS})
-#  SET_PROPERTY(TEST foundation_global_ops_concave_3procs_test-app_mpi PROPERTY LABELS "mpi")
-#  SET_PROPERTY(TEST foundation_global_ops_concave_3procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#else (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_concave_3procs_test-app_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_concave_3procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command "${FEAT_BINARY_DIR}/applications/foundation_global_ops_concave_3procs_test-app")
-#  SET_PROPERTY(TEST foundation_global_ops_concave_3procs_test-app_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST foundation_global_ops_concave_3procs_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#endif (FEAT_HAVE_MPI)
-
-#if (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_concave_4procs_test-app_mpi ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_concave_4procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/foundation_global_ops_concave_4procs_test-app ${MPIEXEC_POSTFLAGS})
-#  SET_PROPERTY(TEST foundation_global_ops_concave_4procs_test-app_mpi PROPERTY LABELS "mpi")
-#  SET_PROPERTY(TEST foundation_global_ops_concave_4procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#else (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_concave_4procs_test-app_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_concave_4procs_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command "${FEAT_BINARY_DIR}/applications/foundation_global_ops_concave_4procs_test-app")
-#  SET_PROPERTY(TEST foundation_global_ops_concave_4procs_test-app_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST foundation_global_ops_concave_4procs_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#endif (FEAT_HAVE_MPI)
-
-#if (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_synch_scal_test-app_mpi ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_synch_scal_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/foundation_global_ops_synch_scal_test-app ${MPIEXEC_POSTFLAGS})
-#  SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_mpi PROPERTY LABELS "mpi")
-#  SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#else (FEAT_HAVE_MPI)
-#  ADD_TEST(foundation_global_ops_synch_scal_test-app_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target foundation_global_ops_synch_scal_test-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/foundation_global_ops_synch_scal_test-app)
-#  SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#endif (FEAT_HAVE_MPI)
-
 
 ######################### poisson_dirichlet_2d
 if (FEAT_HAVE_MPI)
