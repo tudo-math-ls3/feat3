@@ -15,7 +15,6 @@ SET (app_list
   foundation_psystem_test-app
   meshopt_hyperelasticity_resize-app
   navier_stokes_cp2d_q2q1
-  parti_poisson_dirichlet_2d
   poisson_dirichlet_2d
   poisson_neumann_2d
   scarckin_poisson
@@ -235,36 +234,6 @@ else (FEAT_HAVE_MPI)
     SET_PROPERTY(TEST stokes_poiseuille_2d_serial_cuda PROPERTY LABELS "serial")
     SET_PROPERTY(TEST stokes_poiseuille_2d_serial_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAT_HAVE_CUDA)
-endif (FEAT_HAVE_MPI)
-
-###### parti_poisson
-
-if (FEAT_HAVE_MPI)
-  ADD_TEST(sleep11 sleep 2)
-  SET_PROPERTY(TEST sleep11 PROPERTY LABELS "mpi,sleep")
-
-  ADD_TEST(parti_poisson_dirichlet_2d_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target parti_poisson_dirichlet_2d
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 5 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-else (FEAT_HAVE_MPI)
-  ADD_TEST(parti_poisson_dirichlet_2d_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target parti_poisson_dirichlet_2d
-    --build-nocmake
-    --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
-  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
 
 ######################### scarckin_poisson
