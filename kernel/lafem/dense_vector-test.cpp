@@ -190,7 +190,7 @@ public:
     TEST_CHECK_EQUAL(clone4, clone1);
     TEST_CHECK_EQUAL((void*)clone4.elements(), (void*)clone1.elements());
     auto clone5 = a.clone(CloneMode::Allocate);
-    TEST_CHECK_NOT_EQUAL(clone5, a);
+    TEST_CHECK_NOT_EQUAL((void*)clone5.elements(), (void*)a.elements());
     TEST_CHECK_EQUAL(clone5.size(), a.size());
   }
 };
