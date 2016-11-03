@@ -9,6 +9,7 @@
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 //#include <kernel/adjacency/dynamic_graph.hpp>
 //#include <kernel/adjacency/graph.hpp>
+#include <vector>
 
 namespace FEAT
 {
@@ -57,6 +58,9 @@ namespace FEAT
       /// index-type typedef
       typedef typename VectorMirrorType::IndexType IndexType;
 
+      template<typename DT_, typename IT_>
+      using BufferType = LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>;
+
     protected:
       /// row-mirror reference
       const VectorMirrorType& _row_mirror;
@@ -64,7 +68,7 @@ namespace FEAT
       const VectorMirrorType& _col_mirror;
       /// \cond internal
       // mutable work array
-      mutable DataType* _work;
+      mutable std::vector<DataType> _vec_work;
       /// \endcond
 
     public:
@@ -80,25 +84,13 @@ namespace FEAT
       explicit MatrixMirror(const VectorMirrorType& row_mirror, const VectorMirrorType& col_mirror) :
         _row_mirror(row_mirror),
         _col_mirror(col_mirror),
-        _work(nullptr)
+        _vec_work(std::max(col_mirror.get_gather_dual().columns(), col_mirror.get_scatter_dual().columns()), DataType(0))
       {
-        Index n = std::max(
-                           col_mirror.get_gather_dual().columns(),
-                           col_mirror.get_scatter_dual().columns());
-        _work = new DataType[n];
-        for(Index i(0); i < n; ++i)
-        {
-          _work[i] = DataType(0);
-        }
       }
 
       /// virtual destructor
       virtual ~MatrixMirror()
       {
-        if(_work != nullptr)
-        {
-          delete [] _work;
-        }
       }
 
       const VectorMirrorType& get_row_mirror() const
@@ -238,6 +230,7 @@ namespace FEAT
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
@@ -328,6 +321,7 @@ namespace FEAT
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
@@ -426,6 +420,7 @@ namespace FEAT
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
@@ -518,6 +513,7 @@ namespace FEAT
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
@@ -618,6 +614,7 @@ namespace FEAT
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
@@ -712,6 +709,7 @@ namespace FEAT
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
