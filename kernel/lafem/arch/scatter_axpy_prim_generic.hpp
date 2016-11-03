@@ -36,6 +36,28 @@ namespace FEAT
         }
       }
 
+      template <typename DT_, typename IT_, int BlockSize_>
+      void ScatterAxpyPrim<Mem::Main>::dvb_csr_generic(DT_* v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const DT_ alpha, const Index size)
+      {
+        Tiny::Vector<DT_, BlockSize_> * x(reinterpret_cast<Tiny::Vector<DT_, BlockSize_> *>(v));
+        const Tiny::Vector<DT_, BlockSize_> * bbuffer(reinterpret_cast<const Tiny::Vector<DT_, BlockSize_> *>(b));
+
+        for (Index row(0) ; row < size ; ++row)
+        {
+          // skip empty rows
+          if(row_ptr[row] >= row_ptr[row + 1])
+            continue;
+
+          Tiny::Vector<DT_, BlockSize_> bsum(0);
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            bsum += val[i] * bbuffer[col_ind[i]];
+          }
+          x[row] += bsum * alpha;
+        }
+      }
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

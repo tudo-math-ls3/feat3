@@ -32,7 +32,6 @@ if (FEAT_EICKT)
     scale_generic-eickt.cpp
     scale_row_col_generic-eickt.cpp
     scatter_axpy_prim_generic-eickt.cpp
-    scatter_prim_generic-eickt.cpp
     slip_filter_generic-eickt.cpp
     sum_generic-eickt.cpp
     unit_filter_generic-eickt.cpp
@@ -84,7 +83,6 @@ if (FEAT_HAVE_CUDA)
     product_matvec.cu
     scale.cu
     scale_row_col.cu
-    scatter_prim.cu
     scatter_axpy_prim.cu
     slip_filter.cu
     sum.cu

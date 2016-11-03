@@ -39,6 +39,27 @@ namespace FEAT
                                    const DT_ alpha,
                                    const Index size);
 
+        template <typename DT_, typename IT_, int BlockSize_>
+        static void dvb_csr(DT_* v,
+                           const DT_* b,
+                           const IT_* col_ind,
+                           const DT_* val,
+                           const IT_* row_ptr,
+                           const DT_ alpha,
+                           const Index size)
+        {
+          dvb_csr_generic<DT_, IT_, BlockSize_>(v, b, col_ind, val, row_ptr, alpha, size);
+        }
+
+        template <typename DT_, typename IT_, int BlockSize_>
+        static void dvb_csr_generic(DT_* v,
+                                   const DT_* b,
+                                   const IT_* col_ind,
+                                   const DT_* val,
+                                   const IT_* row_ptr,
+                                   const DT_ alpha,
+                                   const Index size);
+
       };
 
 #ifdef FEAT_EICKT
@@ -53,6 +74,15 @@ namespace FEAT
       {
         template <typename DT_, typename IT_>
         static void dv_csr(DT_* v,
+                           const DT_* b,
+                           const IT_* col_ind,
+                           const DT_* val,
+                           const IT_* row_ptr,
+                           const DT_ alpha,
+                           const Index size);
+
+        template <typename DT_, typename IT_, int BlockSize_>
+        static void dvb_csr(DT_* v,
                            const DT_* b,
                            const IT_* col_ind,
                            const DT_* val,
