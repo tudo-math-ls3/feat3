@@ -5,7 +5,6 @@
 // includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/util/statistics.hpp>
-#include <kernel/util/comm_base.hpp>
 
 namespace FEAT
 {
@@ -62,8 +61,8 @@ namespace FEAT
       Index _iter_digits;
       /// whether to plot something
       bool _plot;
-      /// does any other rank calc its current defect for plotting
-      bool _other_plot_def;
+      /// whether to skip defect computation if possible
+      bool _skip_def_calc;
 
       /**
        * \brief Protected constructor
@@ -100,7 +99,11 @@ namespace FEAT
         _def_cur(0),
         _iter_digits(Math::ilog10(_max_iter)),
         _plot(false),
-        _other_plot_def(false)
+#ifdef FEAT_HAVE_MPI
+        _skip_def_calc(false) // not allowed as this may cause deadlocks
+#else
+        _skip_def_calc(true) // no potential problem in non-MPI builds
+#endif
       {
       }
 
@@ -209,21 +212,30 @@ namespace FEAT
       }
 
       /**
+       * \brief Specifies whether defect calculation is allowed to be skipped.
+       *
+       * \warning
+       * Skipping defect calculation can lead to deadlocks in parallel solver implementations
+       * if one (but not all) processes need to compute the defect for some reason (like plotting) !\n
+       * Use this function only when you really know what you are doing!
+       *
+       * \param[in] skip
+       * Specifies whether defect computation is allowed to be skipped.
+       */
+      void skip_defect_calc(bool skip)
+      {
+        _skip_def_calc = skip;
+      }
+
+      /**
        * \brief Sets the plot mode of the solver.
        *
        * \param[in] plot
        * If set to \c true, the solver will print a convergence plot to std::cout.
-       *
-       * \note This method triggers a call to mpi_allreduce and thus should not
-       * be used extensivley within loops.
        */
       void set_plot(bool plot)
       {
         _plot = plot;
-        Index send = (Index) _plot;
-        Index result(0);
-        Util::Comm::allreduce(&send, &result, 1);
-        _other_plot_def = result > 0;
       }
 
       /// Sets the plot name of the solver.
@@ -374,11 +386,10 @@ namespace FEAT
         ++this->_num_iter;
 
         // first, let's see if we have to compute the defect at all
-        bool calc_def = false;
+        bool calc_def = !_skip_def_calc;
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
         calc_def = calc_def || this->_plot;
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
-        calc_def = calc_def || _other_plot_def;
 
         // save previous defect
         const DataType def_old = this->_def_cur;
