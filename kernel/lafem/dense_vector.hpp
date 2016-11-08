@@ -247,12 +247,12 @@ namespace FEAT
        *
        * Creates a vector with a given size.
        */
-      explicit DenseVector(Index size_in, bool pinned_allocation = false) :
+      explicit DenseVector(Index size_in, Pinning pinning = Pinning::disabled) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        XASSERTM(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
+        XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
-        if (pinned_allocation)
+        if (pinning == Pinning::enabled)
         {
 #ifdef FEAT_HAVE_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size_in));
@@ -295,6 +295,11 @@ namespace FEAT
        * Creates a vector with given size and given data.
        *
        * \note The array must be allocated by FEAT's own memory pool
+       *
+       * \note Obviously, the pointer must point to data in the same memory.
+       *
+       * \warning If you use a data pointer from another container, both containers will be able to modify the array and will effect the other container,
+       * as they share one and the same array.
        */
       explicit DenseVector(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)

@@ -185,7 +185,7 @@ namespace FEAT
        */
       DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(size(), false);
+        return DenseVector<Mem::Main, DataType, IndexType>(size(), Pinning::disabled);
       }
 
       /**
@@ -853,7 +853,7 @@ namespace FEAT
        */
       BufferVectorType create_buffer_vector() const
       {
-        return BufferVectorType(Index(BlockSize)*_mirror_gather.rows(), false);
+        return BufferVectorType(Index(BlockSize)*_mirror_gather.rows(), Pinning::disabled);
       }
 
       /**

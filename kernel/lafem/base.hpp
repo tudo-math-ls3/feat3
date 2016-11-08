@@ -80,6 +80,17 @@ namespace FEAT
       native = 0, /**< each block is treated as one entry */
       pod /**< each entry of a block is treated as one entry on its own (formerly known as 'raw') */
     };
+
+    /**
+     * Supported memory pinning modes
+     *
+     * \note This enum is mainly used to prevent any compiler from missusing the intuitive bool parameter for fancy implicit conversion tricks.
+     */
+    enum class Pinning
+    {
+      disabled = 0, /**< do not use memory pinning */
+      enabled /** < enable memory pinning (for fast device <-> host transfers) */
+    };
   } // namespace LAFEM
 } // namespace FEAT
 
