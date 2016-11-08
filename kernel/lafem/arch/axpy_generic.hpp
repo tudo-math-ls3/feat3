@@ -46,17 +46,34 @@ namespace FEAT
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main>::csr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-                                               const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
+                                               const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index, const bool transpose)
       {
-        for (Index row(0) ; row < rows ; ++row)
+        if (transpose)
         {
-          DT_ sum(0);
-          const IT_ end(row_ptr[row + 1]);
-          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          for (Index col(0) ; col < columns ; ++col)
           {
-            sum += val[i] * x[col_ind[i]];
+            r[col] = y[col];
           }
-          r[row] = (sum * a) + y[row];
+          for (Index row(0) ; row < rows ; ++row)
+          {
+            for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
+            {
+              r[col_ind[i]] += val[i] * x[row] * a;
+            }
+          }
+        }
+        else
+        {
+          for (Index row(0) ; row < rows ; ++row)
+          {
+            DT_ sum(0);
+            const IT_ end(row_ptr[row + 1]);
+            for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+            {
+              sum += val[i] * x[col_ind[i]];
+            }
+            r[row] = (sum * a) + y[row];
+          }
         }
       }
 

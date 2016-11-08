@@ -346,6 +346,21 @@ public:
       a_local.apply(ref_local, x_local);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+
+      // transposed apply-test for alpha = 4711.1
+      if (!(typeid(Mem::CUDA) == typeid(Mem_) && typeid(IT_) == typeid(unsigned long)))
+      {
+        a.apply(r, x, y, s, true);
+        result_local.copy(r);
+
+        SparseMatrixCSR<Mem_, DT_, IT_> at = a.transpose();
+        at.apply(ref, x);
+        ref.scale(ref, s);
+        ref.axpy(ref, y);
+        ref_local.copy(ref);
+        for (Index i(0) ; i < size ; ++i)
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+      }
     }
   }
 };

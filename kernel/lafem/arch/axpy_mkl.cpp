@@ -54,12 +54,16 @@ void Axpy<Mem::Main>::dv_mkl(double * r, const double a, const double * const x,
   }
 }
 
-void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index)
+void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transpose)
 {
   MKL_INT mrows = (MKL_INT)rows;
   MKL_INT mcolumns = (MKL_INT)columns;
   float beta = 1.f;
-  char trans = 'N';
+  char trans;
+  if (transpose)
+    trans = 'T';
+  else
+    trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
   matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
@@ -77,12 +81,16 @@ void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, c
   }
 }
 
-void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index)
+void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transpose)
 {
   MKL_INT mrows = (MKL_INT)rows;
   MKL_INT mcolumns = (MKL_INT)columns;
   double beta = 1;
-  char trans = 'N';
+  char trans;
+  if (transpose)
+    trans = 'T';
+  else
+    trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
   matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise

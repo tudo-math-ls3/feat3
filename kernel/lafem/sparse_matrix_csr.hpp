@@ -1978,12 +1978,14 @@ namespace FEAT
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
+       * \param[in] transposed Should the product use the transposed matrix?
        */
       void apply(
                  DenseVector<Mem_,DT_, IT_> & r,
                  const DenseVector<Mem_, DT_, IT_> & x,
                  const DenseVector<Mem_, DT_, IT_> & y,
-                 const DT_ alpha = DT_(1)) const
+                 const DT_ alpha = DT_(1),
+                 const bool transposed = false) const
       {
         if (r.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
@@ -2003,6 +2005,13 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
+        if (transposed)
+        {
+          Statistics::add_flops(this->used_elements() * 3);
+          Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
+                                       this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
+        }
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
@@ -2019,7 +2028,7 @@ namespace FEAT
         {
           Statistics::add_flops(this->used_elements() * 3);
           Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
-                                       this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+                                       this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
         }
 
         TimeStamp ts_stop;
