@@ -55,6 +55,7 @@ thirdparty/*.zip
 thirdparty/alglib/*
 thirdparty/SuiteSparse/*
 thirdparty/fparser/*
+thirdparty/parmetis/*
 
 # Ignore Visual Studio user/filter files
 *.vcxproj.user
