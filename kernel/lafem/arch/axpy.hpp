@@ -41,29 +41,29 @@ namespace FEAT
         template <typename DT_, typename IT_>
         static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
-                        const Index used_elements, const bool transpose)
+                        const Index used_elements, const bool transposed)
         {
-          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transpose);
+          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
         }
 
         template <typename DT_>
         static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
                         const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
-                        const Index used_elements, const bool transpose)
+                        const Index used_elements, const bool transposed)
         {
 #ifdef FEAT_HAVE_MKL
-          csr_mkl(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transpose);
+          csr_mkl(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
 #else
-          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transpose);
+          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
 #endif
         }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void csr(__float128 * r, const __float128 a, const __float128 * const x, const __float128 * const y, const __float128 * const val,
                         const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
-                        const Index used_elements, const bool transpose)
+                        const Index used_elements, const bool transposed)
         {
-          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transpose);
+          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
         }
 #endif
 
@@ -232,10 +232,10 @@ namespace FEAT
         static void dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
 
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transpose);
+        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
 
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transpose);
+        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)

@@ -28,7 +28,7 @@ namespace FEAT
 
       template <typename DT_>
       __global__ void cuda_axpy_mv_csr(DT_ * r, const DT_ a, const DT_ * x, const DT_ * y, const DT_ * val,
-          const unsigned long * col_ind, const unsigned long * row_ptr, const Index count, const bool transpose)
+          const unsigned long * col_ind, const unsigned long * row_ptr, const Index count, const bool transposed)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -234,10 +234,10 @@ template void Axpy<Mem::CUDA>::dv(float *, const float, const float * const, con
 template void Axpy<Mem::CUDA>::dv(double *, const double, const double * const, const double * const, const Index);
 
 template <typename DT_>
-void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transpose)
+void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed)
 {
-  if (transpose)
-    throw InternalError(__func__, __FILE__, __LINE__, "transposed csr product not supported for IT=unsigned long!");
+  if (transposed)
+    throw InternalError(__func__, __FILE__, __LINE__, "transposedd csr product not supported for IT=unsigned long!");
 
   Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
   dim3 grid;
@@ -245,7 +245,7 @@ void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAT::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows, transpose);
+  FEAT::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows, transposed);
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -257,10 +257,10 @@ template void Axpy<Mem::CUDA>::csr(float *, const float, const float * const, co
 template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
 
 template <typename DT_>
-void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transpose)
+void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed)
 {
   cusparseOperation_t trans;
-  if (transpose)
+  if (transposed)
     trans = CUSPARSE_OPERATION_TRANSPOSE;
   else
     trans = CUSPARSE_OPERATION_NON_TRANSPOSE;

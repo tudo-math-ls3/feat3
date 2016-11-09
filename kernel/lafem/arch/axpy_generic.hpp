@@ -46,9 +46,9 @@ namespace FEAT
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main>::csr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-                                               const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index, const bool transpose)
+                                               const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index, const bool transposed)
       {
-        if (transpose)
+        if (transposed)
         {
           for (Index col(0) ; col < columns ; ++col)
           {

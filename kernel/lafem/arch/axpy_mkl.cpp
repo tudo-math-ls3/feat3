@@ -54,13 +54,13 @@ void Axpy<Mem::Main>::dv_mkl(double * r, const double a, const double * const x,
   }
 }
 
-void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transpose)
+void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transposed)
 {
   MKL_INT mrows = (MKL_INT)rows;
   MKL_INT mcolumns = (MKL_INT)columns;
   float beta = 1.f;
   char trans;
-  if (transpose)
+  if (transposed)
     trans = 'T';
   else
     trans = 'N';
@@ -81,13 +81,13 @@ void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, c
   }
 }
 
-void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transpose)
+void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transposed)
 {
   MKL_INT mrows = (MKL_INT)rows;
   MKL_INT mcolumns = (MKL_INT)columns;
   double beta = 1;
   char trans;
-  if (transpose)
+  if (transposed)
     trans = 'T';
   else
     trans = 'N';

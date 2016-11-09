@@ -1987,12 +1987,24 @@ namespace FEAT
                  const DT_ alpha = DT_(1),
                  const bool transposed = false) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-        if (y.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+        if (transposed)
+        {
+          if (r.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+        }
+        else
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+        }
 
         TimeStamp ts_start;
 
