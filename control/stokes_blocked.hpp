@@ -273,6 +273,11 @@ namespace FEAT
         typename SystemLevel_::PresGate& gate_pres = sys_level.gate_pres;
         typename SystemLevel_::SystemGate& gate_sys  = sys_level.gate_sys;
 
+        // set the gate comm
+        gate_velo.set_comm(dom_layer.get_comm());
+        gate_pres.set_comm(dom_layer.get_comm());
+        gate_sys.set_comm(dom_layer.get_comm());
+
         // loop over all ranks
         for(Index i(0); i < dom_layer.size(); ++i)
         {
