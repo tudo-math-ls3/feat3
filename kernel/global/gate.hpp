@@ -57,6 +57,11 @@ namespace FEAT
       {
       }
 
+      explicit Gate(const Dist::Comm& comm) :
+        _comm(&comm)
+      {
+      }
+
       ~Gate()
       {
       }

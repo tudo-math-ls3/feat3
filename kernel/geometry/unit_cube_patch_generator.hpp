@@ -97,6 +97,17 @@ namespace FEAT
       }
 
     public:
+      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks)
+      {
+        MeshNodeType* nnode = nullptr;
+        std::vector<Index> cranks, ctags;
+        int lvl = create(rank, nprocs, nnode, cranks, ctags);
+        node = std::shared_ptr<MeshNodeType>(nnode);
+        for(auto it = cranks.begin(); it != cranks.end(); ++it)
+          ranks.push_back(int(*it));
+        return Index(lvl);
+      }
+
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
         if(nprocs < 1)
@@ -279,6 +290,17 @@ namespace FEAT
       }
 
     public:
+      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks)
+      {
+        MeshNodeType* nnode = nullptr;
+        std::vector<Index> cranks, ctags;
+        int lvl = create(rank, nprocs, nnode, cranks, ctags);
+        node = std::shared_ptr<MeshNodeType>(nnode);
+        for(auto it = cranks.begin(); it != cranks.end(); ++it)
+          ranks.push_back(int(*it));
+        return Index(lvl);
+      }
+
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
         if(nprocs < 1)
@@ -598,6 +620,17 @@ namespace FEAT
       }
 
     public:
+      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks)
+      {
+        MeshNodeType* nnode = nullptr;
+        std::vector<Index> cranks, ctags;
+        int lvl = create(rank, nprocs, nnode, cranks, ctags);
+        node = std::shared_ptr<MeshNodeType>(nnode);
+        for(auto it = cranks.begin(); it != cranks.end(); ++it)
+          ranks.push_back(int(*it));
+        return Index(lvl);
+      }
+
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
         if(nprocs < 1)

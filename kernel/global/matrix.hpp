@@ -2,9 +2,10 @@
 #ifndef KERNEL_GLOBAL_MATRIX_HPP
 #define KERNEL_GLOBAL_MATRIX_HPP 1
 
-#include <kernel/global/gate.hpp>
 #include <kernel/lafem/container.hpp> // required for LAFEM::CloneMode
+#include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
+#include <kernel/global/synch_mat.hpp>
 
 namespace FEAT
 {
@@ -72,6 +73,16 @@ namespace FEAT
       }
 
       const LocalMatrix_& operator*() const
+      {
+        return _matrix;
+      }
+
+      LocalMatrix_& local()
+      {
+        return _matrix;
+      }
+
+      const LocalMatrix_& local() const
       {
         return _matrix;
       }
@@ -208,6 +219,14 @@ namespace FEAT
 
         // synchronise r
         r.sync_0();
+      }
+
+      LocalMatrix convert_to_1() const
+      {
+        LocalMatrix locmat = _matrix.clone(LAFEM::CloneMode::Weak);
+        if((_row_gate != nullptr) && (_col_gate != nullptr))
+          synch_matrix(locmat, *_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
+        return locmat;
       }
     };
   } // namespace Global

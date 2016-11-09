@@ -49,6 +49,16 @@ namespace FEAT
         return _filter;
       }
 
+      LocalFilter_& local()
+      {
+        return _filter;
+      }
+
+      const LocalFilter_& local() const
+      {
+        return _filter;
+      }
+
       template<typename OtherGlobalFilter_>
       void convert(const OtherGlobalFilter_ & other)
       {

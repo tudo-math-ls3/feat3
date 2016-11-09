@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/analytic/function.hpp>
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/util/dist.hpp>
 
 namespace FEAT
 {
@@ -218,6 +219,31 @@ namespace FEAT
         norm_h0 = DataType_(other.norm_h0);
         norm_h1 = DataType_(other.norm_h1);
         norm_h2 = DataType_(other.norm_h2);
+      }
+
+      /**
+       * \brief Synchronises the error information over a communicator
+       *
+       * This function sums up the error information of all patches in a
+       * parallel simulation to obtain the information for the global mesh.
+       *
+       * \param[in] comm
+       * The communication over which to synchronise.
+       */
+      void synchronise(const Dist::Comm& comm)
+      {
+        DataType_ verr[3] =
+        {
+          have_h0 ? Math::sqr(norm_h0) : DataType_(0),
+          have_h1 ? Math::sqr(norm_h1) : DataType_(0),
+          have_h2 ? Math::sqr(norm_h2) : DataType_(0)
+        };
+
+        comm.allreduce(verr, verr, std::size_t(3), Dist::op_sum);
+
+        if(have_h0) norm_h0 = Math::sqrt(verr[0]);
+        if(have_h1) norm_h1 = Math::sqrt(verr[1]);
+        if(have_h2) norm_h2 = Math::sqrt(verr[2]);
       }
 
       /**

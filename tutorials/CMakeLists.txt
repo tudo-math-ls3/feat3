@@ -26,6 +26,9 @@ TARGET_LINK_LIBRARIES(tutorial-04-parser feat)
 ADD_EXECUTABLE(tutorial-05-multigrid tutorial_05_multigrid.cpp)
 TARGET_LINK_LIBRARIES(tutorial-05-multigrid feat)
 
+ADD_EXECUTABLE(tutorial-06-global tutorial_06_global.cpp)
+TARGET_LINK_LIBRARIES(tutorial-06-global feat)
+
 # tutorials target
 ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-01-poisson
@@ -33,4 +36,5 @@ ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-03-andicore
   tutorial-04-parser
   tutorial-05-multigrid
+  tutorial-06-global
 )

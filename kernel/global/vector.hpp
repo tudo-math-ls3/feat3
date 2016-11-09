@@ -62,6 +62,16 @@ namespace FEAT
         return _vector;
       }
 
+      LocalVector_& local()
+      {
+        return _vector;
+      }
+
+      const LocalVector_& local() const
+      {
+        return _vector;
+      }
+
       template<typename OtherGlobalVector_>
       void convert(GateType* gate, const OtherGlobalVector_ & other)
       {

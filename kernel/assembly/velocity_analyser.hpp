@@ -6,6 +6,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/dist.hpp>
 
 namespace FEAT
 {
@@ -86,6 +87,44 @@ namespace FEAT
         norm_h1_comp(DataType_(0))
       {
       }
+
+      /**
+       * \brief Synchronises the velocity information over a communicator
+       *
+       * This function sums up the velocity information of all patches in a
+       * parallel simulation to obtain the information for the global mesh.
+       *
+       * \param[in] comm
+       * The communication over which to synchronise.
+       */
+      void synchronise(const Dist::Comm& comm)
+      {
+        DataType_ verr[2*dim_+4] =
+        {
+          Math::sqr(norm_h0),
+          Math::sqr(norm_h1),
+          Math::sqr(divergence),
+          Math::sqr(vorticity),
+        };
+        for(int i(0); i < dim_; ++i)
+        {
+          verr[4+i] = Math::sqr(norm_h0_comp[i]);
+          verr[4+dim_+i] = Math::sqr(norm_h1_comp[i]);
+        }
+
+        comm.allreduce(verr, verr, std::size_t(2*dim_+4), Dist::op_sum);
+
+        norm_h0    = Math::sqrt(verr[0]);
+        norm_h1    = Math::sqrt(verr[1]);
+        divergence = Math::sqrt(verr[2]);
+        vorticity  = Math::sqrt(verr[3]);
+        for(int i(0); i < dim_; ++i)
+        {
+          norm_h0_comp[i] = Math::sqrt(verr[4+i]);
+          norm_h1_comp[i] = Math::sqrt(verr[4+dim_+i]);
+        }
+      }
+
 
       /**
        * \brief Formats the velocity information as a string.

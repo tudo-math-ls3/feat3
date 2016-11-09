@@ -248,13 +248,21 @@ namespace FEAT
 
       /**
        * \brief Returns the names of all mesh parts of this node.
+       *
+       * \param[in] no_internals
+       * Specifies whether to skip all internal mesh-parts whose names begin with an underscore.
+       *
+       * \returns
+       * A deque of all mesh-part names in this node.
        */
-      std::deque<String> get_mesh_part_names() const
+      std::deque<String> get_mesh_part_names(bool no_internals = false) const
       {
         std::deque<String> names;
         for(auto it = _mesh_part_nodes.begin(); it != _mesh_part_nodes.end(); ++it)
         {
-          names.push_back((*it).first);
+          String mpname = (*it).first;
+          if(!(no_internals && (mpname.front() == '_')))
+            names.push_back(mpname);
         }
         return names;
       }
@@ -766,6 +774,26 @@ namespace FEAT
 
         // okay
         return fine_node;
+      }
+
+      /**
+       * \brief Searches this container for a halo meshpart
+       *
+       * \param[in] rank
+       * The rank of the neighbour for which the halo is to be found.
+       *
+       * \returns
+       * A (const) pointer to the halo meshpart or \c nullptr, if no such meshpart was found.
+       */
+      MeshPartType* find_halo_mesh_part(int rank)
+      {
+        return this->find_mesh_part(String("_halo:") + stringify(rank));
+      }
+
+      /** \copydoc find_halo_mesh_part() */
+      const MeshPartType* find_halo_mesh_part(int rank) const
+      {
+        return this->find_mesh_part(String("_halo:") + stringify(rank));
       }
 
       /**
