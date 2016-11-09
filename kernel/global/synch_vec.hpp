@@ -65,6 +65,7 @@ namespace FEAT
         _comm(comm),
         _mirrors(mirrors)
       {
+        TimeStamp ts_start;
         const std::size_t n = ranks.size();
 
         XASSERTM(mirrors.size() == n, "invalid vector mirror count");
@@ -98,6 +99,8 @@ namespace FEAT
           // post send
           _send_reqs.push_back(_comm.isend(buf.elements(), buf.size(), ranks.at(i)));
         }
+
+        Statistics::add_time_mpi_execute(ts_start.elapsed_now());
       }
 #else // non-MPI version
       SynchVectorTicket(VT_ &, const Dist::Comm&, const std::vector<int>& ranks, const std::vector<VMT_> &) :
@@ -133,6 +136,8 @@ namespace FEAT
 
         // wait for all sends to finish
         _send_reqs.wait_all();
+
+        Statistics::add_time_mpi_wait_spmv(ts_start.elapsed_now());
 #endif // FEAT_HAVE_MPI
 
         _finished = true;
