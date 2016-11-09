@@ -590,7 +590,7 @@ namespace StokesPoiseuille2D
 #ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(comm., args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(comm, args, domain);
       }
 #endif
       else
