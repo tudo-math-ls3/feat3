@@ -209,12 +209,12 @@ namespace FEAT
        *
        * Creates a vector with a given block count.
        */
-      explicit DenseVectorBlocked(Index size_in, bool pinned_allocation = false) :
+      explicit DenseVectorBlocked(Index size_in, Pinning pinning = Pinning::disabled) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        XASSERTM(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
+        XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
-        if (pinned_allocation)
+        if (pinning == Pinning::enabled)
         {
 #ifdef FEAT_HAVE_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size<Perspective::pod>()));
