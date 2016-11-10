@@ -2861,53 +2861,65 @@ namespace FEAT
       /**
        * \brief Prints a message line to an output stream
        *
+       * \param[in] os
+       * The output stream to write to. Must be a valid stream on the root process.
+       *
        * \param[in] msg
        * The message that is to be written to \p os.
-       * This function automatically appends a new-line after the message (of each rank).
+       * This function automatically appends a new-line after the message.
        *
        * \param[in] root
        * The root process that should perform the print.
-       * If set to -1, all processes send their message to rank 0,
-       * which prints all messages in rank order.
-       *
-       * \param[in] os
-       * The output stream to write to. Must be a valid stream on the root process.
        */
-      void print(const String& msg, int root, std::ostream& os) const;
+      void print(std::ostream& os, const String& msg, int root = 0) const;
 
       /**
        * \brief Prints a message line to the standard output stream \c cout
        *
        * \param[in] msg
-       * The message that is to be written to \p os.
-       * This function automatically appends a new-line after the message (of each rank).
+       * The message that is to be written to \p cout.
+       * This function automatically appends a new-line after the message.
        *
        * \param[in] root
        * The root process that should perform the print.
-       * If set to -1, all processes send their message to rank 0,
-       * which prints all messages in rank order.
        */
       void print(const String& msg, int root = 0) const
       {
-        print(msg, root, std::cout);
+        print(std::cout, msg, root);
       }
 
       /**
-       * \brief Prints a message line to the standard error stream \c cerr
+       * \brief Prints the ordered messages of all processes to an output stream
+       *
+       * \param[in] os
+       * The output stream to write to. Must be a valid stream on the root process.
        *
        * \param[in] msg
        * The message that is to be written to \p os.
-       * This function automatically appends a new-line after the message (of each rank).
+       * This function automatically appends a new-line after the message (of each rank)
+       * and prefixes each output line with the rank of the author process.
        *
        * \param[in] root
-       * The root process that should perform the print.
-       * If set to -1, all processes send their message to rank 0,
-       * which prints all messages in rank order.
+       * The root process that should collect the messages and perform the print.
        */
-      void print_cerr(const String& msg, int root = 0) const
+      void allprint(std::ostream& os, const String& msg, int root = 0) const;
+
+      /**
+       * \brief Prints the ordered messages of all processes to the standard output stream \c cout
+       *
+       * \param[in] msg
+       * The message that is to be written to \p cout.
+       * This function automatically appends a new-line after the message (of each rank)
+       * and prefixes each output line with the rank of the author process.
+       *
+       * \param[in] root
+       * The root process that should collect the messages and perform the print.
+       */
+      void allprint(const String& msg, int root = 0) const
       {
-        print(msg, root, std::cerr);
+        allprint(std::cout, msg, root);
       }
+
       // end of extended comm group
       ///@}
     }; // class Comm

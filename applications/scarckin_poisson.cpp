@@ -605,7 +605,7 @@ namespace PoissonDirichlet2D
       comm.print("Preparing domain...");
       if(args.check("mesh") < 1)
       {
-        comm.print_cerr("ERROR: Mandatory option --mesh is missing!");
+        comm.print(std::cerr, "ERROR: Mandatory option --mesh is missing!");
         FEAT::Runtime::abort();
       }
 

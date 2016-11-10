@@ -497,21 +497,18 @@ namespace FEAT
       bcast(data.data(), data.size(), root);
     }
 
-    void Comm::print(const String& msg, int root, std::ostream& os) const
+    void Comm::print(std::ostream& os, const String& msg, int root) const
     {
-      XASSERTM((-1 <= root) && (root < _size), "invalid root rank argument");
+      XASSERTM((0 <= root) && (root < _size), "invalid root rank argument");
+      if(root == _rank)
+        os << msg << std::endl;
+    }
 
-      // single rank output?
-      if(root >= 0)
-      {
-        if(root == _rank)
-          os << msg << std::endl;
-        return;
-      }
+    void Comm::allprint(std::ostream& os, const String& msg, int root) const
+    {
+      XASSERTM((0 <= root) && (root < _size), "invalid root rank argument");
 
-      // In this case, we have to print out the messages of all ranks
-
-      if(_rank == 0)
+      if(_rank == root)
       {
         // determine the rank padding size first:
         const std::size_t n = std::size_t(_size);
@@ -520,19 +517,19 @@ namespace FEAT
         // gather message lengths
         std::size_t mylen = msg.size();
         std::vector<std::size_t> lengths(n);
-        this->gather(&mylen, std::size_t(1), lengths.data(), std::size_t(1), 0);
+        this->gather(&mylen, std::size_t(1), lengths.data(), std::size_t(1), root);
 
         // receive and print messages
         for(int i(0); i < _size; ++i)
         {
           // allocate message buffer
           std::size_t length = lengths.at(std::size_t(i));
-          //if(length == std::size_t(0))
-          //  continue;
+          if(length == std::size_t(0))
+            continue;
 
           // get the message to be printed
           String message;
-          if(i == 0)
+          if(i == root)
             message = msg;
           else
           {
@@ -551,21 +548,20 @@ namespace FEAT
 
           // print all lines prefixed
           for(auto it = lines.begin(); it != lines.end(); ++it)
-            os << '[' << prefix << "]: " << (*it) << std::endl;
+            os << '[' << prefix << "] " << (*it) << std::endl;
         }
       }
-      else // 0 < rank < size
+      else // rank != root
       {
         // send the message length via gather
         std::size_t dummy(0), mylen = msg.size();
-        this->gather(&mylen, std::size_t(1), &dummy, std::size_t(1), 0);
+        this->gather(&mylen, std::size_t(1), &dummy, std::size_t(1), root);
 
         // send the message itself
-        //if(mylen > std::size_t(0))
-          this->send(msg.data(), mylen, 0);
+        if(mylen > std::size_t(0))
+          this->send(msg.data(), mylen, root);
       }
     }
-
 
     /* ######################################################################################### */
     /* ######################################################################################### */
@@ -942,7 +938,12 @@ namespace FEAT
       // nothing to do
     }
 
-    void Comm::print(const String& msg, int, std::ostream& os) const
+    void Comm::print(std::ostream& os, const String& msg, int) const
+    {
+      os << msg << std::endl;
+    }
+
+    void Comm::allprint(std::ostream& os, const String& msg, int) const
     {
       os << msg << std::endl;
     }

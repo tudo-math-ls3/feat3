@@ -452,10 +452,10 @@ namespace PoissonDirichlet2D
     {
       // print all unsupported options to cerr
       for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        comm.print_cerr("ERROR: unknown option '--" + (*it).second + "'");
+        comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
 
-      comm.print_cerr("Supported Options are:");
-      comm.print_cerr(args.get_supported_help());
+      comm.print(std::cerr, "Supported Options are:");
+      comm.print(std::cerr, args.get_supported_help());
 
       // abort
       FEAT::Runtime::abort();
@@ -483,7 +483,7 @@ namespace PoissonDirichlet2D
 
       if(args.check("mesh") < 1)
       {
-        comm.print_cerr("ERROR: Mandatory option --mesh is missing!");
+        comm.print(std::cerr, "ERROR: Mandatory option --mesh is missing!");
         FEAT::Runtime::abort();
       }
 

@@ -6,6 +6,7 @@
 #include <kernel/util/dist.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/statistics.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 namespace FEAT
 {

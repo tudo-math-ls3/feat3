@@ -523,7 +523,7 @@ namespace StokesPoiseuille2D
     {
       // print all unsupported options to cerr
       for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        comm.print_cerr("ERROR: unknown option '--" + (*it).second + "'");
+        comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
 
       // abort
       FEAT::Runtime::abort();
@@ -547,7 +547,7 @@ namespace StokesPoiseuille2D
       TimeStamp stamp1;
       if(args.check("mesh") < 1)
       {
-        comm.print_cerr("ERROR: Mandatory option --mesh is missing!");
+        comm.print(std::cerr, "ERROR: Mandatory option --mesh is missing!");
         FEAT::Runtime::abort();
       }
 
