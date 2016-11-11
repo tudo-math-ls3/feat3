@@ -47,7 +47,7 @@ public:
 
     if (typeid(Mem::CUDA) != typeid(Mem_))
     {
-      DenseVector<Mem::Main, DT_, IT_> pinned(10, true);
+      DenseVector<Mem::Main, DT_, IT_> pinned(10, Pinning::enabled);
       pinned(5, DT_(42));
       TEST_CHECK_EQUAL(pinned(5), DT_(42));
     }
