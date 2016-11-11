@@ -695,18 +695,6 @@ namespace FEAT
       InsertWeakClone( SparseMatrixELL )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      SparseMatrixELL shared() const
-      {
-        SparseMatrixELL r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Conversion method
        *

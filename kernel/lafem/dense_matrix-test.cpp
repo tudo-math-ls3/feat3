@@ -65,12 +65,6 @@ public:
     TEST_CHECK_NOT_EQUAL(h, c);
     TEST_CHECK_NOT_EQUAL((void *)h.elements(), (void *)c.elements());
 
-    h = c.shared();
-    TEST_CHECK_EQUAL(h, c);
-    h(1,2,3);
-    TEST_CHECK_EQUAL(h, c);
-    TEST_CHECK_EQUAL((void *)h.elements(), (void *)c.elements());
-
     auto kp = b.serialise();
     DenseMatrix<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, b);

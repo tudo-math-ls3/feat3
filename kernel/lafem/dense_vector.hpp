@@ -429,18 +429,6 @@ namespace FEAT
       InsertDeepClone( DenseVector )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      DenseVector shared() const
-      {
-        DenseVector r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Conversion method
        *

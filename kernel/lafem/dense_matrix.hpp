@@ -163,19 +163,6 @@ namespace FEAT
       InsertDeepClone ( DenseMatrix )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      DenseMatrix shared() const
-      {
-        DenseMatrix r;
-        r.assign(*this);
-        return r;
-      }
-
-
       /**
        * \brief Conversion method
        *

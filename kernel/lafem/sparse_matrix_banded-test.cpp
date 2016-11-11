@@ -116,9 +116,6 @@ public:
     c = z.clone(CloneMode::Deep);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)z.val());
     TEST_CHECK_NOT_EQUAL((void*)c.offsets(), (void*)z.offsets());
-    c = z.shared();
-    TEST_CHECK_EQUAL((void*)c.val(), (void*)z.val());
-    TEST_CHECK_EQUAL((void*)c.offsets(), (void*)z.offsets());
 
     DenseVector<Mem_, IT_, IT_> offsets_d(c.num_of_offsets(), c.offsets());
     DenseVector<Mem_, DT_, IT_> val_d(c.num_of_offsets() * c.rows(), c.val());

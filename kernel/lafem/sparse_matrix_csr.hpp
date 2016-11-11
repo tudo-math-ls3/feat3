@@ -577,18 +577,6 @@ namespace FEAT
       InsertWeakClone( SparseMatrixCSR )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      SparseMatrixCSR shared() const
-      {
-        SparseMatrixCSR r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Conversion method
        *

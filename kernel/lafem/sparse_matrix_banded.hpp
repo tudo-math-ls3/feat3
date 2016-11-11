@@ -602,18 +602,6 @@ namespace FEAT
       InsertWeakClone( SparseMatrixBanded )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      SparseMatrixBanded shared() const
-      {
-        SparseMatrixBanded r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Convertion method
        *

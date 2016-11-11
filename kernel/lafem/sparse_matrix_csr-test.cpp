@@ -149,9 +149,6 @@ public:
     c = b.clone(CloneMode::Deep);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
     TEST_CHECK_NOT_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
-    c = b.shared();
-    TEST_CHECK_EQUAL((void*)c.val(), (void*)b.val());
-    TEST_CHECK_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
 
     DenseVector<Mem_, IT_, IT_> col_ind(c.used_elements(), c.col_ind());
     DenseVector<Mem_, DT_, IT_> val(c.used_elements(), c.val());

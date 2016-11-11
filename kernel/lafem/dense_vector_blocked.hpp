@@ -411,19 +411,6 @@ namespace FEAT
         }
 
       /**
-       * \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      DenseVectorBlocked shared() const
-      {
-        DenseVectorBlocked r;
-        r.assign(*this);
-        return r;
-      }
-
-      /**
        * \brief Conversion method
        *
        * \param[in] other The source vector.

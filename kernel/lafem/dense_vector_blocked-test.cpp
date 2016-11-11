@@ -100,9 +100,6 @@ public:
     a(3, tv2);
     TEST_CHECK_EQUAL(a, c);
     TEST_CHECK_NOT_EQUAL(a, b);
-    c = a.shared();
-    TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
-    TEST_CHECK_EQUAL(a, c);
 
     DenseVector<Mem_, DT_, IT_> dv(12, DT_(2));
     dv(7, DT_(3));

@@ -675,18 +675,6 @@ namespace FEAT
       InsertDeepClone( SparseMatrixCOO )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      SparseMatrixCOO shared() const
-      {
-        SparseMatrixCOO r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Conversion method
        *

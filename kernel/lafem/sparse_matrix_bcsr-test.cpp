@@ -88,10 +88,6 @@ public:
     TEST_CHECK_EQUAL(e, c);
     TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_NOT_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
-    e = c.shared();
-    TEST_CHECK_EQUAL(e, c);
-    TEST_CHECK_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
-    TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
 
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> f(c.layout());
     TEST_CHECK_EQUAL(f.rows(), c.rows());

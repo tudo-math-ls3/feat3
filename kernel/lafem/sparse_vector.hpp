@@ -224,18 +224,6 @@ namespace FEAT
       InsertDeepClone( SparseVector )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      SparseVector shared() const
-      {
-        SparseVector r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Conversion method
        *

@@ -97,10 +97,6 @@ public:
     TEST_CHECK_NOT_EQUAL(c, b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
 
-    c = b.shared();
-    TEST_CHECK_EQUAL((void*)c.val(), (void*)b.val());
-    TEST_CHECK_EQUAL((void*)c.row_indices(), (void*)b.row_indices());
-
     decltype(c) d(c.layout());
     TEST_CHECK_NOT_EQUAL((void*)d.row_indices(), (void*)c.row_indices());
 

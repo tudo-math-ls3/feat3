@@ -440,18 +440,6 @@ namespace FEAT
       InsertWeakClone( SparseMatrixBCSR )
 /// \endcond
 
-      /** \brief Shallow copy operation
-       *
-       * Create a shallow copy of itself.
-       *
-       */
-      SparseMatrixBCSR shared() const
-      {
-        SparseMatrixBCSR r;
-        r.assign(*this);
-        return r;
-      }
-
       /**
        * \brief Conversion method
        *
