@@ -39,6 +39,7 @@ SET (test_list
   dense_matrix-test
   dense_vector-test
   dense_vector_blocked-test
+  matrix_mirror_buffer-test
   matrix_mult-test
   meta_filter-test
   meta_matrix-apply-test

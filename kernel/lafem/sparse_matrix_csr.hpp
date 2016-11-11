@@ -437,7 +437,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] graph The.graph to create the matrix from
+       * \param[in] graph The graph to create the matrix from
        *
        * Creates a CSR matrix based on a given adjacency graph, representing the sparsity pattern.
        */
