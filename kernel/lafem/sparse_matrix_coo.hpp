@@ -671,8 +671,9 @@ namespace FEAT
         return *this;
       }
 
-
+/// \cond nodoxy
       InsertDeepClone( SparseMatrixCOO )
+/// \endcond
 
       /** \brief Shallow copy operation
        *

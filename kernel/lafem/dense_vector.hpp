@@ -425,7 +425,9 @@ namespace FEAT
         return *this;
       }
 
+/// \cond nodoxy
       InsertDeepClone( DenseVector )
+/// \endcond
 
       /** \brief Shallow copy operation
        *

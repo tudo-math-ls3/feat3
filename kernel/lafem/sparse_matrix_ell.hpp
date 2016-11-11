@@ -691,7 +691,9 @@ namespace FEAT
         return *this;
       }
 
+/// \cond nodoxy
       InsertWeakClone( SparseMatrixELL )
+/// \endcond
 
       /** \brief Shallow copy operation
        *

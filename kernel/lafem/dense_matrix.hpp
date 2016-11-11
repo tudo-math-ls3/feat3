@@ -159,7 +159,9 @@ namespace FEAT
         return *this;
       }
 
+/// \cond nodoxy
       InsertDeepClone ( DenseMatrix )
+/// \endcond
 
       /** \brief Shallow copy operation
        *
