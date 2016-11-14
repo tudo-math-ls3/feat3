@@ -47,7 +47,7 @@ namespace FEAT
         {
           functor.alias("simpson", 3);
           functor.alias("pulcherrima", 4);
-          functor.alias("milne-bool", 5);
+          functor.alias("milne-boole", 5);
           functor.alias("6-point", 6);
           functor.alias("weddle", 7);
         }
@@ -83,7 +83,7 @@ namespace FEAT
             rule.get_coord(2) = Coord_(1);
 
             rule.get_weight(0) = Weight_(1) / Weight_(3);
-            rule.get_weight(1) = Weight_(2) / Weight_(3);
+            rule.get_weight(1) = Weight_(4) / Weight_(3);
             rule.get_weight(2) = Weight_(1) / Weight_(3);
             break;
 
