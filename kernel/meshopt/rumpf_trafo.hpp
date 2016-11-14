@@ -153,6 +153,8 @@ namespace FEAT
        * \param[in] h
        * The local optimal edge length.
        *
+       * \returns
+       * The local material matrix.
        */
       static MatTensorType compute_mat_tensor(const Tx& x, const DataType_& h);
     }; // struct RumpfTrafo;

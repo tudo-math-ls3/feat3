@@ -20,7 +20,7 @@ namespace FEAT
      * \tparam DataType_
      * Our data type
      *
-     **/
+     */
     template<typename DataType_>
     class RumpfFunctionalBase
     {
@@ -116,23 +116,52 @@ namespace FEAT
      *
      * \f[
      *   L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2
-     *                          + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2 +
-     *                          +fac\_det (\det \nabla R_K)^p
-     *   + \frac{fac\_rec\_det}{\det \nabla R_K + \sqrt(\mathrm{fac\_reg}^2 + (\det \nabla R_K)^2)}
+     *                          + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2
+     *                          + fac\_det (\det \nabla R_K)^{p_d}
+     *   + \frac{fac\_rec\_det}{A\det \nabla R_K + \sqrt{(\mathrm{fac\_reg}^2 + (\det \nabla R_K)^2)}}
      * \f]
      *
      * For the computation of the gradient of \f$ L \f$, we need to calculate some directional derivatives wrt.
      * matrices.
      *
-     * Let \f$ M: \mathbb{R} \to \mathbb{R}^{d \times d} be a matrix valued mapping. Then we have the following
+     * Let \f$ M: \mathbb{R} \to \mathbb{R}^{d \times d} \f$ be a matrix valued mapping. Then we have the following
      * identities:
      * \f{align*}
-     *    \frac{d}{dt}M(t)^{-1} = - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
-     *    \frac{d}{dt} \| M(t) \|_F^2 =  M(t) : \frac{d M}{d t}(t)\\
-     *    \frac{d}{dt} \mathrm{det}( M(t) ) =  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)\\
-     *    \frac{d}{dt} \mathrm{cof}( M(t) ) =  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{cof}(M(t))
-     *    - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{cof}(M(t))
+     *    \frac{d}{dt} M(t)^{-1} &= - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
+     *    \frac{d}{dt} \| M(t) \|_F^2 &=  M(t) : \frac{d M}{d t}(t)\\
+     *    \frac{d}{dt} \mathrm{cof}( M(t) ) &=  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{cof}(M(t))
+     *    - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{cof}(M(t)) \\
+     *    \frac{d}{dt} \mathrm{det}( M(t) ) &=  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)
+     * \f}
+     * With this, we can compute directional derivatives of a function \f$ f: \mathbb{R}^{d \times d} \to V \f$ with
+     * e.g. \f$ V = \mathbb{R} \f$ or \f$ V = \mathbb{R}^{d \times d} \f$ with regard to matrices according to
+     * \f[
+     *   M(t) = A + tB, \quad f'(A)B = \left. \frac{d f(M(t))}{dt}\right|_{t = 0}.
      * \f]
+     * Here, \f$ M(0) = A \f$ and \f$ \frac{d M}{d t}(t) = B \f$. For computing the directional derivatives of this
+     * RumpfFunctional, set \f$ A = \nabla R_K \f$ (the current FE function) and \f$ B = \nabla \eta \f$
+     * (test function). Because the form is nonlinear, it cannot be represented as a matrix where the columns are
+     * associated with the trial functions.
+     *
+     * So we get
+     * \f{align*}
+     *   \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)' \eta &= 4(\| \nabla R_K \|_F^2 - d)
+     *   \nabla R_K : \nabla \eta \\
+     *   \frac{d}{dt} \left( (\| \mathrm{cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta & =
+     *     4(\| \mathrm{cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{cof}(\nabla R_K) :
+     *      \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{cof}(\nabla R_K) \right) \\
+     *   \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta & = p \mathrm{det}(\nabla R_K )^p
+     *   \nabla R_K)^{-1} : \nabla \eta.
+     * \f}
+     *
+     * Note that the test functiona \f$ \eta \f$ might not be the standard FE basis functions as defined by the FE
+     * space used (call those \f$ \hat{\eta} \f$). They might be with regard to a different reference cell, so a
+     * transformation is involved, which is realised by passing the [c] material tensor [/c] \f$ M \f$ (which can be
+     * identified with a matrix in this case) to corresponding functions and using the relation
+     * \f[
+     *   \nabla \eta = M^T \nabla \hat{\eta},
+     * \f]
+     * which is nothing but the chain rule applied to \f$ \eta := \hat{\eta} \circ M\f$.
      *
      */
 #ifndef DOXYGEN
@@ -145,6 +174,46 @@ namespace FEAT
     template<typename DataType_, typename TrafoType_>
     class RumpfFunctional
     {
+      public:
+        /// Our baseclass
+        typedef RumpfFunctionalBase<DataType_> BaseClass;
+
+        /// Our data type
+        typedef DataType_ DataType;
+        /// Our shape dimension
+        static constexpr int shape_dim = shape_dim_;
+        /// Our world dimension - only world_dim == shape_dim is supported
+        static constexpr int world_dim = shape_dim;
+        /// Shape type of the underlying transformation
+        typedef Shape::Hypercube<shape_dim_> ShapeType;
+        /// The transformation this functional works on
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<ShapeType, world_dim, world_dim, DataType_>> TrafoType;
+        /// The FE space associated with the transformation
+        typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+
+        /// Type for a pack of local vertex coordinates
+        typedef Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, world_dim> Tx;
+        /// Type for the gradient of the local cell sizes
+        typedef Tiny::Vector<DataType_, Shape::FaceTraits<ShapeType,0>::count*world_dim> Tgradh;
+
+        /// Type for the gradient of the local reference mapping
+        typedef Tiny::Matrix<DataType_, shape_dim, world_dim> TgradR;
+
+        /// Type for evaluating the transformation
+        typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+        /// Type for evaluating the FE functions
+        typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+
+        /// We need the Trafo to evaluate the image point, the Jacobian and its determinant
+        static constexpr TrafoTags trafo_config = TrafoTags::img_point | TrafoTags::jac_mat | TrafoTags::jac_det;
+        /// For the FE space, we only need the gradients on the reference cell
+        static constexpr SpaceTags space_config = SpaceTags::ref_grad;
+
+        /// Data from evaluating the transformation
+        typedef typename TrafoEvaluator::template ConfigTraits<trafo_config>::EvalDataType TrafoEvalData;
+        /// Data from evaluating FE spaces
+        typedef typename SpaceEvaluator::template ConfigTraits<space_config>::EvalDataType SpaceEvalData;
+
       /**
        * \brief Constructor
        *
@@ -162,13 +231,16 @@ namespace FEAT
        * \param[in] fac_reg_
        * Regularisation factor for the Rumpf functional
        *
+       * \param[in] exponent_det_
+       * The exponent for the det term, called \f$ p_d \f$ above.
+       *
        * Because we want the functional to have a minimum if the mesh consists of correctly scaled versions of the
        * optimal element (that is, every local transformation is the identity modulo translation), fac_det and
        * fac_rec_det are now coupled.
        *
-       * \f$ f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac_reg}^2 + d^2}} \f$
-       * We want to have \f$ f'(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac_reg}^2 + d^2} +
-       * \mathrm{fac_reg}^2 + d^2} \f$ for \f$ p = 1 \f$ or
+       * \f$ f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac\_reg}^2 + d^2}} \f$
+       * We want to have \f$ f'(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac\_reg}^2 + d^2} +
+       * \mathrm{fac\_reg}^2 + d^2} \f$ for \f$ p = 1 \f$ or
        * \f$ c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac\_reg}^2 + d^2} + \mathrm{fac\_reg}^2 + d^2)} \f$ for \f$ d = 1 \f$ for p = 2.
        *
        **/
@@ -176,60 +248,80 @@ namespace FEAT
         const DataType_ fac_frobenius_,
         const DataType_ fac_det_,
         const DataType_ fac_cof_,
-        const DataType_ fac_reg_);
+        const DataType_ fac_reg_,
+        const int exponent_det_);
 
       /**
-       * \brief Computes value the Rumpf functional on one element.
+       * \brief Computes the functional's value and gradient on one cell
        *
-       * \tparam Tx_
-       * Type for the cell coordinates x
+       * \param[out] fval
+       * The functional value on this cell.
        *
-       * \tparam Th_
-       * Type for the local mesh size
+       * \param[out] grad
+       * The contribution of this cell to the global gradient.
+       *
+       * \param[in] mat_tensor
+       * The material function.
+       *
+       * \param[in] trafo_eval
+       * Evaluator for the transformation.
+       *
+       * \param[in] space_eval
+       * Evaluator for the FE spaces.
        *
        * \param[in] x
        * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
-       * define the cell \f$ K \f$.
+       * define the cell \f$ K \f$. These are the coefficients for the FE function representing the transformation.
        *
        * \param[in] h
        * (world_dim) - vector that holds the dimensions of the target reference cell
-       *
-       * \returns
-       * Local contribution to functional value
        *
        * Computes the local functional value for one cell defined by the coordinates x with regard
        * to the reference cell which depends on the shape type.
        *
        */
-      template<typename Tx_, typename Th_>
-      DataType_ eval_fval_grad(const Tx_& x, const Th_& h);
+      void eval_fval_grad( DataType& DOXY(fval), Tx& DOXY(grad), const TgradR& DOXY(mat_tensor),
+      const TrafoEvaluator& DOXY(trafo_eval), const SpaceEvaluator& DOXY(space_eval),
+      const Tx& DOXY(x), const DataType& DOXY(h));
 
       /**
-       * \copydoc compute_local_functional()
+       * \brief Computes the different contributions to the functional's value on one cell
        *
-       * \tparam Tx_
-       * Type for the cell coordinates x
+       * \param[out] fval
+       * The functional value on this cell.
        *
-       * \tparam Th_
-       * Type for the local mesh size
+       * \param[in] mat_tensor
+       * The material function.
        *
-       * \param[in] func_norm
-       * Contribution from the Frobenius norm
+       * \param[in] trafo_eval
+       * Evaluator for the transformation.
        *
-       * \param[in] func_det
-       * Contribution from the det term
+       * \param[in] space_eval
+       * Evaluator for the FE spaces.
        *
-       * \param[in] func_rec_det
-       * Contribution from the 1/det term
+       * \param[in] x
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
+       * define the cell \f$ K \f$. These are the coefficients for the FE function representing the transformation.
        *
-       * Debug variant that also returns the contributions of the different terms seperately.
+       * \param[in] h
+       * The local optimal scale.
        *
-       **/
-      template<typename Tx_, typename Th_>
-      DataType_ eval_fval_cellwise(const Tx_& x, const Th_& h,
-      DataType_& func_norm,
-      DataType_& func_det,
-      DataType_& func_rec_det);
+       * \param[out] fval_frobenius
+       * Contribution of \f$ \| \nabla R_K \|_F^2 \f$.
+       *
+       * \param[out] fval_cof
+       * Contribution of \f$ \| \mathbb{cof}(\nabla R_K) \|_F^2 \f$.
+       *
+       * \param[out] fval_det
+       * Contribution of \f$ \mathbb{det}(\nabla R_K)\f$.
+       *
+       * \note: This is for debugging and visualisation purposes and does not compute the local gradient.
+       *
+       */
+      void eval_fval_cellwise( DataType& DOXY(fval), const TgradR& DOXY(mat_tensor),
+      const TrafoEvaluator& DOXY(trafo_eval), const SpaceEvaluator& DOXY(space_eval),
+      const Tx& DOXY(x), const DataType& DOXY(h),
+      DataType& DOXY(fval_frobenius), DataType& DOXY(fval_cof), DataType& DOXY(fval_det));
 
       /**
        * \brief Adds the gradient h part to the local gradient
@@ -258,34 +350,30 @@ namespace FEAT
        *   (s_d s_c)^{-2}
        * \f}
        *
-       * \tparam Tgrad_
-       * Type of the local gradient, i.e. Tiny::Matrix
-       *
-       * \tparam Tx_
-       * Type of the local vertex coordinates, i.e. Tiny::Matrix
-       *
-       * \tparam Th_
-       * Type of the local optimal scales, i.e. Tiny::Vector
-       *
-       * \tparam Tgrad_
-       * Type of the local gradient of h, i.e. Tiny::Vector of length dimension*(number of local vertices).
-       * This is due to the structure of DenseVectorBlocked.
-       *
        * \param grad
-       * The local gradient of the functional
+       * The local gradient of the functional to which the contribution is added.
        *
-       * \param x
-       * The local vertex coordinates
+       * \param[in] mat_tensor
+       * The material function.
        *
-       * \param h
-       * The local optimal scales
+       * \param[in] trafo_eval
+       * Evaluator for the transformation.
+       *
+       * \param[in] space_eval
+       * Evaluator for the FE spaces.
+       *
+       * \param[in] x
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
+       * define the cell \f$ K \f$. These are the coefficients for the FE function representing the transformation.
+       *
+       * \param[in] h
+       * The local optimal scale
        *
        * \param grad_h
        * The gradient of h wrt. the local vertex coordinates
        *
-       **/
-      template<typename Tgrad_, typename Tx_, typename Th_, typename Tgradh_>
-      void add_grad_h_part(Tgrad_& grad, const Tx_& x, const Th_& h, const Tgradh_& grad_h);
+       */
+        void add_grad_h_part(Tx& grad, const TgradR& mat_tensor, const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval, const Tx& DOXY(x), const DataType& h, const Tgradh& grad_h)
 
     };
 #endif
