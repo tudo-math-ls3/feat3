@@ -39,117 +39,117 @@ namespace FEAT
 #endif
 
         template <typename DT_, typename IT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
-          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
         }
 
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
 #ifdef FEAT_HAVE_MKL
-          csr_mkl(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          csr_mkl(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
 #else
-          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
 #endif
         }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void csr(__float128 * r, const __float128 a, const __float128 * const x, const __float128 * const y, const __float128 * const val,
+        static void csr(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
                         const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
-          csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
         }
 #endif
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
 #ifdef FEAT_HAVE_MKL
           if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
-            csrb_mkl(r, a, x, y, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
+            csrb_mkl(r, a, x, b, y, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
           else
-            csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+            csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
 #else
-          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
 #endif
         }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(__float128 * r, const __float128 a, const __float128 * const x, const __float128 * const y, const __float128 * const val,
+        static void csrb(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          csrb_generic<__float128, IT_, BlockHeight_, BlockWidth_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+          csrb_generic<__float128, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
 #endif
 
         template <typename DT_, typename IT_, int BlockSize_>
-        static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          csrsb_generic<DT_, IT_, BlockSize_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+          csrsb_generic<DT_, IT_, BlockSize_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
+        static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
         {
-          ell_generic(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          ell_generic(r, a, x, b, y, val, col_ind, cs, cl, C, rows);
         }
 
         template <typename DT_, typename IT_>
-        static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
+          coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
         }
 
         template <typename DT_>
-        static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
 #ifdef FEAT_HAVE_MKL
-          coo_mkl(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
+          coo_mkl(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
 #else
-          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
+          coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
 #endif
         }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void coo(__float128 * r, const __float128 a, const __float128 * const x, const __float128 * const y, const __float128 * const val,
+        static void coo(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
                         const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
+          coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
         }
 #endif
 
         template <typename DT_, typename IT_>
-        static void banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+        static void banded(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
-          banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
+          banded_generic(r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns);
         }
 
         template <typename DT_>
-        static void dense(DT_ * r, const DT_ alpha, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+        static void dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
         {
 #ifdef FEAT_HAVE_MKL
-          dense_mkl(r, alpha, y, val, x, rows, columns);
+          dense_mkl(r, alpha, beta, y, val, x, rows, columns);
 #else
-          dense_generic(r, alpha, y, val, x, rows, columns);
+          dense_generic(r, alpha, beta, y, val, x, rows, columns);
 #endif
         }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void dense(__float128 * r, const __float128 alpha, const __float128 * const y, const __float128 * const val, const __float128 * const x, const Index rows, const Index columns)
+        static void dense(__float128 * r, const __float128 alpha, const __float128 beta, const __float128 * const y, const __float128 * const val, const __float128 * const x, const Index rows, const Index columns)
         {
-          dense_generic(r, alpha, y, val, x, rows, columns);
+          dense_generic(r, alpha, beta, y, val, x, rows, columns);
         }
 #endif
 
@@ -158,71 +158,71 @@ namespace FEAT
         static void dv_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
 
         template <typename DT_, typename IT_>
-        static void csr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void csr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index, const bool);
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void csrb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_, int BlockSize_>
-        static void csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
+        static void csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
-        static void ell_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
+        static void ell_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
 
         template <typename DT_, typename IT_>
-        static void coo_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+        static void coo_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_, typename IT_>
-        static void banded_generic(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
+        static void banded_generic(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns);
 
         template <typename DT_>
-        static void dense_generic(DT_ * r, const DT_ alpha, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
+        static void dense_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
 
         static void dv_mkl(float * r, const float a, const float * const x, const float * const y, const Index size);
         static void dv_mkl(double * r, const double a, const double * const x, const double * const y, const Index size);
 
-        static void csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
-        static void csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
+        static void csr_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
+        static void csr_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
 
-        static void csrb_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
-        static void csrb_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
+        static void csrb_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
+        static void csrb_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
 
-        static void coo_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows,
+        static void coo_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows,
         const Index columns, const Index used_elements);
-        static void coo_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr,
+        static void coo_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr,
         const Index rows, const Index columns, const Index used_elements);
 
-        static void dense_mkl(float * r, const float alpha, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns);
-        static void dense_mkl(double * r, const double alpha, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns);
+        static void dense_mkl(float * r, const float alpha, const float beta, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns);
+        static void dense_mkl(double * r, const double alpha, const double beta, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns);
       };
 
 #ifdef FEAT_EICKT
       extern template void Axpy<Mem::Main>::dv_generic(float *, const float, const float * const, const float * const, const Index);
       extern template void Axpy<Mem::Main>::dv_generic(double *, const double, const double * const, const double * const, const Index);
 
-      extern template void Axpy<Mem::Main>::csr_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-      extern template void Axpy<Mem::Main>::csr_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
-      extern template void Axpy<Mem::Main>::csr_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-      extern template void Axpy<Mem::Main>::csr_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+      extern template void Axpy<Mem::Main>::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+      extern template void Axpy<Mem::Main>::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+      extern template void Axpy<Mem::Main>::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+      extern template void Axpy<Mem::Main>::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
 
-      extern template void Axpy<Mem::Main>::ell_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::ell_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::ell_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::ell_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::ell_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::ell_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::ell_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::ell_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
 
-      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
-      extern template void Axpy<Mem::Main>::banded_generic(float *, const float * const, const float, const float * const, const Index * const, const float * const, const Index, const Index, const Index);
-      extern template void Axpy<Mem::Main>::banded_generic(double *, const double * const, const double, const double * const, const Index * const, const double * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const Index * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const Index * const, const Index, const Index, const Index);
 
-      extern template void Axpy<Mem::Main>::dense_generic(float *, const float, const float * const, const float * const, const float * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::dense_generic(double *, const double, const double * const, const double * const, const double * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);
 #endif
 
       template <>
@@ -232,13 +232,13 @@ namespace FEAT
         static void dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
 
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
+        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
 
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
+        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
         {
           static_assert(BlockHeight_ == BlockWidth_, "cuda bcsr only supports squared matrix blocks!");
           //static_assert(std::is_same<IT_, unsigned int>::value, "cuda bcsr only supports unsigned int!");
@@ -246,26 +246,26 @@ namespace FEAT
           {
             throw InternalError(__func__, __FILE__, __LINE__, "cuda bscr only supports unsigned int!");
           }
-          csrb_intern(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_);
+          csrb_intern(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_);
         }
 
         template <typename DT_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize);
+        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize);
 
         template <typename DT_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize);
+        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize);
 
         template <typename DT_, typename IT_, int BlockSize_>
-        static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements);
+        static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
+        static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
 
         template <typename DT_, typename IT_>
-        static void banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
+        static void banded(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const Index num_of_offsets, const Index rows, const Index columns);
 
         template <typename DT_>
-        static void dense(DT_ * r, const DT_ alpha, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
+        static void dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
       };
 
     } // namespace Arch

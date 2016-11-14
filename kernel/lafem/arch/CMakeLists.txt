@@ -16,9 +16,6 @@ if (FEAT_EICKT)
     axpy_generic_banded-eickt.cpp
     component_invert_generic-eickt.cpp
     component_product_generic-eickt.cpp
-    defect_generic-eickt.cpp
-    defect_generic_ell-eickt.cpp
-    defect_generic_banded-eickt.cpp
     diagonal_generic-eickt.cpp
     difference_generic-eickt.cpp
     dot_product_generic-eickt.cpp
@@ -26,9 +23,6 @@ if (FEAT_EICKT)
     max_element_generic-eickt.cpp
     norm_generic-eickt.cpp
     product_matmat_generic-eickt.cpp
-    product_matvec_generic-eickt.cpp
-    product_matvec_generic_ell-eickt.cpp
-    product_matvec_generic_banded-eickt.cpp
     scale_generic-eickt.cpp
     scale_row_col_generic-eickt.cpp
     scatter_axpy_prim_generic-eickt.cpp
@@ -43,13 +37,11 @@ if (FEAT_HAVE_MKL)
   SET (kernel-lafem-arch-list ${kernel-lafem-arch-list}
     axpy_mkl.cpp
     component_product_mkl.cpp
-    defect_mkl.cpp
     difference_mkl.cpp
     dot_product_mkl.cpp
     max_element_mkl.cpp
     norm_mkl.cpp
     product_matmat_mkl.cpp
-    product_matvec_mkl.cpp
     scale_mkl.cpp
     sum_mkl.cpp
   )
@@ -72,7 +64,6 @@ if (FEAT_HAVE_CUDA)
     axpy.cu
     component_invert.cu
     component_product.cu
-    defect.cu
     difference.cu
     diagonal.cu
     dot_product.cu
@@ -80,7 +71,6 @@ if (FEAT_HAVE_CUDA)
     max_element.cu
     norm.cu
     product_matmat.cu
-    product_matvec.cu
     scale.cu
     scale_row_col.cu
     scatter_axpy_prim.cu

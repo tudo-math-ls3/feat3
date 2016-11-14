@@ -167,7 +167,7 @@ public:
         {
           sum += a_local(i, j) * x_local(j);
         }
-        ref_local(i, y(i) - sum);
+        ref_local(i, y_local(i) - sum);
       }
 
       for (Index i(0) ; i < r.size() ; ++i)

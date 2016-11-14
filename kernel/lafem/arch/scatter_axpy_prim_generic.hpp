@@ -8,7 +8,6 @@
 
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
-#include <kernel/lafem/arch/product_matvec.hpp>
 
 namespace FEAT
 {

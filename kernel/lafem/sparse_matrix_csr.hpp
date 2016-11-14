@@ -18,8 +18,6 @@
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/product_matvec.hpp>
-#include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/lafem/arch/lumping.hpp>
@@ -1897,13 +1895,24 @@ namespace FEAT
        *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
+       * \param[in] transposed Should the product use the transposed matrix?
        */
-      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x, bool transposed = false) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        if (transposed)
+        {
+          if (r.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        }
+        else
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        }
 
         TimeStamp ts_start;
 
@@ -1917,8 +1926,8 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::ProductMatVec<Mem_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
-                                              x.elements(), this->rows(), columns(), used_elements());
+        Arch::Axpy<Mem_>::csr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
+            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1953,9 +1962,9 @@ namespace FEAT
 
 
         Statistics::add_flops(this->used_elements() * 2 * BlockSize_);
-        Arch::ProductMatVec<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
-          r.template elements<Perspective::pod>(), this->val(), this->col_ind(), this->row_ptr(),
-          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
+        Arch::Axpy<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+            r.template elements<Perspective::pod>(), DT_(1.), x.template elements<Perspective::pod>(), DT_(0.), r.template elements<Perspective::pod>(),
+            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1998,40 +2007,19 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        if (transposed)
-        {
-          Statistics::add_flops(this->used_elements() * 3);
-          Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
-                                       this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
-        }
-
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements() * 3);
-          Arch::Defect<Mem_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
-                                         this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          r.copy(y);
-        // r <- y + alpha*A*x
-        else
-        {
-          Statistics::add_flops(this->used_elements() * 3);
-          Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
-                                       this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
-        }
+        Statistics::add_flops(this->used_elements() * 3);
+        Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
+            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -2063,35 +2051,20 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
-          Arch::Defect<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
-              r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->val(), this->col_ind(),
-              this->row_ptr(), x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          r.copy(y);
-        // r <- y + alpha*A*x
-        else
-        {
-          Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
-          Arch::Axpy<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
-              r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(),
-              this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-        }
+        Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
+        Arch::Axpy<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(),
+            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));

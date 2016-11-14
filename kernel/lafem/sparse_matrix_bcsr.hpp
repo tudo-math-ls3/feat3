@@ -15,8 +15,6 @@
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/product_matvec.hpp>
-#include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -1185,9 +1183,9 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.elements(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-          x.elements(), this->rows(), columns(), used_elements());
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1219,9 +1217,9 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-          x.elements(), this->rows(), columns(), used_elements());
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
+            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1253,9 +1251,9 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.elements(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1287,9 +1285,9 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+            this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1318,37 +1316,21 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          r.format();
+          r.copy(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
 
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-            x.elements(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          r.copy(y);
-        // r <- y + alpha*x
-        else
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), alpha, x.elements(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-        }
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1377,36 +1359,20 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          r.format();
+          r.copy(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          //r.copy(y);
-          r.convert(y);
-        // r <- y + alpha*x
-        else
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), alpha, x.elements(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-        }
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1435,36 +1401,20 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          r.format();
+          r.copy(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),  this->row_ptr(),
-            x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          //r.copy(y);
-          r.convert(y);
-        // r <- y + alpha*x
-        else
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), alpha, x.template elements<Perspective::pod>(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-        }
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1493,35 +1443,20 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          r.format();
+          r.copy(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-            x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          r.copy(y);
-        // r <- y + alpha*A*x
-        else
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-        }
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1550,35 +1485,20 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        if (this->used_elements() == 0)
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          r.format();
+          r.convert(y);
+          //r.scale(beta);
           return;
         }
 
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
-            x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          r.convert(y);
-        // r <- y + alpha*A*x
-        else
-        {
-          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+        Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-        }
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));

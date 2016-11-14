@@ -14,8 +14,6 @@
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/product_matvec.hpp>
-#include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 
@@ -964,13 +962,16 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        Arch::ProductMatVec<Mem_>::banded(r.elements(),
-                                                 this->val(),
-                                                 this->offsets(),
-                                                 x.elements(),
-                                                 this->num_of_offsets(),
-                                                 this->rows(),
-                                                 this->columns());
+        Arch::Axpy<Mem_>::banded(r.elements(),
+            DT_(1),
+            x.elements(),
+            DT_(0),
+            r.elements(),
+            this->val(),
+            this->offsets(),
+            this->num_of_offsets(),
+            this->rows(),
+            this->columns());
       }
 
       /**
@@ -996,35 +997,23 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_>::banded(r.elements(),
-                                            y.elements(),
-                                            this->val(),
-                                            this->offsets(),
-                                            x.elements(),
-                                            this->num_of_offsets(),
-                                            this->rows(),
-                                            this->columns());
-        }
-        //r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
           r.copy(y);
-        // r <- y + alpha*A*x
-        else
-        {
-          Arch::Axpy<Mem_>::banded(r.elements(),
-                                          y.elements(),
-                                          alpha,
-                                          this->val(),
-                                          this->offsets(),
-                                          x.elements(),
-                                          this->num_of_offsets(),
-                                          this->rows(),
-                                          this->columns());
+          //r.scale(beta);
+          return;
         }
+
+        Arch::Axpy<Mem_>::banded(r.elements(),
+            alpha,
+            x.elements(),
+            DT_(1),
+            y.elements(),
+            this->val(),
+            this->offsets(),
+            this->num_of_offsets(),
+            this->rows(),
+            this->columns());
       }
       ///@}
 
@@ -1159,13 +1148,13 @@ namespace FEAT
       /// Returns first row-index of the diagonal matching to the offset i
       Index start_offset(const Index i) const
       {
-        return Arch::Intern::ProductMatVecBanded::start_offset(i, offsets(), rows(), columns(), num_of_offsets());
+        return Arch::Intern::AxpyBanded::start_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
 
       /// Returns last row-index of the diagonal matching to the offset i
       Index end_offset(const Index i) const
       {
-        return Arch::Intern::ProductMatVecBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
+        return Arch::Intern::AxpyBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
 
       /* ******************************************************************* */

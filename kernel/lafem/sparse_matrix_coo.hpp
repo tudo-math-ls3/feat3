@@ -16,8 +16,6 @@
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/product_matvec.hpp>
-#include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/math.hpp>
@@ -1882,8 +1880,8 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        Arch::ProductMatVec<Mem_>::coo(r.elements(), this->val(), this->row_indices(),
-                                              this->column_indices(), x.elements(), this->rows(), this->used_elements());
+        Arch::Axpy<Mem_>::coo(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
+            this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
       }
 
       /**
@@ -1910,22 +1908,14 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        // check for special cases
-        // r <- y - A*x
-        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        if(used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_>::coo(r.elements(), y.elements(), this->val(),
-                                         this->row_indices(), this->column_indices(), x.elements(), this->rows(), this->columns(), this->used_elements());
-        }
-        // r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
           r.copy(y);
-        // r <- y + alpha*A*x
-        else
-        {
-          Arch::Axpy<Mem_>::coo(r.elements(), alpha, x.elements(), y.elements(),
-                                       this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
+          return;
         }
+
+        Arch::Axpy<Mem_>::coo(r.elements(), alpha, x.elements(), DT_(1), y.elements(),
+            this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
       }
       ///@}
 
