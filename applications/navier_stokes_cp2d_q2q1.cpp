@@ -327,6 +327,9 @@ namespace NaverStokesCP2D
     // enables verbose statistics output
     bool statistics;
 
+    // specifies whether we run in test mode
+    bool test_mode;
+
   public:
     Config() :
       level_min_in(0),
@@ -356,7 +359,8 @@ namespace NaverStokesCP2D
       tol_rel_s(1E-5),
       smooth_steps_s(4),
       smooth_damp_s(0.5),
-      statistics(false)
+      statistics(false),
+      test_mode(false)
     {
       const char* mpath = getenv("FEAT3_PATH_MESHES");
       if(mpath != nullptr)
@@ -383,7 +387,11 @@ namespace NaverStokesCP2D
           return false;
         }
       }
+
       deformation = (args.check("deformation") >= 0);
+      statistics = (args.check("statistics") >= 0);
+      test_mode = (args.check("test-mode") >= 0);
+
       args.parse("mesh-path", mesh_path);
       args.parse("mesh-file", mesh_file);
       if(args.parse("vtk", vtk_name, vtk_step) == 1)
@@ -411,7 +419,10 @@ namespace NaverStokesCP2D
       args.parse("tol-rel-s", tol_rel_s);
       args.parse("smooth-s", smooth_steps_s);
       args.parse("damp-s", smooth_damp_s);
-      statistics = args.check("statistics") >= 0;
+
+      // only 5 time-steps in test mode
+      if(test_mode)
+        max_time_steps = 5;
 
       return true;
     }
@@ -447,6 +458,7 @@ namespace NaverStokesCP2D
       dump_line(comm, "S: Tol-Rel", tol_rel_s);
       dump_line(comm, "S: Smooth Steps", smooth_steps_s);
       dump_line(comm, "S: Smooth Damp", smooth_damp_s);
+      dump_line(comm, "Test Mode", (test_mode ? "yes" : "no"));
       dump_line(comm, "Statistics", statistics);
     }
 
@@ -928,7 +940,7 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Creating gates...");
+    comm.print("\nCreating gates...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -1415,6 +1427,15 @@ namespace NaverStokesCP2D
 
     watch_total.stop();
 
+    // are we in test-mode?
+    if(cfg.test_mode)
+    {
+      if(failure)
+        comm.print("\nTest-Mode: FAILED");
+      else
+        comm.print("\nTest-Mode: PASSED");
+    }
+
     // release pressure solvers
     solver_s->done();
     if(cfg.multigrid_s)
@@ -1507,6 +1528,7 @@ namespace NaverStokesCP2D
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
     args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.5\n");
     args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete stastistics dump");
+    args.support("test-mode", "Runs the application in regression test mode.");
     args.support("parti-type");
     args.support("parti-name");
     args.support("parti-rank-elems");
