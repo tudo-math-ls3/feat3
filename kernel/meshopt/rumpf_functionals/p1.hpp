@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONALS_2D_P1_HPP
-#define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_2D_P1_HPP 1
+#ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONALS_P1_HPP
+#define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_P1_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -584,4 +584,4 @@ namespace FEAT
     /// \endcond
   } // namespace Meshopt
 } // namespace FEAT
-#endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_2D_P1_HPP
+#endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_P1_HPP

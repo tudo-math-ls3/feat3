@@ -13,14 +13,18 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
-
 #include <kernel/meshopt/rumpf_trafo.hpp>
-#include <kernel/meshopt/rumpf_functional.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1.hpp>
 #include <kernel/util/comm_base.hpp>
 
 #include <map>
+
+// This is for the explicit template instantiation below
+#ifdef FEAT_EICKT
+#include <kernel/meshopt/rumpf_functional.hpp>
+#include <kernel/meshopt/rumpf_functionals/p1.hpp>
+#include <kernel/meshopt/rumpf_functionals/q1.hpp>
+#endif
+
 
 namespace FEAT
 {

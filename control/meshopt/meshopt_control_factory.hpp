@@ -4,10 +4,12 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <kernel/meshopt/rumpf_functionals/2d_q1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1.hpp>
+#include <kernel/meshopt/rumpf_functionals/p1.hpp>
+#include <kernel/meshopt/rumpf_functionals/q1.hpp>
+
 #include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
+//#include <kernel/meshopt/rumpf_functionals/3d_p1_unrolled.hpp>
 
 #include <kernel/meshopt/hyperelasticity_functional.hpp>
 #include <kernel/meshopt/mesh_concentration_function.hpp>

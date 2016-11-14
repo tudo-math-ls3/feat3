@@ -4,17 +4,15 @@
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/meshopt/hyperelasticity_functional.hpp>
 
-#include <kernel/meshopt/rumpf_functionals/2d_p1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1.hpp>
+#include <kernel/meshopt/rumpf_functionals/p1.hpp>
+#include <kernel/meshopt/rumpf_functionals/q1.hpp>
 
 #include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
 
 #include <kernel/meshopt/rumpf_functionals/3d_p1_unrolled.hpp>
-//#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
-
-//#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
-//#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+// Not implemented yet due to too bloody much stuff for Maple to compute
+//#include <kernel/meshopt/rumpf_functionals/3d_q1_unrolled.hpp>
 
 #include <kernel/solver/linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>

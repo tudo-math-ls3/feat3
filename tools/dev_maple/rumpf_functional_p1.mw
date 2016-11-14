@@ -96,7 +96,7 @@
 <Group labelreference="L4">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font style="Text" family="Liberation Serif" executable="true" size="14"># Space dimension
-</Font>d := 2;
+</Font>d := 3;
 <Font foreground="[0,0,0]"># Number of basis functions for the local transformation</Font>
 nphi := d+1;
 <Font foreground="[0,0,0]"># x will hold the vertex coordinates of the physical element</Font>
@@ -259,11 +259,11 @@ for i from 1 to nphi do
     #    - inv_grad_R.vec_grad_phi).(cof_grad_R);
     #variational_grad_cof[i,j] := 2*fac_cof*Trace(Transpose(cof_grad_R).M);
     variational_grad_cof[i,j] :=  4*fac_cof*(frobenius_cof_grad_R_sqr - d)*simplify(
-                    inv_grad_R[j].(jac_phi[i].e_inv)/h*frobenius_cof_grad_R_sqr);
+                    inv_grad_R[j].(jac_phi[i].e_inv)/h*frobenius_cof_grad_R_sqr
                  - (cof_grad_R)[j].(Transpose(cof_grad_R).inv_grad_R.Transpose(jac_phi[i].e_inv))/h);
    end do;
 end do;
-#simplify(grad_cof[3]-variational_grad_cof[3]);</Text-field>
+simplify(grad_cof[3]-variational_grad_cof[3]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L291" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
