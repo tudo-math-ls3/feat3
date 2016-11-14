@@ -105,9 +105,9 @@ template
     Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
     // Parameters for the Rumpf functional
-    DataType fac_norm(1);
-    DataType fac_det(1);
-    DataType fac_cof(MeshType::world_dim == 3);
+    DataType fac_norm(2);
+    DataType fac_det(2.5);
+    DataType fac_cof(3*(MeshType::world_dim == 3));
     DataType fac_reg(DataType(1e-8));
 
     // Create the functional with these parameters
@@ -182,7 +182,8 @@ template
 
     solver->init();
     solver->set_plot(true);
-    solver->set_max_iter(1000);
+    solver->set_tol_rel(Math::pow(Math::eps<DataType>(),DataType(0.9)));
+    solver->set_max_iter(30);
     solver->correct(new_coords, rhs);
     solver->done();
     std::cout << "Solver used: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
@@ -255,8 +256,8 @@ struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
         tmp(d) = (DT_(((i >> d) & 1) << 1) - DT_(1)) * scaling;
       }
 
-      coords[i] = trafo*tmp;
-      //coords[i] = tmp;
+      //coords[i] = trafo*tmp;
+      coords[i] = tmp;
     }
 
 

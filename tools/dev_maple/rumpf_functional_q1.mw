@@ -4,7 +4,7 @@
 <Label-Scheme value="2" prefix=""/>
 <View-Properties presentation="false" autoexpanding_sections="true" UserProfileName="Maple Default Profile" NumericFormat-ApplyInteger="true" NumericFormat-ApplyRational="true" NumericFormat-ApplyExponent="false">
 </View-Properties>
-<MapleNet-Properties elisiondigitsbefore="100" labelling="true" indentamount="4" elisiontermsthreshold="10000" ansi="false" errorbreak="1" useclientjvm="true" echo="1" imaginaryunit="I" labelwidth="20" unitattributes="&quot;fontweight&quot; = &quot;bold&quot;" contextmenusize="automatic" plotdriver="opengl" elisiondigitsafter="100" plotoutput="terminal" helpbrowser="standard" rtablesize="10" elisiontermsbefore="100" elisiondigitsthreshold="10000" typesetting="extended" plotdevice="inline" verboseproc="1" showassumed="1" quiet="false" errorcursor="false" longdelim="true" plotoptions="" elisiontermsafter="100" screenwidth="79" preplot="" prettyprint="3" displayprecision="-1" screenpixelheight="1080" warnlevel="3" screenheight="25" latexwidth="8.0" postplot="" prompt="&gt; " ShowLabels="true"/>
+<MapleNet-Properties elisiondigitsbefore="100" labelling="true" indentamount="4" elisiontermsthreshold="10000" ansi="false" errorbreak="1" useclientjvm="true" echo="0" imaginaryunit="I" labelwidth="20" unitattributes="&quot;fontweight&quot; = &quot;bold&quot;" contextmenusize="automatic" plotdriver="opengl" elisiondigitsafter="100" plotoutput="terminal" helpbrowser="standard" rtablesize="10" elisiontermsbefore="100" elisiondigitsthreshold="10000" typesetting="extended" plotdevice="inline" verboseproc="1" showassumed="1" quiet="false" errorcursor="false" longdelim="true" plotoptions="" elisiontermsafter="100" screenwidth="79" preplot="" prettyprint="3" displayprecision="-1" screenpixelheight="1080" warnlevel="3" screenheight="25" latexwidth="8.0" postplot="" prompt="&gt; " ShowLabels="true"/>
 <Styles>
 <Font name="Ordered List 1" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="Annotation Text" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
@@ -99,7 +99,7 @@
 <Group labelreference="L4">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font style="Code" executable="true"># Space dimension
-</Font>d := 3;
+</Font>d := 2;
 <Font foreground="[0,0,0]"># Number of basis functions for the local transformation</Font>
 nphi := 2^d; xmat := Matrix(nphi,d,symbol=x);
 <Font foreground="[0,0,0]"># xi is the vector of coordinates on the Rumpf reference element</Font>
@@ -184,7 +184,7 @@ det_grad_R:=Determinant(grad_R(x,xi));</Text-field>
 </Group>
 <Group labelreference="L193" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">integrand_frobenius := ((frobenius_grad_R_sqr - d)^2):
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">integrand_frobenius := ((frobenius_grad_R_sqr - d)^2)/normalised_ref_cell_vol;
 fval_frobenius := integrand_frobenius:
 for i from 1 to d do
   fval_frobenius := simplify(int(fval_frobenius,xi[i]=-1..1)):
@@ -212,7 +212,7 @@ elif(d=3) then
   cof_grad_R(3,3) := grad_R(x,xi)[1][1]*grad_R(x,xi)[2][2] - grad_R(x,xi)[1][2]*grad_R(x,xi)[2][1]:
 end if:
 cof_grad_R:
-integrand_cof := simplify((Trace(cof_grad_R.Transpose(cof_grad_R))-d)^2);
+integrand_cof := simplify((Trace(cof_grad_R.Transpose(cof_grad_R))-d)^2)/normalised_ref_cell_vol;
 fval_cof := integrand_cof;
 for i from 1 to d do
   fval_cof := simplify(int(fval_cof,xi[i]=-1..1)):
@@ -222,11 +222,11 @@ end do:
 </Group>
 <Group labelreference="L219" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">integrand_det_1 := simplify(det_grad_R);
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">integrand_det_1 := simplify(det_grad_R)/normalised_ref_cell_vol;
 <Font foreground="[0,0,0]"># Integrate det over the Rumpf reference cell
 # Divide by the scaled Rumpf reference cell's volume so the result is independent of the absolute scaling.
 # Otherwise the sum over all elements would vary with the refinement level</Font>
-fval_det_1 := integrand_det_1/normalised_ref_cell_vol:
+fval_det_1 := integrand_det_1:
 for i from 1 to d do
   fval_det_1 := simplify(int(fval_det_1, xi[i] = -1..1)):
 end do:
@@ -235,11 +235,11 @@ end do:
 </Group>
 <Group labelreference="L213" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">integrand_det_2 := simplify(det_grad_R^2);
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">integrand_det_2 := simplify(det_grad_R^2)/normalised_ref_cell_vol;
 <Font foreground="[0,0,0]"># Integrate det over the Rumpf reference cell
 # Divide by the scaled Rumpf reference cell's volume so the result is independent of the absolute scaling.
 # Otherwise the sum over all elements would vary with the refinement level</Font>
-fval_det_2 := integrand_det_2/normalised_ref_cell_vol:
+fval_det_2 := integrand_det_2:
 for i from 1 to d do
   fval_det_2 := simplify(int(fval_det_2, xi[i] = -1..1)):
 end do:

@@ -150,7 +150,7 @@ template
 
       solver->init();
       solver->set_plot(true);
-      solver->set_tol_rel(Math::eps<DataType>());
+      solver->set_tol_rel(Math::pow(Math::eps<DataType>(), DataType(0.9)));
       solver->correct(new_coords, rhs);
       solver->done();
       // Compute functional value post optimisation
@@ -197,7 +197,8 @@ template
 
     }
 };
-// Vanilla Rumpf smoother
+
+// Use template alias to make everything more readable
 template<typename A, typename B, typename C, typename D, typename E>
 using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
 
@@ -206,6 +207,9 @@ HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctio
 
 HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_2(2);
 HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_hc_2_u(2);
+
+HyperelasticityFunctionalTest<double, Shape::Hypercube<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc3_1(1);
+HyperelasticityFunctionalTest<double, Shape::Hypercube<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc3_2(2);
 
 HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s_1(1);
 HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s_1_u(1);
