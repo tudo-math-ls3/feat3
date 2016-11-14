@@ -180,7 +180,6 @@
 // \author Peter Zajac
 //
 #include <kernel/util/runtime.hpp>
-#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -209,21 +208,21 @@ namespace NaverStokesCP2D
   using namespace FEAT;
 
   // helper functions for padded console output
-  static inline void dump_line(String s, String t)
+  static inline void dump_line(const Dist::Comm& comm, String s, String t)
   {
-    Util::mpi_cout(s.pad_back(30, '.') + ": " + t + "\n");
+    comm.print(s.pad_back(30, '.') + ": " + t);
   }
 
   template<typename T_>
-  static inline void dump_line(String s, T_ t)
+  static inline void dump_line(const Dist::Comm& comm, String s, T_ t)
   {
-    Util::mpi_cout(s.pad_back(30, '.') + ": " + stringify(t) + "\n");
+    comm.print(s.pad_back(30, '.') + ": " + stringify(t));
   }
 
-  static inline void dump_time(String s, double t, double total)
+  static inline void dump_time(const Dist::Comm& comm, String s, double t, double total)
   {
-    Util::mpi_cout(s.pad_back(30, '.') + ": " + stringify_fp_fix(t, 3, 10)
-      + " (" + stringify_fp_fix(100.0*t/total,3,7) + "%)\n");
+    comm.print(s.pad_back(30, '.') + ": " + stringify_fp_fix(t, 3, 10)
+      + " (" + stringify_fp_fix(100.0*t/total,3,7) + "%)");
   }
 
   /**
@@ -379,7 +378,8 @@ namespace NaverStokesCP2D
           setup_c2d0();
         else
         {
-          Util::mpi_cout("ERROR: unknown setup '" + s + "'");
+          Dist::Comm comm = Dist::Comm::world();
+          comm.print(std::cerr, "ERROR: unknown setup '" + s + "'");
           return false;
         }
       }
@@ -416,38 +416,38 @@ namespace NaverStokesCP2D
       return true;
     }
 
-    void dump()
+    void dump(const Dist::Comm& comm)
     {
-      Util::mpi_cout("Configuration Summary:\n");
-      dump_line("Mesh File", mesh_file);
-      dump_line("Mesh Path", mesh_path);
-      dump_line("Level-Min", stringify(level_min) + " [" + stringify(level_min_in) + "]");
-      dump_line("Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
-      dump_line("VTK-Name", vtk_name);
-      dump_line("VTK-Step", vtk_step);
-      dump_line("Inflow-Part", part_name_in);
-      dump_line("Outflow-Part", part_name_out);
-      dump_line("Inflow-Profile", "( " + stringify(ix0) + " , " + stringify(iy0) + " ) - ( "
+      comm.print("Configuration Summary:");
+      dump_line(comm, "Mesh File", mesh_file);
+      dump_line(comm, "Mesh Path", mesh_path);
+      dump_line(comm, "Level-Min", stringify(level_min) + " [" + stringify(level_min_in) + "]");
+      dump_line(comm, "Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
+      dump_line(comm, "VTK-Name", vtk_name);
+      dump_line(comm, "VTK-Step", vtk_step);
+      dump_line(comm, "Inflow-Part", part_name_in);
+      dump_line(comm, "Outflow-Part", part_name_out);
+      dump_line(comm, "Inflow-Profile", "( " + stringify(ix0) + " , " + stringify(iy0) + " ) - ( "
         + stringify(ix1) + " , " + stringify(iy1) + " )");
-      dump_line("V-Max", vmax);
-      dump_line("Tensor", (deformation ? "Deformation" : "Gradient"));
-      dump_line("Nu", nu);
-      dump_line("Time-Max", time_max);
-      dump_line("Time-Steps", time_steps);
-      dump_line("Max Time-Steps", max_time_steps);
-      dump_line("Non-Linear Steps", nonlin_steps);
-      dump_line("Linear DPM Steps", dpm_steps);
-      dump_line("A: Solver", (multigrid_a ? "Rich-Multigrid" : "BiCGStab-Jacobi"));
-      dump_line("A: Max-Iter", max_iter_a);
-      dump_line("A: Tol-Rel", tol_rel_a);
-      dump_line("A: Smooth Steps", smooth_steps_a);
-      dump_line("S: Solver", (multigrid_s ? "PCG-Multigrid" : "PCG-Jacobi"));
-      dump_line("A: Smooth Damp", smooth_damp_a);
-      dump_line("S: Max-Iter", max_iter_s);
-      dump_line("S: Tol-Rel", tol_rel_s);
-      dump_line("S: Smooth Steps", smooth_steps_s);
-      dump_line("S: Smooth Damp", smooth_damp_s);
-      dump_line("Statistics", statistics);
+      dump_line(comm, "V-Max", vmax);
+      dump_line(comm, "Tensor", (deformation ? "Deformation" : "Gradient"));
+      dump_line(comm, "Nu", nu);
+      dump_line(comm, "Time-Max", time_max);
+      dump_line(comm, "Time-Steps", time_steps);
+      dump_line(comm, "Max Time-Steps", max_time_steps);
+      dump_line(comm, "Non-Linear Steps", nonlin_steps);
+      dump_line(comm, "Linear DPM Steps", dpm_steps);
+      dump_line(comm, "A: Solver", (multigrid_a ? "Rich-Multigrid" : "BiCGStab-Jacobi"));
+      dump_line(comm, "A: Max-Iter", max_iter_a);
+      dump_line(comm, "A: Tol-Rel", tol_rel_a);
+      dump_line(comm, "A: Smooth Steps", smooth_steps_a);
+      dump_line(comm, "S: Solver", (multigrid_s ? "PCG-Multigrid" : "PCG-Jacobi"));
+      dump_line(comm, "A: Smooth Damp", smooth_damp_a);
+      dump_line(comm, "S: Max-Iter", max_iter_s);
+      dump_line(comm, "S: Tol-Rel", tol_rel_s);
+      dump_line(comm, "S: Smooth Steps", smooth_steps_s);
+      dump_line(comm, "S: Smooth Damp", smooth_damp_s);
+      dump_line(comm, "Statistics", statistics);
     }
 
     // Setup: Poiseuille-Flow on unit-square
@@ -723,21 +723,23 @@ namespace NaverStokesCP2D
   }; // class NavierStokesBlockedAssemblerLevel
 
   template <typename SystemLevelType, typename TransferLevelType, typename MeshType>
-  void report_statistics(double t_total, std::deque<std::shared_ptr<SystemLevelType>> & system_levels, std::deque<std::shared_ptr<TransferLevelType>> & transfer_levels,
-      Control::Domain::DomainControl<MeshType>& domain, int nprocs)
+  void report_statistics(const Dist::Comm& comm, double t_total,
+    std::deque<std::shared_ptr<SystemLevelType>> & system_levels,
+    std::deque<std::shared_ptr<TransferLevelType>> & transfer_levels,
+      Control::Domain::DomainControl<MeshType>& domain)
   {
-    const Dist::Comm& comm = *domain.get_layers().front()->get_comm();
+    const int nprocs = comm.size();
 
     /// \todo cover exactly all la op timings (some are not timed yet in the application) and replace t_total by them
     double solver_toe = t_total; //t_solver_a + t_solver_s + t_calc_def;
     int shape_dimension = MeshType::ShapeType::dimension;
 
     FEAT::Statistics::expression_target = "solver_a";
-    Util::mpi_cout("\nsolver_a:\n");
-    Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+    comm.print("\nsolver_a:");
+    comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
     FEAT::Statistics::expression_target = "solver_s";
-    Util::mpi_cout("solver_s:\n");
-    Util::mpi_cout(FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+    comm.print("solver_s:");
+    comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
 
     std::size_t la_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { la_size += n->bytes(); });
@@ -836,35 +838,36 @@ namespace NaverStokesCP2D
     comm.allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_min, std::size_t(1), Dist::op_min);
 
     String flops = FEAT::Statistics::get_formatted_flops(solver_toe, (Index)nprocs);
-    Util::mpi_cout(flops + "\n\n");
-    Util::mpi_cout(op_timings + "\n");
-    Util::mpi_cout("solver_a\n");
-    Util::mpi_cout(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_reduction_max) + ", min: " + stringify(solver_a_mpi_wait_reduction_min) + ", local: " +
-        stringify(solver_a_mpi_wait_reduction) + "\n");
-    Util::mpi_cout(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_spmv_max) + ", min: " + stringify(solver_a_mpi_wait_spmv_min) + ", local: " +
-        stringify(solver_a_mpi_wait_spmv) + "\n");
-    Util::mpi_cout("solver_s\n");
-    Util::mpi_cout(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_reduction_max) + ", min: " + stringify(solver_s_mpi_wait_reduction_min) + ", local: " +
-        stringify(solver_s_mpi_wait_reduction) + "\n");
-    Util::mpi_cout(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_spmv_max) + ", min: " + stringify(solver_s_mpi_wait_spmv_min) + ", local: " +
-        stringify(solver_s_mpi_wait_spmv) + "\n\n");
-    Util::mpi_cout(String("Domain size:").pad_back(20) + stringify(double(domain.bytes())  / (1024. * 1024.))  + " MByte\n");
-    Util::mpi_cout(String("MPI size:").pad_back(20) + stringify(double(mpi_size) / (1024. * 1024.)) + " MByte\n");
-    Util::mpi_cout(String("LA size:").pad_back(20) + stringify(double(la_size) / (1024. * 1024.)) + " MByte\n\n");
-    Util::mpi_cout(Util::get_formatted_memory_usage() + "\n");
-    Util::mpi_cout(String("#Mesh cells:").pad_back(20) + "coarse " + stringify(cells_coarse_max) + "/" + stringify(cells_coarse_min) + ", fine " +
-        stringify(cells_fine_max) + "/" + stringify(cells_fine_min) + "\n");
-    Util::mpi_cout(String("#DOFs:").pad_back(20) + "coarse " + stringify(dofs_coarse_max) + "/" + stringify(dofs_coarse_min) + ", fine " +
-        stringify(dofs_fine_max) + "/" + stringify(dofs_fine_min) + "\n");
-    Util::mpi_cout(String("#NZEs").pad_back(20) + "coarse " + stringify(nzes_coarse_max) + "/" + stringify(nzes_coarse_min) + ", fine " +
+    comm.print(flops + "\n");
+    comm.print(op_timings);
+    comm.print("solver_a");
+    comm.print(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_reduction_max) + ", min: " + stringify(solver_a_mpi_wait_reduction_min) + ", local: " +
+        stringify(solver_a_mpi_wait_reduction));
+    comm.print(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_spmv_max) + ", min: " + stringify(solver_a_mpi_wait_spmv_min) + ", local: " +
+        stringify(solver_a_mpi_wait_spmv));
+    comm.print("solver_s");
+    comm.print(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_reduction_max) + ", min: " + stringify(solver_s_mpi_wait_reduction_min) + ", local: " +
+        stringify(solver_s_mpi_wait_reduction));
+    comm.print(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_spmv_max) + ", min: " + stringify(solver_s_mpi_wait_spmv_min) + ", local: " +
+        stringify(solver_s_mpi_wait_spmv) + "\n");
+    comm.print(String("Domain size:").pad_back(20) + stringify(double(domain.bytes())  / (1024. * 1024.))  + " MByte");
+    comm.print(String("MPI size:").pad_back(20) + stringify(double(mpi_size) / (1024. * 1024.)) + " MByte");
+    comm.print(String("LA size:").pad_back(20) + stringify(double(la_size) / (1024. * 1024.)) + " MByte\n");
+    comm.print(Util::get_formatted_memory_usage());
+    comm.print(String("#Mesh cells:").pad_back(20) + "coarse " + stringify(cells_coarse_max) + "/" + stringify(cells_coarse_min) + ", fine " +
+        stringify(cells_fine_max) + "/" + stringify(cells_fine_min));
+    comm.print(String("#DOFs:").pad_back(20) + "coarse " + stringify(dofs_coarse_max) + "/" + stringify(dofs_coarse_min) + ", fine " +
+        stringify(dofs_fine_max) + "/" + stringify(dofs_fine_min));
+    comm.print(String("#NZEs").pad_back(20) + "coarse " + stringify(nzes_coarse_max) + "/" + stringify(nzes_coarse_min) + ", fine " +
         stringify(nzes_fine_max) + "/" + stringify(nzes_fine_min) + "\n");
-    Util::mpi_cout("\n");
   }
 
 
   template<typename MeshType_>
-  void run(const int rank, const int nprocs, const Config& cfg, Control::Domain::DomainControl<MeshType_>& domain)
+  void run(const Dist::Comm& comm, const Config& cfg, Control::Domain::DomainControl<MeshType_>& domain)
   {
+    const int rank = comm.rank();
+
     // create a time-stamp
     TimeStamp stamp_start;
 
@@ -925,7 +928,7 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Creating gates...\n");
+    comm.print("Creating gates...");
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -934,7 +937,7 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Assembling basic matrices...\n");
+    comm.print("Assembling basic matrices...");
     for(Index i(0); i < num_levels; ++i)
     {
       // assemble velocity matrix structure
@@ -948,7 +951,7 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Assembling system filters...\n");
+    comm.print("Assembling system filters...");
     for(Index i(0); i < num_levels; ++i)
     {
       asm_levels.at(i)->assemble_velo_filter(cfg, *system_levels.at(i));
@@ -957,7 +960,7 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Assembling transfer matrices...\n");
+    comm.print("Assembling transfer matrices...");
 
     for (Index i(0); (i + 1) < num_levels; ++i)
     {
@@ -990,7 +993,7 @@ namespace NaverStokesCP2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Setting up Velocity Multigrid...\n");
+    comm.print("Setting up Velocity Multigrid...");
 
     // create a multigrid solver for the velocity
     auto multigrid_hierarchy_velo = std::make_shared<Solver::MultiGridHierarchy<
@@ -1032,7 +1035,7 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("Setting up Pressure Multigrid...\n");
+    comm.print("Setting up Pressure Multigrid...");
 
     // create another multigrid solver for the pressure
     auto multigrid_hierarchy_pres = std::make_shared<Solver::MultiGridHierarchy<
@@ -1131,7 +1134,7 @@ namespace NaverStokesCP2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    Util::mpi_cout("\n\n");
+    comm.print("\n");
 
     // create RHS and SOL vectors
     GlobalVeloVector vec_sol_v = matrix_a.create_vector_l();
@@ -1176,8 +1179,8 @@ namespace NaverStokesCP2D
       head += String("IT-A").pad_front(4) + " ";
       head += String("IT-S").pad_front(4) + "   ";
       head += String("Runtime    ");
-      std::cout << head << std::endl;
-      std::cout << String(head.size(), '-') << std::endl;
+      comm.print(head);
+      comm.print(String(head.size(), '-'));
     }
 
     watch_total.start();
@@ -1293,7 +1296,7 @@ namespace NaverStokesCP2D
           watch_solver_a.stop();
           if(!Solver::status_success(status_a))
           {
-            Util::mpi_cout("\n\nERROR: velocity solver broke down!\n\n");
+            comm.print(std::cerr, "\n\nERROR: velocity solver broke down!\n");
             failure = true;
             break;
           }
@@ -1319,7 +1322,7 @@ namespace NaverStokesCP2D
           watch_solver_s.stop();
           if(!Solver::status_success(status_s))
           {
-            Util::mpi_cout("\n\nERROR: pressure solver broke down!\n\n");
+            comm.print(std::cerr, "\n\nERROR: pressure solver broke down!\n");
             failure = true;
             break;
           }
@@ -1378,7 +1381,7 @@ namespace NaverStokesCP2D
       if(!cfg.vtk_name.empty() && (cfg.vtk_step > 0) && (time_step % cfg.vtk_step == 0))
       {
         watch_vtk.start();
-        String vtk_path = cfg.vtk_name + "." + stringify(nprocs) + "." + stringify(time_step).pad_front(5, '0');
+        String vtk_path = cfg.vtk_name + "." + stringify(comm.size()) + "." + stringify(time_step).pad_front(5, '0');
 
         Geometry::ExportVTK<MeshType> vtk(the_domain_level.get_mesh());
 
@@ -1398,7 +1401,7 @@ namespace NaverStokesCP2D
         vtk.add_vertex_scalar("p_dt", (*vec_der_p).elements());
 
         // export
-        vtk.write(vtk_path, rank, nprocs);
+        vtk.write(vtk_path, comm);
         watch_vtk.stop();
       }
 
@@ -1437,21 +1440,21 @@ namespace NaverStokesCP2D
     // write timings
     if(rank == 0)
     {
-      Util::mpi_cout("\n\n");
-      dump_time("Total Solver Time", t_total, t_total);
-      dump_time("Matrix Assembly Time", t_asm_mat, t_total);
-      dump_time("Vector Assembly Time", t_asm_rhs, t_total);
-      dump_time("Defect-Calc Time", t_calc_def, t_total);
-      dump_time("Solver-A Init Time", t_sol_init, t_total);
-      dump_time("Solver-A Time", t_solver_a, t_total);
-      dump_time("Solver-S Time", t_solver_s, t_total);
-      dump_time("VTK-Write Time", t_vtk, t_total);
-      dump_time("Other Time", t_total-t_sum, t_total);
+      comm.print("\n");
+      dump_time(comm, "Total Solver Time", t_total, t_total);
+      dump_time(comm, "Matrix Assembly Time", t_asm_mat, t_total);
+      dump_time(comm, "Vector Assembly Time", t_asm_rhs, t_total);
+      dump_time(comm, "Defect-Calc Time", t_calc_def, t_total);
+      dump_time(comm, "Solver-A Init Time", t_sol_init, t_total);
+      dump_time(comm, "Solver-A Time", t_solver_a, t_total);
+      dump_time(comm, "Solver-S Time", t_solver_s, t_total);
+      dump_time(comm, "VTK-Write Time", t_vtk, t_total);
+      dump_time(comm, "Other Time", t_total-t_sum, t_total);
     }
 
     if (cfg.statistics)
     {
-      report_statistics(t_total, system_levels, transfer_levels, domain, nprocs);
+      report_statistics(comm, t_total, system_levels, transfer_levels, domain);
     }
   }
 
@@ -1464,7 +1467,7 @@ namespace NaverStokesCP2D
     int nprocs = comm.size();
 
 #ifdef FEAT_HAVE_MPI
-    Util::mpi_cout("NUM-PROCS: " + stringify(nprocs) + "\n");
+    comm.print("NUM-PROCS: " + stringify(nprocs) + "\n");
 #endif
 
     // create arg parser
@@ -1511,26 +1514,25 @@ namespace NaverStokesCP2D
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))
     {
-      Util::mpi_cout("\n2D Nonsteady Navier-Stokes CP-Q2/Q1 Toycode Solver (TM)\n\n");
-      Util::mpi_cout("The easiest way to make this application do something useful is\n");
-      Util::mpi_cout("to load a pre-defined problem configuration by supplying the\n");
-      Util::mpi_cout("option '--setup <config>', where <config> may be one of:\n\n");
-      Util::mpi_cout("  square    Poiseuille-Flow on Unit-Square\n");
-      Util::mpi_cout("  nozzle    Jet-Flow through Nozzle domain\n");
-      Util::mpi_cout("  bench1    Nonsteady Flow Around A Cylinder\n");
-      Util::mpi_cout("\n");
-      Util::mpi_cout("This will pre-configure this application to solve one of the\n");
-      Util::mpi_cout("above problems. Note that you can further adjust the configration\n");
-      Util::mpi_cout("by specifying additional options to override the default problem\n");
-      Util::mpi_cout("configuration.\n");
+      comm.print("\n2D Nonsteady Navier-Stokes CP-Q2/Q1 Toycode Solver (TM)\n");
+      comm.print("The easiest way to make this application do something useful is");
+      comm.print("to load a pre-defined problem configuration by supplying the");
+      comm.print("option '--setup <config>', where <config> may be one of:\n");
+      comm.print("  square    Poiseuille-Flow on Unit-Square");
+      comm.print("  nozzle    Jet-Flow through Nozzle domain");
+      comm.print("  bench1    Nonsteady Flow Around A Cylinder\n");
+      comm.print("This will pre-configure this application to solve one of the");
+      comm.print("above problems. Note that you can further adjust the configration");
+      comm.print("by specifying additional options to override the default problem");
+      comm.print("configuration.");
       if(args.check("help") >= 0)
       {
-        Util::mpi_cout("\nSupported Options:\n");
-        Util::mpi_cout(args.get_supported_help());
+        comm.print("\nSupported Options:");
+        comm.print(args.get_supported_help());
       }
       else
       {
-        Util::mpi_cout("\nUse the option '--help' to display a list of all supported options.\n\n");
+        comm.print("\nUse the option '--help' to display a list of all supported options.\n");
       }
       return;
     }
@@ -1568,7 +1570,7 @@ namespace NaverStokesCP2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Util::mpi_cout("\nPreparing domain...\n");
+      comm.print("\nPreparing domain...");
 
       // create our domain control
       Control::Domain::PartiDomainControl<MeshType> domain(comm);
@@ -1588,7 +1590,7 @@ namespace NaverStokesCP2D
 
       Statistics::toe_partition = stamp_partition.elapsed_now();
 
-      Util::mpi_cout("Creating mesh hierarchy...\n");
+      comm.print("Creating mesh hierarchy...");
 
       // create the level hierarchy
       domain.create_hierarchy(int(cfg.level_max_in), int(cfg.level_min_in));
@@ -1598,10 +1600,10 @@ namespace NaverStokesCP2D
       cfg.level_min = Index(domain.get_levels().front()->get_level_index());
 
       // dump our configuration
-      cfg.dump();
+      cfg.dump(comm);
 
       // run our application
-      run<MeshType>(rank, nprocs, cfg, domain);
+      run<MeshType>(comm, cfg, domain);
 
       TimeStamp stamp2;
 
@@ -1612,8 +1614,8 @@ namespace NaverStokesCP2D
       long long time2 = time1 * (long long) nprocs;
 
       // print time
-      Util::mpi_cout("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
-        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]\n");
+      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
+        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)
