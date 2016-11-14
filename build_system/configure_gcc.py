@@ -38,6 +38,10 @@ def configure_gcc(cpu, buildid, compiler):
   else:
     cxxflags += " -Wpedantic"
 
+  # gcc 6.1 creates floating point code that lets the navstoke app diverge, if using avx support
+  if major == 6 and minor == 1 and (cpu == "sandybridge" or cpu == "ivybridge" or cpu == "haswell" or cpu == "skylake"):
+    cpu="westmere"
+
   if "debug" in buildid:
     cxxflags += " -O0 "
     cxxflags += " -fdiagnostics-show-option -fno-omit-frame-pointer"
