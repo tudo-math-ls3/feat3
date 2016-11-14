@@ -378,31 +378,9 @@ namespace FEAT
     };
 #endif
 
-    /**
-     * \brief Class template for Rumpf functionals splitting hypercubes into simplices
-     *
-     * Each Hypercube<d> is subdivided into d! simplices and the P1 functional is evaluated for each of the possible
-     * ways of performing that subdivision.
-     *
-     * \tparam DataType_
-     * Our data type
-     *
-     * \tparam ShapeType_
-     * Shape type of the underlying transformation
-     *
-     * \tparam BaseClass_
-     * The class of funtional that is to be used on each simplex
-     *
-     * The actual implementation has to be supplied by the implementation of specialisations in ShapeType_. Currently,
-     * this is basically a wrapper that makes specialisations in Hypercube<d> use the specialisation of BaseClass in
-     * Simplex<d>, to keep the template interface clean and the parameters consistent.
-     *
-     */
-    template<typename DataType_, typename ShapeType_, template<typename, typename> class BaseClass_>
-    class RumpfFunctionalQ1Split;
-
     /// \cond internal
-    template<typename DataType_, typename ShapeType_>
+    // These functionals are kept only for debugging purposes
+    template<typename DataType_, typename TrafoType_>
     class RumpfFunctionalUnrolled;
     /// \endcond
   } // namespace Meshopt

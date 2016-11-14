@@ -278,61 +278,22 @@ namespace FEAT
           // Get the local functional
           if(local_functional_p.first == "RumpfFunctional")
           {
-            // Disabled because there is no Q1Split in 3d at the moment. If you need Q1Split in 2d only, use the code below
-            // If hypercubes are to be split into simplices for the evaluation of the functional, their (cell-) local
-            // functional is different
-            //if(split_hypercubes)
-            //{
-            //  // The underlying functional is RumpfFunctional, and this is passed to the Split functional as parameter
-            //  typedef FEAT::Meshopt::RumpfFunctionalQ1Split
-            //  <
-            //    DT_,
-            //    typename MeshType::ShapeType,
-            //    FEAT::Meshopt::RumpfFunctional
-            //  > FunctionalType;
+            typedef FEAT::Meshopt::RumpfFunctional<DT_, Trafo_> FunctionalType;
+            std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+              (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
 
-            //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-            //    (fac_norm, fac_det, fac_cof, fac_reg);
-            //  result = create_hyperelasticity_control_with_functional
-            //    (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
-            //}
-            //else
-            //{
-              typedef FEAT::Meshopt::RumpfFunctional<DT_, Trafo_> FunctionalType;
-              std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-                (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
-
-              result = create_hyperelasticity_control_with_functional
-                (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
-            //}
+            result = create_hyperelasticity_control_with_functional
+              (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
           }
           // This is disabled because the ***Unrolled classes produce huge object files, slow code and are a pain to compile.
           // If you need them for debugging purposes, use the code below
           else if(local_functional_p.first == "RumpfFunctionalUnrolled")
           {
-            //if(split_hypercubes)
-            //{
-            //  // The underlying functional is RumpfFunctional_D2, and this is passed to the Split functional as parameter
-            //  typedef FEAT::Meshopt::RumpfFunctionalQ1Split
-            //  <
-            //    DT_,
-            //    typename MeshType::ShapeType,
-            //    FEAT::Meshopt::RumpfFunctional_D2
-            //  > FunctionalType;
-
-            //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-            //    (fac_norm, fac_det, fac_cof, fac_reg);
-            //  result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section, meshopt_config,
-            //  solver_config, my_functional, dirichlet_list, slip_list);
-            //}
-            //else
-            //{
             typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, Trafo_> FunctionalType;
             std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
               (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
             result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
             meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
-            //}
           }
           else
           {

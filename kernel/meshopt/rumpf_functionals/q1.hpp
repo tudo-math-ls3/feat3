@@ -154,6 +154,7 @@ namespace FEAT
           {
             Util::mpi_cout(name()+" settings:\n");
             BaseClass::print();
+            Util::mpi_cout_pad_line("cubature_rule:",_cubature_rule.get_name());
             Util::mpi_cout_pad_line("exponent_det:",_exponent_det);
           }
 

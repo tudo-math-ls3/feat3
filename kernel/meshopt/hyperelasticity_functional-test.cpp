@@ -222,16 +222,6 @@ HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctiona
 HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s3_2(2);
 HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_2_u(2);
 
-//template<typename A, typename B>
-//using MyFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional>;
-//
-//template<typename A, typename B>
-//using MyFunctionalQ1Split_D2 = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional_D2>;
-//
-//HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_f_1;
-//HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, MyFunctionalQ1Split_D2, MyQualityFunctional> test_q1hack_d_2;
-//HyperelasticityFunctionalTest<double, Shape::Simplex<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_ds_1;
-
 /// \brief Specialisation for hypercubes
 template<int shape_dim>
 struct helperclass< FEAT::Shape::Hypercube<shape_dim> >

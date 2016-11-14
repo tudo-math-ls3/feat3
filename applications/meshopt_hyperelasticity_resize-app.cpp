@@ -210,11 +210,7 @@ template
 // Template aliases to easier switch between variants
 
 template<typename A, typename B>
-using MyLocalFunctional = Meshopt::RumpfFunctionalUnrolled<A, B>;
-
-// For using the Q1 split functional, the functional is a bit more complicated
-template<typename A, typename B>
-using MyLocalFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional>;
+using MyLocalFunctional = Meshopt::RumpfFunctional<A, B>;
 
 // Vanilla Rumpf smoother
 template<typename A, typename B, typename C, typename D, typename E>
