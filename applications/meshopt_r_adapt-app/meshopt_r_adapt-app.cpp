@@ -318,15 +318,15 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if(worst_angle < DT_(52))
+      if(worst_angle < DT_(50))
       {
-        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(52)+
+        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(50)+
             " but is "+stringify_fp_fix(worst_angle)+"!\n");
         return 1;
       }
-      if(qual_min < DT_(3.8e-1))
+      if(qual_min < DT_(3.4e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(3.8e-1)+
+        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(3.4e-1)+
             " but is "+stringify_fp_fix(qual_min)+"!\n");
         return 1;
       }
@@ -535,15 +535,15 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if(worst_angle < DT_(52))
+      if(worst_angle < DT_(50))
       {
-        Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(52)+
+        Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(50)+
             " but is "+stringify_fp_fix(worst_angle)+"!\n");
         return 1;
       }
-      if(qual_min < DT_(3.7e-1))
+      if(qual_min < DT_(3.45e-1))
       {
-        Util::mpi_cout("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(3.5e-1)+
+        Util::mpi_cout("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(3.45e-1)+
             " but is "+stringify_fp_fix(qual_min)+"!\n");
         return 1;
       }
