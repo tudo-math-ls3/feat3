@@ -7,8 +7,8 @@
 #include <kernel/meshopt/rumpf_functionals/p1.hpp>
 #include <kernel/meshopt/rumpf_functionals/q1.hpp>
 
-#include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
+//#include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
+//#include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
 //#include <kernel/meshopt/rumpf_functionals/3d_p1_unrolled.hpp>
 
 #include <kernel/meshopt/hyperelasticity_functional.hpp>
@@ -270,11 +270,6 @@ namespace FEAT
           }
           exponent_det = std::stoi(exponent_det_p.first);
 
-          // Check if we want to split hypercubes into simplices for the evaluation of the local functional
-          //auto split_hc_p = hyperelasticity_config_section->query("split_hypercubes");
-          //if(split_hc_p.second)
-          //split_hypercubes = (std::stoi(split_hc_p.first) == 1);
-
           // Get the local functional
           if(local_functional_p.first == "RumpfFunctional")
           {
@@ -287,14 +282,14 @@ namespace FEAT
           }
           // This is disabled because the ***Unrolled classes produce huge object files, slow code and are a pain to compile.
           // If you need them for debugging purposes, use the code below
-          else if(local_functional_p.first == "RumpfFunctionalUnrolled")
-          {
-            typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, Trafo_> FunctionalType;
-            std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
-              (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
-            result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
-            meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
-          }
+          //else if(local_functional_p.first == "RumpfFunctionalUnrolled")
+          //{
+          //  typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, Trafo_> FunctionalType;
+          //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+          //    (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
+          //  result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
+          //  meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
+          //}
           else
           {
             throw InternalError(__func__,__FILE__,__LINE__,"Unhandled local_functional "+local_functional_p.first);
