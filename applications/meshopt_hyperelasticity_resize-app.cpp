@@ -1,6 +1,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
@@ -114,7 +115,7 @@ template
     auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg, 1);
 
     // Set optimal scale
-    DataType target_scaling(DataType(2.5));
+    DataType target_scaling(DataType(1));
     helperclass<ShapeType>::set_coords(*(rmn->get_mesh()), target_scaling);
 
     // For checking if the method generates a mesh only consisting of optimal cells, the mesh can be refined here.
@@ -150,6 +151,13 @@ template
     DataType* fval_det(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
     DataType* fval_rec_det(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
 
+    DataType* qual_cellwise(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
+    DataType qual_min(0);
+    DataType qual_sum(0);
+
+    DataType* worst_angle_cellwise(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
+    DataType worst_angle(0);
+
     // Dummy vector for rhs
     auto rhs = rumpflpumpfl.create_vector_r();
     // Vector to save the gradient in for visualisation
@@ -160,12 +168,24 @@ template
     // Compute initial functional value
     DataType fval(0);
     rumpflpumpfl.eval_fval_cellwise(fval, fval_norm, fval_det, fval_rec_det);
-    std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
+
+    Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
+    (rmn->get_mesh())->template get_index_set<MeshType::shape_dim, 0>(), (rmn->get_mesh())->get_vertex_set(), qual_cellwise);
+
+    // Compute worst angle between edges
+    worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+      (rmn->get_mesh())->template get_index_set<MeshType::shape_dim, 0>(), (rmn->get_mesh())->get_vertex_set(),
+      worst_angle_cellwise);
+
+    std::cout << "Pre optimisation: fval = " << stringify_fp_sci(fval) <<
+      " Shape quality: " << stringify_fp_sci(qual_min) <<
+      " Worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
 
     std::string filename;
     // Write initial state to file
     filename = "pre_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_pre(*(rmn->get_mesh()));
+    writer_initial_pre.add_cell_scalar("Shape Quality Heuristic", qual_cellwise);
     rumpflpumpfl.add_to_vtk_exporter(writer_initial_pre);
     writer_initial_pre.write(filename);
 
@@ -182,18 +202,31 @@ template
 
     solver->init();
     solver->set_plot(true);
-    solver->set_tol_rel(Math::pow(Math::eps<DataType>(),DataType(0.9)));
-    solver->set_max_iter(30);
+    solver->set_tol_rel(Math::pow(Math::eps<DataType>(),DataType(1)));
+    solver->set_max_iter(100);
     solver->correct(new_coords, rhs);
     solver->done();
     std::cout << "Solver used: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
 
     rumpflpumpfl.eval_fval_cellwise(fval, fval_norm, fval_det, fval_rec_det);
-    std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
+
+    // Compute shape quality
+    Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
+    (rmn->get_mesh())->template get_index_set<MeshType::shape_dim, 0>(), (rmn->get_mesh())->get_vertex_set(),
+    qual_cellwise);
+
+    // Compute worst angle between edges
+    worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+      (rmn->get_mesh())->template get_index_set<MeshType::shape_dim, 0>(), (rmn->get_mesh())->get_vertex_set());
+
+    std::cout << "Post optimisation: fval = " << stringify_fp_sci(fval) <<
+      " Shape quality: " << stringify_fp_sci(qual_min) <<
+      " Worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
 
     // Write optimised initial mesh
     filename = "post_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_post(*(rmn->get_mesh()));
+    writer_initial_post.add_cell_scalar("Shape Quality Heuristic", qual_cellwise);
     rumpflpumpfl.add_to_vtk_exporter(writer_initial_post);
     writer_initial_post.write(filename);
 
@@ -220,7 +253,7 @@ int main(int argc, char** argv)
 {
   FEAT::Runtime::initialise(argc, argv);
 
-  ResizeApp<double, Shape::Hypercube<2>, MyLocalFunctional, MyQualityFunctional>::run();
+  ResizeApp<double, Shape::Hypercube<3>, MyLocalFunctional, MyQualityFunctional>::run();
 
   return FEAT::Runtime::finalise();
 }
@@ -239,11 +272,16 @@ struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
 
     Tiny::Matrix<DT_,shape_dim, shape_dim> trafo(DT_(0));
 
-    trafo(0,0) = DT_(2);
-    trafo(0,1) = DT_(1);
+    for(int i(0); i < shape_dim; ++i)
+    {
+      trafo(i,i) = DT_(1);
+    }
 
-    trafo(1,1) = DT_(1.5);
-    trafo(1,0) = DT_(0.5);
+    trafo(0,0) = DT_(2);
+    //trafo(0,1) = DT_(1);
+
+    //trafo(1,1) = DT_(1.5);
+    //trafo(1,0) = DT_(0.5);
 
     for(Index i(0); i < Index(1 << shape_dim); ++i)
     {
@@ -252,8 +290,8 @@ struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
         tmp(d) = (DT_(((i >> d) & 1) << 1) - DT_(1)) * scaling;
       }
 
-      //coords[i] = trafo*tmp;
-      coords[i] = tmp;
+      coords[i] = trafo*tmp;
+      //coords[i] = tmp;
     }
 
 
@@ -298,29 +336,44 @@ struct helperclass< FEAT::Shape::Simplex<2> >
 template<>
 struct helperclass< FEAT::Shape::Simplex<3> >
 {
+
+  static constexpr int shape_dim = 3;
   /// \brief Sets coordinates so we deal the the Rumpf reference element
   template<typename DT_>
   static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<3>,3,3, DT_>& mesh_, const DT_& scaling)
   {
 
+    Tiny::Matrix<DT_,shape_dim, shape_dim> trafo(DT_(0));
+
+    for(int i(0); i < shape_dim; ++i)
+    {
+      trafo(i,i) = DT_(1);
+    }
+
+    //trafo(0,0) = DT_(2);
+    //trafo(0,1) = DT_(1);
+
+    //trafo(1,1) = DT_(1.5);
+    //trafo(1,0) = DT_(0.5);
+
     auto& coords = mesh_.get_vertex_set();
     Tiny::Vector<DT_, 3> tmp(0);
-    coords[0] = tmp;
+    coords[0] = trafo*tmp;
 
     tmp(0) = scaling;
-    tmp(1) = DT_(0.1);
-    tmp(2) = DT_(0.2);
-    coords[1] = tmp;
+    tmp(1) = DT_(0);
+    tmp(2) = DT_(0);
+    coords[1] = trafo*tmp;
 
     tmp(0) = DT_(0.5) * scaling;
     tmp(1) = DT_(0.5)*Math::sqrt(DT_(3))*scaling;
     tmp(2) = DT_(0);
-    coords[2] = tmp;
+    coords[2] = trafo*tmp;
 
     tmp(0) = DT_(0.5) * scaling;
     tmp(1) = Math::sqrt(DT_(3))/DT_(6)*scaling;
     tmp(2) = Math::sqrt(DT_(6))/DT_(3)*scaling;
-    coords[3] = tmp;
+    coords[3] = trafo*tmp;
   }
 
   // Prints the ShapeType
