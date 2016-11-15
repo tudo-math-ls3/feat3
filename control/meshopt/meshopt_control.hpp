@@ -24,6 +24,9 @@ namespace FEAT
 {
   namespace Control
   {
+    /**
+     * \brief Control layer for mesh optimisation
+     */
     namespace Meshopt
     {
       /// \cond internal
@@ -131,7 +134,7 @@ namespace FEAT
           /**
            * \brief Gets the names of all Dirichlet boundaries
            *
-           * Note that each name refers to a boundary, but that boundary does not necessaryly have to be present due
+           * Note that each name refers to a boundary, but that boundary does not necessarily have to be present due
            * to partitioning etc.
            *
            * \returns A deque of Strings with all Dirichlet boundary names
@@ -141,7 +144,7 @@ namespace FEAT
           /**
            * \brief Gets the names of all slip boundaries
            *
-           * Note that each name refers to a boundary, but that boundary does not necessaryly have to be present due
+           * Note that each name refers to a boundary, but that boundary does not necessarily have to be present due
            * to partitioning etc.
            *
            * \returns A deque of Strings with all slip boundary names
