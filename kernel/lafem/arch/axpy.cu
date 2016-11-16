@@ -4,7 +4,6 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/sum.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/math.hpp>

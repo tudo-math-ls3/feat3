@@ -10,8 +10,6 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
-#include <kernel/lafem/arch/sum.hpp>
-#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/norm.hpp>
@@ -901,19 +899,14 @@ namespace FEAT
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
 
-        // check for special cases
-        // r <- x + y
-        if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_>::value(this->val(), x.val(), y.val(), this->rows() * this->num_of_offsets());
-        // r <- y - x
-        else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_>::value(this->val(), y.val(), x.val(), this->rows() * this->num_of_offsets());
-        // r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
+        if (Math::abs(alpha) < Math::eps<DT_>())
+        {
           this->copy(y);
-        // r <- y + alpha*x
-        else
-          Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
+          //y.scale(beta);
+          return;
+        }
+
+        Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
       }
 
       /**

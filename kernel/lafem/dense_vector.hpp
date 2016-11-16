@@ -11,9 +11,7 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/edi.hpp>
-#include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/component_invert.hpp>
-#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/max_element.hpp>
@@ -1010,30 +1008,17 @@ namespace FEAT
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        if(Math::abs(alpha) < Math::eps<DT_>())
+        {
+          this->copy(y);
+          //y.scale(beta);
+          return;
+        }
+
         TimeStamp ts_start;
 
-        // check for special cases
-        // r <- x + y
-        if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->size());
-          Arch::Sum<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
-        }
-        // r <- y - x
-        else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->size());
-          Arch::Difference<Mem_>::value(this->elements(), y.elements(), x.elements(), this->size());
-        }
-        // r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          this->copy(y);
-        // r <- y + alpha*x
-        else
-        {
-          Statistics::add_flops(this->size() * 2);
-          Arch::Axpy<Mem_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
-        }
+        Statistics::add_flops(this->size() * 2);
+        Arch::Axpy<Mem_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));

@@ -12,8 +12,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
-#include <kernel/lafem/arch/sum.hpp>
-#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/norm.hpp>
@@ -1798,30 +1796,17 @@ namespace FEAT
         if (x.C() != this->C())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix chunk size do not match!");
 
+        if (Math::abs(alpha) < Math::eps<DT_>())
+        {
+          this->copy(y);
+          //y.scale(beta);
+          return;
+        }
+
         TimeStamp ts_start;
 
-        // check for special cases
-        // r <- x + y
-        if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements());
-          Arch::Sum<Mem_>::value(this->val(), x.val(), y.val(), this->val_size());
-        }
-        // r <- y - x
-        else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->used_elements());
-          Arch::Difference<Mem_>::value(this->val(), y.val(), x.val(), this->val_size());
-        }
-        // r <- y
-        else if (Math::abs(alpha) < Math::eps<DT_>())
-          this->copy(y);
-        // r <- y + alpha*x
-        else
-        {
-          Statistics::add_flops(this->used_elements());
-          Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->val_size());
-        }
+        Statistics::add_flops(this->used_elements());
+        Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->val_size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));

@@ -10,8 +10,6 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/arch/sum.hpp>
-#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/scale.hpp>
@@ -964,30 +962,17 @@ namespace FEAT
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        if(Math::abs(alpha) < Math::eps<DT_>())
+        {
+          this->copy(y);
+          //y.scale(beta);
+          return;
+        }
+
         TimeStamp ts_start;
 
-        // check for special cases
-        // r <- x + y
-        if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->size<Perspective::pod>());
-          Arch::Sum<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
-        }
-        // r <- y - x
-        else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-        {
-          Statistics::add_flops(this->size<Perspective::pod>());
-          Arch::Difference<Mem_>::value(elements<Perspective::pod>(), y.template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
-        }
-        // r <- y
-        else if(Math::abs(alpha) < Math::eps<DT_>())
-          this->copy(y);
-        // r <- y + alpha*x
-        else
-        {
-          Statistics::add_flops(this->size<Perspective::pod>() * 2);
-          Arch::Axpy<Mem_>::dv(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
-        }
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        Arch::Axpy<Mem_>::dv(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));

@@ -17,7 +17,6 @@ if (FEAT_EICKT)
     component_invert_generic-eickt.cpp
     component_product_generic-eickt.cpp
     diagonal_generic-eickt.cpp
-    difference_generic-eickt.cpp
     dot_product_generic-eickt.cpp
     lumping_generic-eickt.cpp
     max_element_generic-eickt.cpp
@@ -27,7 +26,6 @@ if (FEAT_EICKT)
     scale_row_col_generic-eickt.cpp
     scatter_axpy_prim_generic-eickt.cpp
     slip_filter_generic-eickt.cpp
-    sum_generic-eickt.cpp
     unit_filter_generic-eickt.cpp
     unit_filter_blocked_generic-eickt.cpp
     )
@@ -37,13 +35,11 @@ if (FEAT_HAVE_MKL)
   SET (kernel-lafem-arch-list ${kernel-lafem-arch-list}
     axpy_mkl.cpp
     component_product_mkl.cpp
-    difference_mkl.cpp
     dot_product_mkl.cpp
     max_element_mkl.cpp
     norm_mkl.cpp
     product_matmat_mkl.cpp
     scale_mkl.cpp
-    sum_mkl.cpp
   )
 endif(FEAT_HAVE_MKL)
 
@@ -64,7 +60,6 @@ if (FEAT_HAVE_CUDA)
     axpy.cu
     component_invert.cu
     component_product.cu
-    difference.cu
     diagonal.cu
     dot_product.cu
     lumping.cu
@@ -75,7 +70,6 @@ if (FEAT_HAVE_CUDA)
     scale_row_col.cu
     scatter_axpy_prim.cu
     slip_filter.cu
-    sum.cu
     unit_filter.cu
     unit_filter_blocked.cu
     STATIC
