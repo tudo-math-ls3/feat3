@@ -14,6 +14,7 @@
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/math.hpp>
@@ -1873,7 +1874,7 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        Arch::Axpy<Mem_>::coo(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
+        Arch::Apply<Mem_>::coo(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
             this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
       }
 
@@ -1907,7 +1908,7 @@ namespace FEAT
           return;
         }
 
-        Arch::Axpy<Mem_>::coo(r.elements(), alpha, x.elements(), DT_(1), y.elements(),
+        Arch::Apply<Mem_>::coo(r.elements(), alpha, x.elements(), DT_(1), y.elements(),
             this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
       }
       ///@}

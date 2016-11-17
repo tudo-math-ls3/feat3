@@ -10,6 +10,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/product_matmat.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
@@ -364,7 +365,7 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        Arch::Axpy<Mem_>::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
+        Arch::Apply<Mem_>::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
             x.elements(), this->rows(), this->columns());
       }
 
@@ -398,7 +399,7 @@ namespace FEAT
           return;
         }
 
-        Arch::Axpy<Mem_>::dense(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
+        Arch::Apply<Mem_>::dense(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
             x.elements(), this->rows(), this->columns());
       }
 

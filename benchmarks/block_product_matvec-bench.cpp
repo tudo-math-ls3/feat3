@@ -22,16 +22,17 @@ struct BlockProductMatVecBench<Algo::Generic, SparseLayoutId::lt_csr, DT_, IT_>
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::csr_generic(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
-                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::Main>::csr_generic(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+        A.rows(), A.columns(), A.used_elements(), false);
   }
 
   template <int BlockHeight_, int BlockWidth_>
   static void f(DenseVectorBlocked<Mem::Main, DT_, IT_, BlockHeight_> & x, const DenseVectorBlocked<Mem::Main, DT_, IT_, BlockWidth_> & b,
     SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::template csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(x.template elements<Perspective::pod>(), A.template val<Perspective::pod>(), A.col_ind(), A.row_ptr(),
-                                              b.template elements<Perspective::pod>(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::Main>::template csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(
+        x.template elements<Perspective::pod>(), DT_(1), b.template elements<Perspective::pod>(), DT_(0), x.template elements<Perspective::pod>(), A.template val<Perspective::pod>(), A.col_ind(),
+        A.row_ptr(), A.rows(), A.columns(), A.used_elements());
   }
 };
 
@@ -41,16 +42,17 @@ struct BlockProductMatVecBench<Algo::MKL, SparseLayoutId::lt_csr, DT_, IT_>
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::csr_mkl(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
-                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::Main>::csr_mkl(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+        A.rows(), A.columns(), A.used_elements(), false);
   }
 
   template <int BlockHeight_, int BlockWidth_>
   static void f(DenseVectorBlocked<Mem::Main, DT_, IT_, BlockHeight_> & x, const DenseVectorBlocked<Mem::Main, DT_, IT_, BlockWidth_> & b,
     SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::csrb_mkl(x.template elements<Perspective::pod>(), A.template val<Perspective::pod>(), A.col_ind(), A.row_ptr(),
-                                              b.template elements<Perspective::pod>(), A.rows(), A.columns(), A.used_elements(), BlockHeight_);
+    Arch::Apply<Mem::Main>::csrb_mkl(
+        x.template elements<Perspective::pod>(), DT_(1), b.template elements<Perspective::pod>(), DT_(0), x.template elements<Perspective::pod>(), A.template val<Perspective::pod>(), A.col_ind(),
+        A.row_ptr(), A.rows(), A.columns(), A.used_elements(), BlockHeight_);
   }
 };
 
@@ -60,16 +62,17 @@ struct BlockProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_csr, DT_, IT_>
   static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
     SparseMatrixCSR<Mem::CUDA, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::CUDA>::csr(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
-                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::CUDA>::csr(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+        A.rows(), A.columns(), A.used_elements(), false);
   }
 
   template <int BlockHeight_, int BlockWidth_>
   static void f(DenseVectorBlocked<Mem::CUDA, DT_, IT_, BlockHeight_> & x, const DenseVectorBlocked<Mem::CUDA, DT_, IT_, BlockWidth_> & b,
     SparseMatrixBCSR<Mem::CUDA, DT_, IT_, BlockHeight_, BlockWidth_> & A)
   {
-    Arch::ProductMatVec<Mem::CUDA>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(x.template elements<Perspective::pod>(), A.template val<Perspective::pod>(), A.col_ind(), A.row_ptr(),
-                                              b.template elements<Perspective::pod>(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::CUDA>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        x.template elements<Perspective::pod>(), DT_(1), b.template elements<Perspective::pod>(), DT_(0), x.template elements<Perspective::pod>(), A.template val<Perspective::pod>(), A.col_ind(),
+        A.row_ptr(), A.rows(), A.columns(), A.used_elements());
   }
 };
 

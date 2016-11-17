@@ -95,7 +95,7 @@ namespace FEAT
           double toe = std::numeric_limits<double>::max();
           try
           {
-            auto func = [&] () { Arch::Axpy<Mem::CUDA>::ell(temp.elements(), DT_(1), vector.elements(), DT_(0), temp.elements(),
+            auto func = [&] () { Arch::Apply<Mem::CUDA>::ell(temp.elements(), DT_(1), vector.elements(), DT_(0), temp.elements(),
                 matrix.val(), matrix.col_ind(), matrix.cs(), matrix.cl(), matrix.C(), matrix.rows()); };
             toe = LAFEM::Tuning::_run_bench(func);
             Util::cuda_check_last_error();

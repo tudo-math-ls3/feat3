@@ -22,8 +22,8 @@ struct ProductMatVecBench<Algo::Generic, SparseLayoutId::lt_csr, DT_, IT_>
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::csr_generic(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
-                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::Main>::csr_generic(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+        A.rows(), A.columns(), A.used_elements(), false);
   }
 };
 
@@ -33,8 +33,8 @@ struct ProductMatVecBench<Algo::MKL, SparseLayoutId::lt_csr, DT_, IT_>
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::csr_mkl(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
-                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::Main>::csr_mkl(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+        A.rows(), A.columns(), A.used_elements(), false);
   }
 };
 
@@ -44,8 +44,8 @@ struct ProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_csr, DT_, IT_>
   static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
     SparseMatrixCSR<Mem::CUDA, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::CUDA>::csr(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
-                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+    Arch::Apply<Mem::CUDA>::csr(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+        A.rows(), A.columns(), A.used_elements(), false);
   }
 };
 
@@ -55,8 +55,8 @@ struct ProductMatVecBench<Algo::Generic, SparseLayoutId::lt_ell, DT_, IT_>
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixELL<Mem::Main, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::ell_generic(x.elements(), A.val(), A.col_ind(), A.cs(), A.cl(),
-                                              b.elements(), A.C(), A.rows());
+    Arch::Apply<Mem::Main>::ell_generic(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.cs(), A.cl(),
+        A.C(), A.rows());
   }
 };
 
@@ -66,8 +66,8 @@ struct ProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_ell, DT_, IT_>
   static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
     SparseMatrixELL<Mem::CUDA, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::CUDA>::ell(x.elements(), A.val(), A.col_ind(), A.cs(), A.cl(),
-                                              b.elements(), A.C(), A.rows());
+    Arch::Apply<Mem::CUDA>::ell(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.col_ind(), A.cs(), A.cl(),
+        A.C(), A.rows());
   }
 };
 
@@ -77,7 +77,7 @@ struct ProductMatVecBench<Algo::Generic, SparseLayoutId::lt_banded, DT_, IT_>
   static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
     SparseMatrixBanded<Mem::Main, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::Main>::banded_generic(x.elements(), A.val(), A.offsets(), b.elements(), A.num_of_offsets(), A.rows(), A.columns());
+    Arch::Apply<Mem::Main>::banded_generic(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.offsets(), A.num_of_offsets(), A.rows(), A.columns());
   }
 };
 
@@ -87,7 +87,7 @@ struct ProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_banded, DT_, IT_>
   static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
     SparseMatrixBanded<Mem::CUDA, DT_, IT_> & A)
   {
-    Arch::ProductMatVec<Mem::CUDA>::banded(x.elements(), A.val(), A.offsets(), b.elements(), A.num_of_offsets(), A.rows(), A.columns());
+    Arch::Apply<Mem::CUDA>::banded(x.elements(), DT_(1), b.elements(), DT_(0), x.elements(), A.val(), A.offsets(), A.num_of_offsets(), A.rows(), A.columns());
   }
 };
 

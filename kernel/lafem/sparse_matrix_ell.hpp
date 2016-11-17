@@ -14,6 +14,7 @@
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/lafem/arch/lumping.hpp>
@@ -2036,7 +2037,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy<Mem_>::ell(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->val(),
+        Arch::Apply<Mem_>::ell(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->val(),
             this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
 
         TimeStamp ts_stop;
@@ -2076,7 +2077,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 3);
-        Arch::Axpy<Mem_>::ell(r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->val(),
+        Arch::Apply<Mem_>::ell(r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->val(),
             this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
 
         TimeStamp ts_stop;

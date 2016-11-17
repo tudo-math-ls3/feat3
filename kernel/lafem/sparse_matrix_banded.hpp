@@ -12,6 +12,7 @@
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 
@@ -955,7 +956,7 @@ namespace FEAT
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
-        Arch::Axpy<Mem_>::banded(r.elements(),
+        Arch::Apply<Mem_>::banded(r.elements(),
             DT_(1),
             x.elements(),
             DT_(0),
@@ -997,7 +998,7 @@ namespace FEAT
           return;
         }
 
-        Arch::Axpy<Mem_>::banded(r.elements(),
+        Arch::Apply<Mem_>::banded(r.elements(),
             alpha,
             x.elements(),
             DT_(1),
@@ -1141,13 +1142,13 @@ namespace FEAT
       /// Returns first row-index of the diagonal matching to the offset i
       Index start_offset(const Index i) const
       {
-        return Arch::Intern::AxpyBanded::start_offset(i, offsets(), rows(), columns(), num_of_offsets());
+        return Arch::Intern::ApplyBanded::start_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
 
       /// Returns last row-index of the diagonal matching to the offset i
       Index end_offset(const Index i) const
       {
-        return Arch::Intern::AxpyBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
+        return Arch::Intern::ApplyBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
 
       /* ******************************************************************* */

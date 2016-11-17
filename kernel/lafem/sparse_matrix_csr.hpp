@@ -16,6 +16,7 @@
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/lafem/arch/lumping.hpp>
@@ -1911,7 +1912,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy<Mem_>::csr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
+        Arch::Apply<Mem_>::csr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
 
         TimeStamp ts_stop;
@@ -1947,7 +1948,7 @@ namespace FEAT
 
 
         Statistics::add_flops(this->used_elements() * 2 * BlockSize_);
-        Arch::Axpy<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+        Arch::Apply<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
             r.template elements<Perspective::pod>(), DT_(1.), x.template elements<Perspective::pod>(), DT_(0.), r.template elements<Perspective::pod>(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -2003,7 +2004,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 3);
-        Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
+        Arch::Apply<Mem_>::csr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
 
         TimeStamp ts_stop;
@@ -2047,7 +2048,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
-        Arch::Axpy<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+        Arch::Apply<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
