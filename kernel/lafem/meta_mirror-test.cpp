@@ -121,13 +121,9 @@ public:
     mirror_x.gather_prim(buf_x, vec_x);
     mirror_y.gather_prim(buf_y, vec_y);
 
-    // combine buffers: x,y <- x+y
-    buf_x.axpy(buf_y, buf_x);
-    buf_y.copy(buf_x);
-
-    // scatter synced buffers
-    mirror_x.scatter_prim(vec_x, buf_x);
-    mirror_y.scatter_prim(vec_y, buf_y);
+    // scatter exchanged buffers
+    mirror_x.scatter_axpy_prim(vec_x, buf_y);
+    mirror_y.scatter_axpy_prim(vec_y, buf_x);
 
     // compute difference to reference
     vec_x.axpy(sync_x, vec_x, -DataType(1));
