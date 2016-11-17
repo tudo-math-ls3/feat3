@@ -167,45 +167,28 @@ struct MeshoptRefinementApp
     // Save new coordinates. We need them for calling prepare() to set the initial guess
     meshopt_ctrl->mesh_to_buffer();
     auto new_coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
-    meshopt_ctrl->prepare(new_coords);
 
     // Now call prepare
     meshopt_ctrl->prepare(new_coords);
 
-    // Write initial vtk output
-    if(write_vtk)
-    {
-      int deque_position(0);
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
-      {
-        int lvl_index((*it)->get_level_index());
-
-        String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm.rank(), comm.size());
-
-        ++deque_position;
-      }
-
-    }
-
     // For the tests these have to have function global scope
     DT_ qual_min(0);
     DT_ qual_sum(0);
+    DataType* qual_cellwise(new DataType[finest_mesh.get_num_entities(MeshType::shape_dim)]);
+
     DT_ worst_angle(0);
+    DataType* worst_angle_cellwise(new DataType[finest_mesh.get_num_entities(MeshType::shape_dim)]);
+
     DT_ cell_size_defect(0);
 
     // Compute quality indicators
     {
       Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
-      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(), qual_cellwise);
 
       worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(),
+        worst_angle_cellwise);
 
       comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
       comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
@@ -227,6 +210,29 @@ struct MeshoptRefinementApp
           " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
           " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
       }
+    }
+
+    // Write initial vtk output
+    if(write_vtk)
+    {
+      int deque_position(0);
+      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      {
+        int lvl_index((*it)->get_level_index());
+
+        String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        exporter.add_cell_scalar("Worst angle", worst_angle_cellwise);
+        exporter.add_cell_scalar("Shape quality heuristic", qual_cellwise);
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, comm.rank(), comm.size());
+
+        ++deque_position;
+      }
+
     }
 
     // Check for the hard coded settings for test mode
@@ -252,34 +258,15 @@ struct MeshoptRefinementApp
     // Optimise the mesh
     meshopt_ctrl->optimise();
 
-    // Write output again
-    if(write_vtk)
-    {
-      int deque_position(0);
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
-      {
-        int lvl_index((*it)->get_level_index());
-
-        String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
-        Util::mpi_cout("Writing "+vtk_name+"\n");
-
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm.rank(), comm.size());
-
-        ++deque_position;
-      }
-
-    }
 
     // Compute quality indicators
     {
       Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
-      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(), qual_cellwise);
 
       worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(),
+        worst_angle_cellwise);
 
       comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
       comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
@@ -301,6 +288,29 @@ struct MeshoptRefinementApp
           " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
           " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
       }
+    }
+
+    // Write output again
+    if(write_vtk)
+    {
+      int deque_position(0);
+      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      {
+        int lvl_index((*it)->get_level_index());
+
+        String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        exporter.add_cell_scalar("Worst angle", worst_angle_cellwise);
+        exporter.add_cell_scalar("Shape quality heuristic", qual_cellwise);
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, comm.rank(), comm.size());
+
+        ++deque_position;
+      }
+
     }
 
     // Check for the hard coded settings for test mode
