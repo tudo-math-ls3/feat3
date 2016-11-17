@@ -6,8 +6,6 @@
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/vector_mirror.hpp>
-#include <kernel/lafem/matrix_mirror.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
@@ -27,9 +25,6 @@ class GridTransferMassTest :
 
   typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
   typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VecMirType;
-  typedef LAFEM::MatrixMirror<VecMirType> MatMirType;
 
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
 
@@ -93,14 +88,10 @@ public:
     // transpose to obtain restriction matrix
     MatrixType rest_matrix(prol_matrix.transpose());
 
-    // build a matrix mirror using the prolongation and restriction matrices
-    VecMirType vec_mirror(std::move(rest_matrix), std::move(prol_matrix));
-    MatMirType mat_mirror(vec_mirror, vec_mirror);
-
     // finally, restrict the fine mesh mass matrix onto the coarse mesh and
     // subtract it from the coarse mesh mass matrix, i.e.
     // M_c <- M_c - R * M_f * P
-    mat_mirror.gather_axpy(mass_c, mass_f, -DataType(1));
+    mass_c.add_double_mat_mult(rest_matrix, mass_f, prol_matrix, -DataType(1), true);
 
     // the resulting matrix should now be the null matrix
     DataType err = Math::sqr(mass_c.norm_frobenius());

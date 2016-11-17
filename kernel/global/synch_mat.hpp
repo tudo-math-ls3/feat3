@@ -33,9 +33,9 @@ namespace FEAT
     {
     public:
       /// the matrix mirror type
-      typedef LAFEM::MatrixMirror<VMT_> MatrixMirrorType;
+      typedef LAFEM::MatrixMirror<Mem::Main, typename MT_::DataType, typename MT_::IndexType> MatrixMirrorType;
       /// the buffer matrix type
-      typedef typename MatrixMirrorType::template BufferType<typename MT_::DataType, typename MT_::IndexType> BufferMatrixType;
+      typedef LAFEM::MatrixMirrorBuffer<Mem::Main, typename MT_::DataType, typename MT_::IndexType> BufferMatrixType;
 
     protected:
       bool _initialised;
@@ -126,34 +126,30 @@ namespace FEAT
         // create matrix mirror buffers
         for(std::size_t i(0); i < n; ++i)
         {
-          const MatrixMirrorType& mirror = _mirrors.at(i);
-          const VMT_& mir_r = mirror.get_row_mirror();
-          const VMT_& mir_c = mirror.get_col_mirror();
-
-          // assemble buffer graph
-          Adjacency::Graph tmp1(Adjacency::rt_injectify, mir_r.get_gather_dual(), matrix);
-          Adjacency::Graph tmp2(Adjacency::rt_injectify, tmp1, mir_c.get_scatter_dual());
-          tmp2.sort_indices();
-
-          // create send buffer matrices
-          _send_bufs.at(i) = BufferMatrixType(tmp2);
+          _send_bufs.at(i) = _mirrors.at(i).create_buffer(matrix);
         }
 
         // receive buffer dimensions vector
-        std::vector<std::array<Index,3>> recv_dims(n);
+        std::vector<std::array<Index,4>> recv_dims(n);
 
         // post send-buffer dimension receives
         for(std::size_t i(0); i < n; ++i)
         {
-          _recv_reqs[i] = _comm.irecv(recv_dims.at(i).data(), std::size_t(3), _ranks.at(i));
+          _recv_reqs[i] = _comm.irecv(recv_dims.at(i).data(), std::size_t(4), _ranks.at(i));
         }
 
         // send send-buffer dimensions
         for(std::size_t i(0); i < n; ++i)
         {
           const BufferMatrixType& sbuf = _send_bufs.at(i);
-          Index dims[3] = { sbuf.rows(), sbuf.columns(), sbuf.used_elements() };
-          _send_reqs[i] = _comm.isend(dims, std::size_t(3), _ranks.at(i));
+          Index dims[4] =
+          {
+            sbuf.rows(),
+            sbuf.columns(),
+            sbuf.entries_per_nonzero(),
+            sbuf.used_elements()
+          };
+          _send_reqs[i] = _comm.isend(dims, std::size_t(4), _ranks.at(i));
         }
 
         // wait for all receives to finish
@@ -165,10 +161,11 @@ namespace FEAT
           // get the receive buffer dimensions
           Index nrows = recv_dims.at(i)[0];
           Index ncols = recv_dims.at(i)[1];
-          Index nnze  = recv_dims.at(i)[2];
+          Index nepnz = recv_dims.at(i)[2];
+          Index nnze  = recv_dims.at(i)[3];
 
           // allocate receive buffer
-          _recv_bufs.at(i) = BufferMatrixType(nrows, ncols, nnze);
+          _recv_bufs.at(i) = BufferMatrixType(nrows, ncols, nnze, nepnz);
         }
 
         // post buffer row-pointer array receives
@@ -237,7 +234,7 @@ namespace FEAT
           BufferMatrixType& buf = _recv_bufs.at(i);
 
           // post receive
-          _recv_reqs.get_request(i) = _comm.irecv(buf.val(), buf.used_elements(), _ranks.at(i));
+          _recv_reqs.get_request(i) = _comm.irecv(buf.val(), buf.val_size(), _ranks.at(i));
         }
 
         // post sends
@@ -249,7 +246,7 @@ namespace FEAT
           _mirrors.at(i).gather(buf, matrix);
 
           // post send
-          _send_reqs.get_request(i) = _comm.isend(buf.val(), buf.used_elements(), _ranks.at(i));
+          _send_reqs.get_request(i) = _comm.isend(buf.val(), buf.val_size(), _ranks.at(i));
         }
 
         // process all pending receives

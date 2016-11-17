@@ -383,6 +383,25 @@ namespace FEAT
       }
 
       /**
+       * \brief Adds another scaled vector onto this vector.
+       *
+       * \param[in] a
+       * The vector to be added onto this vector.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the axpy.
+       *
+       * \returns \c *this
+       */
+      template<int snx_>
+      Vector& axpy(DataType alpha,const Vector<T_, n_, snx_>& a)
+      {
+        for(int i(0); i < n_; ++i)
+          v[i] += alpha * a.v[i];
+        return *this;
+      }
+
+      /**
        * \brief Sets this vector to the result of a matrix-vector product.
        *
        * Let \e y denote \c this vector, and let \e A denote the input matrix and \e x in the input vector, then
@@ -1032,6 +1051,30 @@ namespace FEAT
           for(int j(0); j < n_; ++j)
           {
             v[i][j] = x[i] * y[j];
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Adds another scaled matrix onto this matrix.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the axpy.
+       *
+       * \param[in] a
+       * The matrix to be added onto this matrix.
+       *
+       * \returns \c *this
+       */
+      template<int sma_, int sna_>
+      Matrix& axpy(DataType alpha, const Matrix<T_, m_, n_, sma_, sna_>& a)
+      {
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            v[i][j] += alpha * a.v[i][j];
           }
         }
         return *this;

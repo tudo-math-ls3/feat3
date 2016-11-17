@@ -295,6 +295,19 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve total length of value array.
+       *
+       * That's simply the product of non-zero count and number of entries per non-zero.
+       *
+       * \returns Total length of value array
+       */
+      template <Perspective = Perspective::native>
+      Index val_size() const
+      {
+        return this->_scalar_index.at(3) * this->_scalar_index.at(4);
+      }
+
+      /**
        * \brief Retrieve column indices array.
        *
        * \returns Column indices array.

@@ -104,6 +104,9 @@ namespace FEAT
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
 
+      /// ImageIterator typedef for Adjactor interface implementation
+      typedef const IT_* ImageIterator;
+
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_>;
@@ -1693,7 +1696,37 @@ namespace FEAT
         }
       }
       /// \endcond
-    };
+
+      /* ******************************************************************* */
+      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+      /* ******************************************************************* */
+    public:
+      /** \copydoc Adjactor::get_num_nodes_domain() */
+      inline Index get_num_nodes_domain() const
+      {
+        return rows();
+      }
+
+      /** \copydoc Adjactor::get_num_nodes_image() */
+      inline Index get_num_nodes_image() const
+      {
+        return columns();
+      }
+
+      /** \copydoc Adjactor::image_begin() */
+      inline ImageIterator image_begin(Index domain_node) const
+      {
+        XASSERTM(domain_node < rows(), "Domain node index out of range");
+        return &this->_indices.at(0)[this->_indices.at(1)[domain_node]];
+      }
+
+      /** \copydoc Adjactor::image_end() */
+      inline ImageIterator image_end(Index domain_node) const
+      {
+        XASSERTM(domain_node < rows(), "Domain node index out of range");
+        return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
+      }
+    }; // class SparseMatrixBCSR
   } // namespace LAFEM
 } // namespace FEAT
 

@@ -294,26 +294,6 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles the Matrix-Mirror buffer graph.
-       *
-       * \param[in] matrix_mirror
-       * A reference to the matrix mirror that is to be used.
-       *
-       * \param[in] template_matrix
-       * A reference to the matrix that is to be mirrored.
-       */
-      template<
-        typename VectorMirror_,
-        typename MT_>
-      static Adjacency::Graph assemble_buffer_graph(
-        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const MT_& template_matrix)
-      {
-        Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
-        return Adjacency::Graph(Adjacency::rt_injectify, tmp, matrix_mirror.get_col_mirror().get_scatter_dual());
-      }
-
-      /**
        * \brief Assembles a Mirror-Buffer-Matrix.
        *
        * \param[out] buffer_matrix
@@ -328,15 +308,13 @@ namespace FEAT
       template<
         typename DataTypeA_,
         typename IndexTypeA_,
-        typename VectorMirror_,
         typename MT_>
       static void assemble_buffer_matrix(
-        LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_matrix,
-        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
+        LAFEM::MatrixMirrorBuffer<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_matrix,
+        const LAFEM::MatrixMirror<Mem::Main, DataTypeA_, IndexTypeA_>& matrix_mirror,
         const MT_& template_matrix)
       {
-        buffer_matrix = LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>
-          (assemble_buffer_graph(matrix_mirror, template_matrix));
+        buffer_matrix = matrix_mirror.create_buffer(template_matrix);
       }
 
       /**

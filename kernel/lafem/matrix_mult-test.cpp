@@ -18,7 +18,8 @@ class MatrixMultTest
 {
   typedef SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
   typedef VectorMirror<Mem::Main, DT_, IT_> VectorMirrorType;
-  typedef MatrixMirror<VectorMirrorType> MatrixMirrorType;
+  typedef MatrixMirror<Mem::Main, DT_, IT_> MatrixMirrorType;
+  typedef MatrixMirrorBuffer<Mem::Main, DT_, IT_> MatMirBufType;
 
 public:
   MatrixMultTest()
@@ -59,8 +60,14 @@ public:
     MatrixMirrorType mirror(mir_d, mir_b);
 
     // compute X := D*A*B using matrix mirror
-    x.format();
-    mirror.gather(x, a);
+    // This is a little tricky, as the matrix mirror works on MatrixMirrorBuffer
+    // objects...
+    MatMirBufType temp_c(Adjacency::Graph(Adjacency::rt_as_is, x), Index(1));
+    mirror.gather(temp_c, a);
+    const DT_* vt = temp_c.val();
+    DT_* vx = x.val();
+    for(Index i(0); i < x.used_elements(); ++i)
+        vx[i] = vt[i];
 
     // subtract: X -= D*A*B
     x.add_double_mat_mult(d, a, b, -DT_(1));

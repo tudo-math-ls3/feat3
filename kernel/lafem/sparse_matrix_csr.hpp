@@ -2081,12 +2081,18 @@ namespace FEAT
        *
        * \param[in] alpha
        * The scaling factor for the product.
+       *
+       * \param[in] allow_incomplete
+       * Specifies whether the output matrix structure is allowed to be incomplete.
+       * If set to \c false, this function will throw an exception on incompleteness,
+       * otherwise the missing entries are ignored (dropped).
        */
       void add_double_mat_mult(
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& a,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,
-        const DT_ alpha = DT_(1))
+        const DT_ alpha = DT_(1),
+        const bool allow_incomplete = false)
       {
         // validate matrix dimensions
         XASSERT(this->rows() == d.rows());
@@ -2151,8 +2157,11 @@ namespace FEAT
                 {
                   // If we come out here, then the sparsity pattern of X is incomplete:
                   // B_lj is meant to be added onto X_ij, but the entry X_ij is missing
-                  throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
-                  //++lj;
+                  // We let the caller decide whether this is a valid case or not:
+                  if(allow_incomplete)
+                    ++lj;
+                  else
+                    throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
                 }
               }
             }
@@ -2188,12 +2197,18 @@ namespace FEAT
        *
        * \param[in] alpha
        * The scaling factor for the product.
+       *
+       * \param[in] allow_incomplete
+       * Specifies whether the output matrix structure is allowed to be incomplete.
+       * If set to \c false, this function will throw an exception on incompleteness,
+       * otherwise the missing entries are ignored (dropped).
        */
       void add_double_mat_mult(
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
         const LAFEM::DenseVector<Mem::Main, DT_, IT_>& a,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,
-        const DT_ alpha = DT_(1))
+        const DT_ alpha = DT_(1),
+        const bool allow_incomplete = false)
       {
         // validate matrix dimensions
         XASSERT(this->rows() == d.rows());
@@ -2250,8 +2265,11 @@ namespace FEAT
               {
                 // If we come out here, then the sparsity pattern of X is incomplete:
                 // B_kj is meant to be added onto X_ij, but the entry X_ij is missing
-                throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
-                //++kj;
+                // We let the caller decide whether this is a valid case or not:
+                if(allow_incomplete)
+                  ++kj;
+                else
+                  throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
               }
             }
           }
