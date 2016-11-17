@@ -400,6 +400,8 @@ SparseMatrixBCSRApplySquareTest<Mem::Main, __float128, unsigned int> cpu_sparse_
 #ifdef FEAT_HAVE_CUDA
 SparseMatrixBCSRApplySquareTest<Mem::CUDA, float, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_float_uint;
 SparseMatrixBCSRApplySquareTest<Mem::CUDA, double, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_double_uint;
+SparseMatrixBCSRApplySquareTest<Mem::CUDA, float, unsigned long> gpu_sparse_matrix_bcsr_apply_square_test_float_ulong;
+SparseMatrixBCSRApplySquareTest<Mem::CUDA, double, unsigned long> gpu_sparse_matrix_bcsr_apply_square_test_double_ulong;
 #endif
 
 

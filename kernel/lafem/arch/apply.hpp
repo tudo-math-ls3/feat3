@@ -212,19 +212,14 @@ namespace FEAT
         static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
         {
           static_assert(BlockHeight_ == BlockWidth_, "cuda bcsr only supports squared matrix blocks!");
-          //static_assert(std::is_same<IT_, unsigned int>::value, "cuda bcsr only supports unsigned int!");
-          if(! std::is_same<IT_, unsigned int>::value)
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "cuda bscr only supports unsigned int!");
-          }
-          csrb_intern(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_);
+          csrb_intern<DT_, BlockHeight_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
 
-        template <typename DT_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize);
+        template <typename DT_, int BlockSize_>
+        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements);
 
-        template <typename DT_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize);
+        template <typename DT_, int BlockSize_>
+        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_, typename IT_, int BlockSize_>
         static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements);

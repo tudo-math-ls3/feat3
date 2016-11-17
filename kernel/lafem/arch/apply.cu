@@ -193,6 +193,36 @@ namespace FEAT
           r[idx * BlockSize_ + j] = (bsum[j] * a) + b * r[idx * BlockSize_ + j];
         }
       }
+
+      template <typename DT_, int BlockSize_>
+      __global__ void cuda_apply_csrb(DT_ * r, const DT_ a, const DT_ * x, const DT_ b, const DT_ * val, const unsigned long * col_ind,
+          const unsigned long * row_ptr, const Index count)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= count)
+          return;
+
+        DT_ bsum[BlockSize_];
+        for (int j(0) ; j < BlockSize_ ; ++j)
+        {
+          bsum[j] = DT_(0);
+        }
+        const unsigned long end(row_ptr[idx + 1]);
+        for (unsigned long i(row_ptr[idx]) ; i < end ; ++i)
+        {
+          for (int h(0) ; h < BlockSize_ ; ++h)
+          {
+            for (int w(0) ; w < BlockSize_ ; ++w)
+            {
+              bsum[h] += val[i * BlockSize_ * BlockSize_ + h * BlockSize_ + w] * x[col_ind[i] * BlockSize_ + w];
+            }
+          }
+        }
+        for (int j(0) ; j < BlockSize_ ; ++j)
+        {
+          r[idx * BlockSize_ + j] = (bsum[j] * a) + b * r[idx * BlockSize_ + j];
+        }
+      }
     }
   }
 }
@@ -267,35 +297,23 @@ void Apply<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ 
 template void Apply<Mem::CUDA>::csr(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
 template void Apply<Mem::CUDA>::csr(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
 
-template <typename DT_>
-void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize)
+template <typename DT_, int BlockSize_>
+void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements)
 {
-  if (r == y)
+  if (r != y)
   {
-    cusparseMatDescr_t descr=0;
-    cusparseCreateMatDescr(&descr);
-    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
-    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-
-    FEAT::LAFEM::Intern::cusparse_apply_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
-        blocksize, x, &b, r);
-
-    cusparseDestroyMatDescr(descr);
+    cudaMemcpy(r, y, rows * BlockSize_ * sizeof(DT_), cudaMemcpyDeviceToDevice);
   }
-  else
-  {
-    cudaMemcpy(r, y, rows * blocksize * sizeof(DT_), cudaMemcpyDeviceToDevice);
 
-    cusparseMatDescr_t descr=0;
-    cusparseCreateMatDescr(&descr);
-    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
-    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+  cusparseMatDescr_t descr=0;
+  cusparseCreateMatDescr(&descr);
+  cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+  cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
-    FEAT::LAFEM::Intern::cusparse_apply_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
-        blocksize, x, &b, r);
+  FEAT::LAFEM::Intern::cusparse_apply_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+      BlockSize_, x, &b, r);
 
-    cusparseDestroyMatDescr(descr);
-  }
+  cusparseDestroyMatDescr(descr);
 
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
@@ -304,17 +322,45 @@ void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, co
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply<Mem::CUDA>::csrb_intern(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
-template void Apply<Mem::CUDA>::csrb_intern(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
+template void Apply<Mem::CUDA>::csrb_intern<float, 1>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<double, 1>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<float, 2>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<double, 2>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<float, 3>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<double, 3>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
-template <typename DT_>
-void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize)
+template <typename DT_, int BlockSize_>
+void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements)
 {
-  /// \todo implement
-  throw InternalError(__func__, __FILE__, __LINE__, "csrb ulong not implemented!\n");
+  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  if (Math::abs(b) < Math::eps<DT_>())
+  {
+    MemoryPool<Mem::CUDA>::set_memory(r, DT_(0), /*(transposed?columns:rows)*/ rows * BlockSize_);
+  }
+  else if (r != y)
+  {
+    MemoryPool<Mem::CUDA>::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockSize_);
+  }
+
+  FEAT::LAFEM::Intern::cuda_apply_csrb<DT_, BlockSize_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
-template void Apply<Mem::CUDA>::csrb_intern(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int);
-template void Apply<Mem::CUDA>::csrb_intern(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int);
+template void Apply<Mem::CUDA>::csrb_intern<float, 1>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<double, 1>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<float, 2>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<double, 2>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<float, 3>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply<Mem::CUDA>::csrb_intern<double, 3>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_, int BlockSize_>
 void Apply<Mem::CUDA>::csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows,

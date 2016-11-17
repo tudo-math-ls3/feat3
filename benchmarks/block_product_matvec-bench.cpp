@@ -171,6 +171,7 @@ int main(int argc, char ** argv)
   Runtime::initialise(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int>, 2>();
+  run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned long>, 2>();
 #endif
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, 2>();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> , 2>();
