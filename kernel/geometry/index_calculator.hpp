@@ -120,7 +120,7 @@ namespace FEAT
       Index get_index(Index i, Index j, Index k) const
       {
         typename RepSet::const_iterator iter = _rep_set_vec[i].begin();
-        advance(iter, j);
+        std::advance(iter, (typename std::iterator_traits<decltype(iter)>::difference_type)j);
         return (*iter)[k];
       }
 
