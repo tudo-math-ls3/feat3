@@ -100,12 +100,6 @@ struct MeshoptRefinementApp
     XASSERTM(meshoptimiser_key_p.second,
     "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
 
-    // Get the mode for adapting the mesh upon refinement
-    Geometry::AdaptMode adapt_mode(Geometry::AdaptMode::none);
-    auto adapt_mode_p = app_settings_section->query("adapt_mode");
-    if(adapt_mode_p.second)
-      adapt_mode <<adapt_mode_p.first;
-
     // Get the application settings section
     auto domain_control_settings_section = application_config->query_section("DomainControlSettings");
     XASSERTM(domain_control_settings_section != nullptr,
@@ -123,6 +117,15 @@ struct MeshoptRefinementApp
       lvl_max = lvl_min;
     else
       lvl_max = std::stoi(lvl_max_p.first);
+
+    // Get the mode for adapting the mesh upon refinement
+    Geometry::AdaptMode adapt_mode(Geometry::AdaptMode::none);
+    auto adapt_mode_p = domain_control_settings_section->query("adapt_mode");
+    if(adapt_mode_p.second)
+    {
+      std::cout << "Using adapt_mode " << adapt_mode_p.first << std::endl;
+      adapt_mode << adapt_mode_p.first;
+    }
 
     TimeStamp at;
 
