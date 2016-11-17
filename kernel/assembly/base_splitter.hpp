@@ -120,11 +120,21 @@ namespace FEAT
         // format output
         vector.format();
 
+        // clone for a frequencies vector
+        auto freqs = vector.clone();
+
         // loop over all mirrors and scatter splits
         for(std::size_t i(0); i < _mirrors.size(); ++i)
         {
-          _mirrors.at(i).scatter_prim(vector, splits.at(i));
+          _mirrors.at(i).scatter_axpy_prim(vector, splits.at(i));
+          auto tmp = splits.at(i).clone();
+          tmp.format(DT_(1));
+          _mirrors.at(i).scatter_axpy_prim(freqs, tmp);
         }
+
+        // scale output
+        freqs.component_invert(freqs);
+        vector.component_product(vector, freqs);
       }
     }; // class BaseSplitter<...>
   } // namespace Assembly
