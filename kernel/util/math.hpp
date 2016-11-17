@@ -9,7 +9,7 @@
 #include <cmath>
 #include <limits>
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
 extern "C"
 {
 #    include <quadmath.h>
@@ -26,7 +26,7 @@ extern "C"
 #  define WRAP_QUAD_MATH1(func)
 #  define WRAP_QUAD_MATH2(func)
 #  define WRAP_QUAD_MATH2PTR(func)
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
     // single argument function wrapper
 #define WRAP_STD_MATH1(func) \
@@ -222,9 +222,9 @@ namespace FEAT
 
     // wrap std::abs
     WRAP_STD_MATH1(abs)
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     inline __float128 abs(__float128 x) {return ::fabsq(x);}
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
     /**
      * \brief Returns the square-root of a value.
@@ -681,13 +681,13 @@ namespace FEAT
       return std::numeric_limits<long double>::epsilon();
     }
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     template<>
     inline __float128 eps<__float128>()
     {
       return FLT128_EPSILON;
     }
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
     /// \endcond
 
     /**
@@ -713,7 +713,7 @@ namespace FEAT
     }
 
     /// \cond internal
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     template<>
     inline __float128 huge<__float128>()
     {
@@ -725,7 +725,7 @@ namespace FEAT
     {
       return FLT128_MIN;
     }
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
     /// \endcond
 
     /**
@@ -780,13 +780,13 @@ namespace FEAT
 
     WRAP_STD_MATH1BRET(isfinite)
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     inline bool isfinite(__float128 x)
     {
       // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/finiteq.c
       return (::finiteq(x) != 0);
     }
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is infinite.
@@ -802,13 +802,13 @@ namespace FEAT
 
     WRAP_STD_MATH1BRET(isinf)
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     inline bool isinf(__float128 x)
     {
       // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isinfq.c
       return (::isinfq(x) != 0);
     }
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is Not-A-Number.
@@ -824,13 +824,13 @@ namespace FEAT
 
     WRAP_STD_MATH1BRET(isnan)
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     inline bool isnan(__float128 x)
     {
       // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isnanq.c
       return (::isnanq(x) != 0);
     }
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is normal.
@@ -848,7 +848,7 @@ namespace FEAT
 
     WRAP_STD_MATH1BRET(isnormal)
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     inline bool isnormal(__float128 x)
     {
       // check whether the value is finite
@@ -857,7 +857,7 @@ namespace FEAT
       // check whether the value is not below minimal normal value
       return !(::fabsq(x) < FLT128_MIN);
     }
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
     /**
      * \brief Calculates the (partial) factorial.
@@ -1130,7 +1130,7 @@ namespace FEAT
     {
     }; // class Limits<...>
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     template<>
     class Limits<__float128>
     {
@@ -1169,7 +1169,7 @@ namespace FEAT
       static constexpr bool tinyness_before = true;
       static constexpr std::float_round_style round_style = std::round_to_nearest;
     };
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
   } // namespace Math
 } // namespace FEAT
 

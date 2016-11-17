@@ -433,7 +433,7 @@ namespace FEAT
       }
     };
 
-#ifdef FEAT_HAVE_QUADMATH
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     /**
      * \brief Type Traits specialisation for <c>__float128</c>
      *
@@ -460,7 +460,7 @@ namespace FEAT
         return "__float128";
       }
     };
-#endif // FEAT_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH && !__CUDA__CC
   } // namespace Type
 } // namespace FEAT
 
