@@ -14,7 +14,7 @@ namespace FEAT
     {
       MemUsageInfo info;
 
-#if defined(__linux) || defined(__unix__)
+#if defined(__linux)
       String line;
       std::ifstream status_file("/proc/self/status");
       if (!status_file.is_open())
