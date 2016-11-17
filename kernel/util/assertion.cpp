@@ -1,6 +1,8 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/runtime.hpp>
 
+#include <cstdio>
+
 namespace FEAT
 {
   void assertion(
