@@ -4,7 +4,6 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-#include <kernel/util/mpi_cout.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/meshopt/base.hpp>
 #include <kernel/space/lagrange1/element.hpp>
@@ -213,7 +212,7 @@ namespace FEAT
          * \returns The relative cell size quality indicator.
          */
         virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-        CoordType& vol_min, CoordType& vol_max) const = 0;
+        CoordType& vol_min, CoordType& vol_max, CoordType& vol) const = 0;
 
     }; // class MeshQualityFunctional
 

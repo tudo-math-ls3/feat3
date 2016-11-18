@@ -182,8 +182,6 @@ namespace FEAT
                   _assembler_levels.at(i)->slip_asm,
                   std::forward<Args_>(args)...));
 
-                // Call the operator's init() on the current level
-                (*_system_levels.at(i)->op_sys).init();
                 // If we are not on the coarsest level, create the new transfer level
                 if(i > 0)
                 {
@@ -196,6 +194,9 @@ namespace FEAT
                 _assembler_levels.at(i)->assemble_gates(layer, *_system_levels.at(i));
                 // Assemble the system filter, all homogeneous
                 _assembler_levels.at(i)->assemble_system_filter(*_system_levels.at(i));
+                // Call the operator's init() on the current level. This needs the gates, so it cannot be called
+                // earlier
+                _system_levels.at(i)->op_sys.init();
               }
 
               for(Index i(0); (i+1) < num_levels; ++i)
@@ -250,10 +251,23 @@ namespace FEAT
 
           /// \copydoc BaseClass::compute_cell_size_defect()
           virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-              CoordType& vol_min, CoordType& vol_max) const override
+              CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
           {
-            return (*(_system_levels.back()->op_sys)).
-              compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
+            (*(_system_levels.back()->op_sys)).compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+
+            vol_min = _system_levels.back()->gate_sys.min(vol_min);
+            vol_max = _system_levels.back()->gate_sys.max(vol_max);
+            vol = _system_levels.back()->gate_sys.sum(vol);
+
+            CoordType cell_size_defect =
+              (*(_system_levels.back()->op_sys)).compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
+
+            lambda_min = _system_levels.back()->gate_sys.min(lambda_min);
+            lambda_max = _system_levels.back()->gate_sys.max(lambda_max);
+            cell_size_defect = _system_levels.back()->gate_sys.sum(cell_size_defect);
+
+            return cell_size_defect;
           }
 
           /// \copydoc BaseClass::name()
@@ -432,7 +446,7 @@ namespace FEAT
                 (global_vec_level, _system_levels.at(level)->filter_sys);
 
               // Call init() here to recompute all scales with current_** ScaleComputation
-              (*(_system_levels.at(level)->op_sys)).init();
+              _system_levels.at(level)->op_sys.init();
             }
           }
 

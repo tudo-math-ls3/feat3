@@ -245,9 +245,10 @@ struct MeshoptBoundaryApp
 
       DT_ lambda_min;
       DT_ lambda_max;
+      DT_ vol;
       DT_ vol_min;
       DT_ vol_max;
-      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
       if(comm.rank() == 0)
       {
@@ -319,9 +320,10 @@ struct MeshoptBoundaryApp
 
       DT_ lambda_min;
       DT_ lambda_max;
+      DT_ vol;
       DT_ vol_min;
       DT_ vol_max;
-      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
       if(comm.rank() == 0)
       {
@@ -481,9 +483,10 @@ struct MeshoptBoundaryApp
 
         DT_ lambda_min;
         DT_ lambda_max;
+        DT_ vol;
         DT_ vol_min;
         DT_ vol_max;
-        cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+        cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
         if(comm.rank() == 0)
         {

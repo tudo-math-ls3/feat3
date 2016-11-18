@@ -99,7 +99,7 @@ namespace FEAT
            * \returns The cell size quality indicator.
            */
           virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-              CoordType& vol_min, CoordType& vol_max) const = 0;
+              CoordType& vol_min, CoordType& vol_max, CoordType& vol) const = 0;
 
           /**
            * \brief Optimises the current mesh
@@ -446,6 +446,8 @@ namespace FEAT
                 String identifier(it);
                 slip_asm.emplace(identifier, new_asm);
               }
+
+              trafo.compute_vol();
 
             }
 

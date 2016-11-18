@@ -74,6 +74,8 @@ namespace FEAT
          * \param[in] column_gate
          * Gate for communicating column-wise
          *
+         * \note The gates might not be compiled yet, so they cannot be used for synchronisation in the constructor.
+         *
          */
         template<typename... Args_>
         explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate, Args_&&... args) :
@@ -81,7 +83,6 @@ namespace FEAT
           _col_gate(col_gate),
           _nonlinear_functional(std::forward<Args_>(args)...)
           {
-
           }
 
         /// Explicitly delete default constructor
@@ -173,6 +174,30 @@ namespace FEAT
           return VectorTypeR(_col_gate, _nonlinear_functional.create_vector_r());
         }
 
+        void init()
+        {
+          _nonlinear_functional.init_pre_sync();
+          // Synchronise the necessary parts
+          while(!_nonlinear_functional.sync_scalars.empty())
+          {
+            auto it = _nonlinear_functional.sync_scalars.begin();
+            if(_col_gate != nullptr)
+            {
+              *(*it) = _col_gate->sum(*(*it));
+            }
+            _nonlinear_functional.sync_scalars.erase(it);
+          }
+
+          if(_col_gate != nullptr)
+          {
+            for(auto* it:_nonlinear_functional.sync_vecs)
+            {
+              _col_gate->sync_0(*it);
+            }
+          }
+          _nonlinear_functional.init_post_sync();
+        }
+
         /**
          * \brief Prepares the operator for evaluation by setting the current state
          *
@@ -190,10 +215,22 @@ namespace FEAT
           _nonlinear_functional.prepare_pre_sync(*vec_state, *filter);
 
           // Synchronise the necessary parts
+          while(!_nonlinear_functional.sync_scalars.empty())
+          {
+            auto it = _nonlinear_functional.sync_scalars.begin();
+            if(_col_gate != nullptr)
+            {
+              *(*it) = _col_gate->sum(*(*it));
+            }
+            _nonlinear_functional.sync_scalars.erase(it);
+          }
+
           if(_col_gate != nullptr)
           {
             for(auto* it:_nonlinear_functional.sync_vecs)
+            {
               _col_gate->sync_0(*it);
+            }
           }
 
           // Prepare the rest of the functional

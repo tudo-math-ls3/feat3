@@ -14,7 +14,10 @@ namespace FEAT
     /// \cond internal
 
     /**
-     * \brief Class template for Rumpf functionals, 2d Q1
+     * \brief Class template for Rumpf functionals, standard trafo on conformal Hypercube<2> meshes.
+     *
+     * This is the variant where the local functional's contributions are computed directly with Maple-generated
+     * code, which means there is excessive manual loop unrolling.
      */
     template<typename DataType_>
     class RumpfFunctionalUnrolled<DataType_,
@@ -100,9 +103,18 @@ namespace FEAT
            */
           void print()
           {
-            Util::mpi_cout(name()+" settings:\n");
+            int width(30);
+            Dist::Comm comm_world(Dist::Comm::world());
+
+            String msg;
+
+            msg = name()+": ";
+            comm_world.print(msg);
+
             BaseClass::print();
-            Util::mpi_cout_pad_line("exponent_det:",_exponent_det);
+
+            msg = String("exponent_det").pad_back(width, '.') + String(": ") + stringify(_exponent_det);
+            comm_world.print(msg);
           }
 
           /**

@@ -19,7 +19,6 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/util/comm_base.hpp>
 
 namespace FEAT
 {
@@ -285,6 +284,41 @@ namespace FEAT
 
         }
 
+        void compute_cell_size_defect_pre_sync(CoordType& vol_min, CoordType& vol_max, CoordType& vol) const
+        {
+          vol = CoordType(0);
+
+          vol_min = Math::huge<CoordType>();
+          vol_max = CoordType(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            CoordType my_vol = this->_trafo->template compute_vol<ShapeType, CoordType>(cell);
+            vol_min = Math::min(vol_min, my_vol);
+            vol_max = Math::max(vol_min, my_vol);
+            vol += my_vol;
+          }
+        }
+
+        virtual CoordType compute_cell_size_defect_post_sync(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, const CoordType& vol) const
+        {
+          CoordType size_defect(0);
+          lambda_min = Math::huge<CoordType>();
+          lambda_max = CoordType(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            size_defect += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            lambda_min = Math::min(lambda_min, this->_lambda(cell));
+            lambda_max = Math::max(lambda_max, this->_lambda(cell));
+          }
+
+          vol_min /= vol;
+          vol_max/= vol;
+
+          return size_defect;
+        }
+
         /**
          * \brief Computes a quality indicator concerning the cell sizes
          *
@@ -300,57 +334,12 @@ namespace FEAT
          * \returns The relative cell size quality indicator.
          *
          */
-        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-        CoordType& vol_min, CoordType& vol_max) const override
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
         {
-          CoordType size_defect(0);
-          CoordType vol(0);
 
-          lambda_min = Math::huge<CoordType>();
-          lambda_max = CoordType(0);
-          vol_min = Math::huge<CoordType>();
-          vol_max = CoordType(0);
+          compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+          return compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-          {
-            CoordType my_vol = this->_trafo->template compute_vol<ShapeType, CoordType>(cell);
-            vol_min = Math::min(vol_min, my_vol);
-            vol_max = Math::max(vol_min, my_vol);
-            vol += my_vol;
-          }
-
-#ifdef FEAT_HAVE_MPI
-          CoordType vol_snd(vol);
-          Util::Comm::allreduce(&vol_snd, &vol, Index(1), Util::CommOperationSum());
-
-          CoordType vol_min_snd(vol_min);
-          Util::Comm::allreduce(&vol_min_snd, &vol_min, Index(1), Util::CommOperationMin());
-
-          CoordType vol_max_snd(vol_max);
-          Util::Comm::allreduce(&vol_max_snd, &vol_max, Index(1), Util::CommOperationMax());
-#endif
-
-          vol_min /= vol;
-          vol_max /= vol;
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-          {
-            size_defect += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
-            lambda_min = Math::min(lambda_min, this->_lambda(cell));
-            lambda_max = Math::max(lambda_max, this->_lambda(cell));
-          }
-
-#ifdef FEAT_HAVE_MPI
-          CoordType size_defect_snd(size_defect);
-          Util::Comm::allreduce(&size_defect_snd, &size_defect, Index(1), Util::CommOperationSum());
-
-          CoordType lambda_min_snd(lambda_min);
-          Util::Comm::allreduce(&lambda_min_snd, &lambda_min, Index(1), Util::CommOperationMin());
-
-          CoordType lambda_max_snd(lambda_max);
-          Util::Comm::allreduce(&lambda_max_snd, &lambda_max, Index(1), Util::CommOperationMax());
-#endif
-          return size_defect;
         }
 
         /**

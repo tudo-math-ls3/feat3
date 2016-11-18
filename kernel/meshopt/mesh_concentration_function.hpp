@@ -10,9 +10,8 @@
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/meshopt/rumpf_trafo.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/comm_base.hpp>
 #include <kernel/util/property_map.hpp>
-#include <kernel/util/mpi_cout.hpp>
+#include <kernel/util/dist.hpp>
 
 #include <deque>
 
@@ -51,9 +50,6 @@ namespace FEAT
             eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
         }
 
-#ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
-#endif
         // DEBUG
         return DataType(2)*constraint;
       }
@@ -84,9 +80,6 @@ namespace FEAT
 
         }
 
-#ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
-#endif
         return constraint;
       }
 
@@ -147,10 +140,6 @@ namespace FEAT
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
             eval( - dist(cell_idx(cell,1)) * dist(cell_idx(cell,2)));
         }
-
-#ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
-#endif
 
         // DEBUG
         return DataType(2)*constraint;
@@ -298,10 +287,6 @@ namespace FEAT
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
             eval( - dist(cell_idx(cell,3)) * dist(cell_idx(cell,4)));
         }
-
-#ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&constraint, &constraint, 1, Util::CommOperationSum());
-#endif
 
         // DEBUG
         return DataType(2)*constraint;
@@ -579,7 +564,7 @@ namespace FEAT
          * \f]
          *
          */
-        virtual void compute_grad_h(const VectorType& DOXY(coords)) = 0;
+        virtual void compute_grad_h(const CoordType& DOXY(sum_det)) = 0;
 
         /**
          * \brief Returns a const reference to the concentration
@@ -680,10 +665,12 @@ namespace FEAT
          * \brief Adds pointers to vectors that need synchronising (type-0 to type-1 vectors)
          *
          * \param[in,out] sync_vecs
-         * deque holding pointers to all vector that need synchronising.
+         * deque holding pointers to all vectors that need synchronising.
          *
          */
-        virtual void add_sync_vecs(std::deque<VectorType*>& DOXY(sync_vecs)) = 0;
+        virtual void add_sync_vecs(std::set<VectorType*>& DOXY(sync_vecs)) = 0;
+
+        virtual CoordType& get_sum_conc() = 0;
 
     };
 
@@ -812,12 +799,12 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::add_sync_vecs()
-        virtual void add_sync_vecs(std::deque<VectorType*>& sync_vecs) override
+        virtual void add_sync_vecs(std::set<VectorType*>& sync_vecs) override
         {
           if(_func.use_derivative)
           {
-            sync_vecs.push_back(&_grad_sum_det);
-            sync_vecs.push_back(&_grad_conc);
+            sync_vecs.insert(&_grad_sum_det);
+            sync_vecs.insert(&_grad_conc);
           }
         }
 
@@ -849,6 +836,11 @@ namespace FEAT
         virtual const GradHType& get_grad_h() const override
         {
           return _grad_h;
+        }
+
+        virtual CoordType& get_sum_conc() override
+        {
+          return _sum_conc;
         }
 
         /// copydoc BaseClass::print()
@@ -920,18 +912,15 @@ namespace FEAT
             CoordType avg_dist(0);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
               avg_dist += this->_dist(idx(cell,Index(j)));
+            }
 
             avg_dist = avg_dist/CoordType(Shape::FaceTraits<ShapeType,0>::count);
 
             this->_conc(cell, _func.conc_val(avg_dist));
             _sum_conc += this->_conc(cell);
           }
-
-#ifdef FEAT_HAVE_MPI
-          CoordType sum_conc_snd(_sum_conc);
-          Util::Comm::allreduce(&sum_conc_snd, &_sum_conc, 1, Util::CommOperationSum());
-#endif
         }
 
         /// \copydoc BaseClass:compute_grad_sum_det()
@@ -940,6 +929,7 @@ namespace FEAT
           if(_func.use_derivative)
           {
             RefCellTrafo_::compute_grad_sum_det(_grad_sum_det, coords, *(_mesh_node->get_mesh()));
+            //comm.print(stringify(_grad_sum_det),0);
           }
         }
 
@@ -964,7 +954,7 @@ namespace FEAT
          * \param[in] dist_loc_
          * The distances of the local vertices
          *
-         **/
+         */
         template<typename Tgrad_, typename Tl_, typename Tgradl_>
         void compute_grad_conc_local(Tgrad_& grad_loc_, const Tl_& dist_loc_, const Tgradl_& grad_dist_loc_)
         {
@@ -973,16 +963,20 @@ namespace FEAT
           // This will be the average of the levelset values at the vertices
           CoordType val(0);
           for(int i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
+          {
             val += dist_loc_(i);
+          }
 
           val = val/CoordType(Shape::FaceTraits<ShapeType,0>::count);
 
           for(int i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
+          {
             grad_loc_[i] = _func.conc_der(val)/CoordType(Shape::FaceTraits<ShapeType,0>::count) * grad_dist_loc_[i];
+          }
         }
 
         /// \copydoc BaseClass::compute_grad_h()
-        virtual void compute_grad_h(const VectorType& coords) override
+        virtual void compute_grad_h(const CoordType& sum_det) override
         {
           XASSERT(_mesh_node != nullptr);
 
@@ -990,7 +984,6 @@ namespace FEAT
 
           if(_func.use_derivative)
           {
-            CoordType sum_det = RefCellTrafo_::compute_sum_det(coords, *(_mesh_node->get_mesh()));
 
             // Index set for local/global numbering
             auto& idx = _mesh_node->get_mesh()->template get_index_set<ShapeType::dimension,0>();
@@ -1350,11 +1343,23 @@ namespace FEAT
         /// \copydoc BaseClass::print()
         virtual void print() const override
         {
-          Util::mpi_cout(name()+" settings:\n");
+          int width(30);
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg;
+
+          msg = name()+":";
+          comm_world.print(msg);
+
           DirectBaseClass::print();
-          Util::mpi_cout_pad_line("Operation:",_operation);
+
+          msg = String("Operation").pad_back(width, '.') + String(": ") + _operation;
+
           for(const auto& it:_chart_list)
-            Util::mpi_cout_pad_line("DistanceChart:",it);
+          {
+            msg = String("Distance chart").pad_back(width, '.') + String(": ") + it;
+            comm_world.print(msg);
+          }
         }
 
     }; // class ChartDistanceFunction
@@ -1534,9 +1539,19 @@ namespace FEAT
          */
         virtual void print() const
         {
-          Util::mpi_cout(name()+" settings:\n");
-          Util::mpi_cout_pad_line("Function:","c(d) = |d|");
-          Util::mpi_cout_pad_line("use_derivative:",use_derivative);
+          int width(30);
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg;
+
+          msg = name()+String(":");
+          comm_world.print(msg);
+
+          msg = String("Function").pad_back(width, '.') + String(": c(d) = |d|");
+          comm_world.print(msg);
+
+          msg = String("use_derivative").pad_back(width, '.') + String(": ") += stringify(use_derivative);
+          comm_world.print(msg);
         }
 
         /**
@@ -1642,11 +1657,24 @@ namespace FEAT
          */
         virtual void print() const
         {
-          Util::mpi_cout(name()+" settings:\n");
-          Util::mpi_cout_pad_line("Function:","c(d) = (alpha + |d|)^beta");
-          Util::mpi_cout_pad_line("alpha:",_minval);
-          Util::mpi_cout_pad_line("beta:",_exponent);
-          Util::mpi_cout_pad_line("use_derivative:",use_derivative);
+          int width(30);
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg(name()+":");
+          msg.pad_back(width, '.') += String(": ");
+          comm_world.print(msg);
+
+          msg = String("Function").pad_back(width, '.') + String(": c(d) = (alpha + |d|^beta)");
+          comm_world.print(msg);
+
+          msg = String("alpha").pad_back(width, '.') + String(": ") + stringify_fp_sci(_minval);
+          comm_world.print(msg);
+
+          msg = String("beta").pad_back(width, '.') + String(": ") + stringify_fp_sci(_exponent);
+          comm_world.print(msg);
+
+          msg = String("use_derivative").pad_back(width, '.') + String(": ") + stringify(use_derivative);
+          comm_world.print(msg);
         }
 
         /**

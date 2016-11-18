@@ -7,7 +7,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/util/comm_base.hpp>
 
 namespace FEAT
 {
@@ -96,18 +95,14 @@ namespace FEAT
        * \param[in] h_
        * Vector of local mesh sizes
        *
-       * \param[in] coords_
-       * Vector of vertex coordinates
-       *
        * \param[in] lambda_
        * Vector of element weights
        *
-       * \param[in] mesh_
-       * The underlying mesh.
+       * \param[in] sum_det_
+       * The sum of the volumes of all optimally scaled reference cells
        *
-       **/
-      static void compute_h(ScalarVectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
-      const MeshType& mesh_);
+       */
+      static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det);
 
       /**
        * \brief Computes the transformation's determinant's gradient on a cell
@@ -220,16 +215,14 @@ namespace FEAT
         /**
          * \brief Computes the optimal local mesh size
          */
-        static void compute_h(ScalarVectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
-        const MeshType& mesh_)
+        static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det_)
         {
-          DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
-          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < h_.size(); ++cell)
           {
             // For hypercubes, h is half the refence cell's edge length
-            h_(cell, DataType(0.5)*Math::pow(lambda_(cell)*sum_det,exponent));
+            h_(cell, DataType(0.5)*Math::pow(lambda_(cell)*sum_det_,exponent));
           }
         }
 
@@ -256,9 +249,6 @@ namespace FEAT
             sum_det += compute_det(x);
           }
 
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_det, &sum_det, 1, Util::CommOperationSum());
-#endif
           return sum_det;
         }
 
@@ -281,7 +271,9 @@ namespace FEAT
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
               x[j] = coords_(idx(cell,Index(j)));
+            }
 
             compute_grad_det(local_grad, x);
 
@@ -398,16 +390,14 @@ namespace FEAT
         /**
          * \brief Computes the optimal local mesh size
          */
-        static void compute_h(ScalarVectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
-        const MeshType& mesh_)
+        static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det_)
         {
-          DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
-          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < h_.size(); ++cell)
           {
             // For hypercubes, h is half the refence cell's edge length
-            h_(cell, DataType(0.5)*Math::pow(lambda_(cell)*sum_det,exponent));
+            h_(cell, DataType(0.5)*Math::pow(lambda_(cell)*sum_det_,exponent));
           }
         }
 
@@ -427,14 +417,13 @@ namespace FEAT
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
               x[j] = coords_(idx(cell,Index(j)));
+            }
 
             sum_det += compute_det(x);
           }
 
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_det, &sum_det, 1, Util::CommOperationSum());
-#endif
           return sum_det;
         }
 
@@ -457,7 +446,9 @@ namespace FEAT
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
               x[j] = coords_(idx(cell,Index(j)));
+            }
 
             compute_grad_det(local_grad, x);
 
@@ -547,18 +538,13 @@ namespace FEAT
         /**
          * \brief Computes the optimal local mesh size
          */
-        static void compute_h(ScalarVectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
-        const MeshType& mesh_)
+        static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det_)
         {
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
-
-          DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
-          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < h_.size(); ++cell)
           {
-            h_(cell, Math::pow(lambda_(cell)*sum_det,exponent));
+            h_(cell, Math::pow(lambda_(cell)*sum_det_,exponent));
           }
         }
 
@@ -578,14 +564,13 @@ namespace FEAT
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
               x[j] = coords_(idx(cell,Index(j)));
+            }
 
             sum_det += compute_det(x);
           }
 
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_det, &sum_det, 1, Util::CommOperationSum());
-#endif
           return sum_det;
         }
 
@@ -711,18 +696,13 @@ namespace FEAT
         /**
          * \brief Computes the optimal local mesh size
          */
-        static void compute_h(ScalarVectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
-        const MeshType& mesh_)
+        static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det_)
         {
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
-
-          DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
-          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < h_.size(); ++cell)
           {
-            h_(cell, Math::pow(lambda_(cell)*sum_det,exponent));
+            h_(cell, Math::pow(lambda_(cell)*sum_det_,exponent));
           }
         }
 
@@ -749,9 +729,6 @@ namespace FEAT
             sum_det += compute_det(x);
           }
 
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_det, &sum_det, 1, Util::CommOperationSum());
-#endif
           return sum_det;
         }
 

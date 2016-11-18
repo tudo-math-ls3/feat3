@@ -6,7 +6,6 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
@@ -73,21 +72,27 @@ struct MeshoptRefinementApp
     int test_number(0);
 
     // Check if we want to write vtk files and at what frequency
-    // Check if we want to write vtk files
     if(args.check("vtk") >= 0 )
+    {
       write_vtk = true;
+    }
 
     // Check if we are to perform test 1 or test 2, if any
     if( args.check("test") >=0 )
     {
-      Util::mpi_cout("Running in test mode, all other command line arguments and configuration files are ignored.\n");
+      comm.print("Running in test mode, all other command line arguments and configuration files are ignored.");
 
       if(args.check("test") > 1)
+      {
         throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
+      }
 
       args.parse("test",test_number);
       if(test_number != 1 && test_number != 2)
-        throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
+      {
+        throw InternalError(__func__, __FILE__, __LINE__,
+        "Encountered unhandled test number "+stringify(test_number));
+      }
     }
 
     // Get the application settings section
@@ -108,22 +113,29 @@ struct MeshoptRefinementApp
     // Get the coarse mesh and finest mesh levels from the application settings
     auto lvl_min_p = domain_control_settings_section->query("lvl_min");
     if(!lvl_min_p.second)
+    {
       lvl_min = 0;
+    }
     else
+    {
       lvl_min = std::stoi(lvl_min_p.first);
+    }
 
     auto lvl_max_p = domain_control_settings_section->query("lvl_max");
     if(!lvl_max_p.second)
+    {
       lvl_max = lvl_min;
+    }
     else
+    {
       lvl_max = std::stoi(lvl_max_p.first);
+    }
 
     // Get the mode for adapting the mesh upon refinement
     Geometry::AdaptMode adapt_mode(Geometry::AdaptMode::none);
     auto adapt_mode_p = domain_control_settings_section->query("adapt_mode");
     if(adapt_mode_p.second)
     {
-      std::cout << "Using adapt_mode " << adapt_mode_p.first << std::endl;
       adapt_mode << adapt_mode_p.first;
     }
 
@@ -142,16 +154,13 @@ struct MeshoptRefinementApp
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
     comm.allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
 
+
+
     // Print level information
-    if(comm.rank() == 0)
-    {
-      std::cout << name() << "settings:" << std::endl;
-      std::cout << "LVL-MAX: " <<
-        dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
-      std::cout << " LVL-MIN: " <<
-        dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-      std::cout << "Cells: " << ncells << std::endl;
-    }
+    comm.print(name()+" settings:");
+    comm.print("LVL-MAX "+stringify(dom_ctrl.get_levels().back()->get_level_index())+" [" +stringify(lvl_max) + "]");
+    comm.print("LVL-MIN "+stringify(dom_ctrl.get_levels().front()->get_level_index())+" [" +stringify(lvl_min) + "]");
+    comm.print("Cells"+stringify(ncells));
 
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
@@ -201,9 +210,10 @@ struct MeshoptRefinementApp
 
       DT_ lambda_min;
       DT_ lambda_max;
+      DT_ vol;
       DT_ vol_min;
       DT_ vol_max;
-      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
       if(comm.rank() == 0)
       {
@@ -211,7 +221,7 @@ struct MeshoptRefinementApp
           " / " << stringify_fp_sci(qual_avg) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
         std::cout << "Pre initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
           " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
-          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
+          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) <<  " " << stringify_fp_sci(vol) << std::endl;
       }
     }
 
@@ -224,7 +234,7 @@ struct MeshoptRefinementApp
         int lvl_index((*it)->get_level_index());
 
         String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
-        Util::mpi_cout("Writing "+vtk_name+"\n");
+        comm.print("Writing "+vtk_name);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
@@ -243,7 +253,7 @@ struct MeshoptRefinementApp
     {
       if( Math::abs(worst_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
       {
-        Util::mpi_cout("FAILED:");
+        comm.print("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
         "Initial worst angle should be = "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
       }
@@ -251,7 +261,7 @@ struct MeshoptRefinementApp
       {
         if( Math::abs(worst_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
         {
-          Util::mpi_cout("FAILED:");
+          comm.print("FAILED:");
           throw InternalError(__func__,__FILE__,__LINE__,
           "Initial worst angle should be >= "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
         }
@@ -279,9 +289,10 @@ struct MeshoptRefinementApp
 
       DT_ lambda_min;
       DT_ lambda_max;
+      DT_ vol;
       DT_ vol_min;
       DT_ vol_max;
-      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
       if(comm.rank() == 0)
       {
@@ -289,7 +300,7 @@ struct MeshoptRefinementApp
           " / " << stringify_fp_sci(qual_avg ) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
         std::cout << "Post initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
           " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
-          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
+          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) <<  " " << stringify_fp_sci(vol) << std::endl;
       }
     }
 
@@ -302,7 +313,7 @@ struct MeshoptRefinementApp
         int lvl_index((*it)->get_level_index());
 
         String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
-        Util::mpi_cout("Writing "+vtk_name+"\n");
+        comm.print("Writing "+vtk_name);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
@@ -321,19 +332,19 @@ struct MeshoptRefinementApp
     {
       if(worst_angle < DT_(55.1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(55.1)+
-            " but is "+stringify_fp_fix(worst_angle)+"\n");
+        comm.print("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(55.1)+
+            " but is "+stringify_fp_fix(worst_angle));
         return 1;
       }
       if(qual_min < DT_(4.12e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(4.12e-1)+
+        comm.print("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(4.12e-1)+
             " but is "+stringify_fp_fix(qual_min)+"\n");
         return 1;
       }
       if(cell_size_defect > DT_(2.6e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(2.6e-1)+
+        comm.print("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(2.6e-1)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
         return 1;
       }
@@ -342,25 +353,25 @@ struct MeshoptRefinementApp
     {
       if(worst_angle < DT_(22))
       {
-        Util::mpi_cout("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(22)+
+        comm.print("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(22)+
             " but is "+stringify_fp_fix(worst_angle)+"\n");
         return 1;
       }
       if(qual_min < DT_(6.4e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(6.4e-1)+
+        comm.print("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(6.4e-1)+
             " but is "+stringify_fp_fix(qual_min)+"\n");
         return 1;
       }
       if(cell_size_defect > DT_(1.2e-1))
       {
-        Util::mpi_cout("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(1.2e-1)+
+        comm.print("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(1.2e-1)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
         return 1;
       }
     }
 
-    Util::mpi_cout("Finished!\n");
+    comm.print("Finished!\n");
     meshopt_ctrl->print();
 
     // Check for the hard coded settings for test mode
@@ -368,19 +379,19 @@ struct MeshoptRefinementApp
     {
       if(worst_angle < DT_(43))
       {
-        Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(43)+
+        comm.print("FAILED: Final worst angle should be >= "+stringify_fp_fix(43)+
             " but is "+stringify_fp_fix(worst_angle)+"\n");
         return 1;
       }
       if(qual_min < DT_(2.3e-1))
       {
-        Util::mpi_cout("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(2.3e-1)+
+        comm.print("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(2.3e-1)+
             " but is "+stringify_fp_fix(qual_min)+"\n");
         return 1;
       }
       if(cell_size_defect > DT_(2.3))
       {
-        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(2.3)+
+        comm.print("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(2.3)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
         return 1;
       }
@@ -389,19 +400,19 @@ struct MeshoptRefinementApp
     {
       if(worst_angle < DT_(28))
       {
-        Util::mpi_cout("FAILED: Final worst angle should be >= "+stringify_fp_fix(28)+
+        comm.print("FAILED: Final worst angle should be >= "+stringify_fp_fix(28)+
             " but is "+stringify_fp_fix(worst_angle)+"\n");
         return 1;
       }
       if(qual_min < DT_(7.16e-1))
       {
-        Util::mpi_cout("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(7.16e-1)+
+        comm.print("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(7.16e-1)+
             " but is "+stringify_fp_fix(qual_min)+"\n");
         return 1;
       }
       if(cell_size_defect > DT_(9.4e-2))
       {
-        Util::mpi_cout("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(9.4e-2)+
+        comm.print("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(9.4e-2)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
         return 1;
       }
@@ -441,13 +452,7 @@ int run_app(int argc, char* argv[])
 
   // create world communicator
   Dist::Comm comm(Dist::Comm::world());
-
-#ifdef FEAT_HAVE_MPI
-  if (comm.rank() == 0)
-  {
-    std::cout << "NUM-PROCS: " << comm.size() << std::endl;
-  }
-#endif
+  comm.print("NUM-PROCS: "+stringify(comm.size()));
 
   // Filenames to read the mesh from, parsed from the application config file
   std::deque<String> mesh_files;

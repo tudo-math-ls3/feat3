@@ -4,7 +4,6 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
-#include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <iostream>
 
@@ -71,6 +70,11 @@ namespace FEAT
           _fac_cof(fac_cof_),
           _fac_reg(fac_reg_)
           {
+            XASSERTM(_fac_frobenius >= DataType_(0), "_fac_frobenius must be >= 0!\n");
+            XASSERTM(_fac_det >= DataType_(0), "_fac_det must be >= 0!\n");
+            XASSERTM(_fac_rec_det >= DataType_(0), "_fac_rec_det must be >= 0!\n");
+            XASSERTM(_fac_cof >= DataType_(0), "_fac_cof must be >= 0!\n");
+            XASSERTM(_fac_reg >= DataType_(0), "_fac_reg must be >= 0!\n");
           }
 
         /// \brief Virtual destructor
@@ -91,11 +95,26 @@ namespace FEAT
         /// \brief Print basic information
         void print()
         {
-          Util::mpi_cout_pad_line("fac_frobenius",stringify_fp_sci(_fac_frobenius));
-          Util::mpi_cout_pad_line("fac_det",stringify_fp_sci(_fac_det));
-          Util::mpi_cout_pad_line("fac_rec_det",stringify_fp_sci(_fac_rec_det));
-          Util::mpi_cout_pad_line("fac_cof",stringify_fp_sci(_fac_cof));
-          Util::mpi_cout_pad_line("fac_reg",stringify_fp_sci(_fac_reg));
+          int width(30);
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg;
+
+          msg = String("fac_frobenius").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_frobenius);
+          comm_world.print(msg);
+
+          msg = String("fac_cof").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_cof);
+          comm_world.print(msg);
+
+          msg = String("fac_det").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_det);
+          comm_world.print(msg);
+
+          msg = String("fac_rec_det").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_rec_det);
+          comm_world.print(msg);
+
+          msg = String("fac_reg").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_reg);
+          comm_world.print(msg);
+
         }
 
     };

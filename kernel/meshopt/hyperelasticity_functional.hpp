@@ -14,7 +14,6 @@
 #include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/meshopt/rumpf_trafo.hpp>
-#include <kernel/util/comm_base.hpp>
 
 #include <map>
 
@@ -286,8 +285,10 @@ namespace FEAT
         std::shared_ptr<FunctionalType> _functional;
         /// The mesh concentration function (if any)
         std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
+        /// These are the scalars that need to be synchronised in init() or prepare()
+        std::set<DataType*> sync_scalars;
         /// These are the vectors that need to be synchronised (type-0 to type-1)
-        std::deque<VectorTypeR*> sync_vecs;
+        std::set<VectorTypeR*> sync_vecs;
 
       protected:
         /// Weights for the local contributions to the global functional value.
@@ -311,6 +312,14 @@ namespace FEAT
         DataType _penalty_param;
         /// Last computed contraint (violation)
         DataType _alignment_constraint;
+
+        /// This is the sum of the determinant of the transformation of the reference cell to the mesh cell over all
+        /// cells
+        DataType _sum_det;
+        /// The sum of all lambda (= optimal cell size) over all cells before normalisation
+        DataType _sum_lambda;
+        /// The sum of all mu (= cell weights) over all cells before normalisation
+        DataType _sum_mu;
 
       public:
         /**
@@ -348,6 +357,7 @@ namespace FEAT
           _slip_asm(slip_asm_),
           _functional(functional_),
           _mesh_conc(nullptr),
+          sync_scalars(),
           sync_vecs(),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -356,15 +366,20 @@ namespace FEAT
           _rows(_trafo_space.get_num_dofs()),
           _scale_computation(ScaleComputation::once_uniform),
           _penalty_param(0),
-          _alignment_constraint(0)
+          _alignment_constraint(0),
+          _sum_det(0),
+          _sum_lambda(0),
+          _sum_mu(0)
           {
 
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
 
+            _sum_mu = CoordType(rmn_->get_mesh()->get_num_entities(ShapeType::dimension));
+
+            sync_scalars.insert(&_sum_mu);
+
             // Compute desired element size distribution
             _compute_scales_once();
-            // Compute element weights
-            _compute_mu();
           }
 
         /**
@@ -409,6 +424,7 @@ namespace FEAT
           _slip_asm(slip_asm_),
           _functional(functional_),
           _mesh_conc(nullptr),
+          sync_scalars(),
           sync_vecs(),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -417,17 +433,28 @@ namespace FEAT
           _rows(_trafo_space.get_num_dofs()),
           _scale_computation(scale_computation_),
           _penalty_param(penalty_param_),
-          _alignment_constraint(0)
+          _alignment_constraint(0),
+          _sum_det(0),
+          _sum_lambda(0),
+          _sum_mu(0)
           {
 
-            XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
+            XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr!\n");
+            XASSERTM(_penalty_param >= DataType(0), "penalty_param must be >= 0!\n");
 
-            if(( _scale_computation == ScaleComputation::once_concentration ||
-                  _scale_computation == ScaleComputation::current_concentration ||
-                  _scale_computation == ScaleComputation::iter_concentration ) &&
-                mesh_conc_ == nullptr)
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
+            _sum_mu = CoordType(rmn_->get_mesh()->get_num_entities(ShapeType::dimension));
+
+            sync_scalars.insert(&_sum_mu);
+
+            if(
+              ( _scale_computation == ScaleComputation::once_concentration ||
+                _scale_computation == ScaleComputation::current_concentration ||
+                _scale_computation == ScaleComputation::iter_concentration ) &&
+              mesh_conc_ == nullptr)
+              {
+                throw InternalError(__func__,__FILE__,__LINE__,
+                "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
+              }
 
             if(mesh_conc_ != nullptr)
             {
@@ -438,8 +465,6 @@ namespace FEAT
 
             // Perform one time scal computation
             _compute_scales_once();
-            // Compute the cell weights
-            _compute_mu();
           }
 
         /// Explicitly delete default constructor
@@ -509,7 +534,14 @@ namespace FEAT
          */
         virtual void print()
         {
-          Util::mpi_cout_pad_line("Scale computation",_scale_computation);
+          int width(30);
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg;
+
+          msg = String("Scale computation").pad_back(width, '.') + String(": ");
+          comm_world.print(msg);
+
           _functional->print();
           if(_mesh_conc != nullptr)
             _mesh_conc->print();
@@ -619,7 +651,7 @@ namespace FEAT
         //}
 
         /// \copydoc BaseClass::init()
-        virtual void init() override
+        virtual void init_pre_sync()
         {
           // Write any potential changes to the mesh
           this->buffer_to_mesh();
@@ -639,6 +671,29 @@ namespace FEAT
 
           // Compute desired element size distribution
           this->_compute_scales_init();
+        }
+
+        virtual void init_post_sync()
+        {
+          if(_sum_mu != DataType(1))
+          {
+            _mu.format(DataType(1)/_sum_mu);
+            _sum_mu = DataType(1);
+          }
+
+          if(_sum_lambda != DataType(1))
+          {
+            _lambda.scale(_lambda, DataType(1)/_sum_lambda);
+            _sum_lambda = DataType(1);
+          }
+
+          RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
+        }
+
+        virtual void init() override
+        {
+          init_pre_sync();
+          init_post_sync();
         }
 
         /**
@@ -661,9 +716,17 @@ namespace FEAT
 
         virtual void prepare_post_sync(const VectorTypeR& DOXY(vec_state), FilterType& DOXY(filter))
         {
+          if(_sum_lambda != DataType(1))
+          {
+            _lambda.scale(_lambda, DataType(1)/_sum_lambda);
+            _sum_lambda = DataType(1);
+          }
+
+          RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
+
           if(this->_scale_computation == ScaleComputation::iter_concentration)
           {
-            _mesh_conc->compute_grad_h(this->get_coords());
+            _mesh_conc->compute_grad_h(this->_sum_det);
           }
         }
 
@@ -727,9 +790,44 @@ namespace FEAT
           if(_penalty_param > DataType(0))
           {
             _alignment_constraint = this->_mesh_conc->compute_constraint();
+            this->sync_scalars.insert(&_alignment_constraint);
           }
 
+        }
 
+        void compute_cell_size_defect_pre_sync(CoordType& vol_min, CoordType& vol_max, CoordType& vol) const
+        {
+          vol = CoordType(0);
+
+          vol_min = Math::huge<CoordType>();
+          vol_max = CoordType(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            CoordType my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
+            vol_min = Math::min(vol_min, my_vol);
+            vol_max = Math::max(vol_min, my_vol);
+            vol += my_vol;
+          }
+        }
+
+        virtual CoordType compute_cell_size_defect_post_sync(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, const CoordType& vol) const
+        {
+          CoordType size_defect(0);
+          lambda_min = Math::huge<CoordType>();
+          lambda_max = CoordType(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            lambda_min = Math::min(lambda_min, this->_lambda(cell));
+            lambda_max = Math::max(lambda_max, this->_lambda(cell));
+          }
+
+          vol_min /= vol;
+          vol_max/= vol;
+
+          return size_defect;
         }
 
         /**
@@ -747,57 +845,12 @@ namespace FEAT
          * \returns The relative cell size quality indicator.
          *
          */
-        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-        CoordType& vol_min, CoordType& vol_max) const override
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
         {
-          CoordType size_defect(0);
-          CoordType vol(0);
 
-          lambda_min = Math::huge<CoordType>();
-          lambda_max = CoordType(0);
-          vol_min = Math::huge<CoordType>();
-          vol_max = CoordType(0);
+          compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+          return compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-          {
-            CoordType my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
-            vol_min = Math::min(vol_min, my_vol);
-            vol_max = Math::max(vol_min, my_vol);
-            vol += my_vol;
-          }
-
-#ifdef FEAT_HAVE_MPI
-          CoordType vol_snd(vol);
-          Util::Comm::allreduce(&vol_snd, &vol, Index(1), Util::CommOperationSum());
-
-          CoordType vol_min_snd(vol_min);
-          Util::Comm::allreduce(&vol_min_snd, &vol_min, Index(1), Util::CommOperationMin());
-
-          CoordType vol_max_snd(vol_max);
-          Util::Comm::allreduce(&vol_max_snd, &vol_max, Index(1), Util::CommOperationMax());
-#endif
-
-          vol_min /= vol;
-          vol_max /= vol;
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-          {
-            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
-            lambda_min = Math::min(lambda_min, this->_lambda(cell));
-            lambda_max = Math::max(lambda_max, this->_lambda(cell));
-          }
-
-#ifdef FEAT_HAVE_MPI
-          CoordType size_defect_snd(size_defect);
-          Util::Comm::allreduce(&size_defect_snd, &size_defect, Index(1), Util::CommOperationSum());
-
-          CoordType lambda_min_snd(lambda_min);
-          Util::Comm::allreduce(&lambda_min_snd, &lambda_min, Index(1), Util::CommOperationMin());
-
-          CoordType lambda_max_snd(lambda_max);
-          Util::Comm::allreduce(&lambda_max_snd, &lambda_max, Index(1), Util::CommOperationMax());
-#endif
-          return size_defect;
         }
 
         /**
@@ -817,14 +870,14 @@ namespace FEAT
          */
         virtual void eval_fval_cellwise(CoordType& DOXY(fval), CoordType* DOXY(fval_norm), CoordType* DOXY(fval_det), CoordType* DOXY(fval_rec_det)) const = 0;
 
-        /**
-         * \brief Computes the volume of the optimal reference for each cell and saves it to _h.
-         *
-         */
-        virtual void compute_h()
-        {
-          RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, *(this->get_mesh()));
-        }
+        ///**
+        // * \brief Computes the volume of the optimal reference for each cell and saves it to _h.
+        // *
+        // */
+        //virtual void compute_h()
+        //{
+        //  RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
+        //}
 
       protected:
         /// \brief Computes the weights _lambda according to the current mesh
@@ -832,8 +885,14 @@ namespace FEAT
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
+          _sum_lambda = DataType(0);
           for(Index cell(0); cell < ncells; ++cell)
+          {
             _lambda(cell, this->_trafo.template compute_vol<ShapeType, CoordType>(cell));
+            _sum_lambda += _lambda(cell);
+          }
+
+          this->sync_scalars.insert(&_sum_lambda);
 
         }
 
@@ -841,28 +900,30 @@ namespace FEAT
         virtual void _compute_lambda_uniform()
         {
           _lambda.format(CoordType(1));
+
+          _sum_lambda = CoordType(_lambda.size());
+          this->sync_scalars.insert(&_sum_lambda);
         }
 
         /// \brief Computes _lambda according to the concentration function given by _mesh_conc
         virtual void _compute_lambda_conc()
         {
           _mesh_conc->compute_conc();
+          this->sync_scalars.insert(&(_mesh_conc->get_sum_conc()));
+
           _mesh_conc->compute_grad_conc();
 
           _mesh_conc->compute_grad_sum_det(this->_coords_buffer);
 
           _lambda.copy(_mesh_conc->get_conc());
 
-        }
-        /// \brief Computes the weights mu
-        virtual void _compute_mu()
-        {
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
+          _sum_lambda = DataType(0);
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            _sum_lambda += _lambda(cell);
+          }
+          this->sync_scalars.insert(&_sum_lambda);
 
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&ncells, &ncells, 1, Util::CommOperationSum());
-#endif
-          _mu.format(CoordType(1)/CoordType(ncells));
         }
 
         /**
@@ -872,6 +933,7 @@ namespace FEAT
          */
         virtual void _compute_scales_init()
         {
+
           switch(_scale_computation)
           {
             case ScaleComputation::once_uniform:
@@ -892,22 +954,10 @@ namespace FEAT
               return;
           }
 
-          // Rescale so that sum lambda == 1
-          CoordType sum_lambda(0);
+          _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
+          this->sync_scalars.insert(&_sum_det);
 
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-          {
-            sum_lambda += _lambda(cell);
-          }
 
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_lambda, &sum_lambda, 1, Util::CommOperationSum());
-#endif
-
-          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
-
-          // Compute the scales
-          compute_h();
         }
 
         /**
@@ -926,18 +976,8 @@ namespace FEAT
               return;
           }
 
-          // Rescale so that sum lambda == 1
-          CoordType sum_lambda(0);
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-            sum_lambda += _lambda(cell);
-
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_lambda, &sum_lambda, 1, Util::CommOperationSum());
-#endif
-          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
-
-          compute_h();
+          _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
+          this->sync_scalars.insert(&_sum_det);
         }
 
         /**
@@ -962,21 +1002,9 @@ namespace FEAT
               return;
           }
 
-          // Rescale so that sum lambda == 1
-          CoordType sum_lambda(0);
+          _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
+          this->sync_scalars.insert(&_sum_det);
 
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-          {
-            sum_lambda += _lambda(cell);
-          }
-
-#ifdef FEAT_HAVE_MPI
-          Util::Comm::allreduce(&sum_lambda, &sum_lambda, 1, Util::CommOperationSum());
-#endif
-          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
-
-          // Compute the scales
-          compute_h();
         }
 
         virtual void eval_fval_grad(CoordType& DOXY(fval), VectorTypeL& DOXY(grad), const bool& DOXY(add_penalty_fval)) =0;
@@ -1072,7 +1100,11 @@ namespace FEAT
          */
         virtual void print() override
         {
-          Util::mpi_cout(name()+" settings:\n");
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg(name()+": ");
+          comm_world.print(msg);
+
           BaseClass::print();
         }
 

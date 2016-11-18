@@ -226,10 +226,23 @@ namespace FEAT
 
           /// \copydoc BaseClass::compute_cell_size_defect()
           virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-              CoordType& vol_min, CoordType& vol_max) const override
+              CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
           {
-            return (*(_system_levels.back()->op_sys)).
-              compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
+            (*(_system_levels.back()->op_sys)).compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+
+            vol_min = _system_levels.back()->gate_sys.min(vol_min);
+            vol_max = _system_levels.back()->gate_sys.max(vol_max);
+            vol = _system_levels.back()->gate_sys.sum(vol);
+
+            CoordType cell_size_defect =
+              (*(_system_levels.back()->op_sys)).compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
+
+            lambda_min = _system_levels.back()->gate_sys.min(lambda_min);
+            lambda_max = _system_levels.back()->gate_sys.max(lambda_max);
+            cell_size_defect = _system_levels.back()->gate_sys.sum(cell_size_defect);
+
+            return cell_size_defect;
           }
 
           /// \copydoc BaseClass::get_coords()
