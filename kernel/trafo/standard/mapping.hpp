@@ -107,6 +107,23 @@ namespace FEAT
         }
 
         /**
+         * \brief Computes the volume of the whole mesh given by this trafo
+         *
+         * \returns The shape_dim dimensional volume
+         */
+        CoordType compute_vol()
+        {
+          CoordType vol(0);
+
+          for(Index cell(0); cell < this->get_mesh().get_num_entities(ShapeType::dimension); ++cell)
+          {
+            vol += compute_vol<ShapeType>(cell);
+          }
+
+          return vol;
+        }
+
+        /**
          * \brief Computes all oriented normals on one face
          *
          * \param[in] k
