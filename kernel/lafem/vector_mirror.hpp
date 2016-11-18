@@ -220,8 +220,8 @@ namespace FEAT
         XASSERTM(num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
         LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(num_rows);
 
-        Arch::ProductMatVec<Mem_>::csr(mem_buffer.elements(), _mirror_gather.val(), _mirror_gather.col_ind(), _mirror_gather.row_ptr(),
-                                              mem_vector.elements(), _mirror_gather.rows(), _mirror_gather.columns(), _mirror_gather.used_elements());
+        Arch::Apply<Mem_>::csr(mem_buffer.elements(), DataType_(1), mem_vector.elements(), DataType_(0), mem_buffer.elements(), _mirror_gather.val(),
+            _mirror_gather.col_ind(), _mirror_gather.row_ptr(), _mirror_gather.rows(), _mirror_gather.columns(), _mirror_gather.used_elements(), false);
 
         //download
         DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, num_rows, buffer_offset);
@@ -648,8 +648,8 @@ namespace FEAT
 
         LAFEM::DenseVector<Mem_, DT_, IT_> mem_buffer(num_rows * BlockSize_);
 
-        Arch::ProductMatVec<Mem_>::template csrsb<DT_, IT_, BlockSize>(mem_buffer.elements(), _mirror_gather.val(), _mirror_gather.col_ind(), _mirror_gather.row_ptr(),
-                                              mem_vector.template elements<Perspective::pod>(), _mirror_gather.rows(), _mirror_gather.columns(), _mirror_gather.used_elements());
+        Arch::Apply<Mem_>::template csrsb<DT_, IT_, BlockSize>(mem_buffer.elements(), DT_(1), mem_vector.template elements<Perspective::pod>(), DT_(0), mem_buffer.elements(),
+            _mirror_gather.val(), _mirror_gather.col_ind(), _mirror_gather.row_ptr(), _mirror_gather.rows(), _mirror_gather.columns(), _mirror_gather.used_elements());
 
         DenseVector<Mem::Main, DT_, IT_> buffer_range(buffer, num_rows * BlockSize_, buffer_offset);
         //download
