@@ -93,8 +93,6 @@ struct MeshoptBoundaryApp
     // Check if we are to perform test 1 or test 2, if any
     if( args.check("test") >=0 )
     {
-      Util::mpi_cout("Running in test mode, all other command line arguments and configuration files are ignored.\n");
-
       if(args.check("test") > 1)
         throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
 

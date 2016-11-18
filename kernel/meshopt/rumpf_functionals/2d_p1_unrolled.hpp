@@ -144,28 +144,6 @@ namespace FEAT
 
             fval = fval_frobenius + fval_det + fval_rec_det;
 
-            //std::cout << std::scientific;
-            //std::cout << std::setprecision(16);
-            //Tx grad_frobenius(DataType(0));
-            //Tx grad_det(DataType(0));
-            //Tx grad_rec_det(DataType(0));
-
-            //add_grad_frobenius_part(grad_frobenius, x, h);
-            //add_grad_det_1_part(grad_det, x, h);
-            //add_grad_rec_det_1_part(grad_rec_det, x, h);
-
-            //std::cout << "grad_frobenius"<< std::endl << grad_frobenius << std::endl;
-            //std::cout << "grad_det"<< std::endl << grad_det << std::endl;
-            //std::cout << "grad_rec_det"<< std::endl << grad_rec_det << std::endl;
-            //
-            //std::cout << "x = " << std::endl << x << std::endl;
-            //std::cout << "h = " << std::endl << h << std::endl;
-            //std::cout << "fval = " << stringify_fp_sci(fval) << ", "
-            //<< stringify_fp_sci(fval_frobenius)<< ", "
-            //<< stringify_fp_sci(fval_det) << ", "
-            //<< stringify_fp_sci(fval_rec_det) << std::endl;
-
-            //std::cout << "local grad " << std::endl << grad << std::endl;
           }
 
           void eval_fval_cellwise(DataType& fval, const TgradR& DOXY(mat_tensor), const TrafoEvaluator& DOXY(trafo_eval), const SpaceEvaluator& DOXY(space_eval), const Tx& x, const DataType& h, DataType& fval_frobenius, DataType& fval_cof, DataType& fval_det)
@@ -195,8 +173,6 @@ namespace FEAT
             }
 
             fval = fval_frobenius + fval_det;
-
-            //std::cout << "fval = " << stringify_fp_sci(fval) << ", "  << stringify_fp_sci(fval_frobenius)<< ", "  << stringify_fp_sci(fval_det) << ", "  << stringify_fp_sci(fval_rec_det) << std::endl;
 
           }
 
@@ -236,11 +212,6 @@ namespace FEAT
               }
 
               DataType der_h(frobenius_der_h + det_der_h + rec_det_der_h);
-
-              //std::cout << "norm_der_h = " << stringify_fp_sci(this->_fac_frobenius*norm_der_h) << std::endl <<
-              //  " det_der_h = " << stringify_fp_sci(this->_fac_det*det_der_h) << std::endl <<
-              //  " rec_det_der_h = " << stringify_fp_sci(this->_fac_rec_det*rec_det_der_h) << std::endl;
-              //std::cout << "full_der_h " << stringify_fp_sci(der_h) <<  std::endl;
 
               for(int i(0); i < Tx::m; ++i)
               {

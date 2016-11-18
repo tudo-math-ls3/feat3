@@ -104,11 +104,11 @@ struct MeshoptRAdaptApp
     // Get the application settings section
     auto app_settings_section = application_config->query_section("ApplicationSettings");
     XASSERTM(app_settings_section != nullptr,
-    "Application config is missing the mandatory ApplicationSettings section!");
+    "Application config is missing the mandatory ApplicationSettings section!\n");
 
     // Get timestep size
     auto delta_t_p = app_settings_section->query("delta_t");
-    XASSERTM(delta_t_p.second, "ApplicationConfig section is missing the mandatory delta_t entry!");
+    XASSERTM(delta_t_p.second, "ApplicationConfig section is missing the mandatory delta_t entry!\n");
     delta_t = std::stod(delta_t_p.first);
     XASSERT(delta_t > DataType(0));
 
@@ -248,7 +248,7 @@ struct MeshoptRAdaptApp
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
-        "Initial worst angle should be = "+stringify_fp_fix(90)+ " but is "+stringify_fp_fix(worst_angle));
+        "Initial worst angle should be = "+stringify_fp_fix(90)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
       }
       else if(test_number == 2)
       {
@@ -256,7 +256,7 @@ struct MeshoptRAdaptApp
         {
           Util::mpi_cout("FAILED:");
           throw InternalError(__func__,__FILE__,__LINE__,
-          "Initial worst angle should be >= "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(worst_angle));
+          "Initial worst angle should be >= "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
         }
       }
     }

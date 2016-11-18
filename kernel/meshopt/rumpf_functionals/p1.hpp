@@ -257,13 +257,6 @@ namespace FEAT
           DataType fval_det(0);
           DataType fval_rec_det(0);
 
-          //Tx grad_norm(DataType(0));
-          //Tx grad_cof(DataType(0));
-          //Tx grad_cof1(DataType(0));
-          //Tx grad_cof2(DataType(0));
-          //Tx grad_det(DataType(0));
-          //Tx grad_rec_det(DataType(0));
-
           for(int k(0); k < _cubature_rule.get_num_points(); ++k)
           {
             // Evaluate trafo and FE space
@@ -297,43 +290,9 @@ namespace FEAT
               add_grad_rec_det(grad, space_data, mat_tensor, this->_fac_rec_det*weight);
             }
 
-            //add_grad_frobenius(grad_norm, space_data, mat_tensor, this->_fac_frobenius*weight);
-            //add_grad_det(grad_det, space_data, mat_tensor, this->_fac_det*weight);
-            //add_grad_rec_det(grad_rec_det, space_data, mat_tensor, this->_fac_rec_det*weight);
-              //add_grad_cof(grad_cof, space_data, mat_tensor, this->_fac_cof*weight);
-              //add_grad_cof1(grad_cof1, space_data, mat_tensor, this->_fac_cof*weight);
-              //add_grad_cof2(grad_cof2, space_data, mat_tensor, this->_fac_cof*weight);
-
           }
 
-          //std::cout << std::scientific;
-          //std::cout << std::setprecision(16);
-
-          //std::cout << "grad_R_new" << std::endl << grad_R << std::endl;
-
-          //TgradR grad_R_old(0);
-          //grad_R_old[0][0] = -(x[0][0] - x[1][0]) / h;
-          //grad_R_old[1][0] = -sqrt(0.3e1) * (x[0][0] + x[1][0] - 0.2e1 * x[2][0]) / h / 0.3e1;
-          //grad_R_old[0][1] = -(x[0][1] - x[1][1]) / h;
-          //grad_R_old[1][1] = -sqrt(0.3e1) * (x[0][1] + x[1][1] - 0.2e1 * x[2][1]) / h / 0.3e1;
-
-          //std::cout << "grad_R_old" << std::endl << grad_R_old << std::endl;
-
           fval = fval_frobenius + fval_cof + fval_det + fval_rec_det;
-
-          //std::cout << "grad_norm"<< std::endl << grad_norm << std::endl;
-          //std::cout << "grad_cof"<< std::endl << grad_cof << std::endl;
-          //std::cout << "grad_cof1"<< std::endl << grad_cof1 << std::endl;
-          //std::cout << "grad_cof2"<< std::endl << grad_cof2 << std::endl;
-          //std::cout << "grad_det"<< std::endl << grad_det << std::endl;
-          //std::cout << "grad_rec_det"<< std::endl << grad_rec_det << std::endl;
-          //std::cout << "fval = " << stringify_fp_sci(fval) << ", "  << stringify_fp_sci(fval_frobenius)<< ", "  << stringify_fp_sci(fval_det) << ", "  << stringify_fp_sci(fval_rec_det) << std::endl;
-
-          //  std::cout << "fval = " << stringify_fp_sci(fval) << ", "
-          //  << stringify_fp_sci(fval_frobenius)<< ", "
-          //  << stringify_fp_sci(fval_cof)<< ", "
-          //  << stringify_fp_sci(fval_det) << ", "
-          //  << stringify_fp_sci(fval_rec_det) << std::endl;
 
         }
 
@@ -383,8 +342,6 @@ namespace FEAT
           }
 
           fval = fval_frobenius + fval_cof + fval_det;
-
-          //std::cout << "fval = " << stringify_fp_sci(fval) << ", "  << stringify_fp_sci(fval_frobenius)<< ", "  << stringify_fp_sci(fval_det) << ", "  << stringify_fp_sci(fval_rec_det) << std::endl;
 
         }
 
@@ -557,11 +514,6 @@ namespace FEAT
           rec_det_der_h *= this->_fac_rec_det*DataType(2)/h;
 
           DataType der_h(frobenius_der_h + det_der_h + rec_det_der_h);
-
-          //std::cout << "frobenius_der_h = " << stringify_fp_sci(frobenius_der_h) << std::endl <<
-          //  " det_der_h = " << stringify_fp_sci(det_der_h) << std::endl <<
-          //  " rec_det_der_h = " << stringify_fp_sci(rec_det_der_h) << std::endl;
-          //std::cout << "full_der_h " << stringify_fp_sci(der_h) <<  std::endl;
 
           // Add the local contributions to the global gradient
           for(int i(0); i < Tx::m; ++i)

@@ -198,7 +198,7 @@ namespace FEAT
         static DataType compute_det(Tx& x)
         {
           return (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(0,1) * x(1,0) + x(0,1) * x(2,0)
-              + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(8);
+              + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(2);
         }
 
         /**
@@ -253,7 +253,6 @@ namespace FEAT
               x[j] = coords_(idx(cell,Index(j)));
             }
 
-            std::cout << "det nabla R K n " << stringify_fp_sci(compute_det(x)) << std::endl;
             sum_det += compute_det(x);
           }
 
