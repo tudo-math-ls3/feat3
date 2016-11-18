@@ -199,10 +199,13 @@ def run_test(build_id, branch, myDB, extra_opts):
 
 ######### TEST #####################
   label_flag = ""
-  if mpi_only:
+  if mpi_distributed:
     label_flag = "--label-regex mpi"
   else:
     label_flag = " --schedule-random --label-exclude sleep"
+  if no_mpi:
+    label_flag += " --label-exclude mpi"
+
   test_command = "ctest " + label_flag + " --output-on-failure --output-log " + dump_filename_full + ".ctest"
   test_output = get_output_utf8(test_command)
 
@@ -313,7 +316,8 @@ cuda_host_compiler = ""
 onlynew = False
 cuda_arch = "sm_20"
 lto = ""
-mpi_only = False
+mpi_distributed = False
+no_mpi = False
 
 for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("dump="):
@@ -353,8 +357,10 @@ for i in range(1, len(sys.argv)):
     unroll_banded = True
   if sys.argv[i].startswith("lto"):
     lto = "-lto"
-  if sys.argv[i].startswith("mpi_only"):
-    mpi_only = True
+  if sys.argv[i].startswith("mpi_distributed"):
+    mpi_distributed = True
+  if sys.argv[i].startswith("no_mpi"):
+    no_mpi = True
 
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
