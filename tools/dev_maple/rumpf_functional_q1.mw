@@ -524,7 +524,7 @@ eval(diff( fval_frobenius,x[1,1] ),[h=1,x=xref]);</Text-field>
 <Group labelreference="L173" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font foreground="[0,0,0]"># For the H_Evaluator: Determinant of the transformation of the Rumpf reference cell to this cell</Font>
-h_eval_det := det_grad_R:
+h_eval_det := det_grad_R/normalised_ref_cell_vol:
 for i from 1 to d do
   h_eval_det:= int(eval(h_eval_det, [h=1]),xi[i]=-1..1):
 end do:
@@ -533,7 +533,7 @@ C(h_eval_det, declare=[x::numeric], resultname=h_eval_det_);</Text-field>
 </Group>
 <Group labelreference="L185" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">eval(h_eval_det,x=xref);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L172" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">

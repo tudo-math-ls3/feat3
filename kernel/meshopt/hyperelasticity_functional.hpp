@@ -713,9 +713,11 @@ namespace FEAT
               (_penalty_param > DataType(0)))
               {
                 if(_mesh_conc == nullptr)
+                {
                   throw InternalError(__func__,__FILE__,__LINE__,
                   "Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
                   stringify_fp_sci(_penalty_param)+", but no concentration function was given");
+                }
 
                 _mesh_conc->compute_dist();
               }
@@ -723,7 +725,9 @@ namespace FEAT
           _compute_scales_iter();
 
           if(_penalty_param > DataType(0))
+          {
             _alignment_constraint = this->_mesh_conc->compute_constraint();
+          }
 
 
         }

@@ -198,7 +198,7 @@ namespace FEAT
         static DataType compute_det(Tx& x)
         {
           return (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(0,1) * x(1,0) + x(0,1) * x(2,0)
-              + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(2);
+              + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(8);
         }
 
         /**
@@ -249,8 +249,11 @@ namespace FEAT
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
               x[j] = coords_(idx(cell,Index(j)));
+            }
 
+            std::cout << "det nabla R K n " << stringify_fp_sci(compute_det(x)) << std::endl;
             sum_det += compute_det(x);
           }
 
@@ -386,9 +389,9 @@ namespace FEAT
           grad(7,1) = -x(1,0) * x(3,2) + x(1,0) * x(5,2) + x(1,2) * x(3,0) - x(1,2) * x(5,0) + x(2,0) * x(3,2) - x(2,0) * x(6,2) - x(2,2) * x(3,0) + x(2,2) * x(6,0) + x(3,0) * x(5,2) - x(3,0) * x(6,2) - x(3,2) * x(5,0) + x(3,2) * x(6,0) - x(4,0) * x(5,2) + x(4,0) * x(6,2) + x(4,2) * x(5,0) - x(4,2) * x(6,0) + x(5,0) * x(6,2) - x(5,2) * x(6,0);
           grad(7,2) = x(1,0) * x(3,1) - x(1,0) * x(5,1) - x(1,1) * x(3,0) + x(1,1) * x(5,0) - x(2,0) * x(3,1) + x(2,0) * x(6,1) + x(2,1) * x(3,0) - x(2,1) * x(6,0) - x(3,0) * x(5,1) + x(3,0) * x(6,1) + x(3,1) * x(5,0) - x(3,1) * x(6,0) + x(4,0) * x(5,1) - x(4,0) * x(6,1) - x(4,1) * x(5,0) + x(4,1) * x(6,0) - x(5,0) * x(6,1) + x(5,1) * x(6,0);
 
-          // Important: Scale the matrix with the missing factor 1/12
+          // Important: Scale the matrix with the missing factor 1/96
 
-          grad *= (DataType(1)/DataType(12));
+          grad *= (DataType(1)/DataType(96));
 
         }
 
