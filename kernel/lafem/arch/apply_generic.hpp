@@ -213,7 +213,7 @@ namespace FEAT
                   Intern::LoopUnroller<0, C_>::step(Intern::ApplyELL::single_matrix_entry, tmp, val + cs[i] + j*C_, x, col_ind + cs[i] + j*C_);
                 }
 
-                Intern::LoopUnroller<0, C_>::step(single_entry_apply, r + i*C_, ctmp, a, ((const DT_ * const)r) + i*C_, b);
+                Intern::LoopUnroller<0, C_>::step(single_entry_apply, r + i*C_, ctmp, a, ((const DT_ *)r) + i*C_, b);
               }
 
               Index i(rows/C_);
