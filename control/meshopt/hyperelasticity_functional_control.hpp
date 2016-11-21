@@ -4,8 +4,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <kernel/util/mpi_cout.hpp>
-
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
@@ -279,21 +277,41 @@ namespace FEAT
           /// \copydoc BaseClass::print()
           virtual void print() const override
           {
-            Util::mpi_cout(name()+" settings:\n");
-            Util::mpi_cout_pad_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
-            Util::mpi_cout_pad_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
+            int width(30);
+            Dist::Comm comm_world(Dist::Comm::world());
+
+            String msg;
+
+            msg = name().pad_back(width, '.') + String(":");
+            comm_world.print(msg);
+
+            msg = String("level max/min").pad_back(width, '.') + String(": ")
+              + stringify(_assembler_levels.back()->domain_level.get_level_index()) + String(" / ")
+              + stringify(_assembler_levels.back()->domain_level.get_level_index());
+            comm_world.print(msg);
 
             for(const auto& it : get_dirichlet_boundaries())
-              Util::mpi_cout_pad_line("Displacement BC on",it);
-            for(const auto& it : get_slip_boundaries())
-              Util::mpi_cout_pad_line("Unilateral BC of place on",it);
+            {
+              msg = String("Displacement BC on").pad_back(width, '.') + String(": ") + it;
+              comm_world.print(msg);
+            }
 
-            Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
+            for(const auto& it : get_slip_boundaries())
+            {
+              msg = String("Unilateral BC of place on").pad_back(width, '.') + String(": ") + it;
+              comm_world.print(msg);
+            }
+
+            msg = String("DoF").pad_back(width, '.') + String(": ")
+              + stringify(_system_levels.back()->op_sys.columns());
+            comm_world.print(msg);
 
             FEAT::Statistics::expression_target = name();
             try
             {
-              Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim());
+              msg = String("Solver") .pad_back(width, '.') + String(": ")
+                + FEAT::Statistics::get_formatted_solver_tree().trim();
+              comm_world.print(msg);
             }
             catch(std::exception& /*e*/)
             {
@@ -301,11 +319,12 @@ namespace FEAT
 
             if(precond != nullptr)
             {
-              Util::mpi_cout("Nonlinear preconditioner:\n");
+              msg = String("Nonlinear preconditioner:");
+              comm_world.print(msg);
               precond->print();
             }
 
-            Util::mpi_cout("\n");
+            comm_world.print("\n");
             (*(_system_levels.back()->op_sys)).print();
           }
 

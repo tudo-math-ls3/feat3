@@ -203,20 +203,45 @@ namespace FEAT
           /// \copydoc BaseClass::print()
           virtual void print() const override
           {
-            Util::mpi_cout(name()+" settings:\n");
-            Util::mpi_cout_pad_line("Domain level min",_assembler_levels.front()->domain_level.get_level_index());
-            Util::mpi_cout_pad_line("Domain level max",_assembler_levels.back()->domain_level.get_level_index());
-            Util::mpi_cout_pad_line("Fixed reference domain",fixed_reference_domain);
+            int width(30);
+            Dist::Comm comm_world(Dist::Comm::world());
+
+            String msg;
+
+            msg = name().pad_back(width, '.') + String(":");
+            comm_world.print(msg);
+
+            msg = String("level max/min").pad_back(width, '.') + String(": ")
+              + stringify(_assembler_levels.back()->domain_level.get_level_index()) + String(" / ")
+              + stringify(_assembler_levels.back()->domain_level.get_level_index());
+            comm_world.print(msg);
+
+            msg = String("Fixed reference domain").pad_back(width, '.') + String(": ")
+              + stringify(fixed_reference_domain);
+            comm_world.print(msg);
+
             for(const auto& it : get_dirichlet_boundaries())
-              Util::mpi_cout_pad_line("Displacement BC on",it);
+            {
+              msg = String("Displacement BC on").pad_back(width, '.') + String(": ") + it;
+              comm_world.print(msg);
+            }
+
             for(const auto& it : get_slip_boundaries())
-              Util::mpi_cout_pad_line("Unilateral BC of place on",it);
-            Util::mpi_cout_pad_line("DoF",_system_levels.back()->op_sys.columns());
+            {
+              msg = String("Unilateral BC of place on").pad_back(width, '.') + String(": ") + it;
+              comm_world.print(msg);
+            }
+
+            msg = String("DoF").pad_back(width, '.') + String(": ")
+              + stringify(_system_levels.back()->op_sys.columns());
+            comm_world.print(msg);
 
             FEAT::Statistics::expression_target = name();
             try
             {
-              Util::mpi_cout_pad_line("Solver",FEAT::Statistics::get_formatted_solver_tree().trim() + "\n");
+              msg = String("Solver") .pad_back(width, '.') + String(": ")
+                + FEAT::Statistics::get_formatted_solver_tree().trim();
+              comm_world.print(msg);
             }
             catch(std::exception& /*e*/)
             {
