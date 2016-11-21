@@ -246,6 +246,44 @@ namespace FEAT
       }
 
       /**
+       * \brief Computes the minimum of a scalar variable over all processes.
+       *
+       * \param[in] x
+       * What we want to compute the minimum over all processes of.
+       *
+       * \returns
+       * The minimum of all \p x.
+       */
+      DataType min(DataType x) const
+      {
+        return synch_scalar(x, *_comm, Dist::op_min, false);
+      }
+
+      ScalarTicketType min_async(DataType x) const
+      {
+        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_min, false);
+      }
+
+      /**
+       * \brief Computes the maximum of a scalar variable over all processes.
+       *
+       * \param[in] x
+       * What we want to compute the maximum over all processes of.
+       *
+       * \returns
+       * The maximum of all \p x.
+       */
+      DataType max(DataType x) const
+      {
+        return synch_scalar(x, *_comm, Dist::op_max, false);
+      }
+
+      ScalarTicketType max_async(DataType x) const
+      {
+        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_max, false);
+      }
+
+      /**
        * \brief Computes a reduced 2-norm over all processes.
        *
        * This function is equivalent to the call
