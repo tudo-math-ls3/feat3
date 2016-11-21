@@ -131,11 +131,11 @@ namespace FEAT
         for(std::size_t i(0); i < _mirrors.size(); ++i)
         {
           // sum up number of ranks per frequency entry, listed in different mirrors
-          auto temp = _mirrors.at(i).create_buffer_vector();
+          auto temp = _mirrors.at(i).create_buffer(_freqs);
           temp.format(DataType(1));
 
           // gather-axpy into frequency vector
-          _mirrors.at(i).scatter_axpy_dual(_freqs, temp);
+          _mirrors.at(i).scatter_axpy(_freqs, temp);
         }
 
         // invert frequencies

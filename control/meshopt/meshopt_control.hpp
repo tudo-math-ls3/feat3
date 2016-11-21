@@ -66,7 +66,8 @@ namespace FEAT
           /// operate
           typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, world_dim> LocalCoordsBuffer;
           /// corresponding vector mirror
-          typedef LAFEM::VectorMirrorBlocked<Mem::Main, CoordType, Index, world_dim> CoordsMirror;
+          //typedef LAFEM::VectorMirrorBlocked<Mem::Main, CoordType, Index, world_dim> CoordsMirror;
+          typedef LAFEM::VectorMirror<Mem::Main, CoordType, Index> CoordsMirror;
           /// The global version of LocalCoordsBuffer, needed for prepare setting the internal state variable
           typedef Global::Vector<LocalCoordsBuffer, CoordsMirror> GlobalCoordsBuffer;
           /// Type of the vtk exporter this (and derived classes) can write to
@@ -234,7 +235,8 @@ namespace FEAT
           typedef typename LocalQualityFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
 
           /// Mirrors for system vectors
-          typedef LAFEM::VectorMirrorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SystemMirror;
+          //typedef LAFEM::VectorMirrorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SystemMirror;
+          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> SystemMirror;
           /// Gates for the system
           typedef Global::Gate<LocalSystemVectorR, SystemMirror> SystemGate;
           /// Mirrors for scalar vectors

@@ -24,8 +24,16 @@ template<
 class VectorMirrorTest
   : public FullTaggedTest<MemType_, DT_, IT_>
 {
+  static constexpr int block_size = 3;
+
+  typedef DenseVector<Mem::Main, DT_, IT_> BufferVectorType;
+
   typedef DenseVector<MemType_, DT_, IT_> VectorType;
   typedef SparseVector<MemType_, DT_, IT_> SparseVectorType;
+  typedef DenseVectorBlocked<MemType_, DT_, IT_, block_size> BlockedVectorType;
+  typedef SparseVectorBlocked<MemType_, DT_, IT_, block_size> BlockedSparseVectorType;
+
+
   typedef DenseVector<MemType_, IT_, IT_> IVectorType;
   typedef SparseMatrixCSR<MemType_, DT_, IT_> MatrixType;
   typedef VectorMirror<MemType_, DT_, IT_> MirrorType;
@@ -60,19 +68,18 @@ public:
     MirrorType mirror1(std::move(mat_gather1), std::move(mat_scatter1));
     MirrorType mirror2(std::move(mat_gather2), std::move(mat_scatter2));
 
-    // create four buffer and one temporary vectors
-    VectorType vec_buf_ab_a(Index(1), DT_(0));
-    VectorType vec_buf_ab_b(Index(1), DT_(0));
-    VectorType vec_buf_ac_a(Index(1), DT_(0));
-    VectorType vec_buf_ac_c(Index(1), DT_(0));
-    VectorType vec_buf_bc_b(Index(1), DT_(0));
-    VectorType vec_buf_bc_c(Index(1), DT_(0));
-    VectorType vec_buf_abc_a(Index(1), DT_(0));
-    VectorType vec_buf_abc_b(Index(1), DT_(0));
-    VectorType vec_buf_abc_c(Index(1), DT_(0));
-
     // Test for DenseVector
     {
+      BufferVectorType vec_buf_ab_a(Index(1), DT_(0));
+      BufferVectorType vec_buf_ab_b(Index(1), DT_(0));
+      BufferVectorType vec_buf_ac_a(Index(1), DT_(0));
+      BufferVectorType vec_buf_ac_c(Index(1), DT_(0));
+      BufferVectorType vec_buf_bc_b(Index(1), DT_(0));
+      BufferVectorType vec_buf_bc_c(Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_a(Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_b(Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_c(Index(1), DT_(0));
+
       VectorType a1(Index(3), DT_(0));
       VectorType a2(Index(3), DT_(0));
       VectorType b1(Index(3), DT_(0));
@@ -103,37 +110,37 @@ public:
       c2(Index(2), DT_(9));
 
       // gather from a
-      mirror0.gather_prim(vec_buf_abc_a, a1);
-      mirror1.gather_prim(vec_buf_ac_a, a1);
-      mirror2.gather_prim(vec_buf_ab_a, a1);
+      mirror0.gather(vec_buf_abc_a, a1);
+      mirror1.gather(vec_buf_ac_a, a1);
+      mirror2.gather(vec_buf_ab_a, a1);
 
       // gather from b
-      mirror0.gather_prim(vec_buf_abc_b, b1);
-      mirror1.gather_prim(vec_buf_ab_b, b1);
-      mirror2.gather_prim(vec_buf_bc_b, b1);
+      mirror0.gather(vec_buf_abc_b, b1);
+      mirror1.gather(vec_buf_ab_b, b1);
+      mirror2.gather(vec_buf_bc_b, b1);
 
       // gather from c
-      mirror0.gather_prim(vec_buf_abc_c, c1);
-      mirror1.gather_prim(vec_buf_bc_c, c1);
-      mirror2.gather_prim(vec_buf_ac_c, c1);
+      mirror0.gather(vec_buf_abc_c, c1);
+      mirror1.gather(vec_buf_bc_c, c1);
+      mirror2.gather(vec_buf_ac_c, c1);
 
       // scatter to a
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_b);
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(a1, vec_buf_ac_c);
-      mirror2.scatter_axpy_prim(a1, vec_buf_ab_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_c);
+      mirror1.scatter_axpy(a1, vec_buf_ac_c);
+      mirror2.scatter_axpy(a1, vec_buf_ab_b);
 
       // scatter to b
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(b1, vec_buf_ab_a);
-      mirror2.scatter_axpy_prim(b1, vec_buf_bc_c);
+      mirror0.scatter_axpy(b1, vec_buf_abc_a);
+      mirror0.scatter_axpy(b1, vec_buf_abc_c);
+      mirror1.scatter_axpy(b1, vec_buf_ab_a);
+      mirror2.scatter_axpy(b1, vec_buf_bc_c);
 
       // scatter to c
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_b);
-      mirror1.scatter_axpy_prim(c1, vec_buf_bc_b);
-      mirror2.scatter_axpy_prim(c1, vec_buf_ac_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_b);
+      mirror1.scatter_axpy(c1, vec_buf_bc_b);
+      mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
       // subtract reference results
       a1.axpy(a2, a1, -DT_(1));
@@ -148,16 +155,15 @@ public:
 
     // Test for SparseVectors
     {
-      // clear buffers
-      vec_buf_abc_a.format(DT_(0));
-      vec_buf_abc_b.format(DT_(0));
-      vec_buf_abc_c.format(DT_(0));
-      vec_buf_ab_a.format(DT_(0));
-      vec_buf_ab_b.format(DT_(0));
-      vec_buf_bc_b.format(DT_(0));
-      vec_buf_bc_c.format(DT_(0));
-      vec_buf_ac_a.format(DT_(0));
-      vec_buf_ac_c.format(DT_(0));
+      BufferVectorType vec_buf_ab_a(Index(1), DT_(0));
+      BufferVectorType vec_buf_ab_b(Index(1), DT_(0));
+      BufferVectorType vec_buf_ac_a(Index(1), DT_(0));
+      BufferVectorType vec_buf_ac_c(Index(1), DT_(0));
+      BufferVectorType vec_buf_bc_b(Index(1), DT_(0));
+      BufferVectorType vec_buf_bc_c(Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_a(Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_b(Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_c(Index(1), DT_(0));
 
       SparseVectorType a1(Index(3));
       SparseVectorType a2(Index(3));
@@ -188,37 +194,37 @@ public:
       c2(Index(2), a1(1)+c1(2));
 
       // gather from a
-      mirror0.gather_prim(vec_buf_abc_a, a1);
-      mirror1.gather_prim(vec_buf_ac_a, a1);
-      mirror2.gather_prim(vec_buf_ab_a, a1);
+      mirror0.gather(vec_buf_abc_a, a1);
+      mirror1.gather(vec_buf_ac_a, a1);
+      mirror2.gather(vec_buf_ab_a, a1);
 
       // gather from b
-      mirror0.gather_prim(vec_buf_abc_b, b1);
-      mirror1.gather_prim(vec_buf_ab_b, b1);
-      mirror2.gather_prim(vec_buf_bc_b, b1);
+      mirror0.gather(vec_buf_abc_b, b1);
+      mirror1.gather(vec_buf_ab_b, b1);
+      mirror2.gather(vec_buf_bc_b, b1);
 
       // gather from c
-      mirror0.gather_prim(vec_buf_abc_c, c1);
-      mirror1.gather_prim(vec_buf_bc_c, c1);
-      mirror2.gather_prim(vec_buf_ac_c, c1);
+      mirror0.gather(vec_buf_abc_c, c1);
+      mirror1.gather(vec_buf_bc_c, c1);
+      mirror2.gather(vec_buf_ac_c, c1);
 
       // scatter to a
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_b);
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(a1, vec_buf_ac_c);
-      mirror2.scatter_axpy_prim(a1, vec_buf_ab_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_c);
+      mirror1.scatter_axpy(a1, vec_buf_ac_c);
+      mirror2.scatter_axpy(a1, vec_buf_ab_b);
 
       // scatter to b
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(b1, vec_buf_ab_a);
-      mirror2.scatter_axpy_prim(b1, vec_buf_bc_c);
+      mirror0.scatter_axpy(b1, vec_buf_abc_a);
+      mirror0.scatter_axpy(b1, vec_buf_abc_c);
+      mirror1.scatter_axpy(b1, vec_buf_ab_a);
+      mirror2.scatter_axpy(b1, vec_buf_bc_c);
 
       // scatter to c
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_b);
-      mirror1.scatter_axpy_prim(c1, vec_buf_bc_b);
-      mirror2.scatter_axpy_prim(c1, vec_buf_ac_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_b);
+      mirror1.scatter_axpy(c1, vec_buf_bc_b);
+      mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
       // There is no axpy for SparseVector yet, so for now download the vectors (if necessary) and do it by hand.
       LAFEM::SparseVector<Mem::Main, DT_, IT_> a1_main; a1_main.convert(a1);
@@ -258,110 +264,52 @@ public:
       }
 
     } // End of test for SparseVector
-  }
-};
-
-VectorMirrorTest<Mem::Main, double, unsigned long> vector_mirror_test_main_d_ul;
-VectorMirrorTest<Mem::Main, float, unsigned int> vector_mirror_test_main_f_ui;
-/// \todo Add cuda vector mirror tests
-//VectorMirrorTest<Mem::CUDA, double, unsigned long> vector_mirror_test_cuda_d_ul;
-//VectorMirrorTest<Mem::CUDA, float, unsigned int> vector_mirror_test_cuda_f_ui;
-
-/**
- * \brief Test class for VectorMirrorBlocked class template
- *
- * \author Jordi Paul
- */
-template < typename Mem_, typename DT_, typename IT_, int BS_>
-class VectorMirrorBlockedTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
-{
-  typedef DenseVectorBlocked<Mem_, DT_, IT_, BS_> VectorType;
-  typedef SparseVectorBlocked<Mem_, DT_, IT_, BS_> SparseVectorType;
-  typedef DenseVector<Mem_, IT_, IT_> IVectorType;
-  typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
-  typedef DenseVector<Mem_, DT_, IT_> BufferVectorType;
-  typedef VectorMirrorBlocked<Mem_, DT_, IT_, BS_> MirrorType;
-
-  static constexpr int BlockSize = BS_;
-
-public:
-  VectorMirrorBlockedTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("VectorMirrorBlockedTest")
-  {
-  }
-
-  virtual void run() const override
-  {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
-
-    // Create mirror vectors. Every mirror gathers one entry from / scatters one entry to a DenseVectorBlocked of
-    // length 3
-    IVectorType col_idx0(Index(1), IT_(0));
-    IVectorType col_idx1(Index(1), IT_(1));
-    IVectorType col_idx2(Index(1), IT_(2));
-    BufferVectorType mir_val(Index(1), DT_(1));
-    IVectorType row_ptr(Index(2));
-    row_ptr(Index(0), IT_(0));
-    row_ptr(Index(1), IT_(1));
-    MatrixType mat_gather0(Index(1), Index(3), col_idx0, mir_val, row_ptr);
-    MatrixType mat_gather1(Index(1), Index(3), col_idx1, mir_val, row_ptr);
-    MatrixType mat_gather2(Index(1), Index(3), col_idx2, mir_val, row_ptr);
-    MatrixType mat_scatter0(mat_gather0.transpose());
-    MatrixType mat_scatter1(mat_gather1.transpose());
-    MatrixType mat_scatter2(mat_gather2.transpose());
-
-    // Create mirrors. mirror{k} gathers/scatters to/from entry k
-    MirrorType mirror0(std::move(mat_gather0), std::move(mat_scatter0));
-    MirrorType mirror1(std::move(mat_gather1), std::move(mat_scatter1));
-    MirrorType mirror2(std::move(mat_gather2), std::move(mat_scatter2));
-
-    // Create four buffer and one temporary vectors
-    // a1(2)+b1(1)
-    BufferVectorType vec_buf_ab_a(Index(BlockSize)*Index(1), DT_(0));
-    BufferVectorType vec_buf_ab_b(Index(BlockSize)*Index(1), DT_(0));
-    // a1(1)+c1(2)
-    BufferVectorType vec_buf_ac_a(Index(BlockSize)*Index(1), DT_(0));
-    BufferVectorType vec_buf_ac_c(Index(BlockSize)*Index(1), DT_(0));
-    // b1(2)+c(1)
-    BufferVectorType vec_buf_bc_b(Index(BlockSize)*Index(1), DT_(0));
-    BufferVectorType vec_buf_bc_c(Index(BlockSize)*Index(1), DT_(0));
-    // a1(0) + b1(0) + c1(0)
-    BufferVectorType vec_buf_abc_a(Index(BlockSize)*Index(1), DT_(0));
-    BufferVectorType vec_buf_abc_b(Index(BlockSize)*Index(1), DT_(0));
-    BufferVectorType vec_buf_abc_c(Index(BlockSize)*Index(1), DT_(0));
 
     // Tests for DenseVectorBlocked
     {
-      VectorType a1(Index(3), DT_(0));
-      VectorType a2(Index(3), DT_(0));
-      VectorType b1(Index(3), DT_(0));
-      VectorType b2(Index(3), DT_(0));
-      VectorType c1(Index(3), DT_(0));
-      VectorType c2(Index(3), DT_(0));
+      // a1(2)+b1(1)
+      BufferVectorType vec_buf_ab_a(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_ab_b(Index(block_size)*Index(1), DT_(0));
+      // a1(1)+c1(2)
+      BufferVectorType vec_buf_ac_a(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_ac_c(Index(block_size)*Index(1), DT_(0));
+      // b1(2)+c(1)
+      BufferVectorType vec_buf_bc_b(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_bc_c(Index(block_size)*Index(1), DT_(0));
+      // a1(0) + b1(0) + c1(0)
+      BufferVectorType vec_buf_abc_a(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_b(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_c(Index(block_size)*Index(1), DT_(0));
 
-      Tiny::Vector<DT_, BS_> tiny_tmp(DT_(0));
+      BlockedVectorType a1(Index(3), DT_(0));
+      BlockedVectorType a2(Index(3), DT_(0));
+      BlockedVectorType b1(Index(3), DT_(0));
+      BlockedVectorType b2(Index(3), DT_(0));
+      BlockedVectorType c1(Index(3), DT_(0));
+      BlockedVectorType c2(Index(3), DT_(0));
+
+      Tiny::Vector<DT_, block_size> tiny_tmp(DT_(0));
 
       // Vectors to gather/scatter
-      tiny_tmp(0) = DT_(-3), tiny_tmp(1) = DT_(0.5), tiny_tmp(BlockSize-1) = -DT_(1);
+      tiny_tmp(0) = DT_(-3), tiny_tmp(1) = DT_(0.5), tiny_tmp(block_size-1) = -DT_(1);
       a1(Index(0), tiny_tmp);
-      tiny_tmp(0) = DT_(-7), tiny_tmp(1) = DT_(5), tiny_tmp(BlockSize-1) = -DT_(1000);
+      tiny_tmp(0) = DT_(-7), tiny_tmp(1) = DT_(5), tiny_tmp(block_size-1) = -DT_(1000);
       a1(Index(1), tiny_tmp);
-      tiny_tmp(0) = DT_(-0.3), tiny_tmp(1) = DT_(0.1), tiny_tmp(BlockSize-1) = DT_(2);
+      tiny_tmp(0) = DT_(-0.3), tiny_tmp(1) = DT_(0.1), tiny_tmp(block_size-1) = DT_(2);
       a1(Index(2), tiny_tmp);
 
-      tiny_tmp(0) = DT_(0.3), tiny_tmp(1) = DT_(0.001), tiny_tmp(BlockSize-1) = DT_(2.2);
+      tiny_tmp(0) = DT_(0.3), tiny_tmp(1) = DT_(0.001), tiny_tmp(block_size-1) = DT_(2.2);
       b1(Index(0), tiny_tmp);
-      tiny_tmp(0) = DT_(-3.7), tiny_tmp(1) = DT_(8.001), tiny_tmp(BlockSize-1) = -DT_(9.002);
+      tiny_tmp(0) = DT_(-3.7), tiny_tmp(1) = DT_(8.001), tiny_tmp(block_size-1) = -DT_(9.002);
       b1(Index(1), tiny_tmp);
-      tiny_tmp(0) = DT_(19), tiny_tmp(1) = DT_(-111), tiny_tmp(BlockSize-1) = -DT_(111);
+      tiny_tmp(0) = DT_(19), tiny_tmp(1) = DT_(-111), tiny_tmp(block_size-1) = -DT_(111);
       b1(Index(2), tiny_tmp);
 
-      tiny_tmp(0) = DT_(2303), tiny_tmp(1) = DT_(0), tiny_tmp(BlockSize-1) = DT_(0);
+      tiny_tmp(0) = DT_(2303), tiny_tmp(1) = DT_(0), tiny_tmp(block_size-1) = DT_(0);
       c1(Index(0), tiny_tmp);
-      tiny_tmp(0) = DT_(0), tiny_tmp(1) = DT_(1), tiny_tmp(BlockSize-1) = DT_(7);
+      tiny_tmp(0) = DT_(0), tiny_tmp(1) = DT_(1), tiny_tmp(block_size-1) = DT_(7);
       c1(Index(1), tiny_tmp);
-      tiny_tmp(0) = DT_(0.001), tiny_tmp(1) = DT_(1), tiny_tmp(BlockSize-1) = -DT_(7.7);
+      tiny_tmp(0) = DT_(0.001), tiny_tmp(1) = DT_(1), tiny_tmp(block_size-1) = -DT_(7.7);
       c1(Index(2), tiny_tmp);
 
       // Supposed results. See the gather operations below for this to make sense.
@@ -378,37 +326,37 @@ public:
       c2(Index(2), a1(1)+c1(2));
 
       // gather from a
-      mirror0.gather_prim(vec_buf_abc_a, a1);
-      mirror1.gather_prim(vec_buf_ac_a, a1);
-      mirror2.gather_prim(vec_buf_ab_a, a1);
+      mirror0.gather(vec_buf_abc_a, a1);
+      mirror1.gather(vec_buf_ac_a, a1);
+      mirror2.gather(vec_buf_ab_a, a1);
 
       // gather from b
-      mirror0.gather_prim(vec_buf_abc_b, b1);
-      mirror1.gather_prim(vec_buf_ab_b, b1);
-      mirror2.gather_prim(vec_buf_bc_b, b1);
+      mirror0.gather(vec_buf_abc_b, b1);
+      mirror1.gather(vec_buf_ab_b, b1);
+      mirror2.gather(vec_buf_bc_b, b1);
 
       // gather from c
-      mirror0.gather_prim(vec_buf_abc_c, c1);
-      mirror1.gather_prim(vec_buf_bc_c, c1);
-      mirror2.gather_prim(vec_buf_ac_c, c1);
+      mirror0.gather(vec_buf_abc_c, c1);
+      mirror1.gather(vec_buf_bc_c, c1);
+      mirror2.gather(vec_buf_ac_c, c1);
 
       // scatter to a
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_b);
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(a1, vec_buf_ac_c);
-      mirror2.scatter_axpy_prim(a1, vec_buf_ab_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_c);
+      mirror1.scatter_axpy(a1, vec_buf_ac_c);
+      mirror2.scatter_axpy(a1, vec_buf_ab_b);
 
       // scatter to b
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(b1, vec_buf_ab_a);
-      mirror2.scatter_axpy_prim(b1, vec_buf_bc_c);
+      mirror0.scatter_axpy(b1, vec_buf_abc_a);
+      mirror0.scatter_axpy(b1, vec_buf_abc_c);
+      mirror1.scatter_axpy(b1, vec_buf_ab_a);
+      mirror2.scatter_axpy(b1, vec_buf_bc_c);
 
       // scatter to c
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_b);
-      mirror1.scatter_axpy_prim(c1, vec_buf_bc_b);
-      mirror2.scatter_axpy_prim(c1, vec_buf_ac_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_b);
+      mirror1.scatter_axpy(c1, vec_buf_bc_b);
+      mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
       // Subtract reference results
       a1.axpy(a2, a1, -DT_(1));
@@ -419,10 +367,24 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
       TEST_CHECK_EQUAL_WITHIN_EPS(b1.norm2(), DT_(0), tol);
       TEST_CHECK_EQUAL_WITHIN_EPS(c1.norm2(), DT_(0), tol);
-    }
+    } // End of test for DenseVectorBlocked
 
     // Tests for SparseVectorBlocked
     {
+      // a1(2)+b1(1)
+      BufferVectorType vec_buf_ab_a(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_ab_b(Index(block_size)*Index(1), DT_(0));
+      // a1(1)+c1(2)
+      BufferVectorType vec_buf_ac_a(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_ac_c(Index(block_size)*Index(1), DT_(0));
+      // b1(2)+c(1)
+      BufferVectorType vec_buf_bc_b(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_bc_c(Index(block_size)*Index(1), DT_(0));
+      // a1(0) + b1(0) + c1(0)
+      BufferVectorType vec_buf_abc_a(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_b(Index(block_size)*Index(1), DT_(0));
+      BufferVectorType vec_buf_abc_c(Index(block_size)*Index(1), DT_(0));
+
       // clear buffers
       vec_buf_abc_a.format(DT_(0));
       vec_buf_abc_b.format(DT_(0));
@@ -434,29 +396,29 @@ public:
       vec_buf_ac_a.format(DT_(0));
       vec_buf_ac_c.format(DT_(0));
 
-      SparseVectorType a1(Index(3));
-      SparseVectorType a2(Index(3));
-      SparseVectorType b1(Index(3));
-      SparseVectorType b2(Index(3));
-      SparseVectorType c1(Index(3));
-      SparseVectorType c2(Index(3));
+      BlockedSparseVectorType a1(Index(3));
+      BlockedSparseVectorType a2(Index(3));
+      BlockedSparseVectorType b1(Index(3));
+      BlockedSparseVectorType b2(Index(3));
+      BlockedSparseVectorType c1(Index(3));
+      BlockedSparseVectorType c2(Index(3));
 
-      Tiny::Vector<DT_, BS_> tiny_tmp(DT_(0));
+      Tiny::Vector<DT_, block_size> tiny_tmp(DT_(0));
 
       // Vectors to gather/scatter
-      tiny_tmp(0) = DT_(-3), tiny_tmp(1) = DT_(0.5), tiny_tmp(BlockSize-1) = -DT_(1);
+      tiny_tmp(0) = DT_(-3), tiny_tmp(1) = DT_(0.5), tiny_tmp(block_size-1) = -DT_(1);
       a1(Index(0), tiny_tmp);
-      tiny_tmp(0) = DT_(-7), tiny_tmp(1) = DT_(5), tiny_tmp(BlockSize-1) = -DT_(1000);
+      tiny_tmp(0) = DT_(-7), tiny_tmp(1) = DT_(5), tiny_tmp(block_size-1) = -DT_(1000);
       a1(Index(1), tiny_tmp);
 
-      tiny_tmp(0) = DT_(-3.7), tiny_tmp(1) = DT_(8.001), tiny_tmp(BlockSize-1) = -DT_(9.002);
+      tiny_tmp(0) = DT_(-3.7), tiny_tmp(1) = DT_(8.001), tiny_tmp(block_size-1) = -DT_(9.002);
       b1(Index(1), tiny_tmp);
-      tiny_tmp(0) = DT_(19), tiny_tmp(1) = DT_(-111), tiny_tmp(BlockSize-1) = -DT_(111);
+      tiny_tmp(0) = DT_(19), tiny_tmp(1) = DT_(-111), tiny_tmp(block_size-1) = -DT_(111);
       b1(Index(2), tiny_tmp);
 
-      tiny_tmp(0) = DT_(2303), tiny_tmp(1) = DT_(0), tiny_tmp(BlockSize-1) = DT_(0);
+      tiny_tmp(0) = DT_(2303), tiny_tmp(1) = DT_(0), tiny_tmp(block_size-1) = DT_(0);
       c1(Index(0), tiny_tmp);
-      tiny_tmp(0) = DT_(0.001), tiny_tmp(1) = DT_(1), tiny_tmp(BlockSize-1) = -DT_(7.7);
+      tiny_tmp(0) = DT_(0.001), tiny_tmp(1) = DT_(1), tiny_tmp(block_size-1) = -DT_(7.7);
       c1(Index(2), tiny_tmp);
 
       // Supposed results. See the gather operations below for this to make sense.
@@ -470,41 +432,41 @@ public:
       c2(Index(2), a1(1)+c1(2));
 
       // gather from a
-      mirror0.gather_prim(vec_buf_abc_a, a1);
-      mirror1.gather_prim(vec_buf_ac_a, a1);
-      mirror2.gather_prim(vec_buf_ab_a, a1);
+      mirror0.gather(vec_buf_abc_a, a1);
+      mirror1.gather(vec_buf_ac_a, a1);
+      mirror2.gather(vec_buf_ab_a, a1);
 
       // gather from b
-      mirror0.gather_prim(vec_buf_abc_b, b1);
-      mirror1.gather_prim(vec_buf_ab_b, b1);
-      mirror2.gather_prim(vec_buf_bc_b, b1);
+      mirror0.gather(vec_buf_abc_b, b1);
+      mirror1.gather(vec_buf_ab_b, b1);
+      mirror2.gather(vec_buf_bc_b, b1);
 
       // gather from c
-      mirror0.gather_prim(vec_buf_abc_c, c1);
-      mirror1.gather_prim(vec_buf_bc_c, c1);
-      mirror2.gather_prim(vec_buf_ac_c, c1);
+      mirror0.gather(vec_buf_abc_c, c1);
+      mirror1.gather(vec_buf_bc_c, c1);
+      mirror2.gather(vec_buf_ac_c, c1);
 
       // scatter to a
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_b);
-      mirror0.scatter_axpy_prim(a1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(a1, vec_buf_ac_c);
-      mirror2.scatter_axpy_prim(a1, vec_buf_ab_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_b);
+      mirror0.scatter_axpy(a1, vec_buf_abc_c);
+      mirror1.scatter_axpy(a1, vec_buf_ac_c);
+      mirror2.scatter_axpy(a1, vec_buf_ab_b);
 
       // scatter to b
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(b1, vec_buf_abc_c);
-      mirror1.scatter_axpy_prim(b1, vec_buf_ab_a);
-      mirror2.scatter_axpy_prim(b1, vec_buf_bc_c);
+      mirror0.scatter_axpy(b1, vec_buf_abc_a);
+      mirror0.scatter_axpy(b1, vec_buf_abc_c);
+      mirror1.scatter_axpy(b1, vec_buf_ab_a);
+      mirror2.scatter_axpy(b1, vec_buf_bc_c);
 
       // scatter to c
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_a);
-      mirror0.scatter_axpy_prim(c1, vec_buf_abc_b);
-      mirror1.scatter_axpy_prim(c1, vec_buf_bc_b);
-      mirror2.scatter_axpy_prim(c1, vec_buf_ac_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_a);
+      mirror0.scatter_axpy(c1, vec_buf_abc_b);
+      mirror1.scatter_axpy(c1, vec_buf_bc_b);
+      mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
       // There is no axpy for SparseVector yet, so for now download the vectors (if necessary) and do it by hand.
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, BS_> a1_main; a1_main.convert(a1);
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, BS_> a2_main; a2_main.convert(a2);
+      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> a1_main; a1_main.convert(a1);
+      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> a2_main; a2_main.convert(a2);
 
       TEST_CHECK_MSG(a1_main.used_elements() == a2_main.used_elements(),"Wrong number of nonzeros.");
       for(Index i(0); i < a1_main.used_elements(); ++i)
@@ -515,8 +477,8 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS((a1_main.elements()[i]-a2_main.elements()[i]).norm_euclid(), DT_(0), tol);
       }
 
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, BS_> b1_main; b1_main.convert(b1);
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, BS_> b2_main; b2_main.convert(b2);
+      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> b1_main; b1_main.convert(b1);
+      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> b2_main; b2_main.convert(b2);
 
       TEST_CHECK_MSG(b1_main.used_elements() == b2_main.used_elements(),"Wrong number of nonzeros.");
       for(Index i(0); i < b1_main.used_elements(); ++i)
@@ -527,8 +489,8 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS((b1_main.elements()[i]-b2_main.elements()[i]).norm_euclid(), DT_(0), tol);
       }
 
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, BS_> c1_main; c1_main.convert(c1);
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, BS_> c2_main; c2_main.convert(c2);
+      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> c1_main; c1_main.convert(c1);
+      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> c2_main; c2_main.convert(c2);
 
       TEST_CHECK_MSG(c1_main.used_elements() == c2_main.used_elements(),"Wrong number of nonzeros.");
       for(Index i(0); i < c1_main.used_elements(); ++i)
@@ -538,10 +500,12 @@ public:
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
         TEST_CHECK_EQUAL_WITHIN_EPS((c1_main.elements()[i]-c2_main.elements()[i]).norm_euclid(), DT_(0), tol);
       }
-
-    } // end of SparseVectorBlocked tests
+    }
   }
 };
 
-VectorMirrorBlockedTest<Mem::Main, float, Index, 2> vector_mirror_blocked_test_generic_f;
-VectorMirrorBlockedTest<Mem::Main, double, unsigned int, 3> vector_mirror_blocked_test_generic_d;
+VectorMirrorTest<Mem::Main, double, unsigned long> vector_mirror_test_main_d_ul;
+VectorMirrorTest<Mem::Main, float, unsigned int> vector_mirror_test_main_f_ui;
+/// \todo Add cuda vector mirror tests
+//VectorMirrorTest<Mem::CUDA, double, unsigned long> vector_mirror_test_cuda_d_ul;
+//VectorMirrorTest<Mem::CUDA, float, unsigned int> vector_mirror_test_cuda_f_ui;

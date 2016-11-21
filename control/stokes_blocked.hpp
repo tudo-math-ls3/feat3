@@ -66,7 +66,8 @@ namespace FEAT
       typedef LAFEM::TupleVector<LocalVeloVector, LocalPresVector> LocalSystemVector;
 
       /// define mirror types
-      typedef LAFEM::VectorMirrorBlocked<MemType_, DataType, IndexType, dim_> VeloMirror;
+      //typedef LAFEM::VectorMirrorBlocked<MemType_, DataType, IndexType, dim_> VeloMirror;
+      typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VeloMirror;
       typedef LAFEM::VectorMirror<MemType, DataType, IndexType> PresMirror;
       typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
 

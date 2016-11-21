@@ -18,6 +18,8 @@ public:
   typedef DataType_ DataType;
   typedef IndexType_ IndexType;
 
+  typedef DenseVector<Mem::Main, DataType, IndexType> BufferVector;
+
   typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
   typedef PowerVector<ScalarVector, 2> PowerVector2;
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
@@ -114,16 +116,16 @@ public:
     }
 
     // create two buffer-vectors
-    ScalarVector buf_x(mirror_x.size(), DataType(0));
-    ScalarVector buf_y(mirror_y.size(), DataType(0));
+    BufferVector buf_x = mirror_x.create_buffer(vec_x);
+    BufferVector buf_y = mirror_y.create_buffer(vec_y);
 
     // gather local vectors
-    mirror_x.gather_prim(buf_x, vec_x);
-    mirror_y.gather_prim(buf_y, vec_y);
+    mirror_x.gather(buf_x, vec_x);
+    mirror_y.gather(buf_y, vec_y);
 
     // scatter exchanged buffers
-    mirror_x.scatter_axpy_prim(vec_x, buf_y);
-    mirror_y.scatter_axpy_prim(vec_y, buf_x);
+    mirror_x.scatter_axpy(vec_x, buf_y);
+    mirror_y.scatter_axpy(vec_y, buf_x);
 
     // compute difference to reference
     vec_x.axpy(sync_x, vec_x, -DataType(1));

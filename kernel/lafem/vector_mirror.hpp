@@ -38,6 +38,7 @@ namespace FEAT
      * coefficients.
      *
      * \author Peter Zajac
+     * \author Jordi Paul
      * \author Markus Geveler
      */
     template<
@@ -56,9 +57,6 @@ namespace FEAT
 
       /// mirror matrix typedef
       typedef SparseMatrixCSR<Mem_, DataType_, IndexType_> MirrorMatrixType;
-
-      /// corresponding vector
-      typedef DenseVector<MemType, DataType, IndexType> VectorType;
 
       /// gather-mirror matrix
       MirrorMatrixType _mirror_gather;
@@ -130,87 +128,103 @@ namespace FEAT
       }
 
       /// \cond internal
-      const MirrorMatrixType& get_gather_prim() const
+      const MirrorMatrixType& get_gather() const
       {
         return _mirror_gather;
       }
 
-      const MirrorMatrixType& get_gather_dual() const
-      {
-        return _mirror_gather;
-      }
-
-      const MirrorMatrixType& get_scatter_prim() const
+      const MirrorMatrixType& get_scatter() const
       {
         return _mirror_scatter;
       }
 
-      const MirrorMatrixType& get_scatter_dual() const
-      {
-        return _mirror_scatter;
-      }
-
-      MirrorMatrixType& get_gather_prim()
+      MirrorMatrixType& get_gather()
       {
         return _mirror_gather;
       }
 
-      MirrorMatrixType& get_gather_dual()
-      {
-        return _mirror_gather;
-      }
-
-      MirrorMatrixType& get_scatter_prim()
-      {
-        return _mirror_scatter;
-      }
-
-      MirrorMatrixType& get_scatter_dual()
+      MirrorMatrixType& get_scatter()
       {
         return _mirror_scatter;
       }
       /// \endcond
 
       /**
-       * \brief Returns the number of entries in the mirror.
+       * \brief Computes the required buffer size for a DenseVector.
+       *
+       * \tparam[in] vector
+       * The vector whose buffer size is to be computed.
        */
-      Index size() const
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      Index buffer_size(const DenseVector<Mem2_, DT2_, IT2_>& DOXY(vector)) const
       {
         return _mirror_gather.rows();
       }
 
       /**
-       * \brief Creates a new buffer vector.
+       * \brief Computes the required buffer size for a DenseVectorBlocked.
+       *
+       * \tparam[in] vector
+       * The vector whose buffer size is to be computed.
        */
-      DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
+      template<typename Mem2_, typename DT2_, typename IT2_, int block_size_>
+      Index buffer_size(const DenseVectorBlocked<Mem2_, DT2_, IT2_, block_size_>& DOXY(vector)) const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(size(), Pinning::disabled);
+        return _mirror_gather.rows()*Index(block_size_);
       }
 
       /**
-       * \brief Creates a new (local) vector.
+       * \brief Computes the required buffer size for a SparseVector.
+       *
+       * \tparam[in] vector
+       * The vector whose buffer size is to be computed.
        */
-      VectorType create_vector() const
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      Index buffer_size(const SparseVector<Mem2_, DT2_, IT2_>& DOXY(vector)) const
       {
-        return _mirror_gather.create_vector_r();
+        return _mirror_gather.rows();
       }
 
       /**
-       * \brief Performs a gather-operation on a primal vector.
+       * \brief Computes the required buffer size for a SparseVectorBlocked.
+       *
+       * \tparam[in] vector
+       * The vector whose buffer size is to be computed.
+       */
+      template<typename Mem2_, typename DT2_, typename IT2_, int block_size_>
+      Index buffer_size(const SparseVectorBlocked<Mem2_, DT2_, IT2_, block_size_>& DOXY(vector)) const
+      {
+        return _mirror_gather.rows()*Index(block_size_);
+      }
+
+      /**
+       * \brief Creates a new buffer vector for a vector.
+       *
+       * \tparam[in] vector
+       * The vector for which the buffer is to be created.
+       */
+      template<typename Vector_>
+      DenseVector<Mem::Main, DataType, IndexType> create_buffer(const Vector_& vector) const
+      {
+        return DenseVector<Mem::Main, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+      }
+
+      /**
+       * \brief Gathers the buffer entries from a DenseVector.
        *
        * \param[in,out] buffer
-       * A reference to a buffer vector.
+       * A reference to the buffer.
        *
-       * \param[in] mem_vector
-       * A primal vector whose entries are to be gathered.
+       * \param[in] vector
+       * A vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
-       * The offset within the buffer vector.
+       * The offset within the buffer.
        */
-      void gather_prim(
-                       LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
-                       const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
-                       const Index buffer_offset = Index(0)) const
+      void gather(
+        LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+        const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_gather.empty())
@@ -220,7 +234,7 @@ namespace FEAT
         XASSERTM(num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
         LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(num_rows);
 
-        Arch::Apply<Mem_>::csr(mem_buffer.elements(), DataType_(1), mem_vector.elements(), DataType_(0), mem_buffer.elements(), _mirror_gather.val(),
+        Arch::Apply<Mem_>::csr(mem_buffer.elements(), DataType_(1), vector.elements(), DataType_(0), mem_buffer.elements(), _mirror_gather.val(),
             _mirror_gather.col_ind(), _mirror_gather.row_ptr(), _mirror_gather.rows(), _mirror_gather.columns(), _mirror_gather.used_elements(), false);
 
         //download
@@ -229,25 +243,25 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs a scatter-axpy-operation on a primal vector.
+       * \brief Scatters the buffer entries onto a DenseVector.
        *
-       * \param[in,out] mem_vector
-       * A reference to a primal vector.
+       * \param[in,out] vector
+       * A reference to the vector.
        *
        * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
+       * A reference to the buffer whose entries are to be scattered.
        *
        * \param[in] alpha
        * A scaling factor for the operation.
        *
        * \param[in] buffer_offset
-       * The offset within the buffer vector.
+       * The offset within the buffer.
        */
-      void scatter_axpy_prim(
-                             LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
-                             const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
-                             const DataType_ alpha = DataType_(1),
-                             const Index buffer_offset = Index(0)) const
+      void scatter_axpy(
+        LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
+        const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+        const DataType_ alpha = DataType_(1),
+        const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_scatter.empty())
@@ -261,7 +275,7 @@ namespace FEAT
         DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, num_cols, buffer_offset);
         mem_buffer.copy(buffer_range);
 
-        DataType_ * x(mem_vector.elements());
+        DataType_ * x(vector.elements());
         const DataType_ * y(mem_buffer.elements());
         const IndexType_ * col_idx(_mirror_scatter.col_ind());
         const DataType_* val(_mirror_scatter.val());
@@ -272,59 +286,101 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs a gather-operation on a dual vector.
+       * \brief Gathers the buffer entries from a DenseVectorBlocked.
        *
        * \param[in,out] buffer
        * A reference to a buffer vector.
        *
        * \param[in] vector
-       * A dual vector whose entries are to be gathered.
+       * A vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      void gather_dual(
-                       LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
-                       const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
-                       const Index buffer_offset = Index(0)) const
+      template<int block_size_>
+      void gather(
+        LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+        const LAFEM::DenseVectorBlocked<Mem_, DataType_, IndexType_, block_size_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
-        this->gather_prim(buffer, vector, buffer_offset);
+        // skip on empty mirror
+        if(_mirror_gather.empty())
+          return;
+
+        const Index data_size = Index(block_size_) * _mirror_gather.rows();
+        XASSERTM(data_size + buffer_offset <= buffer.size(), "buffer vector size mismatch");
+
+        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(data_size);
+
+        Arch::Apply<Mem_>::template csrsb<DataType_, IndexType_, block_size_>(
+          mem_buffer.elements(), DataType_(1), vector.template elements<Perspective::pod>(),
+          DataType_(0), mem_buffer.elements(), _mirror_gather.val(), _mirror_gather.col_ind(),
+          _mirror_gather.row_ptr(), _mirror_gather.rows(), _mirror_gather.columns(),
+          _mirror_gather.used_elements());
+
+        DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, data_size, buffer_offset);
+
+        //download
+        buffer_range.copy(mem_buffer);
       }
 
       /**
-       * \brief Performs a scatter-axpy-operation on a dual vector.
+       * \brief Scatters the buffer entries onto a DenseVectorBlocked.
        *
        * \param[in,out] vector
-       * A reference to a dual vector.
+       * A reference to the vector.
        *
        * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
+       * A reference to the buffer whose entries are to be scattered.
        *
        * \param[in] alpha
        * A scaling factor for the operation.
        *
        * \param[in] buffer_offset
-       * The offset within the buffer vector.
+       * The offset within the buffer.
        */
-      void scatter_axpy_dual(
-                             LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
-                             const DataType_ alpha = DataType_(1),
-                             const Index buffer_offset = Index(0)) const
+      template<int block_size_>
+      void scatter_axpy(
+        LAFEM::DenseVectorBlocked<Mem_, DataType_, IndexType_, block_size_>& vector,
+        const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+        const DataType_ alpha = DataType_(1),
+        const Index buffer_offset = Index(0)) const
       {
-        this->scatter_axpy_prim(vector, buffer, alpha, buffer_offset);
+        // skip on empty mirror
+        if(_mirror_scatter.empty())
+          return;
+
+        const Index data_size = Index(block_size_) * _mirror_scatter.columns();
+        XASSERTM(data_size + buffer_offset <= buffer.size(), "buffer vector size mismatch");
+
+        DenseVector<Mem_, DataType_, IndexType_> mem_buffer(data_size);
+        //download
+        DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, data_size, buffer_offset);
+        mem_buffer.copy(buffer_range);
+
+        Arch::ScatterAxpyPrim<Mem_>::template dvb_csr<DataType_, IndexType_, block_size_>(
+          vector.template elements<Perspective::pod>(), mem_buffer.elements(),
+          _mirror_scatter.col_ind(), _mirror_scatter.val(), _mirror_scatter.row_ptr(),
+          alpha, _mirror_scatter.rows());
       }
 
-      /// \copydoc gather_prim()
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void gather_prim(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
-                       const Index buffer_offset = Index(0)) const
+      /**
+       * \brief Gathers the buffer entries from a SparseVector.
+       *
+       * \param[in,out] buffer
+       * A reference to a buffer vector.
+       *
+       * \param[in] vector
+       * A vector whose entries are to be gathered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
+      void gather(
+        LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+        const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_gather.empty())
@@ -371,17 +427,27 @@ namespace FEAT
         }
       }
 
-      /// \copydoc scatter_axpy_prim()
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void scatter_axpy_prim(
-                             LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-                             const Tx_ alpha = Tx_(1),
-                             const Index buffer_offset = Index(0)) const
+      /**
+       * \brief Scatters the buffer entries onto a SparseVector.
+       *
+       * \param[in,out] vector
+       * A reference to the vector.
+       *
+       * \param[in] buffer
+       * A reference to the buffer whose entries are to be scattered.
+       *
+       * \param[in] alpha
+       * A scaling factor for the operation.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer.
+       */
+      template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
+      void scatter_axpy(
+        LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
+        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+        const Tx_ alpha = Tx_(1),
+        const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_scatter.empty())
@@ -415,331 +481,20 @@ namespace FEAT
         }
       }
 
-      /// \copydoc gather_dual()
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void gather_dual(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
-                       const Index buffer_offset = Index(0)) const
-      {
-        this->gather_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
-      }
-
-      /// \copydoc scatter_axpy_dual()
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void scatter_axpy_dual(
-                             LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-                             const Tx_ alpha = Tx_(1),
-                             const Index buffer_offset = Index(0)) const
-      {
-        this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
-      }
-
-    }; // class VectorMirror<...>
-
-    /**
-     * \brief Handles DenseVectorBlocked prolongation, restriction and serialisation
-     *
-     * \tparam Mem_
-     * Memory architecture
-     *
-     * \tparam DataType_
-     * Data type in the vector
-     *
-     * \tparam IndexType_
-     * Type for indexing
-     *
-     * \tparam BlockSize_
-     * Size of the DenseVectorBlocked blocks.
-     *
-     * \see VectorMirror for more details on Mirrors in general.
-     *
-     * \author Jordi Paul
-     */
-    template<typename Mem_, typename DT_, typename IT_, int BlockSize_>
-    class VectorMirrorBlocked
-    {
-    public:
-      /// arch typedef
-      typedef Mem_ MemType;
-      /// data-type typedef
-      typedef DT_ DataType;
-      /// index-type typedef
-      typedef IT_ IndexType;
-      /// Our block size
-      static constexpr int BlockSize = BlockSize_;
-
-      /// mirror matrix typedef
-      typedef SparseMatrixCSR<Mem_, DT_, IT_> MirrorMatrixType;
-
-      /// corresponding vector
-      typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> VectorType;
-
-      /// our buffer vector type
-      typedef DenseVector<Mem::Main, DT_, IT_> BufferVectorType;
-
-      /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using MirrorType = class VectorMirrorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
-
-      /// gather-mirror matrix
-      MirrorMatrixType _mirror_gather;
-      /// scatter-mirror matrix
-      MirrorMatrixType _mirror_scatter;
-
-      /// default constructor
-      VectorMirrorBlocked() :
-        _mirror_gather(),
-        _mirror_scatter()
-      {
-      }
-
-      /// explicit constructor
-      explicit VectorMirrorBlocked(MirrorMatrixType&& mirror_gather, MirrorMatrixType&& mirror_scatter) :
-        _mirror_gather(std::move(mirror_gather)),
-        _mirror_scatter(std::move(mirror_scatter))
-      {
-      }
-
-      /// move-ctor
-      VectorMirrorBlocked(VectorMirrorBlocked&& other) :
-        _mirror_gather(std::move(other._mirror_gather)),
-        _mirror_scatter(std::move(other._mirror_scatter))
-      {
-      }
-
-      /// move-assign operator
-      VectorMirrorBlocked& operator=(VectorMirrorBlocked&& other)
-      {
-        if(this == &other)
-          return *this;
-        _mirror_gather = std::move(other._mirror_gather);
-        _mirror_scatter = std::move(other._mirror_scatter);
-        return *this;
-      }
-
       /**
-       * \brief Clone operation
-       *
-       * \returns A deep copy of this vector mirror.
-       */
-      VectorMirrorBlocked clone() const
-      {
-        return VectorMirrorBlocked(_mirror_gather.clone(), _mirror_scatter.clone());
-      }
-
-      /// \brief Returns the total amount of bytes allocated.
-      std::size_t bytes() const
-      {
-        return _mirror_gather.bytes() + _mirror_scatter.bytes();
-      }
-
-      /**
-       * \brief Conversion method
-       *
-       * \param[in] other
-       * The source mirror.
-       */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const VectorMirrorBlocked<Mem2_, DT2_, IT2_, BlockSize>& other)
-      {
-        this->_mirror_gather.convert(other._mirror_gather);
-        this->_mirror_scatter.convert(other._mirror_scatter);
-      }
-
-      /// \cond internal
-      const MirrorMatrixType& get_gather_prim() const
-      {
-        return _mirror_gather;
-      }
-
-      const MirrorMatrixType& get_gather_dual() const
-      {
-        return _mirror_gather;
-      }
-
-      const MirrorMatrixType& get_scatter_prim() const
-      {
-        return _mirror_scatter;
-      }
-
-      const MirrorMatrixType& get_scatter_dual() const
-      {
-        return _mirror_scatter;
-      }
-
-      MirrorMatrixType& get_gather_prim()
-      {
-        return _mirror_gather;
-      }
-
-      MirrorMatrixType& get_gather_dual()
-      {
-        return _mirror_gather;
-      }
-
-      MirrorMatrixType& get_scatter_prim()
-      {
-        return _mirror_scatter;
-      }
-
-      MirrorMatrixType& get_scatter_dual()
-      {
-        return _mirror_scatter;
-      }
-      /// \endcond
-
-      /**
-       * \brief Returns the number of entries in the mirror.
-       */
-      Index size() const
-      {
-        return Index(BlockSize)*_mirror_gather.rows();
-      }
-
-      /**
-       * \brief Creates a new buffer vector.
-       */
-      BufferVectorType create_buffer_vector() const
-      {
-        return BufferVectorType(Index(BlockSize)*_mirror_gather.rows(), Pinning::disabled);
-      }
-
-      /**
-       * \brief Creates a new (local) vector.
-       */
-      DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> create_vector() const
-      {
-        return DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>(_mirror_gather.columns());
-      }
-
-      /**
-       * \brief Performs a gather-operation on a primal vector.
+       * \brief Gathers the buffer entries from a SparseVector.
        *
        * \param[in,out] buffer
        * A reference to a buffer vector.
        *
        * \param[in] vector
-       * A primal vector whose entries are to be gathered.
+       * A vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      void gather_prim(
-        LAFEM::DenseVector<Mem::Main, DT_, IT_>& buffer,
-        const LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>& mem_vector,
-        const Index buffer_offset = Index(0)) const
-      {
-        // skip on empty mirror
-        if(_mirror_gather.empty())
-          return;
-
-        Index num_rows(_mirror_gather.rows());
-        XASSERTM(Index(BlockSize_)*num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
-
-        LAFEM::DenseVector<Mem_, DT_, IT_> mem_buffer(num_rows * BlockSize_);
-
-        Arch::Apply<Mem_>::template csrsb<DT_, IT_, BlockSize>(mem_buffer.elements(), DT_(1), mem_vector.template elements<Perspective::pod>(), DT_(0), mem_buffer.elements(),
-            _mirror_gather.val(), _mirror_gather.col_ind(), _mirror_gather.row_ptr(), _mirror_gather.rows(), _mirror_gather.columns(), _mirror_gather.used_elements());
-
-        DenseVector<Mem::Main, DT_, IT_> buffer_range(buffer, num_rows * BlockSize_, buffer_offset);
-        //download
-        buffer_range.copy(mem_buffer);
-      }
-
-      /**
-       * \brief Performs a scatter-axpy-operation on a primal vector.
-       *
-       * \param[in,out] vector
-       * A reference to a primal vector.
-       *
-       * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
-       *
-       * \param[in] alpha
-       * A scaling factor for the operation.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
-      void scatter_axpy_prim(
-        LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>& mem_vector,
-        const LAFEM::DenseVector<Mem::Main, DT_, IT_>& buffer,
-        const DT_ alpha = DT_(1),
-        const Index buffer_offset = Index(0)) const
-      {
-        // skip on empty mirror
-        if(_mirror_scatter.empty())
-          return;
-
-        const Index num_cols(_mirror_scatter.columns());
-        XASSERTM(Index(BlockSize_)*num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
-
-        DenseVector<Mem_, DT_, IT_> mem_buffer(num_cols * BlockSize_);
-        //download
-        DenseVector<Mem::Main, DT_, IT_> buffer_range(buffer, num_cols * BlockSize_, buffer_offset);
-        mem_buffer.copy(buffer_range);
-
-        Arch::ScatterAxpyPrim<Mem_>::template dvb_csr<DT_, IT_, BlockSize_>(mem_vector.template elements<Perspective::pod>(), mem_buffer.elements(),
-            _mirror_scatter.col_ind(), _mirror_scatter.val(), _mirror_scatter.row_ptr(), alpha, _mirror_scatter.rows());
-      }
-
-      /**
-       * \brief Performs a gather-operation on a dual vector.
-       *
-       * \param[in,out] buffer
-       * A reference to a buffer vector.
-       *
-       * \param[in] vector
-       * A dual vector whose entries are to be gathered.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
-      void gather_dual(
-        LAFEM::DenseVector<Mem::Main, DT_, IT_>& buffer,
-        const LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>& vector,
-        const Index buffer_offset = Index(0)) const
-      {
-        this->gather_prim(buffer, vector, buffer_offset);
-      }
-
-      /**
-       * \brief Performs a scatter-axpy-operation on a dual vector.
-       *
-       * \param[in,out] vector
-       * A reference to a dual vector.
-       *
-       * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
-       *
-       * \param[in] alpha
-       * A scaling factor for the operation.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
-      void scatter_axpy_dual(
-        LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_>& vector,
-        const LAFEM::DenseVector<Mem::Main, DT_, IT_>& buffer,
-        const DT_ alpha = DT_(1),
-        const Index buffer_offset = Index(0)) const
-      {
-        this->scatter_axpy_prim(vector, buffer, alpha, buffer_offset);
-      }
-
-      /// \copydoc gather_prim()
       template< typename Tx_, typename Ix_, typename Ty_, typename Iy_, int BS_>
-      void gather_prim(
+      void gather(
         LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
         const LAFEM::SparseVectorBlocked<Mem::Main, Ty_, Iy_, BS_>& vector,
         const Index buffer_offset = Index(0)) const
@@ -754,7 +509,7 @@ namespace FEAT
         const IndexType* col_idx(_mirror_gather.col_ind());
         const DataType* val(_mirror_gather.val());
         const IndexType* row_ptr(_mirror_gather.row_ptr());
-        Index num_rows(_mirror_gather.rows());
+        const Index num_rows(_mirror_gather.rows());
 
         XASSERTM(Index(BS_)*num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
@@ -796,9 +551,23 @@ namespace FEAT
         }
       }
 
-      /// \copydoc scatter_axpy_prim
+      /**
+       * \brief Scatters the buffer entries onto a SparseVectorBlocked.
+       *
+       * \param[in,out] vector
+       * A reference to the vector.
+       *
+       * \param[in] buffer
+       * A reference to the buffer whose entries are to be scattered.
+       *
+       * \param[in] alpha
+       * A scaling factor for the operation.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer.
+       */
       template< typename Tx_, typename Ix_, typename Ty_, typename Iy_, int BS_ >
-      void scatter_axpy_prim(
+      void scatter_axpy(
         LAFEM::SparseVectorBlocked<Mem::Main, Tx_, Ix_, BS_>& vector,
         const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
         const Tx_ alpha = Tx_(1),
@@ -838,28 +607,7 @@ namespace FEAT
           x[isparse] += alpha*sum;
         }
       }
-
-      /// \copydoc gather_dual()
-      template<typename Tx_, typename Ix_, typename Ty_, typename Iy_, int BS_>
-      void gather_dual(
-        LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-        const LAFEM::SparseVectorBlocked<Mem::Main, Ty_, Iy_, BS_>& vector,
-        const Index buffer_offset = Index(0)) const
-      {
-        this->gather_prim<Tx_, Ix_, Ty_, Iy_, BS_>(buffer, vector, buffer_offset);
-      }
-
-      /// \copydoc scatter_axpy_dual()
-      template< typename Tx_, typename Ix_, typename Ty_, typename Iy_, int BS_>
-      void scatter_axpy_dual(
-        LAFEM::SparseVectorBlocked<Mem::Main, Tx_, Ix_, BS_>& vector,
-        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-        const Tx_ alpha = Tx_(1),
-        const Index buffer_offset = Index(0)) const
-      {
-        this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_, BS_>(vector, buffer, alpha, buffer_offset);
-      }
-    }; // class VectorMirrorBlocked<...>
+    }; // class VectorMirror<...>
   } // namespace LAFEM
 } // namespace FEAT
 

@@ -62,7 +62,7 @@ namespace FEAT
       explicit MatrixMirror(const VectorMirrorType& row_mirror, const VectorMirrorType& col_mirror) :
         _row_mirror(row_mirror),
         _col_mirror(col_mirror),
-        _vec_work(std::max(col_mirror.get_gather_dual().columns(), col_mirror.get_scatter_dual().columns()), DataType(0))
+        _vec_work(std::max(col_mirror.get_gather().columns(), col_mirror.get_scatter().columns()), DataType(0))
       {
       }
 
@@ -170,8 +170,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
         DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
@@ -275,8 +275,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
         DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
@@ -384,8 +384,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(bw_*bh_));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
         DataType* _work = _vec_work.data();
 
         typedef Tiny::Matrix<DT_, bw_, bh_> ValueType;
@@ -489,8 +489,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(bw_*bh_));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
         DataType* _work = _vec_work.data();
 
         typedef Tiny::Matrix<DT_, bw_, bh_> ValueType;
@@ -598,8 +598,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
         DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
@@ -705,8 +705,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
         DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
@@ -816,8 +816,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
         DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
@@ -925,8 +925,8 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
+        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
+        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
         DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
@@ -1032,10 +1032,10 @@ namespace FEAT
         // where:
         // X is the buffer matrix
         // Y is the system matrix
-        // A is the row-mirror dual-gather matrix
-        // B is the col-mirror dual-gather matrix
-        Adjacency::Graph tmp1(Adjacency::rt_injectify, _row_mirror.get_gather_dual(), tmpl_mat);
-        Adjacency::Graph tmp2(Adjacency::rt_injectify, tmp1, _col_mirror.get_scatter_dual());
+        // A is the row-mirror gather matrix
+        // B is the col-mirror gather matrix
+        Adjacency::Graph tmp1(Adjacency::rt_injectify, _row_mirror.get_gather(), tmpl_mat);
+        Adjacency::Graph tmp2(Adjacency::rt_injectify, tmp1, _col_mirror.get_scatter());
         tmp2.sort_indices();
         return tmp2;
       }

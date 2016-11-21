@@ -47,7 +47,7 @@ namespace FEAT
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirrorBlocked<MemType_, DataType, IndexType, dim_> SystemMirror;
+      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
 
       /// define system gate
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
@@ -103,7 +103,7 @@ namespace FEAT
       typedef IndexType_ IndexType;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirrorBlocked<MemType_, DataType, IndexType, dim_> SystemMirror;
+      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
 
       /// define local filter type
       typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalSystemFilter;

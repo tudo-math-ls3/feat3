@@ -80,7 +80,7 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           // create receive buffer vector
-          _recv_bufs.emplace_back(_mirrors.at(i).create_buffer_vector());
+          _recv_bufs.emplace_back(_mirrors.at(i).create_buffer(target));
           BufferVectorType& buf = _recv_bufs.back();
 
           // post receive
@@ -91,11 +91,11 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           // create receive buffer vector
-          _send_bufs.emplace_back(_mirrors.at(i).create_buffer_vector());
+          _send_bufs.emplace_back(_mirrors.at(i).create_buffer(target));
           BufferVectorType& buf = _send_bufs.back();
 
           // gather from mirror
-          _mirrors.at(i).gather_dual(buf, _target);
+          _mirrors.at(i).gather(buf, _target);
 
           // post send
           _send_reqs.push_back(_comm.isend(buf.elements(), buf.size(), ranks.at(i)));
@@ -132,7 +132,7 @@ namespace FEAT
         for(std::size_t idx; _recv_reqs.wait_any(idx); )
         {
           // scatter the receive buffer
-          _mirrors.at(idx).scatter_axpy_dual(_target, _recv_bufs.at(idx));
+          _mirrors.at(idx).scatter_axpy(_target, _recv_bufs.at(idx));
         }
 
         // wait for all sends to finish

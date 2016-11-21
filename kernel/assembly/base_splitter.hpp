@@ -94,8 +94,8 @@ namespace FEAT
         // loop over all mirrors and gather
         for(auto it = _mirrors.begin(); it != _mirrors.end(); ++it)
         {
-          auto svec = (*it).create_buffer_vector();
-          (*it).gather_prim(svec, vector);
+          auto svec = (*it).create_buffer(vector);
+          (*it).gather(svec, vector);
           splits.push_back(std::move(svec));
         }
       }
@@ -126,10 +126,10 @@ namespace FEAT
         // loop over all mirrors and scatter splits
         for(std::size_t i(0); i < _mirrors.size(); ++i)
         {
-          _mirrors.at(i).scatter_axpy_prim(vector, splits.at(i));
+          _mirrors.at(i).scatter_axpy(vector, splits.at(i));
           auto tmp = splits.at(i).clone();
           tmp.format(DT_(1));
-          _mirrors.at(i).scatter_axpy_prim(freqs, tmp);
+          _mirrors.at(i).scatter_axpy(freqs, tmp);
         }
 
         // scale output
