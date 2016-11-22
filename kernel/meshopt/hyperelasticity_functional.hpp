@@ -144,7 +144,7 @@ namespace FEAT
       typename FunctionalType_,
       typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
     >
-    class HyperelasticityFunctionalBase;
+    class HyperelasticityFunctional;
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms.
      *
@@ -208,7 +208,7 @@ namespace FEAT
       typename FunctionalType_,
       typename RefCellTrafo_
     >
-    class HyperelasticityFunctionalBase<Mem::Main, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>:
+    class HyperelasticityFunctional<Mem::Main, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>:
     public MeshQualityFunctional<typename Trafo_::MeshType>
     {
       public :
@@ -307,7 +307,6 @@ namespace FEAT
         /// How to compute the optimal scales
         ScaleComputation _scale_computation;
 
-      protected:
         /// Factor for the alignment penalty term
         DataType _penalty_param;
         /// Last computed contraint (violation)
@@ -344,7 +343,7 @@ namespace FEAT
          * concentration function to nullptr.
          *
          */
-        explicit HyperelasticityFunctionalBase(
+        explicit HyperelasticityFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
           TrafoSpace& trafo_space_,
           std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& dirichlet_asm_,
@@ -408,7 +407,7 @@ namespace FEAT
          * nullptr.
          *
          */
-        explicit HyperelasticityFunctionalBase(
+        explicit HyperelasticityFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
           TrafoSpace& trafo_space_,
           std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& dirichlet_asm_,
@@ -468,12 +467,12 @@ namespace FEAT
           }
 
         /// Explicitly delete default constructor
-        HyperelasticityFunctionalBase() = delete;
+        HyperelasticityFunctional() = delete;
         /// Explicitly delete copy constructor
-        HyperelasticityFunctionalBase(const HyperelasticityFunctionalBase&) = delete;
+        HyperelasticityFunctional(const HyperelasticityFunctional&) = delete;
 
         /// \brief Destructor
-        virtual ~HyperelasticityFunctionalBase()
+        virtual ~HyperelasticityFunctional()
         {
         }
 
@@ -526,7 +525,7 @@ namespace FEAT
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "HyperelasticityFunctionalBase<"+MeshType::name()+">";
+          return "HyperelasticityFunctional<"+MeshType::name()+">";
         }
 
         /**
@@ -534,17 +533,19 @@ namespace FEAT
          */
         virtual void print()
         {
-          int width(30);
+          Index pad_width(30);
           Dist::Comm comm_world(Dist::Comm::world());
 
-          String msg;
+          String msg(name()+":");
+          comm_world.print(msg);
 
-          msg = String("Scale computation").pad_back(width, '.') + String(": ") + stringify(_scale_computation);
+          msg = String("Scale computation").pad_back(pad_width, '.') + String(": ") + stringify(_scale_computation);
           comm_world.print(msg);
 
           _functional->print();
           if(_mesh_conc != nullptr)
             _mesh_conc->print();
+
         }
 
         /// \copydoc BaseClass::add_to_vtk_exporter()
@@ -620,37 +621,23 @@ namespace FEAT
           return _alignment_constraint;
         }
 
-        ///**
-        // * \brief Computes (alignment) constraint at the current state of _mesh_conc
-        // *
-        // * This also saves the result to _alignment_constraint.
-        // *
-        // * \returns The (alignment) constraint.
-        // */
-        //DataType compute_constraint()
-        //{
-        //  XASSERT(this->_mesh_conc != nullptr);
-        //  _alignment_constraint = this->_mesh_conc->compute_constraint();
-        //  return _alignment_constraint;
-        //}
-        ///**
-        // * \brief Computes the (mesh alignment) constraint on every cell
-        // *
-        // * \param[in] constraint_at_cells
-        // * Array to receive the constraint violation on every cell
-        // *
-        // * \returns The sum of the constraint violation over all cells.
-        // */
-        //DataType compute_constraint(CoordType* constraint_at_cells)
-        //{
-        //  XASSERT(this->_mesh_conc != nullptr);
+        /**
+         * \brief Performs intialisations that cannot be done in the constructor
+         *
+         * \note This needs some synchronisation, so if this object lives on just one of many patches, use
+         * init_pre_sync() and init_post_sync() like the Global::NonlinearFunctional class does.
+         */
+        virtual void init() override
+        {
+          init_pre_sync();
+          init_post_sync();
+        }
 
-        //  _alignment_constraint = this->_mesh_conc->compute_constraint(constraint_at_cells);
-
-        //  return _alignment_constraint;
-        //}
-
-        /// \copydoc BaseClass::init()
+        /**
+         * \brief Performs initialisations that cannot be done in the constructor, pre synchronisation phase
+         *
+         * \seealso init()
+         */
         virtual void init_pre_sync()
         {
           // Write any potential changes to the mesh
@@ -673,27 +660,32 @@ namespace FEAT
           this->_compute_scales_init();
         }
 
+        /**
+         * \brief Performs initialisations that cannot be done in the constructor, post synchronisation phase
+         *
+         * \seealso init()
+         */
         virtual void init_post_sync()
         {
+          // Scale mu so that || mu ||_1 = 1
+          // For this, _sum_mu needs to have been summed up over all patches in the synchronisation phase.
           if(_sum_mu != DataType(1))
           {
             _mu.format(DataType(1)/_sum_mu);
             _sum_mu = DataType(1);
           }
 
+          // Scale lambda so that || lambda ||_1 = 1
+          // For this, _sum_lambda needs to have been summed up over all patches in the synchronisation phase.
           if(_sum_lambda != DataType(1))
           {
             _lambda.scale(_lambda, DataType(1)/_sum_lambda);
             _sum_lambda = DataType(1);
           }
 
+          // Compute the new optimal scales. For this, lambda needs to be scaled correctly and _sum_det needs to be
+          // summed up over all patches in the synchronisation phase.
           RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
-        }
-
-        virtual void init() override
-        {
-          init_pre_sync();
-          init_post_sync();
         }
 
         /**
@@ -714,22 +706,18 @@ namespace FEAT
           prepare_post_sync(vec_state, filter);
         }
 
-        virtual void prepare_post_sync(const VectorTypeR& DOXY(vec_state), FilterType& DOXY(filter))
-        {
-          if(_sum_lambda != DataType(1))
-          {
-            _lambda.scale(_lambda, DataType(1)/_sum_lambda);
-            _sum_lambda = DataType(1);
-          }
-
-          RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
-
-          if(this->_scale_computation == ScaleComputation::iter_concentration)
-          {
-            _mesh_conc->compute_grad_h(this->_sum_det);
-          }
-        }
-
+        /**
+         * \brief Prepares the functional for evaluation, pre synchronisation phase
+         *
+         * \param[in] vec_state
+         * The state to evaluate the functional at.
+         *
+         * \param[in] filter
+         * The filter. We might need to reassemble it.
+         *
+         * \see prepare()
+         *
+         */
         virtual void prepare_pre_sync(const VectorTypeR& vec_state, FilterType& filter)
         {
           // Download state if neccessary
@@ -766,8 +754,10 @@ namespace FEAT
             const auto& assembler = _slip_asm.find(it.first);
 
             if(assembler == _slip_asm.end())
+            {
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find slip filter assembler for filter with key "+it.first);
+            }
 
             assembler->second->assemble(it.second, _trafo_space);
           }
@@ -795,6 +785,105 @@ namespace FEAT
 
         }
 
+        /**
+         * \brief Prepares the functional for evaluation, post synchronisation phase
+         *
+         * \param[in] vec_state
+         * The state to evaluate the functional at.
+         *
+         * \param[in] filter
+         * The filter. We might need to reassemble it.
+         *
+         * \see prepare()
+         *
+         */
+        virtual void prepare_post_sync(const VectorTypeR& DOXY(vec_state), FilterType& DOXY(filter))
+        {
+          if(_sum_lambda != DataType(1))
+          {
+            _lambda.scale(_lambda, DataType(1)/_sum_lambda);
+            _sum_lambda = DataType(1);
+          }
+
+          RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
+
+          if(this->_scale_computation == ScaleComputation::iter_concentration)
+          {
+            _mesh_conc->compute_grad_h(this->_sum_det);
+          }
+        }
+
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes
+         *
+         * \param[out] lambda_min
+         * Minimum of the optimal cell size lambda over all cells
+         *
+         * \param[out] lambda_max
+         * Maximum of the optimal cell size lambda over all cells
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
+         * exactly lambda(cell). This is especially the goal for r-adaptivity.
+         * So in an optimal mesh,
+         * \f[
+         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
+         * \f]
+         * so we compute the 1-norm of the vector
+         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \f$.
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
+         * \note As these quantities are global, this function has a pre_sync and post_sync part.
+         *
+         * \see Control::HyperelasticityFunctionalControl::compute_cell_size_defect()
+         *
+         */
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
+        {
+
+          compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+          return compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
+
+        }
+
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         *
+         * \param[out] lambda_min
+         * Minimum of the optimal cell size lambda over all cells
+         *
+         * \param[out] lambda_max
+         * Maximum of the optimal cell size lambda over all cells
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
+         * \note As these quantities are global, this function has a pre_sync and post_sync part.
+         *
+         * \see Control::HyperelasticityFunctionalControl::compute_cell_size_defect()
+         *
+         */
         void compute_cell_size_defect_pre_sync(CoordType& vol_min, CoordType& vol_max, CoordType& vol) const
         {
           vol = CoordType(0);
@@ -811,6 +900,33 @@ namespace FEAT
           }
         }
 
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         *
+         * \param[out] lambda_min
+         * Minimum of the optimal cell size lambda over all cells
+         *
+         * \param[out] lambda_max
+         * Maximum of the optimal cell size lambda over all cells
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
+         * \note As these quantities are global, this function has a pre_sync and post_sync part.
+         *
+         * \see Control::HyperelasticityFunctionalControl::compute_cell_size_defect()
+         *
+         */
         virtual CoordType compute_cell_size_defect_post_sync(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, const CoordType& vol) const
         {
           CoordType size_defect(0);
@@ -831,26 +947,55 @@ namespace FEAT
         }
 
         /**
-         * \brief Computes a quality indicator concerning the cell sizes
+         * \brief Evaluates the functional's value and gradient at the current state
          *
-         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
-         * exactly lambda(cell). This is especially the goal for r-adaptivity.
-         * So in an optimal mesh,
-         * \f[
-         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
-         * \f]
-         * so we compute the 1-norm of the vector
-         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \f$.
+         * \param[out] fval
+         * The functional value computed
          *
-         * \returns The relative cell size quality indicator.
+         * \param[out] grad
+         * The functional's gradient computed
+         *
+         * \param[in] add_penalty_fval
+         * Whether to add the penalty term
+         *
+         * \note The awkward handling of the penalty term is because this needs to be handled in THIS class and not
+         * in another class that uses it because the the quadratic penalty method (\see Solver::QPenalty) needs to
+         * call an inner solver that is unaware of the existence (or special treatment) of the penalty term.
          *
          */
-        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
+        virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true)
         {
+          // Increase number of functional evaluations
+          this->_num_func_evals++;
+          this->_num_grad_evals++;
 
-          compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
-          return compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
+          static_cast<const HyperelasticityFunctional*>(this)->eval_fval_grad(fval, grad, add_penalty_fval);
+        }
 
+        /// \copydoc BaseClass::eval_fval_grad()
+        virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true) const
+        {
+          if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
+          {
+            _eval_fval_grad_with_conc(fval, grad);
+          }
+          else
+          {
+            _eval_fval_grad_without_conc(fval, grad);
+          }
+
+          if(add_penalty_fval && (this->_penalty_param > DataType(0)) )
+          {
+            XASSERT(this->_mesh_conc != nullptr);
+            fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
+          }
+
+          if(this->_penalty_param > DataType(0))
+          {
+            XASSERTM(this->_mesh_conc != nullptr,
+            "You need a mesh concentration function for imposing a mesh alignment constraint!");
+            this->_mesh_conc->add_constraint_grad(grad, this->_alignment_constraint, this->_penalty_param);
+          }
         }
 
         /**
@@ -859,25 +1004,62 @@ namespace FEAT
          * \param[in] fval_norm
          * Array to receive the Frobenius norm part of the functional value on every cell.
          *
+         * \param[in] fval_cof
+         * Array to receive the cofactor matrix part of the functional value on every cell.
+         *
          * \param[in] fval_det
          * Array to receive the det part of the functional value on every cell.
-         *
-         * \param[in] fval_rec_det
-         * Array to receive the 1/det part of the functional value on every cell.
          *
          * \returns
          * The functional value, summed up over all parts and cells.
          */
-        virtual void eval_fval_cellwise(CoordType& DOXY(fval), CoordType* DOXY(fval_norm), CoordType* DOXY(fval_det), CoordType* DOXY(fval_rec_det)) const = 0;
+        virtual void eval_fval_cellwise(CoordType& fval, CoordType* fval_norm, CoordType* fval_cof,
+        CoordType* fval_det) const
+        {
+          typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
 
-        ///**
-        // * \brief Computes the volume of the optimal reference for each cell and saves it to _h.
-        // *
-        // */
-        //virtual void compute_h()
-        //{
-        //  RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
-        //}
+          // Total number of cells in the mesh
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          // Local cell dimensions for passing to other routines
+          CoordType h(0);
+          // This will hold the local gradient for one element for passing to other routines
+          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
+
+          fval = DataType(0);
+
+          TrafoEvaluator trafo_eval(this->_trafo);
+          SpaceEvaluator space_eval(this->_trafo_space);
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            DataType fval_loc(0);
+            trafo_eval.prepare(cell);
+            space_eval.prepare(trafo_eval);
+
+            h = this->_h(cell);
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+            }
+
+            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
+
+            this->_functional->eval_fval_cellwise(fval_loc, mat_tensor, trafo_eval, space_eval, x, h,
+            fval_norm[cell], fval_cof[cell], fval_det[cell]);
+
+            fval += this->_mu(cell)*fval_loc;
+          }
+
+        } // eval_fval_cellwise
 
       protected:
         /// \brief Computes the weights _lambda according to the current mesh
@@ -957,7 +1139,6 @@ namespace FEAT
           _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
           this->sync_scalars.insert(&_sum_det);
 
-
         }
 
         /**
@@ -1007,196 +1188,12 @@ namespace FEAT
 
         }
 
-        virtual void eval_fval_grad(CoordType& DOXY(fval), VectorTypeL& DOXY(grad), const bool& DOXY(add_penalty_fval)) =0;
-        virtual void eval_fval_grad(CoordType& DOXY(fval), VectorTypeL& DOXY(grad), const bool& DOXY(add_penalty_fval)) const = 0;
-
-    }; // class HyperelasticityFunctionalBase
-
-    /// \copydoc Meshopt::HyperelasticityFunctionalBase
-    template
-    <
-      typename Mem_,
-      typename DT_,
-      typename IT_,
-      typename Trafo_,
-      typename FunctionalType_,
-      typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
-    >
-    class HyperelasticityFunctional:
-      public HyperelasticityFunctionalBase<Mem_, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>
-    {
-      public :
-        /// Our base class
-        typedef HyperelasticityFunctionalBase<Mem_, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_> BaseClass;
-
-        /// Only Mem::Main is supported atm
-        typedef Mem_ MemType;
-        /// We always use the precision of the mesh
-        typedef DT_ DataType;
-        /// We always use Index for now
-        typedef IT_ IndexType;
-
-        /// Type for the transformation
-        typedef Trafo_ TrafoType;
-        /// Type for the functional
-        typedef FunctionalType_ FunctionalType;
-        /// Type of the reference cell trafo for the mesh quality
-        typedef RefCellTrafo_ RefCellTrafo;
-
-        /// The mesh the transformation is defined on
-        typedef typename TrafoType::MeshType MeshType;
-        /// ShapeType of said mesh
-        typedef typename MeshType::ShapeType ShapeType;
-        /// The precision of the mesh coordinates
-        typedef typename MeshType::CoordType CoordType;
-
-        /// Output vector type of the operator
-        typedef typename BaseClass::VectorTypeL VectorTypeL;
-        /// Input vector type of the operator
-        typedef typename BaseClass::VectorTypeL VectorTypeR;
-        /// Type of the gradient vector
-        typedef typename BaseClass::GradientType GradientType;
-        /// Type for exchanging information between state variable and mesh
-        typedef typename BaseClass::CoordsBufferType CoordsBufferType;
-
-        /// Filter for Dirichlet boundary conditions
-        typedef typename BaseClass::DirichletFilterType DirichletFilterType;
-        /// Sequence of Dirichlet filters for several different boundary parts
-        typedef typename BaseClass::DirichletFilterSequence DirichletFilterSequence;
-        /// Filter for slip boundary conditions
-        typedef typename BaseClass::SlipFilterType SlipFilterType;
-        /// Sequence of Slip filters for several different boundary parts
-        typedef typename BaseClass::SlipFilterSequence SlipFilterSequence;
-        /// Combined filter
-        typedef typename BaseClass::FilterType FilterType;
-        /// Since the functional contains a ShapeType, these have to be the same
-        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
-        "ShapeTypes of the transformation / functional have to agree" );
-
-      public:
-        /**
-         * \copydoc HyperelasticityFunctionalBase()
-         */
-        using BaseClass::BaseClass;
-
-        /// Explicitly delete default constructor
-        HyperelasticityFunctional() = delete;
-        /// Explicitly delete copy constructor
-        HyperelasticityFunctional(const HyperelasticityFunctional&) = delete;
-
-        /// \brief Destructor
-        virtual ~HyperelasticityFunctional()
-        {
-        };
-
-        /// \copydoc BaseClass::name()
-        virtual String name() const override
-        {
-          return "HyperelasticityFunctional<"+MeshType::name()+">";
-        }
-
-        /**
-         * \brief Prints some characteristics of the HyperelasticityFunctional object
-         */
-        virtual void print() override
-        {
-          Dist::Comm comm_world(Dist::Comm::world());
-
-          String msg(name()+":");
-          comm_world.print(msg);
-
-          BaseClass::print();
-        }
-
-        /**
-         *
-         */
-        virtual void eval_fval_cellwise(CoordType& fval, CoordType* fval_norm, CoordType* fval_det, CoordType* fval_rec_det) const override
-        {
-          typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename BaseClass::TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
-
-          // Total number of cells in the mesh
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-
-          // Index set for local/global numbering
-          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
-
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
-          // Local cell dimensions for passing to other routines
-          CoordType h(0);
-          // This will hold the local gradient for one element for passing to other routines
-          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
-
-          fval = DataType(0);
-
-          TrafoEvaluator trafo_eval(this->_trafo);
-          SpaceEvaluator space_eval(this->_trafo_space);
-
-          // Compute the functional value for each cell
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            DataType fval_loc(0);
-            trafo_eval.prepare(cell);
-            space_eval.prepare(trafo_eval);
-
-            h = this->_h(cell);
-            // Get local coordinates
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-            {
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
-            }
-
-            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
-
-            this->_functional->eval_fval_cellwise(fval_loc, mat_tensor, trafo_eval, space_eval, x, h,
-            fval_norm[cell], fval_det[cell], fval_rec_det[cell]);
-
-            fval += this->_mu(cell)*fval_loc;
-          }
-
-        } // eval_fval_cellwise
-
-        /// \copydoc BaseClass::eval_fval_grad()
-        virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true) override
-        {
-          // Increase number of functional evaluations
-          this->_num_func_evals++;
-          this->_num_grad_evals++;
-
-          static_cast<const HyperelasticityFunctional*>(this)->eval_fval_grad(fval, grad, add_penalty_fval);
-        }
-
-        /// \copydoc BaseClass::eval_fval_grad()
-        virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true) const override
-        {
-          if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
-            _eval_fval_grad_with_conc(fval, grad);
-          else
-            _eval_fval_grad_without_conc(fval, grad);
-
-          if(add_penalty_fval && (this->_penalty_param > DataType(0)) )
-          {
-            XASSERT(this->_mesh_conc != nullptr);
-            fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
-          }
-
-          if(this->_penalty_param > DataType(0))
-          {
-            XASSERTM(this->_mesh_conc != nullptr,
-            "You need a mesh concentration function for imposing a mesh alignment constraint!");
-            this->_mesh_conc->add_constraint_grad(grad, this->_alignment_constraint, this->_penalty_param);
-          }
-        }
-
       protected:
-        /// \copydoc HyperelasticityFunctionalBase::eval_fval_grad()
         virtual void _eval_fval_grad_without_conc(DataType& func, VectorTypeL& grad) const
         {
 
           typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename BaseClass::TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
 
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
@@ -1247,12 +1244,11 @@ namespace FEAT
           }
         }
 
-        /// \copydoc HyperelasticityFunctionalBase::eval_fval_grad()
         virtual void _eval_fval_grad_with_conc(DataType& func, VectorTypeL& grad) const
         {
 
           typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename BaseClass::TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
 
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
@@ -1327,11 +1323,33 @@ namespace FEAT
     extern template class HyperelasticityFunctional
     <
       Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double >>,
+      Meshopt::RumpfFunctional
+      <
+        double,
+        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double >>
+      >
+    >;
+
+    extern template class HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>,
       Meshopt::RumpfFunctional
       <
         double,
         Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>
+      >
+    >;
+
+    extern template class HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, 3, double >>,
+      Meshopt::RumpfFunctional
+      <
+        double,
+        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, 3, double >>
       >
     >;
     /// \endcond
