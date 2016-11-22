@@ -3,6 +3,7 @@
 #define CONTROL_DOMAIN_DOMAIN_CONTROL_HPP 1
 
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/math.hpp>
@@ -154,6 +155,7 @@ namespace FEAT
         typedef DomainLevel<Mesh_> LevelType;
         typedef Mesh_ MeshType;
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
+        typedef typename MeshType::CoordType CoordType;
 
       protected:
         /// the main communicator
@@ -197,6 +199,28 @@ namespace FEAT
           {
             delete _atlas;
           }
+        }
+
+        static String name()
+        {
+          return "DomainControl<"+MeshType::name()+">";
+        }
+
+        virtual void print() const
+        {
+          Index pad_width(30);
+          String msg;
+
+          msg = String("num_levels").pad_back(pad_width, '.') + String(": ") + stringify(num_levels());
+          _comm->print(msg);
+
+          const auto& my_mesh = _levels.back()->get_mesh();
+          Index ncells(my_mesh.get_num_entities(MeshType::shape_dim));
+          _comm->allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
+
+          msg = String("Cells on level "+stringify(_levels.back()->get_level_index())).pad_back(pad_width, '.')
+            + String(": ") + stringify(ncells);
+          _comm->print(msg);
         }
 
         std::size_t bytes() const
@@ -279,6 +303,73 @@ namespace FEAT
         const AtlasType* get_atlas() const
         {
           return _atlas;
+        }
+
+        /**
+         * \brief Computes mesh quality heuristics
+         *
+         * \param[out] edge_angle
+         * The worst angle between two edges. Keep in mind that in 3d, this can be >0 even for deteriorated cells.
+         *
+         * \param[out] qi_min
+         * The minimum quality indicator over all cells.
+         *
+         * \param[out] qi_mean
+         * The mean quality indicator overa all cells.
+         *
+         * \param[out] edge_angle_cellwise
+         * For debugging or visualisation purposes, this can receive the worst edge angle for every cell.
+         *
+         * \param[out] qi_cellwise
+         * For debugging or visualisation purposes, this can receive the quality indicator for every cell.
+         *
+         * \param[in] lvl_index
+         * Index of the level to compute everything for. Defaults to the maximum level.
+         *
+         */
+        void compute_mesh_quality(CoordType& edge_angle, CoordType& qi_min, CoordType& qi_mean,
+        CoordType* edge_angle_cellwise = nullptr, CoordType* qi_cellwise = nullptr,
+        int lvl_index = -1) const
+        {
+          // max_level_index cannot be called for the default argument, so we do it here
+          if(lvl_index == -1)
+          {
+            lvl_index = max_level_index();
+          }
+          ASSERT(lvl_index >= min_level_index());
+          ASSERT(lvl_index <= max_level_index());
+
+          CoordType qi_sum(0);
+
+          for(const auto& it: _levels)
+          {
+            if(it->get_level_index() == lvl_index)
+            {
+              const auto& my_mesh = it->get_mesh();
+
+              Index ncells(my_mesh.get_num_entities(MeshType::shape_dim));
+              _comm->allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
+
+              Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qi_min, qi_sum,
+              my_mesh.template get_index_set<MeshType::shape_dim, 0>(), my_mesh.get_vertex_set(), qi_cellwise);
+
+              _comm->allreduce(&qi_min, &qi_min, std::size_t(1), Dist::op_min);
+              _comm->allreduce(&qi_sum, &qi_sum, std::size_t(1), Dist::op_sum);
+
+              edge_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+              my_mesh.template get_index_set<MeshType::shape_dim, 0>(), my_mesh.get_vertex_set(), edge_angle_cellwise);
+              _comm->allreduce(&edge_angle, &edge_angle, std::size_t(1), Dist::op_min);
+
+              qi_mean = qi_sum/CoordType(ncells);
+
+              return;
+            }
+          }
+
+          // We should never get to this point
+          throw InternalError(__func__,__FILE__,__LINE__,
+          "Could not find level with index "+stringify(lvl_index)+"!\n");
+
         }
       }; // class DomainControl<...>
     } // namespace Domain
