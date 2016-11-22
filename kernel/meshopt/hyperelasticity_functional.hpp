@@ -14,6 +14,7 @@
 #include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/meshopt/rumpf_trafo.hpp>
+#include <kernel/util/dist.hpp>
 
 #include <map>
 
@@ -965,23 +966,67 @@ namespace FEAT
          */
         virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true)
         {
+          typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+
           // Increase number of functional evaluations
           this->_num_func_evals++;
           this->_num_grad_evals++;
 
-          static_cast<const HyperelasticityFunctional*>(this)->eval_fval_grad(fval, grad, add_penalty_fval);
-        }
+          // Total number of cells in the mesh
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
-        /// \copydoc BaseClass::eval_fval_grad()
-        virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true) const
-        {
-          if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
+          // Index set for local/global numbering
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          // This will hold the local gradient for one element for passing to other routines
+          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
+
+          // Clear gradient vector
+          grad.format();
+          fval = DataType(0);
+
+          TrafoEvaluator trafo_eval(this->_trafo);
+          SpaceEvaluator space_eval(this->_trafo_space);
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
           {
-            _eval_fval_grad_with_conc(fval, grad);
-          }
-          else
-          {
-            _eval_fval_grad_without_conc(fval, grad);
+            DataType fval_loc(0);
+            trafo_eval.prepare(cell);
+            space_eval.prepare(trafo_eval);
+
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+            }
+
+            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
+
+            this->_functional->eval_fval_grad(
+              fval_loc, grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell));
+
+            // Add the contribution from the dependence of h on the vertex coordinates
+            if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
+            {
+              const auto& grad_h = this->_mesh_conc->get_grad_h();
+              this->_functional->add_grad_h_part(
+                grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell), grad_h(cell));
+            }
+
+            fval += this->_mu(cell)*fval_loc;
+            // Add local contributions to global gradient vector
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
+              Index i(idx(cell,Index(j)));
+              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
+              tmp += this->_mu(cell)*grad_loc[j];
+
+              grad(i,tmp);
+            }
           }
 
           if(add_penalty_fval && (this->_penalty_param > DataType(0)) )
@@ -1110,8 +1155,6 @@ namespace FEAT
 
         /**
          * \brief Recomputes the optimal scales, every call to the solver
-         *
-         * To be called from init(). This consists of first computing _lambda and then _h.
          */
         virtual void _compute_scales_init()
         {
@@ -1187,123 +1230,6 @@ namespace FEAT
           this->sync_scalars.insert(&_sum_det);
 
         }
-
-      protected:
-        virtual void _eval_fval_grad_without_conc(DataType& func, VectorTypeL& grad) const
-        {
-
-          typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
-
-          // Total number of cells in the mesh
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-
-          // Index set for local/global numbering
-          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
-
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
-          // This will hold the local gradient for one element for passing to other routines
-          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
-
-          // Clear gradient vector
-          grad.format();
-          func = DataType(0);
-
-          TrafoEvaluator trafo_eval(this->_trafo);
-          SpaceEvaluator space_eval(this->_trafo_space);
-
-          // Compute the functional value for each cell
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            DataType func_loc(0);
-            trafo_eval.prepare(cell);
-            space_eval.prepare(trafo_eval);
-
-            // Get local coordinates
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-            {
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
-            }
-
-            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
-
-            this->_functional->eval_fval_grad(
-              func_loc, grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell));
-
-            func += this->_mu(cell)*func_loc;
-            // Add local contributions to global gradient vector
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-            {
-              Index i(idx(cell,Index(j)));
-              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
-              tmp += this->_mu(cell)*grad_loc[j];
-
-              grad(i,tmp);
-            }
-          }
-        }
-
-        virtual void _eval_fval_grad_with_conc(DataType& func, VectorTypeL& grad) const
-        {
-
-          typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
-
-          // Total number of cells in the mesh
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-
-          // Index set for local/global numbering
-          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
-
-          // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
-          // This will hold the local gradient for one element for passing to other routines
-          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
-
-          // Clear gradient vector
-          grad.format();
-          func = DataType(0);
-
-          TrafoEvaluator trafo_eval(this->_trafo);
-          SpaceEvaluator space_eval(this->_trafo_space);
-
-          const auto& grad_h = this->_mesh_conc->get_grad_h();
-
-          // Compute the functional value for each cell
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            DataType func_loc(0);
-            trafo_eval.prepare(cell);
-            space_eval.prepare(trafo_eval);
-
-            // Get local coordinates
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-            {
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
-            }
-
-            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
-
-            this->_functional->eval_fval_grad(
-              func_loc, grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell));
-
-            // Add the contribution from the dependence of h on the vertex coordinates
-            this->_functional->add_grad_h_part(
-              grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell), grad_h(cell));
-
-            func += this->_mu(cell)*func_loc;
-            // Add local contributions to global gradient vector
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-            {
-              Index i(idx(cell,Index(j)));
-              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
-              tmp += this->_mu(cell)*grad_loc[j];
-
-              grad(i,tmp);
-            }
-          }
-        } // _eval_fval_grad_with_conc
 
     }; // class HyperelasticityFunctional
 
