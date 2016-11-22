@@ -1,5 +1,5 @@
 //
-// \brief FEAT Tutorial 05: Multgrid solver (TM)
+// \brief FEAT Tutorial 05: Geometric Multgrid Solver (TM)
 //
 // This file contains a simple prototypical multigrid Poisson solver for the unit square domain.
 //
@@ -118,7 +118,7 @@ namespace Tutorial05
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   // In contrast to the previous tutorials, we need to store various data on multiple levels and
-  // not just one the finest one, because we want to use multigrid as a solver.
+  // not just one the finest one, because we want to use geometric multigrid as a solver.
   // In the most simple case, which is what we consider in this tutorial, we need to store the
   // following data for each level in our multigrid mesh hierarchy:
   //
@@ -187,10 +187,12 @@ namespace Tutorial05
     {
       std::cout << "Refining to level " << (ilevel+1) << "..." << std::endl;
 
-      // Create a refinery to refine the previous level mesh
+      // The StandardRefinery is another mesh factory class, which creates a new mesh by
+      // applying the "standard-regular-refinement" algorithm onto a given input mesh.
+      // Create a StandardRefinery object and pass the last mesh to its constructor.
       Geometry::StandardRefinery<MeshType> mesh_factory(levels.back()->mesh);
 
-      // Allocate the next level using the refined mesh and append it to our deque:
+      // Allocate the next level using the mesh factory and append it to our deque:
       levels.push_back(std::make_shared<Level>(mesh_factory));
     }
 
@@ -198,8 +200,7 @@ namespace Tutorial05
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    // In the next step, we will assemble the system matrices and filters as well as the
-    // grid transfer matrices for each level.
+    // In the next step, we will assemble the system matrices and filters for each level.
 
     // Create a cubature factory; this one can be used for all assembly steps on all levels.
     Cubature::DynamicFactory cubature_factory("auto-degree:5");
@@ -207,7 +208,7 @@ namespace Tutorial05
     // Now loop over all levels:
     for(Index ilevel(level_min); ilevel <= level_max; ++ilevel)
     {
-      std::cout << "Assembling level " << ilevel << "..." << std::endl;
+      std::cout << "Assembling Matrix and Filter for level " << ilevel << "..." << std::endl;
 
       // Get a reference to the corresponding level for easier member access
       Level& lvl = *levels.at(std::size_t(ilevel - level_min));
@@ -226,46 +227,53 @@ namespace Tutorial05
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
       unit_asm.add_mesh_part(boundary);
       unit_asm.assemble(lvl.filter, lvl.space);
+    } // end of level loop
 
-      // If this is the coarsest level, then we're done.
-      // For each refined level, we additionally need to assemble the grid transfer matrices:
-      if(ilevel > level_min)
-      {
-        // get a reference to the corresponding coarse level
-        Level& lvl_coarse = *levels.at(std::size_t(ilevel - level_min - 1));
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-        // We need to assemble the prolongation matrix, which is used by the multigrid
-        // solver to project correction vectors from the coarse mesh onto the current mesh.
-        // The assembly of prolongation matrices is quite similar to the assembly of
-        // operator matrices (like the Laplace matrix above), i.e. we first need to
-        // assemble the matrix structure and then the matrix content.
+    // Next, we need to assemble the grid transfer (prolongation and restriction) matrices for
+    // each pair of consecutive levels.
 
-        // Assemble the prolongation matrix structure:
-        Assembly::SymbolicAssembler::assemble_matrix_2lvl(
-          lvl.mat_prol,       // the prolongation matrix that is to be assembled
-          lvl.space,          // the fine-mesh space
-          lvl_coarse.space    // the coarse-mesh space
-        );
+    // Now loop over all level pairs:
+    for(Index ilevel(level_min); ilevel < level_max; ++ilevel)
+    {
+      std::cout << "Assembling Grid Transfer for level " << ilevel << "..." << std::endl;
 
-        // As always, format the matrix:
-        lvl.mat_prol.format();
+      // Get references to the corresponding coarse and fine levels:
+      Level& lvl_coarse = *levels.at(std::size_t(ilevel - level_min));
+      Level& lvl_fine   = *levels.at(std::size_t(ilevel - level_min + 1));
 
-        // Assemble the contents of the prolongation matrix:
-        Assembly::GridTransfer::assemble_prolongation_direct(
-          lvl.mat_prol,       // the prolongation matrix that is to be assembled
-          lvl.space,          // the fine-mesh space
-          lvl_coarse.space,   // the coarse-mesh space
-          cubature_factory    // the cubature factory to be used for integration
-        );
+      // We need to assemble the prolongation matrix, which is used by the multigrid
+      // solver to project correction vectors from the coarse mesh onto the current mesh.
+      // The assembly of prolongation matrices is quite similar to the assembly of
+      // operator matrices (like the Laplace matrix above), i.e. we first need to
+      // assemble the matrix structure and then the matrix content.
 
-        // That's it for our prolongation matrix.
+      // Assemble the prolongation matrix structure:
+      Assembly::SymbolicAssembler::assemble_matrix_2lvl(
+        lvl_fine.mat_prol,  // the prolongation matrix that is to be assembled
+        lvl_fine.space,     // the fine-mesh space
+        lvl_coarse.space    // the coarse-mesh space
+      );
 
-        // We also need the restriction matrix, which is used by multigrid to project
-        // defect vectors from the fine mesh to the coarse mesh.
-        // Fortunately, this task is easy, because the restriction matrix is
-        // always identical to the transpose of the prolongation matrix:
-        lvl.mat_rest = lvl.mat_prol.transpose();
-      }
+      // As always, format the matrix:
+      lvl_fine.mat_prol.format();
+
+      // Assemble the contents of the prolongation matrix:
+      Assembly::GridTransfer::assemble_prolongation_direct(
+        lvl_fine.mat_prol,  // the prolongation matrix that is to be assembled
+        lvl_fine.space,     // the fine-mesh space
+        lvl_coarse.space,   // the coarse-mesh space
+        cubature_factory    // the cubature factory to be used for integration
+      );
+
+      // That's it for our prolongation matrix.
+
+      // We also need the restriction matrix, which is used by multigrid to project
+      // defect vectors from the fine mesh to the coarse mesh.
+      // Fortunately, this task is easy, because the restriction matrix is
+      // always identical to the transpose of the prolongation matrix:
+      lvl_fine.mat_rest = lvl_fine.mat_prol.transpose();
     } // end of level loop
 
     // At this point, all levels of our level hierarchy are fully assembled.
@@ -273,7 +281,7 @@ namespace Tutorial05
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     // We have assembled the system matrices and filter, but we still need to set up the
-    // right-hand-side vector as well as an initial solution vector.  Note that these vectors
+    // right-hand-side vector as well as an initial solution vector. Note that these vectors
     // are required only on the finest level, so there is no loop involved here.
 
     // Get a reference to the finest level
@@ -289,7 +297,7 @@ namespace Tutorial05
 
     std::cout << "Assembling right-hand-side vector..." << std::endl;
 
-    // Now assemble the right-hand-side vector; this is virtually identical to Tutorial 01.
+    // Now assemble the right-hand-side vector; this is virtually identical to tutorial 01.
 
     // Our desired reference solution function:
     Analytic::Common::SineBubbleFunction<2> sol_function;
@@ -307,9 +315,9 @@ namespace Tutorial05
 
     std::cout << "Setting up Multigrid solver..." << std::endl;
 
-    // All matrices, filters and vectors are assembled, so we can start to set up our geometric
+    // All matrices, filters and vectors have been assembled, so we can start to set up our geometric
     // multigrid solver. Naturally, this task is more complex than the setup of a simple PCG-SSOR
-    // solver as in Tutorial 01, so let's take a look at the "road map":
+    // solver as in tutorial 01, so let's take a look at the "road map":
 
     // The solver we want to set up is a "standard" geometric multigrid solver, which
     // 1) uses a simple CG solver as the coarse grid solver
@@ -331,13 +339,16 @@ namespace Tutorial05
     // all our matrices and filters to it. Moreover, we also need to create the corresponding
     // coarse grid solver and smoother objects.
 
-    // As a first step, we need to set up the coarse level:
+    // As a first step, we have to set up the coarse level:
     {
       // get a reference to the coarsest level
       Level& lvl = *levels.front();
 
       // We use a simple (unpreconditioned) CG solver as a coarse-grid solver, so let's create one:
       auto coarse_solver = Solver::new_pcg(lvl.matrix, lvl.filter);
+
+      // At this point, we could configure the coarse grid solver, i.e. set tolerances and maximum
+      // allowed iterations, but we'll just leave it at its default configuration here.
 
       // Now we need to attach this solver as well as the system matrix and filter to
       // our multigrid hierarchy. This is done by calling the following member function:
@@ -389,7 +400,7 @@ namespace Tutorial05
       // for more details about the different cycles and their smoother calls.
     }
 
-    // Next, we need to create a multigrid preconditioner for our hierarhcy. This task
+    // Next, we need to create a multigrid preconditioner for our hierarchy. This task
     // is quite simple, as we can use one of the convenience functions to obtain a
     // MultiGrid solver object using the hierarchy we have just set up. At this point,
     // we can also choose which multigrid cycle we want to use. We have the choice
@@ -425,14 +436,14 @@ namespace Tutorial05
     // This may seem inconvenient, but this is the only way to go when building more complex
     // multigrid solver configurations like e.g. the ScaRC solver, so we have to live with that.
 
-    // So, initialise the multigrid hierarchy:
+    // So, initialise the multigrid hierarchy first:
     multigrid_hierarchy->init();
+
+    // Now we can initialise our solver:
+    solver->init();
 
     // As always, enable the convergence plot:
     solver->set_plot(true);
-
-    // Initialise our solver
-    solver->init();
 
     // Solve our linear system
     Solver::solve(*solver, vec_sol, vec_rhs, lvl_fine.matrix, lvl_fine.filter);
@@ -487,7 +498,7 @@ int main(int argc, char* argv[])
   Runtime::initialise(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #05: Multigrid" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #05: Geometric Multigrid" << std::endl;
 
   Index level_max(3), level_min(1);
 

@@ -302,23 +302,24 @@ namespace Tutorial01
     // Initialise the right-hand-side vector entries to zero.
     vec_rhs.format();
 
-    // First, we need an analytic function representing the right-hand-side, or more generally
+    // We need an analytic functional representing the right-hand-side, or more generally
     // speaking, any force.
-    // In our example, the analytical solution of the PDE is the sine-bubble,
-    // which is an eigenfunction of the Laplace operator, so the corresponding
-    // right-hand-side is the solution multiplied by 2*pi^2. We exploit this by we'll simply
-    // using our solution function for the right-hand-side assembly and pass
-    // the constant factor as a multiplier for our assembly method. More general linear form
-    // assemblies are covered in later tutorials.
-
-    // The sine-bubble function is pre-defined as a 'common function' in the "analytic/common.hpp"
-    // header, so we'll use it here.
+    // In this tutorial, we first choose a reference solution for our PDE and then assemble the
+    // corresponding right-hand-side for our Poisson problem. We choose the "sine-bubble" function,
+    // which is pre-defined as a 'common function' in the "analytic/common.hpp" header,
+    // so we can use it here:
     Analytic::Common::SineBubbleFunction<2> sol_function;
 
-    // Next, we need a linear functional that can be applied onto test functions.
-    // We utilise the Common::ForceFunctional class template to convert our
-    // sine-bubble function into a functional.
-    Assembly::Common::ForceFunctional<decltype(sol_function)> force_functional(sol_function);
+    // Next, we need a linear functional that can be applied onto test functions for our
+    // right-hand-side vector. The sine-bubble is an eigenfunction of the Laplace operator,
+    // so the corresponding right-hand-side function is the solution multiplied by 2*pi^2.
+    // We could exploit this by simply using our solution function for the right-hand-side
+    // assembly and passing the constant factor as a multiplier for our assembly method,
+    // but we will instead use the pre-defined LaplaceFunctional wrapper, which will
+    // compute the right-hand-side force for any given solution function based on its
+    // second derivatives. The LaplaceFunctional requires the type of the solution function
+    // as its one and only template parameter, so we use the decltype specifier here:
+    Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
 
     // Now we can call the LinearFunctionalAssembler class to assemble our linear
     // functional into a vector.
@@ -326,8 +327,7 @@ namespace Tutorial01
         vec_rhs,          // the vector that receives the assembled functional
         force_functional, // the functional that is to be assembled
         space,            // the finite element space in use
-        cubature_factory, // the cubature factory to be used for integration
-        DataType(2) * Math::sqr(Math::pi<DataType>()) // this is our factor 2*pi^2
+        cubature_factory  // the cubature factory to be used for integration
         );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -726,9 +726,9 @@ namespace Tutorial06
     // each patch to obtain the errors over the whole domain:
     errors.synchronise(comm);
 
-    // And let's print the errors to the console; we need to use the "stringify" function here,
+    // And let's print the errors to the console; we need to use the "format_string" function here,
     // as the "print" function accepts only String objects as input:
-    comm.print(stringify(errors));
+    comm.print(errors.format_string());
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
