@@ -3,7 +3,7 @@
 #define KERNEL_SOLVER_NLOPT_PRECOND 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
-#include <kernel/util/mpi_cout.hpp>
+#include <kernel/util/dist.hpp>
 
 namespace FEAT
 {
@@ -167,7 +167,8 @@ namespace FEAT
 
         virtual void print() const override
         {
-          Util::mpi_cout(name()+" settings:\n");
+          Dist::Comm comm(Dist::Comm::world());
+          comm.print(name());
           _op.print();
         }
 

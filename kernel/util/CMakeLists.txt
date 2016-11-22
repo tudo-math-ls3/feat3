@@ -14,7 +14,6 @@ ADD_LIBRARY(kernel-util STATIC
   kahan_summation.cpp
   memory_pool.cpp
   memory_usage.cpp
-  mpi_cout.cpp
   property_map.cpp
   runtime.cpp
   statistics.cpp

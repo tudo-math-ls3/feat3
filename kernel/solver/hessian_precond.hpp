@@ -4,6 +4,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
+#include <kernel/util/dist.hpp>
 
 namespace FEAT
 {
@@ -132,7 +133,8 @@ namespace FEAT
         /// \copydoc BaseClass::print()
         virtual void print() const override
         {
-          Util::mpi_cout(name());
+          Dist::Comm comm(Dist::Comm::world());
+          comm.print(name());
         }
     };
     /// \endcond
@@ -308,7 +310,8 @@ namespace FEAT
         /// \copydoc BaseClass::print()
         virtual void print() const override
         {
-          Util::mpi_cout(name());
+          Dist::Comm comm(Dist::Comm::world());
+          comm.print(name());
         }
     };
     /// \endcond
