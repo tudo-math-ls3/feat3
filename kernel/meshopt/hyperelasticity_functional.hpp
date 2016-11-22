@@ -539,7 +539,7 @@ namespace FEAT
 
           String msg;
 
-          msg = String("Scale computation").pad_back(width, '.') + String(": ");
+          msg = String("Scale computation").pad_back(width, '.') + String(": ") + stringify(_scale_computation);
           comm_world.print(msg);
 
           _functional->print();
@@ -1102,7 +1102,7 @@ namespace FEAT
         {
           Dist::Comm comm_world(Dist::Comm::world());
 
-          String msg(name()+": ");
+          String msg(name()+":");
           comm_world.print(msg);
 
           BaseClass::print();

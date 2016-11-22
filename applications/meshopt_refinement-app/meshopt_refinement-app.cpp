@@ -62,6 +62,10 @@ struct MeshoptRefinementApp
     PropertyMap* meshopt_config, PropertyMap* solver_config, Geometry::MeshFileReader& mesh_file_reader)
   {
 
+    static constexpr int pad_width = 30;
+
+    int ret(0);
+
     // Mininum refinement level, parsed from the application config file
     int lvl_min(-1);
     // Maximum refinement level, parsed from the application config file
@@ -141,6 +145,7 @@ struct MeshoptRefinementApp
 
     TimeStamp at;
 
+    // Create domain control
     DomCtrl dom_ctrl(comm);
     dom_ctrl.set_adapt_mode(adapt_mode);
     dom_ctrl.read_mesh(mesh_file_reader);
@@ -151,16 +156,12 @@ struct MeshoptRefinementApp
     // Mesh on the finest level, mainly for computing quality indicators
     const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
-    Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
-    comm.allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
-
-
-
     // Print level information
     comm.print(name()+" settings:");
-    comm.print("LVL-MAX "+stringify(dom_ctrl.get_levels().back()->get_level_index())+" [" +stringify(lvl_max) + "]");
-    comm.print("LVL-MIN "+stringify(dom_ctrl.get_levels().front()->get_level_index())+" [" +stringify(lvl_min) + "]");
-    comm.print("Cells"+stringify(ncells));
+    comm.print("LVL-MAX "+stringify(dom_ctrl.get_levels().back()->get_level_index())
+        +" [" +stringify(lvl_max) + "] "
+        +"LVL-MIN "+stringify(dom_ctrl.get_levels().front()->get_level_index())+" [" +stringify(lvl_min) + "]");
+    dom_ctrl.print();
 
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
@@ -184,46 +185,14 @@ struct MeshoptRefinementApp
     meshopt_ctrl->prepare(new_coords);
 
     // For the tests these have to have function global scope
-    DT_ qual_min(0);
-    DT_ qual_sum(0);
-    DataType* qual_cellwise(new DataType[finest_mesh.get_num_entities(MeshType::shape_dim)]);
+    DT_ qi_min(0);
+    DT_ qi_mean(0);
+    DataType* qi_cellwise(new DataType[finest_mesh.get_num_entities(MeshType::shape_dim)]);
 
-    DT_ worst_angle(0);
-    DataType* worst_angle_cellwise(new DataType[finest_mesh.get_num_entities(MeshType::shape_dim)]);
+    DT_ edge_angle(0);
+    DataType* edge_angle_cellwise(new DataType[finest_mesh.get_num_entities(MeshType::shape_dim)]);
 
     DT_ cell_size_defect(0);
-
-    // Compute quality indicators
-    {
-      Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
-      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(), qual_cellwise);
-
-      worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(),
-        worst_angle_cellwise);
-
-      comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
-      comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
-      comm.allreduce(&worst_angle, &worst_angle, std::size_t(1), Dist::op_min);
-
-      DataType qual_avg(qual_sum/DataType(ncells));
-
-      DT_ lambda_min;
-      DT_ lambda_max;
-      DT_ vol;
-      DT_ vol_min;
-      DT_ vol_max;
-      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
-
-      if(comm.rank() == 0)
-      {
-        std::cout << "Pre initial quality indicator: " << stringify_fp_sci(qual_min) <<
-          " / " << stringify_fp_sci(qual_avg) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
-        std::cout << "Pre initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
-          " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
-          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) <<  " " << stringify_fp_sci(vol) << std::endl;
-      }
-    }
 
     // Write initial vtk output
     if(write_vtk)
@@ -236,73 +205,83 @@ struct MeshoptRefinementApp
         String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
 
+        // Compute mesh quality on this level
+        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        exporter.add_cell_scalar("Worst angle", worst_angle_cellwise);
-        exporter.add_cell_scalar("Shape quality heuristic", qual_cellwise);
+        exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
+        exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
         exporter.write(vtk_name, comm.rank(), comm.size());
 
         ++deque_position;
       }
+    }
+
+    // Compute and print quality indicators on the finest level only
+    {
+      DT_ lambda_min(Math::huge<DT_>());
+      DT_ lambda_max(0);
+      DT_ vol(0);
+      DT_ vol_min(Math::huge<DT_>());
+      DT_ vol_max(0);
+
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
+
+      // If we did not compute this for the vtk output, we have to do it here
+      if(!write_vtk)
+      {
+        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+      }
+
+      String msg("");
+      comm.print(msg);
+
+      msg = String("Initial total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
+      comm.print(msg);
+
+      msg = String("Initial QI min/mean").pad_back(pad_width,' ') + String(": ") + stringify_fp_sci(qi_min) + String(" / ") + stringify_fp_sci(qi_mean);
+      comm.print(msg);
+
+      msg = String("Initial worst edge angle").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_fix(edge_angle);
+      comm.print(msg);
+
+      msg = String("Initial cell size defect").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_sci(cell_size_defect);
+      comm.print(msg);
+
+      msg = String("Initial lambda min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(lambda_min) + String(" / ") + stringify_fp_sci(lambda_max) ;
+      comm.print(msg);
+
+      msg = String("Initial vol fraction min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol_min) + " / " + stringify_fp_sci(vol_max);
+      comm.print(msg);
+
+      msg = String("");
+      comm.print(msg);
 
     }
 
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if( Math::abs(worst_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
+      if( Math::abs(edge_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
       {
-        comm.print("FAILED:");
-        throw InternalError(__func__,__FILE__,__LINE__,
-        "Initial worst angle should be = "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
+        comm.print("FAILED: Initial worst angle should be = "+stringify_fp_fix(45)+ " but is "
+            +stringify_fp_fix(edge_angle));
+        ret++;
       }
-      else if(test_number == 2)
+    }
+    else if(test_number == 2)
+    {
+      if( Math::abs(edge_angle - DT_(26.103429982165846)) > Math::sqrt(Math::eps<DataType>()))
       {
-        if( Math::abs(worst_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
-        {
-          comm.print("FAILED:");
-          throw InternalError(__func__,__FILE__,__LINE__,
-          "Initial worst angle should be >= "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(worst_angle)+"\n");
-        }
+        comm.print("FAILED: Initial worst angle should be >= "+stringify_fp_fix(26.103429982165846)+ " but is "
+            +stringify_fp_fix(edge_angle));
+        ret++;
       }
     }
 
     // Optimise the mesh
     meshopt_ctrl->optimise();
-
-
-    // Compute quality indicators
-    {
-      Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
-      finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(), qual_cellwise);
-
-      worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set(),
-        worst_angle_cellwise);
-
-      comm.allreduce(&qual_min, &qual_min, std::size_t(1), Dist::op_min);
-      comm.allreduce(&qual_sum, &qual_sum, std::size_t(1), Dist::op_sum);
-      comm.allreduce(&worst_angle, &worst_angle, std::size_t(1), Dist::op_min);
-
-      DataType qual_avg(qual_sum/DataType(ncells));
-
-      DT_ lambda_min;
-      DT_ lambda_max;
-      DT_ vol;
-      DT_ vol_min;
-      DT_ vol_max;
-      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
-
-      if(comm.rank() == 0)
-      {
-        std::cout << "Post initial quality indicator: " << stringify_fp_sci(qual_min) <<
-          " / " << stringify_fp_sci(qual_avg ) << " worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
-        std::cout << "Post initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
-          " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
-          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) <<  " " << stringify_fp_sci(vol) << std::endl;
-      }
-    }
 
     // Write output again
     if(write_vtk)
@@ -315,116 +294,130 @@ struct MeshoptRefinementApp
         String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
 
+        // Compute mesh quality on this level
+        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        exporter.add_cell_scalar("Worst angle", worst_angle_cellwise);
-        exporter.add_cell_scalar("Shape quality heuristic", qual_cellwise);
+        exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
+        exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
         exporter.write(vtk_name, comm.rank(), comm.size());
 
         ++deque_position;
       }
+    }
+
+    // Compute and print quality indicators on the finest level only
+    {
+      DT_ lambda_min(Math::huge<DT_>());
+      DT_ lambda_max(0);
+      DT_ vol(0);
+      DT_ vol_min(Math::huge<DT_>());
+      DT_ vol_max(0);
+
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
+
+      // If we did not compute this for the vtk output, we have to do it here
+      if(!write_vtk)
+      {
+        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+      }
+
+      String msg("");
+      comm.print(msg);
+
+      msg = String("Final total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
+      comm.print(msg);
+
+      msg = String("Final QI min/mean").pad_back(pad_width,' ') + String(": ") + stringify_fp_sci(qi_min) + String(" / ") + stringify_fp_sci(qi_mean);
+      comm.print(msg);
+
+      msg = String("Final worst edge angle").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_fix(edge_angle);
+      comm.print(msg);
+
+      msg = String("Final cell size defect").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_sci(cell_size_defect);
+      comm.print(msg);
+
+      msg = String("Final lambda min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(lambda_min) + String(" / ") + stringify_fp_sci(lambda_max) ;
+      comm.print(msg);
+
+      msg = String("Final vol fraction min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol_min) + " / " + stringify_fp_sci(vol_max);
+      comm.print(msg);
+
+      msg = String("");
+      comm.print(msg);
 
     }
 
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if(worst_angle < DT_(55.1))
+      if(edge_angle < DT_(55.1))
       {
         comm.print("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(55.1)+
-            " but is "+stringify_fp_fix(worst_angle));
-        return 1;
+            " but is "+stringify_fp_fix(edge_angle));
+        ret++;
       }
-      if(qual_min < DT_(4.12e-1))
+      if(qi_min < DT_(4.12e-1))
       {
         comm.print("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(4.12e-1)+
-            " but is "+stringify_fp_fix(qual_min)+"\n");
-        return 1;
+            " but is "+stringify_fp_fix(qi_min)+"\n");
+        ret++;
       }
       if(cell_size_defect > DT_(2.6e-1))
       {
         comm.print("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(2.6e-1)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
-        return 1;
+        ret++;
       }
     }
     else if(test_number == 2)
     {
-      if(worst_angle < DT_(22))
+      if(edge_angle < DT_(22))
       {
         comm.print("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(22)+
-            " but is "+stringify_fp_fix(worst_angle)+"\n");
-        return 1;
+            " but is "+stringify_fp_fix(edge_angle)+"\n");
+        ret++;
       }
-      if(qual_min < DT_(6.4e-1))
+      if(qi_min < DT_(6.4e-1))
       {
         comm.print("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(6.4e-1)+
-            " but is "+stringify_fp_fix(qual_min)+"\n");
-        return 1;
+            " but is "+stringify_fp_fix(qi_min)+"\n");
+        ret++;
       }
       if(cell_size_defect > DT_(1.2e-1))
       {
         comm.print("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(1.2e-1)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
-        return 1;
+        ret++;
       }
     }
 
-    comm.print("Finished!\n");
     meshopt_ctrl->print();
 
-    // Check for the hard coded settings for test mode
-    if(test_number == 1)
+    // Print success or not
+    if(ret == 0)
     {
-      if(worst_angle < DT_(43))
-      {
-        comm.print("FAILED: Final worst angle should be >= "+stringify_fp_fix(43)+
-            " but is "+stringify_fp_fix(worst_angle)+"\n");
-        return 1;
-      }
-      if(qual_min < DT_(2.3e-1))
-      {
-        comm.print("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(2.3e-1)+
-            " but is "+stringify_fp_fix(qual_min)+"\n");
-        return 1;
-      }
-      if(cell_size_defect > DT_(2.3))
-      {
-        comm.print("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(2.3)+
-            " but is "+stringify_fp_fix(cell_size_defect)+"\n");
-        return 1;
-      }
+      comm.print("\nFinished successfully!");
     }
-    else if(test_number == 2)
+    else
     {
-      if(worst_angle < DT_(28))
+      String msg("\nFAILED: "+stringify(ret) + " check");
+      if(ret > 1)
       {
-        comm.print("FAILED: Final worst angle should be >= "+stringify_fp_fix(28)+
-            " but is "+stringify_fp_fix(worst_angle)+"\n");
-        return 1;
+        msg+="s";
       }
-      if(qual_min < DT_(7.16e-1))
-      {
-        comm.print("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(7.16e-1)+
-            " but is "+stringify_fp_fix(qual_min)+"\n");
-        return 1;
-      }
-      if(cell_size_defect > DT_(9.4e-2))
-      {
-        comm.print("FAILED: Final cell size distribution defect should be < "+stringify_fp_fix(9.4e-2)+
-            " but is "+stringify_fp_fix(cell_size_defect)+"\n");
-        return 1;
-      }
+      comm.print(msg);
     }
 
-    if(comm.rank() == 0)
-    {
-      TimeStamp bt;
-      std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
-    }
+    TimeStamp bt;
+    comm.print("Elapsed time: "+stringify(bt.elapsed(at)));
 
-    return 0;
+    delete[] qi_cellwise;
+    delete[] edge_angle_cellwise;
+
+    return ret;
 
   }
 }; // struct MeshoptRefinementApp
@@ -551,7 +544,9 @@ int run_app(int argc, char* argv[])
       {
         std::ifstream ifs(meshopt_config_filename_p.first);
         if(!ifs.good())
+        {
           throw FileNotFound(meshopt_config_filename_p.first);
+        }
 
         std::cout << "Reading mesh optimisation config from file " <<meshopt_config_filename_p.first << std::endl;
         synchstream_meshopt_config << ifs.rdbuf();
@@ -604,6 +599,7 @@ int run_app(int argc, char* argv[])
   for(std::size_t i(0); i < mesh_files.size(); ++i)
   {
     // read the stream
+    comm.print("Reading mesh file "+mesh_files.at(i));
     DistFileIO::read_common(mesh_streams.at(i), mesh_files.at(i));
 
     // add to mesh reader
@@ -638,7 +634,9 @@ int run_app(int argc, char* argv[])
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
   else
+  {
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
+  }
 
   delete application_config;
   delete meshopt_config;
@@ -684,7 +682,9 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "lvl_max = 3" << std::endl;
   }
   else
+  {
     throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number: "+stringify(test_number));
+  }
 }
 
 static void read_test_meshopt_config(std::stringstream& iss, const int test_number)
@@ -726,7 +726,9 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "scale_computation = current_uniform" << std::endl;
   }
   else
+  {
     throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number "+stringify(test_number));
+  }
 }
 
 static void read_test_solver_config(std::stringstream& iss, const int test_number)
@@ -845,18 +847,26 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "precon = jac" << std::endl;
   }
   else
+  {
     throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number "+stringify(test_number));
+  }
 }
 
 static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int test_number)
 {
   String mesh_filename(FEAT_SRC_DIR);
   if(test_number == 1)
+  {
     mesh_filename +="/data/meshes/unit-circle-quad.xml";
+  }
   else if(test_number == 2)
+  {
     mesh_filename +="/data/meshes/unit-circle-tria.xml";
+  }
   else
+  {
     throw InternalError(__func__,__FILE__,__LINE__,"Encountered unhandled test "+stringify(test_number));
+  }
 
   mesh_files.push_back(mesh_filename);
 }

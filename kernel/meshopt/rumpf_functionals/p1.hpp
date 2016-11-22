@@ -156,20 +156,20 @@ namespace FEAT
            */
           void print()
           {
-            int width(30);
+            Index pad_width(30);
             Dist::Comm comm_world(Dist::Comm::world());
 
             String msg;
 
-            msg = name()+": ";
+            msg = name()+":";
             comm_world.print(msg);
 
             BaseClass::print();
 
-            msg = String("exponent_det").pad_back(width, '.') + String(": ") + stringify(_exponent_det);
+            msg = String("exponent_det").pad_back(pad_width, '.') + String(": ") + stringify(_exponent_det);
             comm_world.print(msg);
 
-            msg = String("cubature_rule").pad_back(width, '.') += String(": ") += _cubature_rule.get_name();
+            msg = String("cubature_rule").pad_back(pad_width, '.') += String(": ") += _cubature_rule.get_name();
             comm_world.print(msg);
           }
 

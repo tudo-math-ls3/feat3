@@ -3,6 +3,7 @@
 #define KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP 1
 
 #include <kernel/base_header.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <iostream>
@@ -95,24 +96,24 @@ namespace FEAT
         /// \brief Print basic information
         void print()
         {
-          int width(30);
+          Index pad_width(30);
           Dist::Comm comm_world(Dist::Comm::world());
 
           String msg;
 
-          msg = String("fac_frobenius").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_frobenius);
+          msg = String("fac_frobenius").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_frobenius);
           comm_world.print(msg);
 
-          msg = String("fac_cof").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_cof);
+          msg = String("fac_cof").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_cof);
           comm_world.print(msg);
 
-          msg = String("fac_det").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_det);
+          msg = String("fac_det").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_det);
           comm_world.print(msg);
 
-          msg = String("fac_rec_det").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_rec_det);
+          msg = String("fac_rec_det").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_rec_det);
           comm_world.print(msg);
 
-          msg = String("fac_reg").pad_back(width, '.') + String(": ") + stringify_fp_sci(_fac_reg);
+          msg = String("fac_reg").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_reg);
           comm_world.print(msg);
 
         }

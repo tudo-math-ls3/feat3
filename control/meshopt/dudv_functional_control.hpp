@@ -203,43 +203,43 @@ namespace FEAT
           /// \copydoc BaseClass::print()
           virtual void print() const override
           {
-            int width(30);
+            Index pad_width(30);
             Dist::Comm comm_world(Dist::Comm::world());
 
             String msg;
 
-            msg = name().pad_back(width, '.') + String(":");
+            msg = name().pad_back(pad_width, '.') + String(":");
             comm_world.print(msg);
 
-            msg = String("level max/min").pad_back(width, '.') + String(": ")
+            msg = String("level max/min").pad_back(pad_width, '.') + String(": ")
               + stringify(_assembler_levels.back()->domain_level.get_level_index()) + String(" / ")
-              + stringify(_assembler_levels.back()->domain_level.get_level_index());
+              + stringify(_assembler_levels.front()->domain_level.get_level_index());
             comm_world.print(msg);
 
-            msg = String("Fixed reference domain").pad_back(width, '.') + String(": ")
+            msg = String("Fixed reference domain").pad_back(pad_width, '.') + String(": ")
               + stringify(fixed_reference_domain);
             comm_world.print(msg);
 
             for(const auto& it : get_dirichlet_boundaries())
             {
-              msg = String("Displacement BC on").pad_back(width, '.') + String(": ") + it;
+              msg = String("Displacement BC on").pad_back(pad_width, '.') + String(": ") + it;
               comm_world.print(msg);
             }
 
             for(const auto& it : get_slip_boundaries())
             {
-              msg = String("Unilateral BC of place on").pad_back(width, '.') + String(": ") + it;
+              msg = String("Unilateral BC of place on").pad_back(pad_width, '.') + String(": ") + it;
               comm_world.print(msg);
             }
 
-            msg = String("DoF").pad_back(width, '.') + String(": ")
+            msg = String("DoF").pad_back(pad_width, '.') + String(": ")
               + stringify(_system_levels.back()->op_sys.columns());
             comm_world.print(msg);
 
             FEAT::Statistics::expression_target = name();
             try
             {
-              msg = String("Solver") .pad_back(width, '.') + String(": ")
+              msg = String("Solver") .pad_back(pad_width, '.') + String(": ")
                 + FEAT::Statistics::get_formatted_solver_tree().trim();
               comm_world.print(msg);
             }

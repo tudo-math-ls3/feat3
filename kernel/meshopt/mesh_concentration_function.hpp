@@ -1343,7 +1343,7 @@ namespace FEAT
         /// \copydoc BaseClass::print()
         virtual void print() const override
         {
-          int width(30);
+          Index width(30);
           Dist::Comm comm_world(Dist::Comm::world());
 
           String msg;
@@ -1539,7 +1539,7 @@ namespace FEAT
          */
         virtual void print() const
         {
-          int width(30);
+          Index pad_width(30);
           Dist::Comm comm_world(Dist::Comm::world());
 
           String msg;
@@ -1547,10 +1547,10 @@ namespace FEAT
           msg = name()+String(":");
           comm_world.print(msg);
 
-          msg = String("Function").pad_back(width, '.') + String(": c(d) = |d|");
+          msg = String("Function").pad_back(pad_width, '.') + String(": c(d) = |d|");
           comm_world.print(msg);
 
-          msg = String("use_derivative").pad_back(width, '.') + String(": ") += stringify(use_derivative);
+          msg = String("use_derivative").pad_back(pad_width, '.') + String(": ") += stringify(use_derivative);
           comm_world.print(msg);
         }
 
@@ -1657,23 +1657,23 @@ namespace FEAT
          */
         virtual void print() const
         {
-          int width(30);
+          Index pad_width(30);
           Dist::Comm comm_world(Dist::Comm::world());
 
           String msg(name()+":");
-          msg.pad_back(width, '.') += String(": ");
+          msg.pad_back(pad_width, '.') += String(": ");
           comm_world.print(msg);
 
-          msg = String("Function").pad_back(width, '.') + String(": c(d) = (alpha + |d|^beta)");
+          msg = String("Function").pad_back(pad_width, '.') + String(": c(d) = (alpha + |d|^beta)");
           comm_world.print(msg);
 
-          msg = String("alpha").pad_back(width, '.') + String(": ") + stringify_fp_sci(_minval);
+          msg = String("alpha").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_minval);
           comm_world.print(msg);
 
-          msg = String("beta").pad_back(width, '.') + String(": ") + stringify_fp_sci(_exponent);
+          msg = String("beta").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_exponent);
           comm_world.print(msg);
 
-          msg = String("use_derivative").pad_back(width, '.') + String(": ") + stringify(use_derivative);
+          msg = String("use_derivative").pad_back(pad_width, '.') + String(": ") + stringify(use_derivative);
           comm_world.print(msg);
         }
 
