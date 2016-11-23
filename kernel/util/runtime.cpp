@@ -35,12 +35,6 @@ PropertyMap * Runtime::global_property()
 
 void Runtime::initialise(int& argc, char**& argv)
 {
-  int rank(0), nprocs(0);
-  initialise(argc, argv, rank, nprocs);
-}
-
-void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
-{
   // Note:
   // On Windows, these two function calls MUST come before anything else,
   // otherwise one the following calls may cause the automated regression
@@ -63,22 +57,13 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
     Runtime::abort();
   }
 
-  // reset rank and nprocs
-  rank = 0;
-  nprocs = 0;
-
 #ifdef FEAT_HAVE_MPI
   // initialise MPI
   if(::MPI_Init(&argc, &argv) != MPI_SUCCESS)
     abort();
-  // fetch rank and world size
-  ::MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  ::MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 #else
   (void)argc;
   (void)argv;
-  rank = 0;
-  nprocs = 1;
 #endif
 
   // read in initial settings from provided ini file via system environment variable FEAT_INI_FILE

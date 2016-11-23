@@ -37,20 +37,6 @@ namespace FEAT
      *
      * \param[in] argc, argv
      * The argument parameters of the calling \p main function.
-     *
-     * \param[out] rank
-     * The MPI rank of this process. Is always 0 for serial builds.
-     *
-     * \param[out] nprocs
-     * The total number of MPI processes. Is always 1 for serial builds.
-     */
-    static void initialise(int& argc, char**& argv, int& rank, int& nprocs);
-
-    /**
-     * \brief FEAT initialisation
-     *
-     * This function calls the four-argument initialise function and discards the
-     * \p rank and \p nprocs values.
      */
     static void initialise(int& argc, char**& argv);
 
