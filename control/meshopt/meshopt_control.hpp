@@ -447,8 +447,6 @@ namespace FEAT
                 slip_asm.emplace(identifier, new_asm);
               }
 
-              trafo.compute_vol();
-
             }
 
           /// Explicitly delete default constructor
@@ -504,6 +502,9 @@ namespace FEAT
                 // Get the filter vector
                 auto& slip_filter_vector = it.second.get_filter_vector();
 
+                //sys_level.gate_sys._comm->allprint("sv size "+stringify(slip_filter_vector.size()));
+                //sys_level.gate_sys._comm->allprint("sv used elements "+stringify(slip_filter_vector.used_elements()));
+                //sys_level.gate_sys._comm->allprint("sv_elements "+stringify(slip_filter_vector.template elements<LAFEM::Perspective::native>()));
                 if(slip_filter_vector.used_elements() > 0)
                 {
                   // Temporary DenseVector for syncing
@@ -526,6 +527,12 @@ namespace FEAT
                     Index idense(slip_filter_vector.indices()[isparse]);
                     sfv_elements[isparse] = tmp_elements[idense];
                   }
+                }
+                else
+                {
+                  // Temporary DenseVector for syncing
+                  typename SystemLevel_::LocalSystemVectorL tmp(slip_filter_vector.size());
+                  sys_level.gate_sys.sync_0(tmp);
                 }
               }
 
@@ -600,6 +607,12 @@ namespace FEAT
                     Index idense(slip_filter_vector.indices()[isparse]);
                     sfv_elements[isparse] = tmp_elements[idense];
                   }
+                }
+                else
+                {
+                  // Temporary DenseVector for syncing
+                  typename SystemLevel_::LocalSystemVectorL tmp;
+                  sys_level.gate_sys.sync_0(tmp);
                 }
               }
 

@@ -270,6 +270,13 @@ namespace FEAT
 
                 }
               }
+
+              else
+              {
+                // Temporary DenseVector for syncing
+                LocalVectorTypeR tmp(slip_filter_vector.size(), DataType(0));
+                _col_gate->sync_0(tmp);
+              }
             }
           } // col_gate
         } // prepare()
