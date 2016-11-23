@@ -308,19 +308,19 @@ namespace FEAT
 
       template<typename Tx_, typename Ix_, typename Tv_>
       void gather(
-                       LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-                       const LAFEM::TupleVector<Tv_>& vector,
-                       const Index buffer_offset = Index(0)) const
+        LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+        const LAFEM::TupleVector<Tv_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
         _first.gather(buffer, vector.first(), buffer_offset);
       }
 
       template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_axpy(
-                             LAFEM::TupleVector<Tv_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                             const Tx_ alpha = Tx_(1),
-                             const Index buffer_offset = Index(0)) const
+        LAFEM::TupleVector<Tv_>& vector,
+        const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+        const Tx_ alpha = Tx_(1),
+        const Index buffer_offset = Index(0)) const
       {
         _first.scatter_axpy(vector.first(), buffer, alpha, buffer_offset);
       }
