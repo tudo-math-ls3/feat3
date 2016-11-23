@@ -1031,16 +1031,12 @@ namespace FEAT
 
           if(add_penalty_fval && (this->_penalty_param > DataType(0)) )
           {
-            XASSERT(this->_mesh_conc != nullptr);
-            fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
-          }
-
-          if(this->_penalty_param > DataType(0))
-          {
             XASSERTM(this->_mesh_conc != nullptr,
             "You need a mesh concentration function for imposing a mesh alignment constraint!");
+            fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
             this->_mesh_conc->add_constraint_grad(grad, this->_alignment_constraint, this->_penalty_param);
           }
+
         }
 
         /**
