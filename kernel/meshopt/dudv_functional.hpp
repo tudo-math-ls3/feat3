@@ -135,11 +135,14 @@ namespace FEAT
          * \param[in] rmn_
          * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
          *
-         * \param[in] dirichlet_list_
-         * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
+         * \param[in] trafo_space_
+         * The FE space the transformation lives in.
          *
-         * \param[in] slip_list_
-         * List of boundary identifiers for enforcing slip boundary conditions, can be empty
+         * \param[in] dirichlet_asm_
+         * The set of unit filter assemblers.
+         *
+         * \param[in] slip_asm_
+         * The set of slip filter assemblers.
          *
          */
         explicit DuDvFunctional(
@@ -158,6 +161,11 @@ namespace FEAT
           {
           }
 
+        /**
+         * \brief Empty standard constructor
+         *
+         * This is needed to use this class in a Global::Matrix
+         */
         explicit DuDvFunctional() :
           BaseClass(),
           sys_matrix(),
@@ -170,23 +178,23 @@ namespace FEAT
           {
           }
 
-        explicit DuDvFunctional(DuDvFunctional&& other) :
-          sys_matrix(std::move(other.sys_matrix)),
-          _trafo(other._trafo),
-          _trafo_space(other._trafo_space),
-          _lambda(std::move(other._lambda)),
-          _dirichlet_asm(other._dirichlet_asm),
-          _slip_asm(other._slip_asm),
-          _cubature_factory(other._cubature_factory)
-          {
-            if(this != &other)
-            {
-              other._trafo = nullptr;
-              other._trafo_space = nullptr;
-              other._dirichlet_asm = nullptr;
-              other._slip_asm = nullptr;
-            }
-          }
+        //explicit DuDvFunctional(DuDvFunctional&& other) :
+        //  sys_matrix(std::move(other.sys_matrix)),
+        //  _trafo(other._trafo),
+        //  _trafo_space(other._trafo_space),
+        //  _lambda(std::move(other._lambda)),
+        //  _dirichlet_asm(other._dirichlet_asm),
+        //  _slip_asm(other._slip_asm),
+        //  _cubature_factory(other._cubature_factory)
+        //  {
+        //    if(this != &other)
+        //    {
+        //      other._trafo = nullptr;
+        //      other._trafo_space = nullptr;
+        //      other._dirichlet_asm = nullptr;
+        //      other._slip_asm = nullptr;
+        //    }
+        //  }
 
         /// Explicitly delete copy constructor
         DuDvFunctional(const DuDvFunctional&) = delete;
@@ -217,12 +225,15 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::name()
-        virtual String name() const override
+        static String name()
         {
           return "DuDvFunctional<"+MeshType::name()+">";
         }
 
 
+        /**
+         * \brief Assembles the system matrix
+         */
         virtual void assemble_system_matrix()
         {
           XASSERT(_trafo_space != nullptr);
@@ -242,10 +253,15 @@ namespace FEAT
         /**
          * \brief Prepares the functional for evaluation.
          *
-         * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
+         * \param[in, out] vec_state
+         * The state vector. This is not const because it might be filtered using a slip filter.
          *
-         **/
-        // \todo override
+         * \param[in, out] filter
+         * The filter. This is not const because the slip filter might need to be reassembled.
+         *
+         * Needs to be called whenever any data like the mesh etc. changed.
+         *
+         */
         virtual void prepare(VectorTypeR& vec_state, FilterType& filter)
         {
           XASSERT(_dirichlet_asm != nullptr);
@@ -284,6 +300,71 @@ namespace FEAT
 
         }
 
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes
+         *
+         * \param[out] lambda_min
+         * Minimum of the optimal cell size lambda over all cells
+         *
+         * \param[out] lambda_max
+         * Maximum of the optimal cell size lambda over all cells
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
+         * exactly lambda(cell). This is especially the goal for r-adaptivity.
+         * So in an optimal mesh,
+         * \f[
+         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
+         * \f]
+         * so we compute the 1-norm of the vector
+         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \f$.
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
+         * \note As these quantities are global, this function has a pre_sync and post_sync part.
+         *
+         * \see Control::DuDvFunctionalControl::compute_cell_size_defect()
+         *
+         */
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
+        {
+
+          compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+          return compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
+
+        }
+
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
+         * \note As these quantities are global, this function has a pre_sync and post_sync part.
+         *
+         * \see Control::DuDvFunctionalControl::compute_cell_size_defect()
+         *
+         */
         void compute_cell_size_defect_pre_sync(CoordType& vol_min, CoordType& vol_max, CoordType& vol) const
         {
           vol = CoordType(0);
@@ -300,6 +381,33 @@ namespace FEAT
           }
         }
 
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         *
+         * \param[out] lambda_min
+         * Minimum of the optimal cell size lambda over all cells
+         *
+         * \param[out] lambda_max
+         * Maximum of the optimal cell size lambda over all cells
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
+         * \note As these quantities are global, this function has a pre_sync and post_sync part.
+         *
+         * \see Control::DuDvFunctionalControl::compute_cell_size_defect()
+         *
+         */
         virtual CoordType compute_cell_size_defect_post_sync(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, const CoordType& vol) const
         {
           CoordType size_defect(0);
@@ -317,29 +425,6 @@ namespace FEAT
           vol_max/= vol;
 
           return size_defect;
-        }
-
-        /**
-         * \brief Computes a quality indicator concerning the cell sizes
-         *
-         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
-         * exactly lambda(cell). This is especially the goal for r-adaptivity.
-         * So in an optimal mesh,
-         * \f[
-         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
-         * \f]
-         * so we compute the 1-norm of the vector
-         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \f$.
-         *
-         * \returns The relative cell size quality indicator.
-         *
-         */
-        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
-        {
-
-          compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
-          return compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
-
         }
 
         /**
@@ -404,43 +489,17 @@ namespace FEAT
           sys_matrix.apply(r, x, r, alpha);
         }
 
-        /// \copydoc MatrixType::extract_diag()
+        /// \copydoc MatrixType::extract_diag(VectorTypeL&)
         void extract_diag(VectorTypeL& diag) const
         {
           sys_matrix.extract_diag(diag);
         }
 
-        /// \copydoc MatrixType::format()
+        /// \copydoc MatrixType::format(DataType)
         void format(DataType value = DataType(0))
         {
           sys_matrix.format(value);
         }
-
-        //virtual void prepare(VectorTypeR& vec_state)
-        //{
-        //  if(_filter != nullptr)
-        //    _dirichlet_asm.assemble(_filter->template at<1>(), _trafo_space, vec_state);
-
-        //  // Adapt all slip boundaries
-        //  //for(auto& it : _slip_list)
-        //  //  this->_mesh_node->adapt_by_name(it);
-
-        //  // Assemble homogeneous slip boundary conditions, as the outer normal could have changed
-        //  //_slip_asm.assemble(_filter.template at<0>(), _trafo_space);
-
-        //  //sys_matrix.format();
-
-        //  //Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
-
-        //  //Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-        //  //  sys_matrix,           // the matrix that receives the assembled operator
-        //  //  my_operator, // the operator that is to be assembled
-        //  //  _trafo_space,            // the finite element space in use
-        //  //  _cubature_factory  // the cubature factory to be used for integration
-        //  //  );
-
-        //  return;
-        //}
 
     }; // class DuDvFunctional
 

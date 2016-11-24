@@ -30,9 +30,145 @@ namespace FEAT
     class ConcentrationFunctionPowOfDist;
     /// \endcond
 
+    /**
+     * \brief Wrapper class for functionality around aligning meshes to (implicit) surfaces
+     *
+     * \tparam DT_
+     * The floating point type.
+     *
+     * \tparam ShapeType_
+     * The mesh's shape type.
+     *
+     * The alignment happens through using the distance function of the (implicit) surfaces and determining if it
+     * changes sign along an edge. If so, a penalty term is added to the functional value.
+     *
+     * \cite BW13
+     *
+     * \author Jordi Paul
+     */
     template<typename DT_, typename ShapeType_>
+#ifndef DOXYGEN
     struct AlignmentPenalty;
+#else
+    // Note: The following block is only visible for Doxygen. The implementation has to be provided by specialisations
+    // in ShapeType_
+    struct AlignmentPenalty
+    {
+      /// The floating point type
+      typedef DT_ DataType;
+      /// The mesh's shape type
+      typedef Shape::Simplex<shape_dim> ShapeType;
 
+      /**
+       * \brief Computes the constraint (violation) for a given mesh
+       *
+       * \tparam Mesh_
+       * The mesh type.
+       *
+       * \tparam Dist_
+       * Type for the distance vector.
+       *
+       * \tparam EdgeFreqs
+       * Type for the edge frequencies vector.
+       *
+       * \param[in] mesh
+       * The mesh we want to compute the constraint violation for.
+       *
+       * \param[in] dist
+       * Vector containing the distance to the implicit surface(s) for every mesh vertex.
+       *
+       * \param[in] edge_freqs
+       * For every edge in the mesh, this contains on how many patches it is present.
+       *
+       * \returns The constraint violation
+       *
+       */
+      template<typename Mesh_, typename Dist_, typename EdgeFreqs_>
+      static DataType compute_constraint(const Mesh_& DOXY(mesh), const Dist_& DOXY(dist),
+      const EdgeFreqs_& DOXY(edge_freqs))
+      {
+      }
+
+      /**
+       * \brief Computes the constraint (violation) on every cell of a given mesh
+       *
+       * This is mainly for visualisation and debugging purposes, as it computes the contribution of every cell to the
+       * global constraint violation.
+       *
+       * \tparam Mesh_
+       * The mesh type.
+       *
+       * \tparam Dist_
+       * Type for the distance vector.
+       *
+       * \param[out] constraint_vec
+       * Cell vector that will receive the local constraint violation.
+       *
+       * \param[in] mesh
+       * The mesh we want to compute the constraint violation for.
+       *
+       * \param[in] dist
+       * Vector containing the distance to the implicit surface(s) for every mesh vertex.
+       *
+       * \returns The constraint violation
+       */
+      template<typename Mesh_, typename Dist_>
+      static DataType compute_constraint(DataType* constraint_vec, const Mesh_& mesh, const Dist_& dist)
+      {
+      }
+
+      /**
+       * \brief Adds the gradient of the constraint violation term
+       *
+       * \tparam Vector
+       * Type for the gradient vector.
+       *
+       * \tparam Mesh_
+       * The mesh type.
+       *
+       * \tparam Dist_
+       * Type for the distance vector.
+       *
+       * \tparam GradDist_
+       * Type for the vector holding the gradient of the distance function.
+       *
+       * \tparam EdgeFreqs
+       * Type for the edge frequencies vector.
+       *
+       * \param[in, out] grad
+       * The (patch)-global gradient vector to add to.
+       *
+       * \param[in] alignment_fval
+       * The total constraint violation.
+       *
+       * \param[in] fac
+       * Additional factor to multiply the local contributions by.
+       *
+       * \param[in] mesh
+       * The mesh we want to compute the constraint violation for.
+       *
+       * \param[in] dist
+       * Vector containing the distance to the implicit surface(s) for every mesh vertex.
+       *
+       * \param[in] grad_dist
+       * Vector containing the gradient of the distance function of the implicit surface(s) for every mesh vertex.
+       *
+       * \param[in] edge_freqs
+       * For every edge in the mesh, this contains on how many patches it is present.
+       *
+       */
+      template<typename Vector_, typename Mesh_, typename Dist_, typename GradDist_, typename EdgeFreqs_>
+      static void add_constraint_grad(
+        Vector_& DOXY(grad), const DataType DOXY(alignment_fval), const DataType DOXY(fac),
+        const Mesh_& DOXY(mesh), const Dist_& DOXY(dist), const GradDist_& DOXY(grad_dist),
+        const EdgeFreqs_& DOXY(edge_freqs))
+      {
+      }
+
+    };
+#endif
+
+    /// \cond internal
     template<typename DT_, int shape_dim>
     struct AlignmentPenalty<DT_, Shape::Simplex<shape_dim>>
     {
@@ -444,7 +580,7 @@ namespace FEAT
         }
       }
     };
-
+    /// \endcond
 
     /**
      * \brief Base class for mesh concentration functions
@@ -539,8 +675,8 @@ namespace FEAT
         /**
          * \brief Computes the local gradient of the optimal scales
          *
-         * \param[in] coords
-         * The current mesh vertex coordinates.
+         * \param[out] sum_det
+         * The sum of all optimal reference cell's volumes, which is different from the domain's volume in general.
          *
          * The optimal scales \f$ h \f$ depend on the concentration \f$ c \f$ by the relation
          * \f[
@@ -622,7 +758,8 @@ namespace FEAT
         /**
          * \brief Computes the surface alignment constraint
          *
-         * \returns The surface alignment constraint
+         * \returns The sum of all surface alignment constraints.
+         *
          */
         virtual CoordType compute_constraint() const = 0;
 
@@ -633,6 +770,8 @@ namespace FEAT
          * The vector of constraints at every vertex.
          *
          * The is for post processing and debugging purposes.
+         *
+         * \returns The sum of all surface alignment constraints.
          *
          */
         virtual CoordType compute_constraint(CoordType* DOXY(constraint_at_vtx)) const = 0;
@@ -670,6 +809,11 @@ namespace FEAT
          */
         virtual void add_sync_vecs(std::set<VectorType*>& DOXY(sync_vecs)) = 0;
 
+        /**
+         * \brief Returns the sum of the mesh concentration over all cells
+         *
+         * \returns _sum_conc
+         */
         virtual CoordType& get_sum_conc() = 0;
 
     };
@@ -700,6 +844,9 @@ namespace FEAT
     class MeshConcentrationFunction : public MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>
     {
       public:
+        /// Our base class
+        typedef MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_> BaseClass;
+
         /// The scalar function that computes the concentration from something
         typedef ElementalFunction_ ElementalFunction;
         /// Type for the transformation
@@ -838,6 +985,7 @@ namespace FEAT
           return _grad_h;
         }
 
+        /// \copydoc BaseClass::get_sum_conc()
         virtual CoordType& get_sum_conc() override
         {
           return _sum_conc;
@@ -923,13 +1071,18 @@ namespace FEAT
           }
         }
 
-        /// \copydoc BaseClass:compute_grad_sum_det()
+        /**
+         * \brief Computes the gradient of the sum of all determinants of the trafo
+         *
+         * \param[in] coords
+         * Set of coordinates to compute the gradient for
+         *
+         */
         virtual void compute_grad_sum_det(const VectorType& coords) override
         {
           if(_func.use_derivative)
           {
             RefCellTrafo_::compute_grad_sum_det(_grad_sum_det, coords, *(_mesh_node->get_mesh()));
-            //comm.print(stringify(_grad_sum_det),0);
           }
         }
 
@@ -1094,23 +1247,32 @@ namespace FEAT
             return PenaltyFunction::compute_constraint(*(_mesh_node->get_mesh()), this->_dist, this->_edge_freqs);
         }
 
-        /// \copydoc BaseClass::compute_constraint()
-        virtual CoordType compute_constraint(CoordType* constraint_vec) const override
+        /**
+         * \brief Computes the surface alignment constraint at every vertex
+         *
+         * \param[out] constraint_at_vtx
+         * The vector of constraints at every vertex.
+         *
+         * The is for post processing and debugging purposes.
+         *
+         * \returns The sum of all surface alignment constraints.
+         *
+         */
+        virtual CoordType compute_constraint(CoordType* constraint_at_vtx) const override
         {
-          XASSERT(constraint_vec != nullptr);
-          return PenaltyFunction::compute_constraint(constraint_vec, *(_mesh_node->get_mesh()), this->_dist);
+          XASSERT(constraint_at_vtx != nullptr);
+          return PenaltyFunction::compute_constraint(constraint_at_vtx, *(_mesh_node->get_mesh()), this->_dist);
         }
 
         /// \copydoc BaseClass::add_constraint_grad()
         virtual void add_constraint_grad(
-          VectorType& grad, const CoordType alignment_fval, const CoordType penalty_param) const override
+          VectorType& grad, const CoordType constraint, const CoordType fac) const override
         {
           PenaltyFunction::add_constraint_grad(
-            grad, alignment_fval, penalty_param, *(_mesh_node->get_mesh()), _dist, _grad_dist, this->_edge_freqs);
+            grad, constraint, fac, *(_mesh_node->get_mesh()), _dist, _grad_dist, this->_edge_freqs);
         }
 
     }; // class MeshConcentrationFunction
-
 
     /**
      * \brief Class to compute a desired concentration for the mesh cell distribution base on distance to Charts
@@ -1185,6 +1347,9 @@ namespace FEAT
          *
          * \param[in] chart_list_
          * The list of charts to compute the distance from.
+         *
+         * \param[in] operation_
+         * How to handle the distances multiple charts (sum, min, max etc.)
          *
          */
         ChartDistanceFunction(const ElementalFunction& func_, const std::deque<String>& chart_list_, const String& operation_):
@@ -1335,6 +1500,11 @@ namespace FEAT
           }
         }
 
+        /**
+         * \brief Returns the class name as String
+         *
+         * \returns The class name as String.
+         */
         static String name()
         {
           return "ChartDistanceFunction<"+ElementalFunction::name()+">";

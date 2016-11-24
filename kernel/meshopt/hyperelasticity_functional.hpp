@@ -407,6 +407,9 @@ namespace FEAT
          * The mesh concentration function to use. If no scale computation that uses this is set, this may be
          * nullptr.
          *
+         * \param[in] penalty_param_
+         * The penalty parameter, e.g. for surface alignment. Defaults to 0, which turns off this functionality.
+         *
          */
         explicit HyperelasticityFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
@@ -523,8 +526,12 @@ namespace FEAT
           return _rows;
         }
 
-        /// \copydoc BaseClass::name()
-        virtual String name() const override
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
         {
           return "HyperelasticityFunctional<"+MeshType::name()+">";
         }
@@ -549,7 +556,17 @@ namespace FEAT
 
         }
 
-        /// \copydoc BaseClass::add_to_vtk_exporter()
+        /**
+         * \brief Adds relevant quantities of this object to a VTK exporter
+         *
+         * \param[in, out] exporter
+         * The exporter to add our data to.
+         *
+         * \note This does not compute and/or add the functional's gradient to the exporter because this requires
+         * filtering and synchronisation if there is more than one patch. Compute the gradient at a point where
+         * you know these things (e.g. in the application itself, or in Control::Meshopt::HyperelasticityControl).
+         *
+         */
         virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename Trafo_::MeshType>& exporter) const
         {
           exporter.add_cell_scalar("h", this->_h.elements());
@@ -638,7 +655,7 @@ namespace FEAT
         /**
          * \brief Performs initialisations that cannot be done in the constructor, pre synchronisation phase
          *
-         * \seealso init()
+         * \see init()
          */
         virtual void init_pre_sync()
         {
@@ -665,7 +682,7 @@ namespace FEAT
         /**
          * \brief Performs initialisations that cannot be done in the constructor, post synchronisation phase
          *
-         * \seealso init()
+         * \see init()
          */
         virtual void init_post_sync()
         {
@@ -851,7 +868,8 @@ namespace FEAT
          * \see Control::HyperelasticityFunctionalControl::compute_cell_size_defect()
          *
          */
-        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min,
+        CoordType& vol_max, CoordType& vol) const override
         {
 
           compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
@@ -861,12 +879,6 @@ namespace FEAT
 
         /**
          * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
-         *
-         * \param[out] lambda_min
-         * Minimum of the optimal cell size lambda over all cells
-         *
-         * \param[out] lambda_max
-         * Maximum of the optimal cell size lambda over all cells
          *
          * \param[out] vol_min
          * Minimum cell volume
@@ -929,7 +941,8 @@ namespace FEAT
          * \see Control::HyperelasticityFunctionalControl::compute_cell_size_defect()
          *
          */
-        virtual CoordType compute_cell_size_defect_post_sync(CoordType& lambda_min, CoordType& lambda_max, CoordType& vol_min, CoordType& vol_max, const CoordType& vol) const
+        virtual CoordType compute_cell_size_defect_post_sync(CoordType& lambda_min, CoordType& lambda_max,
+        CoordType& vol_min, CoordType& vol_max, const CoordType& vol) const
         {
           CoordType size_defect(0);
           lambda_min = Math::huge<CoordType>();
@@ -937,7 +950,9 @@ namespace FEAT
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            size_defect += Math::abs(this->_trafo.template
+                compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+
             lambda_min = Math::min(lambda_min, this->_lambda(cell));
             lambda_max = Math::max(lambda_max, this->_lambda(cell));
           }
@@ -1034,7 +1049,11 @@ namespace FEAT
           {
             XASSERTM(this->_mesh_conc != nullptr,
             "You need a mesh concentration function for imposing a mesh alignment constraint!");
+
+            // Add the quadratic penalty term to the functional value
             fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
+
+            // Add the gradient of the penalty term
             this->_mesh_conc->add_constraint_grad(grad, this->_alignment_constraint, this->_penalty_param);
           }
 
@@ -1042,6 +1061,9 @@ namespace FEAT
 
         /**
          * \brief Computes the functional value parts on every cell
+         *
+         * \param[in] fval
+         * The functional value summed up over all cells.
          *
          * \param[in] fval_norm
          * Array to receive the Frobenius norm part of the functional value on every cell.
@@ -1052,8 +1074,6 @@ namespace FEAT
          * \param[in] fval_det
          * Array to receive the det part of the functional value on every cell.
          *
-         * \returns
-         * The functional value, summed up over all parts and cells.
          */
         virtual void eval_fval_cellwise(CoordType& fval, CoordType* fval_norm, CoordType* fval_cof,
         CoordType* fval_det) const

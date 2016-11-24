@@ -9,6 +9,15 @@
 /// \cond internal
 namespace FEAT
 {
+  /**
+   * \brief Namespace for everything mesh optimiser related
+   *
+   * Mesh optimisers in general need parts of Geometry (i.e. meshes), Trafo, Space (because FE knowledge is
+   * required), Assembly to assemble systems of equations, and LAFEM to solve these equations.
+   *
+   * If possible, access them through their respective control classes.
+   *
+   */
   namespace Meshopt
   {
     namespace Intern

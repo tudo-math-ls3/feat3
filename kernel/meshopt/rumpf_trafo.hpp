@@ -67,7 +67,7 @@ namespace FEAT
        * \returns
        * The transformation's determinant
        *
-       **/
+       */
       static DataType compute_det(Tx& x);
       /**
        * \brief Computes the sum of the local transformation's determinants
@@ -82,7 +82,7 @@ namespace FEAT
        *
        * \returns The sum of all local transformation's determinants
        *
-       **/
+       */
       static DataType_ compute_sum_det(const VectorType& coords_, const MeshType& mesh_);
 
       /**
@@ -102,7 +102,7 @@ namespace FEAT
        * The sum of the volumes of all optimally scaled reference cells
        *
        */
-      static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det);
+      static void compute_h(ScalarVectorType& h_, const ScalarVectorType& lambda_, const DataType& sum_det_);
 
       /**
        * \brief Computes the transformation's determinant's gradient on a cell

@@ -11,15 +11,6 @@
 
 namespace FEAT
 {
-  /**
-   * \brief Namespace for everything mesh optimiser related
-   *
-   * Mesh optimisers in general need parts of Geometry (i.e. meshes), Trafo, Space (because FE knowledge is
-   * required), Assembly to assemble systems of equations, and LAFEM to solve these equations.
-   *
-   * If possible, access them through their respective control classes.
-   *
-   */
   namespace Meshopt
   {
 
@@ -82,6 +73,13 @@ namespace FEAT
             mesh_to_buffer();
           }
 
+        /**
+         * \brief Empty standard constructor
+         *
+         * This is needed because derived classes like DuDvFunctional are used in Global::Matrix, which needs an
+         * empty standard constructor.
+         *
+         */
         explicit MeshQualityFunctional():
           _mesh_node(nullptr),
           _coords_buffer(),
@@ -104,7 +102,7 @@ namespace FEAT
          *
          * \returns String with the class name
          */
-        virtual String name() const
+        static String name()
         {
           return "MeshQualityFunctional<"+MeshType_::name()+">";
         }
@@ -209,10 +207,37 @@ namespace FEAT
         /**
          * \brief Computes a quality indicator concerning the cell sizes
          *
+         * \param[out] lambda_min
+         * Minimum of the optimal cell size lambda over all cells
+         *
+         * \param[out] lambda_max
+         * Maximum of the optimal cell size lambda over all cells
+         *
+         * \param[out] vol_min
+         * Minimum cell volume
+         *
+         * \param[out] vol_max
+         * Maximum cell volume
+         *
+         * \param[out] vol
+         * Total volume of the domain given by the mesh
+         *
+         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
+         * exactly lambda(cell). This is especially the goal for r-adaptivity.
+         * So in an optimal mesh,
+         * \f[
+         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
+         * \f]
+         * so we compute the 1-norm of the vector
+         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \f$.
+         *
          * \returns The relative cell size quality indicator.
+         *
+         * \note lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.
+         *
          */
-        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
-        CoordType& vol_min, CoordType& vol_max, CoordType& vol) const = 0;
+        virtual CoordType compute_cell_size_defect(CoordType& DOXY(lambda_min), CoordType& DOXY(lambda_max),
+        CoordType& DOXY(vol_min), CoordType& DOXY(vol_max), CoordType& DOXY(vol)) const = 0;
 
     }; // class MeshQualityFunctional
 
