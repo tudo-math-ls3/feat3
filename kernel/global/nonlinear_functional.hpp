@@ -183,7 +183,7 @@ namespace FEAT
             auto it = _nonlinear_functional.sync_scalars.begin();
             if(_col_gate != nullptr)
             {
-              *(*it) = _col_gate->sum(*(*it));
+              *((*it).second) = _col_gate->sum(*((*it).second));
             }
             _nonlinear_functional.sync_scalars.erase(it);
           }
@@ -220,7 +220,7 @@ namespace FEAT
             auto it = _nonlinear_functional.sync_scalars.begin();
             if(_col_gate != nullptr)
             {
-              *(*it) = _col_gate->sum(*(*it));
+              *((*it).second) = _col_gate->sum(*((*it).second));
             }
             _nonlinear_functional.sync_scalars.erase(it);
           }

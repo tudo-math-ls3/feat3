@@ -287,7 +287,7 @@ namespace FEAT
         /// The mesh concentration function (if any)
         std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
         /// These are the scalars that need to be synchronised in init() or prepare()
-        std::set<DataType*> sync_scalars;
+        std::map<String, DataType*> sync_scalars;
         /// These are the vectors that need to be synchronised (type-0 to type-1)
         std::set<VectorTypeR*> sync_vecs;
 
@@ -359,7 +359,7 @@ namespace FEAT
           _mesh_conc(nullptr),
           sync_scalars(),
           sync_vecs(),
-          _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
+          _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension), DataType(1)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
@@ -376,7 +376,7 @@ namespace FEAT
 
             _sum_mu = CoordType(rmn_->get_mesh()->get_num_entities(ShapeType::dimension));
 
-            sync_scalars.insert(&_sum_mu);
+            sync_scalars.emplace("_sum_mu",&_sum_mu);
 
             // Compute desired element size distribution
             _compute_scales_once();
@@ -426,7 +426,7 @@ namespace FEAT
           _mesh_conc(nullptr),
           sync_scalars(),
           sync_vecs(),
-          _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
+          _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension), DataType(1)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
@@ -444,7 +444,7 @@ namespace FEAT
 
             _sum_mu = CoordType(rmn_->get_mesh()->get_num_entities(ShapeType::dimension));
 
-            sync_scalars.insert(&_sum_mu);
+            sync_scalars.emplace("_sum_mu",&_sum_mu);
 
             if(
               ( _scale_computation == ScaleComputation::once_concentration ||
@@ -605,7 +605,8 @@ namespace FEAT
         void set_penalty_param(const DataType penalty_param_)
         {
           XASSERTM(penalty_param_ >= DataType(0),"Penalty parameter must be >= 0!");
-          XASSERTM(penalty_param_ <= Math::pow(Math::huge<DataType>(), DataType(0.25)), "Excessively large penalty parameter.");
+          XASSERTM(penalty_param_ <= Math::pow(Math::huge<DataType>(), DataType(0.25)),
+          "Excessively large penalty parameter.");
 
           _penalty_param = penalty_param_;
         }
@@ -781,7 +782,7 @@ namespace FEAT
           if(_penalty_param > DataType(0))
           {
             _alignment_constraint = this->_mesh_conc->compute_constraint();
-            this->sync_scalars.insert(&_alignment_constraint);
+            this->sync_scalars.emplace("_alignment_constraint",&_alignment_constraint);
           }
 
         }
@@ -1115,7 +1116,7 @@ namespace FEAT
             _sum_lambda += _lambda(cell);
           }
 
-          this->sync_scalars.insert(&_sum_lambda);
+          this->sync_scalars.emplace("_sum_lambda",&_sum_lambda);
 
         }
 
@@ -1125,14 +1126,14 @@ namespace FEAT
           _lambda.format(CoordType(1));
 
           _sum_lambda = CoordType(_lambda.size());
-          this->sync_scalars.insert(&_sum_lambda);
+          this->sync_scalars.emplace("_sum_lambda",&_sum_lambda);
         }
 
         /// \brief Computes _lambda according to the concentration function given by _mesh_conc
         virtual void _compute_lambda_conc()
         {
           _mesh_conc->compute_conc();
-          this->sync_scalars.insert(&(_mesh_conc->get_sum_conc()));
+          this->sync_scalars.emplace("_sum_conc",&(_mesh_conc->get_sum_conc()));
 
           _mesh_conc->compute_grad_conc();
 
@@ -1145,7 +1146,7 @@ namespace FEAT
           {
             _sum_lambda += _lambda(cell);
           }
-          this->sync_scalars.insert(&_sum_lambda);
+          this->sync_scalars.emplace("_sum_lambda",&_sum_lambda);
 
         }
 
@@ -1176,7 +1177,7 @@ namespace FEAT
           }
 
           _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
-          this->sync_scalars.insert(&_sum_det);
+          this->sync_scalars.emplace("_sum_det",&_sum_det);
 
         }
 
@@ -1197,7 +1198,7 @@ namespace FEAT
           }
 
           _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
-          this->sync_scalars.insert(&_sum_det);
+          this->sync_scalars.emplace("_sum_det",&_sum_det);
         }
 
         /**
@@ -1223,7 +1224,7 @@ namespace FEAT
           }
 
           _sum_det = RefCellTrafo_::compute_sum_det(this->_coords_buffer, *(this->get_mesh()));
-          this->sync_scalars.insert(&_sum_det);
+          this->sync_scalars.emplace("_sum_det",&_sum_det);
 
         }
 
