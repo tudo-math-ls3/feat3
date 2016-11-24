@@ -215,8 +215,11 @@ namespace FEAT
       _rank(0),
       _size(0)
     {
-      MPI_Comm_rank(comm, &_rank);
-      MPI_Comm_size(comm, &_size);
+      if(comm_ != MPI_COMM_NULL)
+      {
+        MPI_Comm_rank(comm, &_rank);
+        MPI_Comm_size(comm, &_size);
+      }
     }
 
     Comm::Comm(Comm&& other) :
@@ -270,6 +273,63 @@ namespace FEAT
     bool Comm::is_null() const
     {
       return (comm == MPI_COMM_NULL);
+    }
+
+    Comm Comm::comm_create_rangle_incl(int count, int first, int stride) const
+    {
+      XASSERT(count > 0);
+      XASSERT((first >= 0) && (first < _size));
+      XASSERT(stride > 0);
+
+      // get this comm's group
+      MPI_Group group = MPI_GROUP_NULL;
+      MPI_Comm_group(comm, &group);
+
+      // create sub-group
+      MPI_Group newgroup = MPI_GROUP_NULL;
+      int ranges[3] = {first, first + (count-1)*stride, stride};
+      MPI_Group_range_incl(group, 1, &ranges, &newgroup);
+
+      // create new comm from group
+      MPI_Comm newcomm = MPI_COMM_NULL;
+      MPI_Comm_create(comm, newgroup, &newcomm);
+
+      // free group handles
+      MPI_Group_free(&newgroup);
+      MPI_Group_free(&group);
+
+      return Comm(newcomm);
+    }
+
+    Comm Comm::comm_create_incl(int n, const int* ranks) const
+    {
+      XASSERT(n > 0);
+      XASSERT(ranks != nullptr);
+
+      // get this comm's group
+      MPI_Group group = MPI_GROUP_NULL;
+      MPI_Comm_group(comm, &group);
+
+      // create sub-group
+      MPI_Group newgroup = MPI_GROUP_NULL;
+      MPI_Group_incl(group, n, ranks, &newgroup);
+
+      // create new comm from group
+      MPI_Comm newcomm = MPI_COMM_NULL;
+      MPI_Comm_create(comm, newgroup, &newcomm);
+
+      // free group handles
+      MPI_Group_free(&newgroup);
+      MPI_Group_free(&group);
+
+      return Comm(newcomm);
+    }
+
+    Comm Comm::comm_split(int color, int key) const
+    {
+      MPI_Comm newcomm = MPI_COMM_NULL;
+      MPI_Comm_split(comm, color, key, &newcomm);
+      return Comm(newcomm);
     }
 
     void Comm::barrier() const
@@ -771,6 +831,21 @@ namespace FEAT
     bool Comm::is_world() const
     {
       return _size == 1;
+    }
+
+    Comm Comm::comm_create_rangle_incl(int, int, int) const
+    {
+      return Comm(1);
+    }
+
+    Comm Comm::comm_create_incl(int, const int*) const
+    {
+      return Comm(1);
+    }
+
+    Comm Comm::comm_split(int, int) const
+    {
+      return Comm(1);
     }
 
     void Comm::barrier() const

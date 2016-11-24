@@ -1434,6 +1434,80 @@ namespace FEAT
       }
 
       /**
+       * \name Comm Creation
+       */
+      ///@{
+
+      /**
+       * \brief Creates a new sub-communicator from a strided range of ranks.
+       *
+       * This function is a short-cut, which creates a process group by using
+       * \c MPI_Group_range_incl and then creates a corresponding new communicator
+       * via \c MPI_Comm_create.\n
+       * The ranks, which are contained in the new sub-communicator, are given
+       * by <em>first, first+stride, first+2*stride, ..., first+(count-1)*stride</em>.
+       *
+       * \see \cite MPI31, Section 6.3.2, page 233
+       * \see \cite MPI31, Section 6.4.2, page 240
+       *
+       * \param[in] count
+       * The number desired ranks in the sub-communicator. Must be > 0.
+       *
+       * \param[in] first
+       * The rank of the first process to be included in the sub-communicator.
+       *
+       * \param[in] stride
+       * The stride for the rank range. Must be >= 1.
+       *
+       * \returns
+       * A new sub-communicator for the range of processes. If this process is not
+       * part of the new sub-communicator, the returned comm is a null communicator.
+       */
+      Comm comm_create_rangle_incl(int count, int first = 0, int stride = 1) const;
+
+      /**
+       * \brief Creates a new sub-communicator for a given set of ranks.
+       *
+       * This function is a short-cut, which creates a process group by using
+       * \c MPI_Group_incl and then creates a corresponding new communicator
+       * via \c MPI_Comm_create.\n
+       *
+       * \see \cite MPI31, Section 6.3.2, page 232
+       * \see \cite MPI31, Section 6.4.2, page 240
+       *
+       * \param[in] n
+       * The number of desired ranks in the sub-communicator. Must be > 0.
+       *
+       * \param[in] ranks
+       * An array of unique ranks that should be part of the new sub-communicator.
+       *
+       * \returns
+       * A new sub-communicator for the set of processes. If this process is not
+       * part of the new sub-communicator, the returned comm is a null communicator.
+       */
+      Comm comm_create_incl(int n, const int* ranks) const;
+
+      /**
+       * \brief Creates a new sub-communicator by splitting this communicator.
+       *
+       * This functions splits this communicator into disjoint sub-communicators.
+       *
+       * \param[in] color
+       * The color of this process.
+       *
+       * \param[in] key
+       * The key for the ranking of the process.
+       *
+       * \see \cite MPI31, Section 6.4.2, page 244
+       *
+       * \returns
+       * A new communicator for the set of processes of the same color.
+       */
+      Comm comm_split(int color, int key) const;
+
+      ///@}
+
+      /**
        * \name Barrier Synchronisation
        */
       ///@{
