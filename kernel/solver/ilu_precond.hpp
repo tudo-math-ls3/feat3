@@ -1024,6 +1024,7 @@ namespace FEAT
       }
     }; // class ILUPrecond<SparseMatrixCSR<Mem::CUDA,...>,...>
 
+    /*
     template<typename Filter_>
     class ILUPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>, Filter_> :
       public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>::VectorTypeL>
@@ -1094,7 +1095,7 @@ namespace FEAT
       {
           throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
       }
-    };
+    };*/
 
     /**
      * \brief ILU(0) preconditioner implementation
@@ -1203,6 +1204,28 @@ namespace FEAT
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class ILUPrecond<SparseMatrixBCSR<Mem::CUDA,...>,...>
+
+    /// Dummy class for not implemented specialisations
+    template<typename Matrix_, typename Filter_>
+    class ILUPrecond :
+      public SolverBase<typename Matrix_::VectorTypeL>
+    {
+      public:
+
+      explicit ILUPrecond(const Matrix_&, const Filter_&, const int = 0)
+      {
+      }
+
+      Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
 
     /**
      * \brief Creates a new ILUPrecond solver object

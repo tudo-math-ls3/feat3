@@ -114,6 +114,12 @@ namespace FEAT
         return VectorTypeR(this->columns());
       }
 
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other)
+      {
+        BaseClass::convert(other);
+      }
+
       /**
        * \brief Clone operation
        *

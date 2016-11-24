@@ -161,6 +161,8 @@ namespace FEAT
     {
     public:
 
+      typedef Vector_ VectorType;
+
       /// virtual destructor
       virtual ~SolverBase()
       {

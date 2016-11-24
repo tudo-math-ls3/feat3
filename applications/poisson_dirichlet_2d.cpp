@@ -23,13 +23,13 @@
 #include <kernel/solver/precon_wrapper.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/util/dist.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
-#include <control/scalar_solver.hpp>
 
 namespace PoissonDirichlet2D
 {
@@ -164,16 +164,16 @@ namespace PoissonDirichlet2D
     }
   };
 
-  template<typename MeshType_, typename TargetMatrixSolve_>
+  template<typename MeshType_>
   void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
 
     // define our arch types
-    typedef typename Mem::Main MemType;
-    typedef typename TargetMatrixSolve_::DataType DataType;
-    typedef typename TargetMatrixSolve_::IndexType IndexType;
+    typedef Mem::Main MemType;
+    typedef double DataType;
+    typedef Index IndexType;
 
     // choose our desired analytical solution
     Analytic::Common::ExpBubbleFunction<2> sol_func;
@@ -275,31 +275,26 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    comm.print("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() + ", Mem:" + MemType::name() +
-        " to " + TargetMatrixSolve_::name() + ", Mem:" + TargetMatrixSolve_::MemType::name() + "...\n");
-
-    // create system levels, transfer levels and vectors for linear solver
-    Control::ScalarSolver<TargetMatrixSolve_, SystemLevelType, TransferLevelType> scalar_solver(system_levels, transfer_levels, vec_sol, vec_rhs);
 
     comm.print("Solving linear system...");
 
     //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
     auto multigrid_hierarchy = std::make_shared<
       Solver::MultiGridHierarchy<
-      typename decltype(scalar_solver)::GlobalSystemMatrixSolve,
-      typename decltype(scalar_solver)::GlobalSystemFilterSolve,
-      typename decltype(scalar_solver)::TransferLevelTypeSolve::GlobalSystemTransferMatrix,
-      typename decltype(scalar_solver)::TransferLevelTypeSolve::GlobalSystemTransferMatrix
+      typename SystemLevelType::GlobalSystemMatrix,
+      typename SystemLevelType::GlobalSystemFilter,
+      typename TransferLevelType::GlobalSystemTransferMatrix,
+      typename TransferLevelType::GlobalSystemTransferMatrix
         > >();
 
-    auto coarse_precond = Solver::new_jacobi_precond(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, 0.7);
-    auto coarse_solver = Solver::new_richardson(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, 1.0, coarse_precond);
+    auto coarse_precond = Solver::new_jacobi_precond(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, 0.7);
+    auto coarse_solver = Solver::new_richardson(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, 1.0, coarse_precond);
     coarse_solver->set_min_iter(4);
     coarse_solver->set_max_iter(4);
-    multigrid_hierarchy->push_level(scalar_solver.get_system_levels_solve().front()->matrix_sys, scalar_solver.get_system_levels_solve().front()->filter_sys, coarse_solver);
+    multigrid_hierarchy->push_level(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, coarse_solver);
 
-    auto jt = scalar_solver.get_transfer_levels_solve().begin();
-    for (auto it = ++scalar_solver.get_system_levels_solve().begin(); it != scalar_solver.get_system_levels_solve().end(); ++it, ++jt)
+    auto jt = transfer_levels.begin();
+    for (auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
     {
       auto jac_smoother = Solver::new_jacobi_precond((*it)->matrix_sys, (*it)->filter_sys, 0.7);
       auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);
@@ -309,7 +304,7 @@ namespace PoissonDirichlet2D
     }
     multigrid_hierarchy->init();
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
-    auto solver = Solver::new_pcg(scalar_solver.get_system_levels_solve().back()->matrix_sys, scalar_solver.get_system_levels_solve().back()->filter_sys, mgv);
+    auto solver = Solver::new_pcg(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, mgv);
 
     // enable plotting
     solver->set_plot(comm.rank() == 0);
@@ -326,8 +321,7 @@ namespace PoissonDirichlet2D
     TimeStamp at;
 
     // solve
-    auto result = Solver::solve(*solver, scalar_solver.get_vec_sol_solve(), scalar_solver.get_vec_rhs_solve(), scalar_solver.get_system_levels_solve().back()->matrix_sys,
-        scalar_solver.get_system_levels_solve().back()->filter_sys);
+    auto result = Solver::solve(*solver, vec_sol, vec_rhs, system_levels.back()->matrix_sys, system_levels.back()->filter_sys);
 
     if (!Solver::status_success(result))
     {
@@ -342,9 +336,6 @@ namespace PoissonDirichlet2D
     // release solver
     solver->done();
     multigrid_hierarchy->done();
-
-    // download solution
-    vec_sol.convert(&system_levels.back()->gate_sys, scalar_solver.get_vec_sol_solve());
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -438,7 +429,6 @@ namespace PoissonDirichlet2D
     args.support("no-err");
     args.support("vtk");
     args.support("statistics");
-    args.support("mem");
     args.support("min-rank-elems");
     args.support("mesh");
     args.support("test-iter");
@@ -468,9 +458,6 @@ namespace PoissonDirichlet2D
     int lvl_max = 3;
     int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);
-
-    FEAT::String mem_string = "main";
-    args.parse("mem", mem_string);
 
 #ifndef DEBUG
     try
@@ -519,20 +506,7 @@ namespace PoissonDirichlet2D
       comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
       // run our application
-      if (mem_string == "main")
-      {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
-      }
-#ifdef FEAT_HAVE_CUDA
-      else if(mem_string == "cuda")
-      {
-        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(comm, args, domain);
-      }
-#endif
-      else
-      {
-        throw InternalError("Memory type " + mem_string + " not known!");
-      }
+      run<MeshType>(comm, args, domain);
 
       TimeStamp stamp2;
 

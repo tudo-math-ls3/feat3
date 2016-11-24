@@ -193,7 +193,7 @@ namespace StokesPoiseuille2D
   }; // class StokesUnitSquarePoiseuilleAssemblerLevel<...>
 
 
-  template<typename MeshType_, typename TargetMatrixSolve_>
+  template<typename MeshType_>
   void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
@@ -203,8 +203,8 @@ namespace StokesPoiseuille2D
 
     // define our arch types
     typedef Mem::Main MemType;
-    typedef typename TargetMatrixSolve_::DataType DataType;
-    typedef typename TargetMatrixSolve_::IndexType IndexType;
+    typedef double DataType;
+    typedef Index IndexType;
 
     // define our domain type
     typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
@@ -234,15 +234,6 @@ namespace StokesPoiseuille2D
     std::deque<TransferLevelType*> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
-
-    //Lin-Solve phase related typedefs
-    //Main-CSR or CUDA-CSR
-    typedef typename TargetMatrixSolve_::MemType MemTypeSolve;
-    typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemTypeSolve, DataType, IndexType, TargetMatrixSolve_> SystemLevelTypeSolve;
-    typedef Control::StokesBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
-
-    std::deque<SystemLevelTypeSolve*> system_levels_solve;
-    std::deque<TransferLevelTypeSolve*> transfer_levels_solve;
 
     // create stokes and system levels
     for(Index i(0); i < num_levels; ++i)
@@ -312,67 +303,42 @@ namespace StokesPoiseuille2D
     GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
     GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
 
-    ////////////////// solver type conversion ////////////////////////
-
     // get our global solver system types
-    typedef typename SystemLevelTypeSolve::GlobalSystemVector GlobalSystemVectorSolve;
-    typedef typename SystemLevelTypeSolve::GlobalSystemMatrix GlobalSystemMatrixSolve;
-    typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
-    typedef typename SystemLevelTypeSolve::GlobalVeloVector GlobalVeloVectorSolve;
-    typedef typename SystemLevelTypeSolve::GlobalPresVector GlobalPresVectorSolve;
-
-    comm.print("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() + ", Mem:" + MemType::name() +
-        " to " + TargetMatrixSolve_::name() + ", Mem:" + TargetMatrixSolve_::MemType::name() + "...\n");
-
-    //convert system and transfer levels
-    for (Index i(0); i < num_levels; ++i)
-    {
-      //system levels must be converted first, because transfer levels use their converted gates
-      system_levels_solve.push_back(new SystemLevelTypeSolve());
-      system_levels_solve.back()->convert(*system_levels.at(i));
-      if (i > 0)
-      {
-        transfer_levels_solve.push_back(new TransferLevelTypeSolve());
-        transfer_levels_solve.back()->convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
-      }
-    }
-
-    SystemLevelTypeSolve& the_system_level_solve = *system_levels_solve.back();
+    typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
+    typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
+    typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
+    typedef typename SystemLevelType::GlobalVeloVector GlobalVeloVector;
+    typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
 
     // get our global solve matrix and filter
-    GlobalSystemMatrixSolve& matrix_solve = the_system_level_solve.matrix_sys;
-    GlobalSystemFilterSolve& filter_solve = the_system_level_solve.filter_sys;
+    GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
+    GlobalSystemFilter& filter = the_system_level.filter_sys;
 
-    //convert rhs and sol vectors
-    GlobalSystemVectorSolve vec_rhs_solve;
-    vec_rhs_solve.convert(&system_levels_solve.back()->gate_sys, vec_rhs);
-    GlobalSystemVectorSolve vec_sol_solve;
-    vec_sol_solve.convert(&system_levels_solve.back()->gate_sys, vec_sol);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
     // our A/S block solvers
-    std::shared_ptr<Solver::SolverBase<GlobalVeloVectorSolve>> solver_a(nullptr);
-    std::shared_ptr<Solver::SolverBase<GlobalPresVectorSolve>> solver_s(nullptr);
+    std::shared_ptr<Solver::SolverBase<GlobalVeloVector>> solver_a(nullptr);
+    std::shared_ptr<Solver::SolverBase<GlobalPresVector>> solver_s(nullptr);
 
     // create a multigrid cycle A-solver
     {
       auto mgv = std::make_shared<
         Solver::BasicVCycle<
-          typename SystemLevelTypeSolve::GlobalMatrixBlockA,
-          typename SystemLevelTypeSolve::GlobalVeloFilter,
-          typename TransferLevelTypeSolve::GlobalVeloTransferMatrix
+          typename SystemLevelType::GlobalMatrixBlockA,
+          typename SystemLevelType::GlobalVeloFilter,
+          typename TransferLevelType::GlobalVeloTransferMatrix
         > > ();
 
       // create coarse grid solver
-      auto coarse_solver = Solver::new_jacobi_precond(system_levels_solve.front()->matrix_a, system_levels_solve.front()->filter_velo);
-      mgv->set_coarse_level(system_levels_solve.front()->matrix_a, system_levels_solve.front()->filter_velo, coarse_solver);
+      auto coarse_solver = Solver::new_jacobi_precond(system_levels.front()->matrix_a, system_levels.front()->filter_velo);
+      mgv->set_coarse_level(system_levels.front()->matrix_a, system_levels.front()->filter_velo, coarse_solver);
 
       // push levels into MGV
-      auto jt = transfer_levels_solve.begin();
-      for(auto it = ++system_levels_solve.begin(); it != system_levels_solve.end(); ++it, ++jt)
+      auto jt = transfer_levels.begin();
+      for(auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
       {
         auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
         mgv->push_level((*it)->matrix_a, (*it)->filter_velo, (*jt)->prol_velo, (*jt)->rest_velo, smoother, smoother);
@@ -385,11 +351,11 @@ namespace StokesPoiseuille2D
     // create S-solver
     {
       // create a local ILU(0) for S
-      auto loc_ilu = Solver::new_ilu_precond(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, Index(0));
+      auto loc_ilu = Solver::new_ilu_precond(*the_system_level.matrix_s, *the_system_level.filter_pres, Index(0));
 
 
       // make it Schwarz...
-      auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level_solve.filter_pres);
+      auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level.filter_pres);
 
       // set our S-solver
       solver_s = glob_ilu;
@@ -397,18 +363,18 @@ namespace StokesPoiseuille2D
 
     // create a global Schur-Complement preconditioner
     auto schur = Solver::new_schur_precond(
-        the_system_level_solve.matrix_a,
-        the_system_level_solve.matrix_b,
-        the_system_level_solve.matrix_d,
-        the_system_level_solve.filter_velo,
-        the_system_level_solve.filter_pres,
+        the_system_level.matrix_a,
+        the_system_level.matrix_b,
+        the_system_level.matrix_d,
+        the_system_level.filter_velo,
+        the_system_level.filter_pres,
         solver_a,
         solver_s,
         Solver::SchurType::full
       );
 
     // create our solver
-    auto solver = Solver::new_pcr(matrix_solve, filter_solve, schur);
+    auto solver = Solver::new_pcr(matrix, filter, schur);
 
     // enable plotting
     solver->set_plot(comm.rank() == 0);
@@ -423,7 +389,7 @@ namespace StokesPoiseuille2D
     TimeStamp at;
 
     // solve
-    Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
     double solver_toe(at.elapsed_now());
 
@@ -432,9 +398,6 @@ namespace StokesPoiseuille2D
 
     // release solver
     solver->done();
-
-    // download solution
-    vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -481,17 +444,6 @@ namespace StokesPoiseuille2D
       delete asm_levels.back();
       asm_levels.pop_back();
     }
-
-    while(!transfer_levels_solve.empty())
-    {
-      delete transfer_levels_solve.back();
-      transfer_levels_solve.pop_back();
-    }
-    while(!system_levels_solve.empty())
-    {
-      delete system_levels_solve.back();
-      system_levels_solve.pop_back();
-    }
   }
 
   void main(int argc, char* argv[])
@@ -511,7 +463,6 @@ namespace StokesPoiseuille2D
     args.support("no-err");
     args.support("vtk");
     args.support("statistics");
-    args.support("mem");
     args.support("mesh");
     args.support("parti-type");
     args.support("parti-name");
@@ -536,9 +487,6 @@ namespace StokesPoiseuille2D
     int lvl_max = 3;
     int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);
-
-    FEAT::String mem_string = "main";
-    args.parse("mem", mem_string);
 
 #ifndef DEBUG
     try
@@ -582,21 +530,7 @@ namespace StokesPoiseuille2D
       comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
       comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
 
-      // run our application
-      if (mem_string == "main")
-      {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
-      }
-#ifdef FEAT_HAVE_CUDA
-      else if(mem_string == "cuda")
-      {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(comm, args, domain);
-      }
-#endif
-      else
-      {
-        throw InternalError("Memory type " + mem_string + " not known!");
-      }
+      run<MeshType>(comm, args, domain);
 
       TimeStamp stamp2;
 

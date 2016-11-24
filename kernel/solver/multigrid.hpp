@@ -1752,7 +1752,7 @@ namespace FEAT
 
           // update our solution vector
           auto alpha(lvl_f.level->get_alpha_adaptive_coarse_correction());
-          decltype(lvl_f.vec_cor) tmp(lvl_f.vec_cor.size());
+          auto tmp = lvl_f.vec_cor.clone(LAFEM::CloneMode::Allocate);
           lvl_f.level->get_system_matrix().apply(tmp, lvl_f.vec_cor);
           system_filter_f.filter_def(tmp);
           auto t = lvl_f.vec_cor.dot(tmp);

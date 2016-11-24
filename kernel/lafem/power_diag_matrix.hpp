@@ -60,6 +60,10 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = blocks_;
       /// number of column blocks (horizontal size)
@@ -248,6 +252,19 @@ namespace FEAT
       PowerDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return PowerDiagMatrix(_first.clone(mode), _rest.clone(mode));
+      }
+
+      /** \brief Clone operation
+       *
+       * Become a copy of a given container.
+       *
+       * \param[in] other The source container.
+       * \param[in] clone_mode The actual cloning procedure
+       *
+       */
+      void clone(const PowerDiagMatrix & other, CloneMode clone_mode = CloneMode::Weak)
+      {
+        (*this)=other.clone(clone_mode);
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -600,6 +617,10 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+
       static constexpr int num_row_blocks = 1;
       static constexpr int num_col_blocks = 1;
 
@@ -727,6 +748,11 @@ namespace FEAT
       PowerDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return PowerDiagMatrix(_first.clone(mode));
+      }
+
+      void clone(const PowerDiagMatrix & other, CloneMode clone_mode = CloneMode::Weak)
+      {
+        (*this)=other.clone(clone_mode);
       }
 
       /// \brief Returns the total amount of bytes allocated.

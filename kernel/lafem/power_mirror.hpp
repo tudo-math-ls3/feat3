@@ -99,6 +99,10 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using MirrorType = class PowerMirror<typename SubMirrorType::template MirrorType<Mem2_, DT2_, IT2_>, count_>;
 
+      /// this typedef lets you create a mirror with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
+
       /// the one and only sub-mirror object
       SubMirrorType _sub_mirror;
 

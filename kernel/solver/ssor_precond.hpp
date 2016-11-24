@@ -21,6 +21,9 @@ namespace FEAT
         int* & colored_row_ptr, int* & rows_per_color, int* & inverse_row_ptr);
     }
 
+    template<typename Matrix_, typename Filter_>
+    class SSORPrecond;
+
     /**
      * \brief SSOR preconditioner implementation
      *
@@ -35,16 +38,17 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template<typename Matrix_, typename Filter_>
-    class SSORPrecond :
-      public SolverBase<typename Matrix_::VectorTypeL>
+    template<template<class,class,class> class ScalarMatrix_, typename DT_, typename IT_, typename Filter_>
+    class SSORPrecond<ScalarMatrix_<Mem::Main, DT_, IT_>, Filter_> :
+      public SolverBase<typename ScalarMatrix_<Mem::Main, DT_, IT_>::VectorTypeL>
     {
     public:
-      typedef Matrix_ MatrixType;
+      typedef ScalarMatrix_<Mem::Main, DT_, IT_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DT_ DataType;
+      typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
-      typedef typename MatrixType::DataType DataType;
-      typedef typename MatrixType::IndexType IndexType;
 
     protected:
       const MatrixType& _matrix;
@@ -318,71 +322,18 @@ namespace FEAT
       }
     }; // class SSORPrecond<SparseMatrixCSR<Mem::CUDA>>
 
-    template<typename Filter_>
-    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>, Filter_> :
-      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int>::VectorTypeL>
+    /// Dummy class for not implemented specialisations
+    template<typename Matrix_, typename Filter_>
+    class SSORPrecond :
+      public SolverBase<typename Matrix_::VectorTypeL>
     {
       public:
-      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned int> MatrixType;
-      typedef typename MatrixType::VectorTypeL VectorType;
-      typedef Filter_ FilterType;
-      typedef typename MatrixType::DataType DataType;
 
-      explicit SSORPrecond(const MatrixType&, const FilterType&, const DataType = DataType(1))
+      explicit SSORPrecond(const Matrix_&, const Filter_&, const int = 0)
       {
       }
 
-      Status apply(VectorType &, const VectorType &) override
-      {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
-      }
-
-      String name() const override
-      {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
-      }
-    };
-
-    template<typename Filter_>
-    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long>, Filter_> :
-      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long>::VectorTypeL>
-    {
-      public:
-      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, float, unsigned long> MatrixType;
-      typedef typename MatrixType::VectorTypeL VectorType;
-      typedef Filter_ FilterType;
-      typedef typename MatrixType::DataType DataType;
-
-      explicit SSORPrecond(const MatrixType&, const FilterType&, const DataType = DataType(1))
-      {
-      }
-
-      Status apply(VectorType &, const VectorType &) override
-      {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
-      }
-
-      String name() const override
-      {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
-      }
-    };
-
-    template<typename Filter_>
-    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long>, Filter_> :
-      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long>::VectorTypeL>
-    {
-      public:
-      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned long> MatrixType;
-      typedef typename MatrixType::VectorTypeL VectorType;
-      typedef Filter_ FilterType;
-      typedef typename MatrixType::DataType DataType;
-
-      explicit SSORPrecond(const MatrixType&, const FilterType&, const DataType = DataType(1))
-      {
-      }
-
-      Status apply(VectorType &, const VectorType &) override
+      Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
           throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
       }
