@@ -2,6 +2,13 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/os_windows.hpp>
 
+#ifdef __unix__
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <stdio.h>
+#endif
+
 #include <fstream>
 #include <vector>
 #include <string>
@@ -116,6 +123,15 @@ namespace FEAT
     info.peak_physical    = std::size_t(work_set_size_peak);
     info.peak_virtual     = std::size_t(page_file_usage_peak);
     info.current_swap     = std::size_t(0);
+
+#elif defined(__unix__)
+    struct rusage r_usage;
+    getrusage(RUSAGE_SELF, &r_usage);
+    info.peak_physical = (size_t)r_usage.ru_maxrss;
+    info.peak_virtual = (size_t)r_usage.ru_maxrss;
+    info.current_physical = (size_t)r_usage.ru_maxrss;
+    info.current_virtual = (size_t)r_usage.ru_maxrss;
+    info.current_swap = std::size_t(0);
 
 #endif
 
