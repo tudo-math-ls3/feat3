@@ -97,6 +97,8 @@ void Runtime::initialise(int& argc, char**& argv)
   Index spmv = (Index)atoi(_global_property_map.query("CUDA.blocksize_spmv", "256").c_str());
   Index axpy = (Index)atoi(_global_property_map.query("CUDA.blocksize_axpy", "256").c_str());
   MemoryPool<Mem::CUDA>::set_blocksize(misc, reduction, spmv, axpy);
+#else
+  (void)rank;
 #endif
 
   _initialised = true;
@@ -109,7 +111,7 @@ void Runtime::abort(bool dump_call_stack)
 #if defined(__linux) || defined(__unix__)
     // https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
     void* buffer[1024];
-    int bt_size = backtrace(buffer, 1024);
+    auto bt_size = backtrace(buffer, 1024);
     char** bt_symb = backtrace_symbols(buffer, bt_size);
     if((bt_size > 0) && (bt_symb != nullptr))
     {
