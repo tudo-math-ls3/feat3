@@ -8,6 +8,13 @@ SET (kernel-solver-list
   umfpack.cpp
   )
 
+if (FEAT_EICKT)
+  SET (kernel-solver-list
+    ${kernel-solver-list}
+    matrix_stock-eickt.cpp
+    )
+endif(FEAT_EICKT)
+
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 

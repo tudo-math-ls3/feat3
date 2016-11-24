@@ -353,7 +353,7 @@ namespace FEAT
         _initialised = true;
       }
 #else // non-MPI version
-      void init(const MT_&)
+      void init(const SMT_&)
       {
         XASSERTM(!_initialised, "SynchMatrix object is already initialised");
         _initialised = true;
