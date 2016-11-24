@@ -81,9 +81,13 @@ def run_test(build_id, branch, myDB, extra_opts):
   os.chdir(src_dirname)
   git_output = get_output("git gc --auto")
   git_output += get_output("git checkout -f --no-track -B test123" + hostname + " origin/" + branch)
+  git_actions_output = "\n".join(git_output)
   git_output.append("git HEAD:")
   git_output += get_output("git log HEAD -n1")
-  m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="git output", body="\n".join(git_output))
+  if "fatal:" in git_actions_output or "error:" in git_actions_output:
+    m = Message.create(runid=r, stage="intern", status="error", timestamp=time.time(), title="git output", body="\n".join(git_output))
+  else:
+    m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="git output", body="\n".join(git_output))
   m.save()
   if dump_filename != "":
     dump_file.write("\n" + "\n".join(git_output))
