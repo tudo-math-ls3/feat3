@@ -57,10 +57,13 @@ void Runtime::initialise(int& argc, char**& argv)
     Runtime::abort();
   }
 
+  int rank = 0;
 #ifdef FEAT_HAVE_MPI
   // initialise MPI
   if(::MPI_Init(&argc, &argv) != MPI_SUCCESS)
     abort();
+  // get rank for MemPool initialisation
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #else
   (void)argc;
   (void)argv;
