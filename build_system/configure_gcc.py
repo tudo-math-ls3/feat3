@@ -39,11 +39,15 @@ def configure_gcc(cpu, buildid, compiler):
     cxxflags += " -Wpedantic"
 
   # gcc 6.1 creates floating point code that lets the navstoke app diverge, if using avx support
-  if major == 6 and minor == 1 and (cpu == "sandybridge" or cpu == "ivybridge" or cpu == "haswell" or cpu == "skylake"):
+  if major == 6 and minor <= 2 and (cpu == "sandybridge" or cpu == "ivybridge" or cpu == "haswell" or cpu == "skylake"):
     cpu="westmere"
 
-  if "debug" in buildid:
-    cxxflags += " -O0 "
+  if "debug" in buildid or "noop" in buildid:
+    if "debug" in buildid:
+      cxxflags += " -Og "
+    if "noop" in buildid:
+      cxxflags += " -O0 "
+
     cxxflags += " -fdiagnostics-show-option -fno-omit-frame-pointer"
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
     if platform.system() != "Darwin":
@@ -59,6 +63,7 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
     if major >= 6:
       cxxflags += " -fsanitize=bounds-strict"
+
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
     if "lto" in buildid:

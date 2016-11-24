@@ -54,7 +54,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("The FEAT build-id is a string of various keywords, delimited by hyphes or whitespaces")
   print ("It is used to choose different tools and configurations related to the build process.")
   print ("The keywords, sorted by categories are:")
-  print ("  Build Mode: debug, opt, fast")
+  print ("  Build Mode: debug, opt, fast, noop")
   print ("  Cluster Parallelisation: mpi")
   print ("  Compiler: gcc, icc, clang, pgi")
   print ("  Compiler frontends: ccache")
@@ -185,6 +185,9 @@ else:
 if "debug" in buildid:
   remove_string(unused_tokens, "debug")
   cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=ON"
+elif "noop" in buildid:
+  remove_string(unused_tokens, "noop")
+  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=ON"
 elif "opt" in buildid:
   remove_string(unused_tokens, "opt")
   cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
@@ -192,7 +195,7 @@ elif "fast" in buildid:
   remove_string(unused_tokens, "fast")
   cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
 else:
-  print ("Error: No supported build mode (opt/debug/fast) found in build id:")
+  print ("Error: No supported build mode (opt/debug/fast/noop) found in build id:")
   print (buildid_string)
   sys.exit(1)
 
