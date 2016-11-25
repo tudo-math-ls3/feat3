@@ -166,6 +166,104 @@ namespace FEAT
       }; // class IdentityOperator
 
       /**
+       * \brief Trial-Derivative operator implementation
+       *
+       * This functor implements the weak formulation of the bilinear trial-function derivative operator, i.e.
+       *   \f[ \partial_i \varphi \cdot \psi \f]
+       *
+       * This functor can be used with the BilinearOperator assembly class template to assemble a
+       * scalar matrix for the pressure-gradient operator of the Stokes equation.
+       *
+       * \author Peter Zajac
+       */
+      class TrialDerivativeOperator :
+        public BilinearOperator
+      {
+      public:
+        /// the desired derivative
+        int deriv;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::value;
+
+        /**
+         * \brief Trial-Derivative evaluator class template
+         *
+         * \tparam AsmTraits_
+         * The assembly traits class.
+         *
+         * \author Peter Zajac
+         */
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        protected:
+          /// the desired derivative
+          int deriv;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] operat
+           * A reference to the Laplace operator object.
+           */
+          explicit Evaluator(const TrialDerivativeOperator& operat) :
+            deriv(operat.deriv)
+          {
+          }
+
+          // copy pasted since Doxygen does not like the operator part in
+          // \copydoc BilinearOperator::Evaluator::operator()
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
+          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            return phi.value * psi.grad[deriv];
+          }
+        }; // class TrialDerivativeOperator::Evaluator<...>
+
+        /*
+         *
+         * \param[in] derivative
+         * The index of the derivative for this operator:
+         *  - 0: X-derivative
+         *  - 1: Y-derivative
+         *  - 2: Z-derivative
+         *  - ...
+        */
+        explicit TrialDerivativeOperator(int derivative) :
+          deriv(derivative)
+        {
+        }
+      }; // class TrialDerivativeOperator
+
+      /**
        * \brief Test-Derivative operator implementation
        *
        * This functor implements the weak formulation of the bilinear test-function derivative operator, i.e.
