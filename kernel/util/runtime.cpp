@@ -117,7 +117,7 @@ void Runtime::abort(bool dump_call_stack)
     {
       fprintf(stderr, "\nCall-Stack Back-Trace:\n");
       fprintf(stderr,   "----------------------\n");
-      for(int i(0); i < bt_size; ++i)
+      for(decltype(bt_size) i(0); i < bt_size; ++i)
         fprintf(stderr, "%s\n", bt_symb[i]);
       fflush(stderr);
     }
