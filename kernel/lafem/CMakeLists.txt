@@ -33,8 +33,6 @@ endif(FEAT_HAVE_CUDA)
 
 # list of lafem tests
 SET (test_list
-  bicgstab-test
-  bicgstab-meta-test
   container_main_wrapper-test
   dense_matrix-test
   dense_vector-test
@@ -53,7 +51,6 @@ SET (test_list
   meta_vector-io-test
   meta_vector-scale-test
   pointstar_factory-test
-  richardson-test
   slip_filter-test
   sparse_matrix_conversion-test
   sparse_matrix_banded-test
