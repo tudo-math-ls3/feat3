@@ -27,7 +27,7 @@ keep_iterates = 0
 
 [DuDvPrecon]
 type = DuDvPrecon
-dirichlet_boundaries = bottom top left right
+dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r
 slip_boundaries = inner
 linear_solver = pcg
 

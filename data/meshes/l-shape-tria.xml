@@ -1,6 +1,6 @@
-<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
   <Info>
-    This is the L-shape mesh consisting of three quadrilateral cells.
+    This is the L-shape mesh consisting of twelve triangular cells.
   </Info>
   <Chart name="outer">
     <Spline dim="2" size="7" type="closed">
@@ -24,7 +24,7 @@
       </Params>
     </Spline>
   </Chart>
-  <Mesh type="conformal:hypercube:2:2" size="8 10 3">
+  <Mesh type="conformal:simplex:2:2" size="11 22 12">
     <Vertices>
       -1 -1
       0 -1
@@ -34,6 +34,9 @@
       1 0
       -1 1
       0 1
+      -0.5 -0.5
+      0.5 -0.5
+      -0.5 0.5
     </Vertices>
     <Topology dim="1">
       0 1
@@ -46,11 +49,32 @@
       3 0
       1 4
       3 4
+      0 8
+      1 8
+      3 8
+      4 8
+      1 9
+      2 9
+      4 9
+      5 9
+      3 10
+      4 10
+      6 10
+      7 10
     </Topology>
     <Topology dim="2">
-      0 1 3 4
-      1 2 4 5
-      3 4 6 7
+      8 0 1
+      8 4 3
+      8 3 0
+      8 1 4
+      9 1 2
+      9 5 4
+      9 4 1
+      9 2 5
+      10 3 4
+      10 7 6
+      10 6 3
+      10 4 7
     </Topology>
   </Mesh>
   <MeshPart name="bnd:b" parent="root" chart="outer" topology="full" size="3 2">

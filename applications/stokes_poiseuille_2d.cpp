@@ -80,9 +80,9 @@ namespace StokesPoiseuille2D
 
       // loop over all boundary parts except for the right one, which is outflow
       std::deque<String> part_names;
-      part_names.push_back("left");
-      part_names.push_back("top");
-      part_names.push_back("bottom");
+      part_names.push_back("bnd:l");
+      part_names.push_back("bnd:t");
+      part_names.push_back("bnd:b");
       for(const auto& name : part_names)
       {
         // try to fetch the corresponding mesh part node

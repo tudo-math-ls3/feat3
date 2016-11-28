@@ -61,7 +61,7 @@
       5 6 8
     </Topology>
   </Mesh>
-  <MeshPart name="bottom" parent="root" chart="outer" topology="full" size="3 2">
+  <MeshPart name="bnd:b" parent="root" chart="outer" topology="full" size="3 2">
     <Mapping dim="0">
       0
       4
@@ -81,7 +81,7 @@
       1
     </Attribute>
   </MeshPart>
-  <MeshPart name="right" parent="root" chart="outer" topology="full" size="3 2">
+  <MeshPart name="bnd:r" parent="root" chart="outer" topology="full" size="3 2">
     <Mapping dim="0">
       1
       7
@@ -101,7 +101,7 @@
       2
     </Attribute>
   </MeshPart>
-  <MeshPart name="top" parent="root" chart="outer" topology="full" size="3 2">
+  <MeshPart name="bnd:t" parent="root" chart="outer" topology="full" size="3 2">
     <Mapping dim="0">
       3
       5
@@ -121,7 +121,7 @@
       3
     </Attribute>
   </MeshPart>
-  <MeshPart name="left" parent="root" chart="outer" topology="full" size="3 2">
+  <MeshPart name="bnd:l" parent="root" chart="outer" topology="full" size="3 2">
     <Mapping dim="0">
       2
       6

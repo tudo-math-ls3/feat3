@@ -2,7 +2,7 @@
   <Info>
     Polyline charts for screws_2d_meshes
   </Info>
-  <Chart name="inner_screw">
+  <Chart name="screw:i">
     <Spline dim="2" size=" 3601" type="closed" orientation="-1">
       <Points>
         0 0.114167626E+01  0.286526852E-02
@@ -3609,7 +3609,7 @@
       </Points>
     </Spline>
   </Chart>
-  <Chart name="outer_screw">
+  <Chart name="screw:o">
     <Spline dim="2" size=" 3601" type="closed">
       <Points>
         0 0.229644513E+01  0.488072244E-02

@@ -1,12 +1,12 @@
 [HyperElasticityDefault]
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
-dirchlet_boundaries = outer
+slip_boundaries = bnd:o
 
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
-dirichlet_boundaries = outer
+dirichlet_boundaries = bnd:o
 fixed_reference_domain = 1
 
 [DuDvDefaultParameters]

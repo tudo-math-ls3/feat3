@@ -956,7 +956,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "type = DuDv" << std::endl;
     iss << "config_section = DuDvDefaultParameters" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "dirichlet_boundaries = outer" << std::endl;
+    iss << "dirichlet_boundaries = bnd:o" << std::endl;
 
     iss << "[DuDvDefaultParameters]" << std::endl;
     iss << "solver_config = PCG-MGV" << std::endl;
@@ -966,7 +966,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "[HyperElasticityDefault]" << std::endl;
     iss << "type = Hyperelasticity" << std::endl;
     iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "dirichlet_boundaries = bottom top left right" << std::endl;
+    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
@@ -999,7 +999,7 @@ static void read_test_solver_config(std::stringstream& iss)
 
   iss << "[DuDvPrecon]" << std::endl;
   iss << "type = DuDvPrecon" << std::endl;
-  iss << "dirichlet_boundaries = bottom top left right" << std::endl;
+  iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
   iss << "fixed_reference_domain = 1" << std::endl;
   iss << "linear_solver = PCG-MGV" << std::endl;
 

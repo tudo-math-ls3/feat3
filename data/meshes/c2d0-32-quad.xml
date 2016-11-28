@@ -1,7 +1,7 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Info>
     This is a mesh for the C2D0 benchmark aka "bench1" aka
-    the 2D "flow around a cylinder" benchark.
+    the 2D "flow around a cylinder" benchmark.
     This mesh consists of 32 quadrilateral cells.
   </Info>
   <Chart name="circle">

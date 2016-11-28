@@ -1567,7 +1567,7 @@
       31
     </Mapping>
   </MeshPart>
-  <MeshPart name="bottom" parent="root" topology="none" size="40 67 28 0">
+  <MeshPart name="bnd:b" parent="root" topology="none" size="40 67 28 0">
     <Mapping dim="0">
       0
       5
@@ -2048,7 +2048,7 @@
       159
     </Mapping>
   </MeshPart>
-  <MeshPart name="left" parent="root" topology="none" size="25 40 16 0">
+  <MeshPart name="bnd:l" parent="root" topology="none" size="25 40 16 0">
     <Mapping dim="0">
       4
       3
@@ -2137,7 +2137,7 @@
       391
     </Mapping>
   </MeshPart>
-  <MeshPart name="right" parent="root" topology="none" size="25 40 16 0">
+  <MeshPart name="bnd:r" parent="root" topology="none" size="25 40 16 0">
     <Mapping dim="0">
       40
       41
@@ -2226,7 +2226,7 @@
       467
     </Mapping>
   </MeshPart>
-  <MeshPart name="top" parent="root" topology="none" size="40 67 28 0">
+  <MeshPart name="bnd:t" parent="root" topology="none" size="40 67 28 0">
     <Mapping dim="0">
       44
       39

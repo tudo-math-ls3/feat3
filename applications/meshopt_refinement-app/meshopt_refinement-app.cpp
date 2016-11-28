@@ -4,6 +4,7 @@
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
+#include <kernel/geometry/mesh_file_writer.hpp>
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/runtime.hpp>
@@ -305,6 +306,7 @@ struct MeshoptRefinementApp
         exporter.write(vtk_name, comm.rank(), comm.size());
 
         ++deque_position;
+
       }
     }
 
@@ -694,7 +696,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "[HyperElasticityDefault]" << std::endl;
     iss << "type = Hyperelasticity" << std::endl;
     iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "dirichlet_boundaries = outer" << std::endl;
+    iss << "dirichlet_boundaries = bnd:o" << std::endl;
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
@@ -712,7 +714,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "[HyperElasticityDefault]" << std::endl;
     iss << "type = Hyperelasticity" << std::endl;
     iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "slip_boundaries = outer" << std::endl;
+    iss << "slip_boundaries = bnd:o" << std::endl;
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
@@ -747,7 +749,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
 
     iss << "[DuDvPrecon]" << std::endl;
     iss << "type = DuDvPrecon" << std::endl;
-    iss << "dirichlet_boundaries = outer" << std::endl;
+    iss << "dirichlet_boundaries = bnd:o" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
     iss << "linear_solver = PCG-MGV" << std::endl;
 
@@ -801,7 +803,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
 
     iss << "[DuDvPrecon]" << std::endl;
     iss << "type = DuDvPrecon" << std::endl;
-    iss << "slip_boundaries = outer" << std::endl;
+    iss << "slip_boundaries = bnd:o" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
     iss << "linear_solver = PCG-MGV" << std::endl;
 

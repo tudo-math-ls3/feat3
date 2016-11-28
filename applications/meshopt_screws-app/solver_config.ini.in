@@ -26,7 +26,7 @@ keep_iterates = 0
 
 [DuDvPrecon]
 type = DuDvPrecon
-dirichlet_boundaries = inner outer
+dirichlet_boundaries = screw:i screw:o
 linear_solver = PCG-Jacobi
 
 [PCG-MGV]

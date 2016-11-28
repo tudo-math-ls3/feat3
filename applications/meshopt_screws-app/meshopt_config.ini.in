@@ -1,12 +1,12 @@
 [HyperelasticityDefault]
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
-slip_boundaries = inner outer
+slip_boundaries = bnd:i bnd:o
 
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
-dirichlet_boundaries = inner outer
+dirichlet_boundaries = bnd:i bnd:o
 
 [DuDvDefaultParameters]
 solver_config = PCG-MGV
@@ -26,5 +26,5 @@ conc_function = GapWidth
 [GapWidth]
 type = ChartDistance
 operation = add
-chart_list = inner_screw outer_screw
+chart_list = screw:i screw:o
 function_type = default

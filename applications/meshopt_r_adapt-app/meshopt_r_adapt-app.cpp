@@ -951,7 +951,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "[HyperElasticityDefault]" << std::endl;
     iss << "type = Hyperelasticity" << std::endl;
     iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "dirichlet_boundaries = bottom top left right" << std::endl;
+    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
@@ -979,7 +979,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "[HyperElasticityDefault]" << std::endl;
     iss << "type = Hyperelasticity" << std::endl;
     iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "dirichlet_boundaries = bottom top left right" << std::endl;
+    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;

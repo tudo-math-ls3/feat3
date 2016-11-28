@@ -274,13 +274,13 @@ struct MeshoptScrewsApp
     dom_ctrl.print();
 
     MeshExtrudeHelper<MeshType> extruder(dom_ctrl.get_levels().back()->get_mesh_node(),
-    Index(10*(lvl_max+1)), DataType(0), DataType(1), "bottom", "top");
+    Index(10*(lvl_max+1)), DataType(0), DataType(1), "bnd:b", "bnd:t");
 
     // This is the centre reference point
     WorldPoint x_0(DataType(0));
 
     // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner");
+    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("bnd:i");
     Geometry::TargetSet* inner_indices(nullptr);
     if(inner_boundary != nullptr)
       inner_indices = &(inner_boundary->template get_target_set<0>());
@@ -288,19 +288,19 @@ struct MeshoptScrewsApp
     // This is the centre point of the rotation of the inner screw
     WorldPoint centre_inner(DataType(0));
     centre_inner.v[0] = -excentricity_inner;
-    //const String inner_str(dom_ctrl.get_atlas()->find_mesh_chart("inner")->get_type());
-    auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("inner_screw");
+    auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("screw:i");
 
     // Get outer boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* outer_boundary_part = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
+    auto* outer_boundary_part = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("bnd:o");
     Geometry::TargetSet* outer_indices(nullptr);
     if(outer_boundary_part != nullptr)
+    {
       outer_indices = &(outer_boundary_part->template get_target_set<0>());
+    }
 
     // This is the centre point of the rotation of the outer screw
     WorldPoint centre_outer(DataType(0));
-    //const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
-    auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer_screw");
+    auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("screw:o");
 
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
@@ -1086,7 +1086,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "type = DuDv" << std::endl;
     iss << "config_section = DuDvDefaultParameters" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "dirichlet_boundaries = inner outer" << std::endl;
+    iss << "dirichlet_boundaries = bnd:i bnd:o" << std::endl;
 
     iss << "[DuDvDefaultParameters]" << std::endl;
     iss << "solver_config = PCG-MGV" << std::endl;
@@ -1096,7 +1096,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "[HyperElasticityDefault]" << std::endl;
     iss << "type = Hyperelasticity" << std::endl;
     iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "slip_boundaries = inner outer" << std::endl;
+    iss << "slip_boundaries = bnd:i bnd:o" << std::endl;
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
@@ -1113,7 +1113,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "[GapWidth]" << std::endl;
     iss << "type = ChartDistance" << std::endl;
     iss << "operation = add" << std::endl;
-    iss << "chart_list = inner_screw outer_screw" << std::endl;
+    iss << "chart_list = screw:i screw:o" << std::endl;
     iss << "function_type = default" << std::endl;
 
   }

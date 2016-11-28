@@ -27,7 +27,7 @@ keep_iterates = 0
 
 [DuDvPrecon]
 type = DuDvPrecon
-slip_boundaries = outer
+slip_boundaries = bnd:o
 fixed_reference_domain = 1
 linear_solver = PCG-MGV
 

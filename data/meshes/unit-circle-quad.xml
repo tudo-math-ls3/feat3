@@ -38,7 +38,7 @@
       4 5 7 6
     </Topology>
   </Mesh>
-  <MeshPart name="outer" parent="root" chart="outer" topology="full" size="5 4">
+  <MeshPart name="bnd:o" parent="root" chart="outer" topology="full" size="5 4">
     <Mapping dim="0">
       0
       1

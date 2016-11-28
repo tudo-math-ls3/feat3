@@ -91,7 +91,7 @@
       8 9 10 11 12 13 14 15
     </Topology>
   </Mesh>
-  <MeshPart name="bottom" parent="root" chart="sphere" topology="none" size="4 4 1">
+  <MeshPart name="bnd:b" parent="root" chart="sphere" topology="none" size="4 4 1">
     <Mapping dim="0">
       0
       1
@@ -108,7 +108,7 @@
       0
     </Mapping>
   </MeshPart>
-  <MeshPart name="top" parent="root" chart="sphere" topology="none" size="4 4 1">
+  <MeshPart name="bnd:t" parent="root" chart="sphere" topology="none" size="4 4 1">
     <Mapping dim="0">
       4
       5
@@ -125,7 +125,7 @@
       1
     </Mapping>
   </MeshPart>
-  <MeshPart name="front" parent="root" chart="sphere" topology="none" size="4 4 1">
+  <MeshPart name="bnd:fr" parent="root" chart="sphere" topology="none" size="4 4 1">
     <Mapping dim="0">
       0
       1
@@ -142,7 +142,7 @@
       2
     </Mapping>
   </MeshPart>
-  <MeshPart name="back" parent="root" chart="sphere" topology="none" size="4 4 1">
+  <MeshPart name="bnd:ba" parent="root" chart="sphere" topology="none" size="4 4 1">
     <Mapping dim="0">
       2
       3
@@ -159,7 +159,7 @@
       3
     </Mapping>
   </MeshPart>
-  <MeshPart name="left" parent="root" chart="sphere" topology="none" size="4 4 1">
+  <MeshPart name="bnd:l" parent="root" chart="sphere" topology="none" size="4 4 1">
     <Mapping dim="0">
       0
       2
@@ -176,7 +176,7 @@
       4
     </Mapping>
   </MeshPart>
-  <MeshPart name="right" parent="root" chart="sphere" topology="none" size="4 4 1">
+  <MeshPart name="bnd:r" parent="root" chart="sphere" topology="none" size="4 4 1">
     <Mapping dim="0">
       1
       3

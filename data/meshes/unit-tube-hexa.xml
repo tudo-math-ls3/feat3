@@ -73,7 +73,7 @@
       5
     </Mapping>
   </MeshPart>
-  <MeshPart name="bottom" parent="root"  topology="none" size="4 4 1 0">
+  <MeshPart name="bnd:b" parent="root"  topology="none" size="4 4 1 0">
     <Mapping dim="0">
       0
       1
@@ -90,7 +90,7 @@
       0
     </Mapping>
   </MeshPart>
-  <MeshPart name="top" parent="root"  topology="none" size="4 4 1 0">
+  <MeshPart name="bnd:t" parent="root"  topology="none" size="4 4 1 0">
     <Mapping dim="0">
       4
       5

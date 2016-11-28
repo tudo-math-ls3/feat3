@@ -65,7 +65,7 @@
       2 6 1 4
     </Topology>
   </Mesh>
-  <MeshPart name ="outer" chart="sphere" parent="root" topology="parent" size="6 12 8">
+  <MeshPart name ="bnd:o" chart="sphere" parent="root" topology="parent" size="6 12 8">
     <Mapping dim="0">
       0
       1

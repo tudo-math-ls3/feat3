@@ -1,7 +1,7 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Info>
     This mesh is the 2D plane of the C3D0 benchmark aka
-    the 3D "flow around a cylinder" benchark, which can be
+    the 3D "flow around a cylinder" benchmark, which can be
     used to generate a 3D hexa mesh using the mesh-extruder tool.
     Note that the domain is slightly different from the 2D case.
     This mesh consists of 32 quadrilateral cells.
@@ -171,7 +171,7 @@
       38 43 39 44
     </Topology>
   </Mesh>
-  <MeshPart name="left" parent="root" topology="none" size="5 4">
+  <MeshPart name="bnd:l" parent="root" topology="none" size="5 4">
     <Mapping dim="0">
       4
       3
@@ -186,7 +186,7 @@
       0
     </Mapping>
   </MeshPart>
-  <MeshPart name="right" parent="root" topology="none" size="5 4">
+  <MeshPart name="bnd:r" parent="root" topology="none" size="5 4">
     <Mapping dim="0">
       40
       41
@@ -201,7 +201,7 @@
       76
     </Mapping>
   </MeshPart>
-  <MeshPart name="bottom" parent="root" topology="none" size="8 7">
+  <MeshPart name="bnd:b" parent="root" topology="none" size="8 7">
     <Mapping dim="0">
       0
       5
@@ -222,7 +222,7 @@
       68
     </Mapping>
   </MeshPart>
-  <MeshPart name="top" parent="root" topology="none" size="8 7">
+  <MeshPart name="bnd:t" parent="root" topology="none" size="8 7">
     <Mapping dim="0">
       44
       39
@@ -243,7 +243,7 @@
       8
     </Mapping>
   </MeshPart>
-  <MeshPart name="circle" parent="root" chart="circle" topology="full" size="5 4">
+  <MeshPart name="bnd:c" parent="root" chart="circle" topology="full" size="5 4">
     <Topology dim="1">
       0 1
       1 2

@@ -374,7 +374,10 @@ namespace FEAT
 
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
 
-            _sum_mu = CoordType(rmn_->get_mesh()->get_num_entities(ShapeType::dimension));
+            for(Index i(0); i < _mu.size(); ++i)
+            {
+              _sum_mu += _mu(i);
+            }
 
             sync_scalars.emplace("_sum_mu",&_sum_mu);
 
@@ -445,7 +448,15 @@ namespace FEAT
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr!\n");
             XASSERTM(_penalty_param >= DataType(0), "penalty_param must be >= 0!\n");
 
-            _sum_mu = CoordType(rmn_->get_mesh()->get_num_entities(ShapeType::dimension));
+            //_mu(17, DataType(128));
+            //_mu(20, DataType(128));
+            //_mu(25, DataType(128));
+            //_mu(28, DataType(128));
+
+            for(Index i(0); i < _mu.size(); ++i)
+            {
+              _sum_mu += _mu(i);
+            }
 
             sync_scalars.emplace("_sum_mu",&_sum_mu);
 
@@ -571,6 +582,7 @@ namespace FEAT
         {
           exporter.add_cell_scalar("h", this->_h.elements());
           exporter.add_cell_scalar("lambda", this->_lambda.elements());
+          exporter.add_cell_scalar("mu", this->_mu.elements());
 
           DataType* fval_norm(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
           DataType* fval_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
@@ -640,6 +652,20 @@ namespace FEAT
           return _alignment_constraint;
         }
 
+        //void set_mu(std::vector<CoordType>& cells, const CoordType& weight)
+        //{
+        //  for(Index i(0); i < cells.size(); ++i)
+        //  {
+        //    _mu(cells(i), weight);
+        //  }
+
+        //  _sum_mu = CoordType(0);
+        //  for(Index i(0); i < _mu.size(); ++i)
+        //  {
+        //    _sum_mu += _mu(i);
+        //  }
+        //}
+
         /**
          * \brief Performs intialisations that cannot be done in the constructor
          *
@@ -690,7 +716,7 @@ namespace FEAT
           // For this, _sum_mu needs to have been summed up over all patches in the synchronisation phase.
           if(_sum_mu != DataType(1))
           {
-            _mu.format(DataType(1)/_sum_mu);
+            _mu.scale(_mu, DataType(1)/_sum_mu);
             _sum_mu = DataType(1);
           }
 
