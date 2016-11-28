@@ -678,6 +678,7 @@ struct MeshoptBoundaryApp
 
     delete[] qi_cellwise;
     delete[] edge_angle_cellwise;
+    delete[] todo_boundary;
 
     return ret;
 
