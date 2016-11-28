@@ -189,9 +189,7 @@ namespace FEAT
 
       std::shared_ptr<SynchScalarTicket<DataType>> norm2_async() const
       {
-        auto t = norm2sqr_async();
-        t->sqrt = true;
-        return t;
+        return _gate->dot_async(_vector, _vector, true);
       }
 
       void component_invert(const Vector& x, const DataType alpha = DataType(1))

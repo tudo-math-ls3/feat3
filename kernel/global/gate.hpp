@@ -221,9 +221,9 @@ namespace FEAT
         return sum(_freqs.triple_dot(x, y));
       }
 
-      ScalarTicketType dot_async(const LocalVector_& x, const LocalVector_& y) const
+      ScalarTicketType dot_async(const LocalVector_& x, const LocalVector_& y, bool sqrt = false) const
       {
-        return sum_async(_freqs.triple_dot(x, y));
+        return sum_async(_freqs.triple_dot(x, y), sqrt);
       }
 
       /**
@@ -240,9 +240,9 @@ namespace FEAT
         return synch_scalar(x, *_comm, Dist::op_sum, false);
       }
 
-      ScalarTicketType sum_async(DataType x) const
+      ScalarTicketType sum_async(DataType x, bool sqrt = false) const
       {
-        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_sum, false);
+        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_sum, sqrt);
       }
 
       /**
