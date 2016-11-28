@@ -175,7 +175,7 @@ namespace FEAT
           // first, create a mutable copy of our point
           PointType v(point);
 
-          // next, choose the inital h
+          // next, choose the initial h
           DataType h(_init_grad_h);
 
           // Note: the '_grad' vector was already allocated to
@@ -231,7 +231,7 @@ namespace FEAT
           // first, create a mutable copy of our point
           PointType v(point);
 
-          // next, choose the inital h
+          // next, choose the initial h
           DataType h(_init_hess_h);
 
           // Note: the '_hess' vector was already allocated to

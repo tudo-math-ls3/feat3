@@ -687,7 +687,7 @@ struct MeshoptBoundaryApp
 
 int run_app(int argc, char* argv[])
 {
-  // Even though this *looks* configureable, it is not: All HyperelasticityFunctionals are implemented for Mem::Main
+  // Even though this *looks* configurable, it is not: All HyperelasticityFunctionals are implemented for Mem::Main
   // only
   typedef Mem::Main MemType;
   // Floating point type

@@ -79,7 +79,7 @@ namespace FEAT
         template <typename DT_>
         static void upload(DT_ * dest, const DT_ * const src, const Index count);
 
-        /// recieve element
+        /// receive element
         template <typename DT_>
         static DT_ get_element(const DT_ * data, const Index index);
 
@@ -119,9 +119,9 @@ namespace FEAT
     };
 
     /**
-     * \brief Memory managment.
+     * \brief Memory management.
      *
-     * This class manages the used memory chunks and releases them, if neccesary.
+     * This class manages the used memory chunks and releases them, if necessary.
      *
      * \author Dirk Ribbrock
      */
@@ -282,7 +282,7 @@ namespace FEAT
           ::memcpy(dest, src, count * sizeof(DT_));
         }
 
-        /// recieve element
+        /// receive element
         template <typename DT_>
         inline static const DT_ & get_element(const DT_ * data, const Index index)
         {

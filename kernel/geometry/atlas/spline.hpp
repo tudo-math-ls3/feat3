@@ -78,7 +78,7 @@ namespace FEAT
          * \brief Constructor.
          *
          * \param[in] vtx_ptr
-         * A deque containing the indicies of the vertex points in the world point array.
+         * A deque containing the indices of the vertex points in the world point array.
          *
          * \param[in] world
          * A deque of vertex and control points representing the spline.

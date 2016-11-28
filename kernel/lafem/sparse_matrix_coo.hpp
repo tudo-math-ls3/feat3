@@ -833,7 +833,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Matrix.
        *
@@ -1503,7 +1503,7 @@ namespace FEAT
        *
        * \note This methods creates a deep copy of its own layout and returns it.
        * This is necessary because coo layouts may change after creation and thus cannot be used by two different SparseMatrix Objects.
-       * Nevertheless it is usefull to extract a matrix' layout, to create another matrix with the same matrix (same as 'same' at the moment of creation).
+       * Nevertheless it is useful to extract a matrix' layout, to create another matrix with the same matrix (same as 'same' at the moment of creation).
        */
       SparseLayout<Mem_, IT_, layout_id> layout() const
       {
@@ -1861,7 +1861,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
       void apply(DenseVector<Mem_,DT_, IT_>& r, const DenseVector<Mem_, DT_, IT_>& x) const
@@ -1881,7 +1881,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.

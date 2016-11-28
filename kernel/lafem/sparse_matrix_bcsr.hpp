@@ -1144,7 +1144,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
@@ -1177,7 +1177,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
       void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
@@ -1211,7 +1211,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
@@ -1245,7 +1245,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
       void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
@@ -1279,7 +1279,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
@@ -1322,7 +1322,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
@@ -1364,7 +1364,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
@@ -1406,7 +1406,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
@@ -1448,7 +1448,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.

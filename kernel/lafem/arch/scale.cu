@@ -42,7 +42,7 @@ void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const In
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
 template void Scale<Mem::CUDA>::value(float *, const float * const, const float, const Index);

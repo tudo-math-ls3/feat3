@@ -36,7 +36,7 @@ void FEAT::Util::cuda_check_last_error()
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 }
 
 void * FEAT::Util::cuda_get_device_pointer(void * host)

@@ -973,7 +973,7 @@ namespace FEAT
      *
      * Moreover, each of the above variants is parameterised in a relaxation/damping parameter
      * \e omega, which can be specified in the constructor. For multiplicative variants, \e omega
-     * is a relaxation paramter (as in SOR), whereas for additive variants \e omega is a damping
+     * is a relaxation parameter (as in SOR), whereas for additive variants \e omega is a damping
      * parameter (as in damped Jacobi).
      *
      * <b>Guidelines, Remarks, Warnings & Tips</b>\n

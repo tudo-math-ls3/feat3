@@ -705,7 +705,7 @@ int main(int argc, char** argv)
       cout << "                   the project files. If not given, the name of the last" << endl;
       cout << "                   directory of the path is taken." << endl;
       cout << endl;
-      cout << "Futher options:" << endl;
+      cout << "Further options:" << endl;
       cout << "-hpp:<list>        Include all C++ header files of the semicolon-separated" << endl;
       cout << "                   list. Specify '-hpp:*' to include all C++ header files" << endl;
       cout << "                   in the application directory automatically." << endl;

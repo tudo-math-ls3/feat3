@@ -85,7 +85,7 @@ void MemoryPool<Mem::CUDA>::finalise()
 
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "Pending cuda errors occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+    throw InternalError(__func__, __FILE__, __LINE__, "Pending cuda errors occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 }
 
 template <typename DT_>

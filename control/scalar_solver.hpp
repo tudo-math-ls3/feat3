@@ -312,7 +312,7 @@ namespace FEAT
             result = create_schwarz_precon<SolverVectorType_>(system_levels, transfer_levels, base, solver_name, section, nullptr);
           }
           else
-            throw InternalError(__func__, __FILE__, __LINE__, "solver with type " + solver_type + " unkown!");
+            throw InternalError(__func__, __FILE__, __LINE__, "solver with type " + solver_type + " unknown!");
 
           return result;
         }
@@ -368,7 +368,7 @@ namespace FEAT
       public:
 
         /**
-         * \brief Create ScalarSolver controll object
+         * \brief Create ScalarSolver control object
          *
          * This creates a new set of system levels, transfer levels and vectors from the containers provided,
          * that fit the MatrixTypeSolve_ type.

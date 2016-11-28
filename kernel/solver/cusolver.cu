@@ -39,7 +39,7 @@ namespace FEAT
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 
         return (status != CUSOLVER_STATUS_SUCCESS);
@@ -68,7 +68,7 @@ namespace FEAT
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 
         return (status != CUSOLVER_STATUS_SUCCESS);

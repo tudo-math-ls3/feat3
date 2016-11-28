@@ -159,7 +159,7 @@ public:
     filter.filter_rhs(vec_rhs);
     filter.filter_sol(vec_sol);
 
-    // compute inital defect
+    // compute initial defect
     matrix.apply(vec_def, vec_sol, vec_rhs, -DT_(1));
     const DT_ def0 = vec_def.norm2();
 
@@ -296,7 +296,7 @@ public:
     filter.filter_rhs(vec_rhs);
     filter.filter_sol(vec_sol);
 
-    // compute inital defect
+    // compute initial defect
     matrix.apply(vec_def, vec_sol, vec_rhs, -DT_(1));
     const DT_ def0 = vec_def.norm2();
 

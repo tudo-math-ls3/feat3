@@ -563,7 +563,7 @@ namespace FEAT
        */
       void write_vtu(std::ostream& os) const
       {
-        // fetch basic infomation
+        // fetch basic information
         const int num_coords = MeshType::world_dim;
         const int verts_per_cell = Shape::FaceTraits<ShapeType,0>::count;
 

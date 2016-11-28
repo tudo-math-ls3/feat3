@@ -744,7 +744,7 @@ namespace FEAT
          * The mesh node this function is to use.
          *
          * \note The mesh node cannot be set at construction time because this class is used from the
-         * MeshConcentrationFuncionFactory, so this method is neccessary.
+         * MeshConcentrationFuncionFactory, so this method is necessary.
          */
         virtual void set_mesh_node(const Geometry::RootMeshNode<MeshType>* DOXY(mesh_node_)) = 0;
 

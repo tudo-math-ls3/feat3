@@ -56,7 +56,7 @@
 // 1. The right-hand-side 'f' of the PDE is chosen by the following rules:
 //    1.1: If the caller explicitly specified this function by supplying
 //           --f <formula>
-//         at the command line, then this formula is used for the definiton of 'f'.
+//         at the command line, then this formula is used for the definition of 'f'.
 //    1.2: Else if the caller explicitly specified a reference solution function
 //         by supplying
 //           --u <formula>
@@ -66,7 +66,7 @@
 // 2. The boundary condition function 'g' is chosen in analogy to 'f':
 //    2.1: If the caller explicitly specified this function by supplying
 //           --g <formula>
-//         at the command line, then this formula is used for the definiton of 'g'.
+//         at the command line, then this formula is used for the definition of 'g'.
 //    2.2: Else if the caller explicitly specified a reference solution function
 //         by supplying
 //           --u <formula>
@@ -170,7 +170,7 @@ namespace Tutorial04
     // The argument parser distinguishes between three argument types:
     // Any argument beginning with a double-hyphen ('--') is called an 'option', whereas
     // any other argument is called a 'parameter', which is associated with the last
-    // option preceeding the parameter (if there is one). Finally, any argument preceeding
+    // option preceding the parameter (if there is one). Finally, any argument preceding
     // the first option is silently ignored by the parser - this includes the very first
     // argument which is always the path of the application's binary executable.
     //
@@ -182,7 +182,7 @@ namespace Tutorial04
     // This call has a total of 8 arguments:
     // 0: "./my_application" is the path of the application's binary.
     // 1: "foobar" is some argument that is ignored by our SimpleArgParser,
-    //    because there is no option preceeding it
+    //    because there is no option preceding it
     // 2: "--quiet" is an option without any parameters
     // 3: "--level" is another option with two parameters:
     // 4: "5" is the first parameter for the option "--level"

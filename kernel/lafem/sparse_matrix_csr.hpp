@@ -745,7 +745,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Matrix.
        *
@@ -843,7 +843,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Matrix.
        *
@@ -1879,7 +1879,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] transposed Should the product use the transposed matrix?
        */
@@ -1922,7 +1922,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The block vector that recieves the result.
+       * \param[out] r The block vector that receives the result.
        * \param[in] x The block vector to be multiplied by this matrix.
        *
        * \note Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix.
@@ -1959,7 +1959,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The vector that recieves the result.
+       * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
@@ -2014,7 +2014,7 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
-       * \param[out] r The block vector that recieves the result.
+       * \param[out] r The block vector that receives the result.
        * \param[in] x The block vector to be multiplied by this matrix.
        * \param[in] y The summand block vector.
        * \param[in] alpha A scalar to scale the product with.

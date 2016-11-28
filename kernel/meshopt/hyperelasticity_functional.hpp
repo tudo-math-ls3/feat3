@@ -456,7 +456,7 @@ namespace FEAT
               mesh_conc_ == nullptr)
               {
                 throw InternalError(__func__,__FILE__,__LINE__,
-                "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
+                "Scale computation set to "+stringify(_scale_computation)+", but no concentration function was given");
               }
 
             if(mesh_conc_ != nullptr)
@@ -739,7 +739,7 @@ namespace FEAT
          */
         virtual void prepare_pre_sync(const VectorTypeR& vec_state, FilterType& filter)
         {
-          // Download state if neccessary
+          // Download state if necessary
           CoordsBufferType vec_buf;
           vec_buf.convert(vec_state);
 

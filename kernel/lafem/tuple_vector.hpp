@@ -162,7 +162,7 @@ namespace FEAT
       /**
        * \brief Turns this vector into a clone of other
        *
-       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       * As the default CloneMode of the underlying containers is unknown, this has to be separate.
        *
        */
       void clone(const TupleVector& other)
@@ -338,7 +338,7 @@ namespace FEAT
       /// \endcond
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Vector.
        *
@@ -596,7 +596,7 @@ namespace FEAT
       /**
        * \brief Turns this vector into a clone of other
        *
-       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       * As the default CloneMode of the underlying containers is unknown, this has to be separate.
        *
        */
       void clone(const TupleVector& other)
@@ -734,7 +734,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Vector.
        *

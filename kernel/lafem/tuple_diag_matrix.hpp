@@ -508,7 +508,7 @@ namespace FEAT
       /// \endcond
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Matrix.
        *
@@ -803,7 +803,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Convertion method
+       * \brief Conversion method
        *
        * \param[in] other The source Matrix.
        *

@@ -453,7 +453,7 @@ namespace FEAT
         return size_type(0);
       }
 
-      // find first occurance of fork substring
+      // find first occurrence of fork substring
       size_type off1(find_first_not_of(charset));
       if(off1 == npos)
       {
@@ -464,7 +464,7 @@ namespace FEAT
       // go forking
       while(off1 != npos)
       {
-        // find next occurance of delimiter string
+        // find next occurrence of delimiter string
         size_type off2(find_first_of(charset, off1));
 
         // add next fork substring to vector
@@ -480,7 +480,7 @@ namespace FEAT
           words.push_back(substr(off1, (off2 == npos ? npos : off2 - off1)));
         }
 
-        // find next occurance of fork substring
+        // find next occurrence of fork substring
         off1 = find_first_not_of(charset, off2);
       }
 
@@ -532,7 +532,7 @@ namespace FEAT
       if(empty() || delimiter.empty())
         return size_type(0);
 
-      // find first occurance of delimiter substring
+      // find first occurrence of delimiter substring
       size_type off1(find(delimiter));
       words.push_back(substr(0, off1));
       if(off1 == npos)
@@ -545,7 +545,7 @@ namespace FEAT
         // increase leading offset by delimiter length
         off1 += dellen;
 
-        // find next substring occurance
+        // find next substring occurrence
         size_type off2 = find(delimiter, off1);
         if(off2 == npos)
         {
@@ -568,12 +568,12 @@ namespace FEAT
     }
 
     /**
-     * \brief Replaces all occurances of a substring by another substring.
+     * \brief Replaces all occurrences of a substring by another substring.
      *
-     * This function will replace all occurances of a substring \c find_string by \c replace_string.
+     * This function will replace all occurrences of a substring \c find_string by \c replace_string.
      *
-     * \note This function is not successive, i.e. it will \b not replace an occurance of the find-string
-     * if this occurance is a result of a previous replacement, e.g. for the combination \c *this = "aaa",
+     * \note This function is not successive, i.e. it will \b not replace an occurrence of the find-string
+     * if this occurrence is a result of a previous replacement, e.g. for the combination \c *this = "aaa",
      * \c find_string = "aa" and \c replace_string = "pa" the resulting string will be "paa" and not "ppa".
      *
      * \param[in] find_string
@@ -592,7 +592,7 @@ namespace FEAT
       if(flen <= 0)
         return size_type(0);
 
-      // find first occurance of find string
+      // find first occurrence of find string
       size_type pos(find(find_string));
       size_type counter(size_type(0));
       while(pos != npos)
@@ -603,7 +603,7 @@ namespace FEAT
         // increment counter
         ++counter;
 
-        // find next occurance
+        // find next occurrence
         pos = find(find_string, pos + rlen);
       }
 

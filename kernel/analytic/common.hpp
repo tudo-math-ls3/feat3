@@ -1798,7 +1798,7 @@ namespace FEAT
        *  \f}
        *  with \f$ \forall i = 0, \dots, 3: u(x_i) = 0 \f$.
        *
-       *  It is often used for testing optimisation algorithms because of the nonconvexity and existance of a local
+       *  It is often used for testing optimisation algorithms because of the nonconvexity and existence of a local
        *  maximum in \f$ x_4 \approx ( -0.270845, -0.93039)^T \f$ and several saddle points.
        *
        * \author Jordi Paul
@@ -1869,7 +1869,7 @@ namespace FEAT
        *  \f}
        *  with \f$ \forall i = 0, \dots, 3: u(x_i) = 0 \f$.
        *
-       *  It is often used for testing optimisation algorithms because of the nonconvexity and existance of a local
+       *  It is often used for testing optimisation algorithms because of the nonconvexity and existence of a local
        *  maximum in \f$ x_4 \approx ( -0.270845, -0.93039)^T \f$ and several saddle points.
        *
        * \author Jordi Paul
@@ -1935,7 +1935,7 @@ namespace FEAT
        * \f]
        *
        * The function has a global minimum in \f$ x_0 = (1, 1)^T\f$ and a "steep valley" along the parabola
-       * \f$ y = x^2 \f$. This is a great challange to descend-based optimisation algorithms like steepest descent or
+       * \f$ y = x^2 \f$. This is a great challenge to descend-based optimisation algorithms like steepest descent or
        * nonlinear CG and the reason it is frequently used as a target function to test such algorithms.
        *
        * \author Jordi Paul

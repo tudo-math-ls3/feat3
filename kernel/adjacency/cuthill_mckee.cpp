@@ -99,7 +99,7 @@ namespace FEAT
           throw InternalError("Invalid root_type parameter!");
         }
 
-        // if something very odd has happend
+        // if something very odd has happened
         if(!(root < num_nodes))
         {
           throw InternalError("No root found!");

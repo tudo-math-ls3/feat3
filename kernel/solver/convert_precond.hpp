@@ -51,7 +51,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] inner_solver
-       * The acutal solver, which shall be executed with converted rhs/sol vectors
+       * The actual solver, which shall be executed with converted rhs/sol vectors
        */
       explicit ConvertPrecond(std::shared_ptr<SolverTypeInner> inner_solver) :
         _inner_solver(inner_solver)
@@ -118,7 +118,7 @@ namespace FEAT
      * \brief Creates a new ConvertPrecond solver object
      *
      * \param[in] inner_solver
-     * The acutal solver, which shall be executed with converted rhs/sol vectors
+     * The actual solver, which shall be executed with converted rhs/sol vectors
      *
      * \returns
      * A shared pointer to a new ConvertPrecond object.
@@ -155,7 +155,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] inner_solver
-       * The acutal solver, which shall be executed with converted rhs/sol vectors
+       * The actual solver, which shall be executed with converted rhs/sol vectors
        */
       explicit ConvertPrecond(std::shared_ptr<SolverTypeInner> inner_solver) :
         _inner_solver(inner_solver)
@@ -222,7 +222,7 @@ namespace FEAT
      * \brief Creates a new ConvertPrecond solver object
      *
      * \param[in] inner_solver
-     * The acutal solver, which shall be executed with converted rhs/sol vectors
+     * The actual solver, which shall be executed with converted rhs/sol vectors
      *
      * \returns
      * A shared pointer to a new ConvertPrecond object.

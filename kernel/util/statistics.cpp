@@ -49,7 +49,7 @@ String Statistics::get_formatted_solver_tree()
   {
     ++it;
 
-    // the current solver is of multigrid type, search for smoother and coarse solver (smoother allways comes first).
+    // the current solver is of multigrid type, search for smoother and coarse solver (smoother always comes first).
     // if smoother and coarse solver have been found, skip everything until solver end statement has been found
     if (names.back().starts_with("MultiGrid") || names.back().starts_with("VCycle") || names.back().starts_with("ScaRCMultiGrid"))
     {

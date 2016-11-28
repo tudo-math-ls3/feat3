@@ -424,7 +424,7 @@ namespace FEAT
           // Check for convergence wrt. the function value improvement if _tol_fval says so
           if(_tol_fval > DataType(0))
           {
-            // This is the factor for the relative funciton value
+            // This is the factor for the relative function value
             DataType scale(Math::max(_fval, _fval_prev));
             // Make sure it is at least 1
             scale = Math::max(scale, DataType(1));

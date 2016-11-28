@@ -22,8 +22,8 @@ namespace FEAT
    * - Any command line argument starting with <c>\--</c> (double hyphen) is interpreted as
    *   an \e option.
    * - Any command line argument not starting with <c>\--</c> is interpreted as a \e parameter
-   *   for the last option preceeding the parameter.
-   * - Any command line argument preceeding the very first option is ignored by the parser.
+   *   for the last option preceding the parameter.
+   * - Any command line argument preceding the very first option is ignored by the parser.
    *
    * <b>Example:</b>\n
    * The command line call
@@ -32,13 +32,13 @@ namespace FEAT
         \endverbatim
    * has a total of 8 arguments:
    * - 0: <c>"my_app"</c>: The name of the application's binary.
-   * - 1: <c>"foobar"</c>: An argument ignored by the parser (as there is no option preceeding it).
+   * - 1: <c>"foobar"</c>: An argument ignored by the parser (as there is no option preceding it).
    * - 2: <c>"--quiet"</c>: The first option named <c>quiet</c> without any parameters.
    * - 3: <c>"--level"</c>: The second option named <c>level</c> with one parameter following.
-   * - 4: <c>"4"</c>: The first and only parameter for the preceeding option <c>level</c>.
+   * - 4: <c>"4"</c>: The first and only parameter for the preceding option <c>level</c>.
    * - 5: <c>"--precon"</c>: The second option <c>precon</c> with two parameters following.
-   * - 6: <c>"spai"</c>: The first parameter for the preceeding option <c>precon</c>.
-   * - 7: <c>"jacobi"</c>: The second parameter for the preceeding option <c>precon</c>.
+   * - 6: <c>"spai"</c>: The first parameter for the preceding option <c>precon</c>.
+   * - 7: <c>"jacobi"</c>: The second parameter for the preceding option <c>precon</c>.
    *
    * Assume that the application's main function creates an SimpleArgParser object by
    * \code{.cpp}
@@ -383,7 +383,7 @@ namespace FEAT
       // get an option iterator
       auto opt = _opts.end();
 
-      // we definately skip the first argument
+      // we definitely skip the first argument
       _num_skipped_args = 1;
 
       // loop over all arguments

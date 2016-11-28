@@ -116,7 +116,7 @@ namespace FEAT
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 
         CudaIluSolveInfo * info = new CudaIluSolveInfo;
@@ -176,7 +176,7 @@ namespace FEAT
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 
         return 0;
@@ -303,7 +303,7 @@ namespace FEAT
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 
         CudaIluBSolveInfo * info = new CudaIluBSolveInfo;
@@ -365,7 +365,7 @@ namespace FEAT
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+          throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 
         return 0;

@@ -106,7 +106,7 @@ int run(Solver_& solver, Operator_& op)
   Status st = solver->correct(sol, rhs);
 
 
-  // Check the distance betwen solution and minimal points
+  // Check the distance between solution and minimal points
   DataType min_dist(Math::Limits<DataType>::max());
 
   it = min_points.begin();

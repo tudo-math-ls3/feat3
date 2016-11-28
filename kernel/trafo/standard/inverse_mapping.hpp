@@ -187,7 +187,7 @@ namespace FEAT
        *   v^3 := (x^1 - x^0) \times (x^2 - x^0) \Rightarrow v^3 \perp S.
        * \f]
        *
-       * Using \f$ x^3 := \| v^3 \|_2^{-1} v^3 \f$, the vertices \f$ x^0, \dots, x^3 \f$ define a ficticious
+       * Using \f$ x^3 := \| v^3 \|_2^{-1} v^3 \f$, the vertices \f$ x^0, \dots, x^3 \f$ define a fictitious
        * \c Simplex<3> \f$ S' \f$. Then we can proceed with computing the coefficients as in the \c Simplex<d> in
        * \f$ \mathbb{R}^d\f$ variant of this function, and the last coefficient is just the distance of the point
        * \f$ x \f$ to the plane in which \f$ S \f$ lies.

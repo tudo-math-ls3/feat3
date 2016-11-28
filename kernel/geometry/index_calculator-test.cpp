@@ -333,7 +333,7 @@ class IndexCalculatorVertexTest
           indices_at_edge[j] = my_vert_at_subshape_index_set[i][j];
 
         std::pair<bool, Index> bi = original_tree.find(indices_at_edge);
-        TEST_CHECK_MSG(bi.first,"New subshape not found in orginal IndexSet");
+        TEST_CHECK_MSG(bi.first,"New subshape not found in original IndexSet");
       }
 
       // Parse the new IndexSet into an IndexTree

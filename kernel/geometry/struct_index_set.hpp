@@ -120,7 +120,7 @@ namespace FEAT
       /**
        * \brief Returns the number of indices per entity.
        * \returns
-       * The number of indices per entitiy.
+       * The number of indices per entity.
        */
       int get_num_indices() const
       {

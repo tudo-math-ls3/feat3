@@ -377,7 +377,7 @@ namespace FEAT
      * This function writes the whole section tree into an output stream, which can be parsed.
      *
      * \param[in,out] os
-     * A refernce to an output stream to which to write to. It is silently assumed that the output stream is
+     * A reference to an output stream to which to write to. It is silently assumed that the output stream is
      * open.
      *
      * \param[in] indent

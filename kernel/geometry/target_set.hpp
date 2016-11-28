@@ -163,7 +163,7 @@ namespace FEAT
     /**
      * \brief Template recursive array of TargetSets
      *
-     * A MeshPart refering to a mesh of Shape_ can have Shape_::dimension+1 TargetSets and this class provides the
+     * A MeshPart referring to a mesh of Shape_ can have Shape_::dimension+1 TargetSets and this class provides the
      * means of accessing them. It inherits from the TargetSetHolder class wrt. the same shape of one dimension less.
      *
      * \tparam Shape_

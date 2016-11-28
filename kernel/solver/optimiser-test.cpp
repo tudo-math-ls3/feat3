@@ -109,7 +109,7 @@ class NLCGTest:
       std::deque<PointType> min_points;
       TestTraitsType::get_minimal_points(min_points);
 
-      // Check the distance betwen solution and minimal points
+      // Check the distance between solution and minimal points
       DT_ min_dist(Math::Limits<DT_>::max());
 
       const auto& jt = min_points.end();
@@ -267,7 +267,7 @@ class NLSDTest:
       std::deque<PointType> min_points;
       TestTraitsType::get_minimal_points(min_points);
 
-      // Check the distance betwen solution and minimal points
+      // Check the distance between solution and minimal points
       DT_ min_dist(Math::Limits<DT_>::max());
 
       const auto& jt = min_points.end();
@@ -376,7 +376,7 @@ class ALGLIBMinLBFGSTest:
       std::deque<PointType> min_points;
       TestTraitsType::get_minimal_points(min_points);
 
-      // Check the distance betwen solution and minimal points
+      // Check the distance between solution and minimal points
       DT_ min_dist(Math::Limits<DT_>::max());
 
       const auto& jt = min_points.end();
@@ -478,7 +478,7 @@ class ALGLIBMinCGTest:
       std::deque<PointType> min_points;
       TestTraitsType::get_minimal_points(min_points);
 
-      // Check the distance betwen solution and minimal points
+      // Check the distance between solution and minimal points
       DT_ min_dist(Math::Limits<DT_>::max());
 
       const auto& jt = min_points.end();

@@ -92,7 +92,7 @@
 // Boundary Condition Specification Options
 // ----------------------------------------
 // This application supports only very limited customisation of boundary conditions, which
-// is limited to specifiying
+// is limited to specifying
 //  1) the mesh-part for the parabolic inflow region,
 //  2) the mesh-part for the "do-nothing" outflow region
 // All other mesh-parts are treated as "no-flow" boundaries.

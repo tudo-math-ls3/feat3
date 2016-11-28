@@ -217,7 +217,7 @@ SparseMatrixCudaConversionTest<Mem::CUDA, double, unsigned int> sparse_matrix_cu
 #endif
 
 /**
- * \brief Test class for the convertion from SparseMatrixBanded to another matrix-format
+ * \brief Test class for the conversion from SparseMatrixBanded to another matrix-format
  *
  * \test test description missing
  *

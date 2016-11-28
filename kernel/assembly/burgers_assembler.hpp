@@ -36,7 +36,7 @@ namespace FEAT
       // specifies whether to use the deformation tensor
       bool deformation;
 
-      /// viscosity paramter: nu
+      /// viscosity parameter: nu
       DataType_ nu;
       DataType_ nu_scale_matrix;
       DataType_ nu_scale_vector;

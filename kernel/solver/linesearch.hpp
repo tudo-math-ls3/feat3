@@ -187,7 +187,7 @@ namespace FEAT
          * \brief Sets the intitial functional value
          *
          * \param[in] f0
-         * The intial functional value.
+         * The initial functional value.
          *
          * This is handy because the linesearch gets called from another solver that in general already evaluated
          * the functional.
@@ -204,7 +204,7 @@ namespace FEAT
          * \brief Sets the initial gradient from a defect vector
          *
          * \param[in] vec_def
-         * The intial defect vector.
+         * The initial defect vector.
          *
          * This is handy because the linesearch gets called from another solver that in general already evaluated
          * the functional gradient.
@@ -242,7 +242,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Trims the function value and gradient according to some threshhold
+         * \brief Trims the function value and gradient according to some threshold
          *
          * \param[in,out] func
          * Function value.
@@ -1062,7 +1062,7 @@ namespace FEAT
 
           this->_num_iter = Index(0);
 
-          // Save the intial state
+          // Save the initial state
           this->_vec_initial_sol.copy(vec_sol);
           // Norm of the search direction vector. It was normalised befor, but there might be rounding errors
           this->_norm_dir = vec_dir.norm2();
@@ -1082,7 +1082,7 @@ namespace FEAT
           if(_alpha_hard_max < Math::eps<DataType>())
             _alpha_hard_max = Math::pow(Math::huge<DataType>(), DataType(0.1622));
 
-          // Set the intervall of uncertainity
+          // Set the intervall of uncertainty
           _alpha_soft_min = DataType(0);
           _alpha_soft_max = _alpha_0 + extrapolation_width*_alpha_0;
           _alpha_soft_max = Math::min(_alpha_soft_max, _alpha_hard_max);
@@ -1422,7 +1422,7 @@ namespace FEAT
             //std::cout << "Case 4: alpha " << alpha_new << std::endl;
           }
 
-            // Update the inverval of uncertainity. Has to happen befor we clamp the step to the admissable interval.
+            // Update the inverval of uncertainty. Has to happen befor we clamp the step to the admissible interval.
             // Check which step(s) we need to replace
             if(fval > fval_lo)
             {
@@ -1467,7 +1467,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Enforces hard and soft step limits, adjusting the soft limits if neccessary
+         * \brief Enforces hard and soft step limits, adjusting the soft limits if necessary
          *
          * \param[in,out] alpha_new
          * The step size to be clamped.
@@ -1511,7 +1511,7 @@ namespace FEAT
          * If this is true, variant a) is chosen
          *
          * \returns
-         * The step corresponding to the minumum
+         * The step corresponding to the minimum
          *
          */
         DataType _argmin_quadratic(const DataType alpha_lo, const DataType fval_lo, const DataType df_lo, const DataType alpha_hi, const DataType fval_hi, const DataType df_hi, const bool interpolate_derivative) const
@@ -1554,7 +1554,7 @@ namespace FEAT
          * Derivative at alpha_hi
          *
          * \returns
-         * The step corresponding to the minumum or _alpha_soft_{min, max} if there is no minimum in the interiour.
+         * The step corresponding to the minimum or _alpha_soft_{min, max} if there is no minimum in the interiour.
          *
          * \note The code is extremely ugly and sensitive to annihilation.
          *

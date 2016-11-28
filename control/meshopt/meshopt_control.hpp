@@ -306,7 +306,7 @@ namespace FEAT
       }; // class MeshoptSystemLevel<...>
 
       /**
-       * \brief Structures for transfering data between mesh levels
+       * \brief Structures for transferring data between mesh levels
        *
        * \tparam SystemLevel_
        * The system level type

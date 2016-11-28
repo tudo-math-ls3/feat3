@@ -1088,7 +1088,7 @@ class StandardTrafoVolumeTest
 
       TrafoType trafo(mesh);
 
-      // Everything checked agains has been computed by hand
+      // Everything checked against has been computed by hand
       DataType_ vol = trafo.compute_vol<ShapeType, DataType_>(Index(0));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, DataType_(11)/DataType_(8), eps);
       // Check volume of sub simplices
