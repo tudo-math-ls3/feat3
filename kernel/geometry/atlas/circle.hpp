@@ -197,7 +197,15 @@ namespace FEAT
 
           CoordType my_dist(_radius - (point - _midpoint).norm_euclid());
 
-          grad_dist = (point - projected)*Math::signum(my_dist);
+          if(my_dist < Math::eps<CoordType>())
+          {
+            grad_dist = (_midpoint - point);
+          }
+          else
+          {
+            grad_dist = (point - projected)*Math::signum(my_dist);
+          }
+
           grad_dist.normalise();
 
           return my_dist;
