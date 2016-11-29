@@ -75,7 +75,7 @@ template
     const int _exponent_det;
 
   public:
-    HyperelasticityFunctionalTest(int exponent_det) : TestSystem::FullTaggedTest<MemType, DataType, IndexType>
+    explicit HyperelasticityFunctionalTest(int exponent_det) : TestSystem::FullTaggedTest<MemType, DataType, IndexType>
     ("hyperelasticity_functional_test-"+FunctionalType::name()), _exponent_det(exponent_det)
       {
       }
