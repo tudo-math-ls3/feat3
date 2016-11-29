@@ -4,14 +4,14 @@
 
 // includes, FEAT
 #include <kernel/solver/base.hpp>
-#include <kernel/lafem/preconditioner.hpp>
+#include <kernel/solver/legacy_preconditioners.hpp>
 
 namespace FEAT
 {
   namespace Solver
   {
     /**
-     * \brief Provisional LAFEM Preconditioner Wrapper class template
+     * \brief Provisional Legacy Preconditioners Wrapper class template
      *
      * This class template acts as a wrapper around the preconditioners implemented in the
      * <c>lafem/preconditioner.hpp</c> header file.

@@ -11,7 +11,7 @@ namespace FEAT
   {
     /// \todo reimplement this
     template<typename Matrix_, typename Filter_>
-    using SPAIPrecond = Solver::PreconWrapper<Matrix_, Filter_, LAFEM::SPAIPreconditioner>;
+    using SPAIPrecond = Solver::PreconWrapper<Matrix_, Filter_, Solver::SPAIPreconditioner>;
 
     /**
      * \brief Creates a new SPAIPrecond solver object

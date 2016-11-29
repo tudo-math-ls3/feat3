@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LAFEM_PRECONDITIONER_HPP
-#define KERNEL_LAFEM_PRECONDITIONER_HPP 1
+#ifndef KERNEL_SOLVER_LEGACY_PRECONDITIONERS_HPP
+#define KERNEL_SOLVER_LEGACY_PRECONDITIONERS_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -16,7 +16,7 @@
 
 namespace FEAT
 {
-  namespace LAFEM
+  namespace Solver
   {
     /**
      * Supported sparse precon types.
@@ -179,7 +179,7 @@ namespace FEAT
        *
        * Creates a Matrix preconditioner from given source matrix file name.
        */
-      explicit FilePreconditioner(const FileMode mode, const String filename) :
+      explicit FilePreconditioner(const LAFEM::FileMode mode, const String filename) :
         _mat(mode, filename)
       {
       }
@@ -385,14 +385,14 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class GaussSeidelPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                                    DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class GaussSeidelPreconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                                    LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
       const DT_ _damping;
-      const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & _A;
 
     public:
       /// Our datatype
@@ -402,9 +402,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_gauss_seidel;
 
@@ -420,7 +420,7 @@ namespace FEAT
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      explicit GaussSeidelPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
+      explicit GaussSeidelPreconditioner(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -446,8 +446,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -490,14 +490,14 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class GaussSeidelPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                                    DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class GaussSeidelPreconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                                    LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
       const DT_ _damping;
-      const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & _A;
 
     public:
       /// Our datatype
@@ -507,9 +507,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_gauss_seidel;
 
@@ -525,7 +525,7 @@ namespace FEAT
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      explicit GaussSeidelPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
+      explicit GaussSeidelPreconditioner(const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -551,8 +551,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // create pointers
         DT_ * pout(out.elements());
@@ -594,14 +594,14 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class GaussSeidelPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                                    DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class GaussSeidelPreconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                                    LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
       const DT_ _damping;
-      const SparseMatrixELL<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & _A;
 
     public:
       /// Our datatype
@@ -611,9 +611,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_gauss_seidel;
 
@@ -629,7 +629,7 @@ namespace FEAT
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      explicit GaussSeidelPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
+      explicit GaussSeidelPreconditioner(const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -655,8 +655,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -714,14 +714,14 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class ILUPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                            DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class ILUPreconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                            LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
-      SparseMatrixCSR<Mem_, DT_, IT_> _LU;
+      const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & _A;
+      LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> _LU;
 
     public:
       /// Our datatype
@@ -731,9 +731,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ilu;
 
@@ -750,7 +750,7 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      explicit ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const Index p) :
+      explicit ILUPreconditioner(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -760,7 +760,7 @@ namespace FEAT
 
         if (p == 0)
         {
-          _LU = SparseMatrixCSR<Mem_, DT_, IT_>(A.layout());
+          _LU = LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>(A.layout());
 
           _copy_entries(false);
         }
@@ -782,7 +782,7 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      explicit ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & LU) :
+      explicit ILUPreconditioner(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & LU) :
         _A(LU)
       {
         if (_LU.columns() != _LU.rows())
@@ -801,8 +801,8 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A,
-                        const SparseLayout<Mem_, IT_, SparseMatrixCSR<Mem_, DT_, IT_>::layout_id> & layout) :
+      ILUPreconditioner(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & A,
+                        const LAFEM::SparseLayout<Mem_, IT_, LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>::layout_id> & layout) :
         _A(A),
         _LU(layout)
       {
@@ -841,8 +841,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1050,9 +1050,9 @@ namespace FEAT
           nnz += Index(ll[i].size());
         }
 
-        DenseVector<Mem_, DT_, IT_> val(nnz);
-        DenseVector<Mem_, IT_, IT_> col_ind(nnz);
-        DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+        LAFEM::DenseVector<Mem_, DT_, IT_> val(nnz);
+        LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(nnz);
+        LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
         IT_ * pcol_ind(col_ind.elements());
         IT_ * prow_ptr(row_ptr.elements());
 
@@ -1069,7 +1069,7 @@ namespace FEAT
           prow_ptr[i+1] = k1;
         }
 
-        _LU = SparseMatrixCSR<Mem_, DT_, IT_>(n, n, col_ind, val, row_ptr);
+        _LU = LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>(n, n, col_ind, val, row_ptr);
 
         delete[] ll;
         delete[] pldiag;
@@ -1133,14 +1133,14 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class ILUPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                            DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class ILUPreconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                            LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_, IT_> & _A;
-      SparseMatrixELL<Mem_, DT_, IT_> _LU;
+      const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & _A;
+      LAFEM::SparseMatrixELL<Mem_, DT_, IT_> _LU;
 
     public:
       /// Our datatype
@@ -1150,9 +1150,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ilu;
 
@@ -1169,7 +1169,7 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      explicit ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const Index p) :
+      explicit ILUPreconditioner(const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -1179,7 +1179,7 @@ namespace FEAT
 
         if (p == 0)
         {
-          _LU = SparseMatrixELL<Mem_, DT_, IT_>(A.layout());
+          _LU = LAFEM::SparseMatrixELL<Mem_, DT_, IT_>(A.layout());
 
           _copy_entries(false);
         }
@@ -1201,7 +1201,7 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      explicit ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & LU) :
+      explicit ILUPreconditioner(const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & LU) :
         _A(LU)
       {
         if (_LU.columns() != _LU.rows())
@@ -1221,8 +1221,8 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A,
-                        const SparseLayout<Mem_, IT_, SparseMatrixELL<Mem_, DT_>::layout_id> & layout) :
+      ILUPreconditioner(const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & A,
+                        const LAFEM::SparseLayout<Mem_, IT_, LAFEM::SparseMatrixELL<Mem_, DT_>::layout_id> & layout) :
         _A(A),
         _LU(layout)
       {
@@ -1267,8 +1267,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1467,9 +1467,9 @@ namespace FEAT
         // Create LU-matrix
         // calculate cl-array and fill rl-array
         Index num_of_chunks(Index(ceil(n / float(C))));
-        DenseVector<Mem_, IT_, IT_> lucl(num_of_chunks, IT_(0));
-        DenseVector<Mem_, IT_, IT_> lucs(num_of_chunks + 1);
-        DenseVector<Mem_, IT_, IT_> lurl(n);
+        LAFEM::DenseVector<Mem_, IT_, IT_> lucl(num_of_chunks, IT_(0));
+        LAFEM::DenseVector<Mem_, IT_, IT_> lucs(num_of_chunks + 1);
+        LAFEM::DenseVector<Mem_, IT_, IT_> lurl(n);
         IT_ * plucl(lucl.elements());
         IT_ * plucs(lucs.elements());
         IT_ * plurl(lurl.elements());
@@ -1492,8 +1492,8 @@ namespace FEAT
 
         Index val_size = Index(plucs[num_of_chunks]);
 
-        DenseVector<Mem_, DT_, IT_> luval(val_size);
-        DenseVector<Mem_, IT_, IT_> lucol_ind(val_size);
+        LAFEM::DenseVector<Mem_, DT_, IT_> luval(val_size);
+        LAFEM::DenseVector<Mem_, IT_, IT_> lucol_ind(val_size);
         DT_ * pluval    (luval.elements());
         IT_ * plucol_ind(lucol_ind.elements());
 
@@ -1513,7 +1513,7 @@ namespace FEAT
           }
         }
 
-        _LU = SparseMatrixELL<Mem_, DT_, IT_>(n, n, nnz, luval, lucol_ind, lucs, lucl, lurl, C);
+        _LU = LAFEM::SparseMatrixELL<Mem_, DT_, IT_>(n, n, nnz, luval, lucol_ind, lucs, lucl, lurl, C);
 
         delete[] ll;
         delete[] pldiag;
@@ -1586,14 +1586,14 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class ILUPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                            DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class ILUPreconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                            LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      ILUPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                        DenseVector<Mem_, DT_, IT_> > _precond;
+      ILUPreconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                        LAFEM::DenseVector<Mem_, DT_, IT_> > _precond;
     public:
       /// Our datatype
       typedef DT_ DataType;
@@ -1602,9 +1602,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ilu;
 
@@ -1621,8 +1621,8 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      explicit ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const Index p) :
-        _precond(SparseMatrixCSR<Mem_, DT_, IT_> (A), p)
+      explicit ILUPreconditioner(const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & A, const Index p) :
+        _precond(LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> (A), p)
       {
       }
 
@@ -1635,8 +1635,8 @@ namespace FEAT
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      explicit ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & LU) :
-        _precond(SparseMatrixCSR<Mem_, DT_, IT_> (LU))
+      explicit ILUPreconditioner(const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & LU) :
+        _precond(LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> (LU))
       {
       }
 
@@ -1656,8 +1656,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         _precond.apply(out, in);
       }
@@ -1686,13 +1686,13 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SORPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                            DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class SORPreconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                            LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
       const bool _reverse;
 
@@ -1704,9 +1704,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_sor;
 
@@ -1725,7 +1725,7 @@ namespace FEAT
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
-      explicit SORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
+      explicit SORPreconditioner(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
         _A(A),
         _omega(omega),
         _reverse(reverse)
@@ -1752,8 +1752,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1810,13 +1810,13 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SORPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                            DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class SORPreconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                            LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
       const bool _reverse;
 
@@ -1828,9 +1828,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_sor;
 
@@ -1846,7 +1846,7 @@ namespace FEAT
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
-      explicit SORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
+      explicit SORPreconditioner(const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
         _A(A),
         _omega(omega),
         _reverse(reverse)
@@ -1873,8 +1873,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1941,13 +1941,13 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SORPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                            DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class SORPreconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                            LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
       const bool _reverse;
 
@@ -1959,9 +1959,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_sor;
 
@@ -1980,7 +1980,7 @@ namespace FEAT
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
-      explicit SORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
+      explicit SORPreconditioner(const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
         _A(A),
         _omega(omega),
         _reverse(reverse)
@@ -2007,8 +2007,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2081,13 +2081,13 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SSORPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class SSORPreconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                             LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
 
     public:
@@ -2098,9 +2098,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ssor;
 
@@ -2116,7 +2116,7 @@ namespace FEAT
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      explicit SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
+      explicit SSORPreconditioner(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2147,8 +2147,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // create pointers
         DT_ * pout(out.elements());
@@ -2200,13 +2200,13 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SSORPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class SSORPreconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                             LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
 
     public:
@@ -2217,9 +2217,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
+      typedef LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ssor;
 
@@ -2235,7 +2235,7 @@ namespace FEAT
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      explicit SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
+      explicit SSORPreconditioner(const LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2266,8 +2266,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // create pointers
         DT_ * pout(out.elements());
@@ -2328,13 +2328,13 @@ namespace FEAT
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SSORPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                              DenseVector<Mem_, DT_, IT_> >
+    class SSORPreconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                             LAFEM::DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                              LAFEM::DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_, IT_> & _A;
+      const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
 
     public:
@@ -2345,9 +2345,9 @@ namespace FEAT
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef LAFEM::DenseVector<Mem_, DT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixELL<Mem_, DT_> MatrixType;
+      typedef LAFEM::SparseMatrixELL<Mem_, DT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ssor;
 
@@ -2363,7 +2363,7 @@ namespace FEAT
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      explicit SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
+      explicit SSORPreconditioner(const LAFEM::SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2394,8 +2394,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         // create pointers
         DT_ * pout(out.elements());
@@ -2457,19 +2457,19 @@ namespace FEAT
       };
 
       template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<SparseMatrixCSR<Mem_, DT_, IT_>,
-                                          DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
-                                DenseVector<Mem_, DT_, IT_> >
+      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                                          LAFEM::DenseVector<Mem_, DT_, IT_> >
+        : public Preconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
+                                LAFEM::DenseVector<Mem_, DT_, IT_> >
       {
       private:
         typedef std::pair<DT_, IT_> PAIR_;
-        typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
-        typedef DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
+        const LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2485,7 +2485,7 @@ namespace FEAT
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
+                                      LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m(std::numeric_limits<Index>::max()),
@@ -2540,9 +2540,9 @@ namespace FEAT
             nnz += Index(_m_columns[k].size());
           }
 
-          DenseVector<Mem_, DT_, IT_> val(nnz);
-          DenseVector<Mem_, IT_, IT_> col_ind(nnz);
-          DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+          LAFEM::DenseVector<Mem_, DT_, IT_> val(nnz);
+          LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(nnz);
+          LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
           DT_ * pval = val.elements();
           IT_ * pcol_ind = col_ind.elements();
           IT_ * prow_ptr = row_ptr.elements();
@@ -2567,7 +2567,7 @@ namespace FEAT
         {
           const Index n(_A.rows());
 
-          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
+          LAFEM::DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
           IT_ * ptrow_ptr(trow_ptr.elements());
 
           ptrow_ptr[0] = 0;
@@ -2587,8 +2587,8 @@ namespace FEAT
             ptrow_ptr[i + 1] += ptrow_ptr[i];
           }
 
-          DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
-          DenseVector<Mem_, DT_, IT_> tval(used_elements);
+          LAFEM::DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
+          LAFEM::DenseVector<Mem_, DT_, IT_> tval(used_elements);
           IT_ * ptcol_ind(tcol_ind.elements());
           DT_ * ptval(tval.elements());
 
@@ -2621,9 +2621,9 @@ namespace FEAT
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
-            DenseVector<Mem_, DT_, IT_> val(used_elements);
-            DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
-            DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+            LAFEM::DenseVector<Mem_, DT_, IT_> val(used_elements);
+            LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
+            LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
             DT_ * pval(val.elements());
             IT_ * pcol_ind(col_ind.elements());
             IT_ * prow_ptr(row_ptr.elements());
@@ -2703,19 +2703,19 @@ namespace FEAT
 
 
       template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<SparseMatrixCOO<Mem_, DT_, IT_>,
-                                          DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
-                                DenseVector<Mem_, DT_, IT_> >
+      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                                          LAFEM::DenseVector<Mem_, DT_, IT_> >
+        : public Preconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
+                                LAFEM::DenseVector<Mem_, DT_, IT_> >
       {
       private:
         typedef std::pair<DT_, IT_> PAIR_;
-        typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
-        typedef DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
+        const LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2731,7 +2731,7 @@ namespace FEAT
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
+                                      LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m(std::numeric_limits<Index>::max()),
@@ -2779,9 +2779,9 @@ namespace FEAT
             nnz += Index(_m_columns[k].size());
           }
 
-          DenseVector<Mem_, DT_, IT_> val(nnz);
-          DenseVector<Mem_, IT_, IT_> col_ind(nnz);
-          DenseVector<Mem_, IT_, IT_> row_ind(nnz);
+          LAFEM::DenseVector<Mem_, DT_, IT_> val(nnz);
+          LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(nnz);
+          LAFEM::DenseVector<Mem_, IT_, IT_> row_ind(nnz);
           DT_ * pval = val.elements();
           IT_ * pcol_ind = col_ind.elements();
           IT_ * prow_ind = row_ind.elements();
@@ -2805,7 +2805,7 @@ namespace FEAT
         {
           const Index n(_A.rows());
 
-          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
+          LAFEM::DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
           IT_ * ptrow_ptr(trow_ptr.elements());
 
           Index used_elements(0);
@@ -2824,9 +2824,9 @@ namespace FEAT
             ptrow_ptr[i + 1] += ptrow_ptr[i];
           }
 
-          DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
-          DenseVector<Mem_, IT_, IT_> trow_ind(used_elements);
-          DenseVector<Mem_, DT_, IT_> tval(used_elements);
+          LAFEM::DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
+          LAFEM::DenseVector<Mem_, IT_, IT_> trow_ind(used_elements);
+          LAFEM::DenseVector<Mem_, DT_, IT_> tval(used_elements);
           IT_ * ptcol_ind(tcol_ind.elements());
           IT_ * ptrow_ind(trow_ind.elements());
           DT_ * ptval(tval.elements());
@@ -2855,10 +2855,10 @@ namespace FEAT
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
-            DenseVector<Mem_, DT_, IT_> val(used_elements);
-            DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
-            DenseVector<Mem_, IT_, IT_> row_ind(used_elements);
-            DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+            LAFEM::DenseVector<Mem_, DT_, IT_> val(used_elements);
+            LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
+            LAFEM::DenseVector<Mem_, IT_, IT_> row_ind(used_elements);
+            LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
             DT_ * pval(val.elements());
             IT_ * pcol_ind(col_ind.elements());
             IT_ * prow_ind(row_ind.elements());
@@ -2927,19 +2927,19 @@ namespace FEAT
 
 
       template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<SparseMatrixELL<Mem_, DT_, IT_>,
-                                          DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
-                                DenseVector<Mem_, DT_, IT_> >
+      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                                          LAFEM::DenseVector<Mem_, DT_, IT_> >
+        : public Preconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
+                                LAFEM::DenseVector<Mem_, DT_, IT_> >
       {
       private:
         typedef std::pair<DT_, IT_> PAIR_;
-        typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
-        typedef DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef LAFEM::SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
+        const LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2955,7 +2955,7 @@ namespace FEAT
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
+                                      LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m(std::numeric_limits<Index>::max()),
@@ -3010,9 +3010,9 @@ namespace FEAT
 
           // calculate cl-array and fill rl-array
           Index num_of_chunks(Index(ceil(n / float(C))));
-          DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
-          DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-          DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
+          LAFEM::DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
+          LAFEM::DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
+          LAFEM::DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
           IT_ * pmcl(mcl.elements());
           IT_ * pmcs(mcs.elements());
           IT_ * pmrl(mrl.elements());
@@ -3035,8 +3035,8 @@ namespace FEAT
 
           Index val_size = Index(pmcs[num_of_chunks]);
 
-          DenseVector<Mem_, DT_, IT_> mval(val_size);
-          DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
+          LAFEM::DenseVector<Mem_, DT_, IT_> mval(val_size);
+          LAFEM::DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
           DT_ * pmval    (mval.elements());
           IT_ * pmcol_ind(mcol_ind.elements());
 
@@ -3065,9 +3065,9 @@ namespace FEAT
 
           // calculate cl-array and fill rl-array
           Index num_of_chunks(Index(ceil(n / float(C))));
-          DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
-          DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-          DenseVector<Mem_, IT_, IT_> mrl(_A.rows(), IT_(0));
+          LAFEM::DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
+          LAFEM::DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
+          LAFEM::DenseVector<Mem_, IT_, IT_> mrl(_A.rows(), IT_(0));
           IT_ * pmcl(mcl.elements());
           IT_ * pmcs(mcs.elements());
           IT_ * pmrl(mrl.elements());
@@ -3098,8 +3098,8 @@ namespace FEAT
 
           Index val_size = Index(pmcs[num_of_chunks]);
 
-          DenseVector<Mem_, DT_, IT_> mval(val_size);
-          DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
+          LAFEM::DenseVector<Mem_, DT_, IT_> mval(val_size);
+          LAFEM::DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
           DT_ * pmval    (mval.elements());
           IT_ * pmcol_ind(mcol_ind.elements());
 
@@ -3137,9 +3137,9 @@ namespace FEAT
 
             // calculate cl-array and fill rl-array
             Index num_of_chunks(Index(ceil(n / float(C))));
-            DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
-            DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-            DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
+            LAFEM::DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
+            LAFEM::DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
+            LAFEM::DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
             IT_ * pmcl(mcl.elements());
             IT_ * pmcs(mcs.elements());
             IT_ * pmrl(mrl.elements());
@@ -3159,8 +3159,8 @@ namespace FEAT
 
             Index val_size = Index(pmcs[num_of_chunks]);
 
-            DenseVector<Mem_, DT_, IT_> mval(val_size);
-            DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
+            LAFEM::DenseVector<Mem_, DT_, IT_> mval(val_size);
+            LAFEM::DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
             DT_ * pmval    (mval.elements());
             IT_ * pmcol_ind(mcol_ind.elements());
 
@@ -3365,7 +3365,7 @@ namespace FEAT
        * Creates a SPAI preconditioner to the given matrix and given initial layout
        */
       SPAIPreconditioner(const MT_ & A,
-                         SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> && layout,
+                         LAFEM::SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> && layout,
                          const Index max_iter = 10,
                          const DT_ eps_res = 1e-2,
                          const Index fill_in = 10,
@@ -3417,8 +3417,8 @@ namespace FEAT
        * \param[out] out The preconditioner result.
        * \param[in] in The vector, which is applied to the preconditioning
        */
-      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
-                         const DenseVector<Mem_, DT_, IT_> & in) override
+      virtual void apply(LAFEM::DenseVector<Mem_, DT_, IT_> & out,
+                         const LAFEM::DenseVector<Mem_, DT_, IT_> & in) override
       {
         if (_max_iter > 0 && _transpose == true)
         {
@@ -4098,7 +4098,7 @@ namespace FEAT
         }
       } // function apply
     };
-  }// namespace LAFEM
+  }// namespace Solver
 } // namespace FEAT
 
-#endif // KERNEL_LAFEM_PRECONDITIONER_HPP
+#endif // KERNEL_SOLVER_LEGACY_PRECONDITIONERS_HPP

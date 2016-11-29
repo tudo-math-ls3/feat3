@@ -7,7 +7,7 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/lafem/preconditioner.hpp>
+#include <kernel/solver/legacy_preconditioners.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
