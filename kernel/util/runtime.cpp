@@ -69,8 +69,8 @@ void Runtime::initialise(int& argc, char**& argv)
   (void)argv;
 #endif
 
-  // read in initial settings from provided ini file via system environment variable FEAT_INI_FILE
-  if (const char* c_file_path = std::getenv("FEAT_INI_FILE"))
+  // read in initial settings from provided ini file via system environment variable FEAT3_INI_FILE
+  if (const char* c_file_path = std::getenv("FEAT3_INI_FILE"))
   {
     String property_file(c_file_path);
     if (std::ifstream(property_file).good())
