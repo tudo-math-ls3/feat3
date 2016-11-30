@@ -25,6 +25,10 @@ public:
   {
   }
 
+  virtual ~GraphTest()
+  {
+  }
+
   bool test_f(Graph& f) const
   {
     // fetch the graph's arrays

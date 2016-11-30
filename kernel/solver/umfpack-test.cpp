@@ -16,7 +16,14 @@ public:
   typedef SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
   typedef DenseVector<Mem::Main, double, Index> VectorType;
 
-  UmfpackTest() : TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackTest") {}
+  UmfpackTest() :
+    TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackTest")
+  {
+  }
+
+  virtual ~UmfpackTest()
+  {
+  }
 
   virtual void run() const override
   {
@@ -71,7 +78,14 @@ public:
   typedef SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
   typedef DenseVector<Mem::Main, double, Index> VectorType;
 
-  UmfpackMeanTest() : TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackMeanTest") {}
+  UmfpackMeanTest() :
+    TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackMeanTest")
+  {
+  }
+
+  virtual ~UmfpackMeanTest()
+  {
+  }
 
   virtual void run() const override
   {

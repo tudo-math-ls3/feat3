@@ -42,6 +42,10 @@ public:
   {
   }
 
+  virtual ~SimpleArgParserTest()
+  {
+  }
+
   virtual void run() const override
   {
     // create a string map for our precon

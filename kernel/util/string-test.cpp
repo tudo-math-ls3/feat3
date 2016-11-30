@@ -20,6 +20,10 @@ public:
   {
   }
 
+  virtual ~StringTest()
+  {
+  }
+
   virtual void run() const override
   {
     bool b;

@@ -38,6 +38,10 @@ public:
   {
   }
 
+  virtual ~MatrixMirrorBufferTest()
+  {
+  }
+
   virtual void run() const override
   {
     MatrixMirrorBuffer<Mem_, DT_, IT_> zero1;

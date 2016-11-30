@@ -166,6 +166,10 @@ namespace ElementRegression
     {
     }
 
+    virtual ~ElementRegressionBase()
+    {
+    }
+
     virtual void run() const override
     {
       // run the actual test
@@ -261,6 +265,10 @@ namespace ElementRegression
     {
     }
 
+    virtual ~ElementRegressionInterpol()
+    {
+    }
+
     virtual Tiny::Vector<double, 3> run_level(Index level) const override
     {
       // create mesh
@@ -316,6 +324,10 @@ namespace ElementRegression
     explicit ElementRegressionSystem(String name, Index level, double h0, double h1, double h2, double stol) :
       BaseClass(name, level, h0, h1, h2),
       sol_tol(stol)
+    {
+    }
+
+    virtual ~ElementRegressionSystem()
     {
     }
 
@@ -430,6 +442,10 @@ namespace ElementRegression
     {
     }
 
+    virtual ~ElementRegressionL2()
+    {
+    }
+
     virtual void assemble_matrix(MatrixType& matrix, SpaceType& space) const override
     {
       Assembly::Common::IdentityOperator operat;
@@ -460,6 +476,10 @@ namespace ElementRegression
 
     explicit ElementRegressionH1(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0, double stol = 1E-8) :
       BaseClass("H1", level, h0, h1, h2, stol)
+    {
+    }
+
+    virtual ~ElementRegressionH1()
     {
     }
 

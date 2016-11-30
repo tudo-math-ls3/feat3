@@ -33,6 +33,10 @@ public:
   {
   }
 
+  virtual ~SparseVectorBlockedTest()
+  {
+  }
+
   virtual void run() const override
   {
     SparseVectorBlocked<Mem_, DT_, IT_, 2> zero1;

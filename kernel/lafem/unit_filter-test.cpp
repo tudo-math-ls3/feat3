@@ -30,6 +30,10 @@ public:
   {
   }
 
+  virtual ~UnitFilterVectorTest()
+  {
+  }
+
   virtual void run() const override
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
@@ -111,6 +115,10 @@ class UnitFilterMatrixTest
 public:
   UnitFilterMatrixTest()
     : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterMatrixTest")
+  {
+  }
+
+  virtual ~UnitFilterMatrixTest()
   {
   }
 

@@ -48,6 +48,10 @@ public:
   {
   }
 
+  virtual ~UnitTest()
+  {
+  }
+
   /// runs the tests
   virtual void run() const override
   {
@@ -85,6 +89,10 @@ public:
   /// Constructor
   explicit TaggedUnitTest(const String & id_in)
     : TaggedTest<Tag_, DT_>(id_in)
+  {
+  }
+
+  virtual ~TaggedUnitTest()
   {
   }
 
@@ -126,6 +134,10 @@ public:
   /// Constructor
   explicit FullTaggedUnitTest(const String & id_in)
     : FullTaggedTest<Mem_, DT_, IT_>(id_in)
+  {
+  }
+
+  virtual ~FullTaggedUnitTest()
   {
   }
 

@@ -29,6 +29,10 @@ public:
   {
   }
 
+  virtual ~StandardRefineryTestConfTetrahedron()
+  {
+  }
+
   virtual void run() const override
   {
     tetra_std_test();

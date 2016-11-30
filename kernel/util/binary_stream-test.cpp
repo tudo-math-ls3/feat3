@@ -21,6 +21,10 @@ public:
   {
   }
 
+  virtual ~BinaryStreamTest()
+  {
+  }
+
   static bool little_endian()
   {
     int32_t x = 1;

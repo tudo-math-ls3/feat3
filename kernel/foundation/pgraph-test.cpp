@@ -22,6 +22,10 @@ class PGraphParmetisTest:
     {
     }
 
+    virtual ~PGraphParmetisTest()
+    {
+    }
+
     virtual void run() const override
     {
       Dist::Comm comm(Dist::Comm::world());

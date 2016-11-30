@@ -21,7 +21,14 @@ public:
   typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-  MetaVectorAxpyTest() : BaseClass("MetaVectorAxpyTest") {}
+   MetaVectorAxpyTest() :
+    BaseClass("MetaVectorAxpyTest")
+  {
+  }
+
+  virtual ~MetaVectorAxpyTest()
+  {
+  }
 
   using BaseClass::fx00;
   using BaseClass::fx01;

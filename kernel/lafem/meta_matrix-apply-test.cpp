@@ -28,7 +28,14 @@ public:
   typedef DataType_ DataType;
   typedef MetaMatrixTestBase<MemType_, DataType_, IndexType_> BaseClass;
 
-  MetaMatrixApplyTest() : BaseClass("MetaMatrixApplyTest") {}
+   MetaMatrixApplyTest() :
+    BaseClass("MetaMatrixApplyTest")
+  {
+  }
+
+  virtual ~MetaMatrixApplyTest()
+  {
+  }
 
   virtual void run() const override
   {

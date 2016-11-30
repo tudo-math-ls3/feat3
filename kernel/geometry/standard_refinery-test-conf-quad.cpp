@@ -31,6 +31,10 @@ public:
   {
   }
 
+  virtual ~StandardRefineryTestConfQuad()
+  {
+  }
+
   virtual void run() const override
   {
     quad_std_test();

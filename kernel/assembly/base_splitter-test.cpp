@@ -27,6 +27,10 @@ public:
   {
   }
 
+  virtual ~BaseSplitterTest()
+  {
+  }
+
   virtual void run() const override
   {
     // create root mesh node

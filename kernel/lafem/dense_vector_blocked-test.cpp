@@ -39,6 +39,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorBlockedTest()
+  {
+  }
+
   virtual void run() const override
   {
     DenseVectorBlocked<Mem_, DT_, IT_, 2> zero1;
@@ -174,6 +178,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorBlockedAxpyTest()
+  {
+  }
+
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
@@ -252,6 +260,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorBlockedDotTest()
+  {
+  }
+
   virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
@@ -318,6 +330,10 @@ class DenseVectorBlockedTripleDotTest
 public:
   DenseVectorBlockedTripleDotTest()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedTripleDotTest")
+  {
+  }
+
+  virtual ~DenseVectorBlockedTripleDotTest()
   {
   }
 
@@ -398,6 +414,10 @@ class DenseVectorBlockedComponentProductTest
 public:
   DenseVectorBlockedComponentProductTest()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedComponentProductTest")
+  {
+  }
+
+  virtual ~DenseVectorBlockedComponentProductTest()
   {
   }
 
@@ -485,6 +505,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorBlockedScaleTest()
+  {
+  }
+
   virtual void run() const override
   {
     for (Index size(1) ; size < 1e3 ; size*=2)
@@ -546,6 +570,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorBlockedNorm2Test()
+  {
+  }
+
   virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
@@ -602,6 +630,10 @@ class DenseVectorBlockedMaxElementTest
 public:
   DenseVectorBlockedMaxElementTest()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedMaxElementTest")
+  {
+  }
+
+  virtual ~DenseVectorBlockedMaxElementTest()
   {
   }
 

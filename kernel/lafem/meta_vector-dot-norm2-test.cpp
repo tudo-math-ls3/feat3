@@ -21,7 +21,14 @@ public:
   typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-  MetaVectorDotNorm2Test() : BaseClass("MetaVectorDotNorm2Test") {}
+   MetaVectorDotNorm2Test() :
+    BaseClass("MetaVectorDotNorm2Test")
+  {
+  }
+
+  virtual ~MetaVectorDotNorm2Test()
+  {
+  }
 
   using BaseClass::fx00;
   using BaseClass::fx01;
@@ -97,7 +104,14 @@ public:
   typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-  MetaVectorTripleDotTest() : BaseClass("MetaVectorTripleDotTest") {}
+   MetaVectorTripleDotTest() :
+    BaseClass("MetaVectorTripleDotTest")
+  {
+  }
+
+  virtual ~MetaVectorTripleDotTest()
+  {
+  }
 
   using BaseClass::fx00;
   using BaseClass::fx01;

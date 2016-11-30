@@ -34,8 +34,12 @@ class SparseMatrixCSRTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRTest()
+   SparseMatrixCSRTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRTest()
   {
   }
 
@@ -251,8 +255,12 @@ class SparseMatrixCSRApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRApplyTest()
+   SparseMatrixCSRApplyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRApplyTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRApplyTest()
   {
   }
 
@@ -386,8 +394,12 @@ class SparseMatrixCSRBApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRBApplyTest()
+   SparseMatrixCSRBApplyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRBApplyTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRBApplyTest()
   {
   }
 
@@ -499,8 +511,12 @@ class SparseMatrixCSRScaleTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRScaleTest()
+   SparseMatrixCSRScaleTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRScaleTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRScaleTest()
   {
   }
 
@@ -566,8 +582,12 @@ class SparseMatrixCSRScaleRowColTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRScaleRowColTest()
+   SparseMatrixCSRScaleRowColTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRScaleRowColTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRScaleRowColTest()
   {
   }
 
@@ -669,8 +689,12 @@ class SparseMatrixCSRTranspositionTest
 public:
   typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
 
-  SparseMatrixCSRTranspositionTest()
+   SparseMatrixCSRTranspositionTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRTranspositionTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRTranspositionTest()
   {
   }
 
@@ -736,8 +760,12 @@ class SparseMatrixCSRPermuteTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRPermuteTest()
+   SparseMatrixCSRPermuteTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRPermuteTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRPermuteTest()
   {
   }
 
@@ -829,8 +857,12 @@ class SparseMatrixCSRDiagTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRDiagTest()
+   SparseMatrixCSRDiagTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRDiagTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRDiagTest()
   {
   }
 
@@ -890,8 +922,12 @@ class SparseMatrixCSRAxpyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRAxpyTest()
+   SparseMatrixCSRAxpyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRAxpyTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRAxpyTest()
   {
   }
 
@@ -987,8 +1023,12 @@ class SparseMatrixCSRFrobeniusTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRFrobeniusTest()
+   SparseMatrixCSRFrobeniusTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRFrobeniusTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRFrobeniusTest()
   {
   }
 
@@ -1042,8 +1082,12 @@ class SparseMatrixCSRLumpTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRLumpTest()
+   SparseMatrixCSRLumpTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRLumpTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRLumpTest()
   {
   }
 

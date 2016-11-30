@@ -21,7 +21,14 @@ public:
   typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-  MetaVectorCompProdTest() : BaseClass("MetaVectorCompProdTest") {}
+   MetaVectorCompProdTest() :
+    BaseClass("MetaVectorCompProdTest")
+  {
+  }
+
+  virtual ~MetaVectorCompProdTest()
+  {
+  }
 
   using BaseClass::fx00;
   using BaseClass::fx01;

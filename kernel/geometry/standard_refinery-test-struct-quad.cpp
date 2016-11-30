@@ -26,6 +26,10 @@ public:
   {
   }
 
+  virtual ~StandardRefineryTestStructQuad()
+  {
+  }
+
   virtual void run() const override
   {
     // allocate a 2x3 structured mesh

@@ -38,6 +38,11 @@ public:
   {
   }
 
+  virtual ~DenseVectorTest()
+  {
+  }
+
+
   virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> zero1;
@@ -217,6 +222,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorAxpyTest()
+  {
+  }
+
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
@@ -281,6 +290,10 @@ class DenseVectorDotTest
 public:
   DenseVectorDotTest()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorDotTest")
+  {
+  }
+
+  virtual ~DenseVectorDotTest()
   {
   }
 
@@ -354,6 +367,11 @@ public:
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorTripleDotTest")
   {
   }
+
+  virtual ~DenseVectorTripleDotTest()
+  {
+  }
+
 
   virtual void run() const override
   {
@@ -430,6 +448,10 @@ class DenseVectorComponentProductTest
 public:
   DenseVectorComponentProductTest()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorComponentProductTest")
+  {
+  }
+
+  virtual ~DenseVectorComponentProductTest()
   {
   }
 
@@ -510,6 +532,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorScaleTest()
+  {
+  }
+
   virtual void run() const override
   {
     for (Index size(1) ; size < 1e3 ; size*=2)
@@ -564,6 +590,10 @@ class DenseVectorNorm2Test
 public:
   DenseVectorNorm2Test()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorNorm2Test")
+  {
+  }
+
+  virtual ~DenseVectorNorm2Test()
   {
   }
 
@@ -623,6 +653,10 @@ public:
   {
   }
 
+  virtual ~DenseVectorComponentInvertTest()
+  {
+  }
+
   virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
@@ -678,6 +712,10 @@ class DenseVectorMaxElementTest
 public:
   DenseVectorMaxElementTest()
     : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMaxElementTest")
+  {
+  }
+
+  virtual ~DenseVectorMaxElementTest()
   {
   }
 

@@ -34,6 +34,10 @@ public:
   {
   }
 
+  virtual ~ContainerMainWrapperTest()
+  {
+  }
+
   virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> a(10, DT_(4711));

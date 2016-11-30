@@ -64,7 +64,14 @@ class VankaTest :
   public FullTaggedTest<Mem::Main, DT_, IT_>
 {
 public:
-  VankaTest() : FullTaggedTest<Mem::Main, DT_, IT_>("VankaTest") {}
+  VankaTest() :
+    FullTaggedTest<Mem::Main, DT_, IT_>("VankaTest")
+  {
+  }
+
+  virtual ~VankaTest()
+  {
+  }
 
   static constexpr int dim = 2;
   typedef Shape::Hypercube<2> ShapeType;

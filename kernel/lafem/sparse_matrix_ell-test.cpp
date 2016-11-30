@@ -34,8 +34,12 @@ class SparseMatrixELLTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLTest()
+   SparseMatrixELLTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLTest()
   {
   }
 
@@ -160,8 +164,12 @@ class SparseMatrixELLApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLApplyTest()
+   SparseMatrixELLApplyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLApplyTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLApplyTest()
   {
   }
 
@@ -265,8 +273,12 @@ class SparseMatrixELLScaleTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLScaleTest()
+   SparseMatrixELLScaleTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLScaleTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLScaleTest()
   {
   }
 
@@ -333,8 +345,12 @@ class SparseMatrixELLScaleRowColTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLScaleRowColTest()
+   SparseMatrixELLScaleRowColTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLScaleRowColTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLScaleRowColTest()
   {
   }
 
@@ -440,8 +456,12 @@ class SparseMatrixELLTranspositionTest
 public:
   typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
 
-  SparseMatrixELLTranspositionTest()
+   SparseMatrixELLTranspositionTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLTranspositionTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLTranspositionTest()
   {
   }
 
@@ -507,8 +527,12 @@ class SparseMatrixELLDiagTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLDiagTest()
+   SparseMatrixELLDiagTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLDiagTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLDiagTest()
   {
   }
 
@@ -568,8 +592,12 @@ class SparseMatrixELLAxpyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLAxpyTest()
+   SparseMatrixELLAxpyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLAxpyTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLAxpyTest()
   {
   }
 
@@ -665,8 +693,12 @@ class SparseMatrixELLFrobeniusTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLFrobeniusTest()
+   SparseMatrixELLFrobeniusTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLFrobeniusTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLFrobeniusTest()
   {
   }
 
@@ -720,8 +752,12 @@ class SparseMatrixELLLumpTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixELLLumpTest()
+   SparseMatrixELLLumpTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLLumpTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLLumpTest()
   {
   }
 

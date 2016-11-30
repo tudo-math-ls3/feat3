@@ -30,7 +30,14 @@ public:
   typedef PowerFilter<ScalarFilter1, 2> PowerFilter2;
   typedef TupleFilter<PowerFilter2, ScalarFilter2> MetaFilter;
 
-  MetaFilterTest() : FullTaggedTest<MemType_, DataType_, IndexType_>("MetaFilterTest") {}
+   MetaFilterTest() :
+    FullTaggedTest<MemType_, DataType_, IndexType_>("MetaFilterTest")
+  {
+  }
+
+  virtual ~MetaFilterTest()
+  {
+  }
 
   static MetaFilter gen_filter(Index m)
   {

@@ -80,6 +80,10 @@ template
       {
       }
 
+    virtual ~HyperelasticityFunctionalTest()
+    {
+    }
+
     virtual void run() const override
     {
       // Create a single reference cell of the shape type

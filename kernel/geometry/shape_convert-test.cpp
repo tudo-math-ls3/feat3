@@ -31,6 +31,10 @@ public:
   {
   }
 
+  virtual ~ShapeConvertTest()
+  {
+  }
+
   virtual void run() const override
   {
     // test quad->tria conversion

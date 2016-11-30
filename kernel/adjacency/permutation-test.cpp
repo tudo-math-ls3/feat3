@@ -25,6 +25,10 @@ public:
   {
   }
 
+  virtual ~PermutationTest()
+  {
+  }
+
   template<int n_>
   static void make_id(Index (&v)[n_])
   {

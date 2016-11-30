@@ -29,6 +29,10 @@ public:
   {
   }
 
+  virtual ~StandardRefineryTestConfTriangle()
+  {
+  }
+
   virtual void run() const override
   {
     tria_std_test();

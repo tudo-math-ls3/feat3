@@ -44,6 +44,10 @@ public:
   {
   }
 
+  virtual ~StringMappedTest()
+  {
+  }
+
   virtual void run() const override
   {
     // create a string-map for our preconditioner and

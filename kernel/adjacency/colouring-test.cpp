@@ -23,6 +23,10 @@ public:
   {
   }
 
+  virtual ~ColouringTest()
+  {
+  }
+
   bool test_c(Colouring& c) const
   {
     // check against analytic solution

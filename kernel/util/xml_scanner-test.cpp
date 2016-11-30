@@ -10,6 +10,11 @@ class TestParser1 :
   public Xml::DummyParser
 {
 public:
+
+  virtual ~TestParser1()
+  {
+  }
+
   virtual void create(int iline, const String& sline, const String&, const std::map<String, String>&, bool closed) override
   {
     if(closed)
@@ -22,6 +27,10 @@ class TestParser2 :
   public Xml::DummyParser
 {
 public:
+  virtual ~TestParser2()
+  {
+  }
+
   virtual bool content(int, const String&) override
   {
     return false; // no content allowed
@@ -33,6 +42,11 @@ class TestRootParser1 :
   public Xml::DummyParser
 {
 public:
+
+  virtual ~TestRootParser1()
+  {
+  }
+
   virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String& name) override
   {
     if(name == "Test1") return std::make_shared<TestParser1>();
@@ -46,6 +60,11 @@ class TestRootParser2 :
   public Xml::DummyParser
 {
 public:
+
+  virtual ~TestRootParser2()
+  {
+  }
+
   virtual bool attribs(std::map<String,bool>& attrs) const override
   {
     attrs.emplace("mandat", true);
@@ -76,6 +95,10 @@ class XmlScannerTest
 public:
   XmlScannerTest() :
     TaggedTest<Archs::None, Archs::None>("XmlScannerTest")
+  {
+  }
+
+  virtual ~XmlScannerTest()
   {
   }
 

@@ -22,6 +22,10 @@ public:
   {
   }
 
+  virtual ~PropertyMapTest()
+  {
+  }
+
   void test_0() const
   {
     using namespace std;

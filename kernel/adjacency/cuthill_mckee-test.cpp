@@ -24,6 +24,10 @@ public:
   {
   }
 
+  virtual ~CuthillMcKeeTest()
+  {
+  }
+
   bool test_default_root(Graph& g) const
   {
     // permutation-array pointer

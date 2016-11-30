@@ -21,6 +21,10 @@ class HaveParmetisTest:
     {
     }
 
+    virtual ~HaveParmetisTest()
+    {
+    }
+
     virtual void run() const override
     {
       idx_t* vtxdist = new idx_t[2];

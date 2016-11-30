@@ -35,6 +35,10 @@ public:
   {
   }
 
+  virtual ~DenseMatrixTest()
+  {
+  }
+
   virtual void run() const override
   {
     DenseMatrix<Mem_, DT_, IT_> zero1;
@@ -99,6 +103,10 @@ public:
   explicit DenseMatrixApplyTest(double eps)
     : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixApplyTest"),
     _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixApplyTest()
   {
   }
 
@@ -215,6 +223,10 @@ public:
   explicit DenseMatrixMultiplyTest(double eps)
     : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixMultiplyTest"),
     _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixMultiplyTest()
   {
   }
 

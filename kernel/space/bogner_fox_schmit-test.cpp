@@ -22,6 +22,10 @@ public:
   {
   }
 
+  virtual ~BognerFoxSchmitTest()
+  {
+  }
+
   virtual void run() const override
   {
     // test assembly on 1D unit interval

@@ -41,6 +41,10 @@ public:
   {
   }
 
+  virtual ~DiscontinuousTest()
+  {
+  }
+
   virtual void run() const override
   {
     // test assembly on unit quad

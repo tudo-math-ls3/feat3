@@ -39,6 +39,10 @@ public:
   {
   }
 
+  virtual ~SparseMatrixBandedTest()
+  {
+  }
+
   typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
   virtual void run() const override
@@ -170,6 +174,10 @@ public:
   explicit SparseMatrixBandedApplyTest(const Index opt)
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedApplyTest: "
                                             + stringify(opt) + " offsets"), _opt(opt)
+  {
+  }
+
+  virtual ~SparseMatrixBandedApplyTest()
   {
   }
 
@@ -307,6 +315,10 @@ class SparseMatrixBandedScaleTest
 public:
   SparseMatrixBandedScaleTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedScaleTest")
+  {
+  }
+
+  virtual ~SparseMatrixBandedScaleTest()
   {
   }
 

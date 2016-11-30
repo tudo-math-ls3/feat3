@@ -43,8 +43,14 @@ public:
   typedef DataType DT_;
   typedef IndexType IT_;
 
-  MetaToScalarTest()
-    : BaseClass("meta_to_scalar_test: " + MT_::name()) {}
+   MetaToScalarTest()
+    : BaseClass("meta_to_scalar_test: " + MT_::name())
+  {
+  }
+
+  virtual ~MetaToScalarTest()
+  {
+  }
 
   virtual void run() const override
   {
@@ -191,8 +197,15 @@ public:
   typedef DataType DT_;
   typedef IndexType IT_;
 
-  MetaBCSRToScalarTest()
-    : FEAT::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>("meta_block_csr_to_scalar_test: " + MT_::name()) {}
+   MetaBCSRToScalarTest()
+    : FEAT::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>
+      ("meta_block_csr_to_scalar_test: " + MT_::name())
+  {
+  }
+
+  virtual ~MetaBCSRToScalarTest()
+  {
+  }
 
   virtual void run() const override
   {
@@ -326,8 +339,12 @@ public:
   typedef PowerVector<DenseVec, 3> PowerVec3;
   typedef TupleVector<PowerVec3, PowerVec2, PowerVec1, DenseVec, DenseVecBlocked> TupleVec;
 
-  VecMetaToScalarTest()
+   VecMetaToScalarTest()
     : FullTaggedTest<Mem_, DT_, IT_>("vec_meta_to_scalar_test")
+  {
+  }
+
+  virtual ~VecMetaToScalarTest()
   {
   }
 

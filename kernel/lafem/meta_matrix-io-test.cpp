@@ -28,7 +28,14 @@ public:
   typedef DataType_ DataType;
   typedef MetaMatrixTestBase<Mem::Main, DataType_, IndexType_> BaseClass;
 
-  MetaMatrixIOTest() : BaseClass("MetaMatrixIOTest") {}
+   MetaMatrixIOTest() :
+    BaseClass("MetaMatrixIOTest")
+  {
+  }
+
+  virtual ~MetaMatrixIOTest()
+  {
+  }
 
   virtual void run() const override
   {

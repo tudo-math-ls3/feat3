@@ -48,6 +48,10 @@ public:
   {
   }
 
+  virtual ~Lagrange1Test()
+  {
+  }
+
   virtual void run() const override
   {
     // test assembly on unit quad

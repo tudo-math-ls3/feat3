@@ -26,6 +26,10 @@ public:
   {
   }
 
+  virtual ~HitTestFactoryTest()
+  {
+  }
+
   void test_0() const
   {
     typedef Shape::Quadrilateral ShapeType;

@@ -29,6 +29,10 @@ public:
   {
   }
 
+  virtual ~StandardRefineryTestConfHexa()
+  {
+  }
+
   virtual void run() const override
   {
     hexa_std_test();

@@ -294,6 +294,10 @@ class IndexCalculatorVertexTest
       {
       }
 
+    virtual ~IndexCalculatorVertexTest()
+    {
+    }
+
     // run the tests
     virtual void run() const override
     {

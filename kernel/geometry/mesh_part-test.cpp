@@ -47,6 +47,10 @@ public:
   {
   }
 
+  virtual ~MeshPartTest()
+  {
+  }
+
   typedef double DataType;
   typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, DataType> MeshType;
   typedef MeshPart<MeshType> MeshPartType;

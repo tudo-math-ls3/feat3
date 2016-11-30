@@ -14,8 +14,12 @@ public:
   typedef SparseMatrixCSR<Mem::Main, DataType_, IndexType_> MatrixType;
 
 public:
-  PointstarFactoryTest() :
+   PointstarFactoryTest() :
     FEAT::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarFactoryTest")
+  {
+  }
+
+  virtual ~PointstarFactoryTest()
   {
   }
 
@@ -99,8 +103,12 @@ public:
   typedef SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
 
 public:
-  PointstarStructureTest() :
+   PointstarStructureTest() :
     FEAT::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarStructureTest")
+  {
+  }
+
+  virtual ~PointstarStructureTest()
   {
   }
 

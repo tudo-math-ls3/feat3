@@ -40,7 +40,7 @@ class NLCGTest:
     NLCGDirectionUpdate _update;
 
   public:
-    NLCGTest(DT_ exponent_, Index max_iter_, const String& linesearch_type_, const String& precon_type_,
+    explicit NLCGTest(DT_ exponent_, Index max_iter_, const String& linesearch_type_, const String& precon_type_,
     NLCGDirectionUpdate update_) :
       FullTaggedTest<Mem_, DT_, IT_>("NLCGTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
@@ -48,6 +48,10 @@ class NLCGTest:
       _linesearch_type(linesearch_type_),
       _precon_type(precon_type_),
       _update(update_)
+    {
+    }
+
+    virtual ~NLCGTest()
     {
     }
 
@@ -198,12 +202,16 @@ class NLSDTest:
     const String _precon_type;
 
   public:
-    NLSDTest(DT_ exponent_, Index max_iter_, const String& linesearch_type_, const String& precon_type_) :
+    explicit NLSDTest(DT_ exponent_, Index max_iter_, const String& linesearch_type_, const String& precon_type_) :
       FullTaggedTest<Mem_, DT_, IT_>("NLSDTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_),
       _linesearch_type(linesearch_type_),
       _precon_type(precon_type_)
+    {
+    }
+
+    virtual ~NLSDTest()
     {
     }
 
@@ -329,7 +337,7 @@ class ALGLIBMinLBFGSTest:
     const Index _max_iter;
 
   public:
-    ALGLIBMinLBFGSTest(DT_ exponent_, Index max_iter_) :
+    explicit ALGLIBMinLBFGSTest(DT_ exponent_, Index max_iter_) :
       FullTaggedTest<Mem_, DT_, IT_>("ALGLIBMinLBFGSTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_)
@@ -429,7 +437,7 @@ class ALGLIBMinCGTest:
     NLCGDirectionUpdate _direction_update;
 
   public:
-    ALGLIBMinCGTest(DT_ exponent_, Index max_iter_, NLCGDirectionUpdate direction_update_) :
+    explicit ALGLIBMinCGTest(DT_ exponent_, Index max_iter_, NLCGDirectionUpdate direction_update_) :
       FullTaggedTest<Mem_, DT_, IT_>("ALGLIBMinCGTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_),

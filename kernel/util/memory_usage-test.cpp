@@ -21,6 +21,10 @@ public:
   {
   }
 
+  virtual ~MemoryUsageTest()
+  {
+  }
+
   virtual void run() const override
   {
     unsigned int * t = new unsigned int[123456];

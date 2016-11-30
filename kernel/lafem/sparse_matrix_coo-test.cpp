@@ -30,8 +30,12 @@ class SparseMatrixCOOTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCOOTest()
+   SparseMatrixCOOTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOTest()
   {
   }
 
@@ -153,8 +157,12 @@ class SparseMatrixCOOApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCOOApplyTest()
+   SparseMatrixCOOApplyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOApplyTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOApplyTest()
   {
   }
 
@@ -263,8 +271,12 @@ class SparseMatrixCOOScaleTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCOOScaleTest()
+   SparseMatrixCOOScaleTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOScaleTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOScaleTest()
   {
   }
 
@@ -330,8 +342,12 @@ class SparseMatrixCOOScaleRowColTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCOOScaleRowColTest()
+   SparseMatrixCOOScaleRowColTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOScaleRowColTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOScaleRowColTest()
   {
   }
 
@@ -433,8 +449,12 @@ class SparseMatrixCOOTranspositionTest
 public:
   typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
 
-  SparseMatrixCOOTranspositionTest()
+   SparseMatrixCOOTranspositionTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOTranspositionTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOTranspositionTest()
   {
   }
 
@@ -501,8 +521,12 @@ class SparseMatrixCOOAxpyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCOOAxpyTest()
+   SparseMatrixCOOAxpyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOAxpyTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOAxpyTest()
   {
   }
 
@@ -601,8 +625,12 @@ class SparseMatrixCOOFrobeniusTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCOOFrobeniusTest()
+   SparseMatrixCOOFrobeniusTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOFrobeniusTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOFrobeniusTest()
   {
   }
 

@@ -29,6 +29,10 @@ public:
   {
   }
 
+  virtual ~MeshNodeTestConfQuad()
+  {
+  }
+
   virtual void run() const override
   {
     refine_tree_test();

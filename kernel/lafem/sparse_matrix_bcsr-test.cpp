@@ -23,8 +23,12 @@ class SparseMatrixBCSRTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRTest()
+   SparseMatrixBCSRTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRTest()
   {
   }
 
@@ -147,8 +151,12 @@ class SparseMatrixBCSRApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRApplyTest()
+   SparseMatrixBCSRApplyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRApplyTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRApplyTest()
   {
   }
 
@@ -278,8 +286,12 @@ class SparseMatrixBCSRApplySquareTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRApplySquareTest()
+   SparseMatrixBCSRApplySquareTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRApplySquareTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRApplySquareTest()
   {
   }
 
@@ -413,8 +425,12 @@ class SparseMatrixBCSRDiagTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRDiagTest()
+   SparseMatrixBCSRDiagTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRDiagTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRDiagTest()
   {
   }
 
@@ -467,8 +483,12 @@ class SparseMatrixBCSRScaleTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRScaleTest()
+   SparseMatrixBCSRScaleTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRScaleTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRScaleTest()
   {
   }
 
@@ -537,8 +557,12 @@ class SparseMatrixBCSRNormTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRNormTest()
+   SparseMatrixBCSRNormTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRNormTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRNormTest()
   {
   }
 
@@ -597,8 +621,12 @@ class SparseMatrixBCSRAxpyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBCSRAxpyTest()
+   SparseMatrixBCSRAxpyTest()
     : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRAxpyTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRAxpyTest()
   {
   }
 

@@ -23,6 +23,10 @@ public:
   {
   }
 
+  virtual ~StandardRefineryTestStructHexa()
+  {
+  }
+
   virtual void run() const override
   {
 

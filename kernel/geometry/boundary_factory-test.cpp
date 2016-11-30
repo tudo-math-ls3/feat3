@@ -30,6 +30,10 @@ public:
   {
   }
 
+  virtual ~BoundaryFactoryTest()
+  {
+  }
+
   virtual void run() const override
   {
     quad_tetris_test();

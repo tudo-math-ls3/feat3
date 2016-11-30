@@ -27,6 +27,10 @@ public:
   {
   }
 
+  virtual ~MatrixMultTest()
+  {
+  }
+
   virtual void run() const override
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));

@@ -23,6 +23,10 @@ class PExecutorParmetisTest:
     {
     }
 
+    virtual ~PExecutorParmetisTest()
+    {
+    }
+
     virtual void run() const override
     {
       Dist::Comm comm(Dist::Comm::world());

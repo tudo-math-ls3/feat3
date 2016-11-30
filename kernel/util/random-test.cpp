@@ -21,6 +21,10 @@ public:
   {
   }
 
+  virtual ~RandomTest()
+  {
+  }
+
   template<typename T_>
   void testi(Random& rng, T_ a, T_ b) const
   {

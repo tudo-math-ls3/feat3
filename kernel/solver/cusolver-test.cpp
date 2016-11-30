@@ -12,7 +12,14 @@ class CuSolverLUTest :
   public TestSystem::TaggedTest<Mem::CUDA, double>
 {
 public:
-  CuSolverLUTest() : TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverQRTest") {}
+  CuSolverLUTest() :
+    TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverQRTest")
+  {
+  }
+
+  virtual ~CuSolverLUTest()
+  {
+  }
 
   virtual void run() const override
   {
@@ -62,6 +69,10 @@ class CuSolverQRTest :
 {
 public:
   CuSolverQRTest() : TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverLUTest") {}
+
+  virtual ~CuSolverQRTest()
+  {
+  }
 
   virtual void run() const override
   {

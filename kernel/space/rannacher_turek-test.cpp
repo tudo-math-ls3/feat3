@@ -41,6 +41,10 @@ public:
   {
   }
 
+  virtual ~RannacherTurekTest()
+  {
+  }
+
   virtual void run() const override
   {
     // test assembly on unit quad

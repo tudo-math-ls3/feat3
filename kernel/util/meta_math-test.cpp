@@ -22,6 +22,10 @@ public:
   {
   }
 
+  virtual ~MetaMathTest()
+  {
+  }
+
   virtual void run() const override
   {
     test_factorial();

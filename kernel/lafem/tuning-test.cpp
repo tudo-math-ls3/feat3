@@ -34,6 +34,10 @@ public:
   {
   }
 
+  virtual ~TuningTest()
+  {
+  }
+
   virtual void run() const override
   {
     // create a pointstar factory
