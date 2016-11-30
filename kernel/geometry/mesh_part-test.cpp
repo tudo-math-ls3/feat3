@@ -72,8 +72,10 @@ public:
     // Delete parent information for all shape types except for edges
     TargetSet tmp0;
     mesh_part_to_test.get_target_set<0>() = std::move(tmp0);
-    mesh_part_to_test.get_target_set<2>() = std::move(tmp0);
-    mesh_part_to_test.get_target_set<3>() = std::move(tmp0);
+    TargetSet tmp2;
+    mesh_part_to_test.get_target_set<2>() = std::move(tmp2);
+    TargetSet tmp3;
+    mesh_part_to_test.get_target_set<3>() = std::move(tmp3);
 
     // Get lotsa references for target sets
     TargetSet& ts_test0 = mesh_part_to_test.get_target_set<0>();
@@ -105,9 +107,12 @@ public:
 
     // Test top to bottom deduction
     // Delete parent information for all shape types except for faces
-    mesh_part_to_test.get_target_set<0>() = std::move(tmp0);
-    mesh_part_to_test.get_target_set<1>() = std::move(tmp0);
-    mesh_part_to_test.get_target_set<3>() = std::move(tmp0);
+    TargetSet tmp00;
+    mesh_part_to_test.get_target_set<0>() = std::move(tmp00);
+    TargetSet tmp01;
+    mesh_part_to_test.get_target_set<1>() = std::move(tmp01);
+    TargetSet tmp03;
+    mesh_part_to_test.get_target_set<3>() = std::move(tmp03);
 
     mesh_part_to_test.deduct_target_sets_from_top<2>(my_mesh.get_index_set_holder());
 
