@@ -1,6 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/memory_usage.hpp>
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 
 using namespace FEAT;
 using namespace FEAT::Util;
@@ -24,7 +25,8 @@ public:
   {
     unsigned int * t = new unsigned int[123456];
     t[5] = 2;
-    sleep(t[5]);
+    std::chrono::seconds sec(t[5]);
+    std::this_thread::sleep_for(sec);
 
     auto m = get_memory_usage();
     TEST_CHECK_NOT_EQUAL(m.current_physical, 0);
