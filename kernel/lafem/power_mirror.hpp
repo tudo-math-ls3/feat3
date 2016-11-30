@@ -138,9 +138,9 @@ namespace FEAT
        *
        * \returns A deep copy of this power mirror.
        */
-      PowerMirror clone() const
+      PowerMirror clone(CloneMode clone_mode = CloneMode::Weak) const
       {
-        return PowerMirror(_sub_mirror.clone());
+        return PowerMirror(_sub_mirror.clone(clone_mode));
       }
 
       /**

@@ -103,9 +103,9 @@ namespace FEAT
        *
        * \returns A deep copy of this vector mirror.
        */
-      VectorMirror clone() const
+      VectorMirror clone(CloneMode clone_mode = CloneMode::Weak) const
       {
-        return VectorMirror(_mirror_gather.clone(), _mirror_scatter.clone());
+        return VectorMirror(_mirror_gather.clone(clone_mode), _mirror_scatter.clone(clone_mode));
       }
 
       /// \brief Returns the total amount of bytes allocated.

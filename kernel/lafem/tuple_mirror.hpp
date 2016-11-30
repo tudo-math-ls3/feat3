@@ -102,9 +102,9 @@ namespace FEAT
        *
        * \returns A deep copy of this tuple mirror.
        */
-      TupleMirror clone() const
+      TupleMirror clone(CloneMode clone_mode = CloneMode::Weak) const
       {
-        return TupleMirror(_first.clone(), _rest.clone());
+        return TupleMirror(_first.clone(clone_mode), _rest.clone(clone_mode));
       }
 
       /**
