@@ -7,6 +7,7 @@
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
+#include <kernel/lafem/power_diag_matrix.hpp>
 
 #include <vector>
 #include <array>
@@ -293,6 +294,90 @@ namespace FEAT
       synch.init(target);
       synch.exec(target);
     }
+
+    template <typename MT_, typename SVMT_, int blocks_>
+    class SynchMatrix<LAFEM::PowerDiagMatrix<MT_, blocks_>, SVMT_>
+    {
+    public:
+      using VMT_ = typename SVMT_::SubMirrorType;
+      using SMT_ = LAFEM::PowerDiagMatrix<MT_, blocks_>;
+      bool _initialised;
+
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+      std::vector<std::shared_ptr<SynchMatrix<MT_, VMT_>>> synch_matrix_list;
+      std::vector<std::vector<VMT_>> mirrors_row_split;
+      std::vector<std::vector<VMT_>> mirrors_col_split;
+#endif // FEAT_HAVE_MPI || DOXYGEN
+
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+      SynchMatrix(const Dist::Comm& comm, const std::vector<int>& ranks,
+        const std::vector<SVMT_>& mirrors_row, const std::vector<SVMT_>& mirrors_col) :
+        _initialised(false),
+        synch_matrix_list(blocks_),
+        mirrors_row_split(blocks_),
+        mirrors_col_split(blocks_)
+      {
+        for (int block(0) ; block < blocks_ ; ++block)
+        {
+          for (Index i(0) ; i < mirrors_row.size() ; ++i)
+          {
+            mirrors_row_split.at((size_t)block).push_back(mirrors_row.at(i).get(block).clone(LAFEM::CloneMode::Shallow));
+          }
+          for (Index i(0) ; i < mirrors_col.size() ; ++i)
+          {
+            mirrors_col_split.at((size_t)block).push_back(mirrors_col.at(i).get(block).clone(LAFEM::CloneMode::Shallow));
+          }
+
+        synch_matrix_list.at((size_t)block) = std::make_shared<SynchMatrix<MT_, VMT_>>(comm, ranks, mirrors_row_split.at((size_t)block), mirrors_col_split.at((size_t)block));
+
+        }
+      }
+#else // non-MPI version
+      SynchMatrix(const Dist::Comm&, const std::vector<int>& ranks, const std::vector<SVMT_>&, const std::vector<SVMT_>&) :
+        _initialised(false)
+      {
+        XASSERT(ranks.empty());
+      }
+#endif // FEAT_HAVE_MPI
+
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+      void init(const SMT_& matrix)
+      {
+        XASSERTM(!_initialised, "SynchMatrix object is already initialised");
+
+        for (int block(0) ; block < blocks_ ; ++block)
+        {
+          synch_matrix_list.at((size_t)block)->init(matrix.get(block, block));
+        }
+
+        _initialised = true;
+      }
+#else // non-MPI version
+      void init(const MT_&)
+      {
+        XASSERTM(!_initialised, "SynchMatrix object is already initialised");
+        _initialised = true;
+      }
+#endif // FEAT_HAVE_MPI
+
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+      void exec(SMT_& matrix)
+      {
+        XASSERTM(_initialised, "SynchMatrix object has not been initialised");
+
+        for (int block(0) ; block < blocks_ ; ++block)
+        {
+          synch_matrix_list.at((size_t)block)->exec(matrix.get(block, block));
+        }
+      }
+#else // non-MPI version
+      void exec(SMT_&)
+      {
+        XASSERTM(_initialised, "SynchMatrix object has not been initialised");
+      }
+#endif // FEAT_HAVE_MPI
+    };
+
   } // namespace Global
 } // namespace FEAT
 
