@@ -20,14 +20,14 @@ namespace FEAT
     {
       /// returns the object, if T_ has a GateType, i.e. is a GlobalVector - SFINAE at its best
       template <typename Evaluator_, typename T_>
-      static auto derefer(T_ & object, typename Evaluator_::GateType *) -> decltype(*object)
+      auto derefer(T_ & object, typename Evaluator_::GateType *) -> decltype(*object)
       {
         return *object;
       }
 
       /// returns the dereferenced object, if T_ has no GateType, i.e. is a LocalVector - SFINAE at its best
       template <typename Evaluator_, typename T_>
-      static T_& derefer(T_ & object, ...)
+      T_& derefer(T_ & object, ...)
       {
         return object;
       }
