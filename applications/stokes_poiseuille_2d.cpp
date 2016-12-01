@@ -427,6 +427,18 @@ namespace StokesPoiseuille2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
+    if (args.check("test-iter") >= 0)
+    {
+      int num_iter = (int)solver->get_num_iter();
+      int iter_target;
+      args.parse("test-iter", iter_target);
+      if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
+      {
+        comm.print("FAILED");
+        throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
+      }
+    }
+
     // clean up
     while(!transfer_levels.empty())
     {
@@ -467,6 +479,7 @@ namespace StokesPoiseuille2D
     args.support("parti-type");
     args.support("parti-name");
     args.support("parti-rank-elems");
+    args.support("test-iter");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();

@@ -387,7 +387,6 @@ namespace PoissonDirichlet2D
         comm.print("FAILED");
         throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
       }
-
     }
 
     /* ***************************************************************************************** */
