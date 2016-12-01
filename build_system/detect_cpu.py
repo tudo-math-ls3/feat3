@@ -1,5 +1,6 @@
 import platform
 from build_system.feat_util import get_output
+from build_system.feat_util import is_found
 
 def detect_cpu():
   cputype = "unknown"
@@ -80,6 +81,24 @@ def detect_cpu():
     vendor_id = values[7]
     cpu_family = int(values[2])
     model = int(values[4])
+
+  elif platform.system() == "FreeBSD":
+    if not is_found("cpuid"):
+      print ("detect_cpu: you need to install the package 'cpuid' to enable feat for cpu detection.")
+      return cputype
+
+    lines = get_output("cpuid")
+
+    cpu_family = ""
+    model = ""
+
+    for line in lines:
+      if "Vendor ID:" in line:
+        vendor_id = line.split('"')[1]
+      if "Family" in line and cpu_family == "":
+        cpu_family = int(line.split(" ")[1])
+      if "Model" in line and model == "":
+        model = int(line.split(" ")[1])
 
   else:
     print ("detect_cpu: operating system not supported")
