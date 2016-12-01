@@ -42,6 +42,8 @@ namespace FEAT
    *  - For Windows systems, this class makes use of the \c QueryPerformanceCounter() function.
    *  - For other systems, this class makes use of the ANSI-C \c clock() function as a fallback implementation.
    *
+   * \platformswitch Windows does not use gettimeofday
+   *
    * \author Dirk Ribbrock
    * \author Peter Zajac
    */

@@ -21,6 +21,7 @@ namespace FEAT
     {
       MemUsageInfo info;
 
+      /// \platformswitch linux, windows and bsd all have different memory statistic tools
 #if defined(__linux)
       String line;
       std::ifstream status_file("/proc/self/status");

@@ -35,10 +35,10 @@ PropertyMap * Runtime::global_property()
 
 void Runtime::initialise(int& argc, char**& argv)
 {
-  // Note:
-  // On Windows, these two function calls MUST come before anything else,
-  // otherwise one the following calls may cause the automated regression
-  // test system to halt with an error prompt awaiting user interaction.
+  /// \platformswitch
+  /// On Windows, these two function calls MUST come before anything else,
+  /// otherwise one the following calls may cause the automated regression
+  /// test system to halt with an error prompt awaiting user interaction.
 #if defined(_WIN32) && defined(FEAT_TESTING_VC)
   Windows::disable_error_prompts();
   Windows::install_seh_filter();
