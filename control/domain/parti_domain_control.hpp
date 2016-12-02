@@ -164,6 +164,11 @@ namespace FEAT
           // parse --parti-rank-elems
           args.parse("parti-rank-elems", _min_elems_per_rank);
 
+          // parse --adapt_mode
+          String adapt_mode_string("none");
+          args.parse("adapt_mode", adapt_mode_string);
+          _adapt_mode << adapt_mode_string;
+
           // okay
           return true;
         }
@@ -221,6 +226,12 @@ namespace FEAT
             _min_elems_per_rank = Index(std::stoi(parti_rank_elems_p.first));
           }
 
+          auto parti_adapt_mode_p = property_map->query("adapt_mode");
+          if(parti_adapt_mode_p.second)
+          {
+            _adapt_mode << parti_adapt_mode_p.first;
+          }
+
           return true;
 
         } // bool parse_property_map()
@@ -234,6 +245,17 @@ namespace FEAT
         void set_adapt_mode(Geometry::AdaptMode adapt_mode)
         {
           _adapt_mode = adapt_mode;
+        }
+
+        /**
+         * \brief Gets the adapt-mode for refinement
+         *
+         * \returns
+         * The adapt-mode that is used.
+         */
+        Geometry::AdaptMode get_adapt_mode()
+        {
+          return _adapt_mode;
         }
 
         /**
