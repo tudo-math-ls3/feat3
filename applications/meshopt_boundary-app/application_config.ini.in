@@ -2,13 +2,14 @@
 mesh_files =  unit-axe-tria.xml
 meshopt_config_file = ./meshopt_config.ini
 solver_config_file = ./solver_config.ini
-mesh_optimiser = HyperelasticityDefault
-delta_t = 5e-3
+mesh_optimiser = DuDvDefault
+delta_t = 1e-3
 t_end = 5e-1
 
 [DomainControlSettings]
 lvl_min = 1
-lvl_max = 3
+lvl_max = 5
+adapt_mode = chart
 parti-type = parmetis fallback
 #parti-name = default
 parti-rank-elems = 4

@@ -2,15 +2,17 @@
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
 dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r
+meshopt_level = -1
 
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
 dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r
+meshopt_level = -1
 
 [DuDvDefaultParameters]
-solver_config = PCG-MGV
-fixed_reference_domain = 1
+solver_config = PCG-MG
+fixed_reference_domain = 0
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional
@@ -20,5 +22,4 @@ fac_norm = 1.0
 fac_det = 1.0
 fac_cof = 0.0
 fac_reg = 1e-8
-exponent_det = 2
 scale_computation = current_uniform

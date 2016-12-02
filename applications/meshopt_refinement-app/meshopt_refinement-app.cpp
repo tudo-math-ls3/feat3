@@ -194,7 +194,6 @@ struct MeshoptRefinementApp
     // Write initial vtk output
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -206,12 +205,13 @@ struct MeshoptRefinementApp
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -283,7 +283,6 @@ struct MeshoptRefinementApp
     // Write output again
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -296,13 +295,12 @@ struct MeshoptRefinementApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
-
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -703,7 +701,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "fac_norm = 1.0" << std::endl;
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
-    iss << "fac_reg = 1e-8" << std::endl;
+    iss << "fac_reg = 4e-8" << std::endl;
     iss << "exponent_det = 1" << std::endl;
     iss << "scale_computation = once_uniform" << std::endl;
   }
@@ -721,7 +719,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "fac_norm = 1.0" << std::endl;
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
-    iss << "fac_reg = 1e-8" << std::endl;
+    iss << "fac_reg = 2e-8" << std::endl;
     iss << "exponent_det = 2" << std::endl;
     iss << "scale_computation = current_uniform" << std::endl;
   }
@@ -745,19 +743,6 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "direction_update = DYHSHybrid" << std::endl;
     iss << "keep_iterates = 0" << std::endl;
 
-    iss << "[DuDvPrecon]" << std::endl;
-    iss << "type = DuDvPrecon" << std::endl;
-    iss << "dirichlet_boundaries = bnd:o" << std::endl;
-    iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "linear_solver = PCG-MGV" << std::endl;
-
-    iss << "[PCG-MGV]" << std::endl;
-    iss << "type = pcg" << std::endl;
-    iss << "max_iter = 2" << std::endl;
-    iss << "tol_rel = 1e-8" << std::endl;
-    iss << "plot = 1" << std::endl;
-    iss << "precon = mgv" << std::endl;
-
     iss << "[strongwolfelinesearch]" << std::endl;
     iss << "type = StrongWolfeLinesearch" << std::endl;
     iss << "plot = 0" << std::endl;
@@ -765,6 +750,30 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "tol_decrease = 1e-3" << std::endl;
     iss << "tol_curvature = 0.3" << std::endl;
     iss << "keep_iterates = 0" << std::endl;
+
+    iss << "[DuDvPrecon]" << std::endl;
+    iss << "type = DuDvPrecon" << std::endl;
+    iss << "dirichlet_boundaries = bnd:o" << std::endl;
+    iss << "fixed_reference_domain = 1" << std::endl;
+    iss << "linear_solver = PCG-MG" << std::endl;
+
+    iss << "[PCG-JAC]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 10" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "precon = jac" << std::endl;
+
+    iss << "[PCG-MG]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 2" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "plot = 1" << std::endl;
+    iss << "precon = MG1" << std::endl;
+
+    iss << "[cg]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 4" << std::endl;
+    iss << "min_iter = 4" << std::endl;
 
     iss << "[rich]" << std::endl;
     iss << "type = richardson" << std::endl;
@@ -776,16 +785,17 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = jac" << std::endl;
     iss << "omega = 0.5" << std::endl;
 
-    iss << "[mgv]" << std::endl;
-    iss << "type = mgv" << std::endl;
-    iss << "smoother = rich" << std::endl;
-    iss << "coarse = pcg" << std::endl;
+    iss << "[MG1]" << std::endl;
+    iss << "type = mg" << std::endl;
+    iss << "hierarchy = s:rich-c:pcg" << std::endl;
+    iss << "lvl_min = 0" << std::endl;
+    iss << "lvl_max = -1" << std::endl;
+    iss << "cycle = w" << std::endl;
 
-    iss << "[pcg]" << std::endl;
-    iss << "type = pcg" << std::endl;
-    iss << "max_iter = 10" << std::endl;
-    iss << "tol_rel = 1e-8" << std::endl;
-    iss << "precon = jac" << std::endl;
+    iss << "[s:rich-c:pcg]" << std::endl;
+    iss << "smoother = rich" << std::endl;
+    iss << "coarse = PCG-JAC" << std::endl;
+
   }
   else if(test_number == 2)
   {
@@ -803,14 +813,20 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = DuDvPrecon" << std::endl;
     iss << "slip_boundaries = bnd:o" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "linear_solver = PCG-MGV" << std::endl;
+    iss << "linear_solver = PCG-MG" << std::endl;
 
-    iss << "[PCG-MGV]" << std::endl;
+    iss << "[PCG-JAC]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 10" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "precon = jac" << std::endl;
+
+    iss << "[PCG-MG]" << std::endl;
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 2" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "plot = 1" << std::endl;
-    iss << "precon = mgv" << std::endl;
+    iss << "precon = MG1" << std::endl;
 
     iss << "[strongwolfelinesearch]" << std::endl;
     iss << "type = StrongWolfeLinesearch" << std::endl;
@@ -830,21 +846,17 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = jac" << std::endl;
     iss << "omega = 0.7" << std::endl;
 
-    iss << "[mgv]" << std::endl;
-    iss << "type = mgv" << std::endl;
+    iss << "[MG1]" << std::endl;
+    iss << "type = mg" << std::endl;
+    iss << "hierarchy = s:rich-c:pcg" << std::endl;
+    iss << "lvl_min = 0" << std::endl;
+    iss << "lvl_max = -1" << std::endl;
+    iss << "cycle = v" << std::endl;
+
+    iss << "[s:rich-c:pcg]" << std::endl;
     iss << "smoother = rich" << std::endl;
-    iss << "coarse = pcg" << std::endl;
+    iss << "coarse = PCG-JAC" << std::endl;
 
-    iss << "[cg]" << std::endl;
-    iss << "type = pcg" << std::endl;
-    iss << "min_iter = 4" << std::endl;
-    iss << "max_iter = 4" << std::endl;
-
-    iss << "[pcg]" << std::endl;
-    iss << "type = pcg" << std::endl;
-    iss << "max_iter = 50" << std::endl;
-    iss << "tol_rel = 1e-8" << std::endl;
-    iss << "precon = jac" << std::endl;
   }
   else
   {

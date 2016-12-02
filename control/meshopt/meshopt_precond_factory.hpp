@@ -65,7 +65,11 @@ namespace FEAT
               bool fixed_reference_domain(false);
               auto fixed_reference_domain_p = precon_section->query("fixed_reference_domain");
               if(fixed_reference_domain_p.second)
+              {
                 fixed_reference_domain = (std::stoi(fixed_reference_domain_p.first) == 1);
+              }
+
+              int level(my_ctrl.meshopt_lvl);
 
               typedef DuDvFunctionalControl
               <
@@ -77,12 +81,14 @@ namespace FEAT
               > PreconControlType;
 
               result = Solver::new_nonlinear_operator_precond_wrapper<PreconControlType>
-                (dom_ctrl, precon_dirichlet_list, precon_slip_list, precon_solver_p.first, solver_config,
-                fixed_reference_domain);
+                (dom_ctrl, level, precon_dirichlet_list, precon_slip_list,
+                precon_solver_p.first, solver_config, fixed_reference_domain);
             }
             else if(precon_p.first != "none")
+            {
               throw InternalError(__func__,__FILE__,__LINE__,
               "Unsupport nonlinear optimiser precon: "+precon_p.first);
+            }
           }
           else
           {

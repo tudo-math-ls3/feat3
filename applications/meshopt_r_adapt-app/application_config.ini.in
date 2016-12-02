@@ -8,7 +8,7 @@ t_end = 1e0
 
 [DomainControlSettings]
 lvl_min = 2
-lvl_max = 3
+lvl_max = 4
 parti-type = parmetis fallback
 #parti-name = default
 parti-rank-elems = 4

@@ -268,7 +268,9 @@ namespace FEAT
           XASSERT(_slip_asm != nullptr);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
+          {
             _lambda(cell, _trafo->template compute_vol<typename MeshType::ShapeType>(cell));
+          }
 
           auto& dirichlet_filters = filter.template at<1>();
 
@@ -276,8 +278,10 @@ namespace FEAT
           {
             const auto& assembler = _dirichlet_asm->find(it.first);
             if(assembler == _dirichlet_asm->end())
+            {
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find dirichlet assembler for filter with key "+it.first);
+            }
 
             assembler->second->assemble(it.second, *_trafo_space, vec_state);
           }
@@ -289,14 +293,18 @@ namespace FEAT
           {
             const auto& assembler = _slip_asm->find(it.first);
             if(assembler == _slip_asm->end())
+            {
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find slip filter assembler for filter with key "+it.first);
+            }
 
             assembler->second->assemble(it.second, *_trafo_space);
           }
 
           for(const auto& it:slip_filters)
+          {
             this->_mesh_node->adapt_by_name(it.first);
+          }
 
         }
 

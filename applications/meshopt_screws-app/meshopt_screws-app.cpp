@@ -330,7 +330,6 @@ struct MeshoptScrewsApp
     // Write initial vtk output
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -342,12 +341,12 @@ struct MeshoptScrewsApp
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -412,7 +411,6 @@ struct MeshoptScrewsApp
     // Write output again
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -425,12 +423,12 @@ struct MeshoptScrewsApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -730,7 +728,6 @@ struct MeshoptScrewsApp
     // Write final vtk output
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -743,12 +740,12 @@ struct MeshoptScrewsApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -1088,7 +1085,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "dirichlet_boundaries = bnd:i bnd:o" << std::endl;
 
     iss << "[DuDvDefaultParameters]" << std::endl;
-    iss << "solver_config = PCG-MGV" << std::endl;
+    iss << "solver_config = PCG-MG" << std::endl;
   }
   else if(test_number == 2)
   {
@@ -1126,13 +1123,18 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
 {
   if(test_number == 1)
   {
-    iss << "[PCG-MGV]" << std::endl;
+    iss << "[PCG-JAC]" << std::endl;
     iss << "type = pcg" << std::endl;
-    iss << "max_iter = 100" << std::endl;
-    iss << "min_stag_iter = 1" << std::endl;
+    iss << "max_iter = 1000" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
+    iss << "precon = jac" << std::endl;
+
+    iss << "[PCG-MG]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 75" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "precon = MG1" << std::endl;
     iss << "plot = 1" << std::endl;
-    iss << "precon = mgv" << std::endl;
 
     iss << "[rich]" << std::endl;
     iss << "type = richardson" << std::endl;
@@ -1144,22 +1146,16 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = jac" << std::endl;
     iss << "omega = 0.5" << std::endl;
 
-    iss << "[mgv]" << std::endl;
-    iss << "type = mgv" << std::endl;
+    iss << "[MG1]" << std::endl;
+    iss << "type = mg" << std::endl;
+    iss << "hierarchy = s:rich-c:pcg" << std::endl;
+    iss << "lvl_min = 0" << std::endl;
+    iss << "lvl_max = -1" << std::endl;
+    iss << "cycle = v" << std::endl;
+
+    iss << "[s:rich-c:pcg]" << std::endl;
     iss << "smoother = rich" << std::endl;
-    iss << "coarse = pcg" << std::endl;
-
-    iss << "[rich]" << std::endl;
-    iss << "type = richardson" << std::endl;
-    iss << "min_iter = 4" << std::endl;
-    iss << "max_iter = 4" << std::endl;
-    iss << "precon = jac" << std::endl;
-
-    iss << "[pcg]" << std::endl;
-    iss << "type = pcg" << std::endl;
-    iss << "max_iter = 50" << std::endl;
-    iss << "tol_rel = 1e-8" << std::endl;
-    iss << "precon = jac" << std::endl;
+    iss << "coarse = PCG-JAC" << std::endl;
   }
   else if (test_number == 2)
   {

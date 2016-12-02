@@ -207,7 +207,6 @@ struct MeshoptRAdaptApp
     // Write initial vtk output
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -219,12 +218,13 @@ struct MeshoptRAdaptApp
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -296,7 +296,6 @@ struct MeshoptRAdaptApp
     // Write output again
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -309,12 +308,14 @@ struct MeshoptRAdaptApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
+        exporter.write(vtk_name, comm.rank(), comm.size());
+
       }
     }
 
@@ -575,7 +576,6 @@ struct MeshoptRAdaptApp
     // Write final vtk output
     if(write_vtk)
     {
-      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
@@ -588,12 +588,13 @@ struct MeshoptRAdaptApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm);
 
-        ++deque_position;
+        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
 
@@ -960,7 +961,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "fac_norm = 1e-2" << std::endl;
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
-    iss << "fac_reg = 1e-8" << std::endl;
+    iss << "fac_reg = 5e-8" << std::endl;
     iss << "exponent_det = 1" << std::endl;
     iss << "scale_computation = iter_concentration" << std::endl;
     iss << "conc_function = OuterDist" << std::endl;
@@ -988,7 +989,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
     iss << "fac_norm = 1.0" << std::endl;
     iss << "fac_det = 1.0" << std::endl;
     iss << "fac_cof = 0.0" << std::endl;
-    iss << "fac_reg = 1e-8" << std::endl;
+    iss << "fac_reg = 5e-8" << std::endl;
     iss << "exponent_det = 1" << std::endl;
     iss << "scale_computation = once_uniform" << std::endl;
     iss << "conc_function = OuterDist" << std::endl;

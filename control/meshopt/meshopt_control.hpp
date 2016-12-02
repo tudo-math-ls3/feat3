@@ -58,6 +58,8 @@ namespace FEAT
       class MeshoptControlBase
       {
         public:
+          /// The type of the underlying domain control
+          typedef DomainControl_ DomainControl;
           /// The world dimension, i.e. number of coordinates
           static constexpr int world_dim = DomainControl_::MeshType::world_dim;
           /// Floating point type for coordinates
@@ -77,10 +79,20 @@ namespace FEAT
           static_assert( std::is_same<typename DomainControl_::MeshType, typename Trafo_::MeshType>::value,
           "DomainControl/Trafo MeshType mismatch");
 
+        protected:
+          /// The domain control whose mesh objects can be modified
+          DomainControl& _dom_ctrl;
+
+          std::deque<Geometry::VertexSet<world_dim>> _vtx_buffer;
+
+        public:
+
           /**
-           * \brief Empty default constructor
+           * \brief The simplest constructor possible
            */
-          explicit MeshoptControlBase()
+          explicit MeshoptControlBase(DomainControl& dom_ctrl_)
+            : _dom_ctrl(dom_ctrl_),
+            _vtx_buffer()
           {
           }
 
@@ -151,6 +163,13 @@ namespace FEAT
            * \returns A deque of Strings with all slip boundary names
            */
           virtual std::deque<String> get_slip_boundaries() const = 0;
+
+          /**
+           * \brief Get the number of levels in this object
+           *
+           * \returns The number of levels.
+           */
+          virtual size_t get_num_levels() const = 0;
 
           /**
            * \brief Returns a descriptive String
@@ -245,7 +264,7 @@ namespace FEAT
           typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 
           /// Global mesh quality functional type
-          typedef GlobalOp_<LocalQualityFunctional, SystemMirror, SystemMirror> GlobalQualityFunctional;
+          typedef GlobalOp_<LocalQualityFunctional, SystemMirror, SystemMirror> GlobalFunctional;
           /// Global system filter type
           typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
           /// Global scalar vector type
@@ -257,6 +276,9 @@ namespace FEAT
           /// Global coordinates buffer
           typedef Global::Vector<LocalCoordsBuffer, SystemMirror> GlobalCoordsBuffer;
 
+          typedef GlobalFunctional GlobalSystemMatrix;
+
+        public:
           /// The scalar gate
           ScalarGate gate_scalar;
           /// The system gate
@@ -264,9 +286,13 @@ namespace FEAT
           /// The global filter
           GlobalSystemFilter filter_sys;
           /// The global system matrix
-          GlobalQualityFunctional op_sys;
+          GlobalFunctional op_sys;
           /// This contains a shallow copy of the operator's coords_buffer
           GlobalCoordsBuffer coords_buffer;
+
+        private:
+          /// This is the number of refines it took from the mesh at the file level to here
+          const int _level_index;
 
         public:
           /**
@@ -279,12 +305,13 @@ namespace FEAT
            * List of the names of all slip boundaries
            */
           template<typename... Args_>
-          explicit MeshoptSystemLevel(const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
+          explicit MeshoptSystemLevel(const int level_index, const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
           Args_&&... args) :
             gate_sys(),
             filter_sys(),
             op_sys(&gate_sys, &gate_sys, /*filter_sys,*/ std::forward<Args_>(args)...),
-            coords_buffer(&gate_sys, (*op_sys).get_coords().clone(LAFEM::CloneMode::Shallow))
+            coords_buffer(&gate_sys, (*op_sys).get_coords().clone(LAFEM::CloneMode::Shallow)),
+            _level_index(level_index)
             {
 
               LocalSlipFilterSequence slip_sequence(slip_list);
@@ -295,6 +322,11 @@ namespace FEAT
               *filter_sys = std::move(local_filter);
 
             }
+
+          int get_level_index()
+          {
+            return _level_index;
+          }
 
           /**
            * \brief Empty virtual destructor

@@ -103,8 +103,6 @@ namespace FEAT
           std::deque<TransferLevelType*> _transfer_levels;
 
         public:
-          /// Number of refinement levels
-          const Index num_levels;
           /// Solver configuration
           PropertyMap& solver_config;
           /// The name of the section from solver_config we want to use
@@ -113,28 +111,61 @@ namespace FEAT
           std::shared_ptr<Solver::SolverBase<GlobalSystemVectorR>> solver;
           /// Whether to reassemble the system matrix in every call of optimise
           const bool fixed_reference_domain;
+          /// The level index (= number of refinements since the mesh file) to optimise the mesh on
+          int meshopt_lvl;
+          /// The position of this level in the deque of system levels
+          size_t meshopt_lvl_pos;
 
           explicit DuDvFunctionalControl(
-            DomainControl_& dom_ctrl, const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
-            const String& solver_name_, PropertyMap& solver_config_, bool fixed_reference_domain_):
+            DomainControl_& dom_ctrl,
+            const int meshopt_lvl_,
+            const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
+            const String& solver_name_, PropertyMap& solver_config_,
+            bool fixed_reference_domain_):
+            BaseClass(dom_ctrl),
             _assembler_levels(),
             _system_levels(),
             _transfer_levels(),
-            num_levels(dom_ctrl.get_levels().size()),
             solver_config(solver_config_),
             solver_name(solver_name_),
             solver(nullptr),
-            fixed_reference_domain(fixed_reference_domain_)
+            fixed_reference_domain(fixed_reference_domain_),
+            meshopt_lvl(meshopt_lvl_),
+            meshopt_lvl_pos(~size_t(1))
             {
-              XASSERT(num_levels > Index(0));
+              XASSERT(meshopt_lvl >= -1);
+
+              // If the input level was set to -1, take the max level of the domain control
+              if(meshopt_lvl == -1)
+              {
+                meshopt_lvl = dom_ctrl.get_levels().back()->get_level_index();
+              }
+
+              XASSERT(meshopt_lvl<= dom_ctrl.get_levels().back()->get_level_index());
+
+              // Now find the position of the coarsest mesh optimisation level in the domain levels
+              for(size_t i(0); i < dom_ctrl.get_levels().size(); ++i)
+              {
+                if(dom_ctrl.get_levels().at(i)->get_level_index() == meshopt_lvl)
+                {
+                  meshopt_lvl_pos  = i;
+                  break;
+                }
+              }
+
+              XASSERT(meshopt_lvl_pos < dom_ctrl.get_levels().size());
 
               const DomainLayerType& layer = *dom_ctrl.get_layers().back();
               const std::deque<DomainLevelType*>& domain_levels = dom_ctrl.get_levels();
 
-              for(Index i(0); i < num_levels; ++i)
+              for(size_t i(0); i < domain_levels.size(); ++i)
               {
-                _assembler_levels.push_back(new AssemblerLevelType(*domain_levels.at(i), dirichlet_list, slip_list));
-                _system_levels.push_back(new SystemLevelType(dirichlet_list, slip_list,
+                _assembler_levels.push_back(new AssemblerLevelType(*domain_levels.at(i),
+                dirichlet_list, slip_list));
+
+                _system_levels.push_back( new SystemLevelType(
+                  domain_levels.at(i)->get_level_index(),
+                  dirichlet_list, slip_list,
                   domain_levels.at(i)->get_mesh_node(),
                   &(_assembler_levels.at(i)->trafo_space),
                   &(_assembler_levels.at(i)->dirichlet_asm),
@@ -144,21 +175,30 @@ namespace FEAT
                 (*(_system_levels.at(i)->op_sys)).init();
 
                 if(i > 0)
+                {
                   _transfer_levels.push_back(new TransferLevelType(*_system_levels.at(i-1), *_system_levels.at(i)));
+                }
               }
 
-              for(Index i(0); i < num_levels; ++i)
+              // Now that _system_levels has the correct size, we can use get_num_levels()
+              for(Index i(0); i < get_num_levels(); ++i)
+              {
                 _assembler_levels.at(i)->assemble_gates(layer, *_system_levels.at(i));
+              }
 
-              for(Index i(0); (i+1) < num_levels; ++i)
+              for(Index i(0); (i+1) < get_num_levels(); ++i)
+              {
                 _assembler_levels.at(i+1)->assemble_system_transfer(*_transfer_levels.at(i), *_assembler_levels.at(i));
+              }
 
-              for(Index i(0); i < num_levels; ++i)
+              for(Index i(0); i < get_num_levels(); ++i)
+              {
                 _assembler_levels.at(i)->assemble_system_matrix(*_system_levels.at(i));
+              }
 
               // create our solver
               solver = Control::MeshoptSolverFactory::create_linear_solver
-                (_system_levels, _transfer_levels, &solver_config, solver_name);
+                (_system_levels, _transfer_levels, &solver_config, solver_name, meshopt_lvl_pos);
               // initialise
               solver->init();
             }
@@ -214,6 +254,10 @@ namespace FEAT
             msg = String("level max/min").pad_back(pad_width, '.') + String(": ")
               + stringify(_assembler_levels.back()->domain_level.get_level_index()) + String(" / ")
               + stringify(_assembler_levels.front()->domain_level.get_level_index());
+            comm_world.print(msg);
+
+            msg = String("optimisation on level").pad_back(pad_width, '.') + String(": ")
+              + stringify(meshopt_lvl);
             comm_world.print(msg);
 
             msg = String("Fixed reference domain").pad_back(pad_width, '.') + String(": ")
@@ -276,6 +320,12 @@ namespace FEAT
             return _system_levels.back()->coords_buffer;
           }
 
+          /// \copydoc BaseClass::get_num_levels()
+          virtual size_t get_num_levels() const override
+          {
+            return _system_levels.size();
+          }
+
           /// \copydoc BaseClass::buffer_to_mesh()
           virtual void buffer_to_mesh() override
           {
@@ -286,7 +336,7 @@ namespace FEAT
             const auto& coords_buffer_loc = (*(_system_levels.back()->op_sys)).get_coords();
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
-            for(size_t level(num_levels-1); level > 0; )
+            for(size_t level(get_num_levels()-1); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
@@ -315,7 +365,7 @@ namespace FEAT
             const auto& coords_buffer_loc = *(_system_levels.back()->coords_buffer);
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
-            for(size_t level(num_levels-1); level > 0; )
+            for(size_t level(get_num_levels()-1); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
@@ -367,7 +417,7 @@ namespace FEAT
           {
             if(!fixed_reference_domain)
             {
-              for(size_t lvl(0); lvl < size_t(num_levels); ++lvl)
+              for(size_t lvl(0); lvl < size_t(get_num_levels()); ++lvl)
                 _assembler_levels.at(lvl)->assemble_system_matrix(*(_system_levels.at(lvl)));
             }
           }
@@ -378,7 +428,7 @@ namespace FEAT
             typename SystemLevelType::LocalCoordsBuffer vec_buf;
             vec_buf.convert(*vec_state);
 
-            for(size_t level(num_levels); level > 0; )
+            for(size_t level(get_num_levels()); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
@@ -413,8 +463,10 @@ namespace FEAT
           virtual Solver::Status apply(GlobalSystemVectorR& vec_sol, const GlobalSystemVectorL& vec_rhs)
           {
             // Get our global system matrix and filter
-            typename SystemLevelType::GlobalQualityFunctional& op_sys = (*_system_levels.back()).op_sys;
-            typename SystemLevelType::GlobalSystemFilter& filter_sys = (*_system_levels.back()).filter_sys;
+            typename SystemLevelType::GlobalFunctional& op_sys =
+              (*_system_levels.at(meshopt_lvl_pos)).op_sys;
+            typename SystemLevelType::GlobalSystemFilter& filter_sys =
+              (*_system_levels.at(meshopt_lvl_pos)).filter_sys;
 
             return Solver::solve(*solver, vec_sol, vec_rhs, op_sys, filter_sys);
           }
@@ -426,9 +478,8 @@ namespace FEAT
             init_numeric();
 
             // fetch our finest levels
-            //DomainLevelType& the_domain_level = *domain_levels.back();
-            SystemLevelType& the_system_level = *_system_levels.back();
-            AssemblerLevelType& the_asm_level = *_assembler_levels.back();
+            SystemLevelType& the_system_level = *_system_levels.at(meshopt_lvl_pos);
+            AssemblerLevelType& the_asm_level = *_assembler_levels.at(meshopt_lvl_pos);
 
             // Create our RHS and SOL vectors
             GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
@@ -445,13 +496,67 @@ namespace FEAT
             vec_buf.convert(*vec_sol);
             (*(the_system_level.coords_buffer)).copy(vec_buf);
 
-            buffer_to_mesh();
+            (*(the_system_level.op_sys)).buffer_to_mesh();
 
-            // Call prepare again to project the slip boundaries
-            prepare(vec_sol);
+            //If the mesh was not optimised on the finest domain level, we now need to prolongate the solution by:
+            // - refine the coarse vertex set using the StandardRefinery
+            // - copy the results to the CoordsBuffer
+            // - convert the CoordsBuffer to a vector type that we can filter with the system's Dirichlet filter
+            // - copy the filtered vector's contents back to the buffer and write the buffer to the mesh
+            // - apply the nonlinear filter representing unilateral BCs of place by calling adapt() for the
+            //   corresponding meshparts
+            for(size_t pos(meshopt_lvl_pos+1); pos < get_num_levels(); ++pos)
+            {
+              auto& coarse_mesh = this->_dom_ctrl.get_levels().at(pos-1)->get_mesh();
+              auto& fine_mesh = this->_dom_ctrl.get_levels().at(pos)->get_mesh();
+              auto& fine_vtx = fine_mesh.get_vertex_set();
 
-          }
+              // Refine coarse vertex set and write the result to the CoordsBuffer
+              Geometry::StandardRefinery<MeshType> refinery(coarse_mesh);
+              refinery.fill_vertex_set(fine_vtx);
+              (*(_system_levels.at(pos)->op_sys)).mesh_to_buffer();
+              // Convert the buffer to a filterable vector
+              typename GlobalSystemVectorL::LocalVectorType vec_sol_lvl;
+              vec_sol_lvl.convert(*(_system_levels.at(pos)->coords_buffer));
+              // Filter this vector, copy back the contents and write the changes to the mesh
+              auto& dirichlet_filters_lvl = (*(_system_levels.at(pos)->filter_sys)).template at<1>();
+              dirichlet_filters_lvl.filter_sol(vec_sol_lvl);
+              (*(_system_levels.at(pos)->coords_buffer)).copy(vec_sol_lvl);
+              (*(_system_levels.at(pos)->op_sys)).buffer_to_mesh();
+              // Now call adapt() on the slip boundaries
+              auto* fine_mesh_node = this->_dom_ctrl.get_levels().at(pos)->get_mesh_node();
+              for(const auto& it:get_slip_boundaries())
+              {
+                fine_mesh_node->adapt_by_name(it);
+              }
+            }
 
+            // Now we need to update all levels below the one we carried out the optimisation on
+            for(size_t pos(meshopt_lvl_pos); pos > size_t(0); )
+            {
+              --pos;
+              Index ndofs(_assembler_levels.at(pos)->trafo_space.get_num_dofs());
+
+              // At this point, what we really need is a primal restriction operator that restricts the FE function
+              // representing the coordinate distribution to the coarser level. This is very simple for continuous
+              // Lagrange elements (just discard the additional information from the fine level), but not clear in
+              // the generic case. So we use an evil hack here:
+              // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
+              // the fine level vector.
+              typename SystemLevelType::GlobalCoordsBuffer
+                global_sol_level( &(_system_levels.at(pos)->gate_sys), *vec_sol, ndofs, Index(0));
+
+              // prepare() needs to be called of the local object, because there is a Global::Matrix around it
+              // which knows nothing of prepare()
+              (*(_system_levels.at(pos)->op_sys)).prepare(*global_sol_level, *(_system_levels.at(pos)->filter_sys));
+
+              _assembler_levels.at(pos)->assemble_system_filter(*(_system_levels.at(pos)), global_sol_level);
+
+              (*(_system_levels.at(pos)->op_sys)).get_coords().copy(*global_sol_level);
+              (*(_system_levels.at(pos)->op_sys)).buffer_to_mesh();
+            }
+
+          } // void optimise()
       };
 
       /**

@@ -448,11 +448,6 @@ namespace FEAT
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr!\n");
             XASSERTM(_penalty_param >= DataType(0), "penalty_param must be >= 0!\n");
 
-            //_mu(17, DataType(128));
-            //_mu(20, DataType(128));
-            //_mu(25, DataType(128));
-            //_mu(28, DataType(128));
-
             for(Index i(0); i < _mu.size(); ++i)
             {
               _sum_mu += _mu(i);
@@ -773,18 +768,18 @@ namespace FEAT
           this->_coords_buffer.copy(vec_state);
           this->buffer_to_mesh();
 
-          //auto& dirichlet_filters = filter.template at<1>();
+          auto& dirichlet_filters = filter.template at<1>();
 
-          //for(auto& it : dirichlet_filters)
-          //{
-          //  const auto& assembler = _dirichlet_asm.find(it.first);
+          for(auto& it : dirichlet_filters)
+          {
+            const auto& assembler = _dirichlet_asm.find(it.first);
 
-          //  if(assembler == _dirichlet_asm.end())
-          //    throw InternalError(__func__,__FILE__,__LINE__,
-          //    "Could not find unit filter assembler for filter with key "+it.first);
+            if(assembler == _dirichlet_asm.end())
+              throw InternalError(__func__,__FILE__,__LINE__,
+              "Could not find unit filter assembler for filter with key "+it.first);
 
-          //  assembler->second->assemble(it.second, _trafo_space);
-          //}
+            assembler->second->assemble(it.second, _trafo_space, vec_state);
+          }
 
           // The slip filter contains the outer unit normal, so reassemble it
           auto& slip_filters = filter.template at<0>();

@@ -104,6 +104,9 @@ namespace FEAT
           std::deque<String> dirichlet_list;
           std::deque<String> slip_list;
 
+          // -1 causes the DuDvFunctionalControl to use max level of the underlying domain control
+          int meshopt_lvl(-1);
+
           // Get Meshopt configuration section
           auto meshopt_section = meshopt_config->query_section(section_key);
           XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimiser section!");
@@ -120,6 +123,13 @@ namespace FEAT
           // Get list of boundary conditions
           auto slip_list_p = meshopt_section->query("slip_boundaries");
           slip_list_p.first.split_by_charset(slip_list, " ");
+
+          // Get meshopt level (if any)
+          auto meshopt_lvl_p = meshopt_section->query("meshopt_lvl");
+          if(meshopt_lvl_p.second)
+          {
+            meshopt_lvl = std::stoi(meshopt_lvl_p.first);
+          }
 
           auto config_section_p = meshopt_section->query("config_section");
           XASSERTM(config_section_p.second, "MeshOptimiser config section is missing config_section entry!");
@@ -143,7 +153,8 @@ namespace FEAT
 
           typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_, Trafo_> DuDvCtrl;
           result = std::make_shared<DuDvCtrl>(
-            dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config, fixed_reference_domain);
+            dom_ctrl, meshopt_lvl,
+            dirichlet_list, slip_list, solver_p.first, *solver_config, fixed_reference_domain);
 
           return result;
         } // create_dudv_control
@@ -187,6 +198,9 @@ namespace FEAT
           DT_ fac_cof(0);
           DT_ fac_reg(0);
 
+          // -1 causes the HyperelasticityFunctionalControl to use max level of the underlying domain control
+          int meshopt_lvl(-1);
+
           //bool split_hypercubes(false);
 
           // Get Meshopt configuration section
@@ -205,6 +219,13 @@ namespace FEAT
           // Get list of boundary conditions
           auto slip_list_p = meshopt_section->query("slip_boundaries");
           slip_list_p.first.split_by_charset(slip_list, " ");
+
+          // Get meshopt level (if any)
+          auto meshopt_lvl_p = meshopt_section->query("meshopt_lvl");
+          if(meshopt_lvl_p.second)
+          {
+            meshopt_lvl = std::stoi(meshopt_lvl_p.first);
+          }
 
           // Get the name of the MeshOptimiser configuration section
           auto config_section_p = meshopt_section->query("config_section");
@@ -278,7 +299,7 @@ namespace FEAT
               (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
 
             result = create_hyperelasticity_control_with_functional
-              (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
+              (dom_ctrl, meshopt_lvl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
           }
           // This is disabled because the ***Unrolled classes produce huge object files, slow code and are a pain to compile.
           // If you need them for debugging purposes, use the code below
@@ -324,7 +345,7 @@ namespace FEAT
          */
         template<typename DomCtrl_, typename FunctionalType_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
-        create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl,
+        create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl, const int meshopt_lvl,
         PropertyMap* hyperelasticity_config_section, PropertyMap* meshopt_config, PropertyMap* solver_config,
         std::shared_ptr<FunctionalType_> my_functional,
         const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list)
@@ -383,8 +404,8 @@ namespace FEAT
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_, Trafo_,
             SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
-              (dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config, my_functional,
-              scale_computation, mesh_conc_func, DT_(align_mesh));
+              (dom_ctrl, meshopt_lvl, dirichlet_list, slip_list, solver_p.first,
+              *solver_config, my_functional, scale_computation, mesh_conc_func, DT_(align_mesh));
           }
           else
           {

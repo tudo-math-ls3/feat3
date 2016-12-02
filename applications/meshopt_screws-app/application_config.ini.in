@@ -12,3 +12,4 @@ lvl_max = 1
 parti-type = parmetis fallback
 #parti-name = default
 parti-rank-elems = 4
+adapt_mode = chart
