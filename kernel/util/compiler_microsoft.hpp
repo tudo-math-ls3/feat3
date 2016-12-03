@@ -15,7 +15,7 @@
 #  define FEAT_COMPILER_MICROSOFT _MSC_VER
 
 // detect the compiler verson and define the FEAT_COMPILER macro
-#  if (_MSC_VER >= 1800)
+#  if (_MSC_VER >= 1900)
 #    define FEAT_COMPILER "Microsoft Visual C++ 2015 (or newer)"
 #  elif (_MSC_VER >= 1800)
 #    define FEAT_COMPILER "Microsoft Visual C++ 2013"
