@@ -1463,7 +1463,7 @@ namespace FEAT
        * A new sub-communicator for the range of processes. If this process is not
        * part of the new sub-communicator, the returned comm is a null communicator.
        */
-      Comm comm_create_rangle_incl(int count, int first = 0, int stride = 1) const;
+      Comm comm_create_range_incl(int count, int first = 0, int stride = 1) const;
 
       /**
        * \brief Creates a new sub-communicator for a given set of ranks.

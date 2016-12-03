@@ -275,7 +275,7 @@ namespace FEAT
       return (comm == MPI_COMM_NULL);
     }
 
-    Comm Comm::comm_create_rangle_incl(int count, int first, int stride) const
+    Comm Comm::comm_create_range_incl(int count, int first, int stride) const
     {
       XASSERT(count > 0);
       XASSERT((first >= 0) && (first < _size));
@@ -833,7 +833,7 @@ namespace FEAT
       return _size == 1;
     }
 
-    Comm Comm::comm_create_rangle_incl(int, int, int) const
+    Comm Comm::comm_create_range_incl(int, int, int) const
     {
       return Comm(1);
     }
