@@ -164,7 +164,7 @@ namespace FEAT
           // where
           //   vi = offset
           //   Ri = rotation
-          //   wi = orgin
+          //   wi = origin
 
           WorldPoint tmp1, tmp2;
 

@@ -12,7 +12,7 @@
 
 namespace FEAT
 {
-  /// \cond interal
+  /// \cond internal
   namespace Intern
   {
     // Random number class; this class's gen() function takes a Random object reference and
