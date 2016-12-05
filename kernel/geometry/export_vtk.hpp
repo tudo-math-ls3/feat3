@@ -450,12 +450,8 @@ namespace FEAT
           throw InternalError("Invalid rank '" + stringify(rank) + "'");
 
         // Add rank cell array since we're parallel if we come to here
-        double* rank_array = new double[_num_cells];
-        for(Index i(0); i < _num_cells; ++i)
-          rank_array[i] = double(rank);
-
-        add_cell_scalar("rank", rank_array);
-        delete[] rank_array;
+        std::vector<double> rank_array(std::size_t(_num_cells), double(comm.rank()));
+        add_cell_scalar("rank", rank_array.data());
 
         // compute number of non-zero digits in (nparts-1) for padding
         const std::size_t ndigits = Math::ilog10(std::size_t(nparts-1));
@@ -498,25 +494,12 @@ namespace FEAT
        */
       void write(const String& filename, const Dist::Comm& comm)
       {
-        // call the standard serial write version if nparts < 1
-        if(comm.size() <= 1)
-        {
-          write(filename);
-          return;
-        }
-
-        const int rank = comm.rank();
-
         // Add rank cell array since we're parallel if we come to here
-        double* rank_array = new double[_num_cells];
-        for(Index i(0); i < _num_cells; ++i)
-          rank_array[i] = double(rank);
-
-        add_cell_scalar("rank", rank_array);
-        delete[] rank_array;
+        std::vector<double> rank_array(std::size_t(_num_cells), double(comm.rank()));
+        add_cell_scalar("rank", rank_array.data());
 
         // compute number of non-zero digits in (nparts-1) for padding
-        const std::size_t ndigits = Math::ilog10(std::size_t(comm.size()-1));
+        const std::size_t ndigits = std::size_t(Math::max(Math::ilog10(comm.size()-1), 1));
 
         // write serial VTU file into a stringstream
         std::stringstream stream;
@@ -529,7 +512,7 @@ namespace FEAT
         DistFileIO::write_sequence(stream, pattern, comm);
 
         // we're done unless we have rank = 0
-        if(rank != 0)
+        if(comm.rank() != 0)
           return;
 
         // try to open our output file

@@ -222,7 +222,7 @@ struct MeshoptRAdaptApp
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm.rank(), comm.size());
+        exporter.write(vtk_name, comm);
 
         ++deque_position;
       }
@@ -312,7 +312,7 @@ struct MeshoptRAdaptApp
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm.rank(), comm.size());
+        exporter.write(vtk_name, comm);
 
         ++deque_position;
       }
@@ -513,7 +513,7 @@ struct MeshoptRAdaptApp
 
         meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
 
-        exporter.write(vtk_name, comm.rank(), comm.size());
+        exporter.write(vtk_name, comm);
       }
 
       // Compute and print quality indicators on the finest level only
@@ -591,7 +591,7 @@ struct MeshoptRAdaptApp
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, comm.rank(), comm.size());
+        exporter.write(vtk_name, comm);
 
         ++deque_position;
       }
