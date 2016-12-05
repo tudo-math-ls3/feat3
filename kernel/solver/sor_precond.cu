@@ -232,4 +232,30 @@ namespace FEAT
     }
   }
 }
+#else
+namespace FEAT
+{
+  namespace Solver
+  {
+    namespace Intern
+    {
+      void cuda_sor_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd, int & ncolors, int* & colored_row_ptr, int* & rows_per_color, int* & inverse_row_ptr)
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
+      }
+
+      void cuda_sor_done_symbolic(int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
+      }
+
+      int cuda_sor_apply(int m, double * y, const double * x, double * csrVal, int * csrColInd, int ncolors, double omega,
+          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
+        return 0;
+      }
+    }
+  }
+}
 #endif // FEAT_HAVE_CUSOLVER

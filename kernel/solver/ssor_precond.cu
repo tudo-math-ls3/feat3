@@ -109,4 +109,28 @@ namespace FEAT
     }
   }
 }
+#else
+namespace FEAT
+{
+  namespace Solver
+  {
+    namespace Intern
+    {
+      int cuda_ssor_forward_apply(int m, double * y, const double * x, double * csrVal, int * csrColInd, int ncolors, double omega,
+          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SSOR not supported in cuda before version 7!\n");
+        return 0;
+      }
+
+      int cuda_ssor_backward_apply(int m, double * y, const double * x, double * csrVal, int * csrColInd, int ncolors, double omega,
+          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SSOR not supported in cuda before version 7!\n");
+        return 0;
+      }
+    }
+  }
+}
+
 #endif // FEAT_HAVE_CUSOLVER
