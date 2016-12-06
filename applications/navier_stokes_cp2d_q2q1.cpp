@@ -466,8 +466,8 @@ namespace NaverStokesCP2D
     void setup_square()
     {
       mesh_file = "unit-square-quad.xml";
-      part_name_in = "left";
-      part_name_out = "right";
+      part_name_in = "bnd:l";
+      part_name_out = "bnd:r";
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(7);
       nu = 1E-3;
@@ -502,8 +502,8 @@ namespace NaverStokesCP2D
     void setup_bench1()
     {
       mesh_file = "bench1-quad.xml";
-      part_name_in = "left";
-      part_name_out = "right";
+      part_name_in = "bnd:l";
+      part_name_out = "bnd:r";
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(4);
       nu = 1E-3;
