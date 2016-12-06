@@ -329,12 +329,14 @@ int main(int argc, char* argv[])
 
   String solver_name("");
   auto* solver_pair(args.query("solver"));
-  if(solver_pair != nullptr)
-    solver_name = solver_pair->second.front();
-  else
+  if(solver_pair == nullptr)
   {
     display_help();
     return 1;
+  }
+  else
+  {
+    solver_name = solver_pair->second.front();
   }
 
   if(solver_name == "NLCG")
@@ -481,5 +483,7 @@ int main(int argc, char* argv[])
   }
 #endif // FEAT_HAVE_ALGLIB
   else
+  {
     throw InternalError("dbg-nlopt got invalid solver name: "+solver_name);
+  }
 }
