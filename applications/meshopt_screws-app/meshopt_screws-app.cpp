@@ -234,23 +234,23 @@ struct MeshoptScrewsApp
 
     // Get the coarse mesh and finest mesh levels from the application settings
     auto lvl_min_p = domain_control_settings_section->query("lvl_min");
-    if(!lvl_min_p.second)
-    {
-      lvl_min = 0;
-    }
-    else
+    if(lvl_min_p.second)
     {
       lvl_min = std::stoi(lvl_min_p.first);
     }
+    else
+    {
+      lvl_min = 0;
+    }
 
     auto lvl_max_p = domain_control_settings_section->query("lvl_max");
-    if(!lvl_max_p.second)
+    if(lvl_max_p.second)
     {
-      lvl_max = lvl_min;
+      lvl_max = std::stoi(lvl_max_p.first);
     }
     else
     {
-      lvl_max = std::stoi(lvl_max_p.first);
+      lvl_max = lvl_min;
     }
 
     TimeStamp at;
@@ -276,14 +276,13 @@ struct MeshoptScrewsApp
     MeshExtrudeHelper<MeshType> extruder(dom_ctrl.get_levels().back()->get_mesh_node(),
     Index(10*(lvl_max+1)), DataType(0), DataType(1), "bnd:b", "bnd:t");
 
-    // This is the centre reference point
-    WorldPoint x_0(DataType(0));
-
     // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
     auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("bnd:i");
     Geometry::TargetSet* inner_indices(nullptr);
     if(inner_boundary != nullptr)
+    {
       inner_indices = &(inner_boundary->template get_target_set<0>());
+    }
 
     // This is the centre point of the rotation of the inner screw
     WorldPoint centre_inner(DataType(0));
@@ -952,14 +951,14 @@ int run_app(int argc, char* argv[])
       "ApplicationConfig section is missing the mandatory solver_config_file entry!");
       {
         std::ifstream ifs(solver_config_filename_p.first);
-        if(!ifs.good())
-        {
-          throw FileNotFound(solver_config_filename_p.first);
-        }
-        else
+        if(ifs.good())
         {
           std::cout << "Reading solver config from file " << solver_config_filename_p.first << std::endl;
           synchstream_solver_config << ifs.rdbuf();
+        }
+        else
+        {
+          throw FileNotFound(solver_config_filename_p.first);
         }
       }
     } // comm.rank() == 0

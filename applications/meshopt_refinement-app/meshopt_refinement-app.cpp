@@ -117,23 +117,23 @@ struct MeshoptRefinementApp
 
     // Get the coarse mesh and finest mesh levels from the application settings
     auto lvl_min_p = domain_control_settings_section->query("lvl_min");
-    if(!lvl_min_p.second)
-    {
-      lvl_min = 0;
-    }
-    else
+    if(lvl_min_p.second)
     {
       lvl_min = std::stoi(lvl_min_p.first);
     }
+    else
+    {
+      lvl_min = 0;
+    }
 
     auto lvl_max_p = domain_control_settings_section->query("lvl_max");
-    if(!lvl_max_p.second)
+    if(lvl_max_p.second)
     {
-      lvl_max = lvl_min;
+      lvl_max = std::stoi(lvl_max_p.first);
     }
     else
     {
-      lvl_max = std::stoi(lvl_max_p.first);
+      lvl_max = lvl_min;
     }
 
     // Get the mode for adapting the mesh upon refinement
@@ -170,10 +170,6 @@ struct MeshoptRefinementApp
       dom_ctrl, meshoptimiser_key_p.first, meshopt_config, solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
-
-    // Save original coordinates
-    meshopt_ctrl->mesh_to_buffer();
-    auto original_coords(meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep));
 
     // Adapt the finest level
     dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
@@ -560,12 +556,14 @@ int run_app(int argc, char* argv[])
       "ApplicationConfig section is missing the mandatory solver_config_file entry!");
       {
         std::ifstream ifs(solver_config_filename_p.first);
-        if(!ifs.good())
-          throw FileNotFound(solver_config_filename_p.first);
-        else
+        if(ifs.good())
         {
           std::cout << "Reading solver config from file " << solver_config_filename_p.first << std::endl;
           synchstream_solver_config << ifs.rdbuf();
+        }
+        else
+        {
+          throw FileNotFound(solver_config_filename_p.first);
         }
       }
     } // comm.rank() == 0
