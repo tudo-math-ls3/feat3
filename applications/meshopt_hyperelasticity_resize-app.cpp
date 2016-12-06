@@ -167,6 +167,7 @@ template
 
     // Compute initial functional value
     DataType fval(0);
+    rumpflpumpfl.eval_fval_grad(fval, grad);
     rumpflpumpfl.eval_fval_cellwise(fval, fval_norm, fval_det, fval_rec_det);
 
     Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qual_min, qual_sum,
@@ -186,6 +187,7 @@ template
     filename = "pre_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_pre(*(rmn->get_mesh()));
     writer_initial_pre.add_cell_scalar("Shape Quality Heuristic", qual_cellwise);
+    writer_initial_pre.add_vertex_vector("grad", grad);
     rumpflpumpfl.add_to_vtk_exporter(writer_initial_pre);
     writer_initial_pre.write(filename);
 
@@ -208,6 +210,7 @@ template
     solver->done();
     std::cout << "Solver used: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
 
+    rumpflpumpfl.eval_fval_grad(fval, grad);
     rumpflpumpfl.eval_fval_cellwise(fval, fval_norm, fval_det, fval_rec_det);
 
     // Compute shape quality
@@ -227,6 +230,7 @@ template
     filename = "post_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_post(*(rmn->get_mesh()));
     writer_initial_post.add_cell_scalar("Shape Quality Heuristic", qual_cellwise);
+    writer_initial_post.add_vertex_vector("grad", grad);
     rumpflpumpfl.add_to_vtk_exporter(writer_initial_post);
     writer_initial_post.write(filename);
 
@@ -235,6 +239,8 @@ template
     delete[] fval_norm;
     delete[] fval_det;
     delete[] fval_rec_det;
+    delete[] worst_angle_cellwise;
+    delete[] qual_cellwise;
 
   }
 
