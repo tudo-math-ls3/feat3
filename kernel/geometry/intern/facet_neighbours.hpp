@@ -47,7 +47,8 @@ namespace FEAT
           // A facet is shared by exactly 2 cells if it is interiour, and is present in exactly one cell if it is at
           // the boundary
           typedef Index SharedBy[2];
-          SharedBy* shared_by(new SharedBy[num_facets]);
+          std::vector<Index> shared_by_vec(size_t(2)*num_facets);
+          auto shared_by = reinterpret_cast<SharedBy*>(shared_by_vec.data());
 
           // ~Index(0) is the marker for "no neighbour"
           for(Index l(0); l < num_facets; ++l)
@@ -90,8 +91,6 @@ namespace FEAT
                 throw InternalError("Facet "+stringify(l)+" found at cell "+stringify(k)+" but is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1]));
             }
           }
-
-          delete[] shared_by;
 
         } // compute()
 
