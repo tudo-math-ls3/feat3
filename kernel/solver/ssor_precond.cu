@@ -1,7 +1,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 
-#ifdef FEAT_HAVE_CUSOLVER
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -9,9 +8,11 @@
 #include <vector>
 #include <algorithm>
 
-#include "cusparse_v2.h"
-
 using namespace FEAT;
+
+#ifdef FEAT_HAVE_CUSOLVER
+
+#include "cusparse_v2.h"
 
 namespace FEAT
 {
@@ -109,7 +110,9 @@ namespace FEAT
     }
   }
 }
-#else
+
+#else // FEAT_HAVE_CUSOLVER
+
 namespace FEAT
 {
   namespace Solver
