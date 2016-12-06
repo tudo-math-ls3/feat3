@@ -242,6 +242,10 @@ public:
   {
   }
 
+  virtual ~CUDASolverTest()
+  {
+  }
+
   template<typename Solver_>
   void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, const Index ref_iters) const
   {
@@ -412,6 +416,10 @@ public:
 public:
   BandedSolverTest() :
     FullTaggedTest<MemType_, DataType, IndexType>("BandedSolverTest-" + MatrixType::name())
+  {
+  }
+
+  virtual ~BandedSolverTest()
   {
   }
 

@@ -40,9 +40,12 @@ class SparseMatrixConversionTest
 {
 
 public:
-
   SparseMatrixConversionTest()
     : FullTaggedTest<Mem_, DT_, IT_>("sparse_matrix_conversion_test")
+  {
+  }
+
+  virtual ~SparseMatrixConversionTest()
   {
   }
 
@@ -124,9 +127,12 @@ class SparseMatrixCudaConversionTest
 {
 
 public:
-
   SparseMatrixCudaConversionTest()
     : FullTaggedTest<Mem_, DT_, IT_>("sparse_matrix_cuda_conversion_test")
+  {
+  }
+
+  virtual ~SparseMatrixCudaConversionTest()
   {
   }
 
@@ -233,6 +239,10 @@ class SparseMatrixBandedConversionTest
 public:
   SparseMatrixBandedConversionTest()
     : FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>("sparse_matrix_banded_conversion_test: " + MT_::name())
+  {
+  }
+
+  virtual ~SparseMatrixBandedConversionTest()
   {
   }
 

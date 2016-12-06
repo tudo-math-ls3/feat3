@@ -35,6 +35,10 @@ public:
   {
   }
 
+  virtual ~MetaMirrorTest()
+  {
+  }
+
   static ScalarMatrix gen_mir_x(IndexType m)
   {
     DenseVector<Mem::Main, IndexType> row_ptr(m+1);
