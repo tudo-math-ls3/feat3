@@ -126,9 +126,9 @@ template
       rumpflpumpfl.buffer_to_mesh();
 
       // Arrays for saving the contributions of the different Rumpf functional parts
-      DataType func_norm;
-      DataType func_cof;
-      DataType func_det;
+      DataType func_norm(0);
+      DataType func_cof(0);
+      DataType func_det(0);
 
       // Dummy vector for rhs
       auto rhs = rumpflpumpfl.create_vector_r();
