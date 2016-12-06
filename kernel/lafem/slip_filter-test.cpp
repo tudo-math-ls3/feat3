@@ -45,6 +45,10 @@ class SlipFilterVectorTest
     {
     }
 
+  virtual ~SlipFilterVectorTest()
+  {
+  }
+
   virtual void run() const override
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.75));
@@ -74,7 +78,6 @@ class SlipFilterVectorTest
 
     IT_ j(0);
     // 0: Set element to 0
-    ValueType tmp0(DT_(0));
     my_vector(j, ValueType(0));
     // 1: Set element to value of the filter
     j = jj[1];
@@ -84,7 +87,9 @@ class SlipFilterVectorTest
     j = jj[2];
     ValueType tmp2(my_filter.get_filter_vector()(j));
     for(int d(0); d < BlockSize_; ++d)
+    {
       tmp2(d) = -tmp2(d);
+    }
     my_vector(j, tmp2);
     // 3: Set element to first unit vector
     j = jj[3];
@@ -100,7 +105,9 @@ class SlipFilterVectorTest
     j = jj[5];
     ValueType tmp5(my_filter.get_filter_vector()(j));
     for(int d(0); d < BlockSize_; ++d)
+    {
       tmp5(d) = -DT_(2)*tmp5(d);
+    }
     my_vector(j, tmp5);
 
     // Filter vector
@@ -114,7 +121,9 @@ class SlipFilterVectorTest
       for(int k(0); k < 8; ++k)
       {
         if(i == jj[k])
+        {
           filtered = true;
+        }
       }
 
       if(filtered)
