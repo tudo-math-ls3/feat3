@@ -279,14 +279,14 @@ struct MeshoptRAdaptApp
             + stringify_fp_fix(edge_angle));
         ++ret;
       }
-      else if(test_number == 2)
+    }
+    else if(test_number == 2)
+    {
+      if( Math::abs(edge_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
       {
-        if( Math::abs(edge_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
-        {
-          comm.print("FAILED: Initial worst angle should be >= "+stringify_fp_fix(45)+ " but is "
-              + stringify_fp_fix(edge_angle));
-          ++ret;
-        }
+        comm.print("FAILED: Initial worst angle should be >= "+stringify_fp_fix(45)+ " but is "
+            + stringify_fp_fix(edge_angle));
+        ++ret;
       }
     }
 
