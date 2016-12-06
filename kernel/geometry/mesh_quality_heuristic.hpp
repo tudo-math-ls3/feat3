@@ -363,8 +363,8 @@ namespace FEAT
 
           if(cell_worst_angle != nullptr)
           {
-            cell_worst_angle[cell] = (CoordType(360))/(CoordType(2)*Math::pi<CoordType>())
-              *Math::min(min_angle, Math::abs(Math::pi<CoordType>() - max_angle));
+            cell_worst_angle[cell] = CoordType(360)/(CoordType(2)*Math::pi<CoordType>())
+              *Math::min(my_min_angle, Math::abs(Math::pi<CoordType>() - my_max_angle));
           }
 
           ASSERT(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
@@ -372,7 +372,7 @@ namespace FEAT
 
         CoordType worst_angle(Math::min(min_angle, Math::abs(Math::pi<CoordType>() - max_angle)));
 
-        return worst_angle*(CoordType(360))/(CoordType(2)*Math::pi<CoordType>());
+        return worst_angle*CoordType(360)/(CoordType(2)*Math::pi<CoordType>());
       }
 
       template<typename IdxType_, typename VtxType_>
