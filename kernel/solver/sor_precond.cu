@@ -256,7 +256,7 @@ namespace FEAT
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
       {
         throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
-        return 0;
+        //return 0;
       }
     }
   }
