@@ -5,8 +5,11 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/global/synch_vec.hpp>
 #include <kernel/global/synch_scal.hpp>
+
+#include <vector>
 
 namespace FEAT
 {
@@ -44,8 +47,8 @@ namespace FEAT
       LocalVector_ _freqs;
 
       /// Our 'base' class type
-      template <typename LocalMatrix2_, typename Mirror2_>
-      using GateType = class Gate<LocalMatrix2_, Mirror2_>;
+      template <typename LocalVector2_, typename Mirror2_>
+      using GateType = class Gate<LocalVector2_, Mirror2_>;
 
       /// this typedef lets you create a gate container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
@@ -62,7 +65,7 @@ namespace FEAT
       {
       }
 
-      ~Gate()
+      virtual ~Gate()
       {
       }
 
