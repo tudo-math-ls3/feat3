@@ -1034,7 +1034,6 @@ namespace FEAT
         BaseClass::init_symbolic();
 
         // ensure that the hierarchy was initialised
-        /// \todo does this work in nested multigrid?
         XASSERTM(_hierarchy->have_symbolic(), "init_symbolic() of multigrid hierarchy was not called yet");
 
         const std::size_t num_lvls = _hierarchy->get_num_levels();
@@ -1083,7 +1082,6 @@ namespace FEAT
         BaseClass::init_numeric();
 
         // ensure that the hierarchy was initialised
-        /// \todo does this work in nested multigrid?
         XASSERTM(_hierarchy->have_numeric(), "init_numeric() of multigrid hierarchy was not called yet");
       }
 

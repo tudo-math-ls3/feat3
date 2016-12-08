@@ -1297,25 +1297,6 @@ namespace FEAT
         /// initialise any multigrid hierarchy in use
         void hierarchy_init()
         {
-          for (auto& h : hierarchy_map_main_float_ulong)
-            h.second->init();
-          for (auto& h : hierarchy_map_main_double_ulong)
-            h.second->init();
-          for (auto& h : hierarchy_map_main_float_uint)
-            h.second->init();
-          for (auto& h : hierarchy_map_main_double_uint)
-            h.second->init();
-#ifdef FEAT_HAVE_CUDA
-          for (auto& h : hierarchy_map_cuda_float_ulong)
-            h.second->init();
-          for (auto& h : hierarchy_map_cuda_double_ulong)
-            h.second->init();
-          for (auto& h : hierarchy_map_cuda_float_uint)
-            h.second->init();
-          for (auto& h : hierarchy_map_cuda_double_uint)
-            h.second->init();
-#endif
-
           for (auto& h : local_hierarchy_map_main_float_ulong)
             h.second->init();
           for (auto& h : local_hierarchy_map_main_double_ulong)
@@ -1332,6 +1313,25 @@ namespace FEAT
           for (auto& h : local_hierarchy_map_cuda_float_uint)
             h.second->init();
           for (auto& h : local_hierarchy_map_cuda_double_uint)
+            h.second->init();
+#endif
+
+          for (auto& h : hierarchy_map_main_float_ulong)
+            h.second->init();
+          for (auto& h : hierarchy_map_main_double_ulong)
+            h.second->init();
+          for (auto& h : hierarchy_map_main_float_uint)
+            h.second->init();
+          for (auto& h : hierarchy_map_main_double_uint)
+            h.second->init();
+#ifdef FEAT_HAVE_CUDA
+          for (auto& h : hierarchy_map_cuda_float_ulong)
+            h.second->init();
+          for (auto& h : hierarchy_map_cuda_double_ulong)
+            h.second->init();
+          for (auto& h : hierarchy_map_cuda_float_uint)
+            h.second->init();
+          for (auto& h : hierarchy_map_cuda_double_uint)
             h.second->init();
 #endif
         }
@@ -1339,25 +1339,6 @@ namespace FEAT
         /// initialise any multigrid hierarchy in use
         void hierarchy_init_symbolic()
         {
-          for (auto& h : hierarchy_map_main_float_ulong)
-            h.second->init_symbolic();
-          for (auto& h : hierarchy_map_main_double_ulong)
-            h.second->init_symbolic();
-          for (auto& h : hierarchy_map_main_float_uint)
-            h.second->init_symbolic();
-          for (auto& h : hierarchy_map_main_double_uint)
-            h.second->init_symbolic();
-#ifdef FEAT_HAVE_CUDA
-          for (auto& h : hierarchy_map_cuda_float_ulong)
-            h.second->init_symbolic();
-          for (auto& h : hierarchy_map_cuda_double_ulong)
-            h.second->init_symbolic();
-          for (auto& h : hierarchy_map_cuda_float_uint)
-            h.second->init_symbolic();
-          for (auto& h : hierarchy_map_cuda_double_uint)
-            h.second->init_symbolic();
-#endif
-
           for (auto& h : local_hierarchy_map_main_float_ulong)
             h.second->init_symbolic();
           for (auto& h : local_hierarchy_map_main_double_ulong)
@@ -1374,6 +1355,25 @@ namespace FEAT
           for (auto& h : local_hierarchy_map_cuda_float_uint)
             h.second->init_symbolic();
           for (auto& h : local_hierarchy_map_cuda_double_uint)
+            h.second->init_symbolic();
+#endif
+
+          for (auto& h : hierarchy_map_main_float_ulong)
+            h.second->init_symbolic();
+          for (auto& h : hierarchy_map_main_double_ulong)
+            h.second->init_symbolic();
+          for (auto& h : hierarchy_map_main_float_uint)
+            h.second->init_symbolic();
+          for (auto& h : hierarchy_map_main_double_uint)
+            h.second->init_symbolic();
+#ifdef FEAT_HAVE_CUDA
+          for (auto& h : hierarchy_map_cuda_float_ulong)
+            h.second->init_symbolic();
+          for (auto& h : hierarchy_map_cuda_double_ulong)
+            h.second->init_symbolic();
+          for (auto& h : hierarchy_map_cuda_float_uint)
+            h.second->init_symbolic();
+          for (auto& h : hierarchy_map_cuda_double_uint)
             h.second->init_symbolic();
 #endif
         }
@@ -1384,25 +1384,6 @@ namespace FEAT
         {
           this->refresh();
 
-          for (auto& h : hierarchy_map_main_float_ulong)
-            h.second->init_numeric();
-          for (auto& h : hierarchy_map_main_double_ulong)
-            h.second->init_numeric();
-          for (auto& h : hierarchy_map_main_float_uint)
-            h.second->init_numeric();
-          for (auto& h : hierarchy_map_main_double_uint)
-            h.second->init_numeric();
-#ifdef FEAT_HAVE_CUDA
-          for (auto& h : hierarchy_map_cuda_float_ulong)
-            h.second->init_numeric();
-          for (auto& h : hierarchy_map_cuda_double_ulong)
-            h.second->init_numeric();
-          for (auto& h : hierarchy_map_cuda_float_uint)
-            h.second->init_numeric();
-          for (auto& h : hierarchy_map_cuda_double_uint)
-            h.second->init_numeric();
-#endif
-
           for (auto& h : local_hierarchy_map_main_float_ulong)
             h.second->init_numeric();
           for (auto& h : local_hierarchy_map_main_double_ulong)
@@ -1419,6 +1400,25 @@ namespace FEAT
           for (auto& h : local_hierarchy_map_cuda_float_uint)
             h.second->init_numeric();
           for (auto& h : local_hierarchy_map_cuda_double_uint)
+            h.second->init_numeric();
+#endif
+
+          for (auto& h : hierarchy_map_main_float_ulong)
+            h.second->init_numeric();
+          for (auto& h : hierarchy_map_main_double_ulong)
+            h.second->init_numeric();
+          for (auto& h : hierarchy_map_main_float_uint)
+            h.second->init_numeric();
+          for (auto& h : hierarchy_map_main_double_uint)
+            h.second->init_numeric();
+#ifdef FEAT_HAVE_CUDA
+          for (auto& h : hierarchy_map_cuda_float_ulong)
+            h.second->init_numeric();
+          for (auto& h : hierarchy_map_cuda_double_ulong)
+            h.second->init_numeric();
+          for (auto& h : hierarchy_map_cuda_float_uint)
+            h.second->init_numeric();
+          for (auto& h : hierarchy_map_cuda_double_uint)
             h.second->init_numeric();
 #endif
         }
