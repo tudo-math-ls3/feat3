@@ -184,9 +184,6 @@ namespace PoissonDirichlet2D
     // define our system level
     typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer level
-    typedef Control::ScalarBasicTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
@@ -202,19 +199,14 @@ namespace PoissonDirichlet2D
 
     std::deque<SystemLevelType*> system_levels;
     std::deque<AssemblerLevelType*> asm_levels;
-    std::deque<TransferLevelType*> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
-    // create stokes and system levels
+    // create system levels
     for (Index i(0); i < num_levels; ++i)
     {
       asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
       system_levels.push_back(new SystemLevelType());
-      if (i > 0)
-      {
-        transfer_levels.push_back(new TransferLevelType(*system_levels.at(i - 1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -248,11 +240,11 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling transfer matrices...");
+    comm.print("Assembling transfer operators...");
 
-    for (Index i(0); (i + 1) < num_levels; ++i)
+    for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i + 1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
@@ -283,25 +275,28 @@ namespace PoissonDirichlet2D
       Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalSystemMatrix,
       typename SystemLevelType::GlobalSystemFilter,
-      typename TransferLevelType::GlobalSystemTransferMatrix,
-      typename TransferLevelType::GlobalSystemTransferMatrix
+      typename SystemLevelType::GlobalSystemTransfer
         > >();
 
-    auto coarse_precond = Solver::new_jacobi_precond(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, 0.7);
-    auto coarse_solver = Solver::new_richardson(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, 1.0, coarse_precond);
-    coarse_solver->set_min_iter(4);
-    coarse_solver->set_max_iter(4);
-    multigrid_hierarchy->push_level(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, coarse_solver);
-
-    auto jt = transfer_levels.begin();
-    for (auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
+    // push all levels except the coarse most one
+    for (auto it = system_levels.rbegin(), jt = --system_levels.rend(); it != jt; ++it)
     {
       auto jac_smoother = Solver::new_jacobi_precond((*it)->matrix_sys, (*it)->filter_sys, 0.7);
       auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);
       smoother->set_min_iter(4);
       smoother->set_max_iter(4);
-      multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother, smoother);
+      multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*it)->transfer_sys, smoother, smoother, smoother);
     }
+
+    // push the coarse level
+    {
+      auto coarse_precond = Solver::new_jacobi_precond(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, 0.7);
+      auto coarse_solver = Solver::new_richardson(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, 1.0, coarse_precond);
+      coarse_solver->set_min_iter(4);
+      coarse_solver->set_max_iter(4);
+      multigrid_hierarchy->push_level(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, coarse_solver);
+    }
+
     multigrid_hierarchy->init();
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
     auto solver = Solver::new_pcg(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, mgv);
@@ -331,7 +326,7 @@ namespace PoissonDirichlet2D
     double solver_toe(at.elapsed_now());
 
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-    system_levels, transfer_levels, domain);
+      system_levels, domain);
 
     // release solver
     solver->done();
@@ -394,11 +389,6 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
 
     // clean up
-    while (!transfer_levels.empty())
-    {
-      delete transfer_levels.back();
-      transfer_levels.pop_back();
-    }
     while (!system_levels.empty())
     {
       delete system_levels.back();

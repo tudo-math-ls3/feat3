@@ -26,10 +26,9 @@ namespace FEAT
          * \param domain The domain
          *
          */
-        template <typename SystemLevelType_, typename TransferLevelType_, typename DomainType_>
+        template <typename SystemLevelType_, typename DomainType_>
         static void report(double solver_toe, int statistics_check, int shape_dimension,
         std::deque<SystemLevelType_*> & system_levels,
-        std::deque<TransferLevelType_*> & transfer_levels,
         DomainType_ & domain)
         {
           Dist::Comm comm(Dist::Comm::world());
@@ -40,7 +39,6 @@ namespace FEAT
 
           std::size_t la_size(0);
           std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType_ * n) { la_size += n->bytes(); });
-          std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType_ * n) { la_size += n->bytes(); });
           std::size_t mpi_size(0);
           std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType_ * n) { mpi_size += n->gate_sys.bytes(); });
 

@@ -12,9 +12,12 @@
 #include <kernel/lafem/mean_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/transfer.hpp>
 #include <kernel/global/gate.hpp>
+#include <kernel/global/muxer.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
+#include <kernel/global/transfer.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
@@ -55,8 +58,14 @@ namespace FEAT
       /// define local system matrix type
       typedef ScalarMatrix_ LocalSystemMatrix;
 
+      /// define local transfer matrix type
+      typedef ScalarMatrix_ LocalSystemTransferMatrix;
+
       /// define local system vector type
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;
+
+      /// define local system transfer operator type
+      typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       /// define system mirror type
       typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
@@ -64,23 +73,36 @@ namespace FEAT
       /// define system gate
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
 
+      /// define system muxer
+      typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
+
       /// define global system vector type
       typedef Global::Vector<LocalSystemVector, SystemMirror> GlobalSystemVector;
 
       /// define global system matrix type
       typedef Global::Matrix<LocalSystemMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
 
+      /// define global system transfer operator type
+      typedef Global::Transfer<LocalSystemTransfer, SystemMirror> GlobalSystemTransfer;
+
       /* ***************************************************************************************** */
 
       /// our system gate
       SystemGate gate_sys;
 
+      /// our coarse-level system muxer
+      SystemMuxer coarse_muxer_sys;
+
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
 
+      /// our global transfer operator
+      GlobalSystemTransfer transfer_sys;
+
       /// CTOR
       ScalarBasicSystemLevel() :
-        matrix_sys(&gate_sys, &gate_sys)
+        matrix_sys(&gate_sys, &gate_sys),
+        transfer_sys(&coarse_muxer_sys)
       {
       }
 
@@ -92,7 +114,9 @@ namespace FEAT
       void convert(const ScalarBasicSystemLevel<M_, D_, I_, SM_> & other)
       {
         gate_sys.convert(other.gate_sys);
+        coarse_muxer_sys.convert(other.coarse_muxer_sys);
         matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
+        transfer_sys.convert(&coarse_muxer_sys, other.transfer_sys);
       }
     }; // class ScalarBasicSystemLevel<...>
 
@@ -137,7 +161,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + (*this->filter_sys).bytes();
+        return (*this->matrix_sys).bytes () + this->coarse_muxer_sys.bytes() + (*this->filter_sys).bytes();
       }
 
       /**
@@ -196,7 +220,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + (*this->filter_sys).bytes();
+        return (*this->matrix_sys).bytes () + this->coarse_muxer_sys.bytes() + (*this->filter_sys).bytes();
       }
 
       /**
@@ -213,68 +237,6 @@ namespace FEAT
         filter_sys.convert(other.filter_sys);
       }
     }; // class ScalarMeanFilterSystemLevel<...>
-
-    template<typename SystemLevel_, typename ScalarMatrix_ = typename SystemLevel_::LocalScalarMatrix>
-    class ScalarBasicTransferLevel
-    {
-    public:
-      /// define system mirror type
-      typedef typename SystemLevel_::SystemMirror SystemMirror;
-
-      /// our local transfer matrix type
-      typedef ScalarMatrix_ LocalSystemTransferMatrix;
-
-      /// our global transfer matrix type
-      typedef Global::Matrix<LocalSystemTransferMatrix, SystemMirror, SystemMirror> GlobalSystemTransferMatrix;
-
-      /// Our class base type
-      template <typename SystemLevel2_>
-      using BaseType = class ScalarBasicTransferLevel<SystemLevel2_>;
-
-      /// our global transfer matrices
-      GlobalSystemTransferMatrix prol_sys;
-
-      /// \copydoc ScalarBasicTransferLevel::prol_sys
-      GlobalSystemTransferMatrix rest_sys;
-
-      ScalarBasicTransferLevel()
-      {
-      }
-
-      /// CTOR
-      explicit ScalarBasicTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
-        prol_sys(&lvl_fine.gate_sys, &lvl_coarse.gate_sys),
-        rest_sys(&lvl_coarse.gate_sys, &lvl_fine.gate_sys)
-      {
-      }
-
-      virtual ~ScalarBasicTransferLevel()
-      {
-      }
-
-      /// \brief Returns the total amount of bytes allocated.
-      std::size_t bytes() const
-      {
-        return (*prol_sys).bytes() + (*rest_sys).bytes();
-      }
-
-      /**
-       *
-       * \brief Conversion method
-       *
-       * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
-       *
-       * \warning The provided SystemLevels must already be converted to the matching
-       * configuration, as they contain the used gateways.
-       *
-       */
-      template <typename SL_, typename SM_>
-      void convert(SystemLevel_ & lvl_coarse , SystemLevel_ & lvl_fine, const ScalarBasicTransferLevel<SL_, SM_> & other)
-      {
-        prol_sys.convert(&lvl_fine.gate_sys, &lvl_coarse.gate_sys, other.prol_sys);
-        rest_sys.convert(&lvl_coarse.gate_sys, &lvl_fine.gate_sys, other.rest_sys);
-      }
-    }; // class ScalarBasicTransferLevel<...>
 
     template<typename Space_>
     class ScalarBasicAssemblerLevel
@@ -341,16 +303,18 @@ namespace FEAT
         gate_sys.compile(std::move(tmpl_s));
       }
 
-      template<typename TransferLevel_>
-      void assemble_system_transfer(TransferLevel_& trans_level, ScalarBasicAssemblerLevel& level_coarse)
+      template<typename SystemLevel_>
+      void assemble_system_transfer(SystemLevel_& sys_level_fine, ScalarBasicAssemblerLevel& level_coarse)
       {
-        // get global transfer matrices
-        typename TransferLevel_::GlobalSystemTransferMatrix& glob_prol = trans_level.prol_sys;
-        typename TransferLevel_::GlobalSystemTransferMatrix& glob_rest = trans_level.rest_sys;
+        // get global transfer operator
+        typename SystemLevel_::GlobalSystemTransfer& glob_trans = sys_level_fine.transfer_sys;
+
+        // get local transfer operator
+        typename SystemLevel_::LocalSystemTransfer& loc_trans = glob_trans.local();
 
         // get local transfer matrices
-        typename TransferLevel_::LocalSystemTransferMatrix& loc_prol = (*glob_prol);
-        typename TransferLevel_::LocalSystemTransferMatrix& loc_rest = (*glob_rest);
+        typename SystemLevel_::LocalSystemTransferMatrix& loc_prol = loc_trans.get_mat_prol();
+        typename SystemLevel_::LocalSystemTransferMatrix& loc_rest = loc_trans.get_mat_rest();
 
         // assemble structure?
         if (loc_prol.empty())
@@ -358,11 +322,8 @@ namespace FEAT
           Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, this->space, level_coarse.space);
         }
 
-        // create a global pressure weight vector
-        auto glob_vec_weight = glob_prol.create_vector_l();
-
-        // get local pressure weight vector
-        auto& loc_vec_weight = (*glob_vec_weight);
+        // create local weight vector
+        typename SystemLevel_::LocalSystemVector loc_vec_weight = loc_prol.create_vector_l();
 
         // assemble prolongation matrix
         {
@@ -373,8 +334,8 @@ namespace FEAT
           Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
             this->space, level_coarse.space, this->cubature);
 
-          // synchronise weight vector
-          glob_vec_weight.sync_0();
+          // synchronise weight vector using the gate
+          sys_level_fine.gate_sys.sync_0(loc_vec_weight);
 
           // invert components
           loc_vec_weight.component_invert(loc_vec_weight);

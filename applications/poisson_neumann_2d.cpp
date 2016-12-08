@@ -17,7 +17,7 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/solver/basic_vcycle.hpp>
+#include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>
@@ -172,9 +172,6 @@ namespace PoissonNeumann2D
     // define our system level
     typedef Control::ScalarMeanFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer level
-    typedef Control::ScalarBasicTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
@@ -190,7 +187,6 @@ namespace PoissonNeumann2D
 
     std::deque<SystemLevelType*> system_levels;
     std::deque<AssemblerLevelType*> asm_levels;
-    std::deque<TransferLevelType*> transfer_levels;
 
     const Index num_levels = domain_levels.size();
 
@@ -198,20 +194,14 @@ namespace PoissonNeumann2D
     //Main-CSR or CUDA-ELL
     typedef typename TargetMatrixSolve_::MemType MemTypeSolve;
     typedef Control::ScalarMeanFilterSystemLevel<MemTypeSolve, DataType, IndexType, TargetMatrixSolve_> SystemLevelTypeSolve;
-    typedef Control::ScalarBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
 
     std::deque<SystemLevelTypeSolve*> system_levels_solve;
-    std::deque<TransferLevelTypeSolve*> transfer_levels_solve;
 
-    // create stokes and system levels
+    // create system levels
     for (Index i(0); i < num_levels; ++i)
     {
       asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
       system_levels.push_back(new SystemLevelType());
-      if (i > 0)
-      {
-        transfer_levels.push_back(new TransferLevelType(*system_levels.at(i - 1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -243,11 +233,11 @@ namespace PoissonNeumann2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling transfer matrices...");
+    comm.print("Assembling transfer operators...");
 
-    for (Index i(0); (i + 1) < num_levels; ++i)
+    for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i + 1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     /* ***************************************************************************************** */
@@ -283,11 +273,6 @@ namespace PoissonNeumann2D
       //system levels must be converted first, because transfer levels use their converted gates
       system_levels_solve.push_back(new SystemLevelTypeSolve());
       system_levels_solve.back()->convert(*system_levels.at(i));
-      if (i > 0)
-      {
-        transfer_levels_solve.push_back(new TransferLevelTypeSolve());
-        transfer_levels_solve.back()->convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
-      }
     }
 
     // get our global solve matrix and filter
@@ -305,29 +290,30 @@ namespace PoissonNeumann2D
     /* ***************************************************************************************** */
 
     // create a multigrid cycle
-    auto mgv = std::make_shared<
-      Solver::BasicVCycle<
+    auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
       typename SystemLevelTypeSolve::GlobalSystemMatrix,
       typename SystemLevelTypeSolve::GlobalSystemFilter,
-      typename TransferLevelTypeSolve::GlobalSystemTransferMatrix
+      typename SystemLevelTypeSolve::GlobalSystemTransfer
       > >();
 
     // scaling factor
     DataType omega = DataType(0.2);
 
-    // create coarse grid solver
-    auto coarse_solver = Solver::new_scale_precond(system_levels_solve.front()->filter_sys, omega);
-    mgv->set_coarse_level(system_levels_solve.front()->matrix_sys, system_levels_solve.front()->filter_sys, coarse_solver);
-
     // push levels into MGV
-    auto jt = transfer_levels_solve.begin();
-    for (auto it = ++system_levels_solve.begin(); it != system_levels_solve.end(); ++it, ++jt)
+    for (auto it = system_levels_solve.rbegin(), jt = --system_levels_solve.rend(); it != jt; ++it)
     {
       auto smoother = Solver::new_scale_precond((*it)->filter_sys, omega);
-      mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
+      multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*it)->transfer_sys, smoother, smoother, smoother);
     }
 
+    // create coarse grid solver
+    auto coarse_solver = Solver::new_scale_precond(system_levels_solve.front()->filter_sys, omega);
+    multigrid_hierarchy->push_level(system_levels_solve.front()->matrix_sys, system_levels_solve.front()->filter_sys, coarse_solver);
+
+    multigrid_hierarchy->init();
+
     // create our solver
+    auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
     auto solver = Solver::new_pcg(matrix_solve, filter_solve, mgv);
     //auto solver = Solver::new_bicgstab(matrix_solve, filter_solve, mgv);
     //auto solver = Solver::new_fgmres(matrix_solve, filter_solve, 8, 0.0, mgv);
@@ -348,6 +334,8 @@ namespace PoissonNeumann2D
 
     // release solver
     solver->done();
+
+    multigrid_hierarchy->done();
 
     // download solution
     vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
@@ -393,11 +381,6 @@ namespace PoissonNeumann2D
     /* ***************************************************************************************** */
 
     // clean up
-    while (!transfer_levels.empty())
-    {
-      delete transfer_levels.back();
-      transfer_levels.pop_back();
-    }
     while (!system_levels.empty())
     {
       delete system_levels.back();
@@ -409,11 +392,6 @@ namespace PoissonNeumann2D
       asm_levels.pop_back();
     }
 
-    while (!transfer_levels_solve.empty())
-    {
-      delete transfer_levels_solve.back();
-      transfer_levels_solve.pop_back();
-    }
     while (!system_levels_solve.empty())
     {
       delete system_levels_solve.back();
