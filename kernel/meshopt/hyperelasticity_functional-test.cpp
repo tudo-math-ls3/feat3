@@ -10,6 +10,7 @@
 #include <kernel/meshopt/rumpf_functionals/2d_p1_unrolled.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
 
+// Included but not used due to too bloody much stuff to compile
 #include <kernel/meshopt/rumpf_functionals/3d_p1_unrolled.hpp>
 // Not implemented yet due to too bloody much stuff for Maple to compute
 //#include <kernel/meshopt/rumpf_functionals/3d_q1_unrolled.hpp>
@@ -222,9 +223,11 @@ HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctiona
 HyperelasticityFunctionalTest<double, Shape::Simplex<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s_s_2_u(2);
 
 HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s3_1(1);
-HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_1_u(1);
 HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s3_2(2);
-HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_2_u(2);
+
+// These two tests are not compiled because the unrolled code mainly wastes time compiling and linking
+//HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_1_u(1);
+//HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_2_u(2);
 
 /// \brief Specialisation for hypercubes
 template<int shape_dim>
