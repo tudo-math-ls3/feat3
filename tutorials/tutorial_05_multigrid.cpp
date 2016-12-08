@@ -73,6 +73,7 @@
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
+#include <kernel/lafem/transfer.hpp>                       // NEW: for Transfer
 
 // FEAT-Solver includes
 #include <kernel/solver/pcg.hpp>                           // for PCG
@@ -105,6 +106,9 @@ namespace Tutorial05
   typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
   // Define the filter type
   typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+
+  // The next one is new: this is the class that is responsible for the grid transfer.
+  typedef LAFEM::Transfer<MatrixType> TransferType;
 
   // Define the mesh type
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -144,8 +148,8 @@ namespace Tutorial05
     // The system filter for this level
     FilterType filter;
 
-    // The prolongation and restriction matrices for this level
-    MatrixType mat_prol, mat_rest;
+    // The grid-transfer operators for this level
+    TransferType transfer;
 
     // This constructor will create a mesh, trafo and space based on the mesh factory.
     // Note that the other member variables of this level (matrix, filter, etc.) are
@@ -243,6 +247,11 @@ namespace Tutorial05
       Level& lvl_coarse = *levels.at(std::size_t(ilevel - level_min));
       Level& lvl_fine   = *levels.at(std::size_t(ilevel - level_min + 1));
 
+      // Now let's get the references to the internal prolongation and restriction matrices
+      // of the transfer operator:
+      MatrixType& mat_prol = lvl_fine.transfer.get_mat_prol();
+      MatrixType& mat_rest = lvl_fine.transfer.get_mat_rest();
+
       // We need to assemble the prolongation matrix, which is used by the multigrid
       // solver to project correction vectors from the coarse mesh onto the current mesh.
       // The assembly of prolongation matrices is quite similar to the assembly of
@@ -251,17 +260,17 @@ namespace Tutorial05
 
       // Assemble the prolongation matrix structure:
       Assembly::SymbolicAssembler::assemble_matrix_2lvl(
-        lvl_fine.mat_prol,  // the prolongation matrix that is to be assembled
+        mat_prol,           // the prolongation matrix that is to be assembled
         lvl_fine.space,     // the fine-mesh space
         lvl_coarse.space    // the coarse-mesh space
       );
 
       // As always, format the matrix:
-      lvl_fine.mat_prol.format();
+      mat_prol.format();
 
       // Assemble the contents of the prolongation matrix:
       Assembly::GridTransfer::assemble_prolongation_direct(
-        lvl_fine.mat_prol,  // the prolongation matrix that is to be assembled
+        mat_prol,           // the prolongation matrix that is to be assembled
         lvl_fine.space,     // the fine-mesh space
         lvl_coarse.space,   // the coarse-mesh space
         cubature_factory    // the cubature factory to be used for integration
@@ -273,7 +282,7 @@ namespace Tutorial05
       // defect vectors from the fine mesh to the coarse mesh.
       // Fortunately, this task is easy, because the restriction matrix is
       // always identical to the transpose of the prolongation matrix:
-      lvl_fine.mat_rest = lvl_fine.mat_prol.transpose();
+      mat_rest = mat_prol.transpose();
     } // end of level loop
 
     // At this point, all levels of our level hierarchy are fully assembled.
@@ -331,39 +340,16 @@ namespace Tutorial05
     auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
       MatrixType,   // the system matrix type
       FilterType,   // the system filter type
-      MatrixType,   // the prolongation operator type
-      MatrixType    // the restriction operator type
+      TransferType  // the transfer operator type
       >>();
 
     // Now we need to fill this empty hierarchy object with life, i.e. we have to attach
     // all our matrices and filters to it. Moreover, we also need to create the corresponding
     // coarse grid solver and smoother objects.
 
-    // As a first step, we have to set up the coarse level:
-    {
-      // get a reference to the coarsest level
-      Level& lvl = *levels.front();
-
-      // We use a simple (unpreconditioned) CG solver as a coarse-grid solver, so let's create one:
-      auto coarse_solver = Solver::new_pcg(lvl.matrix, lvl.filter);
-
-      // At this point, we could configure the coarse grid solver, i.e. set tolerances and maximum
-      // allowed iterations, but we'll just leave it at its default configuration here.
-
-      // Now we need to attach this solver as well as the system matrix and filter to
-      // our multigrid hierarchy. This is done by calling the following member function:
-      multigrid_hierarchy->push_level(
-        lvl.matrix,       // the coarse-level system matrix
-        lvl.filter,       // the coarse-level system filter
-        coarse_solver     // the coarse-level solver
-      );
-    }
-
-    // That's it for the coarse level.
-
-    // For all other levels, we have to create a smoother and attach it to the hierarchy.
-    // So let' loop over all levels except for the coarse-most one in *ascending* order:
-    for(Index ilevel(level_min+1); ilevel <= level_max; ++ilevel)
+    // For each level above the coarse level, we have to create a smoother and attach it to the
+    // hierarchy. So let' loop over all levels except for the coarse-most one in *descending* order:
+    for(Index ilevel(level_max); ilevel > level_min; --ilevel)
     {
       // Get a reference to the corresponding level
       Level& lvl = *levels.at(std::size_t(ilevel - level_min));
@@ -387,8 +373,7 @@ namespace Tutorial05
       multigrid_hierarchy->push_level(
         lvl.matrix,     // the system matrix for this level
         lvl.filter,     // the system filter for this level
-        lvl.mat_prol,   // the prolongation matrix for this level
-        lvl.mat_rest,   // the restriction matrix for this level
+        lvl.transfer,   // the transfer operator for this level
         smoother,       // the pre-smoother
         smoother,       // the post-smoother
         smoother        // the peak-smoother
@@ -399,6 +384,28 @@ namespace Tutorial05
       // step within a F- or W-cycle. See the Multigrid page in the documentation
       // for more details about the different cycles and their smoother calls.
     }
+
+    // Finally, we have to set up the coarse level:
+    {
+      // get a reference to the coarsest level
+      Level& lvl = *levels.front();
+
+      // We use a simple (unpreconditioned) CG solver as a coarse-grid solver, so let's create one:
+      auto coarse_solver = Solver::new_pcg(lvl.matrix, lvl.filter);
+
+      // At this point, we could configure the coarse grid solver, i.e. set tolerances and maximum
+      // allowed iterations, but we'll just leave it at its default configuration here.
+
+      // Now we need to attach this solver as well as the system matrix and filter to
+      // our multigrid hierarchy. This is done by calling the following member function:
+      multigrid_hierarchy->push_level(
+        lvl.matrix,       // the coarse-level system matrix
+        lvl.filter,       // the coarse-level system filter
+        coarse_solver     // the coarse-level solver
+      );
+    }
+
+    // That's it for the coarse level.
 
     // Next, we need to create a multigrid preconditioner for our hierarchy. This task
     // is quite simple, as we can use one of the convenience functions to obtain a

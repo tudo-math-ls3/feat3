@@ -69,19 +69,15 @@ namespace FEAT
      * \tparam SystemFilter_
      * The class representing the system filter.
      *
-     * \tparam ProlOperator_
-     * The class representing the prolongation operator (usually a matrix type).
-     *
-     * \tparam RestOperator_
-     * The class representing the restriction operator (usually a matrix type).
+     * \tparam TransferOperator_
+     * The class representing the grid-transfer operator.
      *
      * \author Peter Zajac
      */
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class MultiGridLevelBase
     {
     public:
@@ -89,10 +85,8 @@ namespace FEAT
       typedef SystemMatrix_ SystemMatrixType;
       /// the system filter type
       typedef SystemFilter_ SystemFilterType;
-      /// the prolongation operator type
-      typedef ProlOperator_ ProlOperatorType;
-      /// the restriction operator type
-      typedef RestOperator_ RestOperatorType;
+      /// the transfer operator type
+      typedef TransferOperator_ TransferOperatorType;
       /// the system vector type
       typedef typename SystemMatrix_::VectorTypeR SystemVectorType;
       /// the coarse-grid solver/smoother type
@@ -115,20 +109,12 @@ namespace FEAT
       virtual const SystemFilterType& get_system_filter() const = 0;
 
       /**
-       * \brief Returns a const pointer to the prolongation operator.
+       * \brief Returns a const pointer to the transfer operator.
        *
        * \note
        * This function may return \c nullptr on the coarse-grid level.
        */
-      virtual const ProlOperatorType* get_prol_operator() const = 0;
-
-      /**
-       * \brief Returns a const pointer to the restriction operator.
-       *
-       * \note
-       * This function may return \c nullptr on the coarse-grid level.
-       */
-      virtual const RestOperatorType* get_rest_operator() const = 0;
+      virtual const TransferOperatorType* get_transfer_operator() const = 0;
 
       /**
        * \brief Returns a shared pointer to the coarse grid solver.
@@ -190,35 +176,29 @@ namespace FEAT
      * \tparam SystemFilter_
      * The class representing the system filter.
      *
-     * \tparam ProlOperator_
-     * The class representing the prolongation operator (usually a matrix type).
-     *
-     * \tparam RestOperator_
-     * The class representing the restriction operator (usually a matrix type).
+     * \tparam TransferOperator_
+     * The class representing the grid-transfer operator.
      *
      * \author Peter Zajac
      */
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class MultiGridLevelStd :
-      public MultiGridLevelBase<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>
+      public MultiGridLevelBase<SystemMatrix_, SystemFilter_, TransferOperator_>
     {
     public:
       /// the base-class type
-      typedef MultiGridLevelBase<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> BaseClass;
+      typedef MultiGridLevelBase<SystemMatrix_, SystemFilter_, TransferOperator_> BaseClass;
       /// the system-matrix type
       typedef typename BaseClass::SystemMatrixType SystemMatrixType;
       /// the system-filter type
       typedef typename BaseClass::SystemFilterType SystemFilterType;
       /// the system-vector type
       typedef typename BaseClass::SystemVectorType SystemVectorType;
-      /// the prolongation operator type
-      typedef typename BaseClass::ProlOperatorType ProlOperatorType;
-      /// the restriction operator type
-      typedef typename BaseClass::RestOperatorType RestOperatorType;
+      /// the transfer operator type
+      typedef typename BaseClass::TransferOperatorType TransferOperatorType;
       /// the coarse-grid solver/smoother type
       typedef typename BaseClass::SolverType SolverType;
 
@@ -227,10 +207,8 @@ namespace FEAT
       const SystemMatrixType& system_matrix;
       /// the system filter
       const SystemFilterType& system_filter;
-      /// the prolongation matrix
-      const ProlOperatorType* prol_operator;
-      /// the restriction matrix
-      const RestOperatorType* rest_operator;
+      /// the transfer matrix
+      const TransferOperatorType* transfer_operator;
       /// the coarse-grid solver
       std::shared_ptr<SolverType> coarse_solver;
       /// the pre-smoother
@@ -264,8 +242,7 @@ namespace FEAT
          :
         system_matrix(sys_matrix),
         system_filter(sys_filter),
-        prol_operator(nullptr),
-        rest_operator(nullptr),
+        transfer_operator(nullptr),
         coarse_solver(crs_solver),
         smoother_pre(),
         smoother_post(),
@@ -285,11 +262,8 @@ namespace FEAT
        * \param[in] sys_filter
        * A reference to the system filter.
        *
-       * \param[in] prol_operat
-       * A reference to the prolongation operator.
-       *
-       * \param[in] rest_operat
-       * A reference to the restriction operator.
+       * \param[in] transfer_operat
+       * A reference to the transfer operator.
        *
        * \param[in] smooth_pre
        * A shared pointer to the pre-smoother.
@@ -308,8 +282,7 @@ namespace FEAT
       explicit MultiGridLevelStd(
         const SystemMatrixType& sys_matrix,
         const SystemFilterType& sys_filter,
-        const ProlOperatorType& prol_operat,
-        const RestOperatorType& rest_operat,
+        const TransferOperatorType& trans_operat,
         std::shared_ptr<SolverType> smooth_pre,
         std::shared_ptr<SolverType> smooth_post,
         std::shared_ptr<SolverType> smooth_peak,
@@ -318,8 +291,7 @@ namespace FEAT
          :
         system_matrix(sys_matrix),
         system_filter(sys_filter),
-        prol_operator(&prol_operat),
-        rest_operator(&rest_operat),
+        transfer_operator(&trans_operat),
         coarse_solver(crs_solver),
         smoother_pre(smooth_pre),
         smoother_post(smooth_post),
@@ -345,16 +317,10 @@ namespace FEAT
         return system_filter;
       }
 
-      /// \copydoc MultiGridLevelBase::get_prol_operator()
-      virtual const ProlOperatorType* get_prol_operator() const override
+      /// \copydoc MultiGridLevelBase::get_transfer_operator()
+      virtual const TransferOperatorType* get_transfer_operator() const override
       {
-        return prol_operator;
-      }
-
-      /// \copydoc MultiGridLevelBase::get_rest_operator()
-      virtual const RestOperatorType* get_rest_operator() const override
-      {
-        return rest_operator;
+        return transfer_operator;
       }
 
       /// \copydoc MultiGridLevelBase::get_coarse_solver()
@@ -392,16 +358,15 @@ namespace FEAT
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class MultiGrid;
 
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class ScaRCMultiGrid;
+
     /**
      * \brief Multigrid hierarchy management class template
      *
@@ -413,30 +378,26 @@ namespace FEAT
      * \tparam SystemFilter_
      * The class representing the system filter.
      *
-     * \tparam ProlOperator_
-     * The class representing the prolongation operator (usually a matrix type).
-     *
-     * \tparam RestOperator_
-     * The class representing the restriction operator (usually a matrix type).
+     * \tparam TransferOperator_
+     * The class representing the transfer operator.
      *
      * \author Peter Zajac
      */
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class MultiGridHierarchy
     {
     public:
       /// MultiGrid is our friend
-      friend class MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>;
-      friend class ScaRCMultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>;
+      friend class MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>;
+      friend class ScaRCMultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>;
 
       /// the level base class type
-      typedef MultiGridLevelBase<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> LevelType;
+      typedef MultiGridLevelBase<SystemMatrix_, SystemFilter_, TransferOperator_> LevelType;
       /// the standard level class type
-      typedef MultiGridLevelStd<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> StdLevelType;
+      typedef MultiGridLevelStd<SystemMatrix_, SystemFilter_, TransferOperator_> StdLevelType;
 
       /// the system matrix type
       typedef typename LevelType::SystemMatrixType SystemMatrixType;
@@ -444,10 +405,8 @@ namespace FEAT
       typedef typename LevelType::SystemFilterType SystemFilterType;
       /// the system vector type
       typedef typename LevelType::SystemVectorType SystemVectorType;
-      /// the prolongation operator type
-      typedef typename LevelType::ProlOperatorType ProlOperatorType;
-      /// the restriction operator tpye
-      typedef typename LevelType::RestOperatorType RestOperatorType;
+      /// the transfer operator type
+      typedef typename LevelType::TransferOperatorType TransferOperatorType;
       /// the coarse-grid solver/smoother type
       typedef typename LevelType::SolverType SolverType;
 
@@ -600,7 +559,8 @@ namespace FEAT
       {
         XASSERTM(!_have_init_symbolic, "cannot push new level, init_symbolic() was already called");
         XASSERTM(!_have_init_numeric,  "cannot push new level, init_numeric() was already called");
-        _levels.push_back(LevelInfo(level));
+        //_levels.push_back(LevelInfo(level));
+        _levels.push_front(LevelInfo(level));
       }
 
       /**
@@ -621,7 +581,6 @@ namespace FEAT
         const SystemFilterType& system_filter,
         std::shared_ptr<SolverType> coarse_solver)
       {
-        XASSERTM(_levels.empty(), "cannot push coarse level as one already exists");
         push_level(std::make_shared<StdLevelType>(system_matrix, system_filter, coarse_solver));
       }
 
@@ -634,11 +593,8 @@ namespace FEAT
        * \param[in] system_filter
        * A reference to the system filter.
        *
-       * \param[in] prol_operator
-       * A reference to the prolongation operator onto this level.
-       *
-       * \param[in] rest_operator
-       * A reference to the restriction operator from this level.
+       * \param[in] transfer_operator
+       * A reference to the transfer operator onto this level.
        *
        * \param[in] smoother_pre
        * A shared pointer to the pre-smoother.
@@ -667,8 +623,7 @@ namespace FEAT
       void push_level(
         const SystemMatrixType& system_matrix,
         const SystemFilterType& system_filter,
-        const ProlOperatorType& prol_operator,
-        const RestOperatorType& rest_operator,
+        const TransferOperatorType& transfer_operator,
         std::shared_ptr<SolverType> smoother_pre,
         std::shared_ptr<SolverType> smoother_post,
         std::shared_ptr<SolverType> smoother_peak,
@@ -676,8 +631,7 @@ namespace FEAT
         typename SystemMatrixType::DataType alpha = typename SystemMatrixType::DataType(1)
         )
       {
-        XASSERTM(!_levels.empty(), "cannot push level, no coarse level exists yet");
-        push_level(std::make_shared<StdLevelType>(system_matrix, system_filter, prol_operator, rest_operator,
+        push_level(std::make_shared<StdLevelType>(system_matrix, system_filter, transfer_operator,
           smoother_pre, smoother_post, smoother_peak, coarse_solver, alpha));
       }
 
@@ -858,8 +812,7 @@ namespace FEAT
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class MultiGrid :
       public SolverBase<typename SystemMatrix_::VectorTypeR>
     {
@@ -868,7 +821,7 @@ namespace FEAT
       typedef SolverBase<typename SystemMatrix_::VectorTypeR> BaseClass;
 
       /// our compatible multigrid hierarchy class
-      typedef MultiGridHierarchy<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> HierarchyType;
+      typedef MultiGridHierarchy<SystemMatrix_, SystemFilter_, TransferOperator_> HierarchyType;
 
       /// the level type
       typedef typename HierarchyType::LevelType LevelType;
@@ -881,10 +834,8 @@ namespace FEAT
       typedef typename LevelType::SystemFilterType FilterType;
       /// the system vector type
       typedef typename LevelType::SystemVectorType VectorType;
-      /// the prolongation operator type
-      typedef typename LevelType::ProlOperatorType ProlOperatorType;
-      /// the restriction operator tpye
-      typedef typename LevelType::RestOperatorType RestOperatorType;
+      /// the trasnfer operator type
+      typedef typename LevelType::TransferOperatorType TransferOperatorType;
       /// the sub-solver type
       typedef typename LevelType::SolverType SolverType;
 
@@ -1513,9 +1464,10 @@ namespace FEAT
           const FilterType& system_filter_f = lvl_f.level->get_system_filter();
           const FilterType& system_filter_c = lvl_c.level->get_system_filter();
 
-          // get our restriction operator
-          const RestOperatorType* rest_operator = lvl_f.level->get_rest_operator();
-          XASSERTM(rest_operator != nullptr, "restriction operator is missing");
+          // get our transfer operator
+          const TransferOperatorType* transfer_operator = lvl_f.level->get_transfer_operator();
+          XASSERTM(transfer_operator != nullptr, "transfer operator is missing");
+          XASSERT(!transfer_operator->is_ghost());
 
           // get our pre-smoother
           std::shared_ptr<SolverType> smoother = lvl_f.level->get_smoother_pre();
@@ -1553,7 +1505,7 @@ namespace FEAT
 
           // restrict onto coarse level
           Statistics::add_solver_expression(std::make_shared<ExpressionRestriction>(this->name(), i));
-          rest_operator->apply(lvl_c.vec_rhs, lvl_f.vec_def);
+          transfer_operator->rest(lvl_f.vec_def, lvl_c.vec_rhs);
 
           // filter coarse fefect
           system_filter_c.filter_def(lvl_c.vec_rhs);
@@ -1600,13 +1552,14 @@ namespace FEAT
           const MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
           const FilterType& system_filter_f = lvl_f.level->get_system_filter();
 
-          // get our prolongation operator
-          const ProlOperatorType* prol_operator = lvl_f.level->get_prol_operator();
-          XASSERTM(prol_operator != nullptr, "prolongation operator is missing");
+          // get our transfer operator
+          const TransferOperatorType* transfer_operator = lvl_f.level->get_transfer_operator();
+          XASSERTM(transfer_operator != nullptr, "transfer operator is missing");
+          XASSERT(!transfer_operator->is_ghost());
 
           // prolongate coarse grid solution
           Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
-          prol_operator->apply(lvl_f.vec_cor, lvl_c.vec_sol);
+          transfer_operator->prol(lvl_f.vec_cor, lvl_c.vec_sol);
 
           // apply correction filter
           system_filter_f.filter_cor(lvl_f.vec_cor);
@@ -1674,31 +1627,29 @@ namespace FEAT
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
-    std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> new_multigrid(
-      std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> hierarchy,
+      typename TransferOperator_>
+    std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>> new_multigrid(
+      std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, TransferOperator_>> hierarchy,
       MultiGridCycle cycle = MultiGridCycle::V,
       int top_level = -1,
       int crs_level = 0)
     {
-      return std::make_shared<MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>>
+      return std::make_shared<MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>>
         (hierarchy, cycle, top_level, crs_level);
     }
 
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
+      typename TransferOperator_>
     class ScaRCMultiGrid :
-      public MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>
+      public MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>
     {
       ///Use MultiGrid's CTORs
-      using MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>::MultiGrid;
+      using MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>::MultiGrid;
 
       public:
-      typedef MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> BaseClass;
+      typedef MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_> BaseClass;
 
       /**
        * \brief Returns a descriptive string.
@@ -1737,13 +1688,14 @@ namespace FEAT
           const typename BaseClass::MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
           const typename BaseClass::FilterType& system_filter_f = lvl_f.level->get_system_filter();
 
-          // get our prolongation operator
-          const typename BaseClass::ProlOperatorType* prol_operator = lvl_f.level->get_prol_operator();
-          XASSERTM(prol_operator != nullptr, "prolongation operator is missing");
+          // get our transfer operator
+          const auto* transfer_operator = lvl_f.level->get_transfer_operator();
+          XASSERTM(transfer_operator != nullptr, "transfer operator is missing");
+          XASSERT(!transfer_operator->is_ghost());
 
           // prolongate coarse grid solution
           Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
-          prol_operator->apply(lvl_f.vec_cor, lvl_c.vec_sol);
+          transfer_operator->prol(lvl_f.vec_cor, lvl_c.vec_sol);
 
           // apply correction filter
           system_filter_f.filter_cor(lvl_f.vec_cor);
@@ -1806,18 +1758,16 @@ namespace FEAT
     template<
       typename SystemMatrix_,
       typename SystemFilter_,
-      typename ProlOperator_,
-      typename RestOperator_>
-    std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> new_scarcmultigrid(
-      std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> hierarchy,
+      typename TransferOperator_>
+    std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>> new_scarcmultigrid(
+      std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, TransferOperator_>> hierarchy,
       MultiGridCycle cycle = MultiGridCycle::V,
       int top_level = -1,
       int crs_level = 0)
     {
-      return std::make_shared<ScaRCMultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>>
+      return std::make_shared<ScaRCMultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>>
         (hierarchy, cycle, top_level, crs_level);
     }
-
   } // namespace Solver
 } // namespace FEAT
 
