@@ -118,7 +118,7 @@ namespace FEAT
        *
        * \returns The number of colums
        */
-      Index columns()
+      Index columns() const
       {
         // Compute total number of rows and columns
         auto vec_r = create_vector_r();
@@ -135,7 +135,7 @@ namespace FEAT
        *
        * \returns The number of colums
        */
-      Index rows()
+      Index rows() const
       {
         // Compute total number of rows and rows
         auto vec_l = create_vector_l();
