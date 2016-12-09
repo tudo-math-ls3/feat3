@@ -734,10 +734,9 @@ namespace NaverStokesCP2D
     }
   }; // class NavierStokesBlockedAssemblerLevel
 
-  template <typename SystemLevelType, typename TransferLevelType, typename MeshType>
+  template <typename SystemLevelType,typename MeshType>
   void report_statistics(const Dist::Comm& comm, double t_total,
     std::deque<std::shared_ptr<SystemLevelType>> & system_levels,
-    std::deque<std::shared_ptr<TransferLevelType>> & transfer_levels,
       Control::Domain::DomainControl<MeshType>& domain)
   {
     const int nprocs = comm.size();
@@ -755,7 +754,6 @@ namespace NaverStokesCP2D
 
     std::size_t la_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { la_size += n->bytes(); });
-    std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (std::shared_ptr<TransferLevelType> n) { la_size += n->bytes(); });
     std::size_t mpi_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { mpi_size += n->gate_sys.bytes(); });
     String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
@@ -900,9 +898,6 @@ namespace NaverStokesCP2D
     // define our velocity and pressure system levels
     typedef NavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer levels
-    typedef Control::StokesBlockedTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> VeloSpaceType;
@@ -919,7 +914,6 @@ namespace NaverStokesCP2D
 
     std::deque<std::shared_ptr<AssemblerLevelType>> asm_levels;
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
-    std::deque<std::shared_ptr<TransferLevelType>> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
@@ -932,10 +926,6 @@ namespace NaverStokesCP2D
     {
       asm_levels.push_back(std::make_shared<AssemblerLevelType>(*domain_levels.at(i)));
       system_levels.push_back(std::make_shared<SystemLevelType>());
-      if(i > 0)
-      {
-        transfer_levels.push_back(std::make_shared<TransferLevelType>(*system_levels.at(i-1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -974,10 +964,10 @@ namespace NaverStokesCP2D
 
     comm.print("Assembling transfer matrices...");
 
-    for (Index i(0); (i + 1) < num_levels; ++i)
+    for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i+1)->assemble_velo_transfer(*transfer_levels.at(i), *asm_levels.at(i));
-      asm_levels.at(i+1)->assemble_pres_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_velo_transfer(*system_levels.at(i), *asm_levels.at(i-1));
+      asm_levels.at(i)->assemble_pres_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     /* ***************************************************************************************** */
@@ -1011,13 +1001,25 @@ namespace NaverStokesCP2D
     auto multigrid_hierarchy_velo = std::make_shared<Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalMatrixBlockA,
       typename SystemLevelType::GlobalVeloFilter,
-      typename TransferLevelType::GlobalVeloTransferMatrix,
-      typename TransferLevelType::GlobalVeloTransferMatrix
+      typename SystemLevelType::GlobalVeloTransfer
       >>();
 
     // use multigrid for A-solver?
     if(cfg.multigrid_a)
     {
+      // loop over all finer levels
+      //for(Index i(1); i < num_levels; ++i)
+      for(Index i(num_levels-1); i > Index(0); --i)
+      {
+        auto& lvl = *system_levels.at(std::size_t(i));
+        auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+        auto smoother = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
+        smoother->set_max_iter(cfg.smooth_steps_a);
+        smoother->set_min_iter(cfg.smooth_steps_a);
+        multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo,
+          smoother, smoother, smoother);
+      }
+
       // set up velocity coarse grid solver
       {
         auto& lvl = *system_levels.front();
@@ -1027,21 +1029,6 @@ namespace NaverStokesCP2D
         cgs->set_min_iter(cfg.smooth_steps_a);
 
         multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, cgs);
-      }
-
-      // loop over all finer levels
-      for(Index i(1); i < num_levels; ++i)
-      {
-        auto& lvl = *system_levels.at(std::size_t(i));
-        auto& trs = *transfer_levels.at(std::size_t(i-1));
-        auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
-        auto smoother = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
-        smoother->set_max_iter(cfg.smooth_steps_a);
-        smoother->set_min_iter(cfg.smooth_steps_a);
-        multigrid_hierarchy_velo->push_level(
-          lvl.matrix_a, lvl.filter_velo,
-          trs.prol_velo, trs.rest_velo,
-          smoother, smoother, smoother);
       }
     }
 
@@ -1053,12 +1040,24 @@ namespace NaverStokesCP2D
     auto multigrid_hierarchy_pres = std::make_shared<Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalSchurMatrix,
       typename SystemLevelType::GlobalPresUnitFilter,
-      typename TransferLevelType::GlobalPresTransferMatrix,
-      typename TransferLevelType::GlobalPresTransferMatrix
+      typename SystemLevelType::GlobalPresTransfer
       >>();
 
     if (cfg.multigrid_s)
     {
+      // loop over all finer levels
+      //for(Index i(1); i < num_levels; ++i)
+      for(Index i(num_levels-1); i > Index(0); --i)
+      {
+        auto& lvl = *system_levels.at(std::size_t(i));
+        auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
+        auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+        smoother->set_max_iter(cfg.smooth_steps_s);
+        smoother->set_min_iter(cfg.smooth_steps_s);
+        multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, lvl.transfer_pres,
+          smoother, smoother, smoother);
+      }
+
       // set up pressure coarse grid solver
       {
         auto& lvl = *system_levels.front();
@@ -1068,21 +1067,6 @@ namespace NaverStokesCP2D
         cgs->set_min_iter(cfg.smooth_steps_s);
 
         multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, cgs);
-      }
-
-      // loop over all finer levels
-      for(Index i(1); i < num_levels; ++i)
-      {
-        auto& lvl = *system_levels.at(std::size_t(i));
-        auto& trs = *transfer_levels.at(std::size_t(i-1));
-        auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-        auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
-        smoother->set_max_iter(cfg.smooth_steps_s);
-        smoother->set_min_iter(cfg.smooth_steps_s);
-        multigrid_hierarchy_pres->push_level(
-            lvl.matrix_s, lvl.filter_pres_unit,
-            trs.prol_pres, trs.rest_pres,
-            smoother, smoother, smoother);
       }
     }
 
@@ -1475,7 +1459,7 @@ namespace NaverStokesCP2D
 
     if (cfg.statistics)
     {
-      report_statistics(comm, t_total, system_levels, transfer_levels, domain);
+      report_statistics(comm, t_total, system_levels, domain);
     }
   }
 

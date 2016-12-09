@@ -39,7 +39,8 @@ namespace FEAT
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     class ScalarBasicSystemLevel
     {
     public:
@@ -59,7 +60,7 @@ namespace FEAT
       typedef ScalarMatrix_ LocalSystemMatrix;
 
       /// define local transfer matrix type
-      typedef ScalarMatrix_ LocalSystemTransferMatrix;
+      typedef TransferMatrix_ LocalSystemTransferMatrix;
 
       /// define local system vector type
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;

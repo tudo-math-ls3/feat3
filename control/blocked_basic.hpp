@@ -9,10 +9,13 @@
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/transfer.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
+#include <kernel/global/transfer.hpp>
+#include <kernel/global/muxer.hpp>
 
 namespace FEAT
 {
@@ -23,7 +26,9 @@ namespace FEAT
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_> >
+      typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>
+      >
     class BlockedBasicSystemLevel
     {
     public:
@@ -43,8 +48,14 @@ namespace FEAT
       /// define local system matrix type
       typedef BlockedMatrix_ LocalSystemMatrix;
 
+      /// define local transfer matrix type
+      typedef TransferMatrix_ LocalSystemTransferMatrix;
+
       /// define local system vector type
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;
+
+      /// define local system transfer operator type
+      typedef typename LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       /// define system mirror type
       typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
@@ -52,23 +63,36 @@ namespace FEAT
       /// define system gate
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
 
+      // define system muxer
+      typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
+
       /// define global system vector type
       typedef Global::Vector<LocalSystemVector, SystemMirror> GlobalSystemVector;
 
       /// define global system matrix type
       typedef Global::Matrix<LocalSystemMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
 
+      /// define global system operator type
+      typedef Global::Transfer<LocalSystemTransfer, SystemMirror> GlobalSystemTransfer;
+
       /* ***************************************************************************************** */
 
       /// our system gate
       SystemGate gate_sys;
 
+      /// our coarse-level system muxer
+      SystemMuxer coarse_muxer_sys;
+
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
 
+      /// our global transfer operator
+      GlobalSystemTransfer transfer_sys;
+
       /// CTOR
       BlockedBasicSystemLevel() :
-        matrix_sys(&gate_sys, &gate_sys)
+        matrix_sys(&gate_sys, &gate_sys),
+        transfer_sys(&coarse_muxer_sys)
       {
       }
 
@@ -80,7 +104,9 @@ namespace FEAT
       void convert(const BlockedBasicSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         gate_sys.convert(other.gate_sys);
+        coarse_muxer_sys.convert(other.coarse_muxer_sys);
         matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
+        transfer_sys.convert(&coarse_muxer_sys, other.transfer_sys);
       }
     }; // class BlockedBasicSystemLevel<...>
 
@@ -144,75 +170,6 @@ namespace FEAT
         filter_sys.convert(other.filter_sys);
       }
     }; // class BlockedUnitFilterSystemLevel<...>
-
-    template<typename SystemLevel_, //typename BlockedMatrix_ = typename SystemLevel_::LocalBlockedMatrix>
-      typename BlockedMatrix_ = LAFEM::SparseMatrixBWrappedCSR<
-        typename SystemLevel_::MemType,
-        typename SystemLevel_::DataType,
-        typename SystemLevel_::IndexType,
-        SystemLevel_::dim>
-      >
-    class BlockedBasicTransferLevel
-    {
-    public:
-      /// define system mirror type
-      typedef typename SystemLevel_::SystemMirror SystemMirror;
-
-      /// our local transfer matrix type
-      typedef BlockedMatrix_ LocalSystemTransferMatrix;
-
-      /// our global transfer matrix type
-      typedef Global::Matrix<LocalSystemTransferMatrix, SystemMirror, SystemMirror> GlobalSystemTransferMatrix;
-
-      /// Our class base type
-      template <typename SystemLevel2_>
-      using BaseType = class BlockedBasicTransferLevel<SystemLevel2_>;
-
-      /// our global transfer matrices
-      GlobalSystemTransferMatrix prol_sys;
-
-      /// \copydoc ScalarBasicTransferLevel::prol_sys
-      GlobalSystemTransferMatrix rest_sys;
-
-      BlockedBasicTransferLevel()
-      {
-      }
-
-      /// CTOR
-      explicit BlockedBasicTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
-        prol_sys(&lvl_fine.gate_sys, &lvl_coarse.gate_sys),
-        rest_sys(&lvl_coarse.gate_sys, &lvl_fine.gate_sys)
-      {
-      }
-
-      virtual ~BlockedBasicTransferLevel()
-      {
-      }
-
-      /// \brief Returns the total amount of bytes allocated.
-      std::size_t bytes() const
-      {
-        return prol_sys.bytes() + rest_sys.bytes();
-      }
-
-      /**
-       *
-       * \brief Conversion method
-       *
-       * Use source BlockedBasicTransferLevel content as content of current BlockedBasicTransferLevel.
-       *
-       * \warning The provided SystemLevels must already be converted to the matching
-       * configuration, as they contain the used gateways.
-       *
-       */
-      template <typename SL_, typename SM_>
-      void convert(SystemLevel_ & lvl_coarse , SystemLevel_ & lvl_fine, const BlockedBasicTransferLevel<SL_, SM_> & other)
-      {
-        prol_sys.convert(&lvl_fine.gate_sys, &lvl_coarse.gate_sys, other.prol_sys);
-        rest_sys.convert(&lvl_coarse.gate_sys, &lvl_fine.gate_sys, other.rest_sys);
-      }
-    }; // class BlockedBasicTransferLevel<...>
-
   } // namespace Control
 } // namespace FEAT
 
