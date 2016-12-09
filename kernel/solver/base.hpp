@@ -7,6 +7,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/property_map.hpp>
 #include <kernel/util/string.hpp>
 
 // includes, system
@@ -241,6 +242,13 @@ namespace FEAT
        * \returns A string describing the solver.
        */
       virtual String name() const = 0;
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* DOXY(section))
+      {
+      }
 
       /**
        * \brief Solver application method

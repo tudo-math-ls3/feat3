@@ -100,6 +100,20 @@ namespace FEAT
           return "QPenalty";
         }
 
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          auto initial_penalty_param_p = section->query("initial_penalty_param");
+          if(initial_penalty_param_p.second)
+          {
+            set_initial_penalty_param(DataType(std::stod(initial_penalty_param_p.first)));
+          }
+        }
+
         /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
         {
@@ -112,6 +126,16 @@ namespace FEAT
         {
           _inner_solver->done_symbolic();
           BaseClass::done_symbolic();
+        }
+
+        /**
+         * \brief Sets the initial penalty parameter
+         */
+        void set_initial_penalty_param(DataType initial_penalty_param)
+        {
+          XASSERT(initial_penalty_param > DataType(0));
+
+          _initial_penalty_param = initial_penalty_param;
         }
 
         /// \copydoc BaseClass::apply()
@@ -315,6 +339,7 @@ namespace FEAT
     {
       return std::make_shared<QPenalty<Operator_>>(op, inner_solver, initial_penalty_param);
     }
+
   }
 } // namespace FEAT
 

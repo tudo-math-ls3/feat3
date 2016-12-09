@@ -824,12 +824,13 @@ namespace FEAT
       typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
       const FilterType& _filter;
       Intern::ILUCore<DataType, IndexType> _ilu;
-      const int _p;
+      int _p;
 
     public:
       /**
@@ -846,6 +847,40 @@ namespace FEAT
         _filter(filter),
         _p(p)
       {
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~ILUPrecond()
+      {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          set_fill_in_param(int(std::stoi(fill_in_param_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the fill-in parameter
+       *
+       * \param[in] p
+       * The new fill-in parameter
+       */
+      void set_fill_in_param(int p)
+      {
+        XASSERT(p > 0);
+        _p = p;
       }
 
       /// Returns the name of the solver.
@@ -881,6 +916,7 @@ namespace FEAT
         _ilu.copy_data(_matrix);
         _ilu.factorise_numeric_il_du();
       }
+
 
       /**
        * \brief apply the preconditioner
@@ -935,6 +971,8 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -958,6 +996,39 @@ namespace FEAT
         _matrix(matrix),
         _filter(filter)
       {
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~ILUPrecond()
+      {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          set_fill_in_param(Index(std::stoul(fill_in_param_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the fill-in parameter
+       *
+       * \param[in] p
+       * The new fill-in parameter
+       */
+      void set_fill_in_param(int p)
+      {
+        XASSERTM(p == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
       }
 
       /// Returns the name of the solver.
@@ -1119,6 +1190,8 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -1142,6 +1215,39 @@ namespace FEAT
         _matrix(matrix),
         _filter(filter)
       {
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~ILUPrecond()
+      {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          set_fill_in_param(Index(std::stoul(fill_in_param_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the fill-in parameter
+       *
+       * \param[in] p
+       * The new fill-in parameter
+       */
+      void set_fill_in_param(int p)
+      {
+        XASSERTM(p == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
       }
 
       /// Returns the name of the solver.

@@ -125,6 +125,11 @@ namespace FEAT
           /// Name of the solver configuration from solver_config we want
           const String solver_name;
           /// The solver
+          //std::shared_ptr<Solver::NLOptLS
+          //<
+          //  typename SystemLevelType::GlobalQualityFunctional,
+          //  typename SystemLevelType::GlobalSystemFilter>
+          //> solver;
           std::shared_ptr<Solver::IterativeSolver<typename SystemLevelType::GlobalSystemVectorR>> solver;
           /// The preconditioner. As this might involve a matrix to be assembled, we keep it between solves.
           std::shared_ptr<PrecondType> precond;
@@ -492,19 +497,40 @@ namespace FEAT
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;
 
-            // Updates the mesh beyond the finest level etc.
-            prepare(vec_sol);
+            solver->plot_summary(st);
 
-            // Print solver summary
-            if(Util::Comm::rank() == 0)
+            // If the mesh was not optimised on the finest domain level, we now need to prolongate the solution by:
+            //  - refining the coarse vertex set using the StandardRefinery
+            //  - copying the results to the CoordsBuffer
+            //  - convert the CoordsBuffer to a vector type that we can filter with the system's Dirichlet filter
+            //  - copy the filtered vector's contents back to the buffer and write the buffer to the mesh
+            //  - apply the nonlinear filter representing unilateral BCs of place by calling adapt() for the
+            //    corresponding meshparts
+            for(size_t pos(meshopt_lvl_pos+1); pos < get_num_levels(); ++pos)
             {
-              std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
-              std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
-              std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
-              std::cout << "Needed evaluations: " << the_system_level.op_sys.get_num_func_evals() << " (func) / " << the_system_level.op_sys.get_num_grad_evals();
-              std::cout <<  " (grad) / " << the_system_level.op_sys.get_num_hess_evals() << " (hess)" << std::endl;
-            }
+              auto& coarse_mesh = this->_dom_ctrl.get_levels().at(pos-1)->get_mesh();
+              auto& fine_mesh = this->_dom_ctrl.get_levels().at(pos)->get_mesh();
+              auto& fine_vtx = fine_mesh.get_vertex_set();
 
+              // Refine coarse vertex set and write the result to the CoordsBuffer
+              Geometry::StandardRefinery<MeshType> refinery(coarse_mesh);
+              refinery.fill_vertex_set(fine_vtx);
+              (*(_system_levels.at(pos)->op_sys)).mesh_to_buffer();
+              // Convert the buffer to a filterable vector
+              typename SystemLevelType::GlobalSystemVectorL::LocalVectorType vec_sol_lvl;
+              vec_sol_lvl.convert(*(_system_levels.at(pos)->coords_buffer));
+              // Filter this vector, copy back the contents and write the changes to the mesh
+              auto& dirichlet_filters_lvl = (*(_system_levels.at(pos)->filter_sys)).template at<1>();
+              dirichlet_filters_lvl.filter_sol(vec_sol_lvl);
+              (*(_system_levels.at(pos)->coords_buffer)).copy(vec_sol_lvl);
+              (*(_system_levels.at(pos)->op_sys)).buffer_to_mesh();
+              // Now call adapt() on the slip boundaries
+              auto* fine_mesh_node = this->_dom_ctrl.get_levels().at(pos)->get_mesh_node();
+              for(const auto& it:get_slip_boundaries())
+              {
+                fine_mesh_node->adapt_by_name(it);
+              }
+            }
           }
 
       }; // class HyperelasticityFunctionalControl

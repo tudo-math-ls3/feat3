@@ -88,10 +88,10 @@ int run(Solver_& solver, Operator_& op)
   solver->set_max_iter(10000);
   solver->set_tol_fval(DataType(0));
   solver->set_tol_step(Math::eps<DataType>());
-  solver->set_tol_abs(Math::sqrt(Math::eps<DataType>()));
-  solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
-  //solver->set_tol_abs(Math::eps<DataType>());
-  //solver->set_tol_rel(Math::eps<DataType>());
+  //solver->set_tol_abs(Math::sqrt(Math::eps<DataType>()));
+  //solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
+  solver->set_tol_abs(Math::eps<DataType>());
+  solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
 
   // This will hold the solution
@@ -105,6 +105,8 @@ int run(Solver_& solver, Operator_& op)
   // Solve the optimisation problem
   Status st = solver->correct(sol, rhs);
 
+  // Print solver summary
+  solver->plot_summary(st);
 
   // Check the distance between solution and minimal points
   DataType min_dist(Math::Limits<DataType>::max());
@@ -117,12 +119,6 @@ int run(Solver_& solver, Operator_& op)
       min_dist = dist;
   }
 
-  // Print solver summary
-  std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
-  std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
-  std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
-  std::cout << "Needed evaluations: " << op.get_num_func_evals() << " (func) / " << op.get_num_grad_evals();
-  std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
 
   String filename("");
 
@@ -220,11 +216,6 @@ int run(Solver_& solver, Operator_& op)
   std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
   std::cout << "Needed evaluations: " << op.get_num_func_evals() << " (func) / " << op.get_num_grad_evals();
   std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
-  solver->set_max_iter(10000);
-  solver->set_tol_fval(DataType(0));
-  solver->set_tol_step(Math::eps<DataType>());
-  solver->set_tol_abs(Math::sqrt(Math::eps<DataType>()));
-  solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
 
   std::cout << String("max_iter").pad_back(30, '.') << ": " << stringify(solver->get_max_iter()) << std::endl;
   std::cout << String("tol_abs").pad_back(30, '.') << ": " << stringify(solver->get_tol_abs()) << std::endl;
@@ -284,7 +275,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
+  typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;

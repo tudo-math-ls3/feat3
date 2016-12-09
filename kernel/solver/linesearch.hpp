@@ -113,7 +113,31 @@ namespace FEAT
         virtual ~Linesearch()
         {
           if(iterates != nullptr)
+          {
             delete iterates;
+          }
+        }
+
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          // Check if we have to keep the iterates
+          auto keep_iterates_p = section->query("keep_iterates");
+          if(keep_iterates_p.second)
+          {
+            set_keep_iterates(std::stoi(keep_iterates_p.first) == 1);
+          }
+
+          // Check if we have to keep the iterates
+          auto tol_step_p = section->query("tol_step");
+          if(tol_step_p.second)
+          {
+            set_tol_step(DataType(std::stod(tol_step_p.first)));
+          }
         }
 
         /// \copydoc BaseClass::init_symbolic()
@@ -149,7 +173,9 @@ namespace FEAT
           _norm_sol = DataType(0);
 
           if(iterates != nullptr)
+          {
             iterates->clear();
+          }
         }
 
         /**
@@ -197,7 +223,9 @@ namespace FEAT
         {
           _fval_0 = f0;
           if(_trim_threshold == Math::huge<DataType>())
+          {
             _trim_threshold = DataType(10)*(Math::abs(_fval_0) + DataType(1));
+          }
         }
 
         /**
@@ -271,6 +299,33 @@ namespace FEAT
           }
         }
 
+        /**
+         * \brief Sets the iterates deque according to a bool
+         */
+        void set_keep_iterates(bool keep_iterates)
+        {
+          if(iterates != nullptr)
+          {
+            delete iterates;
+          }
+
+          if(keep_iterates)
+          {
+            iterates = new std::deque<VectorType>;
+          }
+        }
+
+        /**
+         * \brief Sets the step length tolerance
+         *
+         */
+        void set_tol_step(DataType tol_step)
+        {
+          XASSERT(tol_step > DataType(0));
+
+          _tol_step = tol_step;
+        }
+
     }; // class Linesearch
 
     /**
@@ -293,6 +348,7 @@ namespace FEAT
         typedef Linesearch<Operator_, Filter_> BaseClass;
 
       private:
+        /// The length of the step
         DataType _steplength;
 
       public:
@@ -323,6 +379,23 @@ namespace FEAT
         {
         }
 
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          // Check if we need to set the step length
+          auto step_length_p = section->query("step_length");
+          if(step_length_p.second)
+          {
+            set_step_length(std::stod(step_length_p.first));
+          }
+
+        }
+
+
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
@@ -333,6 +406,16 @@ namespace FEAT
         virtual DataType get_rel_update() override
         {
           return _steplength;
+        }
+
+        /**
+         * \brief Sets the step length
+         */
+        virtual void set_step_length(DataType step_length)
+        {
+          XASSERT(step_length > DataType(0));
+
+          _steplength = step_length;
         }
 
         /**
@@ -629,7 +712,7 @@ namespace FEAT
 
       protected:
         /// Step for calculating the "other" secant point in the initial step. Crucial
-        DataType _sigma_0;
+        DataType _secant_step;
         /// dir^T * preconditioned defect. We want to find the minimum of the functional value along dir
         DataType _eta;
 
@@ -655,7 +738,7 @@ namespace FEAT
           const DataType initial_step_ = initial_step_default,
           const bool keep_iterates_ = false) :
           BaseClass("S-LS", op_, filter_, keep_iterates_),
-          _sigma_0(initial_step_),
+          _secant_step(initial_step_),
           _eta(DataType(0))
           {
             this->set_max_iter(20);
@@ -666,10 +749,35 @@ namespace FEAT
         {
         }
 
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          auto secant_step_p = section->query("secant_step");
+          if(secant_step_p.second)
+          {
+            set_secant_step(DataType(std::stod(secant_step_p.first)));
+          }
+        }
+
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
           return "SecantLinesearch";
+        }
+
+        /**
+         * \brief Sets the length of the first secant step
+         *
+         */
+        void set_secant_step(DataType secant_step)
+        {
+          XASSERT(secant_step > DataType(0));
+
+          _secant_step = secant_step;
         }
 
         /**
@@ -733,8 +841,8 @@ namespace FEAT
           this->_fval_min = this->_fval_0;
           this->_alpha_min = DataType(0);
 
-          // The second secant point in the first iteration is x + _sigma_0 * dir
-          DataType alpha(_sigma_0/this->_norm_dir);
+          // The second secant point in the first iteration is x + _secant_step * dir
+          DataType alpha(_secant_step/this->_norm_dir);
           DataType alpha_hidate(alpha);
 
           _eta = dir.dot(this->_vec_grad);
@@ -743,7 +851,7 @@ namespace FEAT
                 +stringify_fp_sci(_eta));
 
           // The first "other" point for the secant
-          sol.axpy(dir, this->_vec_initial_sol, _sigma_0/this->_norm_dir);
+          sol.axpy(dir, this->_vec_initial_sol, _secant_step/this->_norm_dir);
 
           _eta = dir.dot(this->_vec_grad);
           this->_def_init = Math::abs(_eta);
@@ -972,6 +1080,25 @@ namespace FEAT
         {
         }
 
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          auto tol_curvature_p = section->query("tol_curvature");
+          if(tol_curvature_p.second)
+          {
+            set_tol_curvature(DataType(std::stod(tol_curvature_p.first)));
+          }
+
+          auto tol_decrease_p = section->query("tol_decrease");
+          if(tol_decrease_p.second)
+          {
+            set_tol_decrease(DataType(std::stod(tol_decrease_p.first)));
+          }
+        }
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
@@ -1036,6 +1163,26 @@ namespace FEAT
         virtual DataType get_rel_update() override
         {
           return this->_alpha_min*this->_norm_dir;
+        }
+
+        /**
+         * \brief Sets the tolerance for the sufficient decrease in curvature
+         */
+        void set_tol_curvature(DataType tol_curvature)
+        {
+          XASSERT(tol_curvature > DataType(0));
+
+          _tol_curvature = tol_curvature;
+        }
+
+        /**
+         * \brief Sets the tolerance for the sufficient decrease in functional value
+         */
+        void set_tol_decrease(DataType tol_decrease)
+        {
+          XASSERT(tol_decrease > DataType(0));
+
+          _tol_decrease = tol_decrease;
         }
 
       protected:

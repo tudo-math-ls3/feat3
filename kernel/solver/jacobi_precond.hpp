@@ -45,6 +45,8 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -72,6 +74,28 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~JacobiPrecond()
+      {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _krylov_vim
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+      }
+
       /// Returns the name of the solver.
       virtual String name() const override
       {
@@ -95,6 +119,19 @@ namespace FEAT
 
         // invert diagonal elements
         _inv_diag.component_invert(_inv_diag, _omega);
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      void set_omega(DataType omega)
+      {
+        XASSERT(omega > DataType(0));
+        _omega = omega;
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override

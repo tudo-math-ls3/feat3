@@ -50,7 +50,7 @@ namespace FEAT
      *
      */
     template<typename Operator_, typename Filter_>
-    class ALGLIBMinLBFGS: public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
+    class ALGLIBMinLBFGS: public NLOptLS<Operator_, Filter_>
     {
       public:
         /// The nonlinear operator type
@@ -66,25 +66,16 @@ namespace FEAT
         typedef typename Operator_::DataType DataType;
 
         /// Our baseclass
-        typedef PreconditionedIterativeSolver<VectorType> BaseClass;
+        typedef NLOptLS<Operator_, Filter_> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
       protected:
-        /// Our nonlinear operator
-        Operator_& _op;
-        /// The filter we apply to the gradient
-        Filter_& _filter;
 
         /// defect vector
         VectorType _vec_def;
         /// temporary vector
         VectorType _vec_tmp;
-
-        /// Tolerance for function improvement
-        DataType _tol_fval;
-        /// Tolerance for gradient improvement
-        DataType _tol_step;
 
         /// Optimisation variable for ALGLIB
         alglib::real_1d_array _opt_var;
@@ -93,7 +84,7 @@ namespace FEAT
         /// Convergence report etc.
         alglib::minlbfgsreport _report;
         /// Dimension for lBFGS Hessian update
-        alglib::ae_int_t _lbfgs_dim;
+        Index _lbfgs_dim;
 
       public:
         /// Can hold all iterates for debugging purposes
@@ -117,21 +108,24 @@ namespace FEAT
          *
          */
         explicit ALGLIBMinLBFGS(
-          Operator_& op_, Filter_& filter_, const alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
+          Operator_& op_, Filter_& filter_, const Index lbfgs_dim_ = alglib::ae_int_t(0),
           const bool keep_iterates = false) :
-          BaseClass("ALGLIBMinLBFGS"),
-          _op(op_),
-          _filter(filter_),
-          _tol_fval(DataType(0)),
-          _tol_step(Math::eps<DataType>()),
+          BaseClass("ALGLIBMinLBFGS", op_, filter_, nullptr),
           _lbfgs_dim(lbfgs_dim_),
           iterates(nullptr)
           {
-            if(keep_iterates)
-              iterates = new std::deque<VectorType>;
 
-            if(_lbfgs_dim == alglib::ae_int_t(0))
-              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), _op.columns()));
+            this->set_ls_iter_digits(2);
+
+            if(keep_iterates)
+            {
+              iterates = new std::deque<VectorType>;
+            }
+
+            if(_lbfgs_dim == Index(0))
+            {
+              _lbfgs_dim = Math::min(Index(7), this->_op.columns());
+            }
           }
 
         /**
@@ -140,7 +134,37 @@ namespace FEAT
         virtual ~ALGLIBMinLBFGS()
         {
           if(iterates != nullptr)
+          {
             delete iterates;
+          }
+        }
+
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          // Default LBFGS update dimension is 0 so the constructor can choose is automatically.
+          Index lbfgs_dim(0);
+          auto lbfgs_dim_p = section->query("lbfgs_dim");
+          // Get LBFGS update dimension.
+          if(lbfgs_dim_p.second)
+          {
+            lbfgs_dim = Index(std::stoul(lbfgs_dim_p.first));
+          }
+          set_lbfgs_dim(lbfgs_dim);
+
+          // Check if we have to keep the iterates
+          bool keep_iterates(false);
+          auto keep_iterates_p = section->query("keep_iterates");
+          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+          {
+            keep_iterates = true;
+          }
+          set_keep_iterates(keep_iterates);
+
         }
 
         /// \copydoc BaseClass::init_symbolic()
@@ -156,16 +180,17 @@ namespace FEAT
             Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
 
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          {
             _opt_var[i] = double(0);
+          }
 
-          alglib::minlbfgscreate(_lbfgs_dim, _opt_var, _state);
+          alglib::minlbfgscreate(alglib::ae_int_t(_lbfgs_dim), _opt_var, _state);
           alglib::minlbfgssetxrep(_state, true);
           // Set stopping criteria: absolute tolerance, function improvement, length of update step, max iterations
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
           // second argument
-          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
+          alglib::minlbfgssetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
           alglib::ae_int_t(this->_max_iter));
-          // Set the direction update
         }
 
         /// \copydoc BaseClass::done_symbolic()
@@ -183,28 +208,19 @@ namespace FEAT
         }
 
         /**
-         * \brief Gets the tolerance for function value improvement
+         * \brief Sets the relative tolerance for the norm of the defect vector
          *
-         * The convergence check is against the maximum of the absolute and relative function value.
+         * \param[in] tol_abs
+         * New relative tolerance for the norm of the defect vector.
          *
-         * \returns The function value improvement tolerance
          */
-        DataType get_tol_fval()
+        void set_tol_abs(DataType tol_abs)
         {
-          return _tol_fval;
-        }
-
-        /**
-         * \brief Gets the tolerance for the linesearch step size
-         *
-         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so the solver has to be terminated.
-         *
-         * \returns The function value improvement tolerance
-         */
-        DataType get_tol_step()
-        {
-          return _tol_step;
+          BaseClass::set_tol_abs(tol_abs);
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::minlbfgssetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
+          alglib::ae_int_t(this->_max_iter));
         }
 
         /**
@@ -216,12 +232,12 @@ namespace FEAT
          * The convergence check is against the maximum of the absolute and relative function value.
          *
          */
-        void set_tol_fval(DataType tol_fval)
+        virtual void set_tol_fval(DataType tol_fval) override
         {
-          _tol_fval = tol_fval;
+          BaseClass::set_tol_fval(tol_fval);
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
           // second argument
-          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
+          alglib::minlbfgssetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -230,46 +246,37 @@ namespace FEAT
          */
         void set_max_iter(Index max_iter)
         {
-          this->_max_iter = max_iter;
+          BaseClass::set_max_iter(max_iter);
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
           // second argument
-          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
+          alglib::minlbfgssetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
         /**
-         * \brief Sets the relative tolerance for the norm of the defect vector
-         *
-         * \param[in] tol_abs
-         * New relative tolerance for the norm of the defect vector.
-         *
+         * \brief Sets the dimension for the LBFGS update
          */
-        void set_tol_abs(DataType tol_abs)
+        void set_lbfgs_dim(Index lbfgs_dim)
         {
-          this->_tol_abs = tol_abs;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
+          XASSERT(lbfgs_dim > Index(0));
+          _lbfgs_dim = lbfgs_dim;
         }
 
         /**
-         * \brief Sets the tolerance for the linesearch step size.
-         *
-         * \param[in] tol_step
-         * New tolerance for the linesearch step size.
-         *
-         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so the NLCG has to be terminated.
-         *
+         * \brief Sets the iterates deque according to a bool
          */
-        void set_tol_step(DataType tol_step)
+        void set_keep_iterates(bool keep_iterates)
         {
-          _tol_step = tol_step;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::minlbfgssetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
+          if(iterates != nullptr)
+          {
+            delete iterates;
+          }
+
+          if(keep_iterates)
+          {
+            iterates = new std::deque<VectorType>;
+          }
+
         }
 
         /// \copydoc BaseClass::apply()
@@ -296,12 +303,10 @@ namespace FEAT
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
-          // Unused here
-          DataType fval(0);
 
           this->_op.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.eval_fval_grad(fval, this->_vec_def);
+          this->_op.eval_fval_grad(this->_fval, this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -348,7 +353,9 @@ namespace FEAT
           // Copy initial guess to optimisation state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          {
             _opt_var[i] = vec_sol_elements[i];
+          }
 
           alglib::minlbfgsrestartfrom(_state, _opt_var);
 
@@ -357,7 +364,9 @@ namespace FEAT
           alglib::minlbfgsresults(_state, _opt_var, _report);
 
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          {
             vec_sol_elements[i] = DataType(_opt_var[i]);
+          }
 
           switch(_report.terminationtype)
           {
@@ -416,49 +425,21 @@ namespace FEAT
         {
           ALGLIBMinLBFGS<OperatorType, FilterType>* me =
             reinterpret_cast<ALGLIBMinLBFGS<OperatorType, FilterType>*>(ptr);
-          if(me->_num_iter>0)
+
+          // Because of how ALGLIB counts its iterations, we have to make sure we do not call this before the first
+          // functional evaluation (repnfev is the reported number of functional evaluations)
+          if(me->_state.c_ptr()->repnfev> 0)
           {
-            // first, let's see if we have to compute the defect at all
-            bool calc_def = false;
-            calc_def = calc_def || (me->_min_iter < me->_max_iter);
-            calc_def = calc_def || me->_plot;
-            calc_def = calc_def || (me->_min_stag_iter > Index(0));
-
-            // compute new defect
-            if(calc_def)
-            {
-              me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
-              Statistics::add_solver_expression(
-                std::make_shared<ExpressionDefect>(me->name(), me->_def_cur, me->get_num_iter()));
-            }
-
-            // plot?
-            if(me->_plot)
-            {
-              std::cout << me->_plot_name
-              <<  ": " << stringify(me->_num_iter).pad_front(me->_iter_digits)
-              <<  " (" << stringify(me->_state.c_ptr()->nfev).pad_front(2) << ")"
-              << " : " << stringify_fp_sci(me->_def_cur)
-              << " / " << stringify_fp_sci(me->_def_cur / me->_def_init)
-              << " : " << stringify_fp_sci(me->_state.c_ptr()->f)
-              << " : " << stringify_fp_sci(me->_state.c_ptr()->stp)
-              << std::endl;
-            }
-            // Log iterates if necessary
-            if(me->iterates != nullptr)
-            {
-              auto tmp = me->_vec_tmp.clone();
-              me->iterates->push_back(std::move(tmp));
-            }
-
+            me->_steplength = DataType(me->_state.c_ptr()->stp);
+            me->_ls_its = Index(me->_state.c_ptr()->nfev);
+            Status st = me->_set_new_defect(me->_vec_def, me->_vec_tmp);
             // Because ALGLIB knows no relative tolerance, we have to do it here
-            if( (me->_def_cur <= me->_tol_abs) && (me->_def_cur <= (me->_tol_rel * me->_def_init)) )
+            if( st != Status::progress  )
+            {
               alglib::minlbfgsrequesttermination(me->_state);
-
+            }
           }
 
-          // increase iteration count
-          ++me->_num_iter;
         }
 
         /**
@@ -489,19 +470,21 @@ namespace FEAT
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
             vec_tmp_elements[i] = DataType(x[i]);
 
-          DataType real_fval(0);
+          me->_fval_prev = me->_fval;
           // Prepare the operator
           me->_op.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
-          me->_op.eval_fval_grad(real_fval, me->_vec_def);
+          me->_op.eval_fval_grad(me->_fval, me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
-          fval = double(real_fval);
+          fval = double(me->_fval);
 
           // Copy the operator's gradient to ALGLIB's grad variable
           auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
+          {
             grad[i] = double(vec_def_elements[i]);
+          }
 
         }
 
@@ -551,7 +534,7 @@ namespace FEAT
      *
      */
     template<typename Operator_, typename Filter_>
-    class ALGLIBMinCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
+    class ALGLIBMinCG :  public NLOptLS<Operator_, Filter_>
     {
       public:
         /// The nonlinear operator type
@@ -567,7 +550,7 @@ namespace FEAT
         typedef typename Operator_::DataType DataType;
 
         /// Our baseclass
-        typedef PreconditionedIterativeSolver<VectorType> BaseClass;
+        typedef NLOptLS<Operator_, Filter_> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
@@ -575,11 +558,6 @@ namespace FEAT
         static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::DYHSHybrid;
 
       protected:
-        /// Our nonlinear operator
-        Operator_& _op;
-        /// The filter we apply to the gradient
-        Filter_& _filter;
-
         /// Method to update the search direction, defaults to DYHSHybrid
         NLCGDirectionUpdate _direction_update;
 
@@ -587,11 +565,6 @@ namespace FEAT
         VectorType _vec_def;
         /// temporary vector
         VectorType _vec_tmp;
-
-        /// Tolerance for function improvement
-        DataType _tol_fval;
-        /// Tolerance for gradient improvement
-        DataType _tol_step;
 
         /// Optimisation variable for ALGLIB
         alglib::real_1d_array _opt_var;
@@ -620,16 +593,17 @@ namespace FEAT
          */
         explicit ALGLIBMinCG(Operator_& op_, Filter_& filter_,
         NLCGDirectionUpdate du_ = direction_update_default, bool keep_iterates = false) :
-          BaseClass("ALGLIBMinCG"),
-          _op(op_),
-          _filter(filter_),
+          BaseClass("ALGLIBMinCG", op_, filter_, nullptr),
           _direction_update(du_),
-          _tol_fval(DataType(0)),
-          _tol_step(Math::eps<DataType>()),
           iterates(nullptr)
           {
+
+            this->set_ls_iter_digits(2);
+
             if(keep_iterates)
+            {
               iterates = new std::deque<VectorType>;
+            }
 
           }
 
@@ -640,6 +614,33 @@ namespace FEAT
         {
           if(iterates != nullptr)
             delete iterates;
+        }
+
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          // Get direction update
+          auto direction_update_p = section->query("direction_update");
+          if(direction_update_p.second)
+          {
+            NLCGDirectionUpdate my_update;
+            my_update << direction_update_p.first;
+            set_direction_update(my_update);
+          }
+
+          // Check if we have to keep the iterates
+          bool keep_iterates(false);
+          auto keep_iterates_p = section->query("keep_iterates");
+          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+          {
+            keep_iterates = true;
+          }
+          set_keep_iterates(keep_iterates);
+
         }
 
         /// \copydoc BaseClass::init_symbolic()
@@ -655,14 +656,16 @@ namespace FEAT
             Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
 
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          {
             _opt_var[i] = double(0);
+          }
 
           alglib::mincgcreate(_opt_var, _state);
           alglib::mincgsetxrep(_state, true);
           // Set stopping criteria: Absolute tolerance, function improvement, length of update step, max iterations
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
           // second argument
-          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
+          alglib::mincgsetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
           alglib::ae_int_t(this->_max_iter));
           // Set the direction update
           set_direction_update(this->_direction_update);
@@ -688,6 +691,70 @@ namespace FEAT
           }
         }
 
+        /**
+         * \brief Sets the iterates deque according to a bool
+         */
+        void set_keep_iterates(bool keep_iterates)
+        {
+          if(iterates != nullptr)
+          {
+            delete iterates;
+          }
+
+          if(keep_iterates)
+          {
+            iterates = new std::deque<VectorType>;
+          }
+
+        }
+
+        /**
+         * \brief Sets the tolerance for function value improvement
+         *
+         * \param[in] tol_fval
+         * New tolerance for function value improvement.
+         *
+         * The convergence check is against the maximum of the absolute and relative function value.
+         *
+         */
+        virtual void set_tol_fval(DataType tol_fval) override
+        {
+          BaseClass::set_tol_fval(tol_fval);
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+        /**
+         * \copydoc BaseClass::set_max_iter()
+         */
+        void set_max_iter(Index max_iter)
+        {
+          BaseClass::set_max_iter(max_iter);
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+        /**
+         * \brief Sets the relative tolerance for the norm of the defect vector
+         *
+         * \param[in] tol_abs
+         * New relative tolerance for the norm of the defect vector.
+         *
+         */
+        void set_tol_abs(DataType tol_abs)
+        {
+          BaseClass::set_tol_abs(tol_abs);
+          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
+          // second argument
+          alglib::mincgsetcond(_state, double(0), double(this->_tol_fval), double(this->_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+
         /// \copydoc BaseClass::done_symbolic()
         virtual void done_symbolic() override
         {
@@ -702,107 +769,14 @@ namespace FEAT
           return "ALGLIBMinCG";
         }
 
-        /**
-         * \brief Gets the tolerance for function value improvement
-         *
-         * The convergence check is against the maximum of the absolute and relative function value.
-         *
-         * \returns The function value improvement tolerance
-         */
-        DataType get_tol_fval()
-        {
-          return _tol_fval;
-        }
-
-        /**
-         * \brief Gets the tolerance for the linesearch step size
-         *
-         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so the solver has to be terminated.
-         *
-         * \returns The function value improvement tolerance
-         */
-        DataType get_tol_step()
-        {
-          return _tol_step;
-        }
-
-        /**
-         * \copydoc BaseClass::set_max_iter()
-         */
-        void set_max_iter(Index max_iter)
-        {
-          this->_max_iter = max_iter;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
-        }
-
-        /**
-         * \brief Sets the tolerance for function value improvement
-         *
-         * \param[in] tol_fval
-         * New tolerance for function value improvement.
-         *
-         * The convergence check is against the maximum of the absolute and relative function value.
-         *
-         */
-        void set_tol_fval(DataType tol_fval)
-        {
-          _tol_fval = tol_fval;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
-        }
-
-        /**
-         * \brief Sets the relative tolerance for the norm of the defect vector
-         *
-         * \param[in] tol_abs
-         * New absolute tolerance for the norm of the defect vector.
-         *
-         */
-        void set_tol_abs(DataType tol_abs)
-        {
-          this->_tol_abs = tol_abs;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
-        }
-
-        /**
-         * \brief Sets the tolerance for the linesearch step size.
-         *
-         * \param[in] tol_step
-         * New tolerance for the linesearch step size.
-         *
-         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so ALGLIBMinCG has to be terminated.
-         *
-         */
-        void set_tol_step(DataType tol_step)
-        {
-          _tol_step = tol_step;
-          // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
-          // second argument
-          alglib::mincgsetcond(_state, double(0), double(_tol_fval), double(_tol_step),
-          alglib::ae_int_t(this->_max_iter));
-        }
-
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          // Unused here
-          DataType fval(0);
-
           // clear solution vector
           vec_cor.format();
 
           this->_op.prepare(vec_cor, this->_filter);
-          this->_op.eval_fval_grad(fval, this->_vec_def);
+          this->_op.eval_fval_grad(this->_fval, this->_vec_def);
 
           // Copy back defect
           this->_vec_def.copy(vec_def);
@@ -816,12 +790,9 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
 
-          // Unused here
-          DataType fval(0);
-
           this->_op.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.eval_fval_grad(fval, this->_vec_def);
+          this->_op.eval_fval_grad(this->_fval, this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -864,7 +835,9 @@ namespace FEAT
           // Copy initial guess to optimisation state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          {
             _opt_var[i] = vec_sol_elements[i];
+          }
 
           alglib::mincgrestartfrom(_state, _opt_var);
           IterationStats stat(*this);
@@ -872,7 +845,9 @@ namespace FEAT
           alglib::mincgresults(_state, _opt_var, _report);
 
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          {
             vec_sol_elements[i] = DataType(_opt_var[i]);
+          }
 
           switch(_report.terminationtype)
           {
@@ -931,50 +906,19 @@ namespace FEAT
         {
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
 
-          if(me->_num_iter>0)
+          // Because of how ALGLIB counts its iterations, we have to make sure we do not call this before the first
+          // functional evaluation (repnfev is the reported number of functional evaluations)
+          if(me->_state.c_ptr()->repnfev > 0)
           {
-            // first, let's see if we have to compute the defect at all
-            bool calc_def = false;
-            calc_def = calc_def || (me->_min_iter < me->_max_iter);
-            calc_def = calc_def || me->_plot;
-            calc_def = calc_def || (me->_min_stag_iter > Index(0));
-
-            // compute new defect
-            if(calc_def)
-            {
-              me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
-              Statistics::add_solver_expression(
-                std::make_shared<ExpressionDefect>(me->name(), me->_def_cur, me->get_num_iter()));
-            }
-
-            // plot?
-            if(me->_plot)
-            {
-              std::cout << me->_plot_name
-              <<  ": " << stringify(me->_num_iter).pad_front(me->_iter_digits)
-              <<  " (" << stringify(me->_state.c_ptr()->nfev).pad_front(2) << ")"
-              << " : " << stringify_fp_sci(me->_def_cur)
-              << " / " << stringify_fp_sci(me->_def_cur / me->_def_init)
-              << " : " << stringify_fp_sci(me->_state.c_ptr()->f)
-              << " : " << stringify_fp_sci(me->_state.c_ptr()->stp)
-              << std::endl;
-            }
-
-            // Log iterates if necessary
-            if(me->iterates != nullptr)
-            {
-              auto tmp = me->_vec_tmp.clone();
-              me->iterates->push_back(std::move(tmp));
-            }
-
+            me->_steplength = DataType(me->_state.c_ptr()->stp);
+            me->_ls_its = Index(me->_state.c_ptr()->nfev);
+            Status st = me->_set_new_defect(me->_vec_def, me->_vec_tmp);
             // Because ALGLIB knows no relative tolerance, we have to do it here
-            if( (me->_def_cur <= me->_tol_abs) && (me->_def_cur <= (me->_tol_rel * me->_def_init)) )
+            if( st != Status::progress  )
+            {
               alglib::mincgrequesttermination(me->_state);
-
+            }
           }
-
-          // increase iteration count
-          ++me->_num_iter;
 
         }
 
@@ -1004,23 +948,26 @@ namespace FEAT
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
+          {
             vec_tmp_elements[i] = DataType(x[i]);
+          }
 
-          DataType real_fval(0);
           // Prepare the operator
           me->_op.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
-          me->_op.eval_fval_grad(real_fval, me->_vec_def);
+          me->_op.eval_fval_grad(me->_fval, me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
-          fval = double(real_fval);
+          fval = double(me->_fval);
 
           // Copy the operator's gradient to ALGLIB's grad variable
           auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template
             elements<LAFEM::Perspective::pod>();
 
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
+          {
             grad[i] = double(vec_def_elements[i]);
+          }
 
         }
 

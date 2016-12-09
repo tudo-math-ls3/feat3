@@ -43,6 +43,27 @@ namespace FEAT
         return os << "?";
       }
     }
+
+    inline void operator<<(MultiGridCycle& cycle, const String& cycle_name)
+    {
+      if(cycle_name == "V")
+      {
+        cycle = MultiGridCycle::V;
+      }
+      else if(cycle_name == "W")
+      {
+        cycle = MultiGridCycle::W;
+      }
+      else if(cycle_name == "F")
+      {
+        cycle = MultiGridCycle::F;
+      }
+      else
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "Unknown MultiGridCycle identifier string "
+            +cycle_name);
+      }
+    }
     /// \endcond
 
     /**
@@ -899,6 +920,23 @@ namespace FEAT
       /// virtual destructor
       virtual ~MultiGrid()
       {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Get the cycle
+        auto cycle_p = section->query("cycle");
+        if(cycle_p.second)
+        {
+          MultiGridCycle my_cycle;
+          my_cycle << cycle_p.first;
+          set_cycle(my_cycle);
+        }
       }
 
       /**

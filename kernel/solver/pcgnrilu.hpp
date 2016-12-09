@@ -85,6 +85,40 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~PCGNRILU()
+      {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          set_fill_in_param(int(std::stoi(fill_in_param_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the fill-in parameter
+       *
+       * \param[in] p
+       * The new fill-in parameter
+       */
+      void set_fill_in_param(int p)
+      {
+        XASSERT(p >= -1);
+        _ilu_p = p;
+      }
+
       virtual String name() const override
       {
         return "PCGNRILU";

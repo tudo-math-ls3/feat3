@@ -26,6 +26,8 @@ namespace FEAT
       const Filter_& _filter;
       /// the scaling factor
       DataType _omega;
+      /// Our base class
+      typedef SolverBase<Vector_> BaseClass;
 
     public:
       /**
@@ -40,10 +42,45 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~ScalePrecond()
+      {
+      }
+
       /// Returns the name of the solver.
       virtual String name() const override
       {
         return "Scale";
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _krylov_vim
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      void set_omega(DataType omega)
+      {
+        XASSERT(omega > DataType(0));
+        _omega = omega;
       }
 
       /** \copydoc SolverBase::apply() */

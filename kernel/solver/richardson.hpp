@@ -72,9 +72,44 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~Richardson()
+      {
+      }
+
       virtual String name() const override
       {
         return "Richardson";
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _krylov_vim
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      void set_omega(DataType omega)
+      {
+        XASSERT(omega > DataType(0));
+        _omega = omega;
       }
 
       virtual void init_symbolic() override

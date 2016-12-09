@@ -49,12 +49,113 @@ namespace FEAT
       typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
       const FilterType& _filter;
       DataType _omega;
 
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] matrix
+       * The matrix to be used.
+       *
+       * \param[in] filter
+       * The filter to be used for the correction vector.
+       *
+       * \param[in] omega
+       * Damping
+       *
+       */
+      explicit SSORPrecond(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
+        _matrix(matrix),
+        _filter(filter),
+        _omega(omega)
+      {
+        if (_matrix.columns() != _matrix.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "SSOR";
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _krylov_vim
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      void set_omega(DataType omega)
+      {
+        XASSERT(omega > DataType(0));
+        _omega = omega;
+      }
+
+      virtual void init_symbolic() override
+      {
+      }
+
+      virtual void done_symbolic() override
+      {
+      }
+
+      virtual void init_numeric() override
+      {
+      }
+
+      virtual void done_numeric() override
+      {
+      }
+
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+      {
+        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+
+        TimeStamp ts_start;
+
+        // copy in-vector to out-vector
+        vec_cor.copy(vec_def);
+
+        _apply_intern(_matrix, vec_cor, vec_def);
+
+        vec_cor.scale(vec_cor, _omega * (DataType(2.0) - _omega));
+
+        this->_filter.filter_cor(vec_cor);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
+        Statistics::add_flops(_matrix.used_elements() *2 + 6 * vec_cor.size());
+
+        return Status::success;
+      }
+
+    protected:
       void _apply_intern(const LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
       {
         // create pointers
@@ -137,75 +238,6 @@ namespace FEAT
         }
       }
 
-    public:
-      /**
-       * \brief Constructor
-       *
-       * \param[in] matrix
-       * The matrix to be used.
-       *
-       * \param[in] filter
-       * The filter to be used for the correction vector.
-       *
-       * \param[in] omega
-       * Damping
-       *
-       */
-      explicit SSORPrecond(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
-        _matrix(matrix),
-        _filter(filter),
-        _omega(omega)
-      {
-        if (_matrix.columns() != _matrix.rows())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-      }
-
-      /// Returns the name of the solver.
-      virtual String name() const override
-      {
-        return "SSOR";
-      }
-
-      virtual void init_symbolic() override
-      {
-      }
-
-      virtual void done_symbolic() override
-      {
-      }
-
-      virtual void init_numeric() override
-      {
-      }
-
-      virtual void done_numeric() override
-      {
-      }
-
-      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
-      {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
-
-        TimeStamp ts_start;
-
-        // copy in-vector to out-vector
-        vec_cor.copy(vec_def);
-
-        _apply_intern(_matrix, vec_cor, vec_def);
-
-        vec_cor.scale(vec_cor, _omega * (DataType(2.0) - _omega));
-
-        this->_filter.filter_cor(vec_cor);
-
-        TimeStamp ts_stop;
-        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.used_elements() *2 + 6 * vec_cor.size());
-
-        return Status::success;
-      }
     }; // class SSORPrecond<SparseMatrixCSR<Mem::Main>>
 
     /**
@@ -232,6 +264,8 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -279,6 +313,34 @@ namespace FEAT
       virtual String name() const override
       {
         return "SSOR";
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _krylov_vim
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      void set_omega(DataType omega)
+      {
+        XASSERT(omega > DataType(0));
+        _omega = omega;
       }
 
       virtual void init_symbolic() override

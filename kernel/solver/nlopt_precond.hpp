@@ -83,6 +83,9 @@ namespace FEAT
          */
         virtual Status apply(VectorType& DOXY(vec_cor), const VectorType& DOXY(vec_def)) override = 0;
 
+        /**
+         * \brief Prints information
+         */
         virtual void print() const = 0;
 
     }; // class NLOptPrecond
@@ -147,6 +150,7 @@ namespace FEAT
           _op.prepare(vec_state);
         }
 
+        /// \copydoc BaseClass::init_numeric()
         virtual void init_numeric() override
         {
           _op.init_numeric();
@@ -165,6 +169,7 @@ namespace FEAT
           return st;
         }
 
+        /// \copydoc BaseClass::print()
         virtual void print() const override
         {
           Dist::Comm comm(Dist::Comm::world());

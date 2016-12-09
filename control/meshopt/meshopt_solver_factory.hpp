@@ -10,6 +10,7 @@
 #include <kernel/solver/linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/nlsd.hpp>
+#include <kernel/solver/nloptls.hpp>
 #include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/qpenalty.hpp>
@@ -473,6 +474,7 @@ namespace FEAT
           typename TransferLevelType_,
           typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVectorR
         >
+        //static std::shared_ptr<Solver::NLOptLS<typename SystemLevelType_::GlobalSystemMatrix, typename SystemLevelType_::GlobalSystemFilter>>
         static std::shared_ptr<Solver::IterativeSolver<SolverVectorType_>>
         create_nonlinear_optimiser( std::deque<SystemLevelType_*> & system_levels,
         std::deque<TransferLevelType_*>& transfer_levels, // unused except for passing to create_nonlinear_optimiser
@@ -487,13 +489,27 @@ namespace FEAT
           typedef typename SystemLevelType_::GlobalSystemFilter FilterType;
           typedef typename SolverVectorType_::DataType DataType;
 
-          std::shared_ptr<Solver::IterativeSolver<SolverVectorType_> > result;
+          //std::shared_ptr
+          //<
+          //  Solver::NLOptLS
+          //  <
+          //    typename SystemLevelType_::GlobalSystemMatrix,
+          //    typename SystemLevelType_::GlobalSystemFilter
+          //  >
+          //> result;
+
+          // At the end, we return this guy
+          std::shared_ptr<Solver::IterativeSolver<SolverVectorType_>> result;
 
           auto section = base->query_section(solver_name);
 
           auto solver_p = section->query("type");
           if (!solver_p.second)
-            throw InternalError(__func__, __FILE__, __LINE__, "no type key found in property map: " + solver_name + "!");
+          {
+            throw InternalError(__func__, __FILE__, __LINE__,
+            "no type key found in property map: " + solver_name + "!");
+          }
+
           String solver_type = solver_p.first;
 
           if(solver_type == "QPenalty")
@@ -504,20 +520,14 @@ namespace FEAT
             XASSERTM(inner_solver_p.second, "QPenalty solver section is missing mandatory inner_solver key.");
             XASSERTM(inner_solver_p.first != "QPenalty", "QPenalty cannot be the inner solver for QPenalty.");
 
-            std::shared_ptr<Solver::IterativeSolver<SolverVectorType_> > inner_solver(nullptr);
+            std::shared_ptr<Solver::IterativeSolver<SolverVectorType_>> inner_solver;
             inner_solver = create_nonlinear_optimiser(system_levels, transfer_levels, base, inner_solver_p.first,
             precon);
 
 
             DataType initial_penalty_param(1);
-            auto initial_penalty_param_p = section->query("initial_penalty_param");
-            if(initial_penalty_param_p.second)
-              initial_penalty_param = DataType(std::stod(initial_penalty_param_p.first));
-
             result = Solver::new_qpenalty(derefer<SolverVectorType_>
                 (system_levels.back()->op_sys, nullptr), inner_solver, initial_penalty_param);
-
-            configure_iterative_solver(section, result);
 
           }
           else if(solver_type == "ALGLIBMinLBFGS")
@@ -528,28 +538,20 @@ namespace FEAT
 #else
 
             if( Util::Comm::size() != 1)
+            {
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
+            }
 
-            // Default LBFGS update dimension is 0 so the constructor can choose is automatically.
-            alglib::ae_int_t lbfgs_dim(0);
-            auto lbfgs_dim_p = section->query("lbfgs_dim");
-            // Get LBFGS update dimension.
-            if(lbfgs_dim_p.second)
-              lbfgs_dim = alglib::ae_int_t(std::stoul(lbfgs_dim_p.first));
-
-            // Check if we have to keep the iterates
+            // Get some default parameters for the constructor
+            Index lbfgs_dim(0);
             bool keep_iterates(false);
-            auto keep_iterates_p = section->query("keep_iterates");
-            if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
-              keep_iterates = true;
 
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_alglib_minlbfgs(
-              derefer<SolverVectorType_>(system_levels.back()->op_sys, nullptr),
-              derefer<SolverVectorType_>(system_levels.back()->filter_sys, nullptr),
+            auto solver = Solver::new_alglib_minlbfgs(
+              derefer<SolverVectorType_>(system_levels.at(back_level)->op_sys, nullptr),
+              derefer<SolverVectorType_>(system_levels.at(back_level)->filter_sys, nullptr),
               lbfgs_dim,
               keep_iterates);
-            configure_iterative_solver(section, solver);
+
             result = solver;
 #endif // FEAT_HAVE_ALGLIB
           }
@@ -560,16 +562,13 @@ namespace FEAT
             "ALGLIBMinCG is only available if FEAT was built with the alglib token in the buildid.");
 #else
             if( Util::Comm::size() != 1)
+            {
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinCG is only available with 1 process!");
+            }
 
             // Get default direction update
             Solver::NLCGDirectionUpdate my_update(
               Solver::ALGLIBMinCG<OperatorType, FilterType>::direction_update_default);
-
-            // Get direction update
-            auto direction_update_p = section->query("direction_update");
-            if(direction_update_p.second)
-              my_update << direction_update_p.first;
 
             // Check if we have to keep the iterates
             bool keep_iterates(false);
@@ -577,13 +576,12 @@ namespace FEAT
             if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
               keep_iterates = true;
 
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_alglib_mincg(
-              derefer<SolverVectorType_>(system_levels.back()->op_sys, nullptr),
-              derefer<SolverVectorType_>(system_levels.back()->filter_sys, nullptr),
+            auto solver = Solver::new_alglib_mincg(
+              derefer<SolverVectorType_>(system_levels.at(back_level)->op_sys, nullptr),
+              derefer<SolverVectorType_>(system_levels.at(back_level)->filter_sys, nullptr),
               my_update,
               keep_iterates);
-            configure_iterative_solver(section, solver);
+            //configure_iterative_solver(section, solver);
             result = solver;
 #endif // FEAT_HAVE_ALGLIB
           }
@@ -591,16 +589,8 @@ namespace FEAT
           {
             // Get default direction update
             Solver::NLCGDirectionUpdate my_update(Solver::NLCG<OperatorType, FilterType>::direction_update_default);
-            // Get direction update
-            auto direction_update_p = section->query("direction_update");
-            if(direction_update_p.second)
-              my_update << direction_update_p.first;
-
-            // Check if we have to keep the iterates
+            // Set this to false for the constructor
             bool keep_iterates(false);
-            auto keep_iterates_p = section->query("keep_iterates");
-            if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
-              keep_iterates = true;
 
             std::shared_ptr<Solver::Linesearch
             <typename SystemLevelType_::GlobalQualityFunctional,
@@ -610,23 +600,28 @@ namespace FEAT
             String linesearch_name("StrongWolfeLinesearch");
             auto linesearch_p = section->query("linesearch");
             if(linesearch_p.second)
+            {
               linesearch_name = linesearch_p.first;
+            }
 
             my_linesearch = create_linesearch(system_levels, /* transfer_levels, */ base, linesearch_name);
 
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_nlcg(
-              derefer<SolverVectorType_>(system_levels.back()->op_sys, nullptr),
-              derefer<SolverVectorType_>(system_levels.back()->filter_sys, nullptr),
+            auto solver = Solver::new_nlcg(
+              derefer<SolverVectorType_>(system_levels.at(back_level)->op_sys, nullptr),
+              derefer<SolverVectorType_>(system_levels.at(back_level)->filter_sys, nullptr),
               my_linesearch,
               my_update,
               keep_iterates,
               precon);
-            configure_iterative_solver(section, solver);
             result = solver;
           }
           else
+          {
             throw InternalError(__func__,__FILE__,__LINE__,"Solver type key "+stringify(solver_type)+" unknown.");
+          }
+
+          result->read_config(section);
+
           return result;
         } // create_nonlinear_optimiser
 

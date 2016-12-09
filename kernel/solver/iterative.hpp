@@ -4,6 +4,8 @@
 
 // includes, FEAT
 #include <kernel/solver/base.hpp>
+#include <kernel/util/dist.hpp>
+#include <kernel/util/property_map.hpp>
 #include <kernel/util/statistics.hpp>
 
 namespace FEAT
@@ -289,6 +291,69 @@ namespace FEAT
       }
 
       /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section)
+      {
+
+        BaseClass::read_config(section);
+
+        Dist::Comm comm(Dist::Comm::world());
+
+        auto plot_p = section->get_entry("plot");
+        if (plot_p.second)
+        {
+          Index plot(std::stoul(plot_p.first));
+          if (plot == 0)
+          {
+            set_plot(false);
+          }
+          else if (plot == 1)
+          {
+            set_plot(comm.rank() == 0);
+          }
+          else
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "plot value " + stringify(plot) + " unknown!");
+          }
+        }
+
+        auto tol_abs_p = section->get_entry("tol_abs");
+        if (tol_abs_p.second)
+          set_tol_abs(DataType(std::stod(tol_abs_p.first)));
+
+        auto tol_rel_p = section->get_entry("tol_rel");
+        if (tol_rel_p.second)
+          set_tol_rel(DataType(std::stod(tol_rel_p.first)));
+
+        auto div_abs_p = section->get_entry("div_abs");
+        if (div_abs_p.second)
+          set_div_abs(DataType(std::stod(div_abs_p.first)));
+
+        auto div_rel_p = section->get_entry("div_rel");
+        if (div_rel_p.second)
+          set_div_rel(DataType(std::stod(div_rel_p.first)));
+
+        auto stag_rate_p = section->get_entry("stag_rate");
+        if (stag_rate_p.second)
+          set_stag_rate(DataType(std::stod(stag_rate_p.first)));
+
+        auto max_iter_p = section->get_entry("max_iter");
+        if (max_iter_p.second)
+          set_max_iter(Index(std::stoul(max_iter_p.first)));
+
+        auto min_iter_p = section->get_entry("min_iter");
+        if (min_iter_p.second)
+          set_min_iter(Index(std::stoul(min_iter_p.first)));
+
+        auto min_stag_iter_p = section->get_entry("min_stag_iter");
+        if (min_stag_iter_p.second)
+          set_min_stag_iter(Index(std::stoul(min_stag_iter_p.first)));
+
+      }
+
+
+      /**
        * \brief Solver correction method
        *
        * This method applies the solver represented by this object onto a given right-hand-side vector
@@ -309,6 +374,21 @@ namespace FEAT
        * A Status code that represents the status of the solution step.
        */
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) = 0;
+
+      /**
+       * \brief Plot a summary of the last solver run
+       */
+      virtual void plot_summary(Status st) const
+      {
+        // Print solver summary
+        Dist::Comm comm_world(Dist::Comm::world());
+
+        String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")");
+            msg += this->get_plot_name()  +": defect norm: "+stringify_fp_sci(this->_def_init)
+            + " -> "+stringify_fp_sci(this->_def_cur)
+            + ", reduction factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+            comm_world.print(msg);
+            }
 
     protected:
       /**

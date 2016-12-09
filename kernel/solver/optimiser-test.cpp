@@ -296,13 +296,13 @@ class NLSDTest:
 };
 
 NLSDTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f(float(0.5), Index(13), "SecantLinesearch", "ApproximateHessian");
+nlsd_hb_f(float(0.5), Index(18), "SecantLinesearch", "ApproximateHessian");
 
 NLSDTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 nlsd_rb_d(double(0.75), Index(20), "StrongWolfeLinesearch", "Hessian");
 
 NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
-nlsd_rb_d_sw(double(0.6), Index(10), "NewtonRaphsonLinesearch", "none");
+nlsd_rb_d_sw(double(0.6), Index(13), "NewtonRaphsonLinesearch", "none");
 
 #ifdef FEAT_HAVE_QUADMATH
 NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>

@@ -5,6 +5,7 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/nloptls.hpp>
 #include <kernel/solver/nlopt_precond.hpp>
 
 #include <deque>
@@ -85,16 +86,13 @@ namespace FEAT
      * \tparam Filter_
      * Filter to apply to the operator's gradient
      *
-     * \tparam Linesearch_
-     * Type of linesearch to use along the descent direction
-     *
      * See \cite NW06 for an overview of optimisation techniques.
      *
      * Possible update strategies for the search direction are Dai-Yuan \cite DY99, Fletcher-Reeves \cite FR64,
      * Hager-Zhang \cite HZ05, Hestenes-Stiefel \cite HS52 and Polak-Ribiere \cite PR64.
      */
     template<typename Operator_, typename Filter_>
-    class NLCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
+    class NLCG : public NLOptLS<Operator_, Filter_>
     {
       public:
         /// The nonlinear operator type
@@ -112,17 +110,13 @@ namespace FEAT
         typedef typename Operator_::DataType DataType;
 
         /// Our baseclass
-        typedef PreconditionedIterativeSolver<VectorType> BaseClass;
+        typedef NLOptLS<OperatorType, FilterType> BaseClass;
         /// Generic preconditioner
         typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
         /// Default search direction update
         static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::DYHSHybrid;
 
       protected:
-        /// Our nonlinear operator
-        Operator_& _op;
-        /// The filter we apply to the gradient
-        Filter_& _filter;
         /// The linesearch used along the descent direction
         std::shared_ptr<LinesearchType> _linesearch;
         /// This will be the preconditioner, or a nullptr. We need to save it ourselves because we cannot access the
@@ -142,16 +136,6 @@ namespace FEAT
         VectorType _vec_z;
         /// temporary vector: y[k+1] = r[k+1] - r[k]
         VectorType _vec_y;
-
-        /// Tolerance for function improvement
-        DataType _tol_fval;
-        /// Tolerance for the length of the update step
-        DataType _tol_step;
-
-        /// Current functional value
-        DataType _fval;
-        /// Functional value from the previous iteration
-        DataType _fval_prev;
 
         /// Maximum number of restarts triggered by the strong Wolfe conditions not holding
         Index _max_num_restarts;
@@ -190,25 +174,26 @@ namespace FEAT
         explicit NLCG(Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
         const NLCGDirectionUpdate du_ = direction_update_default,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
-          BaseClass("NLCG", precond),
-          _op(op_),
-          _filter(filter_),
+          BaseClass("NLCG", op_, filter_, precond),
           _linesearch(linesearch_),
           _precond(precond),
           _direction_update(du_),
-          _tol_fval(DataType(0)),
-          _tol_step(Math::eps<DataType>()),
           _max_num_restarts(10),
           _num_restarts(0),
-          _restart_freq(_op.columns() + Index(3)),
+          _restart_freq(0),
           iterates(nullptr)
           {
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
+            _restart_freq = this->_op.columns() + Index(3);
+
+            this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
 
             if(keep_iterates)
+            {
               iterates = new std::deque<VectorType>;
+            }
           }
 
         /**
@@ -219,6 +204,34 @@ namespace FEAT
           if(iterates != nullptr)
             delete iterates;
         }
+
+        /**
+         * \brief Reads a solver configuration from a PropertyMap
+         */
+        virtual void read_config(PropertyMap* section) override
+        {
+          BaseClass::read_config(section);
+
+          // Get direction update
+          auto direction_update_p = section->query("direction_update");
+          if(direction_update_p.second)
+          {
+            NLCGDirectionUpdate my_update;
+            my_update << direction_update_p.first;
+            set_direction_update(my_update);
+          }
+
+          // Check if we have to keep the iterates
+          bool keep_iterates(false);
+          auto keep_iterates_p = section->query("keep_iterates");
+          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+          {
+            keep_iterates = true;
+          }
+          set_keep_iterates(keep_iterates);
+
+        }
+
 
         /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
@@ -255,60 +268,6 @@ namespace FEAT
         virtual String name() const override
         {
           return "NLCG";
-        }
-
-        /**
-         * \brief Gets the tolerance for function value improvement
-         *
-         * The convergence check is against the maximum of the absolute and relative function value.
-         *
-         * \returns The function value improvement tolerance
-         */
-        DataType get_tol_fval()
-        {
-          return _tol_fval;
-        }
-
-        /**
-         * \brief Gets the tolerance for the linesearch step size
-         *
-         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so the NLSD has to be terminated.
-         *
-         * \returns The function value improvement tolerance
-         */
-        DataType get_tol_step()
-        {
-          return _tol_step;
-        }
-
-        /**
-         * \brief Sets the tolerance for function value improvement
-         *
-         * \param[in] tol_fval
-         * New tolerance for function value improvement.
-         *
-         * The convergence check is against the maximum of the absolute and relative function value.
-         *
-         */
-        void set_tol_fval(DataType tol_fval)
-        {
-          _tol_fval = tol_fval;
-        }
-
-        /**
-         * \brief Sets the tolerance for the linesearch step size
-         *
-         * \param[in] tol_step
-         * New tolerance for the linesearch step size.
-         *
-         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so the NLCG has to be terminated.
-         *
-         */
-        void set_tol_step(DataType tol_step)
-        {
-          _tol_step = tol_step;
         }
 
         /// \copydoc BaseClass::apply()
@@ -356,6 +315,45 @@ namespace FEAT
         }
 
         /**
+         * \brief Sets the iterates deque according to a bool
+         */
+        void set_keep_iterates(bool keep_iterates)
+        {
+          if(iterates != nullptr)
+          {
+            delete iterates;
+          }
+
+          if(keep_iterates)
+          {
+            iterates = new std::deque<VectorType>;
+          }
+
+        }
+
+        /**
+         * \brief Sets the restart frquency
+         *
+         */
+        void set_max_num_restarts(Index max_num_restarts)
+        {
+          XASSERT(_max_num_restarts > Index(1));
+
+          _max_num_restarts = max_num_restarts;
+        }
+
+        /**
+         * \brief Sets the restart frquency
+         *
+         */
+        void set_restart_freq(Index restart_freq)
+        {
+          XASSERT(_restart_freq > Index(1));
+
+          _restart_freq = restart_freq;
+        }
+
+        /**
          * \brief Sets the direction update method
          *
          * \param[in] update_
@@ -392,7 +390,9 @@ namespace FEAT
           _linesearch->reset();
 
           if(iterates != nullptr)
+          {
             iterates->push_back(std::move(vec_sol.clone()));
+          }
 
           // Set initial defect. The defect vector was calculated in the calling function
           Status status = this->_set_initial_defect(this->_vec_r, vec_sol);
@@ -463,7 +463,7 @@ namespace FEAT
             // \todo: fix this
             //FEAT::Statistics::reset_solver_statistics();
 
-            _fval_prev = _fval;
+            this->_fval_prev = this->_fval;
 
             this->_vec_y.copy(this->_vec_r);
 
@@ -476,12 +476,16 @@ namespace FEAT
 
             // Copy back information from the linesearch
             this->_fval = _linesearch->get_final_fval();
+            this->_ls_its = _linesearch->get_num_iter();
+            this->_steplength = _linesearch->get_rel_update();
             _linesearch->get_defect_from_grad(this->_vec_r);
             this->_vec_y.axpy(this->_vec_y, this->_vec_r, -DataType(1));
 
             // Log iterates if necessary
             if(iterates != nullptr)
+            {
               iterates->push_back(vec_sol.clone());
+            }
 
             // Compute defect norm. This also performs the convergence/divergence checks.
             status = this->_set_new_defect(this->_vec_r, vec_sol);
@@ -494,7 +498,9 @@ namespace FEAT
 
             // Update preconditioner if necessary
             if(this->_precond != nullptr)
+            {
               this->_precond->prepare(vec_sol, this->_filter);
+            }
 
             // apply preconditioner
             if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
@@ -518,14 +524,16 @@ namespace FEAT
               _num_restarts++;
             }
             else
+            {
               _num_restarts = Index(0);
+            }
 
             if(_restart_freq > Index(0) && this->_num_iter >= first_restart && its_since_restart%_restart_freq == 0)
-                {
-                  //info += " Scheduled restart";
-                  restart = true;
-                  its_since_restart = Index(0);
-                }
+            {
+              //info += " Scheduled restart";
+              restart = true;
+              its_since_restart = Index(0);
+            }
             // This needs to be done after all the checks
             ++its_since_restart;
 
@@ -537,9 +545,13 @@ namespace FEAT
             // We need to check beta again here as some direction updates might set it to zero
             // Discard the old search direction and perform (preconditioned) steepest descent
             if(beta == DataType(0))
-              this->_vec_p.copy(this->_vec_z);
+            {
+               this->_vec_p.copy(this->_vec_z);
+            }
             else
+            {
               this->_vec_p.axpy(this->_vec_p, this->_vec_z, beta);
+            }
 
             // First scale so that all entries are |.| < 1
             this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
@@ -628,85 +640,14 @@ namespace FEAT
          */
         virtual Status _set_new_defect(const VectorType& vec_r, const VectorType& vec_sol) override
         {
-          // increase iteration count
-          ++this->_num_iter;
 
-          // first, let's see if we have to compute the defect at all
-          bool calc_def = false;
-          calc_def = calc_def || (this->_min_iter < this->_max_iter);
-          calc_def = calc_def || this->_plot;
-          calc_def = calc_def || (this->_min_stag_iter > Index(0));
+          Status st = BaseClass::_set_new_defect(vec_r, vec_sol);
 
-          // compute new defect
-          if(calc_def)
-          {
-            this->_def_cur = this->_calc_def_norm(vec_r, vec_sol);
-            Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
-          }
-
-          //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
-
-          // plot?
-          if(this->_plot)
-          {
-
-            Index ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
-
-            std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            <<  " (" << stringify(this->_linesearch->get_num_iter()).pad_front(ls_iter_digits) << ")"
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " : " << stringify_fp_sci(this->_fval)
-            << " : " << stringify_fp_sci(this->_linesearch->get_rel_update())
-            << std::endl;
-          }
-
-          // ensure that the defect is neither NaN nor infinity
-          if(!Math::isfinite(this->_def_cur))
-            return Status::aborted;
-
-          // is diverged?
-          if(this->is_diverged())
-            return Status::diverged;
-
-          // minimum number of iterations performed?
-          if(this->_num_iter < this->_min_iter)
-            return Status::progress;
-
-          // maximum number of iterations performed?
-          if(this->_num_iter >= this->_max_iter)
-            return Status::max_iter;
-
-          // Check for convergence of the gradient norm
-          if(this->is_converged())
-            return Status::success;
-
-          // Check for convergence wrt. the function value improvement if _tol_fval says so
-          if(_tol_fval > DataType(0))
-          {
-            // This is the factor for the relative function value
-            DataType scale(Math::max(this->_fval, _fval_prev));
-            // Make sure it is at least 1
-            scale = Math::max(scale, DataType(1));
-            // Check for success
-            if(Math::abs(_fval_prev - this->_fval) <= _tol_fval*scale)
-              return Status::success;
-          }
-
-          if( (_linesearch->get_rel_update() <= this->_tol_step))
-          {
-            //std::cout << "update step stagnation: " << _linesearch->get_rel_update() << " <= " << this->_tol_step << std::endl;
-            //vec_sol.copy(_linesearch->get_initial_sol());
-            return Status::success;
-          }
+          if(st != Status::progress)
+            return st;
 
           // If there were too many subsequent restarts, the solver is stagnated
           if(_max_num_restarts > Index(0) && _num_restarts > _max_num_restarts)
-            return Status::stagnated;
-
-          // If there were too many stagnated iterations, the solver is stagnated
-          if(this->_min_stag_iter > 0 && this->_num_stag_iter > this->_min_stag_iter)
             return Status::stagnated;
 
           // continue iterating

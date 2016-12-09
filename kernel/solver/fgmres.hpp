@@ -96,6 +96,36 @@ namespace FEAT
           _h.at(i).resize(i+1);
       }
 
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~FGMRES()
+      {
+      }
+
+      /**
+       * \brief Reads a solver configuration from a PropertyMap
+       */
+      virtual void read_config(PropertyMap* section) override
+      {
+        BaseClass::read_config(section);
+
+        // Check if we have set _inner_res_scale
+        auto inner_res_scale_p = section->query("inner_res_scale");
+        if(inner_res_scale_p.second)
+        {
+          set_inner_res_scale(DataType(std::stod(inner_res_scale_p.first)));
+        }
+
+        // Check if we have set _krylov_vim
+        auto krylov_dim_p = section->query("krylov_dim");
+        if(krylov_dim_p.second)
+        {
+          set_krylov_dim(Index(std::stoul(krylov_dim_p.first)));
+        }
+      }
+
+      /// \copydoc BaseClass::name()
       virtual String name() const override
       {
         return "FGMRES";
@@ -119,6 +149,33 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
+      /**
+       * \brief Sets the inner Krylov space dimension
+       *
+       * \param[in] krylov_dim
+       * The k in FGMRES(k)
+       *
+       */
+      virtual void set_krylov_dim(Index krylov_dim)
+      {
+        XASSERT(krylov_dim > Index(0));
+        _krylov_dim = krylov_dim;
+      }
+
+      /**
+       * \brief Sets the inner residual scale
+       *
+       * \param[in] inner_res_scale
+       * Scaling parameter for convergence of the inner iteration
+       *
+       */
+      virtual void set_inner_res_scale(DataType inner_res_scale)
+      {
+        XASSERT(inner_res_scale >= DataType(0));
+        _inner_res_scale = inner_res_scale;
+      }
+
+      /// \copydoc BaseClass::apply()
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // save input rhs vector as initial defect
