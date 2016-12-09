@@ -55,6 +55,12 @@ namespace FEAT
         typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
         typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
 
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      using ContainerTypeByMDI = TupleDiagMatrix<
+        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
+        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = RestClass::num_row_blocks + 1;
       /// number of column blocks (horizontal size)

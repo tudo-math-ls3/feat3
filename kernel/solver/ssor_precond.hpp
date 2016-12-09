@@ -328,8 +328,12 @@ namespace FEAT
       public SolverBase<typename Matrix_::VectorTypeL>
     {
       public:
+      template<typename DT_>
+      explicit SSORPrecond(const Matrix_&, const Filter_&, const DT_)
+      {
+      }
 
-      explicit SSORPrecond(const Matrix_&, const Filter_&, const int = 0)
+      explicit SSORPrecond(const Matrix_&, const Filter_&)
       {
       }
 

@@ -214,9 +214,6 @@ namespace StokesPoiseuille2D
     // define our system level
     typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer level
-    typedef Control::StokesBasicTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
@@ -233,7 +230,6 @@ namespace StokesPoiseuille2D
 
     std::deque<SystemLevelType*> system_levels;
     std::deque<AssemblerLevelType*> asm_levels;
-    std::deque<TransferLevelType*> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
@@ -244,10 +240,6 @@ namespace StokesPoiseuille2D
     {
       asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
       system_levels.push_back(new SystemLevelType());
-      if(i > 0)
-      {
-        transfer_levels.push_back(new TransferLevelType(*system_levels.at(i-1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -284,11 +276,11 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling transfer matrices...");
+    comm.print("Assembling transfer operators...");
 
-    for(Index i(0); (i+1) < num_levels; ++i)
+    for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i+1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
@@ -309,32 +301,26 @@ namespace StokesPoiseuille2D
 
     comm.print("Creating solver tree");
     ////////// MATRIX STOCK
-    Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter, typename TransferLevelType::GlobalVeloTransferMatrix> matrix_stock_a;
+    Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter, typename SystemLevelType::GlobalVeloTransfer> matrix_stock_a;
     for (auto& system_level : system_levels)
     {
       matrix_stock_a.systems.push_back(system_level->matrix_a.clone(LAFEM::CloneMode::Shallow));
       matrix_stock_a.gates_row.push_back(&system_level->gate_velo);
       matrix_stock_a.gates_col.push_back(&system_level->gate_velo);
       matrix_stock_a.filters.push_back(system_level->filter_velo.clone(LAFEM::CloneMode::Shallow));
-    }
-    for (auto& transfer_level : transfer_levels)
-    {
-      matrix_stock_a.prolongations.push_back(transfer_level->prol_velo.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_a.restrictions.push_back(transfer_level->rest_velo.clone(LAFEM::CloneMode::Shallow));
+      matrix_stock_a.muxers.push_back(&system_level->coarse_muxer_velo);
+      matrix_stock_a.transfers.push_back(system_level->transfer_velo.clone(LAFEM::CloneMode::Shallow));
     }
 
-    Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, typename SystemLevelType::GlobalPresFilter, typename TransferLevelType::GlobalPresTransferMatrix> matrix_stock_s;
+    Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, typename SystemLevelType::GlobalPresFilter, typename SystemLevelType::GlobalPresTransfer> matrix_stock_s;
     for (auto& system_level : system_levels)
     {
       matrix_stock_s.systems.push_back(system_level->matrix_s.clone(LAFEM::CloneMode::Shallow));
       matrix_stock_s.gates_row.push_back(&system_level->gate_pres);
       matrix_stock_s.gates_col.push_back(&system_level->gate_pres);
       matrix_stock_s.filters.push_back(system_level->filter_pres.clone(LAFEM::CloneMode::Shallow));
-    }
-    for (auto& transfer_level : transfer_levels)
-    {
-      matrix_stock_s.prolongations.push_back(transfer_level->prol_pres.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_s.restrictions.push_back(transfer_level->rest_pres.clone(LAFEM::CloneMode::Shallow));
+      matrix_stock_s.muxers.push_back(&system_level->coarse_muxer_pres);
+      matrix_stock_s.transfers.push_back(system_level->transfer_pres.clone(LAFEM::CloneMode::Shallow));
     }
 
 
@@ -386,7 +372,7 @@ namespace StokesPoiseuille2D
     double solver_toe(at.elapsed_now());
 
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-      system_levels, transfer_levels, domain);
+      system_levels, domain);
 
     // release solver
     solver->done();
@@ -434,11 +420,6 @@ namespace StokesPoiseuille2D
     }
 
     // clean up
-    while(!transfer_levels.empty())
-    {
-      delete transfer_levels.back();
-      transfer_levels.pop_back();
-    }
     while(!system_levels.empty())
     {
       delete system_levels.back();
