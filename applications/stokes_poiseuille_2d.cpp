@@ -8,7 +8,7 @@
 #include <kernel/solver/legacy_preconditioners.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
-#include <kernel/solver/basic_vcycle.hpp>
+#include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcr.hpp>
@@ -212,9 +212,6 @@ namespace StokesPoiseuille2D
     // define our system level
     typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer level
-    typedef Control::StokesBasicTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
@@ -231,7 +228,6 @@ namespace StokesPoiseuille2D
 
     std::deque<SystemLevelType*> system_levels;
     std::deque<AssemblerLevelType*> asm_levels;
-    std::deque<TransferLevelType*> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
@@ -240,10 +236,6 @@ namespace StokesPoiseuille2D
     {
       asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
       system_levels.push_back(new SystemLevelType());
-      if(i > 0)
-      {
-        transfer_levels.push_back(new TransferLevelType(*system_levels.at(i-1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -282,9 +274,9 @@ namespace StokesPoiseuille2D
 
     comm.print("Assembling transfer matrices...");
 
-    for(Index i(0); (i+1) < num_levels; ++i)
+    for(Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i+1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
@@ -324,29 +316,30 @@ namespace StokesPoiseuille2D
     std::shared_ptr<Solver::SolverBase<GlobalPresVector>> solver_s(nullptr);
 
     // create a multigrid cycle A-solver
+    auto multigrid_hierarchy_a = std::make_shared<
+      Solver::MultiGridHierarchy<
+      typename SystemLevelType::GlobalMatrixBlockA,
+      typename SystemLevelType::GlobalVeloFilter,
+      typename SystemLevelType::GlobalVeloTransfer
+        > >();
+
     {
-      auto mgv = std::make_shared<
-        Solver::BasicVCycle<
-          typename SystemLevelType::GlobalMatrixBlockA,
-          typename SystemLevelType::GlobalVeloFilter,
-          typename TransferLevelType::GlobalVeloTransferMatrix
-        > > ();
+      // push levels into MGV
+      //for(auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
+      for (auto it = system_levels.rbegin(), jt = --system_levels.rend(); it != jt; ++it)
+      {
+        auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
+        multigrid_hierarchy_a->push_level((*it)->matrix_a, (*it)->filter_velo, (*it)->transfer_velo, smoother, smoother, smoother);
+      }
 
       // create coarse grid solver
       auto coarse_solver = Solver::new_jacobi_precond(system_levels.front()->matrix_a, system_levels.front()->filter_velo);
-      mgv->set_coarse_level(system_levels.front()->matrix_a, system_levels.front()->filter_velo, coarse_solver);
-
-      // push levels into MGV
-      auto jt = transfer_levels.begin();
-      for(auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
-      {
-        auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
-        mgv->push_level((*it)->matrix_a, (*it)->filter_velo, (*jt)->prol_velo, (*jt)->rest_velo, smoother, smoother);
-      }
+      multigrid_hierarchy_a->push_level(system_levels.front()->matrix_a, system_levels.front()->filter_velo, coarse_solver);
 
       // set our A-solver
-      solver_a = mgv;
+      solver_a = Solver::new_multigrid(multigrid_hierarchy_a, Solver::MultiGridCycle::V);
     }
+
 
     // create S-solver
     {
@@ -382,6 +375,7 @@ namespace StokesPoiseuille2D
     solver->set_max_iter(1000);
 
     // initialise
+    multigrid_hierarchy_a->init();
     solver->init();
 
     Statistics::reset();
@@ -394,10 +388,11 @@ namespace StokesPoiseuille2D
     double solver_toe(at.elapsed_now());
 
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-      system_levels, transfer_levels, domain);
+      system_levels, domain);
 
     // release solver
     solver->done();
+    multigrid_hierarchy_a->done();
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -440,11 +435,6 @@ namespace StokesPoiseuille2D
     }
 
     // clean up
-    while(!transfer_levels.empty())
-    {
-      delete transfer_levels.back();
-      transfer_levels.pop_back();
-    }
     while(!system_levels.empty())
     {
       delete system_levels.back();

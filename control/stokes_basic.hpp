@@ -22,6 +22,7 @@
 #include <kernel/lafem/power_diag_matrix.hpp>
 #include <kernel/lafem/power_col_matrix.hpp>
 #include <kernel/lafem/power_row_matrix.hpp>
+#include <kernel/lafem/transfer.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
@@ -32,10 +33,12 @@
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/global/gate.hpp>
+#include <kernel/global/muxer.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
+#include <kernel/global/transfer.hpp>
 #include <kernel/util/function_scheduler.hpp>
 
 #include <control/domain/domain_control.hpp>
@@ -49,7 +52,8 @@ namespace FEAT
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     struct StokesBasicSystemLevel
     {
       static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType mismatch!");
@@ -75,6 +79,17 @@ namespace FEAT
       typedef LocalScalarVector LocalPresVector;
       typedef LAFEM::TupleVector<LocalVeloVector, LocalPresVector> LocalSystemVector;
 
+      // define local transfer matrix types
+      typedef TransferMatrix_ LocalScalarTransferMatrix;
+      typedef LAFEM::PowerDiagMatrix<TransferMatrix_, dim_> LocalVeloTransferMatrix;
+      typedef TransferMatrix_ LocalPresTransferMatrix;
+      typedef LAFEM::TupleDiagMatrix<LocalVeloTransferMatrix, LocalPresTransferMatrix> LocalSystemTransferMatrix;
+
+      // define local transfer types
+      typedef LAFEM::Transfer<LocalVeloTransferMatrix> LocalVeloTransfer;
+      typedef LAFEM::Transfer<LocalPresTransferMatrix> LocalPresTransfer;
+      typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
+
       // define mirror types
       typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> ScalarMirror;
       typedef LAFEM::PowerMirror<ScalarMirror, dim> VeloMirror;
@@ -85,6 +100,11 @@ namespace FEAT
       typedef Global::Gate<LocalVeloVector, VeloMirror> VeloGate;
       typedef Global::Gate<LocalPresVector, PresMirror> PresGate;
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
+
+      // define muxers
+      typedef Global::Muxer<LocalVeloVector, VeloMirror> VeloMuxer;
+      typedef Global::Muxer<LocalPresVector, PresMirror> PresMuxer;
+      typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
 
       // define global vector types
       typedef Global::Vector<LocalVeloVector, VeloMirror> GlobalVeloVector;
@@ -98,12 +118,22 @@ namespace FEAT
       typedef Global::Matrix<LocalScalarMatrix, PresMirror, PresMirror> GlobalSchurMatrix;
       typedef Global::Matrix<LocalSystemMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
 
+      // define global transfer types
+      typedef Global::Transfer<LocalVeloTransfer, VeloMirror> GlobalVeloTransfer;
+      typedef Global::Transfer<LocalPresTransfer, PresMirror> GlobalPresTransfer;
+      typedef Global::Transfer<LocalSystemTransfer, SystemMirror> GlobalSystemTransfer;
+
       /* ***************************************************************************************** */
 
       // gates
       VeloGate gate_velo;
       PresGate gate_pres;
       SystemGate gate_sys;
+
+      /// our coarse-level system muxer
+      VeloMuxer coarse_muxer_velo;
+      PresMuxer coarse_muxer_pres;
+      SystemMuxer coarse_muxer_sys;
 
       // (global) matrices
       GlobalSystemMatrix matrix_sys;
@@ -112,12 +142,20 @@ namespace FEAT
       GlobalMatrixBlockD matrix_d;
       GlobalSchurMatrix matrix_s;
 
+      /// our global transfer operator
+      GlobalVeloTransfer transfer_velo;
+      GlobalPresTransfer transfer_pres;
+      GlobalSystemTransfer transfer_sys;
+
       StokesBasicSystemLevel() :
         matrix_sys(&gate_sys, &gate_sys),
         matrix_a(&gate_velo, &gate_velo),
         matrix_b(&gate_velo, &gate_pres),
         matrix_d(&gate_pres, &gate_velo),
-        matrix_s(&gate_pres, &gate_pres)
+        matrix_s(&gate_pres, &gate_pres),
+        transfer_velo(&coarse_muxer_velo),
+        transfer_pres(&coarse_muxer_pres),
+        transfer_sys(&coarse_muxer_sys)
       {
       }
 
@@ -125,12 +163,25 @@ namespace FEAT
       {
       }
 
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesBasicSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      void compile_system_transfer()
+      {
+        // clone content into our global transfer matrix
+        transfer_sys.get_mat_prol().template at<0,0>().clone(transfer_velo.get_mat_prol(), LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_rest().template at<0,0>().clone(transfer_velo.get_mat_rest(), LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_prol().template at<1,1>().clone(transfer_pres.get_mat_prol(), LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_rest().template at<1,1>().clone(transfer_pres.get_mat_rest(), LAFEM::CloneMode::Shallow);
+      }
+
+      template<typename M_, typename D_, typename I_, typename SM_, typename TM_>
+      void convert(const StokesBasicSystemLevel<dim_, M_, D_, I_, SM_, TM_> & other)
       {
         gate_velo.convert(other.gate_velo);
         gate_pres.convert(other.gate_pres);
         gate_sys.convert(other.gate_sys);
+
+        coarse_muxer_velo.convert(other.coarse_muxer_velo);
+        coarse_muxer_pres.convert(other.coarse_muxer_pres);
+        coarse_muxer_sys.convert(other.coarse_muxer_sys);
 
         matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
         matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
@@ -140,6 +191,9 @@ namespace FEAT
         (*matrix_sys).block_a() = (*matrix_a).clone(LAFEM::CloneMode::Shallow);
         (*matrix_sys).block_b() = (*matrix_b).clone(LAFEM::CloneMode::Shallow);
         (*matrix_sys).block_d() = (*matrix_d).clone(LAFEM::CloneMode::Shallow);
+
+        // clone content into our global transfer matrix
+        compile_system_transfer();
       }
     }; // struct StokesBasicSystemLevel<...>
 
@@ -248,74 +302,6 @@ namespace FEAT
         (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
       }
     }; // struct StokesUnitVeloNonePresSystemLevel<...>
-
-    template<typename SystemLevel_>
-    class StokesBasicTransferLevel
-    {
-    public:
-      typedef SystemLevel_ SystemLevel;
-      static constexpr int dim = SystemLevel_::dim;
-
-      typedef typename SystemLevel_::LocalScalarVector LocalScalarVector;
-      typedef typename SystemLevel_::LocalScalarMatrix LocalScalarMatrix;
-      typedef LAFEM::PowerDiagMatrix<LocalScalarMatrix, dim> LocalVeloTransferMatrix;
-      typedef LocalScalarMatrix LocalPresTransferMatrix;
-      typedef LAFEM::TupleDiagMatrix<LocalVeloTransferMatrix, LocalPresTransferMatrix> LocalSystemTransferMatrix;
-
-      typedef Global::Matrix<LocalVeloTransferMatrix, typename SystemLevel::VeloMirror, typename SystemLevel::VeloMirror> GlobalVeloTransferMatrix;
-      typedef Global::Matrix<LocalPresTransferMatrix, typename SystemLevel::PresMirror, typename SystemLevel::PresMirror> GlobalPresTransferMatrix;
-      typedef Global::Matrix<LocalSystemTransferMatrix, typename SystemLevel::SystemMirror, typename SystemLevel::SystemMirror> GlobalSystemTransferMatrix;
-
-      // (global) transfer matrices
-      GlobalVeloTransferMatrix prol_velo, rest_velo;
-      GlobalPresTransferMatrix prol_pres, rest_pres;
-      GlobalSystemTransferMatrix prol_sys, rest_sys;
-
-      explicit StokesBasicTransferLevel()
-      {
-      }
-
-      explicit StokesBasicTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
-        prol_velo(&lvl_fine.gate_velo, &lvl_coarse.gate_velo),
-        rest_velo(&lvl_coarse.gate_velo, &lvl_fine.gate_velo),
-        prol_pres(&lvl_fine.gate_pres, &lvl_coarse.gate_pres),
-        rest_pres(&lvl_coarse.gate_pres, &lvl_fine.gate_pres),
-        prol_sys(&lvl_fine.gate_sys, &lvl_coarse.gate_sys),
-        rest_sys(&lvl_coarse.gate_sys, &lvl_fine.gate_sys)
-      {
-      }
-
-      virtual ~StokesBasicTransferLevel()
-      {
-      }
-
-      /// \brief Returns the total amount of bytes allocated.
-      std::size_t bytes() const
-      {
-        return (*prol_sys).bytes() + (*rest_sys).bytes();
-      }
-
-      /**
-       *
-       * \brief Conversion method
-       *
-       * Use source StokesBasicTransferLevel content as content of current StokesBasicTransferLevel.
-       *
-       */
-      template <typename SL_>
-      void convert(SystemLevel_ & lvl_coarse, SystemLevel_ & lvl_fine, const StokesBasicTransferLevel<SL_> & other)
-      {
-        prol_velo.convert(&lvl_fine.gate_velo, &lvl_coarse.gate_velo, other.prol_velo);
-        rest_velo.convert(&lvl_coarse.gate_velo, &lvl_fine.gate_velo, other.rest_velo);
-        prol_pres.convert(&lvl_fine.gate_pres, &lvl_coarse.gate_pres, other.prol_pres);
-        rest_pres.convert(&lvl_coarse.gate_pres, &lvl_fine.gate_pres, other.rest_pres);
-
-        (*prol_sys).template at<0,0>() = (*prol_velo).clone(LAFEM::CloneMode::Shallow);
-        (*prol_sys).template at<1,1>() = (*prol_pres).clone(LAFEM::CloneMode::Shallow);
-        (*rest_sys).template at<0,0>() = (*rest_velo).clone(LAFEM::CloneMode::Shallow);
-        (*rest_sys).template at<1,1>() = (*rest_pres).clone(LAFEM::CloneMode::Shallow);
-      }
-    }; // struct StokesBasicTransferLevel<...>
 
     template<
       typename SpaceVelo_,
@@ -518,20 +504,22 @@ namespace FEAT
         (*sys_level.matrix_sys).block_d() = (*sys_level.matrix_d).clone(LAFEM::CloneMode::Shallow);
       }
 
-      template<typename TransferLevel_>
-      void assemble_velocity_transfer(TransferLevel_& trans_level, StokesBasicAssemblerLevel& level_coarse)
+      template<typename SystemLevel_>
+      void assemble_velocity_transfer(SystemLevel_& sys_level_fine, StokesBasicAssemblerLevel& level_coarse)
       {
-        // get global transfer matrices
-        typename TransferLevel_::GlobalVeloTransferMatrix& glob_prol_v = trans_level.prol_velo;
-        typename TransferLevel_::GlobalVeloTransferMatrix& glob_rest_v = trans_level.rest_velo;
+        // get global transfer operator
+        typename SystemLevel_::GlobalVeloTransfer& glob_trans = sys_level_fine.transfer_velo;
+
+        // get local transfer operator
+        typename SystemLevel_::LocalVeloTransfer& loc_trans = glob_trans.local();
 
         // get local transfer matrices
-        typename TransferLevel_::LocalVeloTransferMatrix& loc_prol_v = (*glob_prol_v);
-        typename TransferLevel_::LocalVeloTransferMatrix& loc_rest_v = (*glob_rest_v);
+        typename SystemLevel_::LocalVeloTransferMatrix& loc_prol_v = loc_trans.get_mat_prol();
+        typename SystemLevel_::LocalVeloTransferMatrix& loc_rest_v = loc_trans.get_mat_rest();
 
         // get the matrix blocks
-        typename TransferLevel_::LocalScalarMatrix& loc_prol_vx = loc_prol_v.get(0,0);
-        typename TransferLevel_::LocalScalarMatrix& loc_rest_vx = loc_rest_v.get(0,0);
+        typename SystemLevel_::LocalScalarTransferMatrix& loc_prol_vx = loc_prol_v.get(0,0);
+        typename SystemLevel_::LocalScalarTransferMatrix& loc_rest_vx = loc_rest_v.get(0,0);
 
         // assemble structure?
         if(loc_prol_vx.empty())
@@ -542,11 +530,8 @@ namespace FEAT
             loc_prol_v.get(i,i) = loc_prol_vx.clone(LAFEM::CloneMode::Layout);
         }
 
-        // create a global velocity weight vector
-        auto glob_vec_weight = glob_prol_v.create_vector_l();
-
         // get local velocity weight vector
-        auto& loc_vec_weight = (*glob_vec_weight);
+        typename SystemLevel_::LocalVeloVector loc_vec_weight = loc_prol_v.create_vector_l();
 
         // get local weight vector components
         auto& loc_vec_wx = loc_vec_weight.get(0);
@@ -563,7 +548,8 @@ namespace FEAT
           // synchronise weight vector
           for(int i(1); i < loc_vec_weight.num_blocks; ++i)
             loc_vec_weight.get(i).copy(loc_vec_wx);
-          glob_vec_weight.sync_0();
+
+          sys_level_fine.gate_velo.sync_0(loc_vec_weight);
 
           // invert components
           loc_vec_weight.component_invert(loc_vec_weight);
@@ -581,16 +567,18 @@ namespace FEAT
         }
       }
 
-      template<typename TransferLevel_>
-      void assemble_pressure_transfer(TransferLevel_& trans_level, StokesBasicAssemblerLevel& level_coarse)
+      template<typename SystemLevel_>
+      void assemble_pressure_transfer(SystemLevel_& sys_level_fine, StokesBasicAssemblerLevel& level_coarse)
       {
-        // get global transfer matrices
-        typename TransferLevel_::GlobalPresTransferMatrix& glob_prol_p = trans_level.prol_pres;
-        typename TransferLevel_::GlobalPresTransferMatrix& glob_rest_p = trans_level.rest_pres;
+        // get global transfer operator
+        typename SystemLevel_::GlobalPresTransfer& glob_trans = sys_level_fine.transfer_pres;
+
+        // get local transfer operator
+        typename SystemLevel_::LocalPresTransfer& loc_trans = glob_trans.local();
 
         // get local transfer matrices
-        typename TransferLevel_::LocalPresTransferMatrix& loc_prol_p = (*glob_prol_p);
-        typename TransferLevel_::LocalPresTransferMatrix& loc_rest_p = (*glob_rest_p);
+        typename SystemLevel_::LocalPresTransferMatrix& loc_prol_p = loc_trans.get_mat_prol();
+        typename SystemLevel_::LocalPresTransferMatrix& loc_rest_p = loc_trans.get_mat_rest();
 
         // assemble structure?
         if(loc_prol_p.empty())
@@ -598,11 +586,7 @@ namespace FEAT
           Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_p, this->space_pres, level_coarse.space_pres);
         }
 
-        // create a global pressure weight vector
-        auto glob_vec_weight = glob_prol_p.create_vector_l();
-
-        // get local pressure weight vector
-        auto& loc_vec_weight = (*glob_vec_weight);
+        typename SystemLevel_::LocalPresVector loc_vec_weight = loc_prol_p.create_vector_l();
 
         // assemble prolongation matrix
         {
@@ -614,7 +598,7 @@ namespace FEAT
             this->space_pres, level_coarse.space_pres, this->cubature);
 
           // synchronise weight vector
-          glob_vec_weight.sync_0();
+          sys_level_fine.gate_pres.sync_0(loc_vec_weight);
 
           // invert components
           loc_vec_weight.component_invert(loc_vec_weight);
@@ -627,17 +611,14 @@ namespace FEAT
         }
       }
 
-      template<typename TransferLevel_>
-      void assemble_system_transfer(TransferLevel_& trans_level, StokesBasicAssemblerLevel& level_coarse)
+      template<typename SystemLevel_>
+      void assemble_system_transfer(SystemLevel_& sys_level, StokesBasicAssemblerLevel& level_coarse)
       {
-        assemble_velocity_transfer(trans_level, level_coarse);
-        assemble_pressure_transfer(trans_level, level_coarse);
+        assemble_velocity_transfer(sys_level, level_coarse);
+        assemble_pressure_transfer(sys_level, level_coarse);
 
         // clone content into our global transfer matrix
-        (*trans_level.prol_sys).template at<0,0>() = (*trans_level.prol_velo).clone(LAFEM::CloneMode::Shallow);
-        (*trans_level.prol_sys).template at<1,1>() = (*trans_level.prol_pres).clone(LAFEM::CloneMode::Shallow);
-        (*trans_level.rest_sys).template at<0,0>() = (*trans_level.rest_velo).clone(LAFEM::CloneMode::Shallow);
-        (*trans_level.rest_sys).template at<1,1>() = (*trans_level.rest_pres).clone(LAFEM::CloneMode::Shallow);
+        sys_level.compile_system_transfer();
       }
 
       template<typename SolVector_>

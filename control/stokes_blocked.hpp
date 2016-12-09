@@ -170,8 +170,8 @@ namespace FEAT
         // clone content into our global transfer matrix
         transfer_sys.get_mat_prol().template at<0,0>().clone(transfer_velo.get_mat_prol(), LAFEM::CloneMode::Shallow);
         transfer_sys.get_mat_rest().template at<0,0>().clone(transfer_velo.get_mat_rest(), LAFEM::CloneMode::Shallow);
-        transfer_sys.get_mat_prol().template at<1,1>().clone(transfer_velo.get_mat_prol(), LAFEM::CloneMode::Shallow);
-        transfer_sys.get_mat_rest().template at<1,1>().clone(transfer_velo.get_mat_rest(), LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_prol().template at<1,1>().clone(transfer_pres.get_mat_prol(), LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_rest().template at<1,1>().clone(transfer_pres.get_mat_rest(), LAFEM::CloneMode::Shallow);
       }
 
       template<typename M_, typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
