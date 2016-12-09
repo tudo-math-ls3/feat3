@@ -376,8 +376,8 @@ namespace StokesPoiseuille2D
 
     // release solver
     solver->done();
-    matrix_stock_a.hierarchy_init();
-    matrix_stock_s.hierarchy_init();
+    matrix_stock_a.hierarchy_done();
+    matrix_stock_s.hierarchy_done();
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */

@@ -736,8 +736,8 @@ namespace NaverStokesCP2D
     }
   }; // class NavierStokesBlockedAssemblerLevel
 
-  template <typename SystemLevelType, typename TransferLevelType, typename MeshType>
-  void report_statistics(double t_total, std::deque<std::shared_ptr<SystemLevelType>> & system_levels, std::deque<std::shared_ptr<TransferLevelType>> & transfer_levels,
+  template <typename SystemLevelType,  typename MeshType>
+  void report_statistics(double t_total, std::deque<std::shared_ptr<SystemLevelType>> & system_levels,
       Control::Domain::DomainControl<MeshType>& domain)
   {
     const Dist::Comm& comm = *domain.get_layers().front()->get_comm();
@@ -755,7 +755,6 @@ namespace NaverStokesCP2D
 
     std::size_t la_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { la_size += n->bytes(); });
-    std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (std::shared_ptr<TransferLevelType> n) { la_size += n->bytes(); });
     std::size_t mpi_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { mpi_size += n->gate_sys.bytes(); });
     String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
@@ -898,9 +897,6 @@ namespace NaverStokesCP2D
     // define our velocity and pressure system levels
     typedef NavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer levels
-    typedef Control::StokesBlockedTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> VeloSpaceType;
@@ -917,7 +913,6 @@ namespace NaverStokesCP2D
 
     std::deque<std::shared_ptr<AssemblerLevelType>> asm_levels;
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
-    std::deque<std::shared_ptr<TransferLevelType>> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
@@ -930,10 +925,6 @@ namespace NaverStokesCP2D
     {
       asm_levels.push_back(std::make_shared<AssemblerLevelType>(*domain_levels.at(i)));
       system_levels.push_back(std::make_shared<SystemLevelType>());
-      if(i > 0)
-      {
-        transfer_levels.push_back(std::make_shared<TransferLevelType>(*system_levels.at(i-1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -970,12 +961,12 @@ namespace NaverStokesCP2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling transfer matrices...");
+    comm.print("Assembling transfer operators...");
 
-    for (Index i(0); (i + 1) < num_levels; ++i)
+    for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i+1)->assemble_velo_transfer(*transfer_levels.at(i), *asm_levels.at(i));
-      asm_levels.at(i+1)->assemble_pres_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_velo_transfer(*system_levels.at(i), *asm_levels.at(i-1));
+      asm_levels.at(i)->assemble_pres_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     /* ***************************************************************************************** */
@@ -1006,18 +997,15 @@ namespace NaverStokesCP2D
     comm.print("Setting up Velocity Multigrid...");
 
     Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter,
-      typename TransferLevelType::GlobalVeloTransferMatrix> matrix_stock_velo;
+      typename SystemLevelType::GlobalVeloTransfer> matrix_stock_velo;
     for (auto & system_level: system_levels)
     {
       matrix_stock_velo.systems.push_back(system_level->matrix_a.clone(LAFEM::CloneMode::Shallow));
       matrix_stock_velo.gates_row.push_back(&system_level->gate_velo);
       matrix_stock_velo.gates_col.push_back(&system_level->gate_velo);
       matrix_stock_velo.filters.push_back(system_level->filter_velo.clone(LAFEM::CloneMode::Shallow));
-    }
-    for (auto& transfer_level : transfer_levels)
-    {
-      matrix_stock_velo.prolongations.push_back(transfer_level->prol_velo.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_velo.restrictions.push_back(transfer_level->rest_velo.clone(LAFEM::CloneMode::Shallow));
+      matrix_stock_velo.muxers.push_back(&system_level->coarse_muxer_velo);
+      matrix_stock_velo.transfers.push_back(system_level->transfer_velo.clone(LAFEM::CloneMode::Shallow));
     }
 
     String solver_ini_name;
@@ -1036,18 +1024,15 @@ namespace NaverStokesCP2D
     comm.print("Setting up Pressure Multigrid...");
 
     Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, typename SystemLevelType::GlobalPresUnitFilter,
-      typename TransferLevelType::GlobalPresTransferMatrix> matrix_stock_pres;
+      typename SystemLevelType::GlobalPresTransfer> matrix_stock_pres;
     for (auto & system_level: system_levels)
     {
       matrix_stock_pres.systems.push_back(system_level->matrix_s.clone(LAFEM::CloneMode::Shallow));
       matrix_stock_pres.gates_row.push_back(&system_level->gate_pres);
       matrix_stock_pres.gates_col.push_back(&system_level->gate_pres);
       matrix_stock_pres.filters.push_back(system_level->filter_pres_unit.clone(LAFEM::CloneMode::Shallow));
-    }
-    for (auto& transfer_level : transfer_levels)
-    {
-      matrix_stock_pres.prolongations.push_back(transfer_level->prol_pres.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_pres.restrictions.push_back(transfer_level->rest_pres.clone(LAFEM::CloneMode::Shallow));
+      matrix_stock_pres.muxers.push_back(&system_level->coarse_muxer_pres);
+      matrix_stock_pres.transfers.push_back(system_level->transfer_pres.clone(LAFEM::CloneMode::Shallow));
     }
 
     auto tsolver_s = Control::SolverFactory::create_scalar_solver(matrix_stock_pres, &property_map, "linsolver_s");
@@ -1391,7 +1376,7 @@ namespace NaverStokesCP2D
 
     if (cfg.statistics)
     {
-      report_statistics(t_total, system_levels, transfer_levels, domain);
+      report_statistics(t_total, system_levels, domain);
     }
   }
 

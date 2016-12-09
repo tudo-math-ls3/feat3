@@ -1099,7 +1099,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_main_float_ulong.size() ; ++i)
             {
-              local_transfers_main_float_ulong.at(i).convert(*transfers_main_float_ulong.at(i));
+              local_transfers_main_float_ulong.at(i).convert(transfers_main_float_ulong.at(i).local());
             }
 
           }
@@ -1120,7 +1120,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_main_double_ulong.size() ; ++i)
             {
-              local_transfers_main_double_ulong.at(i).convert(*transfers_main_double_ulong.at(i));
+              local_transfers_main_double_ulong.at(i).convert(transfers_main_double_ulong.at(i).local());
             }
 
           }
@@ -1142,7 +1142,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_cuda_float_ulong.size() ; ++i)
             {
-              local_transfers_cuda_float_ulong.at(i).convert(*transfers_cuda_float_ulong.at(i));
+              local_transfers_cuda_float_ulong.at(i).convert(transfers_cuda_float_ulong.at(i).local());
             }
 
           }
@@ -1163,7 +1163,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_cuda_double_ulong.size() ; ++i)
             {
-              local_transfers_cuda_double_ulong.at(i).convert(*transfers_cuda_double_ulong.at(i));
+              local_transfers_cuda_double_ulong.at(i).convert(transfers_cuda_double_ulong.at(i).local());
             }
 
           }
@@ -1185,7 +1185,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_main_float_uint.size() ; ++i)
             {
-              local_transfers_main_float_uint.at(i).convert(*transfers_main_float_uint.at(i));
+              local_transfers_main_float_uint.at(i).convert(transfers_main_float_uint.at(i).local());
             }
 
           }
@@ -1206,7 +1206,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_main_double_uint.size() ; ++i)
             {
-              local_transfers_main_double_uint.at(i).convert(*transfers_main_double_uint.at(i));
+              local_transfers_main_double_uint.at(i).convert(transfers_main_double_uint.at(i).local());
             }
 
           }
@@ -1228,7 +1228,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_cuda_float_uint.size() ; ++i)
             {
-              local_transfers_cuda_float_uint.at(i).convert(*transfers_cuda_float_uint.at(i));
+              local_transfers_cuda_float_uint.at(i).convert(transfers_cuda_float_uint.at(i).local());
             }
 
           }
@@ -1249,7 +1249,7 @@ namespace FEAT
 
             for (Index i(0) ; i < transfers_cuda_double_uint.size() ; ++i)
             {
-              local_transfers_cuda_double_uint.at(i).convert(*transfers_cuda_double_uint.at(i));
+              local_transfers_cuda_double_uint.at(i).convert(transfers_cuda_double_uint.at(i).local());
             }
 
           }
