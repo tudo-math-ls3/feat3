@@ -30,13 +30,15 @@ namespace FEAT
         using GateRowType_ = typename MatrixType_::GateRowType;
         using GateColType_ = typename MatrixType_::GateColType;
 
+        using MuxerType = typename TransferType_::MuxerType;
+
         // input deques with original containers
         std::deque<MatrixType_> systems;
         std::deque<GateRowType_*> gates_row;
         std::deque<GateColType_*> gates_col;
+        std::deque<MuxerType*> muxers;
         std::deque<FilterType_> filters;
-        std::deque<TransferType_> prolongations;
-        std::deque<TransferType_> restrictions;
+        std::deque<TransferType_> transfers;
 
         using MT_main_float_ulong = typename MatrixType_::template ContainerTypeByMDI<Mem::Main, float, unsigned long>;
         using MT_main_double_ulong = typename MatrixType_::template ContainerTypeByMDI<Mem::Main, double, unsigned long>;
@@ -52,11 +54,11 @@ namespace FEAT
         using FT_cuda_double_ulong = typename FilterType_::template FilterTypeByMDI<Mem::CUDA, double, unsigned long>;
 #endif
 
-        using TT_main_float_ulong = typename TransferType_::template ContainerTypeByMDI<Mem::Main, float, unsigned long>;
-        using TT_main_double_ulong = typename TransferType_::template ContainerTypeByMDI<Mem::Main, double, unsigned long>;
+        using TT_main_float_ulong = typename TransferType_::template TransferTypeByMDI<Mem::Main, float, unsigned long>;
+        using TT_main_double_ulong = typename TransferType_::template TransferTypeByMDI<Mem::Main, double, unsigned long>;
 #ifdef FEAT_HAVE_CUDA
-        using TT_cuda_float_ulong = typename TransferType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned long>;
-        using TT_cuda_double_ulong = typename TransferType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned long>;
+        using TT_cuda_float_ulong = typename TransferType_::template TransferTypeByMDI<Mem::CUDA, float, unsigned long>;
+        using TT_cuda_double_ulong = typename TransferType_::template TransferTypeByMDI<Mem::CUDA, double, unsigned long>;
 #endif
 
         using GT_row_main_float_ulong = typename GateRowType_::template GateTypeByMDI<Mem::Main, float, unsigned long>;
@@ -68,6 +70,13 @@ namespace FEAT
         using GT_col_cuda_float_ulong = typename GateColType_::template GateTypeByMDI<Mem::CUDA, float, unsigned long>;
         using GT_row_cuda_double_ulong = typename GateRowType_::template GateTypeByMDI<Mem::CUDA, double, unsigned long>;
         using GT_col_cuda_double_ulong = typename GateColType_::template GateTypeByMDI<Mem::CUDA, double, unsigned long>;
+#endif
+
+        using MXT_main_float_ulong = typename MuxerType::template MuxerTypeByMDI<Mem::Main, float, unsigned long>;
+        using MXT_main_double_ulong = typename MuxerType::template MuxerTypeByMDI<Mem::Main, double, unsigned long>;
+#ifdef FEAT_HAVE_CUDA
+        using MXT_cuda_float_ulong = typename MuxerType::template MuxerTypeByMDI<Mem::CUDA, float, unsigned long>;
+        using MXT_cuda_double_ulong = typename MuxerType::template MuxerTypeByMDI<Mem::CUDA, double, unsigned long>;
 #endif
 
         using MT_main_float_uint = typename MatrixType_::template ContainerTypeByMDI<Mem::Main, float, unsigned int>;
@@ -84,11 +93,11 @@ namespace FEAT
         using FT_cuda_double_uint = typename FilterType_::template FilterTypeByMDI<Mem::CUDA, double, unsigned int>;
 #endif
 
-        using TT_main_float_uint = typename TransferType_::template ContainerTypeByMDI<Mem::Main, float, unsigned int>;
-        using TT_main_double_uint = typename TransferType_::template ContainerTypeByMDI<Mem::Main, double, unsigned int>;
+        using TT_main_float_uint = typename TransferType_::template TransferTypeByMDI<Mem::Main, float, unsigned int>;
+        using TT_main_double_uint = typename TransferType_::template TransferTypeByMDI<Mem::Main, double, unsigned int>;
 #ifdef FEAT_HAVE_CUDA
-        using TT_cuda_float_uint = typename TransferType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned int>;
-        using TT_cuda_double_uint = typename TransferType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned int>;
+        using TT_cuda_float_uint = typename TransferType_::template TransferTypeByMDI<Mem::CUDA, float, unsigned int>;
+        using TT_cuda_double_uint = typename TransferType_::template TransferTypeByMDI<Mem::CUDA, double, unsigned int>;
 #endif
 
         using GT_row_main_float_uint = typename GateRowType_::template GateTypeByMDI<Mem::Main, float, unsigned int>;
@@ -100,6 +109,13 @@ namespace FEAT
         using GT_col_cuda_float_uint = typename GateColType_::template GateTypeByMDI<Mem::CUDA, float, unsigned int>;
         using GT_row_cuda_double_uint = typename GateRowType_::template GateTypeByMDI<Mem::CUDA, double, unsigned int>;
         using GT_col_cuda_double_uint = typename GateColType_::template GateTypeByMDI<Mem::CUDA, double, unsigned int>;
+#endif
+
+        using MXT_main_float_uint = typename MuxerType::template MuxerTypeByMDI<Mem::Main, float, unsigned int>;
+        using MXT_main_double_uint = typename MuxerType::template MuxerTypeByMDI<Mem::Main, double, unsigned int>;
+#ifdef FEAT_HAVE_CUDA
+        using MXT_cuda_float_uint = typename MuxerType::template MuxerTypeByMDI<Mem::CUDA, float, unsigned int>;
+        using MXT_cuda_double_uint = typename MuxerType::template MuxerTypeByMDI<Mem::CUDA, double, unsigned int>;
 #endif
 
         std::deque<MT_main_float_ulong> systems_main_float_ulong;
@@ -116,18 +132,11 @@ namespace FEAT
         std::deque<FT_cuda_double_ulong> filters_cuda_double_ulong;
 #endif
 
-        std::deque<TT_main_float_ulong> prolongations_main_float_ulong;
-        std::deque<TT_main_double_ulong> prolongations_main_double_ulong;
+        std::deque<TT_main_float_ulong> transfers_main_float_ulong;
+        std::deque<TT_main_double_ulong> transfers_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<TT_cuda_float_ulong> prolongations_cuda_float_ulong;
-        std::deque<TT_cuda_double_ulong> prolongations_cuda_double_ulong;
-#endif
-
-        std::deque<TT_main_float_ulong> restrictions_main_float_ulong;
-        std::deque<TT_main_double_ulong> restrictions_main_double_ulong;
-#ifdef FEAT_HAVE_CUDA
-        std::deque<TT_cuda_float_ulong> restrictions_cuda_float_ulong;
-        std::deque<TT_cuda_double_ulong> restrictions_cuda_double_ulong;
+        std::deque<TT_cuda_float_ulong> transfers_cuda_float_ulong;
+        std::deque<TT_cuda_double_ulong> transfers_cuda_double_ulong;
 #endif
 
         std::deque<std::shared_ptr<GT_row_main_float_ulong>> gates_row_main_float_ulong;
@@ -141,11 +150,18 @@ namespace FEAT
         std::deque<std::shared_ptr<GT_col_cuda_double_ulong>> gates_col_cuda_double_ulong;
 #endif
 
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_ulong, FT_main_float_ulong, TT_main_float_ulong, TT_main_float_ulong> > > hierarchy_map_main_float_ulong;
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_ulong, FT_main_double_ulong, TT_main_double_ulong, TT_main_double_ulong> > > hierarchy_map_main_double_ulong;
+        std::deque<std::shared_ptr<MXT_main_float_ulong>> muxers_main_float_ulong;
+        std::deque<std::shared_ptr<MXT_main_double_ulong>> muxers_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_ulong, FT_cuda_float_ulong, TT_cuda_float_ulong, TT_cuda_float_ulong> > > hierarchy_map_cuda_float_ulong;
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_ulong, FT_cuda_double_ulong, TT_cuda_double_ulong, TT_cuda_double_ulong> > > hierarchy_map_cuda_double_ulong;
+        std::deque<std::shared_ptr<MXT_cuda_float_ulong>> muxers_cuda_float_ulong;
+        std::deque<std::shared_ptr<MXT_cuda_double_ulong>> muxers_cuda_double_ulong;
+#endif
+
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_ulong, FT_main_float_ulong, TT_main_float_ulong> > > hierarchy_map_main_float_ulong;
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_ulong, FT_main_double_ulong, TT_main_double_ulong> > > hierarchy_map_main_double_ulong;
+#ifdef FEAT_HAVE_CUDA
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_ulong, FT_cuda_float_ulong, TT_cuda_float_ulong> > > hierarchy_map_cuda_float_ulong;
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_ulong, FT_cuda_double_ulong, TT_cuda_double_ulong> > > hierarchy_map_cuda_double_ulong;
 #endif
 
         std::deque<typename MT_main_float_ulong::LocalMatrix> local_systems_main_float_ulong;
@@ -162,32 +178,25 @@ namespace FEAT
         std::deque<typename FT_cuda_double_ulong::LocalFilter> local_filters_cuda_double_ulong;
 #endif
 
-        std::deque<typename TT_main_float_ulong::LocalMatrix> local_prolongations_main_float_ulong;
-        std::deque<typename TT_main_double_ulong::LocalMatrix> local_prolongations_main_double_ulong;
+        std::deque<typename TT_main_float_ulong::LocalTransfer> local_transfers_main_float_ulong;
+        std::deque<typename TT_main_double_ulong::LocalTransfer> local_transfers_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename TT_cuda_float_ulong::LocalMatrix> local_prolongations_cuda_float_ulong;
-        std::deque<typename TT_cuda_double_ulong::LocalMatrix> local_prolongations_cuda_double_ulong;
-#endif
-
-        std::deque<typename TT_main_float_ulong::LocalMatrix> local_restrictions_main_float_ulong;
-        std::deque<typename TT_main_double_ulong::LocalMatrix> local_restrictions_main_double_ulong;
-#ifdef FEAT_HAVE_CUDA
-        std::deque<typename TT_cuda_float_ulong::LocalMatrix> local_restrictions_cuda_float_ulong;
-        std::deque<typename TT_cuda_double_ulong::LocalMatrix> local_restrictions_cuda_double_ulong;
+        std::deque<typename TT_cuda_float_ulong::LocalTransfer> local_transfers_cuda_float_ulong;
+        std::deque<typename TT_cuda_double_ulong::LocalTransfer> local_transfers_cuda_double_ulong;
 #endif
 
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_float_ulong::LocalMatrix, typename FT_main_float_ulong::LocalFilter, typename TT_main_float_ulong::LocalMatrix, typename TT_main_float_ulong::LocalMatrix>
+          typename MT_main_float_ulong::LocalMatrix, typename FT_main_float_ulong::LocalFilter, typename TT_main_float_ulong::LocalTransfer>
           > > local_hierarchy_map_main_float_ulong;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_double_ulong::LocalMatrix, typename FT_main_double_ulong::LocalFilter, typename TT_main_double_ulong::LocalMatrix, typename TT_main_double_ulong::LocalMatrix>
+          typename MT_main_double_ulong::LocalMatrix, typename FT_main_double_ulong::LocalFilter, typename TT_main_double_ulong::LocalTransfer>
           > > local_hierarchy_map_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_float_ulong::LocalMatrix, typename FT_cuda_float_ulong::LocalFilter, typename TT_cuda_float_ulong::LocalMatrix, typename TT_cuda_float_ulong::LocalMatrix>
+          typename MT_cuda_float_ulong::LocalMatrix, typename FT_cuda_float_ulong::LocalFilter, typename TT_cuda_float_ulong::LocalTransfer>
           > > local_hierarchy_map_cuda_float_ulong;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_double_ulong::LocalMatrix, typename FT_cuda_double_ulong::LocalFilter, typename TT_cuda_double_ulong::LocalMatrix, typename TT_cuda_double_ulong::LocalMatrix>
+          typename MT_cuda_double_ulong::LocalMatrix, typename FT_cuda_double_ulong::LocalFilter, typename TT_cuda_double_ulong::LocalTransfer>
           > > local_hierarchy_map_cuda_double_ulong;
 #endif
 
@@ -205,18 +214,11 @@ namespace FEAT
         std::deque<FT_cuda_double_uint> filters_cuda_double_uint;
 #endif
 
-        std::deque<TT_main_float_uint> prolongations_main_float_uint;
-        std::deque<TT_main_double_uint> prolongations_main_double_uint;
+        std::deque<TT_main_float_uint> transfers_main_float_uint;
+        std::deque<TT_main_double_uint> transfers_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<TT_cuda_float_uint> prolongations_cuda_float_uint;
-        std::deque<TT_cuda_double_uint> prolongations_cuda_double_uint;
-#endif
-
-        std::deque<TT_main_float_uint> restrictions_main_float_uint;
-        std::deque<TT_main_double_uint> restrictions_main_double_uint;
-#ifdef FEAT_HAVE_CUDA
-        std::deque<TT_cuda_float_uint> restrictions_cuda_float_uint;
-        std::deque<TT_cuda_double_uint> restrictions_cuda_double_uint;
+        std::deque<TT_cuda_float_uint> transfers_cuda_float_uint;
+        std::deque<TT_cuda_double_uint> transfers_cuda_double_uint;
 #endif
 
         std::deque<std::shared_ptr<GT_row_main_float_uint>> gates_row_main_float_uint;
@@ -230,11 +232,18 @@ namespace FEAT
         std::deque<std::shared_ptr<GT_col_cuda_double_uint>> gates_col_cuda_double_uint;
 #endif
 
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_uint, FT_main_float_uint, TT_main_float_uint, TT_main_float_uint> > > hierarchy_map_main_float_uint;
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_uint, FT_main_double_uint, TT_main_double_uint, TT_main_double_uint> > > hierarchy_map_main_double_uint;
+        std::deque<std::shared_ptr<MXT_main_float_uint>> muxers_main_float_uint;
+        std::deque<std::shared_ptr<MXT_main_double_uint>> muxers_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_uint, FT_cuda_float_uint, TT_cuda_float_uint, TT_cuda_float_uint> > > hierarchy_map_cuda_float_uint;
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_uint, FT_cuda_double_uint, TT_cuda_double_uint, TT_cuda_double_uint> > > hierarchy_map_cuda_double_uint;
+        std::deque<std::shared_ptr<MXT_cuda_float_uint>> muxers_cuda_float_uint;
+        std::deque<std::shared_ptr<MXT_cuda_double_uint>> muxers_cuda_double_uint;
+#endif
+
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_uint, FT_main_float_uint, TT_main_float_uint> > > hierarchy_map_main_float_uint;
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_uint, FT_main_double_uint, TT_main_double_uint> > > hierarchy_map_main_double_uint;
+#ifdef FEAT_HAVE_CUDA
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_uint, FT_cuda_float_uint, TT_cuda_float_uint> > > hierarchy_map_cuda_float_uint;
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_uint, FT_cuda_double_uint, TT_cuda_double_uint> > > hierarchy_map_cuda_double_uint;
 #endif
 
         std::deque<typename MT_main_float_uint::LocalMatrix> local_systems_main_float_uint;
@@ -251,32 +260,25 @@ namespace FEAT
         std::deque<typename FT_cuda_double_uint::LocalFilter> local_filters_cuda_double_uint;
 #endif
 
-        std::deque<typename TT_main_float_uint::LocalMatrix> local_prolongations_main_float_uint;
-        std::deque<typename TT_main_double_uint::LocalMatrix> local_prolongations_main_double_uint;
+        std::deque<typename TT_main_float_uint::LocalTransfer> local_transfers_main_float_uint;
+        std::deque<typename TT_main_double_uint::LocalTransfer> local_transfers_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename TT_cuda_float_uint::LocalMatrix> local_prolongations_cuda_float_uint;
-        std::deque<typename TT_cuda_double_uint::LocalMatrix> local_prolongations_cuda_double_uint;
-#endif
-
-        std::deque<typename TT_main_float_uint::LocalMatrix> local_restrictions_main_float_uint;
-        std::deque<typename TT_main_double_uint::LocalMatrix> local_restrictions_main_double_uint;
-#ifdef FEAT_HAVE_CUDA
-        std::deque<typename TT_cuda_float_uint::LocalMatrix> local_restrictions_cuda_float_uint;
-        std::deque<typename TT_cuda_double_uint::LocalMatrix> local_restrictions_cuda_double_uint;
+        std::deque<typename TT_cuda_float_uint::LocalTransfer> local_transfers_cuda_float_uint;
+        std::deque<typename TT_cuda_double_uint::LocalTransfer> local_transfers_cuda_double_uint;
 #endif
 
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_float_uint::LocalMatrix, typename FT_main_float_uint::LocalFilter, typename TT_main_float_uint::LocalMatrix, typename TT_main_float_uint::LocalMatrix>
+          typename MT_main_float_uint::LocalMatrix, typename FT_main_float_uint::LocalFilter, typename TT_main_float_uint::LocalTransfer>
           > > local_hierarchy_map_main_float_uint;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_double_uint::LocalMatrix, typename FT_main_double_uint::LocalFilter, typename TT_main_double_uint::LocalMatrix, typename TT_main_double_uint::LocalMatrix>
+          typename MT_main_double_uint::LocalMatrix, typename FT_main_double_uint::LocalFilter, typename TT_main_double_uint::LocalTransfer>
           > > local_hierarchy_map_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_float_uint::LocalMatrix, typename FT_cuda_float_uint::LocalFilter, typename TT_cuda_float_uint::LocalMatrix, typename TT_cuda_float_uint::LocalMatrix>
+          typename MT_cuda_float_uint::LocalMatrix, typename FT_cuda_float_uint::LocalFilter, typename TT_cuda_float_uint::LocalTransfer>
           > > local_hierarchy_map_cuda_float_uint;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_double_uint::LocalMatrix, typename FT_cuda_double_uint::LocalFilter, typename TT_cuda_double_uint::LocalMatrix, typename TT_cuda_double_uint::LocalMatrix>
+          typename MT_cuda_double_uint::LocalMatrix, typename FT_cuda_double_uint::LocalFilter, typename TT_cuda_double_uint::LocalTransfer>
           > > local_hierarchy_map_cuda_double_uint;
 #endif
 
@@ -319,12 +321,16 @@ namespace FEAT
               filters_main_float_ulong.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_main_float_ulong.emplace_back();
-              prolongations_main_float_ulong.back().convert(gates_row_main_float_ulong.at(i+1).get(), gates_col_main_float_ulong.at(i).get(), prolongations.at(i));
-              restrictions_main_float_ulong.emplace_back();
-              restrictions_main_float_ulong.back().convert(gates_row_main_float_ulong.at(i).get(), gates_col_main_float_ulong.at(i+1).get(), restrictions.at(i));
+              muxers_main_float_ulong.emplace_back(std::make_shared<MXT_main_float_ulong>());
+              muxers_main_float_ulong.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_main_float_ulong.emplace_back();
+              transfers_main_float_ulong.back().convert(muxers_main_float_ulong.at(i).get(), transfers.at(i));
             }
           }
 
@@ -359,12 +365,16 @@ namespace FEAT
               filters_main_double_ulong.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_main_double_ulong.emplace_back();
-              prolongations_main_double_ulong.back().convert(gates_row_main_double_ulong.at(i+1).get(), gates_col_main_double_ulong.at(i).get(), prolongations.at(i));
-              restrictions_main_double_ulong.emplace_back();
-              restrictions_main_double_ulong.back().convert(gates_row_main_double_ulong.at(i).get(), gates_col_main_double_ulong.at(i+1).get(), restrictions.at(i));
+              muxers_main_double_ulong.emplace_back(std::make_shared<MXT_main_double_ulong>());
+              muxers_main_double_ulong.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_main_double_ulong.emplace_back();
+              transfers_main_double_ulong.back().convert(muxers_main_double_ulong.at(i).get(), transfers.at(i));
             }
           }
 
@@ -400,12 +410,16 @@ namespace FEAT
               filters_cuda_float_ulong.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_cuda_float_ulong.emplace_back();
-              prolongations_cuda_float_ulong.back().convert(gates_row_cuda_float_ulong.at(i+1).get(), gates_col_cuda_float_ulong.at(i).get(), prolongations.at(i));
-              restrictions_cuda_float_ulong.emplace_back();
-              restrictions_cuda_float_ulong.back().convert(gates_row_cuda_float_ulong.at(i).get(), gates_col_cuda_float_ulong.at(i+1).get(), restrictions.at(i));
+              muxers_cuda_float_ulong.emplace_back(std::make_shared<MXT_cuda_float_ulong>());
+              muxers_cuda_float_ulong.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_cuda_float_ulong.emplace_back();
+              transfers_cuda_float_ulong.back().convert(muxers_cuda_float_ulong.at(i).get(), transfers.at(i));
             }
           }
 
@@ -440,12 +454,16 @@ namespace FEAT
               filters_cuda_double_ulong.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_cuda_double_ulong.emplace_back();
-              prolongations_cuda_double_ulong.back().convert(gates_row_cuda_double_ulong.at(i+1).get(), gates_col_cuda_double_ulong.at(i).get(), prolongations.at(i));
-              restrictions_cuda_double_ulong.emplace_back();
-              restrictions_cuda_double_ulong.back().convert(gates_row_cuda_double_ulong.at(i).get(), gates_col_cuda_double_ulong.at(i+1).get(), restrictions.at(i));
+              muxers_cuda_double_ulong.emplace_back(std::make_shared<MXT_cuda_double_ulong>());
+              muxers_cuda_double_ulong.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_cuda_double_ulong.emplace_back();
+              transfers_cuda_double_ulong.back().convert(muxers_cuda_double_ulong.at(i).get(), transfers.at(i));
             }
           }
 #endif
@@ -481,12 +499,16 @@ namespace FEAT
               filters_main_float_uint.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_main_float_uint.emplace_back();
-              prolongations_main_float_uint.back().convert(gates_row_main_float_uint.at(i+1).get(), gates_col_main_float_uint.at(i).get(), prolongations.at(i));
-              restrictions_main_float_uint.emplace_back();
-              restrictions_main_float_uint.back().convert(gates_row_main_float_uint.at(i).get(), gates_col_main_float_uint.at(i+1).get(), restrictions.at(i));
+              muxers_main_float_uint.emplace_back(std::make_shared<MXT_main_float_uint>());
+              muxers_main_float_uint.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_main_float_uint.emplace_back();
+              transfers_main_float_uint.back().convert(muxers_main_float_uint.at(i).get(), transfers.at(i));
             }
           }
 
@@ -521,12 +543,16 @@ namespace FEAT
               filters_main_double_uint.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_main_double_uint.emplace_back();
-              prolongations_main_double_uint.back().convert(gates_row_main_double_uint.at(i+1).get(), gates_col_main_double_uint.at(i).get(), prolongations.at(i));
-              restrictions_main_double_uint.emplace_back();
-              restrictions_main_double_uint.back().convert(gates_row_main_double_uint.at(i).get(), gates_col_main_double_uint.at(i+1).get(), restrictions.at(i));
+              muxers_main_double_uint.emplace_back(std::make_shared<MXT_main_double_uint>());
+              muxers_main_double_uint.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_main_double_uint.emplace_back();
+              transfers_main_double_uint.back().convert(muxers_main_double_uint.at(i).get(), transfers.at(i));
             }
           }
 
@@ -562,12 +588,16 @@ namespace FEAT
               filters_cuda_float_uint.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_cuda_float_uint.emplace_back();
-              prolongations_cuda_float_uint.back().convert(gates_row_cuda_float_uint.at(i+1).get(), gates_col_cuda_float_uint.at(i).get(), prolongations.at(i));
-              restrictions_cuda_float_uint.emplace_back();
-              restrictions_cuda_float_uint.back().convert(gates_row_cuda_float_uint.at(i).get(), gates_col_cuda_float_uint.at(i+1).get(), restrictions.at(i));
+              muxers_cuda_float_uint.emplace_back(std::make_shared<MXT_cuda_float_uint>());
+              muxers_cuda_float_uint.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_cuda_float_uint.emplace_back();
+              transfers_cuda_float_uint.back().convert(muxers_cuda_float_uint.at(i).get(), transfers.at(i));
             }
           }
 
@@ -602,12 +632,16 @@ namespace FEAT
               filters_cuda_double_uint.back().convert(filter);
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for(auto & muxer : muxers)
             {
-              prolongations_cuda_double_uint.emplace_back();
-              prolongations_cuda_double_uint.back().convert(gates_row_cuda_double_uint.at(i+1).get(), gates_col_cuda_double_uint.at(i).get(), prolongations.at(i));
-              restrictions_cuda_double_uint.emplace_back();
-              restrictions_cuda_double_uint.back().convert(gates_row_cuda_double_uint.at(i).get(), gates_col_cuda_double_uint.at(i+1).get(), restrictions.at(i));
+              muxers_cuda_double_uint.emplace_back(std::make_shared<MXT_cuda_double_uint>());
+              muxers_cuda_double_uint.back()->convert(*muxer);
+            }
+
+            for (Index i(0) ; i < transfers.size() ; ++i)
+            {
+              transfers_cuda_double_uint.emplace_back();
+              transfers_cuda_double_uint.back().convert(muxers_cuda_double_uint.at(i).get(), transfers.at(i));
             }
           }
 #endif
@@ -638,15 +672,11 @@ namespace FEAT
               local_filters_main_float_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_main_float_ulong)
+            for (auto& transfer : transfers_main_float_ulong)
             {
-              local_prolongations_main_float_ulong.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_main_float_ulong.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_main_float_ulong)
-            {
-              local_restrictions_main_float_ulong.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 
           else if (typeid(Mem_) == typeid(Mem::Main) && typeid(DT_) == typeid(double) && typeid(IT_) == typeid(unsigned long))
@@ -666,15 +696,11 @@ namespace FEAT
               local_filters_main_double_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_main_double_ulong)
+            for (auto& transfer : transfers_main_double_ulong)
             {
-              local_prolongations_main_double_ulong.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_main_double_ulong.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_main_double_ulong)
-            {
-              local_restrictions_main_double_ulong.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 
 #ifdef FEAT_HAVE_CUDA
@@ -695,15 +721,11 @@ namespace FEAT
               local_filters_cuda_float_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_cuda_float_ulong)
+            for (auto& transfer : transfers_cuda_float_ulong)
             {
-              local_prolongations_cuda_float_ulong.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_cuda_float_ulong.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_cuda_float_ulong)
-            {
-              local_restrictions_cuda_float_ulong.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 
           else if (typeid(Mem_) == typeid(Mem::CUDA) && typeid(DT_) == typeid(double) && typeid(IT_) == typeid(unsigned long))
@@ -723,15 +745,11 @@ namespace FEAT
               local_filters_cuda_double_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_cuda_double_ulong)
+            for (auto& transfer : transfers_cuda_double_ulong)
             {
-              local_prolongations_cuda_double_ulong.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_cuda_double_ulong.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_cuda_double_ulong)
-            {
-              local_restrictions_cuda_double_ulong.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 #endif
 
@@ -752,15 +770,11 @@ namespace FEAT
               local_filters_main_float_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_main_float_uint)
+            for (auto& transfer : transfers_main_float_uint)
             {
-              local_prolongations_main_float_uint.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_main_float_uint.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_main_float_uint)
-            {
-              local_restrictions_main_float_uint.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 
           else if (typeid(Mem_) == typeid(Mem::Main) && typeid(DT_) == typeid(double) && typeid(IT_) == typeid(unsigned int))
@@ -780,15 +794,11 @@ namespace FEAT
               local_filters_main_double_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_main_double_uint)
+            for (auto& transfer : transfers_main_double_uint)
             {
-              local_prolongations_main_double_uint.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_main_double_uint.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_main_double_uint)
-            {
-              local_restrictions_main_double_uint.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 
 #ifdef FEAT_HAVE_CUDA
@@ -809,15 +819,11 @@ namespace FEAT
               local_filters_cuda_float_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_cuda_float_uint)
+            for (auto& transfer : transfers_cuda_float_uint)
             {
-              local_prolongations_cuda_float_uint.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_cuda_float_uint.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_cuda_float_uint)
-            {
-              local_restrictions_cuda_float_uint.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 
           else if (typeid(Mem_) == typeid(Mem::CUDA) && typeid(DT_) == typeid(double) && typeid(IT_) == typeid(unsigned int))
@@ -837,15 +843,11 @@ namespace FEAT
               local_filters_cuda_double_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& prolongation : prolongations_cuda_double_uint)
+            for (auto& transfer : transfers_cuda_double_uint)
             {
-              local_prolongations_cuda_double_uint.push_back((*prolongation).clone(LAFEM::CloneMode::Shallow));
+              local_transfers_cuda_double_uint.push_back(transfer.local().clone(LAFEM::CloneMode::Shallow));
             }
 
-            for (auto& restriction : restrictions_cuda_double_uint)
-            {
-              local_restrictions_cuda_double_uint.push_back((*restriction).clone(LAFEM::CloneMode::Shallow));
-            }
           }
 #endif
         }
@@ -875,10 +877,9 @@ namespace FEAT
               filters_main_float_ulong.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_main_float_ulong.at(i).convert(gates_row_main_float_ulong.at(i+1).get(), gates_col_main_float_ulong.at(i).get(), prolongations.at(i));
-              restrictions_main_float_ulong.at(i).convert(gates_row_main_float_ulong.at(i).get(), gates_col_main_float_ulong.at(i+1).get(), restrictions.at(i));
+              transfers_main_float_ulong.at(i).convert(muxers_main_float_ulong.at(i).get(), transfers.at(i));
             }
           }
 
@@ -904,10 +905,9 @@ namespace FEAT
               filters_main_double_ulong.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_main_double_ulong.at(i).convert(gates_row_main_double_ulong.at(i+1).get(), gates_col_main_double_ulong.at(i).get(), prolongations.at(i));
-              restrictions_main_double_ulong.at(i).convert(gates_row_main_double_ulong.at(i).get(), gates_col_main_double_ulong.at(i+1).get(), restrictions.at(i));
+              transfers_main_double_ulong.at(i).convert(muxers_main_double_ulong.at(i).get(), transfers.at(i));
             }
           }
 
@@ -934,10 +934,9 @@ namespace FEAT
               filters_cuda_float_ulong.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_cuda_float_ulong.at(i).convert(gates_row_cuda_float_ulong.at(i+1).get(), gates_col_cuda_float_ulong.at(i).get(), prolongations.at(i));
-              restrictions_cuda_float_ulong.at(i).convert(gates_row_cuda_float_ulong.at(i).get(), gates_col_cuda_float_ulong.at(i+1).get(), restrictions.at(i));
+              transfers_cuda_float_ulong.at(i).convert(muxers_cuda_float_ulong.at(i).get(), transfers.at(i));
             }
           }
 
@@ -963,10 +962,9 @@ namespace FEAT
               filters_cuda_double_ulong.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_cuda_double_ulong.at(i).convert(gates_row_cuda_double_ulong.at(i+1).get(), gates_col_cuda_double_ulong.at(i).get(), prolongations.at(i));
-              restrictions_cuda_double_ulong.at(i).convert(gates_row_cuda_double_ulong.at(i).get(), gates_col_cuda_double_ulong.at(i+1).get(), restrictions.at(i));
+              transfers_cuda_double_ulong.at(i).convert(muxers_cuda_double_ulong.at(i).get(), transfers.at(i));
             }
           }
 #endif
@@ -993,10 +991,9 @@ namespace FEAT
               filters_main_float_uint.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_main_float_uint.at(i).convert(gates_row_main_float_uint.at(i+1).get(), gates_col_main_float_uint.at(i).get(), prolongations.at(i));
-              restrictions_main_float_uint.at(i).convert(gates_row_main_float_uint.at(i).get(), gates_col_main_float_uint.at(i+1).get(), restrictions.at(i));
+              transfers_main_float_uint.at(i).convert(muxers_main_float_uint.at(i).get(), transfers.at(i));
             }
           }
 
@@ -1022,10 +1019,9 @@ namespace FEAT
               filters_main_double_uint.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_main_double_uint.at(i).convert(gates_row_main_double_uint.at(i+1).get(), gates_col_main_double_uint.at(i).get(), prolongations.at(i));
-              restrictions_main_double_uint.at(i).convert(gates_row_main_double_uint.at(i).get(), gates_col_main_double_uint.at(i+1).get(), restrictions.at(i));
+              transfers_main_double_uint.at(i).convert(muxers_main_double_uint.at(i).get(), transfers.at(i));
             }
           }
 
@@ -1052,10 +1048,9 @@ namespace FEAT
               filters_cuda_float_uint.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_cuda_float_uint.at(i).convert(gates_row_cuda_float_uint.at(i+1).get(), gates_col_cuda_float_uint.at(i).get(), prolongations.at(i));
-              restrictions_cuda_float_uint.at(i).convert(gates_row_cuda_float_uint.at(i).get(), gates_col_cuda_float_uint.at(i+1).get(), restrictions.at(i));
+              transfers_cuda_float_uint.at(i).convert(muxers_cuda_float_uint.at(i).get(), transfers.at(i));
             }
           }
 
@@ -1081,10 +1076,9 @@ namespace FEAT
               filters_cuda_double_uint.at(i).convert(filters.at(i));
             }
 
-            for (Index i(0) ; i < prolongations.size() ; ++i)
+            for (Index i(0) ; i < transfers.size() ; ++i)
             {
-              prolongations_cuda_double_uint.at(i).convert(gates_row_cuda_double_uint.at(i+1).get(), gates_col_cuda_double_uint.at(i).get(), prolongations.at(i));
-              restrictions_cuda_double_uint.at(i).convert(gates_row_cuda_double_uint.at(i).get(), gates_col_cuda_double_uint.at(i+1).get(), restrictions.at(i));
+              transfers_cuda_double_uint.at(i).convert(muxers_cuda_double_uint.at(i).get(), transfers.at(i));
             }
           }
 #endif
@@ -1103,15 +1097,11 @@ namespace FEAT
               local_filters_main_float_ulong.at(i).convert(*filters_main_float_ulong.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_main_float_ulong.size() ; ++i)
+            for (Index i(0) ; i < transfers_main_float_ulong.size() ; ++i)
             {
-              local_prolongations_main_float_ulong.at(i).convert(*prolongations_main_float_ulong.at(i));
+              local_transfers_main_float_ulong.at(i).convert(*transfers_main_float_ulong.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_main_float_ulong.size() ; ++i)
-            {
-              local_restrictions_main_float_ulong.at(i).convert(*restrictions_main_float_ulong.at(i));
-            }
           }
 
           if (! local_systems_main_double_ulong.empty())
@@ -1128,15 +1118,11 @@ namespace FEAT
               local_filters_main_double_ulong.at(i).convert(*filters_main_double_ulong.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_main_double_ulong.size() ; ++i)
+            for (Index i(0) ; i < transfers_main_double_ulong.size() ; ++i)
             {
-              local_prolongations_main_double_ulong.at(i).convert(*prolongations_main_double_ulong.at(i));
+              local_transfers_main_double_ulong.at(i).convert(*transfers_main_double_ulong.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_main_double_ulong.size() ; ++i)
-            {
-              local_restrictions_main_double_ulong.at(i).convert(*restrictions_main_double_ulong.at(i));
-            }
           }
 
 #ifdef FEAT_HAVE_CUDA
@@ -1154,15 +1140,11 @@ namespace FEAT
               local_filters_cuda_float_ulong.at(i).convert(*filters_cuda_float_ulong.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_cuda_float_ulong.size() ; ++i)
+            for (Index i(0) ; i < transfers_cuda_float_ulong.size() ; ++i)
             {
-              local_prolongations_cuda_float_ulong.at(i).convert(*prolongations_cuda_float_ulong.at(i));
+              local_transfers_cuda_float_ulong.at(i).convert(*transfers_cuda_float_ulong.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_cuda_float_ulong.size() ; ++i)
-            {
-              local_restrictions_cuda_float_ulong.at(i).convert(*restrictions_cuda_float_ulong.at(i));
-            }
           }
 
           if (! local_systems_cuda_double_ulong.empty())
@@ -1179,15 +1161,11 @@ namespace FEAT
               local_filters_cuda_double_ulong.at(i).convert(*filters_cuda_double_ulong.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_cuda_double_ulong.size() ; ++i)
+            for (Index i(0) ; i < transfers_cuda_double_ulong.size() ; ++i)
             {
-              local_prolongations_cuda_double_ulong.at(i).convert(*prolongations_cuda_double_ulong.at(i));
+              local_transfers_cuda_double_ulong.at(i).convert(*transfers_cuda_double_ulong.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_cuda_double_ulong.size() ; ++i)
-            {
-              local_restrictions_cuda_double_ulong.at(i).convert(*restrictions_cuda_double_ulong.at(i));
-            }
           }
 #endif
 
@@ -1205,15 +1183,11 @@ namespace FEAT
               local_filters_main_float_uint.at(i).convert(*filters_main_float_uint.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_main_float_uint.size() ; ++i)
+            for (Index i(0) ; i < transfers_main_float_uint.size() ; ++i)
             {
-              local_prolongations_main_float_uint.at(i).convert(*prolongations_main_float_uint.at(i));
+              local_transfers_main_float_uint.at(i).convert(*transfers_main_float_uint.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_main_float_uint.size() ; ++i)
-            {
-              local_restrictions_main_float_uint.at(i).convert(*restrictions_main_float_uint.at(i));
-            }
           }
 
           if (! local_systems_main_double_uint.empty())
@@ -1230,15 +1204,11 @@ namespace FEAT
               local_filters_main_double_uint.at(i).convert(*filters_main_double_uint.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_main_double_uint.size() ; ++i)
+            for (Index i(0) ; i < transfers_main_double_uint.size() ; ++i)
             {
-              local_prolongations_main_double_uint.at(i).convert(*prolongations_main_double_uint.at(i));
+              local_transfers_main_double_uint.at(i).convert(*transfers_main_double_uint.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_main_double_uint.size() ; ++i)
-            {
-              local_restrictions_main_double_uint.at(i).convert(*restrictions_main_double_uint.at(i));
-            }
           }
 
 #ifdef FEAT_HAVE_CUDA
@@ -1256,15 +1226,11 @@ namespace FEAT
               local_filters_cuda_float_uint.at(i).convert(*filters_cuda_float_uint.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_cuda_float_uint.size() ; ++i)
+            for (Index i(0) ; i < transfers_cuda_float_uint.size() ; ++i)
             {
-              local_prolongations_cuda_float_uint.at(i).convert(*prolongations_cuda_float_uint.at(i));
+              local_transfers_cuda_float_uint.at(i).convert(*transfers_cuda_float_uint.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_cuda_float_uint.size() ; ++i)
-            {
-              local_restrictions_cuda_float_uint.at(i).convert(*restrictions_cuda_float_uint.at(i));
-            }
           }
 
           if (! local_systems_cuda_double_uint.empty())
@@ -1281,15 +1247,11 @@ namespace FEAT
               local_filters_cuda_double_uint.at(i).convert(*filters_cuda_double_uint.at(i));
             }
 
-            for (Index i(0) ; i < prolongations_cuda_double_uint.size() ; ++i)
+            for (Index i(0) ; i < transfers_cuda_double_uint.size() ; ++i)
             {
-              local_prolongations_cuda_double_uint.at(i).convert(*prolongations_cuda_double_uint.at(i));
+              local_transfers_cuda_double_uint.at(i).convert(*transfers_cuda_double_uint.at(i));
             }
 
-            for (Index i(0) ; i < restrictions_cuda_double_uint.size() ; ++i)
-            {
-              local_restrictions_cuda_double_uint.at(i).convert(*restrictions_cuda_double_uint.at(i));
-            }
           }
 #endif
         }
@@ -1985,431 +1947,219 @@ namespace FEAT
 #endif
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_main_float_ulong;
+            return this->transfers_main_float_ulong;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               ...)
           {
-            return this->local_prolongations_main_float_ulong;
+            return this->local_transfers_main_float_ulong;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_main_double_ulong;
+            return this->transfers_main_double_ulong;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               ...)
           {
-            return this->local_prolongations_main_double_ulong;
+            return this->local_transfers_main_double_ulong;
           }
 
 #ifdef FEAT_HAVE_CUDA
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_cuda_float_ulong;
+            return this->transfers_cuda_float_ulong;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               ...)
           {
-            return this->local_prolongations_cuda_float_ulong;
+            return this->local_transfers_cuda_float_ulong;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_cuda_double_ulong;
+            return this->transfers_cuda_double_ulong;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
               ...)
           {
-            return this->local_prolongations_cuda_double_ulong;
+            return this->local_transfers_cuda_double_ulong;
           }
 #endif
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_main_float_uint;
+            return this->transfers_main_float_uint;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               ...)
           {
-            return this->local_prolongations_main_float_uint;
+            return this->local_transfers_main_float_uint;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_main_double_uint;
+            return this->transfers_main_double_uint;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               ...)
           {
-            return this->local_prolongations_main_double_uint;
+            return this->local_transfers_main_double_uint;
           }
 
 #ifdef FEAT_HAVE_CUDA
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_cuda_float_uint;
+            return this->transfers_cuda_float_uint;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               ...)
           {
-            return this->local_prolongations_cuda_float_uint;
+            return this->local_transfers_cuda_float_uint;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               typename SolverVectorType_::GateType *)
           {
-            return this->prolongations_cuda_double_uint;
+            return this->transfers_cuda_double_uint;
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
-          get_prolongations(
+          get_transfers(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
               ...)
           {
-            return this->local_prolongations_cuda_double_uint;
+            return this->local_transfers_cuda_double_uint;
           }
 #endif
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_main_float_ulong;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_main_float_ulong;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_main_double_ulong;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_main_double_ulong;
-          }
-
-#ifdef FEAT_HAVE_CUDA
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_cuda_float_ulong;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_cuda_float_ulong;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_cuda_double_ulong;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned long>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_cuda_double_ulong;
-          }
-#endif
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_main_float_uint;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_main_float_uint;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_main_double_uint;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_main_double_uint;
-          }
-
-#ifdef FEAT_HAVE_CUDA
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_cuda_float_uint;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_cuda_float_uint;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              typename SolverVectorType_::GateType *)
-          {
-            return this->restrictions_cuda_double_uint;
-          }
-
-        template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
-                                                                    typename SolverVectorType_::DataType,
-                                                                    typename SolverVectorType_::IndexType> > &
-          get_restrictions(
-              typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
-              typename std::enable_if<std::is_same<typename SolverVectorType_::IndexType, unsigned int>::value>::type *,
-              ...)
-          {
-            return this->local_restrictions_cuda_double_uint;
-          }
-#endif
-
-        template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_ulong, FT_main_float_ulong, TT_main_float_ulong, TT_main_float_ulong> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_ulong, FT_main_float_ulong, TT_main_float_ulong> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2423,8 +2173,8 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_main_float_ulong::LocalMatrix,
           typename FT_main_float_ulong::LocalFilter,
-          typename TT_main_float_ulong::LocalMatrix,
-          typename TT_main_float_ulong::LocalMatrix> > > &
+          typename TT_main_float_ulong::LocalTransfer
+          > > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2435,7 +2185,7 @@ namespace FEAT
         }
 
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_ulong, FT_main_double_ulong, TT_main_double_ulong, TT_main_double_ulong> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_ulong, FT_main_double_ulong, TT_main_double_ulong> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2449,8 +2199,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_main_double_ulong::LocalMatrix,
           typename FT_main_double_ulong::LocalFilter,
-          typename TT_main_double_ulong::LocalMatrix,
-          typename TT_main_double_ulong::LocalMatrix> > > &
+          typename TT_main_double_ulong::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2462,7 +2211,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_CUDA
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_ulong, FT_cuda_float_ulong, TT_cuda_float_ulong, TT_cuda_float_ulong> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_ulong, FT_cuda_float_ulong, TT_cuda_float_ulong> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2476,8 +2225,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_cuda_float_ulong::LocalMatrix,
           typename FT_cuda_float_ulong::LocalFilter,
-          typename TT_cuda_float_ulong::LocalMatrix,
-          typename TT_cuda_float_ulong::LocalMatrix> > > &
+          typename TT_cuda_float_ulong::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2488,7 +2236,7 @@ namespace FEAT
         }
 
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_ulong, FT_cuda_double_ulong, TT_cuda_double_ulong, TT_cuda_double_ulong> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_ulong, FT_cuda_double_ulong, TT_cuda_double_ulong> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2502,8 +2250,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_cuda_double_ulong::LocalMatrix,
           typename FT_cuda_double_ulong::LocalFilter,
-          typename TT_cuda_double_ulong::LocalMatrix,
-          typename TT_cuda_double_ulong::LocalMatrix> > > &
+          typename TT_cuda_double_ulong::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2515,7 +2262,7 @@ namespace FEAT
 #endif
 
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_uint, FT_main_float_uint, TT_main_float_uint, TT_main_float_uint> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_float_uint, FT_main_float_uint, TT_main_float_uint> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2529,8 +2276,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_main_float_uint::LocalMatrix,
           typename FT_main_float_uint::LocalFilter,
-          typename TT_main_float_uint::LocalMatrix,
-          typename TT_main_float_uint::LocalMatrix> > > &
+          typename TT_main_float_uint::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2541,7 +2287,7 @@ namespace FEAT
         }
 
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_uint, FT_main_double_uint, TT_main_double_uint, TT_main_double_uint> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_main_double_uint, FT_main_double_uint, TT_main_double_uint> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2555,8 +2301,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_main_double_uint::LocalMatrix,
           typename FT_main_double_uint::LocalFilter,
-          typename TT_main_double_uint::LocalMatrix,
-          typename TT_main_double_uint::LocalMatrix> > > &
+          typename TT_main_double_uint::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2568,7 +2313,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_CUDA
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_uint, FT_cuda_float_uint, TT_cuda_float_uint, TT_cuda_float_uint> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_float_uint, FT_cuda_float_uint, TT_cuda_float_uint> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2582,8 +2327,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_cuda_float_uint::LocalMatrix,
           typename FT_cuda_float_uint::LocalFilter,
-          typename TT_cuda_float_uint::LocalMatrix,
-          typename TT_cuda_float_uint::LocalMatrix> > > &
+          typename TT_cuda_float_uint::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2594,7 +2338,7 @@ namespace FEAT
         }
 
         template <typename SolverVectorType_>
-        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_uint, FT_cuda_double_uint, TT_cuda_double_uint, TT_cuda_double_uint> > > &
+        std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_uint, FT_cuda_double_uint, TT_cuda_double_uint> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2608,8 +2352,7 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
           typename MT_cuda_double_uint::LocalMatrix,
           typename FT_cuda_double_uint::LocalFilter,
-          typename TT_cuda_double_uint::LocalMatrix,
-          typename TT_cuda_double_uint::LocalMatrix> > > &
+          typename TT_cuda_double_uint::LocalTransfer> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,

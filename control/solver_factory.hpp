@@ -370,8 +370,7 @@ namespace FEAT
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            auto& prolongations = matrix_stock.template get_prolongations<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            auto& restrictions = matrix_stock.template get_restrictions<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& transfers = matrix_stock.template get_transfers<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& hmap = matrix_stock.template get_hierarchy_map<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
 
             typename std::remove_reference<decltype(hmap)>::type::mapped_type hierarchy; //shared pointer to our hierarchy
@@ -402,8 +401,10 @@ namespace FEAT
                 throw InternalError(__func__, __FILE__, __LINE__, "mg section without smoother key is not allowed!");
               auto smoother_section_path = get_section_path(base, section, solver_name, smoother_p.first);
 
-              for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
+              //for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
+              for(Index level(matrix_stock.systems.size()) ; level > Index(0) ; )
               {
+                --level;
                 auto coarse_solver = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, coarse_solver_section_path, level);
                 if (level == 0)
                 {
@@ -412,7 +413,7 @@ namespace FEAT
                 else
                 {
                   auto smoother = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, smoother_section_path, level);
-                  hierarchy->push_level(systems.at(level), filters.at(level), prolongations.at(level-1), restrictions.at(level-1), smoother, smoother, smoother, coarse_solver);
+                  hierarchy->push_level(systems.at(level), filters.at(level), transfers.at(level), smoother, smoother, smoother, coarse_solver);
                 }
               }
             }

@@ -37,7 +37,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_>
-      using ContainerType = class Transfer<typename Matrix_::template ContainerType<Mem2_, DT2_, IT2_>>;
+      using TransferTypeByMDI = class Transfer<typename Matrix_::template ContainerTypeByMDI<Mem2_, DT2_, IT2_>>;
 
     protected:
       /// the internal prolongation matrix

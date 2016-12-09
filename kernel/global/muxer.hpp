@@ -45,7 +45,7 @@ namespace FEAT
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using MuxerTypeByMDI = class Muxer<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
-    protected:
+    public:
       /// the child communicator
       const Dist::Comm* _comm;
 

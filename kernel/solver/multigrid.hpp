@@ -1645,11 +1645,17 @@ namespace FEAT
     class ScaRCMultiGrid :
       public MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>
     {
+    public:
+      typedef MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_> BaseClass;
+
+      ScaRCMultiGrid() :
+        BaseClass()
+      {
+      }
+
       ///Use MultiGrid's CTORs
       using MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>::MultiGrid;
 
-      public:
-      typedef MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_> BaseClass;
 
       /**
        * \brief Returns a descriptive string.

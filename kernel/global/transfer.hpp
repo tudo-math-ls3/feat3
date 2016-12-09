@@ -19,6 +19,8 @@ namespace FEAT
     class Transfer
     {
     public:
+      /// our local transfer
+      typedef LocalTransfer_ LocalTransfer;
       /// our internal local matrix type
       typedef typename LocalTransfer_::MatrixType LocalMatrixType;
       /// our internal local vector type
@@ -30,7 +32,14 @@ namespace FEAT
       /// our coarse grid multiplexer type
       typedef Global::Muxer<LocalVectorType, Mirror_> MuxerType;
 
-    protected:
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      using TransferTypeByMDI = class Transfer<
+        typename LocalTransfer_::template TransferTypeByMDI<Mem2_, DT2_, IT2_>,
+        typename Mirror_::template MirrorType<Mem2_, DT2_, IT2_>
+        >;
+
+    public:
       /// the coarse-level multiplexer
       MuxerType* _coarse_muxer;
       /// the local transfer operator

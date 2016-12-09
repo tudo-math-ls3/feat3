@@ -32,6 +32,7 @@
 #include <control/statistics.hpp>
 #include <control/solver_factory.hpp>
 
+
 namespace PoissonDirichlet2D
 {
   using namespace FEAT;
@@ -185,9 +186,6 @@ namespace PoissonDirichlet2D
     // define our system level
     typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
-    // define our transfer level
-    typedef Control::ScalarBasicTransferLevel<SystemLevelType> TransferLevelType;
-
     // define our trafo and FE spaces
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
@@ -203,7 +201,6 @@ namespace PoissonDirichlet2D
 
     std::deque<SystemLevelType*> system_levels;
     std::deque<AssemblerLevelType*> asm_levels;
-    std::deque<TransferLevelType*> transfer_levels;
 
     const Index num_levels = Index(domain_levels.size());
 
@@ -212,10 +209,6 @@ namespace PoissonDirichlet2D
     {
       asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
       system_levels.push_back(new SystemLevelType());
-      if (i > 0)
-      {
-        transfer_levels.push_back(new TransferLevelType(*system_levels.at(i - 1), *system_levels.at(i)));
-      }
     }
 
     /* ***************************************************************************************** */
@@ -249,11 +242,11 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling transfer matrices...");
+    comm.print("Assembling transfer operators...");
 
-    for (Index i(0); (i + 1) < num_levels; ++i)
+    for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i + 1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
+      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
@@ -279,18 +272,15 @@ namespace PoissonDirichlet2D
 
     comm.print("Creating solver tree");
     ////////// MATRIX STOCK
-    Solver::MatrixStock<typename SystemLevelType::GlobalSystemMatrix, typename SystemLevelType::GlobalSystemFilter, typename TransferLevelType::GlobalSystemTransferMatrix> matrix_stock;
+    Solver::MatrixStock<typename SystemLevelType::GlobalSystemMatrix, typename SystemLevelType::GlobalSystemFilter, typename SystemLevelType::GlobalSystemTransfer> matrix_stock;
     for (auto& system_level : system_levels)
     {
       matrix_stock.systems.push_back(system_level->matrix_sys.clone(LAFEM::CloneMode::Shallow));
       matrix_stock.gates_row.push_back(&system_level->gate_sys);
       matrix_stock.gates_col.push_back(&system_level->gate_sys);
       matrix_stock.filters.push_back(system_level->filter_sys.clone(LAFEM::CloneMode::Shallow));
-    }
-    for (auto& transfer_level : transfer_levels)
-    {
-      matrix_stock.prolongations.push_back(transfer_level->prol_sys.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock.restrictions.push_back(transfer_level->rest_sys.clone(LAFEM::CloneMode::Shallow));
+      matrix_stock.muxers.push_back(&system_level->coarse_muxer_sys);
+      matrix_stock.transfers.push_back(system_level->transfer_sys.clone(LAFEM::CloneMode::Shallow));
     }
 
     comm.print("Solving linear system...");
@@ -321,7 +311,7 @@ namespace PoissonDirichlet2D
     double solver_toe(at.elapsed_now());
 
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-    system_levels, transfer_levels, domain);
+      system_levels, domain);
 
     // release solver
     solver->done();
@@ -384,11 +374,6 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
 
     // clean up
-    while (!transfer_levels.empty())
-    {
-      delete transfer_levels.back();
-      transfer_levels.pop_back();
-    }
     while (!system_levels.empty())
     {
       delete system_levels.back();
