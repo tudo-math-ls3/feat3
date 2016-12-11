@@ -8,10 +8,13 @@
 #include <kernel/global/synch_mat.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
+#include <kernel/global/muxer.hpp>
+#include <kernel/global/transfer.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/transfer.hpp>
 
 namespace FEAT
 {
@@ -2368,13 +2371,13 @@ namespace FEAT
     extern template class MatrixStock<
       Global::Matrix<LAFEM::SparseMatrixCSR<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>,
       Global::Filter<LAFEM::UnitFilter<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>,
-      Global::Matrix<LAFEM::SparseMatrixCSR<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>
+      Global::Transfer<LAFEM::Transfer<LAFEM::SparseMatrixCSR<Mem::Main, double, Index>>, LAFEM::VectorMirror<Mem::Main, double, Index>>
         >;
 
     extern template class MatrixStock<
       Global::Matrix<LAFEM::SparseMatrixBCSR<Mem::Main, double, Index, 2, 2>, LAFEM::VectorMirror<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>,
       Global::Filter<LAFEM::UnitFilterBlocked<Mem::Main, double, Index, 2>, LAFEM::VectorMirror<Mem::Main, double, Index>>,
-      Global::Matrix<LAFEM::SparseMatrixBCSR<Mem::Main, double, Index, 2, 2>, LAFEM::VectorMirror<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>
+      Global::Transfer<LAFEM::Transfer<LAFEM::SparseMatrixBCSR<Mem::Main, double, Index, 2, 2>>, LAFEM::VectorMirror<Mem::Main, double, Index>>
         >;
 #endif
 
