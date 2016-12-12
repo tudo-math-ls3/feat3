@@ -626,12 +626,15 @@ namespace FEAT
       }
 
       /// copy constructor
-      template<int sma_, int sna_>
-      Matrix(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      template<typename T2_, int sma_, int sna_>
+      Matrix(const Matrix<T2_, m_, n_, sma_, sna_>& a)
       {
         for(int i(0); i < m_; ++i)
         {
-          v[i] = a.v[i];
+          for(int j(0); j < n_; ++j)
+          {
+            v[i][j] = T_(a.v[i][j]);
+          }
         }
       }
 
