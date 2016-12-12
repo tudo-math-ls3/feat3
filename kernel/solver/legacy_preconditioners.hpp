@@ -66,20 +66,20 @@ namespace FEAT
       {
       };
 
-      template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
-                                          LAFEM::DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>,
-                                LAFEM::DenseVector<Mem_, DT_, IT_> >
+      template <typename DT_, typename IT_>
+      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>,
+                                          LAFEM::DenseVector<Mem::Main, DT_, IT_> >
+        : public Preconditioner<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>,
+                                LAFEM::DenseVector<Mem::Main, DT_, IT_> >
       {
       private:
         typedef std::pair<DT_, IT_> PAIR_;
-        typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
-        typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
+        const LAFEM::SparseLayout<Mem::Main, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -95,7 +95,7 @@ namespace FEAT
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
+                                      LAFEM::SparseLayout<Mem::Main, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m(std::numeric_limits<Index>::max()),
@@ -150,9 +150,9 @@ namespace FEAT
             nnz += Index(_m_columns[k].size());
           }
 
-          LAFEM::DenseVector<Mem_, DT_, IT_> val(nnz);
-          LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(nnz);
-          LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> val(nnz);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> col_ind(nnz);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> row_ptr(n+1);
           DT_ * pval = val.elements();
           IT_ * pcol_ind = col_ind.elements();
           IT_ * prow_ptr = row_ptr.elements();
@@ -177,7 +177,7 @@ namespace FEAT
         {
           const Index n(_A.rows());
 
-          LAFEM::DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> trow_ptr(n + 1, IT_(0));
           IT_ * ptrow_ptr(trow_ptr.elements());
 
           ptrow_ptr[0] = 0;
@@ -197,8 +197,8 @@ namespace FEAT
             ptrow_ptr[i + 1] += ptrow_ptr[i];
           }
 
-          LAFEM::DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
-          LAFEM::DenseVector<Mem_, DT_, IT_> tval(used_elements);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> tcol_ind(used_elements);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> tval(used_elements);
           IT_ * ptcol_ind(tcol_ind.elements());
           DT_ * ptval(tval.elements());
 
@@ -231,9 +231,9 @@ namespace FEAT
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
-            LAFEM::DenseVector<Mem_, DT_, IT_> val(used_elements);
-            LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
-            LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+            LAFEM::DenseVector<Mem::Main, DT_, IT_> val(used_elements);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> col_ind(used_elements);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> row_ptr(n+1);
             DT_ * pval(val.elements());
             IT_ * pcol_ind(col_ind.elements());
             IT_ * prow_ptr(row_ptr.elements());
@@ -312,20 +312,20 @@ namespace FEAT
       };
 
 
-      template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
-                                          LAFEM::DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<LAFEM::SparseMatrixCOO<Mem_, DT_, IT_>,
-                                LAFEM::DenseVector<Mem_, DT_, IT_> >
+      template <typename DT_, typename IT_>
+      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixCOO<Mem::Main, DT_, IT_>,
+                                          LAFEM::DenseVector<Mem::Main, DT_, IT_> >
+        : public Preconditioner<LAFEM::SparseMatrixCOO<Mem::Main, DT_, IT_>,
+                                LAFEM::DenseVector<Mem::Main, DT_, IT_> >
       {
       private:
         typedef std::pair<DT_, IT_> PAIR_;
-        typedef LAFEM::SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
-        typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef LAFEM::SparseMatrixCOO<Mem::Main, DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
+        const LAFEM::SparseLayout<Mem::Main, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -341,7 +341,7 @@ namespace FEAT
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
+                                      LAFEM::SparseLayout<Mem::Main, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m(std::numeric_limits<Index>::max()),
@@ -389,9 +389,9 @@ namespace FEAT
             nnz += Index(_m_columns[k].size());
           }
 
-          LAFEM::DenseVector<Mem_, DT_, IT_> val(nnz);
-          LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(nnz);
-          LAFEM::DenseVector<Mem_, IT_, IT_> row_ind(nnz);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> val(nnz);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> col_ind(nnz);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> row_ind(nnz);
           DT_ * pval = val.elements();
           IT_ * pcol_ind = col_ind.elements();
           IT_ * prow_ind = row_ind.elements();
@@ -415,7 +415,7 @@ namespace FEAT
         {
           const Index n(_A.rows());
 
-          LAFEM::DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> trow_ptr(n + 1, IT_(0));
           IT_ * ptrow_ptr(trow_ptr.elements());
 
           Index used_elements(0);
@@ -434,9 +434,9 @@ namespace FEAT
             ptrow_ptr[i + 1] += ptrow_ptr[i];
           }
 
-          LAFEM::DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
-          LAFEM::DenseVector<Mem_, IT_, IT_> trow_ind(used_elements);
-          LAFEM::DenseVector<Mem_, DT_, IT_> tval(used_elements);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> tcol_ind(used_elements);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> trow_ind(used_elements);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> tval(used_elements);
           IT_ * ptcol_ind(tcol_ind.elements());
           IT_ * ptrow_ind(trow_ind.elements());
           DT_ * ptval(tval.elements());
@@ -465,10 +465,10 @@ namespace FEAT
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
-            LAFEM::DenseVector<Mem_, DT_, IT_> val(used_elements);
-            LAFEM::DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
-            LAFEM::DenseVector<Mem_, IT_, IT_> row_ind(used_elements);
-            LAFEM::DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+            LAFEM::DenseVector<Mem::Main, DT_, IT_> val(used_elements);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> col_ind(used_elements);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> row_ind(used_elements);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> row_ptr(n+1);
             DT_ * pval(val.elements());
             IT_ * pcol_ind(col_ind.elements());
             IT_ * prow_ind(row_ind.elements());
@@ -536,20 +536,20 @@ namespace FEAT
       };
 
 
-      template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
-                                          LAFEM::DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<LAFEM::SparseMatrixELL<Mem_, DT_, IT_>,
-                                LAFEM::DenseVector<Mem_, DT_, IT_> >
+      template <typename DT_, typename IT_>
+      class SPAIPreconditionerMTdepending<LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>,
+                                          LAFEM::DenseVector<Mem::Main, DT_, IT_> >
+        : public Preconditioner<LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>,
+                                LAFEM::DenseVector<Mem::Main, DT_, IT_> >
       {
       private:
         typedef std::pair<DT_, IT_> PAIR_;
-        typedef LAFEM::SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
-        typedef LAFEM::DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
+        const LAFEM::SparseLayout<Mem::Main, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -565,7 +565,7 @@ namespace FEAT
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      LAFEM::SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
+                                      LAFEM::SparseLayout<Mem::Main, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m(std::numeric_limits<Index>::max()),
@@ -620,9 +620,9 @@ namespace FEAT
 
           // calculate cl-array and fill rl-array
           Index num_of_chunks(Index(ceil(n / float(C))));
-          LAFEM::DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
-          LAFEM::DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-          LAFEM::DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mcl(num_of_chunks, IT_(0));
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mcs(num_of_chunks + 1);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mrl(_A.rows());
           IT_ * pmcl(mcl.elements());
           IT_ * pmcs(mcs.elements());
           IT_ * pmrl(mrl.elements());
@@ -645,8 +645,8 @@ namespace FEAT
 
           Index val_size = Index(pmcs[num_of_chunks]);
 
-          LAFEM::DenseVector<Mem_, DT_, IT_> mval(val_size);
-          LAFEM::DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> mval(val_size);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mcol_ind(val_size);
           DT_ * pmval    (mval.elements());
           IT_ * pmcol_ind(mcol_ind.elements());
 
@@ -675,9 +675,9 @@ namespace FEAT
 
           // calculate cl-array and fill rl-array
           Index num_of_chunks(Index(ceil(n / float(C))));
-          LAFEM::DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
-          LAFEM::DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-          LAFEM::DenseVector<Mem_, IT_, IT_> mrl(_A.rows(), IT_(0));
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mcl(num_of_chunks, IT_(0));
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mcs(num_of_chunks + 1);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mrl(_A.rows(), IT_(0));
           IT_ * pmcl(mcl.elements());
           IT_ * pmcs(mcs.elements());
           IT_ * pmrl(mrl.elements());
@@ -708,8 +708,8 @@ namespace FEAT
 
           Index val_size = Index(pmcs[num_of_chunks]);
 
-          LAFEM::DenseVector<Mem_, DT_, IT_> mval(val_size);
-          LAFEM::DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> mval(val_size);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> mcol_ind(val_size);
           DT_ * pmval    (mval.elements());
           IT_ * pmcol_ind(mcol_ind.elements());
 
@@ -747,9 +747,9 @@ namespace FEAT
 
             // calculate cl-array and fill rl-array
             Index num_of_chunks(Index(ceil(n / float(C))));
-            LAFEM::DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
-            LAFEM::DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-            LAFEM::DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> mcl(num_of_chunks, IT_(0));
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> mcs(num_of_chunks + 1);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> mrl(_A.rows());
             IT_ * pmcl(mcl.elements());
             IT_ * pmcs(mcs.elements());
             IT_ * pmrl(mrl.elements());
@@ -769,8 +769,8 @@ namespace FEAT
 
             Index val_size = Index(pmcs[num_of_chunks]);
 
-            LAFEM::DenseVector<Mem_, DT_, IT_> mval(val_size);
-            LAFEM::DenseVector<Mem_, IT_, IT_> mcol_ind(val_size);
+            LAFEM::DenseVector<Mem::Main, DT_, IT_> mval(val_size);
+            LAFEM::DenseVector<Mem::Main, IT_, IT_> mcol_ind(val_size);
             DT_ * pmval    (mval.elements());
             IT_ * pmcol_ind(mcol_ind.elements());
 
@@ -975,14 +975,14 @@ namespace FEAT
        * Creates a SPAI preconditioner to the given matrix and given initial layout
        */
       SPAIPreconditioner(const MT_ & A,
-                         LAFEM::SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> && layout,
+                         //LAFEM::SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> && layout,
                          const Index max_iter = 10,
-                         const DT_ eps_res = 1e-2,
+                         const DT_ eps_res = DT_(1e-2),
                          const Index fill_in = 10,
-                         const DT_ eps_res_comp = 1e-3,
-                         const DT_ max_rho = 1e-3,
+                         const DT_ eps_res_comp = DT_(1e-3),
+                         const DT_ max_rho = DT_(1e-3),
                          const bool transpose = false) :
-        Intern::SPAIPreconditionerMTdepending<MT_, VT_>(A, std::move(layout)),
+        Intern::SPAIPreconditionerMTdepending<MT_, VT_>(A, std::move(A.layout())),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),
@@ -1018,7 +1018,7 @@ namespace FEAT
        */
       static String name()
       {
-        return "SPAI_Preconditioner";
+        return "SPAI";
       }
 
       /**

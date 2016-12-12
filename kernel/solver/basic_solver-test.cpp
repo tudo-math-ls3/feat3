@@ -159,7 +159,7 @@ public:
     // test FGMRES-SPAI
     {
       // create an SPAI preconditioner
-      auto precon = Solver::new_spai_precond(matrix, filter, matrix.layout());
+      auto precon = Solver::new_spai_precond(matrix, filter);
       // create a FMGRES solver
       FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
       test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs, 32);
@@ -367,6 +367,15 @@ public:
       auto precon_r = Solver::new_jacobi_precond(matrix, filter);
       PCGNR<MatrixType, FilterType> solver(matrix, filter, precon_l, precon_r);
       test_solver("PCGNR-JAC-JAC", solver, vec_sol, vec_ref, vec_rhs, 43);
+    }
+
+    // test FGMRES-SPAI
+    {
+      // create an SPAI preconditioner
+      auto precon = Solver::new_spai_precond(matrix, filter);
+      // create a FMGRES solver
+      FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
+      test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs, 32);
     }
 
 #ifdef FEAT_HAVE_CUSOLVER

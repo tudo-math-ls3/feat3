@@ -17,6 +17,7 @@
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/ilu_precond.hpp>
 #include <kernel/solver/sor_precond.hpp>
+#include <kernel/solver/spai_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/convert_precond.hpp>
@@ -132,6 +133,24 @@ namespace FEAT
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto result = Solver::new_ilu_precond(systems.at(back_level), filters.at(back_level), 0ul);
+          return result;
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_spai_precon(MST_ & , size_t, typename SolverVectorType_::GateType *)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "spai precon section is only allowed in local context!");
+          return nullptr;
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_spai_precon(MST_ & matrix_stock, size_t back_level, ...)
+        {
+          auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          auto result = Solver::new_spai_precond(systems.at(back_level), filters.at(back_level));
           return result;
         }
 
@@ -428,6 +447,10 @@ namespace FEAT
           else if (solver_type == "ilu")
           {
             result = create_ilu_precon<SolverVectorType_>(matrix_stock, back_level, nullptr);
+          }
+          else if (solver_type == "spai")
+          {
+            result = create_spai_precon<SolverVectorType_>(matrix_stock, back_level, nullptr);
           }
           else if (solver_type == "sor")
           {

@@ -41,9 +41,9 @@ if(MPI_C_LINK_FLAGS)
 endif()
 
 if (FEAT_HAVE_MKL)
-  TARGET_LINK_LIBRARIES(kernel-util
+ TARGET_LINK_LIBRARIES(kernel-util
      -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
-  )
+)
 endif(FEAT_HAVE_MKL)
 
 if (FEAT_HAVE_CUDA)

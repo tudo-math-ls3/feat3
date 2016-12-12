@@ -15,6 +15,12 @@ if (FEAT_EICKT)
     )
 endif(FEAT_EICKT)
 
+if (FEAT_HAVE_MKL)
+  SET (kernel-solver-list ${kernel-solver-list}
+    spai_precond_mkl.cpp
+  )
+endif(FEAT_HAVE_MKL)
+
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
@@ -22,6 +28,7 @@ if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-solver-cuda
     cusolver.cu
     ilu_precond.cu
+    spai_precond.cu
     sor_precond.cu
     ssor_precond.cu
     STATIC

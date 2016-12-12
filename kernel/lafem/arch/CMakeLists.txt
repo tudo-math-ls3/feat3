@@ -51,12 +51,6 @@ if (FEAT_COTIRE)
   cotire(kernel-lafem-arch)
 endif (FEAT_COTIRE)
 
-if (FEAT_HAVE_MKL)
-  TARGET_LINK_LIBRARIES(kernel-lafem-arch
-     -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
-  )
-endif(FEAT_HAVE_MKL)
-
 if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda
     axpy.cu

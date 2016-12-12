@@ -552,7 +552,7 @@ namespace Tutorial03
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SPAI preconditioner
-    auto precond = Solver::new_spai_precond(matrix, filter, matrix.layout());
+    auto precond = Solver::new_spai_precond(matrix, filter);
 
     // Create a preconditioned BiCGStab solver
     auto solver = Solver::new_bicgstab(matrix, filter, precond);
