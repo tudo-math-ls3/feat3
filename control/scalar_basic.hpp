@@ -3,7 +3,6 @@
 #define CONTROL_SCALAR_BASIC_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/comm_base.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/lafem/dense_vector.hpp>

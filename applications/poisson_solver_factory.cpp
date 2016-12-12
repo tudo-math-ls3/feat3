@@ -90,7 +90,7 @@ namespace PoissonDirichlet2D
 
     for (Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space);
+      system_levels.at(i)->assemble_gate(layer, *domain_levels.at(i), asm_levels.at(i)->space);
     }
 
     /* ***************************************************************************************** */
@@ -126,7 +126,7 @@ namespace PoissonDirichlet2D
 
     for (Index i(1); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_transfers(asm_levels.at(i)->space, asm_levels.at(i-1)->space, cubature);
+      system_levels.at(i)->assemble_transfer(asm_levels.at(i)->space, asm_levels.at(i-1)->space, cubature);
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();

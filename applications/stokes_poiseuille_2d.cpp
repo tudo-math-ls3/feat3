@@ -50,149 +50,6 @@ namespace StokesPoiseuille2D
     static T_ eval (T_ x, T_) {return T_(2)*(T_(1) - x);}
   };
 
-  template<
-    typename SpaceVelo_,
-    typename SpacePres_>
-  class StokesUnitSquarePoiseuilleAssemblerLevel :
-    public Control::StokesBasicAssemblerLevel<SpaceVelo_, SpacePres_>
-  {
-  public:
-    typedef Control::StokesBasicAssemblerLevel<SpaceVelo_, SpacePres_> BaseClass;
-    typedef typename SpaceVelo_::MeshType MeshType;
-
-  public:
-    explicit StokesUnitSquarePoiseuilleAssemblerLevel(typename BaseClass::DomainLevelType& dom_lvl) :
-      BaseClass(dom_lvl)
-    {
-    }
-
-    template<typename SystemLevel_>
-    void assemble_velocity_filter(SystemLevel_& sys_level)
-    {
-      // get our global velocity filter
-      typename SystemLevel_::GlobalVeloFilter& fil_glob_v = sys_level.filter_velo;
-
-      // get our local velocity filter
-      typename SystemLevel_::LocalVeloFilter& fil_loc_v = *fil_glob_v;
-
-      // create unit-filter assembler
-      Assembly::UnitFilterAssembler<MeshType> unit_asm;
-
-      // loop over all boundary parts except for the right one, which is outflow
-      std::deque<String> part_names;
-      part_names.push_back("bnd:l");
-      part_names.push_back("bnd:t");
-      part_names.push_back("bnd:b");
-      for(const auto& name : part_names)
-      {
-        // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(name);
-
-        // found it?
-        if (mesh_part_node == nullptr)
-          throw InternalError("Mesh Part Node 'boundary' not found!");
-
-        // let's see if we have that mesh part
-        // if it is nullptr, then our patch is not adjacent to that boundary part
-        auto* mesh_part = mesh_part_node->get_mesh();
-        if (mesh_part != nullptr)
-        {
-          // add to boundary assembler
-          unit_asm.add_mesh_part(*mesh_part);
-        }
-      }
-
-      // our inflow BC function
-      Analytic::StaticWrapperFunction<2, VeloFuncX> inflow_func;
-
-      // finally, assemble the filters
-      unit_asm.assemble(fil_loc_v.template at<0>(), this->space_velo, inflow_func);
-      unit_asm.assemble(fil_loc_v.template at<1>(), this->space_velo);
-    }
-
-    template<typename SystemLevel_>
-    void assemble_pressure_filter(SystemLevel_& /*sys_level*/)
-    {
-      // nothing to do
-    }
-
-    template<typename SystemLevel_>
-    void assemble_system_filter(SystemLevel_& sys_level)
-    {
-      assemble_velocity_filter(sys_level);
-      assemble_pressure_filter(sys_level);
-
-      // clone into system filter
-      (*sys_level.filter_sys).template at<0>() = (*sys_level.filter_velo).clone(LAFEM::CloneMode::Shallow);
-      (*sys_level.filter_sys).template at<1>() = (*sys_level.filter_pres).clone(LAFEM::CloneMode::Shallow);
-    }
-
-    template<typename SystemLevel_>
-    typename SystemLevel_::GlobalSystemVector assemble_rhs_vector(SystemLevel_& sys_level)
-    {
-      // create new vector, format and filter it
-      typename SystemLevel_::GlobalSystemVector vec_rhs = sys_level.matrix_sys.create_vector_r();
-      vec_rhs.format();
-      sys_level.filter_sys.filter_rhs(vec_rhs);
-      return vec_rhs;
-    }
-
-    template<typename SystemLevel_>
-    typename SystemLevel_::GlobalSystemVector assemble_sol_vector(SystemLevel_& sys_level)
-    {
-      typename SystemLevel_::GlobalSystemVector vec_sol = sys_level.matrix_sys.create_vector_r();
-      vec_sol.format();
-      sys_level.filter_sys.filter_sol(vec_sol);
-      return vec_sol;
-    }
-
-    template<typename SystemLevel_>
-    void analyse_sol_vector(bool plot, SystemLevel_& sys_level, const typename SystemLevel_::GlobalSystemVector& vec_sol)
-    {
-      typedef typename SystemLevel_::DataType DataType;
-
-      // define reference solution functions
-      Analytic::StaticWrapperFunction<2, VeloFuncX, true, true> velo_x_func;
-      Analytic::StaticWrapperFunction<2, VeloFuncY, true, true> velo_y_func;
-      Analytic::StaticWrapperFunction<2, PresFunc> pres_func;
-
-      // fetch our vector components
-      const auto& vx = (*vec_sol).template at<0>().template at<0>();
-      const auto& vy = (*vec_sol).template at<0>().template at<1>();
-      const auto& vp = (*vec_sol).template at<1>();
-
-      // compute local errors
-      Assembly::ScalarErrorInfo<DataType> vxerr = Assembly::ScalarErrorComputer<1>::compute(
-        vx, velo_x_func, this->space_velo, this->cubature);
-      Assembly::ScalarErrorInfo<DataType> vyerr = Assembly::ScalarErrorComputer<1>::compute(
-        vy, velo_y_func, this->space_velo, this->cubature);
-      Assembly::ScalarErrorInfo<DataType> vperr = Assembly::ScalarErrorComputer<0>::compute(
-        vp, pres_func, this->space_pres, this->cubature);
-
-      // synhronise all local errors
-      vxerr.norm_h0 = sys_level.gate_sys.norm2(vxerr.norm_h0);
-      vyerr.norm_h0 = sys_level.gate_sys.norm2(vyerr.norm_h0);
-      vxerr.norm_h1 = sys_level.gate_sys.norm2(vxerr.norm_h1);
-      vyerr.norm_h1 = sys_level.gate_sys.norm2(vyerr.norm_h1);
-      vperr.norm_h0 = sys_level.gate_sys.norm2(vperr.norm_h0);
-
-      // compute field errors
-      DataType vv_h0 = Math::sqrt(Math::sqr(vxerr.norm_h0) + Math::sqr(vyerr.norm_h0));
-      DataType vv_h1 = Math::sqrt(Math::sqr(vxerr.norm_h1) + Math::sqr(vyerr.norm_h1));
-
-      // print errors
-      if (plot)
-      {
-        std::cout << "Velocity H0-Error: " << stringify_fp_sci(vv_h0, 12) << " [ ";
-        std::cout << stringify_fp_sci(vxerr.norm_h0, 12) << " , " << stringify_fp_sci(vyerr.norm_h0, 12) << " ]" << std::endl;
-        std::cout << "Velocity H1-Error: " << stringify_fp_sci(vv_h1, 12) << " [ ";
-        std::cout << stringify_fp_sci(vxerr.norm_h1, 12) << " , " << stringify_fp_sci(vyerr.norm_h1, 12) << " ]" << std::endl;
-        std::cout << "Pressure H0-Error: " << stringify_fp_sci(vperr.norm_h0, 12) << std::endl;
-      }
-    }
-  }; // class StokesUnitSquarePoiseuilleAssemblerLevel<...>
-
-
   template<typename MeshType_>
   void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
@@ -219,7 +76,7 @@ namespace StokesPoiseuille2D
 
     // define our assembler level
     typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef StokesUnitSquarePoiseuilleAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
+    typedef Control::StokesBasicAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
 
     // get our domain level and layer
     typedef typename DomainControlType::LayerType DomainLayerType;
@@ -246,28 +103,78 @@ namespace StokesPoiseuille2D
 
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_gates(layer, *system_levels.at(i));
+      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system matrices...");
 
+    Cubature::DynamicFactory cubature("auto-degree:5");
+
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_matrix(*system_levels.at(i));
+      system_levels.at(i)->assemble_velocity_laplace_matrix(asm_levels.at(i)->space_velo, cubature);
+      system_levels.at(i)->assemble_grad_div_matrices(asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres, cubature);
+      system_levels.at(i)->compile_system_matrix();
     }
 
     // assemble Schur-matrix on finest level
-    asm_levels.back()->assemble_schur_matrix(*system_levels.back());
+    {
+      // get the local matrix S
+      auto& mat_loc_s = system_levels.back()->matrix_s.local();
+
+      // assemble matrix structure?
+      Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, asm_levels.back()->space_pres);
+
+      // assemble schur matrix
+      mat_loc_s.format();
+      Assembly::Common::IdentityOperator id_op;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, asm_levels.back()->space_pres, cubature, -DataType(1));
+    }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system filters...");
 
+    // our inflow BC function
+    Analytic::StaticWrapperFunction<2, VeloFuncX> inflow_func;
+
+    // the names of the mesh parts on which to assemble
+    std::deque<String> part_names;
+    part_names.push_back("bnd:l");
+    part_names.push_back("bnd:t");
+    part_names.push_back("bnd:b");
+
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_filter(*system_levels.at(i));
+      // get our local velocity filter
+      auto& fil_loc_v = system_levels.at(i)->filter_velo.local();
+
+      // create unit-filter assembler
+      Assembly::UnitFilterAssembler<MeshType> unit_asm;
+
+      // loop over all boundary parts except for the right one, which is outflow
+      for(const auto& name : part_names)
+      {
+        // try to fetch the corresponding mesh part node
+        auto* mesh_part_node = domain_levels.at(i)->get_mesh_node()->find_mesh_part_node(name);
+        XASSERT(mesh_part_node != nullptr);
+
+        auto* mesh_part = mesh_part_node->get_mesh();
+        if (mesh_part != nullptr)
+        {
+          // add to boundary assembler
+          unit_asm.add_mesh_part(*mesh_part);
+        }
+      }
+
+      // assemble the filters
+      unit_asm.assemble(fil_loc_v.template at<0>(), asm_levels.at(i)->space_velo, inflow_func);
+      unit_asm.assemble(fil_loc_v.template at<1>(), asm_levels.at(i)->space_velo);
+
+      // finally, compile the system filter
+      system_levels.at(i)->compile_system_filter();
     }
 
     /* ***************************************************************************************** */
@@ -276,24 +183,14 @@ namespace StokesPoiseuille2D
 
     for(Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
+      system_levels.at(i)->assemble_transfers(
+        asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres,
+        asm_levels.at(i-1)->space_velo, asm_levels.at(i-1)->space_pres, cubature);
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
 
     /* ***************************************************************************************** */
-
-    // get our assembled vector type
-    typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
-
-    // fetch our finest levels
-    DomainLevelType& the_domain_level = *domain_levels.back();
-    SystemLevelType& the_system_level = *system_levels.back();
-    AssemblerLevelType& the_asm_level = *asm_levels.back();
-
-    // create our RHS and SOL vectors
-    GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
-    GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
 
     // get our global solver system types
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
@@ -302,10 +199,26 @@ namespace StokesPoiseuille2D
     typedef typename SystemLevelType::GlobalVeloVector GlobalVeloVector;
     typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
 
+    // fetch our finest levels
+    DomainLevelType& the_domain_level = *domain_levels.back();
+    SystemLevelType& the_system_level = *system_levels.back();
+    AssemblerLevelType& the_asm_level = *asm_levels.back();
+
     // get our global solve matrix and filter
     GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
     GlobalSystemFilter& filter = the_system_level.filter_sys;
 
+    // create new vectors
+    GlobalSystemVector vec_sol = the_system_level.matrix_sys.create_vector_r();
+    GlobalSystemVector vec_rhs = the_system_level.matrix_sys.create_vector_r();
+
+    // format the vectors
+    vec_sol.format();
+    vec_rhs.format();
+
+    // and filter it
+    the_system_level.filter_sys.filter_sol(vec_sol);
+    the_system_level.filter_sys.filter_rhs(vec_rhs);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -400,7 +313,41 @@ namespace StokesPoiseuille2D
 
     if(args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol);
+      // define reference solution functions
+      Analytic::StaticWrapperFunction<2, VeloFuncX, true, true> velo_x_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncY, true, true> velo_y_func;
+      Analytic::StaticWrapperFunction<2, PresFunc> pres_func;
+
+      // fetch our vector components
+      const auto& vx = vec_sol.local().template at<0>().template at<0>();
+      const auto& vy = vec_sol.local().template at<0>().template at<1>();
+      const auto& vp = vec_sol.local().template at<1>();
+
+      // compute local errors
+      Assembly::ScalarErrorInfo<DataType> vxerr = Assembly::ScalarErrorComputer<1>::compute(
+        vx, velo_x_func, the_asm_level.space_velo, cubature);
+      Assembly::ScalarErrorInfo<DataType> vyerr = Assembly::ScalarErrorComputer<1>::compute(
+        vy, velo_y_func, the_asm_level.space_velo, cubature);
+      Assembly::ScalarErrorInfo<DataType> vperr = Assembly::ScalarErrorComputer<0>::compute(
+        vp, pres_func, the_asm_level.space_pres, cubature);
+
+      // synhronise all local errors
+      vxerr.synchronise(comm);
+      vyerr.synchronise(comm);
+
+      // compute field errors
+      DataType vv_h0 = Math::sqrt(Math::sqr(vxerr.norm_h0) + Math::sqr(vyerr.norm_h0));
+      DataType vv_h1 = Math::sqrt(Math::sqr(vxerr.norm_h1) + Math::sqr(vyerr.norm_h1));
+
+      // print errors
+      if (comm.rank() == 0)
+      {
+        std::cout << "Velocity H0-Error: " << stringify_fp_sci(vv_h0, 12) << " [ ";
+        std::cout << stringify_fp_sci(vxerr.norm_h0, 12) << " , " << stringify_fp_sci(vyerr.norm_h0, 12) << " ]" << std::endl;
+        std::cout << "Velocity H1-Error: " << stringify_fp_sci(vv_h1, 12) << " [ ";
+        std::cout << stringify_fp_sci(vxerr.norm_h1, 12) << " , " << stringify_fp_sci(vyerr.norm_h1, 12) << " ]" << std::endl;
+        std::cout << "Pressure H0-Error: " << stringify_fp_sci(vperr.norm_h0, 12) << std::endl;
+      }
     }
 
     /* ***************************************************************************************** */
@@ -483,6 +430,12 @@ namespace StokesPoiseuille2D
       FEAT::Runtime::abort();
     }
 
+    if(args.check("mesh") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
+      FEAT::Runtime::abort();
+    }
+
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -496,11 +449,6 @@ namespace StokesPoiseuille2D
 #endif
     {
       TimeStamp stamp1;
-      if(args.check("mesh") < 1)
-      {
-        comm.print(std::cerr, "ERROR: Mandatory option --mesh is missing!");
-        FEAT::Runtime::abort();
-      }
 
       // query mesh filename list
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;

@@ -39,156 +39,6 @@ namespace StokesDriCav2D
     }
   };
 
-  template<
-    typename SpaceVelo_,
-    typename SpacePres_>
-  class StokesUnitSquareDriCavAssemblerLevel :
-    public Control::StokesBasicAssemblerLevel<SpaceVelo_, SpacePres_>
-  {
-  public:
-    typedef Control::StokesBasicAssemblerLevel<SpaceVelo_, SpacePres_> BaseClass;
-    typedef typename SpaceVelo_::MeshType MeshType;
-
-  public:
-    explicit StokesUnitSquareDriCavAssemblerLevel(typename BaseClass::DomainLevelType& dom_lvl) :
-      BaseClass(dom_lvl)
-    {
-    }
-
-    template<typename SystemLevel_>
-    void assemble_velocity_filter(SystemLevel_& sys_level)
-    {
-      // get our global velocity filter
-      typename SystemLevel_::GlobalVeloFilter& fil_glob_v = sys_level.filter_velo;
-
-      // get our local velocity filter
-      typename SystemLevel_::LocalVeloFilter& fil_loc_v = *fil_glob_v;
-
-      // create unit-filter assembler
-      Assembly::UnitFilterAssembler<MeshType> unit_asm;
-
-      // loop over all boundary components
-      for(int i(0); i < 4; ++i)
-      {
-        // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(String("bnd:") + stringify(i));
-
-        // found it?
-        if(mesh_part_node == nullptr)
-          throw InternalError("Mesh Part Node 'bnd:" + stringify(i) + "' not found!");
-
-        // let's see if we have that mesh part
-        // if it is nullptr, then our patch is not adjacent to that boundary part
-        auto* mesh_part = mesh_part_node->get_mesh();
-        if(mesh_part == nullptr)
-          continue;
-
-        // boundary regions 0 and 1 are the bottom and top edges; 2 and 3 are the left and right edges
-        unit_asm.add_mesh_part(*mesh_part);
-      }
-
-      Analytic::StaticWrapperFunction<2, VeloFuncX> velo_x_func;
-
-      // finally, assemble the filters
-      unit_asm.assemble(fil_loc_v.template at<0>(), this->space_velo, velo_x_func);
-      unit_asm.assemble(fil_loc_v.template at<1>(), this->space_velo);
-    }
-
-    //template<typename SystemLevel_> void assemble_pressure_filter(SystemLevel_&) {}
-
-    template<typename SystemLevel_>
-    void assemble_pressure_filter(SystemLevel_& sys_level)
-    {
-      // get our global pressure filter
-      typename SystemLevel_::GlobalPresFilter& fil_glob_p = sys_level.filter_pres;
-
-      // get our local pressure filter
-      typedef typename SystemLevel_::LocalPresFilter MeanFilterType;
-      MeanFilterType& fil_loc_p = *fil_glob_p;
-
-      // create two global vectors
-      typename SystemLevel_::GlobalPresVector vec_glob_v(&sys_level.gate_pres), vec_glob_w(&sys_level.gate_pres);
-
-      // fetch the local vectors
-      typename SystemLevel_::LocalPresVector& vec_loc_v = *vec_glob_v;
-      typename SystemLevel_::LocalPresVector& vec_loc_w = *vec_glob_w;
-
-      // fetch the frequency vector of the pressure gate
-      typename SystemLevel_::LocalPresVector& vec_loc_f = sys_level.gate_pres._freqs;
-
-      // assemble the mean filter
-      Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, this->space_pres, this->cubature);
-
-      // synchronise the vectors
-      vec_glob_v.sync_1();
-      vec_glob_w.sync_0();
-
-      // build the mean filter
-      fil_loc_p = MeanFilterType(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), sys_level.gate_pres.get_comm());
-    }
-
-    template<typename SystemLevel_>
-    void assemble_system_filter(SystemLevel_& sys_level)
-    {
-      assemble_velocity_filter(sys_level);
-      assemble_pressure_filter(sys_level);
-
-      // clone into system filter
-      (*sys_level.filter_sys).template at<0>() = (*sys_level.filter_velo).clone(LAFEM::CloneMode::Shallow);
-      (*sys_level.filter_sys).template at<1>() = (*sys_level.filter_pres).clone(LAFEM::CloneMode::Shallow);
-    }
-
-    template<typename SystemLevel_>
-    typename SystemLevel_::GlobalSystemVector assemble_rhs_vector(SystemLevel_& sys_level)
-    {
-      typename SystemLevel_::GlobalSystemVector vec_rhs = sys_level.matrix_sys.create_vector_r();
-      vec_rhs.format();
-      sys_level.filter_sys.filter_rhs(vec_rhs);
-      return vec_rhs;
-    }
-
-    template<typename SystemLevel_>
-    typename SystemLevel_::GlobalSystemVector assemble_sol_vector(SystemLevel_& sys_level)
-    {
-      typename SystemLevel_::GlobalSystemVector vec_sol = sys_level.matrix_sys.create_vector_r();
-      vec_sol.format();
-      sys_level.filter_sys.filter_sol(vec_sol);
-      return vec_sol;
-    }
-
-    template<typename SystemLevel_>
-    void analyse_sol_vector(bool plot, SystemLevel_& sys_level, const typename SystemLevel_::GlobalSystemVector& vec_sol)
-    {
-      typedef typename SystemLevel_::DataType DataType;
-
-      // define reference solution functions
-      Analytic::Common::ConstantFunction<2> zero_func;
-
-      // compute local errors
-      auto vi = Assembly::VelocityAnalyser::compute((*vec_sol).template at<0>(), this->space_velo, this->cubature);
-      DataType vp_h0 = Assembly::ScalarErrorComputer<0>::compute(
-        (*vec_sol).template at<1>(), zero_func, this->space_pres, this->cubature).norm_h0;
-
-      // synhronise all local errors
-      vi.norm_h0 = sys_level.gate_sys.norm2(vi.norm_h0);
-      vi.norm_h1 = sys_level.gate_sys.norm2(vi.norm_h1);
-      vi.divergence = sys_level.gate_sys.norm2(vi.divergence);
-      vi.vorticity = sys_level.gate_sys.norm2(vi.vorticity);
-      vi.norm_h0_comp[0] = sys_level.gate_sys.norm2(vi.norm_h0_comp[0]);
-      vi.norm_h0_comp[1] = sys_level.gate_sys.norm2(vi.norm_h0_comp[1]);
-      vi.norm_h1_comp[0] = sys_level.gate_sys.norm2(vi.norm_h1_comp[0]);
-      vi.norm_h1_comp[1] = sys_level.gate_sys.norm2(vi.norm_h1_comp[1]);
-      vp_h0 = sys_level.gate_sys.norm2(vp_h0);
-
-      // print errors
-      if (plot)
-      {
-        std::cout << vi;
-        std::cout << "Pressure..: " << vp_h0 << std::endl;
-      }
-    }
-  };
-
   template<typename MeshType_>
   void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
@@ -215,7 +65,7 @@ namespace StokesDriCav2D
 
     // define our assembler level
     typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef StokesUnitSquareDriCavAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
+    typedef Control::StokesBasicAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
 
     // get our domain level and layer
     typedef typename DomainControlType::LayerType DomainLayerType;
@@ -240,20 +90,35 @@ namespace StokesDriCav2D
 
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_gates(layer, *system_levels.at(i));
+      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system matrices...");
 
+    Cubature::DynamicFactory cubature("auto-degree:5");
+
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_matrix(*system_levels.at(i));
+      system_levels.at(i)->assemble_velocity_laplace_matrix(asm_levels.at(i)->space_velo, cubature);
+      system_levels.at(i)->assemble_grad_div_matrices(asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres, cubature);
+      system_levels.at(i)->compile_system_matrix();
     }
 
     // assemble Schur-matrix on finest level
-    asm_levels.back()->assemble_schur_matrix(*system_levels.back());
+    {
+      // get the local matrix S
+      auto& mat_loc_s = system_levels.back()->matrix_s.local();
+
+      // assemble matrix structure?
+      Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, asm_levels.back()->space_pres);
+
+      // assemble schur matrix
+      mat_loc_s.format();
+      Assembly::Common::IdentityOperator id_op;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, asm_levels.back()->space_pres, cubature, -DataType(1));
+    }
 
     /* ***************************************************************************************** */
 
@@ -261,7 +126,39 @@ namespace StokesDriCav2D
 
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_filter(*system_levels.at(i));
+      // get our local velocity filter
+      auto& fil_loc_v = system_levels.at(i)->filter_velo.local();
+
+      // create unit-filter assemblers
+      Assembly::UnitFilterAssembler<MeshType> unit_asm;
+
+      // loop over all boundary components
+      for(int k(0); k < 4; ++k)
+      {
+        // try to fetch the corresponding mesh part node
+        auto* mesh_part_node = domain_levels.at(i)->get_mesh_node()->find_mesh_part_node(String("bnd:") + stringify(k));
+        XASSERT(mesh_part_node != nullptr);
+
+        // let's see if we have that mesh part
+        // if it is nullptr, then our patch is not adjacent to that boundary part
+        auto* mesh_part = mesh_part_node->get_mesh();
+        if(mesh_part == nullptr)
+          continue;
+
+        unit_asm.add_mesh_part(*mesh_part);
+      }
+
+      Analytic::StaticWrapperFunction<2, VeloFuncX> velo_x_func;
+
+      // assemble the filters
+      unit_asm.assemble(fil_loc_v.get(0), asm_levels.at(i)->space_velo, velo_x_func);
+      unit_asm.assemble(fil_loc_v.get(1), asm_levels.at(i)->space_velo);
+
+      // assemble pressure mean filter
+      system_levels.at(i)->assemble_pressure_mean_filter(asm_levels.at(i)->space_pres, cubature);
+
+      // compile system filter
+      system_levels.at(i)->compile_system_filter();
     }
 
     /* ***************************************************************************************** */
@@ -270,7 +167,9 @@ namespace StokesDriCav2D
 
     for(Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
+      system_levels.at(i)->assemble_transfers(
+        asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres,
+        asm_levels.at(i-1)->space_velo, asm_levels.at(i-1)->space_pres, cubature);
     }
 
     /* ***************************************************************************************** */
@@ -287,13 +186,21 @@ namespace StokesDriCav2D
     SystemLevelType& the_system_level = *system_levels.back();
     AssemblerLevelType& the_asm_level = *asm_levels.back();
 
-    // create our RHS and SOL vectors
-    GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
-    GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
-
     // get our global matrix and filter
     GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
     GlobalSystemFilter& filter = the_system_level.filter_sys;
+
+    // create our RHS and SOL vectors
+    GlobalSystemVector vec_sol = the_system_level.matrix_sys.create_vector_r();
+    GlobalSystemVector vec_rhs = the_system_level.matrix_sys.create_vector_r();
+
+    // format the vectors
+    vec_sol.format();
+    vec_rhs.format();
+
+    // and filter it
+    the_system_level.filter_sys.filter_sol(vec_sol);
+    the_system_level.filter_sys.filter_rhs(vec_rhs);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -378,7 +285,22 @@ namespace StokesDriCav2D
 
     if(args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol);
+      // define reference solution functions
+      Analytic::Common::ConstantFunction<2> zero_func;
+
+      // compute local errors
+      auto vi = Assembly::VelocityAnalyser::compute(vec_sol.local().template at<0>(), the_asm_level.space_velo, cubature);
+      auto pi = Assembly::ScalarErrorComputer<0>::compute(
+        vec_sol.local().template at<1>(), zero_func, the_asm_level.space_pres, cubature);
+
+      // synhronise all local errors
+      vi.synchronise(comm);
+      pi.synchronise(comm);
+
+      // print errors
+      comm.print("");
+      comm.print(vi.format_string());
+      comm.print("Pressure..: " + stringify_fp_sci(pi.norm_h0));
     }
 
     /* ***************************************************************************************** */
