@@ -120,7 +120,7 @@ namespace FEAT
     template<
       typename MemType_,
       typename DataType_,
-      typename IndexType_ = Index,
+      typename IndexType_,
       int BlockSize_
     >
     class NoneFilterBlocked
