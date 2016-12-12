@@ -82,7 +82,11 @@ namespace FEAT
 
         /// Our 'base' class type
         template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-          using FilterType = class SlipFilter<Mem2_, DT2_, IT2_, BlockSize_>;
+        using FilterType = class SlipFilter<Mem2_, DT2_, IT2_, BlockSize_>;
+
+        /// For creating filter with different Mem, DT, IT
+        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+        using FilterTypeByMDI = FilterType<Mem2_, DT2_, IT2_>;
 
         static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
 
