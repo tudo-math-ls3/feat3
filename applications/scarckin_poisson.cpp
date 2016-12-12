@@ -332,7 +332,8 @@ namespace PoissonDirichlet2D
 
     //all other levels
     Index level(local_matrices_solve.size() - 1);
-    for (auto it = system_levels_solve.rbegin(), jt = --system_levels_solve.rend(); it != jt; ++it, --level)
+    const auto it_end = --system_levels_solve.rend();
+    for (auto it = system_levels_solve.rbegin(); it != it_end; ++it, --level)
     {
       auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
       auto local_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), 1.0, local_precond);
@@ -370,7 +371,7 @@ namespace PoissonDirichlet2D
 
     //all other levels
     level = local_matrices_solve.size() - 1;
-    for (auto it = system_levels_solve.rbegin(), jt = --system_levels_solve.rend(); it != jt; ++it, --level)
+    for (auto it = system_levels_solve.rbegin(); it != it_end; ++it, --level)
     {
       auto inner_multigrid = Solver::new_scarcmultigrid(
           inner_multigrid_hierarchy,

@@ -410,8 +410,8 @@ namespace StokesVortex2D
       typename SystemLevelType::GlobalVeloTransfer
         > >();
     {
-      //for(auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
-      for (auto it = system_levels.rbegin(), jt = --system_levels.rend(); it != jt; ++it)
+      auto it_end = --system_levels.rend();
+      for (auto it = system_levels.rbegin(); it != it_end; ++it)
       {
         auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
         multigrid_hierarchy_a->push_level((*it)->matrix_a, (*it)->filter_velo, (*it)->transfer_velo, smoother, smoother, smoother);

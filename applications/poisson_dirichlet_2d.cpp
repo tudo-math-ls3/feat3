@@ -279,7 +279,8 @@ namespace PoissonDirichlet2D
         > >();
 
     // push all levels except the coarse most one
-    for (auto it = system_levels.rbegin(), jt = --system_levels.rend(); it != jt; ++it)
+    auto it_end = --system_levels.rend();
+    for (auto it = system_levels.rbegin(); it != it_end; ++it)
     {
       auto jac_smoother = Solver::new_jacobi_precond((*it)->matrix_sys, (*it)->filter_sys, 0.7);
       auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);

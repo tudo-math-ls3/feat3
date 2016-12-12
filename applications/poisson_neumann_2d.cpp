@@ -300,7 +300,8 @@ namespace PoissonNeumann2D
     DataType omega = DataType(0.2);
 
     // push levels into MGV
-    for (auto it = system_levels_solve.rbegin(), jt = --system_levels_solve.rend(); it != jt; ++it)
+    auto it_end = --system_levels_solve.rend();
+    for (auto it = system_levels_solve.rbegin(); it != it_end; ++it)
     {
       auto smoother = Solver::new_scale_precond((*it)->filter_sys, omega);
       multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*it)->transfer_sys, smoother, smoother, smoother);
