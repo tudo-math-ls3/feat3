@@ -71,6 +71,14 @@ namespace FEAT
         /// Blockwidth of the system matrix
         static constexpr int BlockWidth = MatrixType::BlockWidth;
 
+        /// Our 'base' class type
+        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+        using ContainerType = DuDvFunctional<Mem2_, DT2_, IT2_, TrafoType_, MatrixType_>;
+
+        /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+        template <typename Mem2_, typename DataType2_, typename IndexType2_>
+        using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+
         /// Our base class
         typedef MeshQualityFunctional<MeshType> BaseClass;
         /// Type for exchanging information between state variable and mesh
@@ -108,11 +116,7 @@ namespace FEAT
         static constexpr int _local_degree = 4*TrafoSpace::local_degree + 1;
 
         /// The system matrix
-        MatrixType sys_matrix;
-
-        /// Our 'base' class type
-        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-        using ContainerType = class DuDvFunctional<Mem2_, DT2_, IT2_, TrafoType_, MatrixType_ >;
+        MatrixType matrix_sys;
 
       protected:
         /// The transformation defining the physical mesh
@@ -151,7 +155,7 @@ namespace FEAT
           std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* dirichlet_asm_,
           std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>* slip_asm_) :
           BaseClass(rmn_),
-          sys_matrix(),
+          matrix_sys(),
           _trafo(&(trafo_space_->get_trafo())),
           _trafo_space(trafo_space_),
           _lambda(rmn_->get_mesh()->get_num_entities(MeshType::shape_dim)),
@@ -159,6 +163,11 @@ namespace FEAT
           _slip_asm(slip_asm_),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
           {
+            Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, *_trafo_space);
+            XASSERT(_trafo != nullptr);
+            XASSERT(_trafo_space != nullptr);
+            XASSERT(_dirichlet_asm != nullptr);
+            XASSERT(_slip_asm != nullptr);
           }
 
         /**
@@ -168,7 +177,7 @@ namespace FEAT
          */
         explicit DuDvFunctional() :
           BaseClass(),
-          sys_matrix(),
+          matrix_sys(),
           _trafo(nullptr),
           _trafo_space(nullptr),
           _lambda(),
@@ -179,7 +188,7 @@ namespace FEAT
           }
 
         //explicit DuDvFunctional(DuDvFunctional&& other) :
-        //  sys_matrix(std::move(other.sys_matrix)),
+        //  matrix_sys(std::move(other.matrix_sys)),
         //  _trafo(other._trafo),
         //  _trafo_space(other._trafo_space),
         //  _lambda(std::move(other._lambda)),
@@ -199,6 +208,18 @@ namespace FEAT
         /// Explicitly delete copy constructor
         DuDvFunctional(const DuDvFunctional&) = delete;
 
+        DuDvFunctional(DuDvFunctional&& other) :
+          BaseClass(other.get_mesh_node()),
+          matrix_sys(std::forward<MatrixType>(other.matrix_sys)),
+          _trafo(other._trafo),
+          _trafo_space(other._trafo_space),
+          _lambda(std::forward<ScalarVectorType>(other._lambda)),
+          _dirichlet_asm(other._dirichlet_asm),
+          _slip_asm(other._slip_asm),
+          _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
+        {
+        }
+
         /// \brief Virtual destructor
         virtual ~DuDvFunctional()
         {
@@ -217,11 +238,11 @@ namespace FEAT
          */
         virtual void init() override
         {
-          XASSERT(_trafo != nullptr);
-          XASSERT(_trafo_space != nullptr);
-          XASSERT(_dirichlet_asm != nullptr);
-          XASSERT(_slip_asm != nullptr);
-          Assembly::SymbolicAssembler::assemble_matrix_std1(sys_matrix, *_trafo_space);
+          //XASSERT(_trafo != nullptr);
+          //XASSERT(_trafo_space != nullptr);
+          //XASSERT(_dirichlet_asm != nullptr);
+          //XASSERT(_slip_asm != nullptr);
+          //Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, *_trafo_space);
         }
 
         /// \copydoc BaseClass::name()
@@ -238,12 +259,12 @@ namespace FEAT
         {
           XASSERT(_trafo_space != nullptr);
 
-          sys_matrix.format();
+          matrix_sys.format();
 
           Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
 
           Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-            sys_matrix,           // the matrix that receives the assembled operator
+            matrix_sys,           // the matrix that receives the assembled operator
             my_operator, // the operator that is to be assembled
             *_trafo_space,            // the finite element space in use
             _cubature_factory  // the cubature factory to be used for integration
@@ -269,7 +290,7 @@ namespace FEAT
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
           {
-            _lambda(cell, _trafo->template compute_vol<typename MeshType::ShapeType>(cell));
+            _lambda(cell, DataType(_trafo->template compute_vol<typename MeshType::ShapeType>(cell)));
           }
 
           auto& dirichlet_filters = filter.template at<1>();
@@ -425,8 +446,8 @@ namespace FEAT
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             size_defect += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
-            lambda_min = Math::min(lambda_min, this->_lambda(cell));
-            lambda_max = Math::max(lambda_max, this->_lambda(cell));
+            lambda_min = Math::min(lambda_min, CoordType(this->_lambda(cell)));
+            lambda_max = Math::max(lambda_max, CoordType(this->_lambda(cell)));
           }
 
           vol_min /= vol;
@@ -436,13 +457,44 @@ namespace FEAT
         }
 
         /**
-         * \brief Checks if the functional is empty (= the null functional
+         * \brief Conversion method
          *
-         * \returns True if the number of DoFs is zero.)
+         * \param[in] other
+         * The source DuDvFunctional.
+         *
          */
-        bool empty() const
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const DuDvFunctional<Mem2_, DT2_, IT2_, TrafoType_, MatrixType_> & other)
         {
-          return sys_matrix.empty();
+          matrix_sys.convert(other.matrix_sys);
+        }
+
+        template<typename Mem2_, typename DT2_, typename IT2_>
+        void clone(const ContainerTypeByMDI<Mem2_, DT2_, IT2_>& other,
+        LAFEM::CloneMode clone_mode = LAFEM::CloneMode::Weak)
+        {
+          matrix_sys.clone(other.matrix_sys, clone_mode);
+          _lambda.clone(other.lambda, clone_mode);
+
+          _trafo = other._trafo;
+          _trafo_space = other._trafo_space;
+
+          _dirichlet_asm = other._dirichlet_asm;
+          _slip_asm = other._slip_asm;
+        }
+
+        DuDvFunctional clone( LAFEM::CloneMode clone_mode = LAFEM::CloneMode::Weak) const
+        {
+          DuDvFunctional result(this->get_mesh_node(),
+          _trafo_space,
+          _dirichlet_asm,
+          _slip_asm);
+
+          result.matrix_sys.clone(matrix_sys, clone_mode);
+          result._lambda.clone(_lambda, clone_mode);
+
+          return result;
+
         }
 
         /**
@@ -450,7 +502,7 @@ namespace FEAT
          */
         VectorTypeL create_vector_l() const
         {
-          return sys_matrix.create_vector_l();
+          return matrix_sys.create_vector_l();
         }
 
         /**
@@ -458,7 +510,17 @@ namespace FEAT
          */
         VectorTypeR create_vector_r() const
         {
-          return sys_matrix.create_vector_r();
+          return matrix_sys.create_vector_r();
+        }
+
+        /**
+         * \brief Checks if the functional is empty (= the null functional
+         *
+         * \returns True if the number of DoFs is zero.)
+         */
+        bool empty() const
+        {
+          return matrix_sys.empty();
         }
 
         /**
@@ -469,7 +531,7 @@ namespace FEAT
         template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
         Index columns() const
         {
-          return sys_matrix.template columns<perspective_>();
+          return matrix_sys.template columns<perspective_>();
         }
 
         /**
@@ -480,13 +542,13 @@ namespace FEAT
         template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
         Index rows() const
         {
-          return sys_matrix.template rows<perspective_>();
+          return matrix_sys.template rows<perspective_>();
         }
 
         /// \copydoc MatrixType::apply()
         void apply(VectorTypeL& r, const VectorTypeR& x) const
         {
-          sys_matrix.apply(r, x);
+          matrix_sys.apply(r, x);
         }
 
         /// \copydoc MatrixType::apply()
@@ -494,19 +556,19 @@ namespace FEAT
         {
           // copy y to r
           r.copy(y);
-          sys_matrix.apply(r, x, r, alpha);
+          matrix_sys.apply(r, x, r, alpha);
         }
 
         /// \copydoc MatrixType::extract_diag(VectorTypeL&)
         void extract_diag(VectorTypeL& diag) const
         {
-          sys_matrix.extract_diag(diag);
+          matrix_sys.extract_diag(diag);
         }
 
         /// \copydoc MatrixType::format(DataType)
         void format(DataType value = DataType(0))
         {
-          sys_matrix.format(value);
+          matrix_sys.format(value);
         }
 
     }; // class DuDvFunctional

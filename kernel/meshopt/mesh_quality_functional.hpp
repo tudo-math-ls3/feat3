@@ -121,6 +121,12 @@ namespace FEAT
           return _mesh_node->get_mesh();
         }
 
+        /// \returns The root mesh node
+        Geometry::RootMeshNode<MeshType>* get_mesh_node() const
+        {
+          return _mesh_node;
+        }
+
         /// \brief Gets the coordinates from the underlying mesh and saves them in _coords_buffer.
         virtual void mesh_to_buffer()
         {

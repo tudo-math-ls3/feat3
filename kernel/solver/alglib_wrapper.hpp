@@ -84,7 +84,7 @@ namespace FEAT
         /// Convergence report etc.
         alglib::minlbfgsreport _report;
         /// Dimension for lBFGS Hessian update
-        Index _lbfgs_dim;
+        alglib::ae_int_t _lbfgs_dim;
 
       public:
         /// Can hold all iterates for debugging purposes
@@ -108,7 +108,7 @@ namespace FEAT
          *
          */
         explicit ALGLIBMinLBFGS(
-          Operator_& op_, Filter_& filter_, const Index lbfgs_dim_ = alglib::ae_int_t(0),
+          Operator_& op_, Filter_& filter_, const alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
           const bool keep_iterates = false) :
           BaseClass("ALGLIBMinLBFGS", op_, filter_, nullptr),
           _lbfgs_dim(lbfgs_dim_),
@@ -122,9 +122,9 @@ namespace FEAT
               iterates = new std::deque<VectorType>;
             }
 
-            if(_lbfgs_dim == Index(0))
+            if(_lbfgs_dim == alglib::ae_int_t(0))
             {
-              _lbfgs_dim = Math::min(Index(7), this->_op.columns());
+              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), this->_op.columns()));
             }
           }
 
@@ -147,12 +147,12 @@ namespace FEAT
           BaseClass::read_config(section);
 
           // Default LBFGS update dimension is 0 so the constructor can choose is automatically.
-          Index lbfgs_dim(0);
+          alglib::ae_int_t lbfgs_dim(0);
           auto lbfgs_dim_p = section->query("lbfgs_dim");
           // Get LBFGS update dimension.
           if(lbfgs_dim_p.second)
           {
-            lbfgs_dim = Index(std::stoul(lbfgs_dim_p.first));
+            lbfgs_dim = alglib::ae_int_t(std::stoul(lbfgs_dim_p.first));
           }
           set_lbfgs_dim(lbfgs_dim);
 
@@ -184,7 +184,7 @@ namespace FEAT
             _opt_var[i] = double(0);
           }
 
-          alglib::minlbfgscreate(alglib::ae_int_t(_lbfgs_dim), _opt_var, _state);
+          alglib::minlbfgscreate(_lbfgs_dim, _opt_var, _state);
           alglib::minlbfgssetxrep(_state, true);
           // Set stopping criteria: absolute tolerance, function improvement, length of update step, max iterations
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
@@ -256,9 +256,9 @@ namespace FEAT
         /**
          * \brief Sets the dimension for the LBFGS update
          */
-        void set_lbfgs_dim(Index lbfgs_dim)
+        void set_lbfgs_dim(alglib::ae_int_t lbfgs_dim)
         {
-          XASSERT(lbfgs_dim > Index(0));
+          XASSERT(lbfgs_dim > alglib::ae_int_t(0));
           _lbfgs_dim = lbfgs_dim;
         }
 

@@ -306,7 +306,7 @@ nlsd_rb_d_sw(double(0.6), Index(13), "NewtonRaphsonLinesearch", "none");
 
 #ifdef FEAT_HAVE_QUADMATH
 NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlsd_rb_q(__float128(0.9), Index(95), "SecantLinesearch", "Hessian");
+nlsd_rb_q(__float128(0.9), Index(96), "SecantLinesearch", "Hessian");
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in

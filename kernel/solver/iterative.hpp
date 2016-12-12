@@ -293,7 +293,7 @@ namespace FEAT
       /**
        * \brief Reads a solver configuration from a PropertyMap
        */
-      virtual void read_config(PropertyMap* section)
+      virtual void read_config(PropertyMap* section) override
       {
 
         BaseClass::read_config(section);

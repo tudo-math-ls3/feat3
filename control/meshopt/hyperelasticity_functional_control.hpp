@@ -11,9 +11,9 @@
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
 
 #include <control/domain/domain_control.hpp>
+#include <control/solver_factory.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_precond_factory.hpp>
-#include <control/meshopt/meshopt_solver_factory.hpp>
 
 namespace FEAT
 {
@@ -92,8 +92,6 @@ namespace FEAT
             LocalQualityFunctionalType,
             Global::NonlinearFunctional
           > SystemLevelType;
-          /// Type for holding inter level transfer information
-          typedef MeshoptTransferLevel<SystemLevelType, TransferMatrixType> TransferLevelType;
 
           /// Domain layers
           typedef typename DomainControl_::LayerType DomainLayerType;
@@ -114,8 +112,6 @@ namespace FEAT
           std::deque<AssemblerLevelType*> _assembler_levels;
           /// These hold the system information for each level
           std::deque<SystemLevelType*> _system_levels;
-          /// Inter level transfer information
-          std::deque<TransferLevelType*> _transfer_levels;
 
         public:
           /// Solver configuration
@@ -167,7 +163,6 @@ namespace FEAT
             BaseClass(dom_ctrl),
             _assembler_levels(),
             _system_levels(),
-            _transfer_levels(),
             solver_config(solver_config_),
             solver_name(solver_name_),
             precond(nullptr),
@@ -212,12 +207,6 @@ namespace FEAT
                   _assembler_levels.at(i)->dirichlet_asm,
                   _assembler_levels.at(i)->slip_asm,
                   std::forward<Args_>(args)...));
-
-                // If we are not on the coarsest level, create the new transfer level
-                if(i > 0)
-                {
-                  _transfer_levels.push_back(new TransferLevelType(*_system_levels.at(i-1), *_system_levels.at(i)));
-                }
               }
 
               for(Index i(0); i < get_num_levels(); ++i)
@@ -230,9 +219,9 @@ namespace FEAT
                 _system_levels.at(i)->op_sys.init();
               }
 
-              for(Index i(0); (i+1) < get_num_levels(); ++i)
+              for(Index i(0); i < get_num_levels(); ++i)
               {
-                _assembler_levels.at(i+1)->assemble_system_transfer(*_transfer_levels.at(i), *_assembler_levels.at(i));
+                _assembler_levels.at(i)->assemble_system_transfer(*_system_levels.at(i), *_assembler_levels.at(i));
               }
 
               auto* solver_section = solver_config.query_section(solver_name);
@@ -243,8 +232,9 @@ namespace FEAT
 
               precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);
 
-              solver = Control::MeshoptSolverFactory::create_nonlinear_optimiser
-                (_system_levels, &solver_config, solver_name, precond, meshopt_lvl_pos);
+              solver = Control::SolverFactory::create_nonlinear_optimiser
+                (_system_levels.at(meshopt_lvl_pos)->op_sys,
+                _system_levels.at(meshopt_lvl_pos)->filter_sys, &solver_config, solver_name, precond);
               solver->init();
 
             }
@@ -267,15 +257,14 @@ namespace FEAT
               _system_levels.pop_back();
             }
 
-            while(!_transfer_levels.empty())
-            {
-              delete _transfer_levels.back();
-              _transfer_levels.pop_back();
-            }
-
+            // Finish the solver
             solver->done();
+
+            // Finish the preconditioner
             if(precond != nullptr)
+            {
               precond->done();
+            }
           }
 
           /// \copydoc BaseClass::compute_cell_size_defect()
@@ -283,14 +272,14 @@ namespace FEAT
               CoordType& vol_min, CoordType& vol_max, CoordType& vol) const override
           {
 
-            (*(_system_levels.back()->op_sys)).compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
+            _system_levels.back()->op_sys.local().compute_cell_size_defect_pre_sync(vol_min, vol_max, vol);
 
             vol_min = _system_levels.back()->gate_sys.min(vol_min);
             vol_max = _system_levels.back()->gate_sys.max(vol_max);
             vol = _system_levels.back()->gate_sys.sum(vol);
 
-            CoordType cell_size_defect =
-              (*(_system_levels.back()->op_sys)).compute_cell_size_defect_post_sync(lambda_min, lambda_max, vol_min, vol_max, vol);
+            CoordType cell_size_defect = _system_levels.back()->op_sys.local().compute_cell_size_defect_post_sync(
+                lambda_min, lambda_max, vol_min, vol_max, vol);
 
             lambda_min = _system_levels.back()->gate_sys.min(lambda_min);
             lambda_max = _system_levels.back()->gate_sys.max(lambda_max);
@@ -381,10 +370,10 @@ namespace FEAT
           virtual void buffer_to_mesh() override
           {
             // Write finest level
-            (*(_system_levels.back()->op_sys)).buffer_to_mesh();
+            _system_levels.back()->op_sys.local().buffer_to_mesh();
 
             // Get the coords buffer on the finest level
-            const auto& coords_buffer_loc = *(_system_levels.back()->coords_buffer);
+            const auto& coords_buffer_loc = _system_levels.back()->coords_buffer.local();
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(get_num_levels()-1); level > 0; )
@@ -401,8 +390,8 @@ namespace FEAT
               typename SystemLevelType::LocalCoordsBuffer
                 vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().copy(vec_level);
-              (*(_system_levels.at(level)->op_sys)).buffer_to_mesh();
+              _system_levels.at(level)->op_sys.local().get_coords().copy(vec_level);
+              _system_levels.at(level)->op_sys.local().buffer_to_mesh();
             }
           }
 
@@ -413,7 +402,7 @@ namespace FEAT
             (*(_system_levels.back()->op_sys)).mesh_to_buffer();
 
             // Get the coords buffer on the finest level
-            const auto& coords_buffer_loc = *(_system_levels.back()->coords_buffer);
+            const auto& coords_buffer_loc = _system_levels.back()->coords_buffer.local();
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(get_num_levels()-1); level > 0; )
@@ -429,7 +418,7 @@ namespace FEAT
               // the fine level vector.
               typename SystemLevelType::LocalCoordsBuffer vec_level(coords_buffer_loc, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).get_coords().copy(vec_level);
+              _system_levels.at(level)->op_sys.local().get_coords().copy(vec_level);
             }
 
           }
@@ -521,6 +510,7 @@ namespace FEAT
               // Call init() here to recompute all scales with current_** ScaleComputation
               _system_levels.at(level)->op_sys.init();
             }
+
           }
 
           /// \copydoc BaseClass::optimise()
@@ -565,15 +555,15 @@ namespace FEAT
               // Refine coarse vertex set and write the result to the CoordsBuffer
               Geometry::StandardRefinery<MeshType> refinery(coarse_mesh);
               refinery.fill_vertex_set(fine_vtx);
-              (*(_system_levels.at(pos)->op_sys)).mesh_to_buffer();
+              _system_levels.at(pos)->op_sys.local().mesh_to_buffer();
               // Convert the buffer to a filterable vector
               typename SystemLevelType::GlobalSystemVectorL::LocalVectorType vec_sol_lvl;
               vec_sol_lvl.convert(*(_system_levels.at(pos)->coords_buffer));
               // Filter this vector, copy back the contents and write the changes to the mesh
               auto& dirichlet_filters_lvl = (*(_system_levels.at(pos)->filter_sys)).template at<1>();
               dirichlet_filters_lvl.filter_sol(vec_sol_lvl);
-              (*(_system_levels.at(pos)->coords_buffer)).copy(vec_sol_lvl);
-              (*(_system_levels.at(pos)->op_sys)).buffer_to_mesh();
+              _system_levels.at(pos)->coords_buffer.local().copy(vec_sol_lvl);
+              _system_levels.at(pos)->op_sys.local().buffer_to_mesh();
               // Now call adapt() on the slip boundaries
               auto* fine_mesh_node = this->_dom_ctrl.get_levels().at(pos)->get_mesh_node();
               for(const auto& it:get_slip_boundaries())
@@ -595,7 +585,7 @@ namespace FEAT
               // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
               // the fine level vector.
               typename SystemLevelType::GlobalCoordsBuffer
-                global_sol_level( &(_system_levels.at(pos)->gate_sys), *vec_sol, ndofs, Index(0));
+                global_sol_level( &(_system_levels.at(pos)->gate_sys), vec_sol.local(), ndofs, Index(0));
 
               _system_levels.at(pos)->op_sys.prepare(global_sol_level, _system_levels.at(pos)->filter_sys);
 

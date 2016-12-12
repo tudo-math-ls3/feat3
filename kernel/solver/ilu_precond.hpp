@@ -867,7 +867,7 @@ namespace FEAT
         auto fill_in_param_p = section->query("fill_in_param");
         if(fill_in_param_p.second)
         {
-          set_fill_in_param(int(std::stoi(fill_in_param_p.first)));
+          set_fill_in_param(std::stoi(fill_in_param_p.first));
         }
       }
 
@@ -1016,7 +1016,7 @@ namespace FEAT
         auto fill_in_param_p = section->query("fill_in_param");
         if(fill_in_param_p.second)
         {
-          set_fill_in_param(Index(std::stoul(fill_in_param_p.first)));
+          set_fill_in_param(std::stoi(fill_in_param_p.first));
         }
       }
 
@@ -1235,7 +1235,7 @@ namespace FEAT
         auto fill_in_param_p = section->query("fill_in_param");
         if(fill_in_param_p.second)
         {
-          set_fill_in_param(Index(std::stoul(fill_in_param_p.first)));
+          set_fill_in_param(std::stoi(fill_in_param_p.first));
         }
       }
 

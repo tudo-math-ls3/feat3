@@ -15,7 +15,6 @@
 #include <kernel/meshopt/mesh_concentration_function.hpp>
 
 #include <control/meshopt/meshopt_control.hpp>
-#include <control/meshopt/meshopt_solver_factory.hpp>
 #include <control/meshopt/dudv_functional_control.hpp>
 #include <control/meshopt/hyperelasticity_functional_control.hpp>
 

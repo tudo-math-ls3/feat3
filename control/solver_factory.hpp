@@ -22,6 +22,14 @@
 #include <kernel/solver/convert_precond.hpp>
 #include <kernel/solver/matrix_stock.hpp>
 
+#include <kernel/solver/alglib_wrapper.hpp>
+#include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/nlcg.hpp>
+#include <kernel/solver/nlsd.hpp>
+#include <kernel/solver/nloptls.hpp>
+#include <kernel/solver/nlopt_precond.hpp>
+#include <kernel/solver/qpenalty.hpp>
+
 namespace FEAT
 {
   namespace Control
@@ -544,6 +552,234 @@ namespace FEAT
 
           return result;
         }
+
+        /**
+         * \brief Creates a new Solver::Linesearch object according to a configuration
+         *
+         * \param[in] base
+         * The PropertyMap containing the configuration of this solver
+         *
+         * \param[in] solver_name
+         * The name to identify our section in the PropertyMap
+         *
+         * \returns An std::shared_ptr to the new solver object.
+         */
+        template
+        <
+          typename Functional_,
+          typename Filter_
+        >
+        static std::shared_ptr<Solver::Linesearch<Functional_, Filter_>> create_linesearch(
+          Functional_& functional, Filter_& filter, PropertyMap* base, const String& solver_name)
+        {
+
+          typedef typename Functional_::VectorTypeR VectorTypeR;
+
+          std::shared_ptr<Solver::Linesearch<Functional_, Filter_> > result;
+
+          // Get the section where our solver is configured
+          auto section = base->query_section(solver_name);
+          if(section == nullptr)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__,
+            "could not find section "+solver_name+" in PropertyMap!");
+          }
+
+          // Get the required type String
+          auto solver_p = section->query("type");
+          if (!solver_p.second)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__,
+            "No type key found in PropertyMap section with name " + solver_name + "!");
+          }
+
+          String solver_type = solver_p.first;
+
+          // \todo: NewtonRaphsonLinesearch requires the operator to compute hessians, which has to be caught at
+          // runtime
+          /*if(solver_type == "NewtonRaphsonLinesearch")
+            {
+            result = Solver::new_newton_raphson_linesearch(
+              derefer<VectorTypeR>(system_levels.at(back_level)->op_sys, nullptr),
+              derefer<VectorTypeR>(system_levels.at(back_level)->filter_sys, nullptr));
+              }
+              else */
+          if(solver_type == "SecantLinesearch")
+          {
+            result = Solver::new_secant_linesearch(
+              derefer<VectorTypeR>(functional, nullptr),
+              derefer<VectorTypeR>(filter, nullptr));
+          }
+          else if(solver_type == "StrongWolfeLinesearch")
+          {
+            result = Solver::new_strong_wolfe_linesearch(
+              derefer<VectorTypeR>(functional, nullptr),
+              derefer<VectorTypeR>(filter, nullptr));
+          }
+          else
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Unknown linesearch type " + solver_name + "!");
+          }
+
+          // Now read the other configuration options from this section
+          result->read_config(section);
+
+          return result;
+        }
+
+        /**
+         *
+         */
+        template
+        <
+          typename Functional_,
+          typename Filter_
+        >
+        static std::shared_ptr<Solver::IterativeSolver<typename Functional_::VectorTypeR>>
+        create_nonlinear_optimiser(Functional_& functional, Filter_& filter, PropertyMap* base, String solver_name,
+        std::shared_ptr
+        <
+          Solver::NLOptPrecond<typename Functional_::VectorTypeR, Filter_>
+        >
+        precon = nullptr)
+        {
+          typedef typename Functional_::DataType DataType;
+          typedef typename Functional_::VectorTypeR VectorTypeR;
+
+          // At the end, we return this guy
+          std::shared_ptr<Solver::IterativeSolver<VectorTypeR>> result;
+
+          auto section = base->query_section(solver_name);
+
+          auto solver_p = section->query("type");
+          if (!solver_p.second)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__,
+            "no type key found in property map: " + solver_name + "!");
+          }
+
+          String solver_type = solver_p.first;
+
+          if(solver_type == "QPenalty")
+          {
+            // Create inner solver first
+            auto inner_solver_p = section->query("inner_solver");
+            // Safety catches for recursions
+            XASSERTM(inner_solver_p.second, "QPenalty solver section is missing mandatory inner_solver key.");
+            XASSERTM(inner_solver_p.first != "QPenalty", "QPenalty cannot be the inner solver for QPenalty.");
+
+            std::shared_ptr<Solver::IterativeSolver<VectorTypeR>> inner_solver;
+            inner_solver = create_nonlinear_optimiser(functional, filter, base, inner_solver_p.first, precon);
+
+            DataType initial_penalty_param(1);
+            result = Solver::new_qpenalty(derefer<VectorTypeR>(functional, nullptr), inner_solver,
+            initial_penalty_param);
+
+          }
+          else if(solver_type == "ALGLIBMinLBFGS")
+          {
+#ifndef FEAT_HAVE_ALGLIB
+            throw InternalError(__func__,__FILE__,__LINE__,
+            "ALGLIBMinLBFGS is only available if FEAT was built with the alglib token in the buildid.");
+#else
+
+            if( Util::Comm::size() != 1)
+            {
+              throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
+            }
+
+            // Get some default parameters for the constructor
+            alglib::ae_int_t lbfgs_dim(0);
+            bool keep_iterates(false);
+
+            auto solver = Solver::new_alglib_minlbfgs(
+              derefer<VectorTypeR>(functional, nullptr),
+              derefer<VectorTypeR>(filter, nullptr),
+              lbfgs_dim,
+              keep_iterates);
+
+            result = solver;
+#endif // FEAT_HAVE_ALGLIB
+          }
+          else if (solver_type == "ALGLIBMinCG")
+          {
+#ifndef FEAT_HAVE_ALGLIB
+            throw InternalError(__func__,__FILE__,__LINE__,
+            "ALGLIBMinCG is only available if FEAT was built with the alglib token in the buildid.");
+#else
+            if( Util::Comm::size() != 1)
+            {
+              throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinCG is only available with 1 process!");
+            }
+
+            // Get default direction update
+            Solver::NLCGDirectionUpdate my_update(
+              Solver::ALGLIBMinCG<Functional_, Filter_>::direction_update_default);
+
+            // By default, do not keep the iterates
+            bool keep_iterates(false);
+
+            auto solver = Solver::new_alglib_mincg(
+              derefer<VectorTypeR>(functional, nullptr),
+              derefer<VectorTypeR>(filter, nullptr),
+              my_update,
+              keep_iterates);
+
+            result = solver;
+#endif // FEAT_HAVE_ALGLIB
+          }
+          else if (solver_type == "NLCG")
+          {
+            // Get default direction update
+            Solver::NLCGDirectionUpdate my_update(Solver::NLCG<Functional_, Filter_>::direction_update_default);
+            // Set this to false for the constructor
+            bool keep_iterates(false);
+
+            std::shared_ptr<Solver::Linesearch<Functional_, Filter_>> my_linesearch;
+
+            // Default linesearch is StrongWolfeLinesearch
+            String linesearch_name("StrongWolfeLinesearch");
+            auto linesearch_p = section->query("linesearch");
+            if(linesearch_p.second)
+            {
+              linesearch_name = linesearch_p.first;
+            }
+
+            my_linesearch = create_linesearch(functional, filter, base, linesearch_name);
+
+            auto solver = Solver::new_nlcg(
+              derefer<VectorTypeR>(functional, nullptr),
+              derefer<VectorTypeR>(filter, nullptr),
+              my_linesearch,
+              my_update,
+              keep_iterates,
+              precon);
+            result = solver;
+          }
+          else
+          {
+            throw InternalError(__func__,__FILE__,__LINE__,"Solver type key "+stringify(solver_type)+" unknown.");
+          }
+
+          result->read_config(section);
+
+          return result;
+        } // create_nonlinear_optimiser
+
+        /// returns the object, if T_ has a GateType, i.e. is a GlobalVector - SFINAE at its best
+        template <typename Evaluator_, typename T_>
+        static T_ & derefer(T_ & object, typename Evaluator_::GateType *)
+        {
+          return object;
+        }
+
+        /// returns the dereferenced object, if T_ has no GateType, i.e. is a LocalVector - SFINAE at its best
+        template <typename Evaluator_, typename T_>
+        static auto derefer(T_ & object, ...) -> decltype(*object)
+        {
+          return *object;
+        }
+
     }; // SolverFactory
 
   } // namespace Control
