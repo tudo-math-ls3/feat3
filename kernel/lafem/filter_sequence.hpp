@@ -60,6 +60,13 @@ namespace FEAT
       }
 
       /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~FilterSequence()
+      {
+      }
+
+      /**
        * \brief Constructs a FilterSequence of empty filters
        *
        * \param[in] ids_
@@ -76,24 +83,46 @@ namespace FEAT
         }
       }
 
+      FilterSequence(FilterSequence&& other) :
+        BaseClass(std::forward<BaseClass>(other))
+      {
+      }
+
+      /// move-assign operator
+      FilterSequence& operator=(FilterSequence&& other)
+      {
+        if(this != &other)
+        {
+          static_cast<BaseClass&>(*this) = std::forward<BaseClass>(other);
+        }
+
+        return *this;
+      }
+
       /// \brief Creates a clone of itself
       FilterSequence clone(CloneMode clone_mode = CloneMode::Deep) const
       {
         FilterSequence result;
+        result.resize(this->size());
 
-        for(auto& it = BaseClass::begin(); it != BaseClass::end(); ++it)
-          result.push_back(std::make_pair<String, InnerFilterType>(it->first, it->second->clone(clone_mode)));
+        for(size_t i(0); i < result.size(); ++i)
+        {
+          result.at(i).first = this->at(i).first;
+          result.at(i).second.clone(this->at(i).second, clone_mode);
+        }
 
         return result;
       }
 
       /// \brief Clones data from another FilterSequence
-      void clone(const FilterSequence & other, CloneMode clone_mode = CloneMode::Deep)
+      void clone(const FilterSequence& other, CloneMode clone_mode = CloneMode::Deep)
       {
         BaseClass::clear();
 
         for(const_iterator it(other.begin()); it != other.end(); ++it)
+        {
           BaseClass::push_back(std::make_pair<String, InnerFilterType>(it->first, it->second->clone(clone_mode)));
+        }
 
       }
 
@@ -105,11 +134,12 @@ namespace FEAT
       {
         BaseClass::clear();
 
-        for(const_iterator it(other.begin()); it != other.end(); ++it)
+        BaseClass::resize(other.size());
+
+        for(size_t i(0); i < this->size(); ++i)
         {
-          InnerFilterType new_filter;
-          new_filter.convert(*(it->second));
-          BaseClass::push_back(std::make_pair<String, InnerFilterType>(it->first, new_filter));
+          this->at(i).first = other.at(i).first;
+          this->at(i).second.convert(other.at(i).second);
         }
       }
 
