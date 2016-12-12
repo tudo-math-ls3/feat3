@@ -49,6 +49,10 @@ namespace FEAT
         typename First_::template FilterType<Mem2_, DT2_, IT2_>,
         typename Rest_::template FilterType<Mem2_, DT2_, IT2_>...>;
 
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterTypeByMDI = FilterType<Mem2_, DT2_, IT2_>;
+
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
                     "sub-filters have different mem-types");
