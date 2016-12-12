@@ -182,11 +182,13 @@ namespace FEAT
           const CoordType* orientation,
           const TrafoType_& trafo)
           {
-            nu.format(CoordType(0));
+            typedef typename VectorType_::DataType DataType;
+
+            nu.format(DataType(0));
             // Vertex at facet index set from the parent
             auto& idx(trafo.get_mesh().template get_index_set<facet_dim,0>());
             // Temporary vector for holding one normal at a time
-            Tiny::Vector<CoordType, world_dim> tmp(CoordType(0));
+            Tiny::Vector<DataType, world_dim> tmp(DataType(0));
 
             // For every cell in the meshpart, compute the outer normal vectors in all local Lagrange points of the
             // element's transformation
@@ -197,12 +199,12 @@ namespace FEAT
                 CoordType vol(trafo.template compute_vol<FacetType>(k));
 
                 // Compute all normals
-                Tiny::Matrix<CoordType, nvt_loc, world_dim> nu_loc(trafo.compute_oriented_normals(k));
+                Tiny::Matrix<DataType, nvt_loc, world_dim> nu_loc(trafo.compute_oriented_normals(k));
 
                 // Add the local contributions to the vector that is numbered according to the parent
                 for(int l(0); l < nvt_loc; ++l)
                 {
-                  tmp = nu(idx[k][l]) + nu_loc[l]*orientation[k]*vol;
+                  tmp = nu(idx[k][l]) + nu_loc[l]*DataType(orientation[k]*vol);
                   nu(idx[k][l],  tmp);
                 }
               }
