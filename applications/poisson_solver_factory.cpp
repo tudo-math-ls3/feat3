@@ -37,135 +37,6 @@ namespace PoissonDirichlet2D
 {
   using namespace FEAT;
 
-  template<typename Space_>
-  class PoissonDirichletAssemblerLevel :
-    public Control::ScalarBasicAssemblerLevel<Space_>
-  {
-  public:
-    typedef Control::ScalarBasicAssemblerLevel<Space_> BaseClass;
-    typedef Space_ SpaceType;
-    typedef typename SpaceType::MeshType MeshType;
-
-  public:
-    explicit PoissonDirichletAssemblerLevel(typename BaseClass::DomainLevelType& dom_lvl) :
-      BaseClass(dom_lvl)
-    {
-    }
-
-    template<typename SystemLevel_>
-    void assemble_system_matrix(SystemLevel_& sys_level)
-    {
-      // get the global matrix
-      typename SystemLevel_::GlobalSystemMatrix& mat_glob = sys_level.matrix_sys;
-
-      // get the local matrix
-      typename SystemLevel_::LocalSystemMatrix& mat_loc = *mat_glob;
-
-      // assemble matrix structure?
-      if (mat_loc.empty())
-      {
-        Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc, this->space);
-      }
-
-      // assemble velocity laplace matrix
-      {
-        mat_loc.format();
-        Assembly::Common::LaplaceOperator laplace_op;
-        Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc, laplace_op, this->space, this->cubature);
-      }
-    }
-
-    template<typename SystemLevel_>
-    void assemble_system_filter(SystemLevel_& sys_level)
-    {
-      // get our global system filter
-      typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
-
-      // get our local system filter
-      typename SystemLevel_::LocalSystemFilter& fil_loc = *fil_glob;
-
-      // create unit-filter assembler
-      Assembly::UnitFilterAssembler<MeshType> unit_asm;
-
-      std::deque<String> part_names = this->domain_level.get_mesh_node()->get_mesh_part_names();
-      for(const auto& name : part_names)
-      {
-        if(name.starts_with('_'))
-          continue;
-
-        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(name);
-
-        // found it?
-        if (mesh_part_node == nullptr)
-          throw InternalError("Mesh Part Node 'boundary' not found!");
-
-        // let's see if we have that mesh part
-        // if it is nullptr, then our patch is not adjacent to that boundary part
-        auto* mesh_part = mesh_part_node->get_mesh();
-        if (mesh_part != nullptr)
-        {
-          // add to boundary assembler
-          unit_asm.add_mesh_part(*mesh_part);
-        }
-      }
-
-      // finally, assemble the filter
-      unit_asm.assemble(fil_loc, this->space);
-    }
-
-
-    template<typename SystemLevel_, typename SolFunc_>
-    typename SystemLevel_::GlobalSystemVector assemble_rhs_vector(SystemLevel_& sys_level, const SolFunc_& sol_func)
-    {
-      // create new vector
-      typename SystemLevel_::GlobalSystemVector vec_rhs = sys_level.matrix_sys.create_vector_r();
-      vec_rhs.format();
-
-      // get the local vector
-      typename SystemLevel_::LocalSystemVector& vec_f = *vec_rhs;
-
-      // assemble the force
-      Assembly::Common::LaplaceFunctional<SolFunc_> force_func(sol_func);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, this->space, this->cubature);
-
-      // sync the vector
-      vec_rhs.sync_0();
-
-      // and filter it
-      sys_level.filter_sys.filter_rhs(vec_rhs);
-      return vec_rhs;
-    }
-
-    template<typename SystemLevel_>
-    typename SystemLevel_::GlobalSystemVector assemble_sol_vector(SystemLevel_& sys_level)
-    {
-      typename SystemLevel_::GlobalSystemVector vec_sol = sys_level.matrix_sys.create_vector_r();
-      vec_sol.format();
-      sys_level.filter_sys.filter_sol(vec_sol);
-      return vec_sol;
-    }
-
-    template<typename SystemLevel_, typename SolFunc_>
-    void analyse_sol_vector(bool plot, SystemLevel_& sys_level, const typename SystemLevel_::GlobalSystemVector& vec_sol, const SolFunc_& sol_func)
-    {
-      typedef typename SystemLevel_::DataType DataType;
-
-      // Compute and print the H0-/H1-errors
-      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-        *vec_sol, sol_func, this->space, this->cubature);
-
-      // synhronise all local errors
-      errors.norm_h0 = sys_level.gate_sys.norm2(errors.norm_h0);
-      errors.norm_h1 = sys_level.gate_sys.norm2(errors.norm_h1);
-
-      // print errors
-      if (plot)
-      {
-        std::cout << errors << std::endl;
-      }
-    }
-  };
-
   template<typename MeshType_>
   void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
@@ -192,7 +63,7 @@ namespace PoissonDirichlet2D
 
     // define our assembler level
     typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef PoissonDirichletAssemblerLevel<SpaceType> AssemblerLevelType;
+    typedef Control::ScalarBasicAssemblerLevel<SpaceType> AssemblerLevelType;
 
     // get our domain level and layer
     typedef typename DomainControlType::LayerType DomainLayerType;
@@ -219,16 +90,25 @@ namespace PoissonDirichlet2D
 
     for (Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_gates(layer, *system_levels.at(i));
+      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system matrices...");
 
+    Cubature::DynamicFactory cubature("auto-degree:5");
+
     for (Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_matrix(*system_levels.at(i));
+      const auto& space = asm_levels.at(i)->space;
+      auto& loc_matrix = system_levels.at(i)->matrix_sys.local();
+
+      Assembly::SymbolicAssembler::assemble_matrix_std1(loc_matrix, space);
+
+      loc_matrix.format();
+      Assembly::Common::LaplaceOperator laplace_op;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_matrix, laplace_op, space, cubature);
     }
 
     /* ***************************************************************************************** */
@@ -237,7 +117,7 @@ namespace PoissonDirichlet2D
 
     for (Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_filter(*system_levels.at(i));
+      system_levels.at(i)->assemble_homogeneous_unit_filter(*domain_levels.at(i), asm_levels.at(i)->space);
     }
 
     /* ***************************************************************************************** */
@@ -246,7 +126,7 @@ namespace PoissonDirichlet2D
 
     for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_system_transfer(*system_levels.at(i), *asm_levels.at(i-1));
+      system_levels.at(i)->assemble_transfers(asm_levels.at(i)->space, asm_levels.at(i-1)->space, cubature);
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
@@ -261,9 +141,28 @@ namespace PoissonDirichlet2D
     SystemLevelType& the_system_level = *system_levels.back();
     AssemblerLevelType& the_asm_level = *asm_levels.back();
 
-    // create our RHS and SOL vectors
-    GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level, sol_func);
-    GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+    // create new vectors
+    GlobalSystemVector vec_sol = the_system_level.matrix_sys.create_vector_r();
+    GlobalSystemVector vec_rhs = the_system_level.matrix_sys.create_vector_r();
+
+    vec_sol.format();
+    vec_rhs.format();
+
+    {
+      // get the local vector
+      typename SystemLevelType::LocalSystemVector& vec_f = vec_rhs.local();
+
+      // assemble the force
+      Assembly::Common::LaplaceFunctional<decltype(sol_func)> force_func(sol_func);
+      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_asm_level.space, cubature);
+
+      // sync the vector
+      vec_rhs.sync_0();
+    }
+
+    // and filter it
+    the_system_level.filter_sys.filter_sol(vec_sol);
+    the_system_level.filter_sys.filter_rhs(vec_rhs);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -323,7 +222,16 @@ namespace PoissonDirichlet2D
 
     if (args.check("no-err") < 0)
     {
-      the_asm_level.analyse_sol_vector(comm.rank() == 0, the_system_level, vec_sol, sol_func);
+      // Compute and print the H0-/H1-errors
+      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
+        (vec_sol.local(), sol_func, the_asm_level.space, cubature);
+
+      // synhronise all local errors
+      errors.synchronise(comm);
+
+      // print errors
+      comm.print("");
+      comm.print(errors.format_string());
     }
 
     /* ***************************************************************************************** */
@@ -342,8 +250,8 @@ namespace PoissonDirichlet2D
 
       // project velocity and pressure
       typename SystemLevelType::LocalSystemVector vtx_sol, vtx_rhs;
-      Assembly::DiscreteVertexProjector::project(vtx_sol, (*vec_sol), the_asm_level.space);
-      Assembly::DiscreteVertexProjector::project(vtx_rhs, (*vec_rhs), the_asm_level.space);
+      Assembly::DiscreteVertexProjector::project(vtx_sol, vec_sol.local(), the_asm_level.space);
+      Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_asm_level.space);
 
       // write velocity
       exporter.add_vertex_scalar("sol", vtx_sol.elements());
@@ -425,6 +333,17 @@ namespace PoissonDirichlet2D
       FEAT::Runtime::abort();
     }
 
+    if(args.check("mesh") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
+      FEAT::Runtime::abort();
+    }
+    if(args.check("solver-ini") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--solver-ini <ini-file>' is missing!");
+      FEAT::Runtime::abort();
+    }
+
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -441,12 +360,6 @@ namespace PoissonDirichlet2D
 
       // let's create our domain
       comm.print("Preparing domain...");
-
-      if(args.check("mesh") < 1)
-      {
-        comm.print(std::cerr, "ERROR: Mandatory option --mesh is missing!");
-        FEAT::Runtime::abort();
-      }
 
       // query mesh filename list
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;

@@ -23,6 +23,8 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
+#include <kernel/assembly/mean_filter_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/util/property_map.hpp>
@@ -119,6 +121,96 @@ namespace FEAT
         matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
         transfer_sys.convert(&coarse_muxer_sys, other.transfer_sys);
       }
+
+      template<typename DomainLayer_, typename DomainLevel_, typename Space_>
+      void assemble_gate(const DomainLayer_& dom_layer, const DomainLevel_& dom_level, const Space_& space)
+      {
+        // set the gate comm
+        this->gate_sys.set_comm(dom_layer.get_comm());
+
+        // loop over all ranks
+        for(Index i(0); i < dom_layer.size(); ++i)
+        {
+          Index rank = dom_layer.get_rank(i);
+
+          // try to find our halo
+          auto* halo = dom_level.find_halo_part(rank);
+          XASSERT(halo != nullptr);
+
+          // assemble the mirror
+          SystemMirror mirror_sys;
+          Assembly::MirrorAssembler::assemble_mirror(mirror_sys, space, *halo);
+
+          // push mirror into gate
+          this->gate_sys.push(int(rank), std::move(mirror_sys));
+        }
+
+        // create local template vector
+        LocalSystemVector tmpl_s(space.get_num_dofs());
+
+        // compile gate
+        this->gate_sys.compile(std::move(tmpl_s));
+      }
+
+      template<typename Space_, typename Cubature_>
+      void assemble_transfer(const Space_& space_fine, const Space_& space_coarse, const Cubature_& cubature)
+      {
+        // get local transfer operator
+        LocalSystemTransfer& loc_trans = this->transfer_sys.local();
+
+        // get local transfer matrices
+        LocalSystemTransferMatrix& loc_prol = loc_trans.get_mat_prol();
+        LocalSystemTransferMatrix& loc_rest = loc_trans.get_mat_rest();
+
+        // assemble structure?
+        if (loc_prol.empty())
+        {
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_fine, space_coarse);
+        }
+
+        // create local weight vector
+        LocalSystemVector loc_vec_weight = loc_prol.create_vector_l();
+
+        // assemble prolongation matrix
+        {
+          loc_prol.format();
+          loc_vec_weight.format();
+
+          // assemble prolongation matrix
+          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
+            space_fine, space_coarse, cubature);
+
+          // synchronise weight vector using the gate
+          this->gate_sys.sync_0(loc_vec_weight);
+
+          // invert components
+          loc_vec_weight.component_invert(loc_vec_weight);
+
+          // scale prolongation matrix
+          loc_prol.scale_rows(loc_prol, loc_vec_weight);
+
+          // copy and transpose
+          loc_rest = loc_prol.transpose();
+        }
+      }
+
+      template<typename Space_, typename Cubature_>
+      void assemble_laplace_matrix(const Space_& space, const Cubature_& cubature, const DataType nu = DataType(1))
+      {
+        // get local matrix
+        auto& loc_matrix = this->matrix_sys.local();
+
+        // assemble structure?
+        if(loc_matrix.empty())
+        {
+          Assembly::SymbolicAssembler::assemble_matrix_std1(loc_matrix, space);
+        }
+
+        // format and assemble laplace
+        loc_matrix.format();
+        Assembly::Common::LaplaceOperator laplace_op;
+        Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_matrix, laplace_op, space, cubature, nu);
+      }
     }; // class ScalarBasicSystemLevel<...>
 
     template<
@@ -178,6 +270,35 @@ namespace FEAT
         BaseClass::convert(other);
         filter_sys.convert(other.filter_sys);
       }
+
+      template<typename DomainLevel_, typename Space_>
+      void assemble_homogeneous_unit_filter(const DomainLevel_& dom_level, const Space_& space)
+      {
+        auto& loc_filter = this->filter_sys.local();
+
+        // create unit-filter assembler
+        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
+
+        std::deque<String> part_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
+        for(const auto& name : part_names)
+        {
+          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(name);
+          XASSERT(mesh_part_node != nullptr);
+
+          // let's see if we have that mesh part
+          // if it is nullptr, then our patch is not adjacent to that boundary part
+          auto* mesh_part = mesh_part_node->get_mesh();
+          if (mesh_part != nullptr)
+          {
+            // add to boundary assembler
+            unit_asm.add_mesh_part(*mesh_part);
+          }
+        }
+
+        // finally, assemble the filter
+        unit_asm.assemble(loc_filter, space);
+      }
+
     }; // class ScalarUnitFilterSystemLevel<...>
 
     template<
@@ -237,6 +358,33 @@ namespace FEAT
         BaseClass::convert(other);
         filter_sys.convert(other.filter_sys);
       }
+
+      template<typename Space_, typename Cubature_>
+      void assemble_mean_filter(const Space_& space, const Cubature_& cubature)
+      {
+        // get our local system filter
+        LocalSystemFilter& loc_filter = this->filter_sys.local();
+
+        // create two global vectors
+        typename BaseClass::GlobalSystemVector vec_glob_v(&this->gate_sys), vec_glob_w(&this->gate_sys);
+
+        // fetch the local vectors
+        typename BaseClass::LocalSystemVector& vec_loc_v = vec_glob_v.local();
+        typename BaseClass::LocalSystemVector& vec_loc_w = vec_glob_w.local();
+
+        // fetch the frequency vector of the system gate
+        typename BaseClass::LocalSystemVector& vec_loc_f = this->gate_sys._freqs;
+
+        // assemble the mean filter
+        Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space, cubature);
+
+        // synchronise the vectors
+        vec_glob_v.sync_1();
+        vec_glob_w.sync_0();
+
+        // build the mean filter
+        loc_filter = LocalSystemFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_sys.get_comm());
+      }
     }; // class ScalarMeanFilterSystemLevel<...>
 
     template<typename Space_>
@@ -253,100 +401,17 @@ namespace FEAT
       MeshType& mesh;
       TrafoType trafo;
       SpaceType space;
-      Cubature::DynamicFactory cubature;
 
       explicit ScalarBasicAssemblerLevel(DomainLevelType& dom_lvl) :
         domain_level(dom_lvl),
         mesh(domain_level.get_mesh()),
         trafo(mesh),
-        space(trafo),
-        cubature("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree)+2))
+        space(trafo)
       {
       }
 
       virtual ~ScalarBasicAssemblerLevel()
       {
-      }
-
-      //template<typename MemType_, typename DataType_, typename IndexType_, template<typename, typename, typename> class ScalarMatrix_>
-      //void assemble_gates(const DomainLayerType& dom_layer, ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_>& sys_level)
-      template<typename SystemLevel_>
-      void assemble_gates(const DomainLayerType& dom_layer, SystemLevel_& sys_level)
-      {
-        // get our gate
-        typename SystemLevel_::SystemGate& gate_sys = sys_level.gate_sys;
-
-        // set the gate comm
-        gate_sys.set_comm(dom_layer.get_comm());
-
-        // loop over all ranks
-        for(Index i(0); i < dom_layer.size(); ++i)
-        {
-          Index rank = dom_layer.get_rank(i);
-
-          // try to find our halo
-          auto* halo = domain_level.find_halo_part(rank);
-          if (halo == nullptr)
-            throw InternalError("ERROR: Halo not found!");
-
-          // assemble the mirror
-          typename SystemLevel_::SystemMirror mirror_sys;
-          Assembly::MirrorAssembler::assemble_mirror(mirror_sys, space, *halo);
-
-          // push mirror into gate
-          gate_sys.push(int(rank), std::move(mirror_sys));
-        }
-
-        // create local template vector
-        typename SystemLevel_::LocalSystemVector tmpl_s(space.get_num_dofs());
-
-        // compile gate
-        gate_sys.compile(std::move(tmpl_s));
-      }
-
-      template<typename SystemLevel_>
-      void assemble_system_transfer(SystemLevel_& sys_level_fine, ScalarBasicAssemblerLevel& level_coarse)
-      {
-        // get global transfer operator
-        typename SystemLevel_::GlobalSystemTransfer& glob_trans = sys_level_fine.transfer_sys;
-
-        // get local transfer operator
-        typename SystemLevel_::LocalSystemTransfer& loc_trans = glob_trans.local();
-
-        // get local transfer matrices
-        typename SystemLevel_::LocalSystemTransferMatrix& loc_prol = loc_trans.get_mat_prol();
-        typename SystemLevel_::LocalSystemTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-
-        // assemble structure?
-        if (loc_prol.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, this->space, level_coarse.space);
-        }
-
-        // create local weight vector
-        typename SystemLevel_::LocalSystemVector loc_vec_weight = loc_prol.create_vector_l();
-
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_vec_weight.format();
-
-          // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
-            this->space, level_coarse.space, this->cubature);
-
-          // synchronise weight vector using the gate
-          sys_level_fine.gate_sys.sync_0(loc_vec_weight);
-
-          // invert components
-          loc_vec_weight.component_invert(loc_vec_weight);
-
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_vec_weight);
-
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
-        }
       }
     }; // class ScalarBasicAssemblerLevel<...>
 
