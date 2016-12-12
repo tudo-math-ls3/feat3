@@ -22,7 +22,7 @@ namespace FEAT
     template<
       typename MemType_,
       typename DataType_,
-      typename IndexType_>
+      typename IndexType_ = Index>
     class NoneFilter
     {
     public:
@@ -120,7 +120,7 @@ namespace FEAT
     template<
       typename MemType_,
       typename DataType_,
-      typename IndexType_,
+      typename IndexType_ = Index,
       int BlockSize_
     >
     class NoneFilterBlocked
