@@ -1429,6 +1429,7 @@ namespace NaverStokesCP2D
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
     args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.5\n");
     args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete stastistics dump");
+    args.support("test-mode", "Runs the application in regression test mode.");
     args.support("parti-type");
     args.support("parti-name");
     args.support("parti-rank-elems");

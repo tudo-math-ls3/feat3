@@ -7,6 +7,9 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/pcg.hpp>
+#include <kernel/solver/pmr.hpp>
+#include <kernel/solver/pcr.hpp>
+#include <kernel/solver/psd.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/fgmres.hpp>
@@ -329,6 +332,33 @@ namespace FEAT
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             solver = Solver::new_richardson(systems.at(back_level), filters.at(back_level), omega, precon);
+            configure_iterative_solver(section, solver);
+            result = solver;
+          }
+          else if (solver_type == "pmr")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
+            solver = Solver::new_pmr(systems.at(back_level), filters.at(back_level), precon);
+            configure_iterative_solver(section, solver);
+            result = solver;
+          }
+          else if (solver_type == "pcr")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
+            solver = Solver::new_pcr(systems.at(back_level), filters.at(back_level), precon);
+            configure_iterative_solver(section, solver);
+            result = solver;
+          }
+          else if (solver_type == "psd")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
+            solver = Solver::new_psd(systems.at(back_level), filters.at(back_level), precon);
             configure_iterative_solver(section, solver);
             result = solver;
           }
