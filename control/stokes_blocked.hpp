@@ -15,10 +15,21 @@
 #include <kernel/lafem/tuple_mirror.hpp>
 #include <kernel/lafem/tuple_diag_matrix.hpp>
 #include <kernel/lafem/transfer.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/gpdv_assembler.hpp>
+#include <kernel/assembly/grid_transfer.hpp>
+#include <kernel/assembly/mean_filter_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
+#include <kernel/global/gate.hpp>
+#include <kernel/global/muxer.hpp>
+#include <kernel/global/vector.hpp>
+#include <kernel/global/matrix.hpp>
+#include <kernel/global/filter.hpp>
+#include <kernel/global/mean_filter.hpp>
+#include <kernel/global/transfer.hpp>
 
 #include <control/blocked_basic.hpp>
 #include <control/scalar_basic.hpp>
@@ -168,10 +179,10 @@ namespace FEAT
       void compile_system_transfer()
       {
         // clone content into our global transfer matrix
-        transfer_sys.get_mat_prol().template at<0,0>().clone(transfer_velo.get_mat_prol(), LAFEM::CloneMode::Shallow);
-        transfer_sys.get_mat_rest().template at<0,0>().clone(transfer_velo.get_mat_rest(), LAFEM::CloneMode::Shallow);
-        transfer_sys.get_mat_prol().template at<1,1>().clone(transfer_pres.get_mat_prol(), LAFEM::CloneMode::Shallow);
-        transfer_sys.get_mat_rest().template at<1,1>().clone(transfer_pres.get_mat_rest(), LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_prol().template at<0,0>() = transfer_velo.get_mat_prol().clone(LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_rest().template at<0,0>() = transfer_velo.get_mat_rest().clone(LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_prol().template at<1,1>() = transfer_pres.get_mat_prol().clone(LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_rest().template at<1,1>() = transfer_pres.get_mat_rest().clone(LAFEM::CloneMode::Shallow);
       }
 
       template<typename M_, typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
@@ -196,7 +207,237 @@ namespace FEAT
         this->compile_system_matrix();
         this->compile_system_transfer();
       }
+
+      template<typename DomainLayer_, typename DomainLevel_, typename SpaceVelo_, typename SpacePres_>
+      void assemble_gates(const DomainLayer_& dom_layer, const DomainLevel_& dom_level,
+        const SpaceVelo_& space_velo, const SpacePres_& space_pres)
+      {
+        // set the gate comm
+        this->gate_velo.set_comm(dom_layer.get_comm());
+        this->gate_pres.set_comm(dom_layer.get_comm());
+        this->gate_sys.set_comm(dom_layer.get_comm());
+
+        // loop over all ranks
+        for(Index i(0); i < dom_layer.size(); ++i)
+        {
+          Index rank = dom_layer.get_rank(i);
+
+          // try to find our halo
+          auto* halo = dom_level.find_halo_part(rank);
+          XASSERT(halo != nullptr);
+
+          // create (empty) velocity mirror
+          VeloMirror mirror_velo;
+          Assembly::MirrorAssembler::assemble_mirror(mirror_velo, space_velo, *halo);
+
+          // create (empty) pressure mirror
+          PresMirror mirror_pres;
+          Assembly::MirrorAssembler::assemble_mirror(mirror_pres, space_pres, *halo);
+
+          // create a system mirror
+          SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
+
+          // push mirror into gates
+          gate_velo.push(int(rank), std::move(mirror_velo));
+          if(!mirror_pres.get_gather().empty())
+            gate_pres.push(int(rank), std::move(mirror_pres));
+          gate_sys.push(int(rank), std::move(mirror_sys));
+        }
+
+        // create local template vectors
+        LocalVeloVector tmpl_v(space_velo.get_num_dofs());
+        LocalPresVector tmpl_p(space_pres.get_num_dofs());
+        LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
+
+        // compile gates
+        this->gate_velo.compile(std::move(tmpl_v));
+        this->gate_pres.compile(std::move(tmpl_p));
+        this->gate_sys.compile(std::move(tmpl_s));
+      }
+
+      template<typename SpaceVelo_, typename Cubature_>
+      void assemble_velocity_transfer(const SpaceVelo_& space_velo_fine, const SpaceVelo_& space_velo_coarse, const Cubature_& cubature)
+      {
+        // get local transfer operator
+        LocalVeloTransfer& loc_trans = this->transfer_velo.local();
+
+        // get local transfer matrices
+        LocalVeloTransferMatrix& loc_prol_wrapped = loc_trans.get_mat_prol();
+        LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
+
+        // get the unwrapped types
+        typename LocalVeloTransferMatrix::BaseClass& loc_prol = loc_prol_wrapped;
+        typename LocalVeloTransferMatrix::BaseClass& loc_rest = loc_rest_wrapped;
+
+        // assemble structure?
+        if (loc_prol.empty())
+        {
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_velo_fine, space_velo_coarse);
+        }
+
+        // create a local weight vector
+        LocalVeloVector loc_vec_weight = loc_prol_wrapped.create_vector_l();
+
+        // create a scalar weight vector for the assembly
+        auto loc_scal_vec_weight = loc_prol.create_vector_l();
+
+        // get the data arrays of the weight vectors
+        auto* v_wb = loc_vec_weight.elements();
+        auto* v_ws = loc_scal_vec_weight.elements();
+
+        // assemble prolongation matrix
+        {
+          loc_prol.format();
+          loc_scal_vec_weight.format();
+
+          // assemble prolongation matrix
+          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_scal_vec_weight,
+            space_velo_fine, space_velo_coarse, cubature);
+
+          // copy weights from scalar to blocked
+          for(Index i(0); i < loc_prol.rows(); ++i)
+            v_wb[i] = v_ws[i];
+
+          // synchronise blocked weight vector
+          this->gate_velo.sync_0(loc_vec_weight);
+
+          // copy weights from blocked to scalar
+          for(Index i(0); i < loc_prol.rows(); ++i)
+            v_ws[i] = v_wb[i][0];
+
+          // invert weight components
+          loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
+
+          // scale prolongation matrix
+          loc_prol.scale_rows(loc_prol, loc_scal_vec_weight);
+
+          // copy and transpose
+          loc_rest = loc_prol.transpose();
+        }
+      }
+
+      template<typename SpacePres_, typename Cubature_>
+      void assemble_pressure_transfer(const SpacePres_& space_pres_fine, const SpacePres_& space_pres_coarse, const Cubature_& cubature)
+      {
+        // get local transfer operator
+        LocalPresTransfer& loc_trans = this->transfer_pres.local();
+
+        // get local transfer matrices
+        LocalPresTransferMatrix& loc_prol = loc_trans.get_mat_prol();
+        LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
+
+        // assemble structure?
+        if (loc_prol.empty())
+        {
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_pres_fine, space_pres_coarse);
+        }
+
+        // get local pressure weight vector
+        LocalPresVector loc_vec_weight = loc_prol.create_vector_l();
+
+        // assemble prolongation matrix
+        {
+          loc_prol.format();
+          loc_vec_weight.format();
+
+          // assemble prolongation matrix
+          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
+            space_pres_fine, space_pres_coarse, cubature);
+
+          // synchronise weight vector
+          this->gate_pres.sync_0(loc_vec_weight);
+
+          // invert components
+          loc_vec_weight.component_invert(loc_vec_weight);
+
+          // scale prolongation matrix
+          loc_prol.scale_rows(loc_prol, loc_vec_weight);
+
+          // copy and transpose
+          loc_rest = loc_prol.transpose();
+        }
+      }
+
+      template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
+      void assemble_transfers(
+        const SpaceVelo_& space_velo_fine, const SpacePres_& space_pres_fine,
+        const SpaceVelo_& space_velo_coarse, const SpacePres_& space_pres_coarse, const Cubature_& cubature)
+      {
+        this->assemble_velocity_transfer(space_velo_fine, space_velo_coarse, cubature);
+        this->assemble_pressure_transfer(space_pres_fine, space_pres_coarse, cubature);
+        this->compile_system_transfer();
+      }
+
+      template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
+      void assemble_grad_div_matrices(const SpaceVelo_& space_velo, const SpacePres_& space_pres, const Cubature_& cubature)
+      {
+        Assembly::GradPresDivVeloAssembler::assemble(this->matrix_b.local(), this->matrix_d.local(),
+          space_velo, space_pres, cubature);
+      }
+
+      template<typename SpaceVelo_>
+      void assemble_velo_struct(const SpaceVelo_& space_velo)
+      {
+        // assemble matrix structure
+        Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_a.local(), space_velo);
+      }
+
+
+      template<typename SpacePres_>
+      void assemble_pres_struct(const SpacePres_& space_pres)
+      {
+        // assemble matrix structure
+        Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_s.local(), space_pres);
+      }
     }; // class StokesBlockedSystemLevel<...>
+
+    template<
+      int dim_,
+      typename MemType_ = Mem::Main,
+      typename DataType_ = Real,
+      typename IndexType_ = Index,
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      >
+    class StokesBlockedUnitVeloNonePresSystemLevel :
+      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+    {
+    public:
+      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+
+      // define local filter types
+      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
+      typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
+
+      // define global filter types
+      typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+      typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+      typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
+
+      // (global) filters
+      GlobalSystemFilter filter_sys;
+      GlobalVeloFilter filter_velo;
+      GlobalPresFilter filter_pres;
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->filter_sys.bytes() + BaseClass::bytes();
+      }
+
+      void compile_system_filter()
+      {
+        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+      }
+    };
 
     template<
       typename SpaceVelo_,
@@ -217,7 +458,6 @@ namespace FEAT
       TrafoType trafo;
       SpaceVeloType space_velo;
       SpacePresType space_pres;
-      Cubature::DynamicFactory cubature;
 
     public:
       explicit StokesBlockedAssemblerLevel(DomainLevelType& dom_lvl) :
@@ -225,217 +465,12 @@ namespace FEAT
         mesh(domain_level.get_mesh()),
         trafo(mesh),
         space_velo(trafo),
-        space_pres(trafo),
-        cubature("auto-degree:" + stringify(Math::sqr(SpaceVeloType::local_degree)+2))
+        space_pres(trafo)
       {
       }
 
       virtual ~StokesBlockedAssemblerLevel()
       {
-      }
-
-      template<typename SystemLevel_>
-      void assemble_gates(const DomainLayerType& dom_layer, SystemLevel_& sys_level)
-      {
-        // create our gates
-        typename SystemLevel_::VeloGate& gate_velo = sys_level.gate_velo;
-        typename SystemLevel_::PresGate& gate_pres = sys_level.gate_pres;
-        typename SystemLevel_::SystemGate& gate_sys  = sys_level.gate_sys;
-
-        // set the gate comm
-        gate_velo.set_comm(dom_layer.get_comm());
-        gate_pres.set_comm(dom_layer.get_comm());
-        gate_sys.set_comm(dom_layer.get_comm());
-
-        // loop over all ranks
-        for(Index i(0); i < dom_layer.size(); ++i)
-        {
-          Index rank = dom_layer.get_rank(i);
-
-          // try to find our halo
-          auto* halo = domain_level.find_halo_part(rank);
-          if(halo == nullptr)
-            throw InternalError("ERROR: Halo not found!");
-
-          // create (empty) velocity mirror
-          typename SystemLevel_::VeloMirror mirror_velo;
-          Assembly::MirrorAssembler::assemble_mirror(mirror_velo, this->space_velo, *halo);
-
-          // create (empty) pressure mirror
-          typename SystemLevel_::PresMirror mirror_pres;
-          Assembly::MirrorAssembler::assemble_mirror(mirror_pres, this->space_pres, *halo);
-
-          // create a system mirror
-          typename SystemLevel_::SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
-
-          // push mirror into gates
-          gate_velo.push(int(rank), std::move(mirror_velo));
-          gate_pres.push(int(rank), std::move(mirror_pres));
-          gate_sys.push(int(rank), std::move(mirror_sys));
-        }
-
-        // create local template vectors
-        typename SystemLevel_::LocalVeloVector tmpl_v(space_velo.get_num_dofs());
-        typename SystemLevel_::LocalPresVector tmpl_p(space_pres.get_num_dofs());
-        typename SystemLevel_::LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
-
-        // compile gates
-        gate_velo.compile(std::move(tmpl_v));
-        gate_pres.compile(std::move(tmpl_p));
-        gate_sys.compile(std::move(tmpl_s));
-      }
-
-      template<typename SystemLevel_>
-      void assemble_grad_div_matrices(SystemLevel_& sys_level)
-      {
-        Assembly::GradPresDivVeloAssembler::assemble(*sys_level.matrix_b, *(sys_level.matrix_d),
-          this->space_velo, this->space_pres, this->cubature);
-      }
-
-      template<typename SystemLevel_>
-      void assemble_pres_laplace(SystemLevel_& sys_level)
-      {
-        // get the global matrix
-        typename SystemLevel_::GlobalSchurMatrix& mat_glob = sys_level.matrix_s;
-
-        // get the local matrix
-        typename SystemLevel_::LocalSchurMatrix& mat_loc = *mat_glob;
-
-        // assemble matrix structure?
-        if (mat_loc.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc, this->space_pres);
-        }
-
-        // assemble pressure laplace matrix
-        {
-          mat_loc.format();
-          Assembly::Common::LaplaceOperator laplace_op;
-          Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc, laplace_op, this->space_pres, this->cubature);
-        }
-      }
-
-      template<typename SystemLevel_>
-      void assemble_velo_struct(SystemLevel_& sys_level)
-      {
-        // get the global matrix
-        typename SystemLevel_::GlobalMatrixBlockA& mat_glob = sys_level.matrix_a;
-
-        // get the local matrix
-        typename SystemLevel_::LocalMatrixBlockA& mat_loc = *mat_glob;
-
-        // assemble matrix structure?
-        Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc, this->space_velo);
-      }
-
-      template<typename SystemLevel_>
-      void assemble_velo_transfer(SystemLevel_& sys_level_fine, StokesBlockedAssemblerLevel& level_coarse)
-      {
-        // get global transfer operator
-        typename SystemLevel_::GlobalVeloTransfer& glob_trans = sys_level_fine.transfer_velo;
-
-        // get local transfer operator
-        typename SystemLevel_::LocalVeloTransfer& loc_trans = glob_trans.local();
-
-        // get local transfer matrices
-        typename SystemLevel_::LocalVeloTransferMatrix& loc_prol_wrapped = loc_trans.get_mat_prol();
-        typename SystemLevel_::LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
-
-        // get the unwrapped types
-        typedef typename SystemLevel_::LocalVeloTransferMatrix WrappedTransfer;
-        typename WrappedTransfer::BaseClass& loc_prol = loc_prol_wrapped;
-        typename WrappedTransfer::BaseClass& loc_rest = loc_rest_wrapped;
-
-        // assemble structure?
-        if (loc_prol.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, this->space_velo, level_coarse.space_velo);
-        }
-
-        // create a local weight vector
-        typename SystemLevel_::LocalVeloVector loc_vec_weight = loc_prol_wrapped.create_vector_l();
-
-        // create a scalar weight vector for the assembly
-        auto loc_scal_vec_weight = loc_prol.create_vector_l();
-
-        // get the data arrays of the weight vectors
-        auto* v_wb = loc_vec_weight.elements();
-        auto* v_ws = loc_scal_vec_weight.elements();
-
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_scal_vec_weight.format();
-
-          // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_scal_vec_weight,
-            this->space_velo, level_coarse.space_velo, this->cubature);
-
-          // copy weights from scalar to blocked
-          for(Index i(0); i < loc_prol.rows(); ++i)
-            v_wb[i] = v_ws[i];
-
-          // synchronise blocked weight vector
-          sys_level_fine.gate_velo.sync_0(loc_vec_weight);
-
-          // copy weights from blocked to scalar
-          for(Index i(0); i < loc_prol.rows(); ++i)
-            v_ws[i] = v_wb[i][0];
-
-          // invert weight components
-          loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
-
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_scal_vec_weight);
-
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
-        }
-      }
-
-      template<typename SystemLevel_>
-      void assemble_pres_transfer(SystemLevel_& sys_level_fine, StokesBlockedAssemblerLevel& level_coarse)
-      {
-        // get global transfer operator
-        typename SystemLevel_::GlobalPresTransfer& glob_trans = sys_level_fine.transfer_pres;
-
-        // get local transfer operator
-        typename SystemLevel_::LocalPresTransfer& loc_trans = glob_trans.local();
-
-        // get local transfer matrices
-        typename SystemLevel_::LocalPresTransferMatrix& loc_prol = loc_trans.get_mat_prol();
-        typename SystemLevel_::LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-
-        // assemble structure?
-        if (loc_prol.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, this->space_pres, level_coarse.space_pres);
-        }
-
-        // get local pressure weight vector
-        typename SystemLevel_::LocalPresVector loc_vec_weight = loc_prol.create_vector_l();
-
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_vec_weight.format();
-
-          // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
-            this->space_pres, level_coarse.space_pres, this->cubature);
-
-          // synchronise weight vector
-          sys_level_fine.gate_pres.sync_0(loc_vec_weight);
-
-          // invert components
-          loc_vec_weight.component_invert(loc_vec_weight);
-
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_vec_weight);
-
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
-        }
       }
     };
   } // namespace Control

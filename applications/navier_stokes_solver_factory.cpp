@@ -553,188 +553,26 @@ namespace NaverStokesCP2D
     typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
     typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
   class NavierStokesBlockedSystemLevel :
-    public Control::StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+    public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
-    typedef Control::StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     // define local filter types
-    typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
-    typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresNoneFilter;
     typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> LocalPresUnitFilter;
-    typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresNoneFilter> LocalSystemFilter;
 
     // define global filter types
-    typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
-    typedef Global::Filter<LocalPresNoneFilter, typename BaseClass::PresMirror> GlobalPresNoneFilter;
     typedef Global::Filter<LocalPresUnitFilter, typename BaseClass::PresMirror> GlobalPresUnitFilter;
-    typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
 
     // (global) filters
-    GlobalSystemFilter filter_sys;
-    GlobalVeloFilter filter_velo;
     GlobalPresUnitFilter filter_pres_unit;
 
     /// \brief Returns the total amount of bytes allocated.
     std::size_t bytes() const
     {
-      return this->filter_sys.bytes() + BaseClass::bytes();
+      return this->filter_pres_unit.bytes() + BaseClass::bytes();
     }
   }; // class NavierStokesBlockedSystemLevel
-
-  /**
-   * \brief Navier-Stokes Assembler Level class
-   *
-   * This extends the StokesBlockedAssemblerLevel by the assembly of the filters
-   * as well as the burgers matrix and the RHS vector.
-   */
-  template<
-    typename SpaceVelo_,
-    typename SpacePres_>
-  class NavierStokesBlockedAssemblerLevel :
-    public Control::StokesBlockedAssemblerLevel<SpaceVelo_, SpacePres_>
-  {
-  public:
-    typedef Control::StokesBlockedAssemblerLevel<SpaceVelo_, SpacePres_> BaseClass;
-    typedef typename BaseClass::MeshType MeshType;
-
-  public:
-    explicit NavierStokesBlockedAssemblerLevel(typename BaseClass::DomainLevelType& dom_lvl) :
-      BaseClass(dom_lvl)
-    {
-    }
-
-    template<typename VeloSystemLevel_>
-    void assemble_velo_filter(const Config& cfg, VeloSystemLevel_& velo_sys_level)
-    {
-      // get our global system filter
-      typename VeloSystemLevel_::GlobalVeloFilter& fil_glob = velo_sys_level.filter_velo;
-
-      // get our local system filter
-      typename VeloSystemLevel_::LocalVeloFilter& fil_loc = *fil_glob;
-
-      // create unit-filter assemblers
-      Assembly::UnitFilterAssembler<MeshType> unit_asm, unit_asm_inflow;
-      bool have_inflow(false);
-
-      // loop over all boundary parts
-      std::deque<String> part_names = this->domain_level.get_mesh_node()->get_mesh_part_names();
-      for(const auto& name : part_names)
-      {
-        // skip internal meshparts
-        if(name.starts_with('_'))
-          continue;
-
-        // skip outflow part
-        if(name == cfg.part_name_out)
-          continue;
-
-        // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(name);
-
-        // found it?
-        XASSERT(mesh_part_node != nullptr);
-
-        // let's see if we have that mesh part
-        // if it is nullptr, then our patch is not adjacent to that boundary part
-        auto* mesh_part = mesh_part_node->get_mesh();
-        if (mesh_part != nullptr)
-        {
-          // add to boundary assembler
-          if(name == cfg.part_name_in)
-          {
-            unit_asm_inflow.add_mesh_part(*mesh_part);
-            have_inflow = true;
-          }
-          else
-          {
-            unit_asm.add_mesh_part(*mesh_part);
-          }
-        }
-      }
-
-      // assemble the filter
-      unit_asm.assemble(fil_loc, this->space_velo);
-
-      if(!have_inflow)
-        return;
-
-      // create parabolic inflow profile
-      Analytic::Common::ParProfileVector inflow(cfg.ix0, cfg.iy0, cfg.ix1, cfg.iy1, cfg.vmax);
-
-      // assemble inflow BC
-      unit_asm_inflow.assemble(fil_loc, this->space_velo, inflow);
-    }
-
-    template<typename PresSystemLevel_>
-    void assemble_pres_filter(const Config& cfg, PresSystemLevel_& pres_sys_level)
-    {
-      // get our global system filter
-      typename PresSystemLevel_::GlobalPresUnitFilter& fil_glob = pres_sys_level.filter_pres_unit;
-
-      // get our local system filter
-      typename PresSystemLevel_::LocalPresUnitFilter& fil_loc = *fil_glob;
-
-      // create unit-filter assembler
-      Assembly::UnitFilterAssembler<MeshType> unit_asm;
-
-      // try to fetch the corresponding mesh part node
-      auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(cfg.part_name_out);
-
-      // found it?
-      XASSERT(mesh_part_node != nullptr);
-
-      // let's see if we have that mesh part
-      // if it is nullptr, then our patch is not adjacent to that boundary part
-      auto* mesh_part = mesh_part_node->get_mesh();
-      if (mesh_part != nullptr)
-      {
-        unit_asm.add_mesh_part(*mesh_part);
-      }
-
-      // assemble the filter
-      unit_asm.assemble(fil_loc, this->space_pres);
-    }
-
-    template<typename GlobalVeloVector_>
-    void assemble_rhs_vector(const Config& cfg, const Real delta_t, GlobalVeloVector_& vec_rhs_v, const GlobalVeloVector_& vec_sol_v)
-    {
-      typedef typename GlobalVeloVector_::DataType DataType;
-      typedef typename GlobalVeloVector_::IndexType IndexType;
-      Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_rhs;
-      burgers_rhs.deformation = cfg.deformation;
-      burgers_rhs.nu = -cfg.nu;
-      burgers_rhs.beta = -DataType(1);
-      burgers_rhs.theta = DataType(1) / delta_t;
-
-      // assemble RHS vector
-      (*vec_rhs_v).format();
-      burgers_rhs.assemble(this->space_velo, this->cubature, (*vec_sol_v), nullptr, &(*vec_rhs_v));
-
-      // synchronise RHS vector
-      vec_rhs_v.sync_0();
-    }
-
-    template<typename GlobalMatrixBlockA_, typename GlobalVeloVector_>
-    void assemble_burgers_matrix(const Config& cfg, const Real delta_t, GlobalMatrixBlockA_& matrix_a, const GlobalVeloVector_& vec_conv)
-    {
-      typedef typename GlobalVeloVector_::DataType DataType;
-      typedef typename GlobalVeloVector_::IndexType IndexType;
-      Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_mat;
-      burgers_mat.deformation = cfg.deformation;
-      burgers_mat.nu = cfg.nu;
-      burgers_mat.beta = DataType(1);
-      burgers_mat.theta = DataType(1) / delta_t;
-
-      // "restrict" our convection vector onto that level;
-      // this exploits the 2-level numbering of the Q2 convection vector
-      typename GlobalVeloVector_::LocalVectorType vec_cv(*vec_conv, (*matrix_a).rows(), IndexType(0));
-
-      // format and assemble the matrix
-      (*matrix_a).format();
-      burgers_mat.assemble(this->space_velo, this->cubature, vec_cv, &(*matrix_a), nullptr);
-    }
-  }; // class NavierStokesBlockedAssemblerLevel
 
   template <typename SystemLevelType,  typename MeshType>
   void report_statistics(double t_total, std::deque<std::shared_ptr<SystemLevelType>> & system_levels,
@@ -875,8 +713,10 @@ namespace NaverStokesCP2D
 
 
   template<typename MeshType_>
-  void run(const Dist::Comm& comm, const int rank, const int nprocs, const Config& cfg, Control::Domain::DomainControl<MeshType_>& domain, SimpleArgParser& args)
+  void run(const Dist::Comm& comm, const Config& cfg, Control::Domain::DomainControl<MeshType_>& domain, SimpleArgParser& args)
   {
+    const int rank = comm.rank();
+
     // create a time-stamp
     TimeStamp stamp_start;
 
@@ -904,7 +744,7 @@ namespace NaverStokesCP2D
 
     // define our assembler level
     typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef NavierStokesBlockedAssemblerLevel<VeloSpaceType, PresSpaceType> AssemblerLevelType;
+    typedef Control::StokesBlockedAssemblerLevel<VeloSpaceType, PresSpaceType> AssemblerLevelType;
 
     // get our domain level and layer
     typedef typename DomainControlType::LayerType DomainLayerType;
@@ -933,30 +773,89 @@ namespace NaverStokesCP2D
 
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_gates(layer, *system_levels.at(i));
+      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling basic matrices...");
+
+    Cubature::DynamicFactory cubature("auto-degree:7");
+
     for(Index i(0); i < num_levels; ++i)
     {
       // assemble velocity matrix structure
-      asm_levels.at(i)->assemble_velo_struct(*system_levels.at(i));
+      system_levels.at(i)->assemble_velo_struct(asm_levels.at(i)->space_velo);
+      // assemble pressure matrix structure
+      system_levels.at(i)->assemble_pres_struct(asm_levels.at(i)->space_pres);
       // assemble pressure laplace matrix
-      asm_levels.at(i)->assemble_pres_laplace(*system_levels.at(i));
+      system_levels.at(i)->matrix_s.local().format();
+      Assembly::Common::LaplaceOperator laplace_op;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(system_levels.at(i)->matrix_s.local(),
+        laplace_op, asm_levels.at(i)->space_pres, cubature);
     }
 
     // assemble B/D matrices on finest level
-    asm_levels.back()->assemble_grad_div_matrices(*system_levels.back());
+    system_levels.back()->assemble_grad_div_matrices(asm_levels.back()->space_velo, asm_levels.back()->space_pres, cubature);
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system filters...");
+
+    // create parabolic inflow profile
+    Analytic::Common::ParProfileVector inflow(cfg.ix0, cfg.iy0, cfg.ix1, cfg.iy1, cfg.vmax);
+
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_velo_filter(cfg, *system_levels.at(i));
-      asm_levels.at(i)->assemble_pres_filter(cfg, *system_levels.at(i));
+      // get our local system filters
+      typename SystemLevelType::LocalVeloFilter& fil_loc_v = system_levels.at(i)->filter_velo.local();
+      typename SystemLevelType::LocalPresUnitFilter& fil_loc_p = system_levels.at(i)->filter_pres_unit.local();
+
+      // create unit-filter assemblers
+      Assembly::UnitFilterAssembler<MeshType> unit_asm_velo, unit_asm_inflow, unit_asm_pres;
+
+      // loop over all boundary parts
+      std::deque<String> part_names = domain_levels.at(i)->get_mesh_node()->get_mesh_part_names(true);
+      for(const auto& name : part_names)
+      {
+        // try to fetch the corresponding mesh part node
+        auto* mesh_part_node = domain_levels.at(i)->get_mesh_node()->find_mesh_part_node(name);
+
+        // found it?
+        XASSERT(mesh_part_node != nullptr);
+
+        // let's see if we have that mesh part
+        // if it is nullptr, then our patch is not adjacent to that boundary part
+        auto* mesh_part = mesh_part_node->get_mesh();
+        if(mesh_part == nullptr)
+          continue;
+
+        // add to corresponding boundary assembler
+        if(name == cfg.part_name_in)
+        {
+          // inflow BC for velocity
+          unit_asm_inflow.add_mesh_part(*mesh_part);
+        }
+        else if(name == cfg.part_name_out)
+        {
+          // Dirichlet-0 for pressure
+          unit_asm_pres.add_mesh_part(*mesh_part);
+        }
+        else
+        {
+          // Dirichlet-0 for velocity
+          unit_asm_velo.add_mesh_part(*mesh_part);
+        }
+      }
+
+      // assemble the velocity filter
+      unit_asm_velo.assemble(fil_loc_v, asm_levels.at(i)->space_velo);
+
+      // assemble inflow BC
+      unit_asm_inflow.assemble(fil_loc_v, asm_levels.at(i)->space_velo, inflow);
+
+      // assemble the pressure filter
+      unit_asm_pres.assemble(fil_loc_p, asm_levels.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
@@ -965,8 +864,9 @@ namespace NaverStokesCP2D
 
     for (Index i(1); i < num_levels; ++i)
     {
-      asm_levels.at(i)->assemble_velo_transfer(*system_levels.at(i), *asm_levels.at(i-1));
-      asm_levels.at(i)->assemble_pres_transfer(*system_levels.at(i), *asm_levels.at(i-1));
+      system_levels.at(i)->assemble_transfers(
+        asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres,
+        asm_levels.at(i-1)->space_velo, asm_levels.at(i-1)->space_pres, cubature);
     }
 
     /* ***************************************************************************************** */
@@ -1102,6 +1002,21 @@ namespace NaverStokesCP2D
     // keep track whether something failed miserably...
     bool failure = false;
 
+    // set up a burgers assembler for the RHS vector
+    Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_rhs;
+    burgers_rhs.deformation = cfg.deformation;
+    burgers_rhs.nu = -cfg.nu;
+    burgers_rhs.beta = -DataType(1);
+    burgers_rhs.theta = DataType(1) / delta_t;
+
+    // set up a burgers assembler for the velocity matrix
+    Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_mat;
+    burgers_mat.deformation = cfg.deformation;
+    burgers_mat.nu = cfg.nu;
+    burgers_mat.beta = DataType(1);
+    burgers_mat.theta = DataType(1) / delta_t;
+
+
     Statistics::reset();
 
     // time-step loop
@@ -1117,7 +1032,9 @@ namespace NaverStokesCP2D
       watch_asm_rhs.start();
       vec_rhs_v.format();
       vec_rhs_p.format();
-      the_asm_level.assemble_rhs_vector(cfg, delta_t, vec_rhs_v, vec_sol_v);
+      burgers_rhs.assemble(the_asm_level.space_velo, cubature, vec_sol_v.local(), nullptr, &vec_rhs_v.local());
+      vec_rhs_v.sync_0();
+
       // subtract pressure (?)
       //matrix_b.apply(vec_rhs_v, vec_sol_p, vec_rhs_v, -DataType(1));
       watch_asm_rhs.stop();
@@ -1149,13 +1066,18 @@ namespace NaverStokesCP2D
           // assemble burgers matrices on all levels
           for(std::size_t i(0); i < asm_levels.size(); ++i)
           {
-            asm_levels.at(i)->assemble_burgers_matrix(cfg, delta_t, system_levels.at(i)->matrix_a, vec_conv);
+            auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
+            typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
+            loc_mat_a.format();
+            burgers_mat.assemble(asm_levels.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
           }
         }
         else
         {
           // assemble burgers matrices on finest level
-          the_asm_level.assemble_burgers_matrix(cfg, delta_t, the_system_level.matrix_a, vec_conv);
+          the_system_level.matrix_a.local().format();
+          burgers_mat.assemble(the_asm_level.space_velo, cubature, vec_conv.local(),
+            &the_system_level.matrix_a.local(), nullptr);
         }
         watch_asm_mat.stop();
 
@@ -1292,7 +1214,7 @@ namespace NaverStokesCP2D
       if(!cfg.vtk_name.empty() && (cfg.vtk_step > 0) && (time_step % cfg.vtk_step == 0))
       {
         watch_vtk.start();
-        String vtk_path = cfg.vtk_name + "." + stringify(nprocs) + "." + stringify(time_step).pad_front(5, '0');
+        String vtk_path = cfg.vtk_name + "." + stringify(comm.size()) + "." + stringify(time_step).pad_front(5, '0');
 
         Geometry::ExportVTK<MeshType> vtk(the_domain_level.get_mesh());
 
@@ -1312,7 +1234,7 @@ namespace NaverStokesCP2D
         vtk.add_vertex_scalar("p_dt", (*vec_der_p).elements());
 
         // export
-        vtk.write(vtk_path, rank, nprocs);
+        vtk.write(vtk_path, comm);
         watch_vtk.stop();
       }
 
@@ -1362,7 +1284,7 @@ namespace NaverStokesCP2D
     // write timings
     if(rank == 0)
     {
-      comm.print("\n");
+      comm.print("");
       dump_time(comm, "Total Solver Time", t_total, t_total);
       dump_time(comm, "Matrix Assembly Time", t_asm_mat, t_total);
       dump_time(comm, "Vector Assembly Time", t_asm_rhs, t_total);
@@ -1527,7 +1449,7 @@ namespace NaverStokesCP2D
       cfg.dump(comm);
 
       // run our application
-      run<MeshType>(comm, rank, nprocs, cfg, domain, args);
+      run<MeshType>(comm, cfg, domain, args);
 
       TimeStamp stamp2;
 
