@@ -50,23 +50,26 @@ namespace FEAT
        * \tparam DomainControl_
        * Type of the underlying domain control
        *
-       * \tparam Trafo_
-       * The type of transformation defining all meshes, i.e. P1/Q1 transformation
-       *
        * For every mesh quality functional, there is a control class which inherits from this. This class only knows
        * the base minimum.
        *
        */
-      template<typename DomainControl_, typename Trafo_>
+      template<typename DomainControl_>
       class MeshoptControlBase
       {
         public:
           /// The type of the underlying domain control
           typedef DomainControl_ DomainControl;
+          /// The type of levels of DomainControl
+          typedef typename DomainControl_::LevelType DomainLevel;
+
+          /// The type of transformation we optimise the mesh for
+          typedef typename DomainLevel::TrafoType TrafoType;
           /// The world dimension, i.e. number of coordinates
           static constexpr int world_dim = DomainControl_::MeshType::world_dim;
           /// Floating point type for coordinates
           typedef typename DomainControl_::MeshType::CoordType CoordType;
+
           /// Type for buffer vectors exchanging information between mesh and some vector type on which the solvers
           /// operate
           typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, world_dim> LocalCoordsBuffer;
@@ -75,12 +78,9 @@ namespace FEAT
           typedef LAFEM::VectorMirror<Mem::Main, CoordType, Index> CoordsMirror;
           /// The global version of LocalCoordsBuffer, needed for prepare setting the internal state variable
           typedef Global::Vector<LocalCoordsBuffer, CoordsMirror> GlobalCoordsBuffer;
-          /// Type of the vtk exporter this (and derived classes) can write to
-          typedef Geometry::ExportVTK<typename Trafo_::MeshType> VTKExporterType;
 
-          /// Check if DomainControl and Trafo are compatible
-          static_assert( std::is_same<typename DomainControl_::MeshType, typename Trafo_::MeshType>::value,
-          "DomainControl/Trafo MeshType mismatch");
+          /// Type of the vtk exporter this (and derived classes) can write to
+          typedef Geometry::ExportVTK<typename TrafoType::MeshType> VTKExporterType;
 
         protected:
           /// The domain control whose mesh objects can be modified
@@ -211,7 +211,7 @@ namespace FEAT
            * \brief Adds quantities of the underlying mesh quality functional to a given exporter object
            */
           virtual void add_to_vtk_exporter
-            (Geometry::ExportVTK<typename Trafo_::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
+            (Geometry::ExportVTK<typename TrafoType::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
             {
             }
 
@@ -583,7 +583,7 @@ namespace FEAT
           /**
            * \brief Creates a new (right) vector
            */
-          GlobalSystemVectorL create_vector_r() const
+          GlobalSystemVectorR create_vector_r() const
           {
             return global_functional.create_vector_r();
           }
@@ -593,27 +593,25 @@ namespace FEAT
       /**
        * \brief Base class for assembler levels for mesh optimisation
        *
-       * \tparam Space_
-       * The finite element space the problem is solved on.
-       *
        * Control objects inheriting from MeshControlBase may overwrite this, but it contains all basic
        * functionality.
        *
        */
-      template<typename Space_>
+      template<typename DomainLevel_>
       class MeshoptAssemblerLevel
       {
         public:
+          /// Type for one level of the DomainControl, needed i.e. for multigrid solvers
+          typedef DomainLevel_ DomainLevelType;
+          /// Type for one layer of the DomainControl, needed i.e. for ScaRC
+          typedef Control::Domain::DomainLayer DomainLayerType;
+
           /// The finite element space
-          typedef Space_ SpaceType;
+          typedef typename DomainLevel_::SpaceType SpaceType;
           /// The underlying transformation
-          typedef typename SpaceType::TrafoType TrafoType;
+          typedef typename DomainLevel_::TrafoType TrafoType;
           /// The type of mesh we use
           typedef typename TrafoType::MeshType MeshType;
-          /// Type for one level of the DomainControl, needed i.e. for multigrid solvers
-          typedef Control::Domain::DomainLevel<MeshType> DomainLevelType;
-          /// Type for one layer of the DomainControl, needed i.e. for ScaRC
-          typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
 
         public:
           /// The domain level holding the RootMeshNode this refers to
@@ -621,9 +619,9 @@ namespace FEAT
           /// The mesh the transformation and our FE spaces live on
           MeshType& mesh;
           /// The transformation
-          TrafoType trafo;
+          TrafoType& trafo;
           /// The FE space we solve our problem on
-          SpaceType trafo_space;
+          SpaceType& trafo_space;
           /// Cubature factory for integration
           Cubature::DynamicFactory cubature;
 
@@ -640,8 +638,8 @@ namespace FEAT
           const std::deque<String>& slip_list) :
             domain_level(dom_lvl),
             mesh(domain_level.get_mesh()),
-            trafo(mesh),
-            trafo_space(trafo),
+            trafo(domain_level.trafo),
+            trafo_space(domain_level.space),
             cubature("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree)+2)),
             dirichlet_asm(),
             slip_asm()
@@ -900,13 +898,13 @@ namespace FEAT
             typename SystemLevel_::ScalarGate& gate_scalar = sys_level.gate_scalar;
 
             // set the gate comm
-            gate_sys.set_comm(dom_layer.get_comm());
-            gate_scalar.set_comm(dom_layer.get_comm());
+            gate_sys.set_comm(dom_layer.comm_ptr());
+            gate_scalar.set_comm(dom_layer.comm_ptr());
 
             // Loop over all ranks
-            for(Index i(0); i < dom_layer.size(); ++i)
+            for(Index i(0); i < dom_layer.neighbour_count(); ++i)
             {
-              Index rank = dom_layer.get_rank(i);
+              int rank(dom_layer.neighbour_rank(i));
 
               // try to find our halo
               auto* halo = domain_level.find_halo_part(rank);
@@ -917,14 +915,14 @@ namespace FEAT
               Assembly::MirrorAssembler::assemble_mirror(sys_mirror, this->trafo_space, *halo);
 
               // push mirror into gates
-              gate_sys.push(int(rank), std::move(sys_mirror));
+              gate_sys.push(rank, std::move(sys_mirror));
 
               // assemble the scalar mirror
               typename SystemLevel_::ScalarMirror scalar_mirror;
               Assembly::MirrorAssembler::assemble_mirror(scalar_mirror, this->trafo_space, *halo);
 
               // push mirror into gates
-              gate_scalar.push(int(rank), std::move(scalar_mirror));
+              gate_scalar.push(rank, std::move(scalar_mirror));
             }
 
             // create local template vectors

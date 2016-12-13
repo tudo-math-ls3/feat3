@@ -39,11 +39,11 @@ namespace PoissonDirichlet2D
 {
   using namespace FEAT;
 
-  template<typename MeshType_, typename TargetMatrixSolve_>
-  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  template<typename TargetMatrixSolve_, typename DomainLevel_>
+  void run(SimpleArgParser& args, Control::Domain::DomainControl<DomainLevel_>& domain)
   {
-    // define our mesh type
-    typedef MeshType_ MeshType;
+    // get our main communicator
+    const Dist::Comm& comm = domain.comm();
 
     // define our arch types
     typedef typename Mem::Main MemType;
@@ -54,61 +54,63 @@ namespace PoissonDirichlet2D
     Analytic::Common::ExpBubbleFunction<2> sol_func;
 
     // define our domain type
-    typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
+    typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
+    typedef typename DomainControlType::LevelType DomainLevelType;
+
+    // fetch our mesh type
+    typedef typename DomainControlType::MeshType MeshType;
 
     // define our system level
     typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
-    // define our trafo and FE spaces
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+    std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
-    // define our assembler level
-    typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef Control::ScalarBasicAssemblerLevel<SpaceType> AssemblerLevelType;
-
-    // get our domain level and layer
-    typedef typename DomainControlType::LayerType DomainLayerType;
-    const DomainLayerType& layer = *domain.get_layers().back();
-    const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
-
-    std::deque<SystemLevelType*> system_levels;
-    std::deque<AssemblerLevelType*> asm_levels;
-
-    const Index num_levels = Index(domain_levels.size());
+    const Index num_levels = domain.size_physical();
 
     //Lin-Solve phase related typedefs
     //Main-CSR or CUDA-ELL
     typedef typename TargetMatrixSolve_::MemType MemTypeSolve;
     typedef Control::ScalarUnitFilterSystemLevel<MemTypeSolve, DataType, IndexType, TargetMatrixSolve_> SystemLevelTypeSolve;
 
-    std::deque<SystemLevelTypeSolve*> system_levels_solve;
+    std::deque<std::shared_ptr<SystemLevelTypeSolve>> system_levels_solve;
 
     // create stokes and system levels
     for (Index i(0); i < num_levels; ++i)
     {
-      asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
-      system_levels.push_back(new SystemLevelType());
+      system_levels.push_back(std::make_shared<SystemLevelType>());
+    }
+
+
+    Cubature::DynamicFactory cubature("auto-degree:5");
+
+    /* ***************************************************************************************** */
+
+    TimeStamp stamp_ass;
+
+    comm.print("Assembling gates...");
+
+    for (Index i(0); i < num_levels; ++i)
+    {
+      system_levels.at(i)->assemble_gate(domain.at(i));
     }
 
     /* ***************************************************************************************** */
 
-    comm.print("Creating gates...");
+    comm.print("Assembling transfers...");
 
-    for (Index i(0); i < num_levels; ++i)
+    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
     {
-      system_levels.at(i)->assemble_gate(layer, *domain_levels.at(i), asm_levels.at(i)->space);
+      system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
+      system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system matrices...");
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
-
     for (Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_laplace_matrix(asm_levels.at(i)->space, cubature);
+      system_levels.at(i)->assemble_laplace_matrix(domain.at(i)->space, cubature);
     }
 
     /* ***************************************************************************************** */
@@ -117,17 +119,10 @@ namespace PoissonDirichlet2D
 
     for (Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_homogeneous_unit_filter(*domain_levels.at(i), asm_levels.at(i)->space);
+      system_levels.at(i)->assemble_homogeneous_unit_filter(*domain.at(i), domain.at(i)->space);
     }
 
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfer operators...");
-
-    for (Index i(1); i < num_levels; ++i)
-    {
-      system_levels.at(i)->assemble_transfer(asm_levels.at(i)->space, asm_levels.at(i-1)->space, cubature);
-    }
+    Statistics::toe_assembly = stamp_ass.elapsed_now();
 
     /* ***************************************************************************************** */
 
@@ -135,9 +130,8 @@ namespace PoissonDirichlet2D
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
 
     // fetch our finest levels
-    DomainLevelType& the_domain_level = *domain_levels.back();
-    SystemLevelType& the_system_level = *system_levels.back();
-    AssemblerLevelType& the_asm_level = *asm_levels.back();
+    DomainLevelType& the_domain_level = *domain.front();
+    SystemLevelType& the_system_level = *system_levels.front();
 
     // create new vector
     GlobalSystemVector vec_sol = the_system_level.matrix_sys.create_vector_r();
@@ -152,7 +146,7 @@ namespace PoissonDirichlet2D
 
       // assemble the force
       Assembly::Common::LaplaceFunctional<decltype(sol_func)> force_func(sol_func);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_asm_level.space, cubature);
+      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_domain_level.space, cubature);
 
       // sync the vector
       vec_rhs.sync_0();
@@ -181,19 +175,19 @@ namespace PoissonDirichlet2D
     for (Index i(0); i < num_levels; ++i)
     {
       //system levels must be converted first, because transfer levels use their converted gates
-      system_levels_solve.push_back(new SystemLevelTypeSolve());
+      system_levels_solve.push_back(std::make_shared<SystemLevelTypeSolve>());
       system_levels_solve.back()->convert(*system_levels.at(i));
     }
 
     // get our global solve matrix and filter
-    GlobalSystemMatrixSolve& matrix_solve = (*system_levels_solve.back()).matrix_sys;
-    GlobalSystemFilterSolve& filter_solve = (*system_levels_solve.back()).filter_sys;
+    GlobalSystemMatrixSolve& matrix_solve = (*system_levels_solve.front()).matrix_sys;
+    GlobalSystemFilterSolve& filter_solve = (*system_levels_solve.front()).filter_sys;
 
     //convert rhs and sol vectors
     GlobalSystemVectorSolve vec_rhs_solve;
-    vec_rhs_solve.convert(&system_levels_solve.back()->gate_sys, vec_rhs);
+    vec_rhs_solve.convert(&system_levels_solve.front()->gate_sys, vec_rhs);
     GlobalSystemVectorSolve vec_sol_solve;
-    vec_sol_solve.convert(&system_levels_solve.back()->gate_sys, vec_sol);
+    vec_sol_solve.convert(&system_levels_solve.front()->gate_sys, vec_sol);
 
     Util::WhistlePunk<> wp;
 
@@ -206,9 +200,8 @@ namespace PoissonDirichlet2D
       auto& kt_mirrors((*kt)->gate_sys._mirrors);
 
       wp.log(" A0: ", *((*kt)->matrix_sys));
-      //auto it_matrix(Global::SynchMat1::exec( *((*kt)->matrix_sys), kt_mirrors, kt_mirrors, kt_ranks, kt_tags/*,&wp*/));
       auto it_matrix = (*((*kt)->matrix_sys)).clone();
-      Global::synch_matrix(it_matrix, *layer.get_comm(), kt_ranks, kt_mirrors, kt_mirrors);
+      Global::synch_matrix(it_matrix, *(*kt)->gate_sys.get_comm(), kt_ranks, kt_mirrors, kt_mirrors);
 
       wp.log(" A1: ", it_matrix);
       LocalSystemMatrixSolve it_matrix_solve;
@@ -221,9 +214,9 @@ namespace PoissonDirichlet2D
     auto inner_multigrid_hierarchy(std::make_shared<Solver::MultiGridHierarchy<LocalSystemMatrixSolve, LocalSystemFilterSolve, LocalSystemTransferSolve> >());
 
     //all other levels
-    Index level(local_matrices_solve.size() - 1);
-    const auto it_end = --system_levels_solve.rend();
-    for (auto it = system_levels_solve.rbegin(); it != it_end; ++it, --level)
+    Index level(0);
+    const auto it_end = --system_levels_solve.end();
+    for (auto it = system_levels_solve.begin(); it != it_end; ++it, ++level)
     {
       auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
       auto local_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), 1.0, local_precond);
@@ -232,23 +225,23 @@ namespace PoissonDirichlet2D
       local_solver->set_min_iter(4);
       inner_multigrid_hierarchy->push_level(
         local_matrices_solve.at(level),     // the system matrix for this level
-        *((*it)->filter_sys),               // the system filter for this level
+        (*it)->filter_sys.local(),          // the system filter for this level
         (*it)->transfer_sys.local(),        // the transfer operator for this level
         local_solver,       // pre-smoother
         local_solver,       // post
         local_solver,
         nullptr,
-        double(1./double(level))
+        double(1./double(Index(local_matrices_solve.size()) - level))
       );
     }
 
     //coarse
     {
-      auto inner_coarse_solver = Solver::new_pcg(local_matrices_solve.at(0), *(system_levels_solve.front()->filter_sys));
+      auto inner_coarse_solver = Solver::new_pcg(local_matrices_solve.back(), *(system_levels_solve.back()->filter_sys));
 
       inner_multigrid_hierarchy->push_level(
-        local_matrices_solve.at(0),       // the coarse-level system matrix
-        *(system_levels_solve.front()->filter_sys),       // the coarse-level system filter
+        local_matrices_solve.back(),       // the coarse-level system matrix
+        *(system_levels_solve.back()->filter_sys),       // the coarse-level system filter
         inner_coarse_solver     // the coarse-level solver
       );
     }
@@ -260,13 +253,13 @@ namespace PoissonDirichlet2D
     auto outer_multigrid_hierarchy(std::make_shared<Solver::MultiGridHierarchy<GlobalSystemMatrixSolve, GlobalSystemFilterSolve, GlobalSystemTransferSolve> >());
 
     //all other levels
-    level = local_matrices_solve.size() - 1;
-    for (auto it = system_levels_solve.rbegin(); it != it_end; ++it, --level)
+    level = 0;
+    for (auto it = system_levels_solve.begin(); it != it_end; ++it, ++level)
     {
       auto inner_multigrid = Solver::new_scarcmultigrid(
           inner_multigrid_hierarchy,
           Solver::MultiGridCycle::W,
-          int(level),
+          -int(level+1),
           0);
 
       auto inner_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), DataType(1), inner_multigrid);
@@ -293,11 +286,11 @@ namespace PoissonDirichlet2D
 
     //coarse
     {
-      auto outer_coarse_solver = Solver::new_pcg(system_levels_solve.front()->matrix_sys, system_levels_solve.front()->filter_sys);
+      auto outer_coarse_solver = Solver::new_pcg(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys);
 
       outer_multigrid_hierarchy->push_level(
-        system_levels_solve.front()->matrix_sys,       // the coarse-level system matrix
-        system_levels_solve.front()->filter_sys,       // the coarse-level system filter
+        system_levels_solve.back()->matrix_sys,       // the coarse-level system matrix
+        system_levels_solve.back()->filter_sys,       // the coarse-level system filter
         outer_coarse_solver     // the coarse-level solver
       );
     }
@@ -307,7 +300,7 @@ namespace PoissonDirichlet2D
       outer_multigrid_hierarchy,
       Solver::MultiGridCycle::W);
 
-    auto outer_solver = Solver::new_richardson(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys, DataType(1), outer_multigrid);
+    auto outer_solver = Solver::new_richardson(system_levels_solve.front()->matrix_sys, system_levels_solve.front()->filter_sys, DataType(1), outer_multigrid);
     outer_multigrid_hierarchy->init();
     //#### OUTER MG ####
 
@@ -350,7 +343,7 @@ namespace PoissonDirichlet2D
     //inner_multigrid_hierarchy->done();
 
     // download solution
-    vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
+    vec_sol.convert(&system_levels.front()->gate_sys, vec_sol_solve);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -360,7 +353,7 @@ namespace PoissonDirichlet2D
     {
       // Compute and print the H0-/H1-errors
       Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
-        (vec_sol.local(), sol_func, the_asm_level.space, cubature);
+        (vec_sol.local(), sol_func, the_domain_level.space, cubature);
 
       // synhronise all local errors
       errors.synchronise(comm);
@@ -386,8 +379,8 @@ namespace PoissonDirichlet2D
 
       // project velocity and pressure
       typename SystemLevelType::LocalSystemVector vtx_sol, vtx_rhs;
-      Assembly::DiscreteVertexProjector::project(vtx_sol, vec_sol.local(), the_asm_level.space);
-      Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_asm_level.space);
+      Assembly::DiscreteVertexProjector::project(vtx_sol, vec_sol.local(), the_domain_level.space);
+      Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_domain_level.space);
 
       // write velocity
       exporter.add_vertex_scalar("sol", vtx_sol.elements());
@@ -406,24 +399,6 @@ namespace PoissonDirichlet2D
 
     //if(Util::Comm::rank() == 0)
     //  std::cout << wp.msg;
-
-    // clean up
-    while (!system_levels_solve.empty())
-    {
-      delete system_levels_solve.back();
-      system_levels_solve.pop_back();
-    }
-
-    while (!system_levels.empty())
-    {
-      delete system_levels.back();
-      system_levels.pop_back();
-    }
-    while (!asm_levels.empty())
-    {
-      delete asm_levels.back();
-      asm_levels.pop_back();
-    }
   }
 
   void main(int argc, char* argv [])
@@ -469,6 +444,8 @@ namespace PoissonDirichlet2D
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
     int lvl_max = 3;
     int lvl_min = 0;
@@ -490,7 +467,8 @@ namespace PoissonDirichlet2D
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain(comm);
+      typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
+      Control::Domain::PartiDomainControl<DomainLevelType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -510,18 +488,18 @@ namespace PoissonDirichlet2D
       domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
-      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
-      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
+      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
 
       // run our application
       if (mem_string == "main")
       {
-        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(comm, args, domain);
+        run<LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(args, domain);
       }
 #ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(comm, args, domain);
+        run<LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(args, domain);
       }
 #endif
       else

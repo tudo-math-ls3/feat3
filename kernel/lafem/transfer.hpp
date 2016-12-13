@@ -124,6 +124,11 @@ namespace FEAT
         return _mat_prol.bytes() + _mat_rest.bytes();
       }
 
+      void compile()
+      {
+        // nothing to do here...
+      }
+
       /// \cond internal
       Matrix_& get_mat_prol()
       {

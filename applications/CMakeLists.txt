@@ -13,6 +13,7 @@ ADD_SUBDIRECTORY( meshopt_screws-app )
 # applications to build
 SET (app_list
   foundation_psystem_test-app
+  hierarch_transfer_test-app
   meshopt_hyperelasticity_resize-app
   navier_stokes_cp2d_q2q1
   navier_stokes_solver_factory
@@ -65,6 +66,49 @@ else (FEAT_HAVE_MPI)
     --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/foundation_psystem_test-app)
   SET_PROPERTY(TEST foundation_psystem_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_psystem_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+endif (FEAT_HAVE_MPI)
+
+######################### hierarch_transfer_test-app
+
+if (FEAT_HAVE_MPI)
+  ADD_TEST(sleep317 sleep 2)
+  SET_PROPERTY(TEST sleep317 PROPERTY LABELS "mpi,sleep")
+
+  ADD_TEST(hierarch_transfer_test-app_mpi_4 ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target hierarch_transfer_test-app
+    --build-nocmake
+    --build-noclean
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app ${MPIEXEC_POSTFLAGS})
+  SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_4 PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+
+  ADD_TEST(sleep318 sleep 2)
+  SET_PROPERTY(TEST sleep318 PROPERTY LABELS "mpi,sleep")
+
+  ADD_TEST(hierarch_transfer_test-app_mpi_16 ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target hierarch_transfer_test-app
+    --build-nocmake
+    --build-noclean
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 16 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app ${MPIEXEC_POSTFLAGS})
+  SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_16 PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_16 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+else (FEAT_HAVE_MPI)
+  ADD_TEST(hierarch_transfer_test-app_serial ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target hierarch_transfer_test-app
+    --build-nocmake
+    --build-noclean
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/foundation_psystem_test-app)
+  SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY LABELS "serial")
+  SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
 
 ######################### poisson_dirichlet_2d

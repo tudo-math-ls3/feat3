@@ -140,6 +140,12 @@ namespace FEAT
         return _transfer.bytes() + _vec_tmp.bytes();
       }
 
+      void compile()
+      {
+        _transfer.compile();
+        _vec_tmp = _transfer.get_mat_rest().create_vector_l();
+      }
+
       /// \cond internal
       LocalVectorType& get_vec_temp()
       {

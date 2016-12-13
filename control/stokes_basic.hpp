@@ -198,27 +198,30 @@ namespace FEAT
 
         compile_system_matrix();
 
-        // clone content into our global transfer matrix
         compile_system_transfer();
       }
 
       /// \todo find out what to do for disc/cont pressure spaces here...
-      template<typename DomainLayer_, typename DomainLevel_, typename SpaceVelo_, typename SpacePres_>
-      void assemble_gates(const DomainLayer_& dom_layer, const DomainLevel_& dom_level,
-        const SpaceVelo_& space_velo, const SpacePres_& space_pres)
+      template<typename DomainLevel_>
+      void assemble_gates(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl)
       {
+        const auto& dom_level = virt_dom_lvl.level();
+        const auto& dom_layer = virt_dom_lvl.layer();
+        const auto& space_velo = dom_level.space_velo;
+        const auto& space_pres = dom_level.space_pres;
+
         // set the gate comm
-        this->gate_velo.set_comm(dom_layer.get_comm());
-        this->gate_pres.set_comm(dom_layer.get_comm());
-        this->gate_sys.set_comm(dom_layer.get_comm());
+        this->gate_velo.set_comm(dom_layer.comm_ptr());
+        this->gate_pres.set_comm(dom_layer.comm_ptr());
+        this->gate_sys.set_comm(dom_layer.comm_ptr());
 
         // loop over all ranks
-        for(Index i(0); i < dom_layer.size(); ++i)
+        for(Index i(0); i < dom_layer.neighbour_count(); ++i)
         {
-          Index rank = dom_layer.get_rank(i);
+          int rank = dom_layer.neighbour_rank(i);
 
           // try to find our halo
-          auto* halo = dom_level.find_halo_part(rank);
+          const auto* halo = dom_level.find_halo_part(rank);
           XASSERT(halo != nullptr);
 
           // assemble the velocity components mirror
@@ -236,10 +239,10 @@ namespace FEAT
           SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
 
           // push mirror into gates
-          this->gate_velo.push(int(rank), std::move(mirror_velo));
+          this->gate_velo.push(rank, std::move(mirror_velo));
           if(!mirror_pres.get_gather().empty())
-            this->gate_pres.push(int(rank), std::move(mirror_pres));
-          this->gate_sys.push(int(rank), std::move(mirror_sys));
+            this->gate_pres.push(rank, std::move(mirror_pres));
+          this->gate_sys.push(rank, std::move(mirror_sys));
         }
 
         // create local template vectors
@@ -253,9 +256,110 @@ namespace FEAT
         this->gate_sys.compile(std::move(tmpl_s));
       }
 
-      template<typename SpaceVelo_, typename Cubature_>
-      void assemble_velocity_transfer(const SpaceVelo_& space_velo_fine, const SpaceVelo_& space_velo_coarse, const Cubature_& cubature)
+      template<typename DomainLevel_>
+      void assemble_coarse_muxers(const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse)
       {
+        // assemble muxer parent
+        if(virt_lvl_coarse.is_parent())
+        {
+          XASSERT(virt_lvl_coarse.is_child());
+
+          const auto& layer_p = virt_lvl_coarse.layer_p();
+          const DomainLevel_& level_p = virt_lvl_coarse.level_p();
+
+          // loop over all children
+          for(Index i(0); i < layer_p.child_count(); ++i)
+          {
+            int child_rank = layer_p.child_rank(i);
+            const auto* child = level_p.find_patch_part(child_rank);
+            XASSERT(child != nullptr);
+            SystemMirror child_mirror_sys;
+            VeloMirror& child_mirror_v = child_mirror_sys.template at<0>();
+            PresMirror& child_mirror_p = child_mirror_sys.template at<1>();
+            Assembly::MirrorAssembler::assemble_mirror(child_mirror_v._sub_mirror, level_p.space_velo, *child);
+            Assembly::MirrorAssembler::assemble_mirror(child_mirror_p, level_p.space_pres, *child);
+            this->coarse_muxer_velo.push_child(child_rank, child_mirror_v.clone(LAFEM::CloneMode::Shallow));
+            this->coarse_muxer_pres.push_child(child_rank, child_mirror_p.clone(LAFEM::CloneMode::Shallow));
+            this->coarse_muxer_sys.push_child(child_rank, std::move(child_mirror_sys));
+          }
+        }
+
+        // assemble muxer child
+        if(virt_lvl_coarse.is_child())
+        {
+          const auto& layer_c = virt_lvl_coarse.layer_c();
+          const DomainLevel_& level_c = virt_lvl_coarse.level_c();
+
+          SystemMirror parent_mirror_sys;
+          VeloMirror& parent_mirror_v = parent_mirror_sys.template at<0>();
+          PresMirror& parent_mirror_p = parent_mirror_sys.template at<1>();
+
+          // manually set up an identity gather/scatter matrix
+          {
+            Index n = level_c.space_velo.get_num_dofs();
+            LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> scagath(n, n, n);
+            auto* ptr = scagath.row_ptr();
+            auto* idx = scagath.col_ind();
+            auto* val = scagath.val();
+
+            for(Index i(0); i < n; ++i)
+            {
+              ptr[i] = idx[i] = i;
+              val[i] = DataType(1);
+            }
+            ptr[n] = n;
+            parent_mirror_v._sub_mirror = ScalarMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
+          }
+          {
+            Index n = level_c.space_pres.get_num_dofs();
+            LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> scagath(n, n, n);
+            auto* ptr = scagath.row_ptr();
+            auto* idx = scagath.col_ind();
+            auto* val = scagath.val();
+
+            for(Index i(0); i < n; ++i)
+            {
+              ptr[i] = idx[i] = i;
+              val[i] = DataType(1);
+            }
+            ptr[n] = n;
+            parent_mirror_p = ScalarMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
+          }
+
+          // set muxer parent
+          int parent_rank = layer_c.parent_rank();
+          this->coarse_muxer_velo.set_parent(parent_rank, parent_mirror_v.clone(LAFEM::CloneMode::Shallow));
+          this->coarse_muxer_pres.set_parent(parent_rank, parent_mirror_p.clone(LAFEM::CloneMode::Shallow));
+          this->coarse_muxer_sys.set_parent(parent_rank, std::move(parent_mirror_sys));
+
+          // set muxer comm
+          this->coarse_muxer_velo.set_comm(layer_c.comm_ptr());
+          this->coarse_muxer_pres.set_comm(layer_c.comm_ptr());
+          this->coarse_muxer_sys.set_comm(layer_c.comm_ptr());
+
+          // compile muxer
+          LocalVeloVector tmpl_v(level_c.space_velo.get_num_dofs());
+          LocalPresVector tmpl_p(level_c.space_pres.get_num_dofs());
+          LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
+          this->coarse_muxer_velo.compile(tmpl_v);
+          this->coarse_muxer_pres.compile(tmpl_p);
+          this->coarse_muxer_sys.compile(tmpl_s);
+        }
+      }
+
+      template<typename DomainLevel_, typename Cubature_>
+      void assemble_velocity_transfer(
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature)
+      {
+        // get fine and coarse domain levels
+        const DomainLevel_& level_f = *virt_lvl_fine;
+        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+
+        const auto& space_f = level_f.space_velo;
+        const auto& space_c = level_c.space_velo;
+
         // get local transfer operator
         LocalVeloTransfer& loc_trans = this->transfer_velo.local();
 
@@ -270,7 +374,7 @@ namespace FEAT
         // assemble structure?
         if(loc_prol_vx.empty())
         {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_vx, space_velo_fine, space_velo_coarse);
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_vx, space_f, space_c);
 
           for(int i(1); i < loc_prol_v.num_row_blocks; ++i)
             loc_prol_v.get(i,i) = loc_prol_vx.clone(LAFEM::CloneMode::Layout);
@@ -288,8 +392,7 @@ namespace FEAT
           loc_vec_weight.format();
 
           // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol_vx, loc_vec_wx,
-            space_velo_fine, space_velo_coarse, cubature);
+          Assembly::GridTransfer::assemble_prolongation(loc_prol_vx, loc_vec_wx, space_f, space_c, cubature);
 
           // synchronise weight vector
           for(int i(1); i < loc_vec_weight.num_blocks; ++i)
@@ -313,9 +416,19 @@ namespace FEAT
         }
       }
 
-      template<typename SpacePres_, typename Cubature_>
-      void assemble_pressure_transfer(const SpacePres_& space_pres_fine, const SpacePres_& space_pres_coarse, const Cubature_& cubature)
+      template<typename DomainLevel_, typename Cubature_>
+      void assemble_pressure_transfer(
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature)
       {
+        // get fine and coarse domain levels
+        const DomainLevel_& level_f = *virt_lvl_fine;
+        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+
+        const auto& space_f = level_f.space_pres;
+        const auto& space_c = level_c.space_pres;
+
         // get local transfer operator
         LocalPresTransfer& loc_trans = this->transfer_pres.local();
 
@@ -326,7 +439,7 @@ namespace FEAT
         // assemble structure?
         if(loc_prol_p.empty())
         {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_p, space_pres_fine, space_pres_coarse);
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_p, space_f, space_c);
         }
 
         LocalPresVector loc_vec_weight = loc_prol_p.create_vector_l();
@@ -337,8 +450,7 @@ namespace FEAT
           loc_vec_weight.format();
 
           // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol_p, loc_vec_weight,
-            space_pres_fine, space_pres_coarse, cubature);
+          Assembly::GridTransfer::assemble_prolongation(loc_prol_p, loc_vec_weight, space_f, space_c, cubature);
 
           // synchronise weight vector
           this->gate_pres.sync_0(loc_vec_weight);
@@ -354,13 +466,14 @@ namespace FEAT
         }
       }
 
-      template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
+      template<typename DomainLevel_, typename Cubature_>
       void assemble_transfers(
-        const SpaceVelo_& space_velo_fine, const SpacePres_& space_pres_fine,
-        const SpaceVelo_& space_velo_coarse, const SpacePres_& space_pres_coarse, const Cubature_& cubature)
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature)
       {
-        this->assemble_velocity_transfer(space_velo_fine, space_velo_coarse, cubature);
-        this->assemble_pressure_transfer(space_pres_fine, space_pres_coarse, cubature);
+        this->assemble_velocity_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
+        this->assemble_pressure_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
         this->compile_system_transfer();
       }
 
@@ -571,77 +684,7 @@ namespace FEAT
         // build the mean filter
         fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
       }
-
     }; // struct StokesUnitVeloNonePresSystemLevel<...>
-
-    template<
-      typename SpaceVelo_,
-      typename SpacePres_>
-    class StokesBasicAssemblerLevel
-    {
-    public:
-      typedef SpaceVelo_ SpaceVeloType;
-      typedef SpacePres_ SpacePresType;
-      typedef typename SpaceVelo_::TrafoType TrafoType;
-      typedef typename TrafoType::MeshType MeshType;
-      typedef Control::Domain::DomainLevel<MeshType> DomainLevelType;
-      typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
-
-    public:
-      DomainLevelType& domain_level;
-      MeshType& mesh;
-      TrafoType trafo;
-      SpaceVeloType space_velo;
-      SpacePresType space_pres;
-
-    public:
-      explicit StokesBasicAssemblerLevel(DomainLevelType& dom_lvl) :
-        domain_level(dom_lvl),
-        mesh(domain_level.get_mesh()),
-        trafo(mesh),
-        space_velo(trafo),
-        space_pres(trafo)
-      {
-      }
-
-      virtual ~StokesBasicAssemblerLevel()
-      {
-      }
-
-      template<typename SolVector_>
-      void write_vtk(const String& vtk_name, const SolVector_& vector, const Dist::Comm& comm) const
-      {
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(this->mesh);
-
-        // project velocity and pressure
-        LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy, vtx_vz;
-        Assembly::DiscreteVertexProjector::project(vtx_vx, vector.template at<0>().get(0), this->space_velo);
-        Assembly::DiscreteVertexProjector::project(vtx_vy, vector.template at<0>().get(1), this->space_velo);
-        if(vector.num_blocks > 2)
-        {
-          Assembly::DiscreteVertexProjector::project(vtx_vz, vector.template at<0>().get(2), this->space_velo);
-          // write 3D velocity
-          exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements(), vtx_vz.elements());
-        }
-        else
-        {
-          // write 2D velocity
-          exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
-        }
-
-        // project pressure
-        Cubature::DynamicFactory cubature("auto-degree:2");
-        LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
-        Assembly::DiscreteCellProjector::project(vtx_p, vector.template at<1>(), this->space_pres, cubature);
-
-        // write pressure
-        exporter.add_cell_scalar("pressure", vtx_p.elements());
-
-        // finally, write the VTK file
-        exporter.write(vtk_name, comm);
-      }
-    };
   } // namespace Control
 } // namespace FEAT
 

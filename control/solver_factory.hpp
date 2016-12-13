@@ -61,7 +61,7 @@ namespace FEAT
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_schwarz_precon(MST_& matrix_stock, PropertyMap* base, String section_name, PropertyMap* section,
-        size_t back_level, typename SolverVectorType_::GateType*)
+        size_t solver_level, typename SolverVectorType_::GateType*)
         {
           using SolverVectorType = SolverVectorType_;
           std::shared_ptr<Solver::SolverBase<typename SolverVectorType::LocalVectorType> > precon_schwarz;
@@ -69,7 +69,7 @@ namespace FEAT
           if (schwarz_p.second)
           {
             precon_schwarz = create_scalar_solver_by_section<MST_, typename SolverVectorType::LocalVectorType>(matrix_stock, base, get_section_path(base, section, section_name, schwarz_p.first),
-                back_level);
+                solver_level);
           }
           else
           {
@@ -78,7 +78,7 @@ namespace FEAT
           }
 
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-          return Solver::new_schwarz_precond(section_name, section, precon_schwarz, filters.at(back_level));
+          return Solver::new_schwarz_precond(section_name, section, precon_schwarz, filters.at(solver_level));
         }
 
         template <typename SolverVectorType_, typename MST_>
@@ -100,11 +100,11 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_ilu_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t back_level, ...)
+        create_ilu_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t solver_level, ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-          auto result = Solver::new_ilu_precond(section_name, section, systems.at(back_level), filters.at(back_level));
+          auto result = Solver::new_ilu_precond(section_name, section, systems.at(solver_level), filters.at(solver_level));
           return result;
         }
 
@@ -118,11 +118,11 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_spai_precon(MST_ & matrix_stock, size_t back_level, ...)
+        create_spai_precon(MST_ & matrix_stock, size_t solver_level, ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-          auto result = Solver::new_spai_precond(systems.at(back_level), filters.at(back_level));
+          auto result = Solver::new_spai_precond(systems.at(solver_level), filters.at(solver_level));
           return result;
         }
 
@@ -136,15 +136,14 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_sor_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t back_level,
+        create_sor_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t solver_level,
         ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
 
           auto result = Solver::new_sor_precond(
-            section_name, section, systems.at(back_level), filters.at(back_level));
-
+            section_name, section, systems.at(solver_level), filters.at(solver_level));
           return result;
         }
 
@@ -158,21 +157,21 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_ssor_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t back_level,
+        create_ssor_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t solver_level,
         ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
 
           auto result = Solver::new_ssor_precond(
-            section_name, section, systems.at(back_level), filters.at(back_level));
+            section_name, section, systems.at(solver_level), filters.at(solver_level));
 
           return result;
         }
 
         template <typename MST_, typename SolverVectorType_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> > create_scalar_solver_by_section(
-          MST_& matrix_stock, PropertyMap* base, const String& precon_section_path, size_t back_level)
+          MST_& matrix_stock, PropertyMap* base, const String& precon_section_path, size_t solver_level)
         {
           std::shared_ptr<Solver::SolverBase<SolverVectorType_> > precon = nullptr;
           auto precon_section = base->query_section(precon_section_path);
@@ -184,20 +183,20 @@ namespace FEAT
               precon_datatype == Type::Traits<typename SolverVectorType_::DataType>::name() &&
               precon_indextype == Type::Traits<typename SolverVectorType_::IndexType>::name())
           {
-            precon = create_scalar_solver<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            precon = create_scalar_solver<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, solver_level);
           }
 #ifdef FEAT_SF_ESOTERIC
           else if (precon_memory == "main" && precon_datatype == "float" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, float, unsigned long>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
           else if (precon_memory == "main" && precon_datatype == "double" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, double, unsigned long>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #ifdef FEAT_SF_ESOTERIC
@@ -205,13 +204,13 @@ namespace FEAT
           else if (precon_memory == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned long>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
           else if (precon_memory == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned long>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
@@ -220,13 +219,13 @@ namespace FEAT
           else if (precon_memory == "main" && precon_datatype == "float" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, float, unsigned int>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
           else if (precon_memory == "main" && precon_datatype == "double" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, double, unsigned int>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
@@ -235,14 +234,14 @@ namespace FEAT
           else if (precon_memory == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned int>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
           else if (precon_memory == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned int>;
-            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
+            auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
@@ -265,14 +264,8 @@ namespace FEAT
          */
         template <typename MST_, typename SolverVectorType_ = typename MST_::VectorType>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_scalar_solver(MST_ & matrix_stock, PropertyMap* base, const String& section_name,
-        size_t back_level = std::numeric_limits<size_t>::max())
+        create_scalar_solver(MST_ & matrix_stock, PropertyMap* base, const String& section_name, std::size_t solver_level = std::size_t(0))
         {
-          if (back_level == std::numeric_limits<size_t>::max())
-          {
-            back_level = matrix_stock.systems.size() - 1;
-          }
-
           using MemType = typename SolverVectorType_::MemType;
           using DataType = typename SolverVectorType_::DataType;
           using IndexType = typename SolverVectorType_::IndexType;
@@ -312,7 +305,7 @@ namespace FEAT
             else
             {
               auto precon_section_path = get_section_path(base, section, section_name, precon_p.first);
-              precon = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, back_level);
+              precon = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             }
           }
 
@@ -321,72 +314,72 @@ namespace FEAT
             std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_pcg(section_name, section, systems.at(back_level), filters.at(back_level), precon);
+            result = Solver::new_pcg(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "bicgstab")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_bicgstab(
-              section_name, section, systems.at(back_level), filters.at(back_level), precon);
+              section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "fgmres")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_fgmres(section_name, section, systems.at(back_level), filters.at(back_level), precon);
+            result = Solver::new_fgmres(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "richardson")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_richardson(
-              section_name, section, systems.at(back_level), filters.at(back_level), precon);
+              section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "pmr")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_pmr(section_name, section, systems.at(back_level), filters.at(back_level), precon);
+            result = Solver::new_pmr(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "pcr")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_pcr(section_name, section, systems.at(back_level), filters.at(back_level), precon);
+            result = Solver::new_pcr(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "psd")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_psd(section_name, section, systems.at(back_level), filters.at(back_level), precon);
+            result = Solver::new_psd(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "jac")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_jacobi_precond(section_name, section, systems.at(back_level), filters.at(back_level));
+            result = Solver::new_jacobi_precond(section_name, section, systems.at(solver_level), filters.at(solver_level));
           }
           else if (solver_type == "scale")
           {
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            result = Solver::new_scale_precond(section_name, section, filters.at(back_level));
+            result = Solver::new_scale_precond(section_name, section, filters.at(solver_level));
           }
           else if (solver_type == "ilu")
           {
-            result = create_ilu_precon<SolverVectorType_>(matrix_stock, section_name, section, back_level, nullptr);
+            result = create_ilu_precon<SolverVectorType_>(matrix_stock, section_name, section, solver_level, nullptr);
           }
           else if (solver_type == "spai")
           {
-            result = create_spai_precon<SolverVectorType_>(matrix_stock, back_level, nullptr);
+            result = create_spai_precon<SolverVectorType_>(matrix_stock, solver_level, nullptr);
           }
           else if (solver_type == "sor")
           {
-            result = create_sor_precon<SolverVectorType_>(matrix_stock, section_name, section, back_level, nullptr);
+            result = create_sor_precon<SolverVectorType_>(matrix_stock, section_name, section, solver_level, nullptr);
           }
           else if (solver_type == "ssor")
           {
-            result = create_ssor_precon<SolverVectorType_>(matrix_stock, section_name, section, back_level, nullptr);
+            result = create_ssor_precon<SolverVectorType_>(matrix_stock, section_name, section, solver_level, nullptr);
           }
           else if (solver_type == "mg" || solver_type == "scarcmg")
           {
@@ -423,12 +416,10 @@ namespace FEAT
                 throw InternalError(__func__, __FILE__, __LINE__, "mg section without smoother key is not allowed!");
               auto smoother_section_path = get_section_path(base, section, section_name, smoother_p.first);
 
-              //for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
-              for(Index level(matrix_stock.systems.size()) ; level > Index(0) ; )
+              for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
               {
-                --level;
                 auto coarse_solver = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, coarse_solver_section_path, level);
-                if (level == 0)
+                if ((level+1) == matrix_stock.systems.size())
                 {
                   hierarchy->push_level(systems.at(level), filters.at(level), coarse_solver);
                 }
@@ -450,7 +441,7 @@ namespace FEAT
             auto lvl_max = std::stoi(lvl_max_s);
             if (solver_type == "scarcmg" && lvl_max != -1)
                 throw InternalError(__func__, __FILE__, __LINE__, "You really should not manually set the max lvl for a scarc mg solver!");
-            lvl_max = Math::max(lvl_max, (int)back_level);
+            lvl_max = Math::max(lvl_max, (int)( matrix_stock.systems.size()-solver_level-1));
 
             if (solver_type == "mg")
             {
@@ -497,7 +488,7 @@ namespace FEAT
           }
           else if (solver_type == "schwarz")
           {
-            result = create_schwarz_precon<SolverVectorType_>(matrix_stock, base, section_name, section, back_level, nullptr);
+            result = create_schwarz_precon<SolverVectorType_>(matrix_stock, base, section_name, section, solver_level, nullptr);
           }
           else
           {

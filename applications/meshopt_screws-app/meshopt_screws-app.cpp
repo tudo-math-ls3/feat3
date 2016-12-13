@@ -106,18 +106,22 @@ struct MeshoptScrewsApp
   /// The shape type of the mesh's cells
   typedef typename Mesh_::ShapeType ShapeType;
 
+  /// Type for points in the mesh
+  typedef Tiny::Vector<DataType, MeshType::world_dim> WorldPoint;
+
   /// The only transformation available is the standard P1 or Q1 transformation
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
+  /// FE space for the transformation. The mesh optimisation problem is solved on this
+  typedef typename Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoFESpace;
+
+  /// The domain level, including trafo and FE space
+  typedef Control::Domain::SimpleDomainLevel<Mesh_, TrafoType, TrafoFESpace> DomLvl;
+  /// Domain Control Type
+  typedef Control::Domain::PartiDomainControl<DomLvl> DomCtrl;
 
   /// Type of the extruded mesh, which is Simplex<2> for Simplex<2> meshes (no extrusion) and Hypercube<3> for
   /// Hypercube<2> meshes
   typedef typename MeshExtrudeHelper<MeshType>::ExtrudedMeshType ExtrudedMeshType;
-
-  /// Type for points in the mesh
-  typedef Tiny::Vector<DataType, MeshType::world_dim> WorldPoint;
-
-  /// Domain Control Type
-  typedef Control::Domain::PartiDomainControl<MeshType> DomCtrl;
 
   /// This is how far the inner screw's centre deviates from the outer screw's
   static constexpr DataType excentricity_inner = DataType(0.2833);
@@ -263,21 +267,21 @@ struct MeshoptScrewsApp
     dom_ctrl.create_hierarchy(lvl_max, lvl_min);
 
     // Mesh on the finest level, mainly for computing quality indicators
-    const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
+    const auto& finest_mesh = dom_ctrl.front()->get_mesh();
 
     // Print level information
     comm.print(name()+" settings:");
-    comm.print("LVL-MAX "+stringify(dom_ctrl.get_levels().back()->get_level_index())
+    comm.print("LVL-MAX "+stringify(dom_ctrl.max_level_index())
         +" [" +stringify(lvl_max) + "] "
-        +"LVL-MIN "+stringify(dom_ctrl.get_levels().front()->get_level_index())+" [" +stringify(lvl_min) + "]");
+        +"LVL-MIN "+stringify(dom_ctrl.min_level_index())+" [" +stringify(lvl_min) + "]");
     comm.print("Timestep size: "+stringify_fp_fix(delta_t)+", end time: "+ stringify_fp_fix(t_end));
     dom_ctrl.print();
 
-    MeshExtrudeHelper<MeshType> extruder(dom_ctrl.get_levels().back()->get_mesh_node(),
+    MeshExtrudeHelper<MeshType> extruder(dom_ctrl.front()->get_mesh_node(),
     Index(10*(lvl_max+1)), DataType(0), DataType(1), "bnd:b", "bnd:t");
 
     // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("bnd:i");
+    auto* inner_boundary = dom_ctrl.front()->get_mesh_node()->find_mesh_part("bnd:i");
     Geometry::TargetSet* inner_indices(nullptr);
     if(inner_boundary != nullptr)
     {
@@ -287,10 +291,10 @@ struct MeshoptScrewsApp
     // This is the centre point of the rotation of the inner screw
     WorldPoint centre_inner(DataType(0));
     centre_inner.v[0] = -excentricity_inner;
-    auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("screw:i");
+    auto* inner_chart = dom_ctrl.get_atlas().find_mesh_chart("screw:i");
 
     // Get outer boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* outer_boundary_part = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("bnd:o");
+    auto* outer_boundary_part = dom_ctrl.front()->get_mesh_node()->find_mesh_part("bnd:o");
     Geometry::TargetSet* outer_indices(nullptr);
     if(outer_boundary_part != nullptr)
     {
@@ -299,11 +303,11 @@ struct MeshoptScrewsApp
 
     // This is the centre point of the rotation of the outer screw
     WorldPoint centre_outer(DataType(0));
-    auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("screw:o");
+    auto* outer_chart = dom_ctrl.get_atlas().find_mesh_chart("screw:o");
 
     // Create MeshoptControl
-    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
-    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
+    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
+    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
       dom_ctrl, meshoptimiser_key_p.first, meshopt_config, solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
@@ -330,22 +334,26 @@ struct MeshoptScrewsApp
     // Write initial vtk output
     if(write_vtk)
     {
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
       {
-        int lvl_index((*it)->get_level_index());
+        auto& dom_lvl = dom_ctrl.at(l);
+
+        int lvl_index(dom_lvl->get_level_index());
 
         String vtk_name = String(file_basename+"_pre_initial_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+
         // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
 
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
 
         meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
         exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
@@ -411,9 +419,11 @@ struct MeshoptScrewsApp
     // Write output again
     if(write_vtk)
     {
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
       {
-        int lvl_index((*it)->get_level_index());
+        auto& dom_lvl = dom_ctrl.at(l);
+
+        int lvl_index(dom_lvl->get_level_index());
 
         String vtk_name = String(file_basename+"_post_initial_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
@@ -422,12 +432,13 @@ struct MeshoptScrewsApp
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
 
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
 
         meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
         exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }
@@ -647,12 +658,12 @@ struct MeshoptScrewsApp
 
         String vtk_name = String(file_basename+"_post_"+stringify(n));
         // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
+        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.front()->get_mesh());
 
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
 
-        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
+        meshopt_ctrl->add_to_vtk_exporter(exporter, -1);
 
         exporter.write(vtk_name, comm);
 
@@ -728,9 +739,11 @@ struct MeshoptScrewsApp
     // Write final vtk output
     if(write_vtk)
     {
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
       {
-        int lvl_index((*it)->get_level_index());
+        auto& dom_lvl = dom_ctrl.at(l);
+
+        int lvl_index(dom_lvl->get_level_index());
 
         String vtk_name = String(file_basename+"_final_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
@@ -739,12 +752,13 @@ struct MeshoptScrewsApp
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
 
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
 
         meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
         exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }

@@ -8,6 +8,8 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/math.hpp>
 
+#include <control/domain/domain_level.hpp>
+
 #include <vector>
 #include <deque>
 
@@ -20,21 +22,37 @@ namespace FEAT
      */
     namespace Domain
     {
-      template<typename Mesh_>
       class DomainLayer
       {
       protected:
-        Dist::Comm* _comm;
-        std::vector<Index> _ranks;
-        std::vector<Index> _ctags;
+        /// the communicator for this level
+        Dist::Comm _comm;
+
+        /// the layer index
+        int _layer_index;
+
+        /// the ranks of the neighbour processes in this layer
+        std::vector<int> _neighbour_ranks;
+        std::vector<int> _child_ranks;
+        int _parent_rank;
 
       public:
-        explicit DomainLayer(Dist::Comm* comm_, std::vector<Index>&& ranks, std::vector<Index>&& ctags) :
-          _comm(comm_),
-          _ranks(std::forward<std::vector<Index>>(ranks)),
-          _ctags(std::forward<std::vector<Index>>(ctags))
+        explicit DomainLayer(Dist::Comm&& comm_, int lyr_idx) :
+          _comm(std::forward<Dist::Comm>(comm_)),
+          _layer_index(lyr_idx),
+          _neighbour_ranks(),
+          _child_ranks(),
+          _parent_rank(-1)
         {
-          XASSERT(_ranks.size() == _ctags.size());
+        }
+
+        DomainLayer(DomainLayer&& other) :
+          _comm(std::forward<Dist::Comm>(other._comm)),
+          _layer_index(other._layer_index),
+          _neighbour_ranks(std::forward<std::vector<int>>(other._neighbour_ranks)),
+          _child_ranks(std::forward<std::vector<int>>(other._child_ranks)),
+          _parent_rank(other._parent_rank)
+        {
         }
 
         virtual ~DomainLayer()
@@ -43,162 +61,293 @@ namespace FEAT
 
         std::size_t bytes() const
         {
-          return (_ranks.size() + _ctags.size()) * sizeof(Index);
+          return (_neighbour_ranks.size() + _child_ranks.size()) * sizeof(int);
         }
 
-        Index size() const
-        {
-          return Index(_ranks.size());
-        }
-
-        Index get_rank(Index i) const
-        {
-          return _ranks.at(std::size_t(i));
-        }
-
-        Index get_ctag(Index i) const
-        {
-          return _ctags.at(std::size_t(i));
-        }
-
-        const Dist::Comm* get_comm() const
+        const Dist::Comm& comm() const
         {
           return _comm;
         }
 
-        const std::vector<Index>& get_ranks() const
+        const Dist::Comm* comm_ptr() const
         {
-          return _ranks;
+          return &_comm;
         }
 
-        const std::vector<Index>& get_ctags() const
+        bool is_child() const
         {
-          return _ctags;
+          return _parent_rank >= 0;
         }
-      };
 
-      template<typename Mesh_>
-      class DomainLevel
+        bool is_parent() const
+        {
+          return !_child_ranks.empty();
+        }
+
+        bool is_ghost() const
+        {
+          return is_child() && !is_parent();
+        }
+
+        int get_layer_index() const
+        {
+          return _layer_index;
+        }
+
+        void set_parent_rank(int parent_rank_)
+        {
+          XASSERT(parent_rank_ >= -1);
+          XASSERT(parent_rank_ < _comm.size());
+          _parent_rank = parent_rank_;
+        }
+
+        Index neighbour_count() const
+        {
+          return Index(_neighbour_ranks.size());
+        }
+
+        void push_neighbour(int neighbour_rank_)
+        {
+          _neighbour_ranks.push_back(neighbour_rank_);
+        }
+
+        int neighbour_rank(Index i) const
+        {
+          return _neighbour_ranks.at(std::size_t(i));
+        }
+
+        void set_neighbour_ranks(const std::vector<int>& neighbours)
+        {
+          _neighbour_ranks = neighbours;
+        }
+
+        const std::vector<int>& get_neighbour_ranks() const
+        {
+          return _neighbour_ranks;
+        }
+
+        int parent_rank() const
+        {
+          return _parent_rank;
+        }
+
+        Index child_count() const
+        {
+          return Index(_child_ranks.size());
+        }
+
+        void push_child(int child_rank_)
+        {
+          _child_ranks.push_back(child_rank_);
+        }
+
+        int child_rank(Index i) const
+        {
+          return _child_ranks.at(std::size_t(i));
+        }
+
+        void set_child_ranks(const std::vector<int>& children)
+        {
+          _child_ranks = children;
+        }
+
+        const std::vector<int>& get_child_ranks() const
+        {
+          return _child_ranks;
+        }
+      }; // class DomainLayer
+
+      template<typename DomLvl_>
+      class VirtualLevel
       {
       public:
-        typedef Mesh_ MeshType;
-        typedef Geometry::MeshPart<Mesh_> PartType;
-        typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
+        typedef DomainLayer LayerType;
+        typedef DomLvl_ LevelType;
 
       protected:
-        int _level_index;
-        MeshNodeType* _mesh_node;
+        std::shared_ptr<LevelType> _level;
+        std::shared_ptr<LevelType> _level_child;
+        std::shared_ptr<LevelType> _level_parent;
+        std::shared_ptr<LayerType> _layer;
+        std::shared_ptr<LayerType> _layer_child;
+        std::shared_ptr<LayerType> _layer_parent;
 
       public:
-        explicit DomainLevel() :
-          _level_index(0),
-          _mesh_node(nullptr)
+        explicit VirtualLevel(std::shared_ptr<LevelType> level_, std::shared_ptr<LayerType> layer_) :
+          _level(level_),
+          _level_child(),
+          _level_parent(),
+          _layer(layer_),
+          _layer_child(),
+          _layer_parent()
         {
         }
 
-        explicit DomainLevel(int lvl_index, MeshNodeType* node) :
-          _level_index(lvl_index),
-          _mesh_node(node)
+        explicit VirtualLevel(
+          std::shared_ptr<LevelType> level_child_,
+          std::shared_ptr<LayerType> layer_child_,
+          std::shared_ptr<LevelType> level_parent_,
+          std::shared_ptr<LayerType> layer_parent_) :
+          _level(level_parent_ ? level_parent_ : level_child_),
+          _level_child(level_child_),
+          _level_parent(level_parent_),
+          _layer(layer_parent_ ? layer_parent_ : layer_child_),
+          _layer_child(layer_child_),
+          _layer_parent(layer_parent_)
         {
-        }
+          XASSERT(bool(_level_child));
+          XASSERT(bool(_layer_child));
+          XASSERT(_layer_child->is_child());
 
-        virtual ~DomainLevel()
-        {
-          if(_mesh_node != nullptr)
+          if(_level_parent)
           {
-            delete _mesh_node;
+            XASSERT(bool(_layer_parent));
+            XASSERT(_layer_parent->is_parent());
+            XASSERT(_level_child->get_level_index() == _level_parent->get_level_index());
+          }
+          else
+          {
+            XASSERT(!bool(_layer_parent));
           }
         }
 
-        std::size_t bytes() const
+        virtual ~VirtualLevel()
         {
-          return _mesh_node->bytes();
         }
 
-        int get_level_index() const
+        bool is_child() const
         {
-          return _level_index;
+          return bool(_level_child);
         }
 
-        MeshNodeType* get_mesh_node()
+        bool is_parent() const
         {
-          return _mesh_node;
+          return bool(_level_parent);
         }
 
-        const MeshNodeType* get_mesh_node() const
+        bool is_ghost() const
         {
-          return _mesh_node;
+          return is_child() && !is_parent();
         }
 
-        MeshType& get_mesh()
+        LevelType& operator*()
         {
-          return *_mesh_node->get_mesh();
+          return *_level;
         }
 
-        const MeshType& get_mesh() const
+        const LevelType& operator*() const
         {
-          return *_mesh_node->get_mesh();
+          return *_level;
         }
 
-        const PartType* find_halo_part(Index rank) const
+        LevelType* operator->()
         {
-          // try to fetch the corresponding mesh part node
-          return this->_mesh_node->find_mesh_part(String("_halo:") + stringify(rank));
+          return _level.get();
         }
-      };
 
-      template<typename Mesh_>
+        const LevelType* operator->() const
+        {
+          return _level.get();
+        }
+
+        LevelType& level()
+        {
+          return *_level;
+        }
+
+        const LevelType& level() const
+        {
+          return *_level;
+        }
+
+        LayerType& layer()
+        {
+          return *_layer;
+        }
+
+        const LayerType& layer() const
+        {
+          return *_layer;
+        }
+
+        LevelType& level_c()
+        {
+          XASSERT(bool(_level_child));
+          return *_level_child;
+        }
+
+        const LevelType& level_c() const
+        {
+          XASSERT(bool(_level_child));
+          return *_level_child;
+        }
+
+        LayerType& layer_c()
+        {
+          XASSERT(bool(_layer_child));
+          return *_layer_child;
+        }
+
+        const LayerType& layer_c() const
+        {
+          XASSERT(bool(_layer_child));
+          return *_layer_child;
+        }
+
+        LevelType& level_p()
+        {
+          XASSERT(bool(_level_parent));
+          return *_level_parent;
+        }
+
+        const LevelType& level_p() const
+        {
+          XASSERT(bool(_level_parent));
+          return *_level_parent;
+        }
+
+        LayerType& layer_p()
+        {
+          XASSERT(bool(_layer_parent));
+          return *_layer_parent;
+        }
+
+        const LayerType& layer_p() const
+        {
+          XASSERT(bool(_layer_parent));
+          return *_layer_parent;
+        }
+      }; // class VirtualLevel<...>
+
+      template<typename DomLvl_>
       class DomainControl
       {
       public:
-        typedef DomainLayer<Mesh_> LayerType;
-        typedef DomainLevel<Mesh_> LevelType;
-        typedef Mesh_ MeshType;
+        typedef DomLvl_ LevelType;
+        typedef DomainLayer LayerType;
+        typedef VirtualLevel<LevelType> VirtLevelType;
+
+        typedef typename LevelType::MeshType MeshType;
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
         typedef typename MeshType::CoordType CoordType;
 
       protected:
-        /// the main communicator
-        Dist::Comm* _comm;
-
-        AtlasType* _atlas;
-        std::deque<LayerType*> _layers;
-        std::deque<LevelType*> _levels;
+        const Dist::Comm& _comm;
+        AtlasType _atlas;
+        std::deque<std::shared_ptr<LayerType>> _layers;
+        std::deque<std::deque<std::shared_ptr<LevelType>>> _layer_levels;
+        std::deque<VirtLevelType> _virt_levels;
 
       public:
-        DomainControl() :
-          _comm(nullptr),
-          _atlas(nullptr)
+        explicit DomainControl(const Dist::Comm& comm_) :
+          _comm(comm_)
         {
-        }
-
-        explicit DomainControl(Dist::Comm* comm_) :
-          _comm(comm_),
-          _atlas(nullptr)
-        {
+          _layers.push_back(std::make_shared<LayerType>(_comm.comm_dup(), 0));
+          _layer_levels.resize(std::size_t(1));
         }
 
         virtual ~DomainControl()
         {
-          // delete layers
-          while(!_layers.empty())
-          {
-            if(_layers.back() != nullptr)
-              delete _layers.back();
-            _layers.pop_back();
-          }
-          // delete levels
-          while(!_levels.empty())
-          {
-            if(_levels.back() != nullptr)
-              delete _levels.back();
-            _levels.pop_back();
-          }
-          // delete atlas
-          if(_atlas != nullptr)
-          {
-            delete _atlas;
-          }
         }
 
         static String name()
@@ -211,33 +360,31 @@ namespace FEAT
           Index pad_width(30);
           String msg;
 
-          msg = String("num_levels").pad_back(pad_width, '.') + String(": ") + stringify(num_levels());
-          _comm->print(msg);
+          XASSERT(!_layers.empty());
 
-          const auto& my_mesh = _levels.back()->get_mesh();
+          msg = String("num_levels").pad_back(pad_width, '.') + String(": ") + stringify(size_physical());
+          _comm.print(msg);
+
+          const auto& my_mesh = front()->get_mesh();
           Index ncells(my_mesh.get_num_entities(MeshType::shape_dim));
-          _comm->allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
+          _comm.allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
 
-          msg = String("Cells on level "+stringify(_levels.back()->get_level_index())).pad_back(pad_width, '.')
+          msg = String("Cells on level "+stringify(max_level_index()).pad_back(pad_width, '.'))
             + String(": ") + stringify(ncells);
-          _comm->print(msg);
+          _comm.print(msg);
+        }
+
+        const Dist::Comm& comm() const
+        {
+          return _comm;
         }
 
         std::size_t bytes() const
         {
-          std::size_t s(0);
-          if(_atlas != nullptr)
-            s += _atlas->bytes();
+          std::size_t s = _atlas.bytes();;
           for(auto it = _layers.begin(); it != _layers.end(); ++it)
             s += (*it)->bytes();
-          for(auto it = _levels.begin(); it != _levels.end(); ++it)
-            s += (*it)->bytes();
           return s;
-        }
-
-        Index num_levels() const
-        {
-          return Index(_levels.size());
         }
 
         Index num_layers() const
@@ -247,62 +394,125 @@ namespace FEAT
 
         int min_level_index() const
         {
-          return _levels.front()->get_level_index();
+          return _virt_levels.back()->get_level_index();
         }
 
         int max_level_index() const
         {
-          return _levels.back()->get_level_index();
+          return _virt_levels.front()->get_level_index();
         }
 
-        std::deque<LevelType*>& get_levels()
+        void push_level_front(int layer_index, std::shared_ptr<LevelType> level)
         {
-          return _levels;
+          _layer_levels.at(std::size_t(layer_index)).push_front(level);
         }
 
-        const std::deque<LevelType*>& get_levels() const
+        void push_level_back(int layer_index, std::shared_ptr<LevelType> level)
         {
-          return _levels;
+          _layer_levels.at(std::size_t(layer_index)).push_back(level);
         }
 
-        std::deque<LayerType*>& get_layers()
+        bool has_ghost() const
         {
-          return _layers;
+          if(_virt_levels.empty())
+            return false;
+          else
+            return _virt_levels.back().is_ghost();
         }
 
-        const std::deque<LayerType*>& get_layers() const
+        std::size_t size_virtual() const
         {
-          return _layers;
+          return _virt_levels.size();
         }
 
-        LevelType& get_level(Index i)
+        std::size_t size_physical() const
         {
-          return *_levels.at(std::size_t(i));
+          if(_virt_levels.empty())
+            return std::size_t(0);
+          else if(_virt_levels.back().is_ghost())
+            return _virt_levels.size() - std::size_t(1);
+          else
+            return _virt_levels.size();
         }
 
-        const LevelType& get_level(Index i) const
+        VirtLevelType& at(std::size_t i)
         {
-          return *_levels.at(std::size_t(i));
+          return _virt_levels.at(i);
         }
 
-        LayerType& get_layer(Index i)
+        const VirtLevelType& at(std::size_t i) const
         {
-          return *_layers.at(std::size_t(i));
+          return _virt_levels.at(i);
         }
 
-        const LayerType& get_layer(Index i) const
+        VirtLevelType& front()
         {
-          return *_layers.at(std::size_t(i));
+          return _virt_levels.front();
         }
 
-        AtlasType* get_atlas()
+        const VirtLevelType& front() const
+        {
+          return _virt_levels.front();
+        }
+
+        VirtLevelType& back()
+        {
+          return _virt_levels.back();
+        }
+
+        const VirtLevelType& back() const
+        {
+          return _virt_levels.back();
+        }
+
+        AtlasType& get_atlas()
         {
           return _atlas;
         }
 
-        const AtlasType* get_atlas() const
+        const AtlasType& get_atlas() const
         {
           return _atlas;
+        }
+
+        void compile_virtual_levels()
+        {
+          _virt_levels.clear();
+
+          // push the finest level
+          _virt_levels.push_back(VirtLevelType(_layer_levels.front().front(), _layers.front()));
+
+          // loop over all layers, front to back
+          for(std::size_t ilay(0); ilay < _layers.size(); ++ilay)
+          {
+            auto& layer = _layers.at(ilay);
+            auto& laylevs = _layer_levels.at(ilay);
+
+            // the front level has already been added
+            if(laylevs.size() <= std::size_t(1))
+              continue;
+
+            // push all inner layer levels
+            for(std::size_t ilev(1); (ilev+1) < laylevs.size(); ++ilev)
+              _virt_levels.push_back(VirtLevelType(laylevs.at(ilev), layer));
+
+            // push the last level
+            if((ilay+1) < _layers.size())
+            {
+              // that's an overlapping virtual mesh level with two physical mesh levels
+              _virt_levels.push_back(VirtLevelType(laylevs.back(), layer, _layer_levels.at(ilay+1).front(), _layers.at(ilay+1)));
+            }
+            else if(layer->is_child())
+            {
+              // that's a "ghost" virtual mesh level with only one physical mesh level on this process
+              _virt_levels.push_back(VirtLevelType(laylevs.back(), layer, nullptr, nullptr));
+            }
+            else
+            {
+              // that's a standard virtual mesh level with exactly one physical mesh level
+              _virt_levels.push_back(VirtLevelType(laylevs.back(), layer));
+            }
+          }
         }
 
         /**
@@ -336,29 +546,30 @@ namespace FEAT
           {
             lvl_index = max_level_index();
           }
-          ASSERT(lvl_index >= min_level_index());
-          ASSERT(lvl_index <= max_level_index());
+          XASSERT(lvl_index >= min_level_index());
+          XASSERT(lvl_index <= max_level_index());
+          XASSERT(!_layers.empty());
 
           CoordType qi_sum(0);
 
-          for(const auto& it: _levels)
+          for(const auto& it: _virt_levels)
           {
             if(it->get_level_index() == lvl_index)
             {
               const auto& my_mesh = it->get_mesh();
 
               Index ncells(my_mesh.get_num_entities(MeshType::shape_dim));
-              _comm->allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
+              _comm.allreduce(&ncells, &ncells, std::size_t(1), Dist::op_sum);
 
               Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(qi_min, qi_sum,
               my_mesh.template get_index_set<MeshType::shape_dim, 0>(), my_mesh.get_vertex_set(), qi_cellwise);
 
-              _comm->allreduce(&qi_min, &qi_min, std::size_t(1), Dist::op_min);
-              _comm->allreduce(&qi_sum, &qi_sum, std::size_t(1), Dist::op_sum);
+              _comm.allreduce(&qi_min, &qi_min, std::size_t(1), Dist::op_min);
+              _comm.allreduce(&qi_sum, &qi_sum, std::size_t(1), Dist::op_sum);
 
               edge_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
               my_mesh.template get_index_set<MeshType::shape_dim, 0>(), my_mesh.get_vertex_set(), edge_angle_cellwise);
-              _comm->allreduce(&edge_angle, &edge_angle, std::size_t(1), Dist::op_min);
+              _comm.allreduce(&edge_angle, &edge_angle, std::size_t(1), Dist::op_min);
 
               qi_mean = qi_sum/CoordType(ncells);
 
@@ -370,6 +581,62 @@ namespace FEAT
           throw InternalError(__func__,__FILE__,__LINE__,
           "Could not find level with index "+stringify(lvl_index)+"!\n");
 
+        }
+
+        void dump_layers()
+        {
+          String msg;
+          msg += "(" + stringify(_layers.size()) + "):";
+          std::size_t nc = std::size_t(1);
+          for(std::size_t i(0); i < _layers.size(); ++i)
+          {
+            const auto& lyr = *_layers.at(i);
+            std::size_t np = std::size_t(Math::ilog10(lyr.comm().size()));
+            if(i > std::size_t(0))
+              msg += " |";
+            msg += " [" + stringify(lyr.comm().rank()).pad_front(np) + "]";
+            for(const auto& cr : lyr.get_child_ranks())
+              msg += " " + stringify(cr).pad_front(nc);
+            if(lyr.is_child())
+              msg += " {" + stringify(lyr.parent_rank()).pad_front(np) + "}";
+            nc = np;
+          }
+          _comm.allprint(msg);
+        }
+
+        void dump_layer_levels()
+        {
+          String msg;
+          for(auto it = _layer_levels.begin(); it != _layer_levels.end(); ++it)
+          {
+            if(it != _layer_levels.begin())
+              msg += " |";
+            for(auto jt = it->begin(); jt != it->end(); ++jt)
+              msg += " " + stringify((*jt)->get_level_index());
+          }
+          _comm.allprint(msg);
+        }
+
+        void dump_virt_levels()
+        {
+          String msg;
+          for(auto it = _virt_levels.begin(); it != _virt_levels.end(); ++it)
+          {
+            std::size_t np = std::size_t(Math::ilog10((*it).layer().comm().size()));
+            if((*it).is_child())
+              np = std::size_t(Math::ilog10((*it).layer_c().comm().size()));
+            msg += " " + stringify((*it)->get_level_index());
+            msg += "[" + stringify((*it).layer().comm().size()).pad_front(np) + "]";
+            if((*it).is_child())
+            {
+              msg += "{" + stringify((*it).layer_c().parent_rank()).pad_front(np);
+              if((*it).is_parent())
+                msg += ":" + stringify((*it).layer_p().comm().rank()).pad_front(np) + "}";
+              else
+                msg += String(np+1, ' ') + "}";
+            }
+          }
+          _comm.allprint(msg);
         }
       }; // class DomainControl<...>
     } // namespace Domain

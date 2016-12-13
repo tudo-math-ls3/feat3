@@ -37,14 +37,18 @@ struct MeshoptRefinementApp
   /// The shape type of the mesh's cells
   typedef typename Mesh_::ShapeType ShapeType;
 
-  /// The only transformation available is the standard P1 or Q1 transformation
-  typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
-
   /// Type for points in the mesh
   typedef Tiny::Vector<DataType, MeshType::world_dim> WorldPoint;
 
+  /// The only transformation available is the standard P1 or Q1 transformation
+  typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
+  /// FE space for the transformation. The mesh optimisation problem is solved on this
+  typedef typename Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoFESpace;
+
+  /// The domain level, including trafo and FE space
+  typedef Control::Domain::SimpleDomainLevel<Mesh_, TrafoType, TrafoFESpace> DomLvl;
   /// Domain Control Type
-  typedef Control::Domain::PartiDomainControl<MeshType> DomCtrl;
+  typedef Control::Domain::PartiDomainControl<DomLvl> DomCtrl;
 
   /**
    * \brief Returns a descriptive string
@@ -155,24 +159,24 @@ struct MeshoptRefinementApp
     dom_ctrl.create_hierarchy(lvl_max, lvl_min);
 
     // Mesh on the finest level, mainly for computing quality indicators
-    const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
+    const auto& finest_mesh = dom_ctrl.front()->get_mesh();
 
     // Print level information
     comm.print(name()+" settings:");
-    comm.print("LVL-MAX "+stringify(dom_ctrl.get_levels().back()->get_level_index())
+    comm.print("LVL-MAX "+stringify(dom_ctrl.max_level_index())
         +" [" +stringify(lvl_max) + "] "
-        +"LVL-MIN "+stringify(dom_ctrl.get_levels().front()->get_level_index())+" [" +stringify(lvl_min) + "]");
+        +"LVL-MIN "+stringify(dom_ctrl.min_level_index())+" [" +stringify(lvl_min) + "]");
     dom_ctrl.print();
 
     // Create MeshoptControl
-    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
-    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
+    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
+    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
       dom_ctrl, meshoptimiser_key_p.first, meshopt_config, solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
 
     // Adapt the finest level
-    dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
+    dom_ctrl.front()->get_mesh_node()->adapt();
 
     // Save new coordinates. We need them for calling prepare() to set the initial guess
     meshopt_ctrl->mesh_to_buffer();
@@ -194,17 +198,20 @@ struct MeshoptRefinementApp
     // Write initial vtk output
     if(write_vtk)
     {
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
       {
-        int lvl_index((*it)->get_level_index());
+        auto& dom_lvl = dom_ctrl.at(l);
 
-        String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
+        int lvl_index(dom_lvl->get_level_index());
+
+        String vtk_name = String(file_basename+"_pre_initial_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+
         // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
 
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
@@ -283,23 +290,26 @@ struct MeshoptRefinementApp
     // Write output again
     if(write_vtk)
     {
-      for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
+      for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
       {
-        int lvl_index((*it)->get_level_index());
+        auto& dom_lvl = dom_ctrl.at(l);
 
-        String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+        int lvl_index(dom_lvl->get_level_index());
+
+        String vtk_name = String(file_basename+"_post_initial_lvl_"+stringify(lvl_index));
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
         dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
 
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
 
         meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+
         exporter.write(vtk_name, comm.rank(), comm.size());
       }
     }

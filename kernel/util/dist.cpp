@@ -275,6 +275,19 @@ namespace FEAT
       return (comm == MPI_COMM_NULL);
     }
 
+    Comm Comm::comm_dup() const
+    {
+      // do not duplicate world and null comms
+      if((comm == MPI_COMM_WORLD) || (comm == MPI_COMM_NULL))
+        return Comm(comm);
+
+      // create a real duplicate
+      MPI_Comm newcomm = MPI_COMM_NULL;
+      MPI_Comm_dup(comm, &newcomm);
+
+      return Comm(newcomm);
+    }
+
     Comm Comm::comm_create_range_incl(int count, int first, int stride) const
     {
       XASSERT(count > 0);
@@ -831,6 +844,11 @@ namespace FEAT
     bool Comm::is_world() const
     {
       return _size == 1;
+    }
+
+    Comm Comm::comm_dup() const
+    {
+      return (_size == 0) ? Comm() : Comm(0);
     }
 
     Comm Comm::comm_create_range_incl(int, int, int) const

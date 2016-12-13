@@ -30,21 +30,23 @@ namespace FEAT
        *
        * \author Peter Zajac
        */
-      template<typename MeshType_>
+      template<typename DomainLevel_>
       class PartiDomainControl :
-        public Control::Domain::DomainControl<MeshType_>
+        public Control::Domain::DomainControl<DomainLevel_>
       {
       public:
         /// Our base class
-        typedef Control::Domain::DomainControl<MeshType_> BaseClass;
+        typedef Control::Domain::DomainControl<DomainLevel_> BaseClass;
         /// our domain level type
         typedef typename BaseClass::LevelType LevelType;
         /// our domain layer type
         typedef typename BaseClass::LayerType LayerType;
+        /// our mesh type
+        typedef typename BaseClass::MeshType MeshType;
         /// our atlas type
         typedef typename BaseClass::AtlasType AtlasType;
         /// our root mesh node type
-        typedef Geometry::RootMeshNode<MeshType_> MeshNodeType;
+        typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
 
       protected:
         /// the adapt mode for refinement
@@ -72,14 +74,14 @@ namespace FEAT
         /// our partition set for manual partitioning
         Geometry::PartitionSet _part_set;
         /// our base mesh node
-        MeshNodeType* _base_mesh_node;
+        std::shared_ptr<MeshNodeType> _base_mesh_node;
         /// our patch-mesh node
-        MeshNodeType* _patch_mesh_node;
+        std::shared_ptr<MeshNodeType> _patch_mesh_node;
 
       public:
         /// default constructor
-        explicit PartiDomainControl(Dist::Comm& comm) :
-          BaseClass(&comm),
+        explicit PartiDomainControl(const Dist::Comm& comm_) :
+          BaseClass(comm_),
           _adapt_mode(Geometry::AdaptMode::chart),
           _have_read_mesh(false),
           _have_partition(false),
@@ -90,18 +92,14 @@ namespace FEAT
           _allow_parti_parmetis(true),
           _allow_parti_fallback(true),
           _min_elems_per_rank(4),
-          _base_mesh_node(nullptr),
-          _patch_mesh_node(nullptr)
+          _base_mesh_node(),
+          _patch_mesh_node()
         {
         }
 
         /// virtual destructor
         virtual ~PartiDomainControl()
         {
-          if(_patch_mesh_node != nullptr)
-            delete _patch_mesh_node;
-          if(_base_mesh_node != nullptr)
-            delete _base_mesh_node;
         }
 
         /**
@@ -150,8 +148,7 @@ namespace FEAT
                   _allow_parti_fallback = true;
                 else
                 {
-                  if(this->_comm->rank() == 0)
-                    std::cerr << "ERROR: unknown partitioner type '" << t << "'" << std::endl;
+                  this->_comm.print("ERROR: unknown partitioner type '" + t + "'");
                   return false;
                 }
               }
@@ -207,8 +204,7 @@ namespace FEAT
                  _allow_parti_fallback = true;
                else
                {
-                 if(this->_comm->rank() == 0)
-                   std::cerr << "ERROR: unknown partitioner type '" << t << "'" << std::endl;
+                 this->_comm.print("ERROR: unknown partitioner type '" + t + "'");
                  return false;
                }
              }
@@ -332,15 +328,11 @@ namespace FEAT
           // make sure we don't have a base mesh node
           XASSERTM(_base_mesh_node == nullptr, "domain control already has a base mesh");
 
-          // create a new atlas unless we already have one
-          if(this->_atlas == nullptr)
-            this->_atlas = new AtlasType();
-
           // create a base mesh node
-          _base_mesh_node = new MeshNodeType(nullptr, this->_atlas);
+          _base_mesh_node = std::make_shared<MeshNodeType>(nullptr, &this->_atlas);
 
           // try to parse the atlas, the base mesh and the partition set
-          mesh_reader.parse(*_base_mesh_node, *this->_atlas, &_part_set);
+          mesh_reader.parse(*_base_mesh_node, this->_atlas, &_part_set);
 
           // remember that we have read a mesh
           _have_read_mesh = true;
@@ -375,7 +367,7 @@ namespace FEAT
         void read_mesh(const String& filename)
         {
           std::stringstream stream;
-          DistFileIO::read_common(stream, filename, *(this->_comm));
+          DistFileIO::read_common(stream, filename, this->_comm);
           read_mesh(stream);
         }
 
@@ -405,7 +397,7 @@ namespace FEAT
           for(std::size_t i(0); i < num_files; ++i)
           {
             // read the stream
-            DistFileIO::read_common(streams.at(i), filenames.at(i),  *(this->_comm));
+            DistFileIO::read_common(streams.at(i), filenames.at(i),  this->_comm);
 
             // add to mesh reader
             mesh_reader.add_stream(streams.at(i));
@@ -492,8 +484,10 @@ namespace FEAT
             return;
           }
 #endif // FEAT_HAVE_MPI
+
           // we should not arrive here
-          throw InternalError(__func__, __FILE__, __LINE__, "Failed to create a partition");
+          this->_comm.print("ERROR: Failed to create a suitable partition");
+          Runtime::abort();
         }
 
         /**
@@ -531,7 +525,7 @@ namespace FEAT
           else
             lvl_min = Math::min(lvl_min, lvl_max);
 
-          MeshNodeType* mesh_node = nullptr;
+          std::shared_ptr<MeshNodeType> mesh_node;
 
 #ifdef FEAT_HAVE_MPI
           // create hierarchy from our patch mesh
@@ -549,24 +543,28 @@ namespace FEAT
           int lvl(_base_mesh_level);
           for(; lvl < lvl_min; ++lvl)
           {
-            MeshNodeType* coarse_node = mesh_node;
-            mesh_node = coarse_node->refine(_adapt_mode);
-            delete coarse_node;
+            std::shared_ptr<MeshNodeType> coarse_node = mesh_node;
+            mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(_adapt_mode));
           }
 
+          auto& laylevs = this->_layer_levels.front();
+
           // add coarse mesh node
-          this->_levels.push_back(new LevelType(lvl, mesh_node));
+          laylevs.push_front(std::make_shared<LevelType>(lvl, mesh_node));
 
           // refine up to desired maximum level
           for(; lvl < lvl_max; ++lvl)
           {
-            MeshNodeType* coarse_node = mesh_node;
-            mesh_node = coarse_node->refine(_adapt_mode);
-            this->_levels.push_back(new LevelType(lvl+1, mesh_node));
+            std::shared_ptr<MeshNodeType> coarse_node = mesh_node;
+            mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(_adapt_mode));
+            laylevs.push_front(std::make_shared<LevelType>(lvl+1, mesh_node));
           }
 
           // okay, we're done here
           _have_hierarchy = true;
+
+          // finally, compile the virtual levels
+          this->compile_virtual_levels();
         }
 
       protected:
@@ -582,9 +580,8 @@ namespace FEAT
 
           for(; _base_mesh_level < level; ++_base_mesh_level)
           {
-            MeshNodeType* coarse_node = _base_mesh_node;
-            _base_mesh_node = coarse_node->refine(_adapt_mode);
-            delete coarse_node;
+            std::shared_ptr<MeshNodeType> coarse_node = _base_mesh_node;
+            _base_mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(_adapt_mode));
           }
         }
 
@@ -601,10 +598,9 @@ namespace FEAT
           Index num_elements = _base_mesh_node->get_mesh()->get_num_elements();
           for(; num_elements < min_elements; ++_base_mesh_level)
           {
-            MeshNodeType* coarse_node = _base_mesh_node;
-            _base_mesh_node = coarse_node->refine(_adapt_mode);
+            std::shared_ptr<MeshNodeType> coarse_node = _base_mesh_node;
+            _base_mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(_adapt_mode));
             num_elements = _base_mesh_node->get_mesh()->get_num_elements();
-            delete coarse_node;
           }
         }
 
@@ -623,22 +619,15 @@ namespace FEAT
           XASSERT(_base_mesh_node != nullptr);
 
 #ifdef FEAT_HAVE_MPI
-          if(this->_comm->size() != 1)
+          if(this->_comm.size() != 1)
             return false;
 
-          std::cout << "Using base mesh as patch, because there is only one process..." << std::endl;
+          this->_comm.print("Using base mesh as patch, because there is only one process");
 
           // copy our base mesh
           _patch_mesh_node = _base_mesh_node;
           _base_mesh_node = nullptr;
 #endif // FEAT_HAVE_MPI
-
-          /// \todo remove tags
-          // comm ranks and tags
-          std::vector<Index> ranks, ctags;
-
-          // push layer
-          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
 
           // okay
           return true;
@@ -661,8 +650,8 @@ namespace FEAT
         bool _create_partition_auto_manual()
         {
           // get rank and nprocs
-          Index rank = Index(this->_comm->rank());
-          Index nprocs = Index(this->_comm->size());
+          Index rank = Index(this->_comm.rank());
+          Index nprocs = Index(this->_comm.size());
 
           //if(rank == Index(0))
           //  std::cout << "Searching for suitable manual partition..." << std::endl;
@@ -672,18 +661,14 @@ namespace FEAT
           if(part == nullptr)
           {
             // no suitable partition found
-            if(rank == Index(0))
-            {
-              if(_manual_parti_name.empty())
-                std::cout << "No suitable manual partition available" << std::endl;
-              else
-                std::cout << "No suitable manual partition with name '" << _manual_parti_name << "' available" << std::endl;
-            }
+            if(_manual_parti_name.empty())
+              this->_comm.print("No suitable manual partition available");
+            else
+              this->_comm.print("No suitable manual partition with name '" + _manual_parti_name + "' available");
             return false;
           }
 
-          if(rank == Index(0))
-            std::cout << "Found manual partition '" << part->get_name() << "' for base mesh level " << part->get_level() << std::endl;
+          this->_comm.print("Found manual partition '" + part->get_name() + "' for base mesh level " + stringify(part->get_level()));
 
           // refine up to required base mesh level
           this->_refine_base_mesh_to_level(part->get_level());
@@ -692,7 +677,7 @@ namespace FEAT
           std::vector<Index> ranks, ctags;
 
           // extract our patch
-          _patch_mesh_node = _base_mesh_node->extract_patch(ranks, ctags, *part, rank);
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, ctags, *part, rank));
 
           // >>>>> DEBUG >>>>>
           /*
@@ -707,8 +692,10 @@ namespace FEAT
           */
           // <<<<< DEBUG <<<<<
 
-          // push layer
-          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
+          // set neighbour ranks
+          LayerType& layer = *this->_layers.front();
+          for(auto r : ranks)
+            layer.push_neighbour(int(r));
 
           // okay
           return true;
@@ -731,11 +718,11 @@ namespace FEAT
         bool _create_partition_2level()
         {
           // get rank and nprocs
-          Index rank = Index(this->_comm->rank());
-          Index nprocs = Index(this->_comm->size());
+          Index rank = Index(this->_comm.rank());
+          Index nprocs = Index(this->_comm.size());
 
           // create a 2-lvl partitioner
-          Geometry::Parti2Lvl<MeshType_> partitioner(*_base_mesh_node->get_mesh(), nprocs);
+          Geometry::Parti2Lvl<MeshType> partitioner(*_base_mesh_node->get_mesh(), nprocs);
 
           // successful?
           if(!partitioner.success())
@@ -744,8 +731,7 @@ namespace FEAT
           // get refinement level
           Index ref_lvl = partitioner.parti_level();
 
-          if(rank == Index(0))
-            std::cout << "Found 2-level partition for base mesh level " << ref_lvl << std::endl;
+          this->_comm.print("Found 2-level partition for base mesh level " + stringify(ref_lvl));
 
           // refine base mesh
           _refine_base_mesh_to_level(int(ref_lvl));
@@ -757,10 +743,12 @@ namespace FEAT
           std::vector<Index> ranks, ctags;
 
           // extract our patch
-          _patch_mesh_node = _base_mesh_node->extract_patch(ranks, ctags, elems_at_rank, rank);
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, ctags, elems_at_rank, rank));
 
-          // push layer
-          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
+          // set neighbour ranks
+          LayerType& layer = *this->_layers.front();
+          for(auto r : ranks)
+            layer.push_neighbour(int(r));
 
           // okay
           return true;
@@ -841,24 +829,23 @@ namespace FEAT
           typedef PExecutorT_ PartT;
 
           // get rank and nprocs
-          const Index rank = Index(this->_comm->rank());
-          const Index nprocs = Index(this->_comm->size());
+          const Index rank = Index(this->_comm.rank());
+          const Index nprocs = Index(this->_comm.size());
 
           // refine base mesh if necessary
           this->_refine_base_mesh_to_min_elems(_min_elems_per_rank * nprocs);
 
-          if(rank == Index(0))
-            std::cout << "Running " << parti_name << " partitioner on level " << _base_mesh_level << "..." << std::endl;
+          this->_comm.print("Running " + parti_name + " partitioner on level " + stringify(_base_mesh_level) + "...");
 
           // get our base mesh
-          const MeshType_& base_root_mesh = *(this->_base_mesh_node->get_mesh());
+          const MeshType& base_root_mesh = *(this->_base_mesh_node->get_mesh());
 
           // get number of elements
-          const Index num_global_elements(base_root_mesh.get_num_entities(MeshType_::shape_dim));
+          const Index num_global_elements(base_root_mesh.get_num_entities(MeshType::shape_dim));
 
           /// \todo make PGraphT use Dist::Comm
           // allocate graph
-          typename PartT::PGraphT global_dual(base_root_mesh, num_global_elements, *this->_comm);
+          typename PartT::PGraphT global_dual(base_root_mesh, num_global_elements, this->_comm);
 
           // local input for k-way partitioning
           auto local_dual(global_dual.create_local());
@@ -876,13 +863,14 @@ namespace FEAT
 
           // get comm ranks and tags
           std::vector<Index> ranks(synched_part.get_comm_ranks());
-          std::vector<Index> ctags(synched_part.get_comm_tags());
 
           // extract our patch
-          _patch_mesh_node = this->_base_mesh_node->extract_patch(rank, ranks_at_elem, ranks);
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(rank, ranks_at_elem, ranks));
 
-          // push layer
-          this->_layers.push_back(new LayerType(this->_comm, std::move(ranks), std::move(ctags)));
+          // set neighbour ranks
+          LayerType& layer = *this->_layers.front();
+          for(auto r : ranks)
+            layer.push_neighbour(int(r));
 
           // okay
           return true;

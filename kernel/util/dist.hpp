@@ -1439,6 +1439,15 @@ namespace FEAT
       ///@{
 
       /**
+       * \brief Creates a copy of this communicator.
+       *
+       * \see \cite MPI31, Section 6.4.2, page 238
+       *
+       * \returns A copy of this communicator.
+       */
+      Comm comm_dup() const;
+
+      /**
        * \brief Creates a new sub-communicator from a strided range of ranks.
        *
        * This function is a short-cut, which creates a process group by using

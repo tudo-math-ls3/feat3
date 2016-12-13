@@ -56,9 +56,6 @@ namespace FEAT
        * \tparam IT_
        * Index type for the solver.
        *
-       * \tparam Trafo_
-       * Trafo to create the MeshoptControl object for.
-       *
        * This class can construct MeshoptControl objects of different types at runtime based on PropertyMaps and
        * returns them through base class std::shared_ptrs.
        *
@@ -68,12 +65,9 @@ namespace FEAT
        * \note At this time, the only transformation available is Trafo::Standard.
        *
        */
-      template<typename Mem_, typename DT_, typename IT_, typename Trafo_>
+      template<typename Mem_, typename DT_, typename IT_>
       struct ControlFactory
       {
-        /// The Trafo's underlying MeshType
-        typedef typename Trafo_::MeshType MeshType;
-
         /**
          * \brief Creates a DuDvFunctionalControl object
          *
@@ -96,10 +90,10 @@ namespace FEAT
          * A BaseClass std::shared_ptr to the new object
          */
         template<typename DomCtrl_>
-        static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
+        static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_>>
         create_dudv_control(DomCtrl_& dom_ctrl, const String& section_key, PropertyMap* meshopt_config, PropertyMap* solver_config)
         {
-          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>> result(nullptr);
+          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
           std::deque<String> dirichlet_list;
           std::deque<String> slip_list;
 
@@ -150,7 +144,7 @@ namespace FEAT
             fixed_reference_domain = (std::stoi(fixed_reference_domain_p.first) == 1);
           }
 
-          typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_, Trafo_> DuDvCtrl;
+          typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_> DuDvCtrl;
           result = std::make_shared<DuDvCtrl>(
             dom_ctrl, meshopt_lvl,
             dirichlet_list, slip_list, solver_p.first, *solver_config, fixed_reference_domain);
@@ -183,11 +177,13 @@ namespace FEAT
          * passed to the next stage.
          */
         template<typename DomCtrl_>
-        static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
+        static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_>>
         create_hyperelasticity_control(DomCtrl_& dom_ctrl, const String& section_key, PropertyMap* meshopt_config,
         PropertyMap* solver_config)
         {
-          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>> result(nullptr);
+          typedef typename DomCtrl_::LevelType::TrafoType TrafoType;
+
+          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
 
           std::deque<String> dirichlet_list;
           std::deque<String> slip_list;
@@ -293,7 +289,7 @@ namespace FEAT
           // Get the local functional
           if(local_functional_p.first == "RumpfFunctional")
           {
-            typedef FEAT::Meshopt::RumpfFunctional<DT_, Trafo_> FunctionalType;
+            typedef FEAT::Meshopt::RumpfFunctional<DT_, TrafoType> FunctionalType;
             std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
               (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
 
@@ -304,7 +300,7 @@ namespace FEAT
           // If you need them for debugging purposes, use the code below
           //else if(local_functional_p.first == "RumpfFunctionalUnrolled")
           //{
-          //  typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, Trafo_> FunctionalType;
+          //  typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, TrafoType> FunctionalType;
           //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
           //    (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
           //  result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
@@ -343,13 +339,15 @@ namespace FEAT
          * passed to the next stage.
          */
         template<typename DomCtrl_, typename FunctionalType_>
-        static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
+        static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_>>
         create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl, const int meshopt_lvl,
         PropertyMap* hyperelasticity_config_section, PropertyMap* meshopt_config, PropertyMap* solver_config,
         std::shared_ptr<FunctionalType_> my_functional,
         const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list)
         {
-          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>> result(nullptr);
+          typedef typename DomCtrl_::LevelType::TrafoType TrafoType;
+
+          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
 
           // Get the global mesh quality functional
           auto global_functional_p = hyperelasticity_config_section->query("global_functional");
@@ -385,9 +383,9 @@ namespace FEAT
 
           if(global_functional_p.first == "HyperelasticityFunctional")
           {
-            typedef typename FEAT::Meshopt::HyperelasticityFunctional<Mem_, DT_, IT_, Trafo_, FunctionalType_>::RefCellTrafo RefCellTrafo;
+            typedef typename FEAT::Meshopt::HyperelasticityFunctional<Mem_, DT_, IT_, TrafoType, FunctionalType_>::RefCellTrafo RefCellTrafo;
 
-            std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunctionBase<Trafo_, RefCellTrafo>>
+            std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunctionBase<TrafoType, RefCellTrafo>>
               mesh_conc_func(nullptr);
 
             if( scale_computation == FEAT::Meshopt::ScaleComputation::current_concentration ||
@@ -396,12 +394,12 @@ namespace FEAT
                 {
                   auto conc_func_section_p = hyperelasticity_config_section->query("conc_function");
                   XASSERTM(conc_func_section_p.second, "conc_function missing!");
-                  mesh_conc_func = FEAT::Meshopt::MeshConcentrationFunctionFactory<Trafo_, RefCellTrafo>::
+                  mesh_conc_func = FEAT::Meshopt::MeshConcentrationFunctionFactory<TrafoType, RefCellTrafo>::
                     create(conc_func_section_p.first, meshopt_config);
                 }
 
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
-            <Mem_, DT_, IT_, DomCtrl_, Trafo_,
+            <Mem_, DT_, IT_, DomCtrl_,
             SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
               (dom_ctrl, meshopt_lvl, dirichlet_list, slip_list, solver_p.first,
               *solver_config, my_functional, scale_computation, mesh_conc_func, DT_(align_mesh));
@@ -415,11 +413,11 @@ namespace FEAT
         } // create_hyperelasticity_control_with_functional
 
         template<typename DomCtrl_>
-        static std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
+        static std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>>
         create_meshopt_control(DomCtrl_& dom_ctrl, const String& section_key,
         PropertyMap* meshopt_config, PropertyMap* solver_config)
         {
-          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>> result(nullptr);
+          std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
 
           String type("");
           std::deque<String> dirichlet_list;

@@ -910,7 +910,7 @@ namespace FEAT
         BaseClass(),
         _hierarchy(hierarchy),
         _cycle(cycle),
-        _top_level(top_level >= 0 ? Index(top_level) : hierarchy->get_num_levels()-1),
+        _top_level(top_level >= 0 ? Index(top_level) : Index(int(_hierarchy->get_num_levels()) + top_level)),
         _crs_level(Index(crs_level))
       {
         XASSERTM(crs_level >= 0, "invalid coarse level");
@@ -957,7 +957,7 @@ namespace FEAT
       void set_levels(int top_level, int crs_level)
       {
         XASSERTM(crs_level >= 0, "invalid coarse level");
-        _top_level = (top_level >= 0 ? Index(top_level) : _hierarchy->get_num_levels()-1);
+        _top_level = (top_level >= 0 ? Index(top_level) : Index(int(_hierarchy->get_num_levels()) + top_level));
         _crs_level = Index(crs_level);
         XASSERTM(_top_level >= _crs_level, "invalid top-/coarse-level combination");
       }

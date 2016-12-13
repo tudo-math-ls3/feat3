@@ -76,8 +76,7 @@ namespace FEAT
                 typename MeshoptCtrl_::MemType,
                 typename MeshoptCtrl_::DataType,
                 typename MeshoptCtrl_::IndexType,
-                DomCtrl_,
-                typename MeshoptCtrl_::TrafoType
+                DomCtrl_
               > PreconControlType;
 
               result = Solver::new_nonlinear_operator_precond_wrapper<PreconControlType>

@@ -99,13 +99,11 @@ namespace StokesVortex2D
     }
   };
 
-  template<typename MeshType_>
-  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  template<typename DomainLevel_>
+  void run(SimpleArgParser& args, Control::Domain::DomainControl<DomainLevel_>& domain)
   {
-    // define our mesh type
-    typedef MeshType_ MeshType;
-    typedef typename MeshType::ShapeType ShapeType;
-    static constexpr int dim = ShapeType::dimension;
+    // get our main communicator
+    const Dist::Comm& comm = domain.comm();
 
     // define our arch types
     typedef Mem::Main MemType;
@@ -113,71 +111,71 @@ namespace StokesVortex2D
     typedef Index IndexType;
 
     // define our domain type
-    typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
+    typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
+    typedef typename DomainControlType::LevelType DomainLevelType;
+
+    // fetch our mesh type
+    typedef typename DomainControlType::MeshType MeshType;
+    typedef typename MeshType::ShapeType ShapeType;
+    static constexpr int dim = ShapeType::dimension;
 
     // define our system level
     typedef Control::StokesUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our trafo and FE spaces
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
-    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
+    std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
-    // define our assembler level
-    typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef Control::StokesBasicAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
+    const Index num_levels = domain.size_physical();
 
-    // get our domain level and layer
-    typedef typename DomainControlType::LayerType DomainLayerType;
-    const DomainLayerType& layer = *domain.get_layers().back();
-    const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
-
-    std::deque<SystemLevelType*> system_levels;
-    std::deque<AssemblerLevelType*> asm_levels;
-
-    const Index num_levels = Index(domain_levels.size());
-
-    // create stokes and system levels
-    for(Index i(0); i < num_levels; ++i)
+    // create system levels
+    for (Index i(0); i < num_levels; ++i)
     {
-      asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
-      system_levels.push_back(new SystemLevelType());
+      system_levels.push_back(std::make_shared<SystemLevelType>());
+    }
+
+    Cubature::DynamicFactory cubature("auto-degree:5");
+
+    /* ***************************************************************************************** */
+
+    comm.print("Assembling gates...");
+
+    for (Index i(0); i < num_levels; ++i)
+    {
+      system_levels.at(i)->assemble_gates(domain.at(i));
     }
 
     /* ***************************************************************************************** */
 
-    comm.print("Creating gates...");
+    comm.print("Assembling transfers...");
 
-    for(Index i(0); i < num_levels; ++i)
+    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
     {
-      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres);
+      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system matrices...");
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
-
     for(Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_velocity_laplace_matrix(asm_levels.at(i)->space_velo, cubature);
-      system_levels.at(i)->assemble_grad_div_matrices(asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres, cubature);
+      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature);
+      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
       system_levels.at(i)->compile_system_matrix();
     }
 
     // assemble Schur-matrix on finest level
     {
       // get the local matrix S
-      auto& mat_loc_s = system_levels.back()->matrix_s.local();
+      auto& mat_loc_s = system_levels.front()->matrix_s.local();
 
       // assemble matrix structure?
-      Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, asm_levels.back()->space_pres);
+      Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, domain.front()->space_pres);
 
       // assemble schur matrix
       mat_loc_s.format();
       Assembly::Common::IdentityOperator id_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, asm_levels.back()->space_pres, cubature, -DataType(1));
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, domain.front()->space_pres, cubature, -DataType(1));
     }
 
     /* ***************************************************************************************** */
@@ -196,7 +194,7 @@ namespace StokesVortex2D
       for(int k(0); k < 4; ++k)
       {
         // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = domain_levels.at(i)->get_mesh_node()->find_mesh_part_node(String("bnd:") + stringify(k));
+        auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(String("bnd:") + stringify(k));
         XASSERT(mesh_part_node != nullptr);
 
         // let's see if we have that mesh part
@@ -213,25 +211,14 @@ namespace StokesVortex2D
       }
 
       // assemble the filters
-      unit_asm_x.assemble(fil_loc_v.get(0), asm_levels.at(i)->space_velo);
-      unit_asm_y.assemble(fil_loc_v.get(1), asm_levels.at(i)->space_velo);
+      unit_asm_x.assemble(fil_loc_v.get(0), domain.at(i)->space_velo);
+      unit_asm_y.assemble(fil_loc_v.get(1), domain.at(i)->space_velo);
 
       // assemble pressure mean filter
-      system_levels.at(i)->assemble_pressure_mean_filter(asm_levels.at(i)->space_pres, cubature);
+      system_levels.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, cubature);
 
       // compile system filter
       system_levels.at(i)->compile_system_filter();
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfer matrices...");
-
-    for(Index i(1); i < num_levels; ++i)
-    {
-      system_levels.at(i)->assemble_transfers(
-        asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres,
-        asm_levels.at(i-1)->space_velo, asm_levels.at(i-1)->space_pres, cubature);
     }
 
     /* ***************************************************************************************** */
@@ -244,9 +231,8 @@ namespace StokesVortex2D
     typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
 
     // fetch our finest levels
-    DomainLevelType& the_domain_level = *domain_levels.back();
-    SystemLevelType& the_system_level = *system_levels.back();
-    AssemblerLevelType& the_asm_level = *asm_levels.back();
+    DomainLevelType& the_domain_level = *domain.front();
+    SystemLevelType& the_system_level = *system_levels.front();
 
     // get our global matrix and filter
     GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
@@ -271,8 +257,8 @@ namespace StokesVortex2D
       Analytic::StaticWrapperFunction<2, ForceFuncY> force_y;
       Assembly::Common::ForceFunctional<decltype(force_x)> force_func_x(force_x);
       Assembly::Common::ForceFunctional<decltype(force_y)> force_func_y(force_y);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_fx, force_func_x, the_asm_level.space_velo, cubature);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_fy, force_func_y, the_asm_level.space_velo, cubature);
+      Assembly::LinearFunctionalAssembler::assemble_vector(vec_fx, force_func_x, the_domain_level.space_velo, cubature);
+      Assembly::LinearFunctionalAssembler::assemble_vector(vec_fy, force_func_y, the_domain_level.space_velo, cubature);
 
       // sync the vector
       vec_rhs.sync_0();
@@ -304,21 +290,23 @@ namespace StokesVortex2D
       typename SystemLevelType::GlobalVeloTransfer
         > >();
     {
-      auto it_end = --system_levels.rend();
-      for (auto it = system_levels.rbegin(); it != it_end; ++it)
+      auto it_end = --system_levels.end();
+      for (auto it = system_levels.begin(); it != it_end; ++it)
       {
         auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
         multigrid_hierarchy_a->push_level((*it)->matrix_a, (*it)->filter_velo, (*it)->transfer_velo, smoother, smoother, smoother);
       }
 
       // create coarse grid solver
-      auto coarse_solver = Solver::new_jacobi_precond(system_levels.front()->matrix_a, system_levels.front()->filter_velo);
-      multigrid_hierarchy_a->push_level(system_levels.front()->matrix_a, system_levels.front()->filter_velo, coarse_solver);
+      {
+        auto coarse_solver = Solver::new_jacobi_precond(system_levels.back()->matrix_a, system_levels.back()->filter_velo);
+        multigrid_hierarchy_a->push_level(system_levels.back()->matrix_a, system_levels.back()->filter_velo, coarse_solver);
+      }
 
       auto mgv = Solver::new_multigrid(multigrid_hierarchy_a, Solver::MultiGridCycle::V);
 
       // create a PCG solver
-      auto pcg = Solver::new_pcg(system_levels.back()->matrix_a, system_levels.back()->filter_velo, mgv);
+      auto pcg = Solver::new_pcg(the_system_level.matrix_a, the_system_level.filter_velo, mgv);
 
       // set its tolerances
       pcg->set_tol_rel(1E-2);
@@ -333,7 +321,7 @@ namespace StokesVortex2D
     // create S-solver
     {
       // create a local ILU(0) for S
-      auto loc_ilu = Solver::new_ilu_precond(*the_system_level.matrix_s, *the_system_level.filter_pres, Index(0));
+      auto loc_ilu = Solver::new_ilu_precond(the_system_level.matrix_s.local(), the_system_level.filter_pres.local(), Index(0));
 
       // make it Schwarz...
       auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level.filter_pres);
@@ -394,11 +382,11 @@ namespace StokesVortex2D
 
       // compute local errors
       Assembly::ScalarErrorInfo<DataType> vxerr = Assembly::ScalarErrorComputer<1>::compute(
-        vx, velo_x_func, the_asm_level.space_velo, cubature);
+        vx, velo_x_func, the_domain_level.space_velo, cubature);
       Assembly::ScalarErrorInfo<DataType> vyerr = Assembly::ScalarErrorComputer<1>::compute(
-        vy, velo_y_func, the_asm_level.space_velo, cubature);
+        vy, velo_y_func, the_domain_level.space_velo, cubature);
       Assembly::ScalarErrorInfo<DataType> vperr = Assembly::ScalarErrorComputer<0>::compute(
-        vp, pres_func, the_asm_level.space_pres, cubature);
+        vp, pres_func, the_domain_level.space_pres, cubature);
 
       // synhronise all local errors
       vxerr.synchronise(comm);
@@ -430,24 +418,25 @@ namespace StokesVortex2D
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(comm.size());
 
-      // write VTK file
-      the_asm_level.write_vtk(vtk_name, *vec_sol, comm);
-    }
+      // Create a VTK exporter for our mesh
+      Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
+      // project velocity and pressure
+      LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy;
+      Assembly::DiscreteVertexProjector::project(vtx_vx, (*vec_sol).template at<0>().get(0), the_domain_level.space_velo);
+      Assembly::DiscreteVertexProjector::project(vtx_vy, (*vec_sol).template at<0>().get(1), the_domain_level.space_velo);
+      exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
 
-    // clean up
-    while(!system_levels.empty())
-    {
-      delete system_levels.back();
-      system_levels.pop_back();
-    }
-    while(!asm_levels.empty())
-    {
-      delete asm_levels.back();
-      asm_levels.pop_back();
+      // project pressure
+      Cubature::DynamicFactory cub("auto-degree:2");
+      LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
+      Assembly::DiscreteCellProjector::project(vtx_p, (*vec_sol).template at<1>(), the_domain_level.space_pres, cub);
+
+      // write pressure
+      exporter.add_cell_scalar("pressure", vtx_p.elements());
+
+      // finally, write the VTK file
+      exporter.write(vtk_name, comm);
     }
   }
 
@@ -483,10 +472,35 @@ namespace StokesVortex2D
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
+    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
-    int lvl_max = 3;
-    int lvl_min = 0;
-    args.parse("level", lvl_max, lvl_min);
+    // parse levels
+    std::deque<int> lvls;
+    {
+      auto p = args.query("level");
+      if(p == nullptr)
+      {
+        lvls.push_back(3);
+      }
+      else
+      {
+        XASSERTM(!p->second.empty(), "no levels given to --level option");
+
+        lvls.resize(p->second.size());
+        for(std::size_t i(0); i < p->second.size(); ++i)
+        {
+          if(!p->second.at(i).parse(lvls.at(i)))
+          {
+            comm.print(std::cerr, "ERROR: failed to parse '" + p->second.at(i) + "' as level");
+            FEAT::Runtime::abort();
+          }
+        }
+      }
+      if(lvls.size() < std::size_t(2))
+        lvls.push_back(0);
+    }
 
 #ifndef DEBUG
     try
@@ -495,14 +509,19 @@ namespace StokesVortex2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Control::Domain::UnitCubeDomainControl<MeshType> domain(&comm, lvl_max, lvl_min);
+      typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
+      Control::Domain::HierarchUnitCubeDomainControl<DomainLevelType> domain(comm, lvls);
 
       // plot our levels
-      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
-      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvls.front()) + "]");
+      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvls.back()) + "]");
+
+      domain.dump_layers();
+      domain.dump_layer_levels();
+      domain.dump_virt_levels();
 
       // run our application
-      run(comm, args, domain);
+      run(args, domain);
 
       TimeStamp stamp2;
 

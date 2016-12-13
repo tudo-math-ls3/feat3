@@ -50,90 +50,86 @@ namespace StokesPoiseuille2D
   {
     static T_ eval (T_ x, T_) {return T_(2)*(T_(1) - x);}
   };
-
-  template<typename MeshType_>
-  void run(const Dist::Comm& comm, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
+  template<typename DomainLevel_>
+  void run(SimpleArgParser& args, Control::Domain::DomainControl<DomainLevel_>& domain)
   {
-    // define our mesh type
-    typedef MeshType_ MeshType;
-    typedef typename MeshType::ShapeType ShapeType;
-    static constexpr int dim = ShapeType::dimension;
+    // get our main communicator
+    const Dist::Comm& comm = domain.comm();
 
     // define our arch types
     typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
+
     // define our domain type
-    typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
+    typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
+    typedef typename DomainControlType::LevelType DomainLevelType;
+
+    // fetch our mesh type
+    typedef typename DomainControlType::MeshType MeshType;
+    typedef typename MeshType::ShapeType ShapeType;
+    static constexpr int dim = ShapeType::dimension;
 
     // define our system level
     typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our trafo and FE spaces
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
-    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
+    std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
-    // define our assembler level
-    typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef Control::StokesBasicAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
+    const Index num_levels = domain.size_physical();
 
-    // get our domain level and layer
-    typedef typename DomainControlType::LayerType DomainLayerType;
-    const DomainLayerType& layer = *domain.get_layers().back();
-    const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
-
-    std::deque<SystemLevelType*> system_levels;
-    std::deque<AssemblerLevelType*> asm_levels;
-
-    const Index num_levels = Index(domain_levels.size());
-
-    //Lin-Solve phase related typedefs
-
-    // create stokes and system levels
-    for(Index i(0); i < num_levels; ++i)
+    // create system levels
+    for (Index i(0); i < num_levels; ++i)
     {
-      asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
-      system_levels.push_back(new SystemLevelType());
+      system_levels.push_back(std::make_shared<SystemLevelType>());
     }
+
+    Cubature::DynamicFactory cubature("auto-degree:5");
 
     /* ***************************************************************************************** */
 
     TimeStamp stamp_ass;
 
-    comm.print("Creating gates...");
+    comm.print("Assembling gates...");
 
-    for(Index i(0); i < num_levels; ++i)
+    for (Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres);
+      system_levels.at(i)->assemble_gates(domain.at(i));
+    }
+
+    /* ***************************************************************************************** */
+
+    comm.print("Assembling transfers...");
+
+    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
+    {
+      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling system matrices...");
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
-
     for(Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_velocity_laplace_matrix(asm_levels.at(i)->space_velo, cubature);
-      system_levels.at(i)->assemble_grad_div_matrices(asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres, cubature);
+      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature);
+      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
       system_levels.at(i)->compile_system_matrix();
     }
 
     // assemble Schur-matrix on finest level
     {
       // get the local matrix S
-      auto& mat_loc_s = system_levels.back()->matrix_s.local();
+      auto& mat_loc_s = system_levels.front()->matrix_s.local();
 
       // assemble matrix structure?
-      Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, asm_levels.back()->space_pres);
+      Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, domain.front()->space_pres);
 
       // assemble schur matrix
       mat_loc_s.format();
       Assembly::Common::IdentityOperator id_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, asm_levels.back()->space_pres, cubature, -DataType(1));
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, domain.front()->space_pres, cubature, -DataType(1));
     }
 
     /* ***************************************************************************************** */
@@ -161,7 +157,7 @@ namespace StokesPoiseuille2D
       for(const auto& name : part_names)
       {
         // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = domain_levels.at(i)->get_mesh_node()->find_mesh_part_node(name);
+        auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
         XASSERT(mesh_part_node != nullptr);
 
         auto* mesh_part = mesh_part_node->get_mesh();
@@ -173,35 +169,27 @@ namespace StokesPoiseuille2D
       }
 
       // assemble the filters
-      unit_asm.assemble(fil_loc_v.template at<0>(), asm_levels.at(i)->space_velo, inflow_func);
-      unit_asm.assemble(fil_loc_v.template at<1>(), asm_levels.at(i)->space_velo);
+      unit_asm.assemble(fil_loc_v.template at<0>(), domain.at(i)->space_velo, inflow_func);
+      unit_asm.assemble(fil_loc_v.template at<1>(), domain.at(i)->space_velo);
 
       // finally, compile the system filter
       system_levels.at(i)->compile_system_filter();
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfer operators...");
-
-    for (Index i(1); i < num_levels; ++i)
-    {
-      system_levels.at(i)->assemble_transfers(
-        asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres,
-        asm_levels.at(i-1)->space_velo, asm_levels.at(i-1)->space_pres, cubature);
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
 
     /* ***************************************************************************************** */
 
-    // get our assembled vector type
+    // get our global solver system types
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
+    //typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
+    //typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
+    //typedef typename SystemLevelType::GlobalVeloVector GlobalVeloVector;
+    //typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
 
     // fetch our finest levels
-    DomainLevelType& the_domain_level = *domain_levels.back();
-    SystemLevelType& the_system_level = *system_levels.back();
-    AssemblerLevelType& the_asm_level = *asm_levels.back();
+    DomainLevelType& the_domain_level = *domain.front();
+    SystemLevelType& the_system_level = *system_levels.front();
 
     // create new vectors
     GlobalSystemVector vec_sol = the_system_level.matrix_sys.create_vector_r();
@@ -218,6 +206,7 @@ namespace StokesPoiseuille2D
     /* ***************************************************************************************** */
 
     comm.print("Creating solver tree");
+
     ////////// MATRIX STOCK
     Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter, typename SystemLevelType::GlobalVeloTransfer> matrix_stock_a;
     for (auto& system_level : system_levels)
@@ -314,11 +303,11 @@ namespace StokesPoiseuille2D
 
       // compute local errors
       Assembly::ScalarErrorInfo<DataType> vxerr = Assembly::ScalarErrorComputer<1>::compute(
-        vx, velo_x_func, the_asm_level.space_velo, cubature);
+        vx, velo_x_func, the_domain_level.space_velo, cubature);
       Assembly::ScalarErrorInfo<DataType> vyerr = Assembly::ScalarErrorComputer<1>::compute(
-        vy, velo_y_func, the_asm_level.space_velo, cubature);
+        vy, velo_y_func, the_domain_level.space_velo, cubature);
       Assembly::ScalarErrorInfo<DataType> vperr = Assembly::ScalarErrorComputer<0>::compute(
-        vp, pres_func, the_asm_level.space_pres, cubature);
+        vp, pres_func, the_domain_level.space_pres, cubature);
 
       // synhronise all local errors
       vxerr.synchronise(comm);
@@ -350,8 +339,25 @@ namespace StokesPoiseuille2D
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(comm.size());
 
-      // write VTK file
-      the_asm_level.write_vtk(vtk_name, *vec_sol, comm);
+      // Create a VTK exporter for our mesh
+      Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
+
+      // project velocity and pressure
+      LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy;
+      Assembly::DiscreteVertexProjector::project(vtx_vx, (*vec_sol).template at<0>().get(0), the_domain_level.space_velo);
+      Assembly::DiscreteVertexProjector::project(vtx_vy, (*vec_sol).template at<0>().get(1), the_domain_level.space_velo);
+      exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
+
+      // project pressure
+      Cubature::DynamicFactory cub("auto-degree:2");
+      LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
+      Assembly::DiscreteCellProjector::project(vtx_p, (*vec_sol).template at<1>(), the_domain_level.space_pres, cub);
+
+      // write pressure
+      exporter.add_cell_scalar("pressure", vtx_p.elements());
+
+      // finally, write the VTK file
+      exporter.write(vtk_name, comm);
     }
 
     /* ***************************************************************************************** */
@@ -368,19 +374,6 @@ namespace StokesPoiseuille2D
         comm.print("FAILED");
         throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
       }
-    }
-
-    // clean up
-    while(!system_levels.empty())
-    {
-      delete system_levels.back();
-      system_levels.pop_back();
-    }
-
-    while(!asm_levels.empty())
-    {
-      delete asm_levels.back();
-      asm_levels.pop_back();
     }
   }
 
@@ -415,6 +408,7 @@ namespace StokesPoiseuille2D
       // print all unsupported options to cerr
       for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
         comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
+
       // abort
       FEAT::Runtime::abort();
     }
@@ -433,6 +427,9 @@ namespace StokesPoiseuille2D
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
+    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
     int lvl_max = 3;
     int lvl_min = 0;
@@ -448,7 +445,8 @@ namespace StokesPoiseuille2D
       const std::deque<String>& mesh_filenames = args.query("mesh")->second;
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain(comm);
+      typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
+      Control::Domain::PartiDomainControl<DomainLevelType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -472,11 +470,10 @@ namespace StokesPoiseuille2D
       domain.create_hierarchy(lvl_max, lvl_min);
 
       // plot our levels
-      comm.print("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]");
-      comm.print("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]");
+      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
+      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
 
-      // run our application
-      run<MeshType>(comm, args, domain);
+      run(args, domain);
 
       TimeStamp stamp2;
 
@@ -503,7 +500,6 @@ namespace StokesPoiseuille2D
     }
 #endif // DEBUG
   }
-
 } // namespace StokesPoiseuille2D
 
 int main(int argc, char* argv[])

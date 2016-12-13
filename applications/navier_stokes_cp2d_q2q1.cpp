@@ -572,16 +572,15 @@ namespace NaverStokesCP2D
     }
   }; // class NavierStokesBlockedSystemLevel
 
-  template <typename SystemLevelType,typename MeshType>
+  template <typename SystemLevelType,typename DomainLevel_>
   void report_statistics(const Dist::Comm& comm, double t_total,
     std::deque<std::shared_ptr<SystemLevelType>> & system_levels,
-      Control::Domain::DomainControl<MeshType>& domain)
+      Control::Domain::DomainControl<DomainLevel_>& domain)
   {
     const int nprocs = comm.size();
 
     /// \todo cover exactly all la op timings (some are not timed yet in the application) and replace t_total by them
     double solver_toe = t_total; //t_solver_a + t_solver_s + t_calc_def;
-    int shape_dimension = MeshType::ShapeType::dimension;
 
     FEAT::Statistics::expression_target = "solver_a";
     comm.print("\nsolver_a:");
@@ -591,39 +590,42 @@ namespace NaverStokesCP2D
     comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
 
     std::size_t la_size(0);
-    std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { la_size += n->bytes(); });
     std::size_t mpi_size(0);
-    std::for_each(system_levels.begin(), system_levels.end(), [&] (std::shared_ptr<SystemLevelType> n) { mpi_size += n->gate_sys.bytes(); });
+    for(const auto& sl : system_levels)
+    {
+      la_size += sl->bytes();
+      mpi_size += sl->gate_sys.bytes() + sl->coarse_muxer_sys.bytes();
+    }
     String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
 
-    Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
+    Index cells_coarse_local = domain.back()->get_mesh().get_num_elements();
     Index cells_coarse_max;
     Index cells_coarse_min;
     comm.allreduce(&cells_coarse_local, &cells_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&cells_coarse_local, &cells_coarse_min, std::size_t(1), Dist::op_min);
-    Index cells_fine_local = domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension);
+    Index cells_fine_local = domain.front()->get_mesh().get_num_elements();
     Index cells_fine_max;
     Index cells_fine_min;
     comm.allreduce(&cells_fine_local, &cells_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&cells_fine_local, &cells_fine_min, std::size_t(1), Dist::op_min);
 
-    Index dofs_coarse_local = (*system_levels.front()->matrix_a).columns() + (*system_levels.front()->matrix_s).columns();
+    Index dofs_coarse_local = (*system_levels.back()->matrix_a).columns() + (*system_levels.back()->matrix_s).columns();
     Index dofs_coarse_max;
     Index dofs_coarse_min;
     comm.allreduce(&dofs_coarse_local, &dofs_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&dofs_coarse_local, &dofs_coarse_min, std::size_t(1), Dist::op_min);
-    Index dofs_fine_local = (*system_levels.back()->matrix_a).columns() + (*system_levels.back()->matrix_s).columns();
+    Index dofs_fine_local = (*system_levels.front()->matrix_a).columns() + (*system_levels.front()->matrix_s).columns();
     Index dofs_fine_max;
     Index dofs_fine_min;
     comm.allreduce(&dofs_fine_local, &dofs_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&dofs_fine_local, &dofs_fine_min, std::size_t(1), Dist::op_min);
 
-    Index nzes_coarse_local = (*system_levels.front()->matrix_a).used_elements() + (*system_levels.front()->matrix_s).used_elements();
+    Index nzes_coarse_local = (*system_levels.back()->matrix_a).used_elements() + (*system_levels.back()->matrix_s).used_elements();
     Index nzes_coarse_max;
     Index nzes_coarse_min;
     comm.allreduce(&nzes_coarse_local, &nzes_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&nzes_coarse_local, &nzes_coarse_min, std::size_t(1), Dist::op_min);
-    Index nzes_fine_local = (*system_levels.back()->matrix_a).used_elements() + (*system_levels.back()->matrix_s).used_elements();
+    Index nzes_fine_local = (*system_levels.front()->matrix_a).used_elements() + (*system_levels.front()->matrix_s).used_elements();
     Index nzes_fine_max;
     Index nzes_fine_min;
     comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
@@ -710,20 +712,15 @@ namespace NaverStokesCP2D
         stringify(nzes_fine_max) + "/" + stringify(nzes_fine_min) + "\n");
   }
 
-
-  template<typename MeshType_>
-  void run(const Dist::Comm& comm, const Config& cfg, Control::Domain::DomainControl<MeshType_>& domain)
+  template<typename DomainLevel_>
+  void run(Config& cfg, Control::Domain::DomainControl<DomainLevel_>& domain)
   {
+    // get our main communicator
+    const Dist::Comm& comm = domain.comm();
     const int rank = comm.rank();
 
     // create a time-stamp
     TimeStamp stamp_start;
-
-    // define our mesh type
-    typedef MeshType_ MeshType;
-
-    // our dimension
-    static constexpr int dim = MeshType::shape_dim;
 
     // our arch types
     typedef Mem::Main MemType;
@@ -731,29 +728,20 @@ namespace NaverStokesCP2D
     typedef Index IndexType;
 
     // define our domain type
-    typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
+    typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
+    typedef typename DomainControlType::LevelType DomainLevelType;
+
+    // fetch our mesh type
+    typedef typename DomainControlType::MeshType MeshType;
+    typedef typename MeshType::ShapeType ShapeType;
+    static constexpr int dim = ShapeType::dimension;
 
     // define our velocity and pressure system levels
     typedef NavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    // define our trafo and FE spaces
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef Space::Lagrange2::Element<TrafoType> VeloSpaceType;
-    typedef Space::Lagrange1::Element<TrafoType> PresSpaceType;
-
-    // define our assembler level
-    typedef typename DomainControlType::LevelType DomainLevelType;
-    typedef Control::StokesBlockedAssemblerLevel<VeloSpaceType, PresSpaceType> AssemblerLevelType;
-
-    // get our domain level and layer
-    typedef typename DomainControlType::LayerType DomainLayerType;
-    const DomainLayerType& layer = *domain.get_layers().back();
-    const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
-
-    std::deque<std::shared_ptr<AssemblerLevelType>> asm_levels;
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
-    const Index num_levels = Index(domain_levels.size());
+    const Index num_levels = domain.size_physical();
 
     // create a batch of stop-watches
     StopWatch watch_total, watch_asm_rhs, watch_asm_mat, watch_calc_def,
@@ -762,40 +750,49 @@ namespace NaverStokesCP2D
     // create stokes and system levels
     for(Index i(0); i < num_levels; ++i)
     {
-      asm_levels.push_back(std::make_shared<AssemblerLevelType>(*domain_levels.at(i)));
       system_levels.push_back(std::make_shared<SystemLevelType>());
+    }
+
+    Cubature::DynamicFactory cubature("auto-degree:7");
+
+    /* ***************************************************************************************** */
+
+    comm.print("Assembling gates...");
+
+    for (Index i(0); i < num_levels; ++i)
+    {
+      system_levels.at(i)->assemble_gates(domain.at(i));
     }
 
     /* ***************************************************************************************** */
 
-    comm.print("\nCreating gates...");
+    comm.print("Assembling transfers...");
 
-    for(Index i(0); i < num_levels; ++i)
+    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
     {
-      system_levels.at(i)->assemble_gates(layer, *domain_levels.at(i), asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres);
+      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
     }
 
     /* ***************************************************************************************** */
 
     comm.print("Assembling basic matrices...");
 
-    Cubature::DynamicFactory cubature("auto-degree:7");
-
     for(Index i(0); i < num_levels; ++i)
     {
       // assemble velocity matrix structure
-      system_levels.at(i)->assemble_velo_struct(asm_levels.at(i)->space_velo);
+      system_levels.at(i)->assemble_velo_struct(domain.at(i)->space_velo);
       // assemble pressure matrix structure
-      system_levels.at(i)->assemble_pres_struct(asm_levels.at(i)->space_pres);
+      system_levels.at(i)->assemble_pres_struct(domain.at(i)->space_pres);
       // assemble pressure laplace matrix
       system_levels.at(i)->matrix_s.local().format();
       Assembly::Common::LaplaceOperator laplace_op;
       Assembly::BilinearOperatorAssembler::assemble_matrix1(system_levels.at(i)->matrix_s.local(),
-        laplace_op, asm_levels.at(i)->space_pres, cubature);
+        laplace_op, domain.at(i)->space_pres, cubature);
     }
 
     // assemble B/D matrices on finest level
-    system_levels.back()->assemble_grad_div_matrices(asm_levels.back()->space_velo, asm_levels.back()->space_pres, cubature);
+    system_levels.front()->assemble_grad_div_matrices(domain.front()->space_velo, domain.front()->space_pres, cubature);
 
     /* ***************************************************************************************** */
 
@@ -814,11 +811,11 @@ namespace NaverStokesCP2D
       Assembly::UnitFilterAssembler<MeshType> unit_asm_velo, unit_asm_inflow, unit_asm_pres;
 
       // loop over all boundary parts
-      std::deque<String> part_names = domain_levels.at(i)->get_mesh_node()->get_mesh_part_names(true);
+      std::deque<String> part_names = domain.at(i)->get_mesh_node()->get_mesh_part_names(true);
       for(const auto& name : part_names)
       {
         // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = domain_levels.at(i)->get_mesh_node()->find_mesh_part_node(name);
+        auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
 
         // found it?
         XASSERT(mesh_part_node != nullptr);
@@ -848,24 +845,13 @@ namespace NaverStokesCP2D
       }
 
       // assemble the velocity filter
-      unit_asm_velo.assemble(fil_loc_v, asm_levels.at(i)->space_velo);
+      unit_asm_velo.assemble(fil_loc_v, domain.at(i)->space_velo);
 
       // assemble inflow BC
-      unit_asm_inflow.assemble(fil_loc_v, asm_levels.at(i)->space_velo, inflow);
+      unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow);
 
       // assemble the pressure filter
-      unit_asm_pres.assemble(fil_loc_p, asm_levels.at(i)->space_pres);
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfer operators...");
-
-    for (Index i(1); i < num_levels; ++i)
-    {
-      system_levels.at(i)->assemble_transfers(
-        asm_levels.at(i)->space_velo, asm_levels.at(i)->space_pres,
-        asm_levels.at(i-1)->space_velo, asm_levels.at(i-1)->space_pres, cubature);
+      unit_asm_pres.assemble(fil_loc_p, domain.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
@@ -875,9 +861,8 @@ namespace NaverStokesCP2D
     typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
 
     // fetch our finest levels
-    DomainLevelType& the_domain_level = *domain_levels.back();
-    SystemLevelType& the_system_level = *system_levels.back();
-    AssemblerLevelType& the_asm_level = *asm_levels.back();
+    DomainLevelType& the_domain_level = *domain.front();
+    SystemLevelType& the_system_level = *system_levels.front();
 
     // get our fine-level matrices
     typename SystemLevelType::GlobalMatrixBlockA& matrix_a = the_system_level.matrix_a;
@@ -906,8 +891,7 @@ namespace NaverStokesCP2D
     if(cfg.multigrid_a)
     {
       // loop over all finer levels
-      //for(Index i(1); i < num_levels; ++i)
-      for(Index i(num_levels-1); i > Index(0); --i)
+      for(Index i(0); (i+1) < num_levels; ++i)
       {
         auto& lvl = *system_levels.at(std::size_t(i));
         auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
@@ -920,7 +904,7 @@ namespace NaverStokesCP2D
 
       // set up velocity coarse grid solver
       {
-        auto& lvl = *system_levels.front();
+        auto& lvl = *system_levels.back();
         auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
         auto cgs = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
         cgs->set_max_iter(cfg.smooth_steps_a);
@@ -944,8 +928,7 @@ namespace NaverStokesCP2D
     if (cfg.multigrid_s)
     {
       // loop over all finer levels
-      //for(Index i(1); i < num_levels; ++i)
-      for(Index i(num_levels-1); i > Index(0); --i)
+      for(Index i(0); (i+1) < num_levels; ++i)
       {
         auto& lvl = *system_levels.at(std::size_t(i));
         auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
@@ -958,7 +941,7 @@ namespace NaverStokesCP2D
 
       // set up pressure coarse grid solver
       {
-        auto& lvl = *system_levels.front();
+        auto& lvl = *system_levels.back();
         auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
         auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
         cgs->set_max_iter(cfg.smooth_steps_s);
@@ -1114,7 +1097,7 @@ namespace NaverStokesCP2D
       watch_asm_rhs.start();
       vec_rhs_v.format();
       vec_rhs_p.format();
-      burgers_rhs.assemble(the_asm_level.space_velo, cubature, vec_sol_v.local(), nullptr, &vec_rhs_v.local());
+      burgers_rhs.assemble(the_domain_level.space_velo, cubature, vec_sol_v.local(), nullptr, &vec_rhs_v.local());
       vec_rhs_v.sync_0();
 
       // subtract pressure (?)
@@ -1146,19 +1129,19 @@ namespace NaverStokesCP2D
         if(cfg.multigrid_a)
         {
           // assemble burgers matrices on all levels
-          for(std::size_t i(0); i < asm_levels.size(); ++i)
+          for(std::size_t i(0); i < system_levels.size(); ++i)
           {
             auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
             typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
             loc_mat_a.format();
-            burgers_mat.assemble(asm_levels.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
+            burgers_mat.assemble(domain.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
           }
         }
         else
         {
           // assemble burgers matrices on finest level
           the_system_level.matrix_a.local().format();
-          burgers_mat.assemble(the_asm_level.space_velo, cubature, vec_conv.local(),
+          burgers_mat.assemble(the_domain_level.space_velo, cubature, vec_conv.local(),
             &the_system_level.matrix_a.local(), nullptr);
         }
         watch_asm_mat.stop();
@@ -1482,6 +1465,10 @@ namespace NaverStokesCP2D
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
+    typedef Space::Lagrange1::Element<TrafoType> SpacePresType;
+
 
     // parse our configuration
     Config cfg;
@@ -1498,7 +1485,8 @@ namespace NaverStokesCP2D
       comm.print("\nPreparing domain...");
 
       // create our domain control
-      Control::Domain::PartiDomainControl<MeshType> domain(comm);
+      typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
+      Control::Domain::PartiDomainControl<DomainLevelType> domain(comm);
 
       // let the controller parse its arguments
       if(!domain.parse_args(args))
@@ -1521,14 +1509,14 @@ namespace NaverStokesCP2D
       domain.create_hierarchy(int(cfg.level_max_in), int(cfg.level_min_in));
 
       // store levels after partitioning
-      cfg.level_max = Index(domain.get_levels().back()->get_level_index());
-      cfg.level_min = Index(domain.get_levels().front()->get_level_index());
+      cfg.level_max = Index(domain.max_level_index());
+      cfg.level_min = Index(domain.min_level_index());
 
       // dump our configuration
       cfg.dump(comm);
 
       // run our application
-      run<MeshType>(comm, cfg, domain);
+      run(cfg, domain);
 
       TimeStamp stamp2;
 
