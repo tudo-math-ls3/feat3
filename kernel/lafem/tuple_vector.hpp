@@ -71,6 +71,10 @@ namespace FEAT
         typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
         typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
 
+      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
                     "sub-vectors have different mem-types");
@@ -529,6 +533,10 @@ namespace FEAT
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+
+      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
 
     protected:
       First_ _first;

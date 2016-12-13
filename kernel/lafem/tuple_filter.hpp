@@ -62,6 +62,10 @@ namespace FEAT
         typename First_::template FilterType<Mem2_, DT2_, IT2_>,
         typename Rest_::template FilterType<Mem2_, DT2_, IT2_>...>;
 
+      /// this typedef lets you create a filter with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+
     protected:
       /// the first sub-filter
       First_ _first;
@@ -219,6 +223,10 @@ namespace FEAT
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using FilterType = class TupleFilter<typename First_::template FilterType<Mem2_, DT2_, IT2_> >;
+
+      /// this typedef lets you create a filter with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
 
     protected:
       /// the first sub-filter

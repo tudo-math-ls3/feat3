@@ -53,6 +53,10 @@ namespace FEAT
         typename First_::template MirrorType<Mem2_, DT2_, IT2_>,
         typename Rest_::template MirrorType<Mem2_, DT2_, IT2_>...>;
 
+      /// this typedef lets you create a mirror with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
+
     protected:
       /// the first sub-mirror
       First_ _first;
@@ -225,6 +229,10 @@ namespace FEAT
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using MirrorType = class TupleMirror<typename First_::template MirrorType<Mem2_, DT2_, IT2_> >;
+
+      /// this typedef lets you create a mirror with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
 
     protected:
       First_ _first;

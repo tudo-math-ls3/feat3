@@ -101,6 +101,10 @@ namespace FEAT
                                                     typename MatrixB_::template ContainerType<Mem2_, DT2_, IT2_>,
                                                     typename MatrixD_::template ContainerType<Mem2_, DT2_, IT2_> >;
 
+      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = 2;
       /// number of column blocks (horizontal size)
