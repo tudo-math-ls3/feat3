@@ -106,6 +106,16 @@ namespace FEAT
         }
 
         /**
+         * \brief Gets the local nonlinear functional
+         *
+         * \returns A reference to the underlying local nonlinear functional
+         */
+        LocalNonlinearFunctional_& local()
+        {
+          return _nonlinear_functional;
+        }
+
+        /**
          * \brief const Derefencing operator
          *
          * \returns A const reference to the underlying local nonlinear functional
