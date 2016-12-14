@@ -137,6 +137,9 @@ namespace FEAT
            * \param[in] dom_ctrl
            * The domaincontrol holding all geometry information for all levels
            *
+           * \param[in] meshopt_lvl_
+           * Index of the level to perform the mesh optimisation on
+           *
            * \param[in] dirichlet_list
            * List of meshpart identifiers for Dirichlet boundary conditions
            *
@@ -148,6 +151,9 @@ namespace FEAT
            *
            * \param[in] solver_config_
            * PropertyMap holding the solver configuration
+           *
+           * \param[in] args
+           * Additional arguments passed to the constructor of the local functional
            *
            */
           template<typename... Args_>
