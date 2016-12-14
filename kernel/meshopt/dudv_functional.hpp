@@ -163,62 +163,17 @@ namespace FEAT
           _slip_asm(slip_asm_),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
           {
-            Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, *_trafo_space);
             XASSERT(_trafo != nullptr);
             XASSERT(_trafo_space != nullptr);
             XASSERT(_dirichlet_asm != nullptr);
             XASSERT(_slip_asm != nullptr);
+            // The symbolic assembly has to happen in the constructor because the matrix is shallow copied immediately
+            // after construction in the Control::QuadraticSystemLevel
+            Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, *_trafo_space);
           }
-
-        /**
-         * \brief Empty standard constructor
-         *
-         * This is needed to use this class in a Global::Matrix
-         */
-        explicit DuDvFunctional() :
-          BaseClass(),
-          matrix_sys(),
-          _trafo(nullptr),
-          _trafo_space(nullptr),
-          _lambda(),
-          _dirichlet_asm(nullptr),
-          _slip_asm(nullptr),
-          _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
-          {
-          }
-
-        //explicit DuDvFunctional(DuDvFunctional&& other) :
-        //  matrix_sys(std::move(other.matrix_sys)),
-        //  _trafo(other._trafo),
-        //  _trafo_space(other._trafo_space),
-        //  _lambda(std::move(other._lambda)),
-        //  _dirichlet_asm(other._dirichlet_asm),
-        //  _slip_asm(other._slip_asm),
-        //  _cubature_factory(other._cubature_factory)
-        //  {
-        //    if(this != &other)
-        //    {
-        //      other._trafo = nullptr;
-        //      other._trafo_space = nullptr;
-        //      other._dirichlet_asm = nullptr;
-        //      other._slip_asm = nullptr;
-        //    }
-        //  }
 
         /// Explicitly delete copy constructor
         DuDvFunctional(const DuDvFunctional&) = delete;
-
-        DuDvFunctional(DuDvFunctional&& other) :
-          BaseClass(other.get_mesh_node()),
-          matrix_sys(std::forward<MatrixType>(other.matrix_sys)),
-          _trafo(other._trafo),
-          _trafo_space(other._trafo_space),
-          _lambda(std::forward<ScalarVectorType>(other._lambda)),
-          _dirichlet_asm(other._dirichlet_asm),
-          _slip_asm(other._slip_asm),
-          _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
-        {
-        }
 
         /// \brief Virtual destructor
         virtual ~DuDvFunctional()
@@ -457,63 +412,6 @@ namespace FEAT
         }
 
         /**
-         * \brief Conversion method
-         *
-         * \param[in] other
-         * The source DuDvFunctional.
-         *
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        void convert(const DuDvFunctional<Mem2_, DT2_, IT2_, TrafoType_, MatrixType_> & other)
-        {
-          matrix_sys.convert(other.matrix_sys);
-        }
-
-        template<typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const ContainerTypeByMDI<Mem2_, DT2_, IT2_>& other,
-        LAFEM::CloneMode clone_mode = LAFEM::CloneMode::Weak)
-        {
-          matrix_sys.clone(other.matrix_sys, clone_mode);
-          _lambda.clone(other.lambda, clone_mode);
-
-          _trafo = other._trafo;
-          _trafo_space = other._trafo_space;
-
-          _dirichlet_asm = other._dirichlet_asm;
-          _slip_asm = other._slip_asm;
-        }
-
-        DuDvFunctional clone( LAFEM::CloneMode clone_mode = LAFEM::CloneMode::Weak) const
-        {
-          DuDvFunctional result(this->get_mesh_node(),
-          _trafo_space,
-          _dirichlet_asm,
-          _slip_asm);
-
-          result.matrix_sys.clone(matrix_sys, clone_mode);
-          result._lambda.clone(_lambda, clone_mode);
-
-          return result;
-
-        }
-
-        /**
-         * \brief Creates an L-vector for the functional's gradient
-         */
-        VectorTypeL create_vector_l() const
-        {
-          return matrix_sys.create_vector_l();
-        }
-
-        /**
-         * \brief Creates an R-vector for the functional and its gradient
-         */
-        VectorTypeR create_vector_r() const
-        {
-          return matrix_sys.create_vector_r();
-        }
-
-        /**
          * \brief Checks if the functional is empty (= the null functional
          *
          * \returns True if the number of DoFs is zero.)
@@ -521,54 +419,6 @@ namespace FEAT
         bool empty() const
         {
           return matrix_sys.empty();
-        }
-
-        /**
-         * \brief Returns the number of columns
-         *
-         * \returns The number of columns.
-         */
-        template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
-        Index columns() const
-        {
-          return matrix_sys.template columns<perspective_>();
-        }
-
-        /**
-         * \brief Returns the number of rows
-         *
-         * \returns The number of rows.
-         */
-        template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
-        Index rows() const
-        {
-          return matrix_sys.template rows<perspective_>();
-        }
-
-        /// \copydoc MatrixType::apply()
-        void apply(VectorTypeL& r, const VectorTypeR& x) const
-        {
-          matrix_sys.apply(r, x);
-        }
-
-        /// \copydoc MatrixType::apply()
-        void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
-        {
-          // copy y to r
-          r.copy(y);
-          matrix_sys.apply(r, x, r, alpha);
-        }
-
-        /// \copydoc MatrixType::extract_diag(VectorTypeL&)
-        void extract_diag(VectorTypeL& diag) const
-        {
-          matrix_sys.extract_diag(diag);
-        }
-
-        /// \copydoc MatrixType::format(DataType)
-        void format(DataType value = DataType(0))
-        {
-          matrix_sys.format(value);
         }
 
     }; // class DuDvFunctional
