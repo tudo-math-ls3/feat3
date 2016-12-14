@@ -116,6 +116,49 @@ namespace FEAT
           }
 
         /**
+         * \brief Constructor
+         *
+         * \param[in] plot_name_
+         * The String identifier used for plots.
+         *
+         * \param[in] op_
+         * The nonlinear functional. Cannot be const as internal variables change upon functional evaluation.
+         *
+         * \param[in] filter_
+         * The filter for essential boundary conditions. Cannot be const, see op_.
+         *
+         * \param[in] precond
+         * The preconditioner, defaults to nullptr. Cannot be const, see op_.
+         *
+         */
+        explicit NLOptLS(const String& plot_name, const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_, std::shared_ptr<PrecondType> precond = nullptr) :
+          BaseClass(plot_name, section_name, section, precond),
+          _op(op_),
+          _filter(filter_),
+          _tol_fval(DataType(0)),
+          _tol_step(Math::eps<DataType>()),
+          _fval_init(-Math::huge<DataType>()),
+          _fval(Math::huge<DataType>()),
+          _fval_prev(-Math::huge<DataType>()),
+          _steplength(1),
+          _ls_iter_digits(2),
+          _ls_its(~Index(0))
+          {
+            auto tol_fval_p = section->get_entry("tol_fval");
+            if (tol_fval_p.second)
+            {
+              set_tol_fval((DataType)std::stod(tol_fval_p.first));
+            }
+
+            auto tol_step_p = section->get_entry("tol_step");
+            if (tol_step_p.second)
+            {
+              set_tol_step((DataType)std::stod(tol_step_p.first));
+            }
+          }
+
+        /**
          * \brief Empty virtual destructor
          */
         virtual ~NLOptLS()
@@ -145,24 +188,19 @@ namespace FEAT
 
         }
 
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
+        /// \copydoc BaseClass::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
         {
-          BaseClass::read_config(section);
+          XASSERT(parent != nullptr);
 
-          auto tol_fval_p = section->get_entry("tol_fval");
-          if (tol_fval_p.second)
-          {
-            set_tol_fval((DataType)std::stod(tol_fval_p.first));
-          }
+          Dist::Comm comm(Dist::Comm::world());
 
-          auto tol_step_p = section->get_entry("tol_step");
-          if (tol_step_p.second)
-          {
-            set_tol_step((DataType)std::stod(tol_step_p.first));
-          }
+          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+
+          my_section->add_entry("tol_fval", stringify_fp_sci(_tol_fval));
+          my_section->add_entry("tol_step", stringify_fp_sci(_tol_step));
+
+          return my_section;
 
         }
 

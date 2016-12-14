@@ -83,6 +83,45 @@ namespace FEAT
         {
         }
 
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \tparam Operator_
+         * The type of the quadratic penalty function \f$ Q \f$.
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The quadratic penalty function \f$ Q \f$.
+         *
+         * \param[in] inner_solver
+         * The inner solver for solving the penalised unconstrained optimisation problem.
+         */
+        explicit QPenalty(const String& section_name, PropertyMap* section,
+        OperatorType& op, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
+          BaseClass("QPenalty", section_name, section),
+          _op(op),
+          _inner_solver(inner_solver),
+          _initial_penalty_param(1),
+          _tol_penalty(Math::pow(Math::huge<DataType>(), DataType(0.25)))
+        {
+          auto initial_penalty_param_p = section->query("initial_penalty_param");
+          if(initial_penalty_param_p.second)
+          {
+            set_initial_penalty_param(DataType(std::stod(initial_penalty_param_p.first)));
+          }
+
+          auto tol_penalty_p = section->query("tol_penalty");
+          if(tol_penalty_p.second)
+          {
+            set_tol_penalty(DataType(std::stod(tol_penalty_p.first)));
+          }
+        }
+
         /// Explicitly delete the copy constructor
         QPenalty(const QPenalty&) = delete;
 
@@ -98,20 +137,6 @@ namespace FEAT
         virtual String name() const override
         {
           return "QPenalty";
-        }
-
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
-        {
-          BaseClass::read_config(section);
-
-          auto initial_penalty_param_p = section->query("initial_penalty_param");
-          if(initial_penalty_param_p.second)
-          {
-            set_initial_penalty_param(DataType(std::stod(initial_penalty_param_p.first)));
-          }
         }
 
         /// \copydoc BaseClass::init_symbolic()
@@ -136,6 +161,16 @@ namespace FEAT
           XASSERT(initial_penalty_param > DataType(0));
 
           _initial_penalty_param = initial_penalty_param;
+        }
+
+        /**
+         * \brief Sets the initial penalty parameter
+         */
+        void set_tol_penalty(DataType tol_penalty)
+        {
+          XASSERT(tol_penalty > DataType(0));
+
+          _tol_penalty = tol_penalty;
         }
 
         /// \copydoc BaseClass::apply()
@@ -330,6 +365,8 @@ namespace FEAT
      *
      * \param[in] inner_solver
      * The inner solver for solving the penalised unconstrained optimisation problem.
+     *
+     * \returns An std::shared_ptr to the new QPenalty solver object
      */
     template<typename Operator_>
     inline std::shared_ptr<QPenalty<Operator_>> new_qpenalty( Operator_& op,
@@ -338,6 +375,34 @@ namespace FEAT
     typename Operator_::VectorTypeR::DataType(1))
     {
       return std::make_shared<QPenalty<Operator_>>(op, inner_solver, initial_penalty_param);
+    }
+
+    /**
+     * \brief Creates a new QPenalty object using a PropertyMap
+     *
+     * \tparam Operator_
+     * The type of the quadratic penalty function \f$ Q \f$.
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The quadratic penalty function \f$ Q \f$.
+     *
+     * \param[in] inner_solver
+     * The inner solver for solving the penalised unconstrained optimisation problem.
+     *
+     * \returns An std::shared_ptr to the new QPenalty solver object
+     */
+    template<typename Operator_>
+    inline std::shared_ptr<QPenalty<Operator_>> new_qpenalty(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, std::shared_ptr<IterativeSolver<typename Operator_::VectorTypeR>> inner_solver)
+    {
+      return std::make_shared<QPenalty<Operator_>>(section_name, section, op, inner_solver);
     }
 
   }

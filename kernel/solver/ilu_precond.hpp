@@ -849,26 +849,31 @@ namespace FEAT
       {
       }
 
+      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter),
+        _p(-1)
+      {
+        // Check for _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          _p = std::stoi(fill_in_param_p.first);
+        }
+        else
+        {
+          throw InternalError(__func__,__FILE__,__LINE__,
+          name() + "config section "+section_name+" is missing the mandatory fill_in_param!");
+        }
+      }
+
       /**
        * \brief Empty virtual destructor
        */
       virtual ~ILUPrecond()
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _p
-        auto fill_in_param_p = section->query("fill_in_param");
-        if(fill_in_param_p.second)
-        {
-          set_fill_in_param(std::stoi(fill_in_param_p.first));
-        }
       }
 
       /**
@@ -998,26 +1003,25 @@ namespace FEAT
       {
       }
 
+      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter)
+      {
+        // Check for _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          XASSERTM(std::stoi(fill_in_param_p.first) == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
+        }
+      }
+
       /**
        * \brief Empty virtual destructor
        */
       virtual ~ILUPrecond()
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _p
-        auto fill_in_param_p = section->query("fill_in_param");
-        if(fill_in_param_p.second)
-        {
-          set_fill_in_param(std::stoi(fill_in_param_p.first));
-        }
       }
 
       /**
@@ -1218,25 +1222,40 @@ namespace FEAT
       }
 
       /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       */
+      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter)
+        {
+          // Check for _p
+          auto fill_in_param_p = section->query("fill_in_param");
+          if(fill_in_param_p.second)
+          {
+            XASSERTM(std::stoi(fill_in_param_p.first) == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
+          }
+        }
+
+      /**
        * \brief Empty virtual destructor
        */
       virtual ~ILUPrecond()
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _p
-        auto fill_in_param_p = section->query("fill_in_param");
-        if(fill_in_param_p.second)
-        {
-          set_fill_in_param(std::stoi(fill_in_param_p.first));
-        }
       }
 
       /**
@@ -1322,6 +1341,10 @@ namespace FEAT
       {
       }
 
+      explicit ILUPrecond(const String& , PropertyMap*, const Matrix_& , const Filter_& )
+      {
+      }
+
       Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
           throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
@@ -1343,7 +1366,7 @@ namespace FEAT
      * The system filter.
      *
      * \param[in] p
-     * Maximum level of fillin.
+     * Maximum level of fill-in.
      *
      * \returns
      * A shared pointer to a new ILUPrecond object.
@@ -1353,6 +1376,32 @@ namespace FEAT
       const Matrix_& matrix, const Filter_& filter, const int p = 0)
     {
       return std::make_shared<ILUPrecond<Matrix_, Filter_>>(matrix, filter, p);
+    }
+
+    /**
+     * \brief Creates a new ILUPrecond solver object based on a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new ILUPrecond object.
+     */
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<ILUPrecond<Matrix_, Filter_>> new_ilu_precond(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<ILUPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);
     }
   } // namespace Solver
 } // namespace FEAT

@@ -70,6 +70,15 @@ namespace FEAT
       {
       }
 
+      explicit GroppPCG(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter,
+        std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("GroppPCG", section_name, section, precond),
+        _system_matrix(matrix),
+        _system_filter(filter)
+      {
+      }
+
       virtual String name() const override
       {
         return "GroppPCG";

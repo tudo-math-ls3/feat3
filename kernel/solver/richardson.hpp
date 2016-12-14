@@ -72,6 +72,41 @@ namespace FEAT
       {
       }
 
+    /**
+     * \brief Constructor using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     */
+      explicit Richardson(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter,
+        std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("Richardson", section_name, section, precond),
+        _system_matrix(matrix),
+        _system_filter(filter),
+        _omega(1)
+      {
+        // Check if we have set omega
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+      }
+
       /**
        * \brief Empty virtual destructor
        */
@@ -82,21 +117,6 @@ namespace FEAT
       virtual String name() const override
       {
         return "Richardson";
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _krylov_vim
-        auto omega_p = section->query("omega");
-        if(omega_p.second)
-        {
-          set_omega(DataType(std::stod(omega_p.first)));
-        }
       }
 
       /**
@@ -220,6 +240,7 @@ namespace FEAT
     {
       return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, nullptr);
     }
+
     template<typename Matrix_, typename Filter_, typename Precond_>
     inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
       const Matrix_& matrix, const Filter_& filter,
@@ -236,6 +257,55 @@ namespace FEAT
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {
       return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, precond);
+    }
+#endif
+
+    /**
+     * \brief Creates a new Richardson solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     * \returns
+     * A shared pointer to a new Richardson object.
+     */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<Richardson<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
+    }
+
+    template<typename Matrix_, typename Filter_, typename Precond_>
+    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
+    {
+      return std::make_shared<Richardson<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+    }
+#else
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter,
+      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
+    {
+      return std::make_shared<Richardson<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
 #endif
   } // namespace Solver

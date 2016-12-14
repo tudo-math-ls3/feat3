@@ -34,11 +34,11 @@ namespace FEAT
       switch(cycle)
       {
       case MultiGridCycle::V:
-        return os << "V";
+        return os << "v";
       case MultiGridCycle::F:
-        return os << "F";
+        return os << "f";
       case MultiGridCycle::W:
-        return os << "W";
+        return os << "w";
       default:
         return os << "?";
       }
@@ -46,15 +46,15 @@ namespace FEAT
 
     inline void operator<<(MultiGridCycle& cycle, const String& cycle_name)
     {
-      if(cycle_name == "V")
+      if(cycle_name == "v")
       {
         cycle = MultiGridCycle::V;
       }
-      else if(cycle_name == "W")
+      else if(cycle_name == "w")
       {
         cycle = MultiGridCycle::W;
       }
-      else if(cycle_name == "F")
+      else if(cycle_name == "f")
       {
         cycle = MultiGridCycle::F;
       }
@@ -920,23 +920,6 @@ namespace FEAT
       /// virtual destructor
       virtual ~MultiGrid()
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Get the cycle
-        auto cycle_p = section->query("cycle");
-        if(cycle_p.second)
-        {
-          MultiGridCycle my_cycle;
-          my_cycle << cycle_p.first;
-          set_cycle(my_cycle);
-        }
       }
 
       /**

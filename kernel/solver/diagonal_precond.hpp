@@ -21,6 +21,7 @@ namespace FEAT
       public SolverBase<Vector_>
     {
     public:
+      typedef SolverBase<Vector_> BaseClass;
       typedef Vector_ VectorType;
       typedef Filter_ FilterType;
 
@@ -39,6 +40,14 @@ namespace FEAT
        * The filter.
        */
       explicit DiagonalPrecond(const VectorType& diag, const FilterType& filter) :
+        _diag(diag),
+        _filter(filter)
+      {
+      }
+
+      explicit DiagonalPrecond(const String& section_name, PropertyMap* section,
+      const VectorType& diag, const FilterType& filter) :
+        BaseClass(section_name, section),
         _diag(diag),
         _filter(filter)
       {

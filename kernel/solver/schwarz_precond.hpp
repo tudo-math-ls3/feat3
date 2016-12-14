@@ -71,6 +71,26 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] local_solver
+       * The local solver that is to be used by the Schwarz preconditioner.
+       */
+      explicit SchwarzPrecond(const String& section_name, PropertyMap* section,
+      std::shared_ptr<LocalSolverType> local_solver, const GlobalFilterType& filter) :
+        BaseClass(section_name, section),
+        _local_solver(local_solver),
+        _filter(filter)
+      {
+      }
+
       /// Returns the name of the solver.
       virtual String name() const override
       {
@@ -153,6 +173,62 @@ namespace FEAT
       return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (local_solver, filter);
     }
+#endif
+
+    /**
+     * \brief Creates a new SchwarzPrecond solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] local_solver
+     * The local solver object.
+     *
+     * \param[in] filter
+     * The global system filter.
+     *
+     * \returns
+     * A shared pointer to a new SchwarzPrecond object.
+     */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename LocalFilter_, typename LocalSolver_, typename Mirror_>
+    inline std::shared_ptr
+    <
+      SchwarzPrecond
+      <
+        Global::Vector<typename LocalFilter_::VectorType, Mirror_>,
+        Global::Filter<LocalFilter_, Mirror_>
+      >
+    >
+    new_schwarz_precond(
+      const String& section_name, PropertyMap* section,
+      std::shared_ptr<LocalSolver_> local_solver, Global::Filter<LocalFilter_, Mirror_>& filter)
+      {
+        return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
+          (section_name, section, local_solver, filter);
+      }
+#else
+    template<typename LocalFilter_, typename Mirror_>
+    inline std::shared_ptr
+    <
+      SchwarzPrecond
+      <
+        Global::Vector<typename LocalFilter_::VectorType, Mirror_>,
+        Global::Filter<LocalFilter_, Mirror_>
+      >
+    >
+    new_schwarz_precond(
+      const String& section_name, PropertyMap* section,
+      std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
+      Global::Filter<LocalFilter_, Mirror_>& filter)
+      {
+        return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
+          (section_name, section, local_solver, filter);
+      }
 #endif
   } // namespace Solver
 } // namespace FEAT

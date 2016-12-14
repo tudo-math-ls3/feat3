@@ -75,25 +75,50 @@ namespace FEAT
       }
 
       /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       * \param[in] omega
+       * The damping parameter for Jacobi.
+       *
+       * \returns
+       * A shared pointer to a new JacobiPrecond object.
+       */
+      explicit JacobiPrecond(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter),
+        _omega(1)
+        {
+          auto omega_p = section->query("omega");
+          if(omega_p.second)
+          {
+            set_omega(DataType(std::stod(omega_p.first)));
+          }
+          else
+          {
+            throw InternalError(__func__,__FILE__,__LINE__,
+            name()+" config section is missing the mandatory omega key!");
+          }
+        }
+
+      /**
        * \brief Empty virtual destructor
        */
       virtual ~JacobiPrecond()
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _krylov_vim
-        auto omega_p = section->query("omega");
-        if(omega_p.second)
-        {
-          set_omega(DataType(std::stod(omega_p.first)));
-        }
       }
 
       /// Returns the name of the solver.
@@ -164,6 +189,36 @@ namespace FEAT
     {
       return std::make_shared<JacobiPrecond<Matrix_, Filter_>>(matrix, filter, omega);
     }
+
+    /**
+     * \brief Creates a new JacobiPrecond solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] omega
+     * The damping parameter for Jacobi.
+     *
+     * \returns
+     * A shared pointer to a new JacobiPrecond object.
+     */
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<JacobiPrecond<Matrix_, Filter_>> new_jacobi_precond(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<JacobiPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);
+    }
+
   } // namespace Solver
 } // namespace FEAT
 

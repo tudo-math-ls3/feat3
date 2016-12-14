@@ -8,7 +8,6 @@
 #include <kernel/solver/legacy_preconditioners.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
-#include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcr.hpp>

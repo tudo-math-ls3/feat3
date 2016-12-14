@@ -196,6 +196,71 @@ namespace FEAT
             }
           }
 
+
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         * \param[in] precond
+         * The preconditioner. May be \c nullptr.
+         *
+         * \param[in] linesearch
+         * The linesearch to use.
+         *
+         */
+        explicit NLCG(const String& section_name, PropertyMap* section, Operator_& op_, Filter_& filter_,
+        std::shared_ptr<LinesearchType> linesearch_, std::shared_ptr<PrecondType> precond = nullptr) :
+          BaseClass("NLCG", section_name, section, op_, filter_, precond),
+          _linesearch(linesearch_),
+          _precond(precond),
+          _direction_update(direction_update_default),
+          _max_num_restarts(10),
+          _num_restarts(0),
+          _restart_freq(0),
+          iterates(nullptr)
+          {
+            XASSERT(_linesearch != nullptr);
+
+            this->_min_stag_iter = 0;
+            _restart_freq = this->_op.columns() + Index(3);
+
+            this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
+
+            // Get direction update
+            auto direction_update_p = section->query("direction_update");
+            if(direction_update_p.second)
+            {
+              NLCGDirectionUpdate my_update;
+              my_update << direction_update_p.first;
+              set_direction_update(my_update);
+            }
+
+            // Check if we have to keep the iterates
+            auto keep_iterates_p = section->query("keep_iterates");
+            if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+            {
+              iterates = new std::deque<VectorType>;
+            }
+
+            auto max_num_restarts_p = section->query("max_num_restarts");
+            if(max_num_restarts_p.second)
+            {
+              set_max_num_restarts(Index(std::stoul(max_num_restarts_p.first)));
+            }
+
+          }
+
         /**
          * \brief Virtual destructor
          */
@@ -205,33 +270,25 @@ namespace FEAT
             delete iterates;
         }
 
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
+        /// \copydoc BaseClass::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
         {
-          BaseClass::read_config(section);
+          XASSERT(parent != nullptr);
 
-          // Get direction update
-          auto direction_update_p = section->query("direction_update");
-          if(direction_update_p.second)
-          {
-            NLCGDirectionUpdate my_update;
-            my_update << direction_update_p.first;
-            set_direction_update(my_update);
-          }
+          Dist::Comm comm(Dist::Comm::world());
 
-          // Check if we have to keep the iterates
-          bool keep_iterates(false);
-          auto keep_iterates_p = section->query("keep_iterates");
-          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
-          {
-            keep_iterates = true;
-          }
-          set_keep_iterates(keep_iterates);
+          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+
+          my_section->add_entry("direction_update", stringify(_direction_update));
+          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
+          my_section->add_entry("linesearch", _linesearch->get_section_name());
+          my_section->add_entry("max_num_restarts", stringify(_max_num_restarts));
+
+          _linesearch->write_config(parent);
+
+          return my_section;
 
         }
-
 
         /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
@@ -902,6 +959,57 @@ namespace FEAT
       {
         return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
         keep_iterates, precond);
+      }
+#endif
+
+    /**
+     * \brief Creates a new NLCG solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     * \param[in] linesearch
+     * The linesearch to use.
+     *
+     * \returns
+     * A shared pointer to a new NLCG object.
+     */
+    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename Operator_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter, Linesearch_& linesearch)
+      {
+        return std::make_shared<NLCG<Operator_, Filter_>>(section_name, section, op, filter, linesearch, nullptr);
+      }
+    template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
+    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter, Linesearch_& linesearch, std::shared_ptr<Precond_> precond)
+      {
+        return std::make_shared<NLCG<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
+      }
+#else
+    template<typename Operator_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter, Linesearch_& linesearch,
+      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
+      {
+        return std::make_shared<NLCG<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
       }
 #endif
   } //namespace Solver

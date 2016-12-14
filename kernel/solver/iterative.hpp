@@ -84,7 +84,7 @@ namespace FEAT
        * \param[in] plot_name
        * Specifies the name of the iterative solver. This is used as a prefix for the convergence plot.
        */
-      explicit IterativeSolver(String plot_name) :
+      explicit IterativeSolver(const String& plot_name) :
         BaseClass(),
         _plot_name(plot_name),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
@@ -108,6 +108,96 @@ namespace FEAT
 #endif
       {
       }
+
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] plot_name
+       * The name of the solver.
+       *
+       */
+      explicit IterativeSolver(const String& plot_name, const String& section_name, PropertyMap* section) :
+        BaseClass(section_name, section),
+        _plot_name(plot_name),
+        _tol_rel(Math::sqrt(Math::eps<DataType>())),
+        _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
+        _div_rel(DataType(1) / Math::eps<DataType>()),
+        _div_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
+        _stag_rate(DataType(0.95)),
+        _min_iter(0),
+        _max_iter(100),
+        _num_iter(0),
+        _min_stag_iter(0),
+        _num_stag_iter(0),
+        _def_init(0),
+        _def_cur(0),
+        _iter_digits(Math::ilog10(_max_iter)),
+        _plot(false),
+#ifdef FEAT_HAVE_MPI
+        _skip_def_calc(false) // not allowed as this may cause deadlocks
+#else
+        _skip_def_calc(true) // no potential problem in non-MPI builds
+#endif
+        {
+        Dist::Comm comm(Dist::Comm::world());
+
+        auto plot_p = section->get_entry("plot");
+        if (plot_p.second)
+        {
+          Index plot(std::stoul(plot_p.first));
+          if (plot == 0)
+          {
+            set_plot(false);
+          }
+          else if (plot == 1)
+          {
+            set_plot(comm.rank() == 0);
+          }
+          else
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "plot value " + stringify(plot) + " unknown!");
+          }
+        }
+
+        auto tol_abs_p = section->get_entry("tol_abs");
+        if (tol_abs_p.second)
+          set_tol_abs(DataType(std::stod(tol_abs_p.first)));
+
+        auto tol_rel_p = section->get_entry("tol_rel");
+        if (tol_rel_p.second)
+          set_tol_rel(DataType(std::stod(tol_rel_p.first)));
+
+        auto div_abs_p = section->get_entry("div_abs");
+        if (div_abs_p.second)
+          set_div_abs(DataType(std::stod(div_abs_p.first)));
+
+        auto div_rel_p = section->get_entry("div_rel");
+        if (div_rel_p.second)
+          set_div_rel(DataType(std::stod(div_rel_p.first)));
+
+        auto stag_rate_p = section->get_entry("stag_rate");
+        if (stag_rate_p.second)
+          set_stag_rate(DataType(std::stod(stag_rate_p.first)));
+
+        auto max_iter_p = section->get_entry("max_iter");
+        if (max_iter_p.second)
+          set_max_iter(Index(std::stoul(max_iter_p.first)));
+
+        auto min_iter_p = section->get_entry("min_iter");
+        if (min_iter_p.second)
+          set_min_iter(Index(std::stoul(min_iter_p.first)));
+
+        auto min_stag_iter_p = section->get_entry("min_stag_iter");
+        if (min_stag_iter_p.second)
+          set_min_stag_iter(Index(std::stoul(min_stag_iter_p.first)));
+
+        }
 
     public:
       /// Sets the relative tolerance for the solver.
@@ -290,65 +380,26 @@ namespace FEAT
         return Math::pow(_def_cur / _def_init, DataType(1) / DataType(_num_iter));
       }
 
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
+      /// \copydoc BaseClass::write_config()
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const override
       {
-
-        BaseClass::read_config(section);
+        XASSERT(parent != nullptr);
 
         Dist::Comm comm(Dist::Comm::world());
 
-        auto plot_p = section->get_entry("plot");
-        if (plot_p.second)
-        {
-          Index plot(std::stoul(plot_p.first));
-          if (plot == 0)
-          {
-            set_plot(false);
-          }
-          else if (plot == 1)
-          {
-            set_plot(comm.rank() == 0);
-          }
-          else
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "plot value " + stringify(plot) + " unknown!");
-          }
-        }
+        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
-        auto tol_abs_p = section->get_entry("tol_abs");
-        if (tol_abs_p.second)
-          set_tol_abs(DataType(std::stod(tol_abs_p.first)));
+        my_section->add_entry("plot", stringify(_plot ? 1 : 0));
+        my_section->add_entry("tol_rel", stringify_fp_sci(_tol_rel));
+        my_section->add_entry("tol_abs", stringify_fp_sci(_tol_abs));
+        my_section->add_entry("div_rel", stringify_fp_sci(_div_rel));
+        my_section->add_entry("div_abs", stringify_fp_sci(_div_abs));
+        my_section->add_entry("stag_rate", stringify_fp_sci(_stag_rate));
+        my_section->add_entry("max_iter", stringify(_max_iter));
+        my_section->add_entry("min_iter", stringify(_min_iter));
+        my_section->add_entry("min_stag_iter", stringify(_min_stag_iter));
 
-        auto tol_rel_p = section->get_entry("tol_rel");
-        if (tol_rel_p.second)
-          set_tol_rel(DataType(std::stod(tol_rel_p.first)));
-
-        auto div_abs_p = section->get_entry("div_abs");
-        if (div_abs_p.second)
-          set_div_abs(DataType(std::stod(div_abs_p.first)));
-
-        auto div_rel_p = section->get_entry("div_rel");
-        if (div_rel_p.second)
-          set_div_rel(DataType(std::stod(div_rel_p.first)));
-
-        auto stag_rate_p = section->get_entry("stag_rate");
-        if (stag_rate_p.second)
-          set_stag_rate(DataType(std::stod(stag_rate_p.first)));
-
-        auto max_iter_p = section->get_entry("max_iter");
-        if (max_iter_p.second)
-          set_max_iter(Index(std::stoul(max_iter_p.first)));
-
-        auto min_iter_p = section->get_entry("min_iter");
-        if (min_iter_p.second)
-          set_min_iter(Index(std::stoul(min_iter_p.first)));
-
-        auto min_stag_iter_p = section->get_entry("min_stag_iter");
-        if (min_stag_iter_p.second)
-          set_min_stag_iter(Index(std::stoul(min_stag_iter_p.first)));
+        return my_section;
 
       }
 
@@ -592,8 +643,30 @@ namespace FEAT
        * \param[in] precond
        * A pointer to the preconditioner. May be nullptr.
        */
-      explicit PreconditionedIterativeSolver(String plot_name, std::shared_ptr<PrecondType> precond = nullptr) :
+      explicit PreconditionedIterativeSolver(const String& plot_name,std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass(plot_name),
+        _precond(precond)
+      {
+      }
+
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] plot_name
+       * The name of the solver.
+       *
+       * \param[in] precond
+       * A pointer to the preconditioner. May be nullptr.
+       */
+      explicit PreconditionedIterativeSolver(const String& plot_name, const String& section_name,
+      PropertyMap* section, std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass(plot_name, section_name, section),
         _precond(precond)
       {
       }
@@ -602,6 +675,29 @@ namespace FEAT
       /// virtual destructor
       virtual ~PreconditionedIterativeSolver()
       {
+      }
+
+      /// \copydoc BaseClass::write_config()
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+      {
+        XASSERT(parent != nullptr);
+
+        Dist::Comm comm(Dist::Comm::world());
+
+        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+        if(_precond == nullptr)
+        {
+          my_section->add_entry("precon", "none");
+        }
+        else
+        {
+          my_section->add_entry("precond", _precond->get_section_name());
+          _precond->write_config(parent);
+        }
+
+        return my_section;
+
       }
 
       virtual void init_symbolic() override

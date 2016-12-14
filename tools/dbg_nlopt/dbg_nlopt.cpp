@@ -94,6 +94,10 @@ int run(Solver_& solver, Operator_& op)
   solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
 
+  PropertyMap config;
+  PropertyMap* my_config_section = solver->write_config(&config, "dbg-nlopt-solver");
+  my_config_section->dump(std::cout);
+
   // This will hold the solution
   auto sol = op.create_vector_r();
   sol(0,starting_point);

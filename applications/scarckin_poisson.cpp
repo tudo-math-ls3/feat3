@@ -18,7 +18,6 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>

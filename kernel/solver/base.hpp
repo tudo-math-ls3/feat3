@@ -164,6 +164,22 @@ namespace FEAT
 
       typedef Vector_ VectorType;
 
+    private:
+      String _section_name;
+
+    public:
+
+      SolverBase()
+        : _section_name("")
+      {
+      }
+
+      explicit SolverBase(const String& config_section_name, PropertyMap* config_section) :
+        _section_name(config_section_name)
+      {
+        XASSERT(config_section != nullptr);
+      }
+
       /// virtual destructor
       virtual ~SolverBase()
       {
@@ -243,11 +259,53 @@ namespace FEAT
        */
       virtual String name() const = 0;
 
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* DOXY(section))
+      virtual String get_section_name() const
       {
+        if(_section_name == "")
+        {
+          return name();
+        }
+        else
+        {
+          return _section_name;
+        }
+      }
+
+      /**
+       * \brief Writes the solver configuration to a PropertyMap
+       *
+       * \param[in] parent
+       * The PropertyMap to add a new section to
+       *
+       * \param[in] name
+       * The name the new section will have
+       *
+       */
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const
+      {
+        XASSERT(parent != nullptr);
+
+        PropertyMap* config_section(nullptr);
+
+        if(new_section_name == "")
+        {
+          if(_section_name == "")
+          {
+            config_section = parent->add_section(name());
+          }
+          else
+          {
+            config_section = parent->add_section(_section_name);
+          }
+        }
+        else
+        {
+          config_section = parent->add_section(new_section_name);
+        }
+
+        config_section->add_entry("type",name());
+
+        return config_section;
       }
 
       /**

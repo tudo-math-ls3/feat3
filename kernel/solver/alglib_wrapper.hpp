@@ -129,6 +129,47 @@ namespace FEAT
           }
 
         /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         */
+        explicit ALGLIBMinLBFGS(const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_) :
+          BaseClass("ALGLIBMinLBFGS", section_name, section, op_, filter_, nullptr),
+          _lbfgs_dim(0),
+          iterates(nullptr)
+          {
+
+            this->set_ls_iter_digits(2);
+
+            // Get direction update
+            auto lbfgs_dim_p = section->query("lbfgs_dim");
+            if(lbfgs_dim_p.second)
+            {
+              _lbfgs_dim = alglib::ae_int_t(std::stoul(lbfgs_dim_p.first));
+              XASSERT(_lbfgs_dim > alglib::ae_int_t(0));
+            }
+
+            // Check if we have to keep the iterates
+            auto keep_iterates_p = section->query("keep_iterates");
+            if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+            {
+              iterates = new std::deque<VectorType>;
+            }
+          }
+
+        /**
          * \brief Virtual destructor
          */
         virtual ~ALGLIBMinLBFGS()
@@ -139,31 +180,19 @@ namespace FEAT
           }
         }
 
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
+        /// \copydoc BaseClass::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
         {
-          BaseClass::read_config(section);
+          XASSERT(parent != nullptr);
 
-          // Default LBFGS update dimension is 0 so the constructor can choose is automatically.
-          alglib::ae_int_t lbfgs_dim(0);
-          auto lbfgs_dim_p = section->query("lbfgs_dim");
-          // Get LBFGS update dimension.
-          if(lbfgs_dim_p.second)
-          {
-            lbfgs_dim = alglib::ae_int_t(std::stoul(lbfgs_dim_p.first));
-          }
-          set_lbfgs_dim(lbfgs_dim);
+          Dist::Comm comm(Dist::Comm::world());
 
-          // Check if we have to keep the iterates
-          bool keep_iterates(false);
-          auto keep_iterates_p = section->query("keep_iterates");
-          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
-          {
-            keep_iterates = true;
-          }
-          set_keep_iterates(keep_iterates);
+          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+
+          my_section->add_entry("lbfgs_dim", stringify(_lbfgs_dim));
+          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
+
+          return my_section;
 
         }
 
@@ -493,14 +522,17 @@ namespace FEAT
     /**
      * \brief Creates a new ALGLIBMinLBFGS solver object
      *
-     * \param[in] op
+     * \param[in] op_
      * The operator
      *
-     * \param[in] filter
+     * \param[in] filter_
      * The system filter.
      *
+     * \param[in] lbfgs_dim_
+     * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, op_.columns()).
+     *
      * \param[in] keep_iterates
-     * Flag for keeping the iterates, defaults to false
+     * Keep all iterates in a std::deque. Defaults to false.
      *
      * \returns
      * A shared pointer to a new ALGLIBMinLBFGS object.
@@ -508,11 +540,39 @@ namespace FEAT
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinLBFGS<Operator_, Filter_>> new_alglib_minlbfgs(
-      Operator_& op_, Filter_& filter_, alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
-      bool keep_iterates_ = false)
+      Operator_& op_, Filter_& filter_,
+      alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0), bool keep_iterates = false)
       {
-        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(op_, filter_, lbfgs_dim_, keep_iterates_);
+        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(op_, filter_, lbfgs_dim_, keep_iterates);
       }
+
+    /**
+     * \brief Creates a new ALGLIBMinLBFGS solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op_
+     * The operator
+     *
+     * \param[in] filter_
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new ALGLIBMinLBFGS object.
+     */
+    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinLBFGS<Operator_, Filter_>> new_alglib_minlbfgs(
+      const String& section_name, PropertyMap* section,
+      Operator_& op_, Filter_& filter_)
+      {
+        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(section_name, section, op_, filter_);
+      }
+
     /**
      * \brief Wrapper around ALGLIB's mincg implementation for minimising an operator's gradient
      *
@@ -608,6 +668,48 @@ namespace FEAT
           }
 
         /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         */
+        explicit ALGLIBMinCG(const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_) :
+          BaseClass("ALGLIBMinCG", section_name, section, op_, filter_, nullptr),
+          _direction_update(direction_update_default),
+          iterates(nullptr)
+          {
+
+            this->set_ls_iter_digits(2);
+
+            // Get direction update
+            auto direction_update_p = section->query("direction_update");
+            if(direction_update_p.second)
+            {
+              NLCGDirectionUpdate my_update;
+              my_update << direction_update_p.first;
+              set_direction_update(my_update);
+            }
+
+            // Check if we have to keep the iterates
+            auto keep_iterates_p = section->query("keep_iterates");
+            if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+            {
+              iterates = new std::deque<VectorType>;
+            }
+          }
+
+        /**
          * \brief Virtual destructor
          */
         virtual ~ALGLIBMinCG()
@@ -616,30 +718,20 @@ namespace FEAT
             delete iterates;
         }
 
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
+
+        /// \copydoc BaseClass::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
         {
-          BaseClass::read_config(section);
+          XASSERT(parent != nullptr);
 
-          // Get direction update
-          auto direction_update_p = section->query("direction_update");
-          if(direction_update_p.second)
-          {
-            NLCGDirectionUpdate my_update;
-            my_update << direction_update_p.first;
-            set_direction_update(my_update);
-          }
+          Dist::Comm comm(Dist::Comm::world());
 
-          // Check if we have to keep the iterates
-          bool keep_iterates(false);
-          auto keep_iterates_p = section->query("keep_iterates");
-          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
-          {
-            keep_iterates = true;
-          }
-          set_keep_iterates(keep_iterates);
+          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+
+          my_section->add_entry("direction_update", stringify(_direction_update));
+          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
+
+          return my_section;
 
         }
 
@@ -998,7 +1090,32 @@ namespace FEAT
         return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op_, filter_, du_, keep_iterates_);
       }
 
-
+    /**
+     * \brief Creates a new ALGLIBMinCG solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new ALGLIBMinCG object.
+     */
+    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
+      const String& section_name, PropertyMap* section,
+      Operator_& op_, Filter_& filter_)
+      {
+        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(section_name, section, op_, filter_);
+      }
   } // namespace Solver
 } // namespace FEAT
 #endif // FEAT_HAVE_ALGLIB

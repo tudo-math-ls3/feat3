@@ -5,7 +5,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/solver/base.hpp>
-#include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/pmr.hpp>
 #include <kernel/solver/pcr.hpp>
@@ -23,6 +22,7 @@
 #include <kernel/solver/convert_precond.hpp>
 #include <kernel/solver/matrix_stock.hpp>
 
+// Includes for nonlinear optimisers
 #include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
@@ -31,6 +31,8 @@
 #include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/qpenalty.hpp>
 
+#include <kernel/util/dist.hpp>
+
 namespace FEAT
 {
   namespace Control
@@ -38,45 +40,6 @@ namespace FEAT
     struct SolverFactory
     {
       private:
-
-        template <typename VectorType_>
-        static void configure_iterative_solver(PropertyMap * section, std::shared_ptr<Solver::PreconditionedIterativeSolver<VectorType_> > solver)
-        {
-          using DataType = typename VectorType_::DataType;
-
-          Index rank = Util::Comm::rank();
-
-          auto plot_p = section->get_entry("plot");
-          if (plot_p.second)
-          {
-            Index plot(std::stoul(plot_p.first));
-            if (plot == 0)
-            {
-              solver->set_plot(false);
-            }
-            else if (plot == 1)
-            {
-              solver->set_plot(rank == 0);
-            }
-            else
-            {
-              throw InternalError(__func__, __FILE__, __LINE__, "plot value " + stringify(plot) + " unknown!");
-            }
-          }
-
-          auto tol_rel_p = section->get_entry("tol_rel");
-          if (tol_rel_p.second)
-            solver->set_tol_rel((DataType)std::stod(tol_rel_p.first));
-
-          auto max_iter_p = section->get_entry("max_iter");
-          if (max_iter_p.second)
-            solver->set_max_iter(std::stoul(max_iter_p.first));
-
-          auto min_iter_p = section->get_entry("min_iter");
-          if (min_iter_p.second)
-            solver->set_min_iter(std::stoul(min_iter_p.first));
-        }
-
         static String get_section_path(PropertyMap * base, PropertyMap * section, String path, String name)
         {
           if (section->get_sub_section(name) != nullptr)
@@ -93,34 +56,39 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_schwarz_precon(MST_ & matrix_stock, PropertyMap * base, String solver_name, PropertyMap * section, size_t back_level, typename SolverVectorType_::GateType *)
+        create_schwarz_precon(MST_& matrix_stock, PropertyMap* base, String section_name, PropertyMap* section,
+        size_t back_level, typename SolverVectorType_::GateType*)
         {
           using SolverVectorType = SolverVectorType_;
           std::shared_ptr<Solver::SolverBase<typename SolverVectorType::LocalVectorType> > precon_schwarz;
           auto schwarz_p = section->query("solver");
           if (schwarz_p.second)
           {
-            precon_schwarz = create_scalar_solver_by_section<MST_, typename SolverVectorType::LocalVectorType>(matrix_stock, base, get_section_path(base, section, solver_name, schwarz_p.first),
+            precon_schwarz = create_scalar_solver_by_section<MST_, typename SolverVectorType::LocalVectorType>(matrix_stock, base, get_section_path(base, section, section_name, schwarz_p.first),
                 back_level);
           }
           else
-            throw InternalError(__func__, __FILE__, __LINE__, "Schwarz precon section without solver key is not allowed!");
+          {
+            throw InternalError(__func__, __FILE__, __LINE__,
+            "Schwarz precon section without solver key is not allowed!");
+          }
 
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-          return Solver::new_schwarz_precond(precon_schwarz, filters.at(back_level));
+          return Solver::new_schwarz_precond(section_name, section, precon_schwarz, filters.at(back_level));
         }
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_schwarz_precon(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Schwarz precon section is only allowed in global context! Maybe you have two in one solver branch?");
+          throw InternalError(__func__, __FILE__, __LINE__,
+          "Schwarz precon section is only allowed in global context! Maybe you have two in one solver branch?");
           return nullptr;
         }
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_ilu_precon(MST_ & , size_t, typename SolverVectorType_::GateType *)
+        create_ilu_precon(MST_&, const String&, PropertyMap*, size_t, typename SolverVectorType_::GateType *)
         {
           throw InternalError(__func__, __FILE__, __LINE__, "ilu precon section is only allowed in local context!");
           return nullptr;
@@ -128,11 +96,11 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_ilu_precon(MST_ & matrix_stock, size_t back_level, ...)
+        create_ilu_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t back_level, ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-          auto result = Solver::new_ilu_precond(systems.at(back_level), filters.at(back_level), 0ul);
+          auto result = Solver::new_ilu_precond(section_name, section, systems.at(back_level), filters.at(back_level));
           return result;
         }
 
@@ -164,22 +132,16 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_sor_precon(MST_ & matrix_stock, PropertyMap * section, size_t back_level, ...)
+        create_sor_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t back_level,
+        ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
 
-          auto omega_p = section->get_entry("omega");
-          if (omega_p.second)
-          {
-            auto result = Solver::new_sor_precond(systems.at(back_level), filters.at(back_level), (typename SolverVectorType_::DataType)std::stod(omega_p.first));
-            return result;
-          }
-          else
-          {
-            auto result = Solver::new_sor_precond(systems.at(back_level), filters.at(back_level));
-            return result;
-          }
+          auto result = Solver::new_sor_precond(
+            section_name, section, systems.at(back_level), filters.at(back_level));
+
+          return result;
         }
 
         template <typename SolverVectorType_, typename MST_>
@@ -192,27 +154,21 @@ namespace FEAT
 
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_ssor_precon(MST_ & matrix_stock, PropertyMap * section, size_t back_level, ...)
+        create_ssor_precon(MST_ & matrix_stock, const String& section_name, PropertyMap* section, size_t back_level,
+        ...)
         {
           auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
 
-          auto omega_p = section->get_entry("omega");
-          if (omega_p.second)
-          {
-            auto result = Solver::new_ssor_precond(systems.at(back_level), filters.at(back_level), (typename SolverVectorType_::DataType)std::stod(omega_p.first));
-            return result;
-          }
-          else
-          {
-            auto result = Solver::new_ssor_precond(systems.at(back_level), filters.at(back_level));
-            return result;
-          }
+          auto result = Solver::new_ssor_precond(
+            section_name, section, systems.at(back_level), filters.at(back_level));
+
+          return result;
         }
 
         template <typename MST_, typename SolverVectorType_>
-        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> > create_scalar_solver_by_section(MST_ & matrix_stock, PropertyMap * base,
-            String precon_section_path, size_t back_level)
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> > create_scalar_solver_by_section(
+          MST_& matrix_stock, PropertyMap* base, const String& precon_section_path, size_t back_level)
         {
           std::shared_ptr<Solver::SolverBase<SolverVectorType_> > precon = nullptr;
           auto precon_section = base->query_section(precon_section_path);
@@ -293,14 +249,17 @@ namespace FEAT
          *
          * \param[in] matrix_stock A MatrixStock object, initialised with Systemlevels etc
          * \param[in] base A pointer to the PropertyMap that contains all solver related informations
-         * \param[in] solver_name The name of the solver tree's root section
+         * \param[in] section_name The name of the solver tree's root section
          */
         template <typename MST_, typename SolverVectorType_ = typename MST_::VectorType>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_scalar_solver(MST_ & matrix_stock, PropertyMap * base, String solver_name, size_t back_level = std::numeric_limits<size_t>::max())
+        create_scalar_solver(MST_ & matrix_stock, PropertyMap* base, const String& section_name,
+        size_t back_level = std::numeric_limits<size_t>::max())
         {
           if (back_level == std::numeric_limits<size_t>::max())
+          {
             back_level = matrix_stock.systems.size() - 1;
+          }
 
           using MemType = typename SolverVectorType_::MemType;
           using DataType = typename SolverVectorType_::DataType;
@@ -308,14 +267,16 @@ namespace FEAT
 
           std::shared_ptr<Solver::SolverBase<SolverVectorType_> > result;
 
-          auto section = base->query_section(solver_name);
+          auto section = base->query_section(section_name);
           if (section == nullptr)
-            throw InternalError(__func__, __FILE__, __LINE__, "section not found in property map: " + solver_name + "!");
-
+          {
+            throw InternalError(__func__, __FILE__, __LINE__,
+            "section not found in property map: " + section_name + "!");
+          }
 
           auto solver_p = section->query("type");
           if (!solver_p.second)
-            throw InternalError(__func__, __FILE__, __LINE__, "no type key found in property map section: " + solver_name + "!");
+            throw InternalError(__func__, __FILE__, __LINE__, "no type key found in property map section: " + section_name + "!");
           String solver_type = solver_p.first;
 
           auto section_memory = section->query("memory", "main");
@@ -333,10 +294,12 @@ namespace FEAT
           if (precon_p.second)
           {
             if (precon_p.first == "none")
+            {
               precon = nullptr;
+            }
             else
             {
-              auto precon_section_path = get_section_path(base, section, solver_name, precon_p.first);
+              auto precon_section_path = get_section_path(base, section, section_name, precon_p.first);
               precon = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, back_level);
             }
           }
@@ -346,107 +309,60 @@ namespace FEAT
             std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            solver = Solver::new_pcg(systems.at(back_level), filters.at(back_level), precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_pcg(section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "bicgstab")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_bicgstab(systems.at(back_level), filters.at(back_level), precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_bicgstab(
+              section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "fgmres")
           {
-            auto krylov_dim_p = section->get_entry("krylov_dim");
-            Index krylov_dim;
-            if (krylov_dim_p.second)
-              krylov_dim = std::stoul(krylov_dim_p.first);
-            else
-              throw InternalError(__func__, __FILE__, __LINE__, "no krylov_dim key found in fgmres section!");
-
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_fgmres(systems.at(back_level), filters.at(back_level), krylov_dim, 0.0, precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_fgmres(section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "richardson")
           {
-            auto omega_p = section->get_entry("omega");
-            DataType omega;
-            if (omega_p.second)
-              omega = (DataType)stod(omega_p.first);
-            else
-              omega = 1.0;
-
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            solver = Solver::new_richardson(systems.at(back_level), filters.at(back_level), omega, precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_richardson(
+              section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "pmr")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_pmr(systems.at(back_level), filters.at(back_level), precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_pmr(section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "pcr")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_pcr(systems.at(back_level), filters.at(back_level), precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_pcr(section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "psd")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
-            solver = Solver::new_psd(systems.at(back_level), filters.at(back_level), precon);
-            configure_iterative_solver(section, solver);
-            result = solver;
+            result = Solver::new_psd(section_name, section, systems.at(back_level), filters.at(back_level), precon);
           }
           else if (solver_type == "jac")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-            auto omega_p = section->get_entry("omega");
-            if (omega_p.second)
-            {
-              result = Solver::new_jacobi_precond(systems.at(back_level), filters.at(back_level),
-                  (DataType)std::stod(omega_p.first));
-            }
-            else
-            {
-              result = Solver::new_jacobi_precond(systems.at(back_level), filters.at(back_level));
-            }
+            result = Solver::new_jacobi_precond(section_name, section, systems.at(back_level), filters.at(back_level));
           }
           else if (solver_type == "scale")
           {
-            auto omega_p = section->get_entry("omega");
-            if (omega_p.second)
-            {
-              auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
-              result = Solver::new_scale_precond(filters.at(back_level), (DataType)std::stod(omega_p.first));
-            }
-            else
-              throw InternalError(__func__, __FILE__, __LINE__, "no omega key found in scale section!");
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            result = Solver::new_scale_precond(section_name, section, filters.at(back_level));
           }
           else if (solver_type == "ilu")
           {
-            result = create_ilu_precon<SolverVectorType_>(matrix_stock, back_level, nullptr);
+            result = create_ilu_precon<SolverVectorType_>(matrix_stock, section_name, section, back_level, nullptr);
           }
           else if (solver_type == "spai")
           {
@@ -454,11 +370,11 @@ namespace FEAT
           }
           else if (solver_type == "sor")
           {
-            result = create_sor_precon<SolverVectorType_>(matrix_stock, section, back_level, nullptr);
+            result = create_sor_precon<SolverVectorType_>(matrix_stock, section_name, section, back_level, nullptr);
           }
           else if (solver_type == "ssor")
           {
-            result = create_ssor_precon<SolverVectorType_>(matrix_stock, section, back_level, nullptr);
+            result = create_ssor_precon<SolverVectorType_>(matrix_stock, section_name, section, back_level, nullptr);
           }
           else if (solver_type == "mg" || solver_type == "scarcmg")
           {
@@ -482,18 +398,18 @@ namespace FEAT
               hierarchy = std::make_shared<typename decltype(hierarchy)::element_type>();
               hmap[hierarchy_p.first] = hierarchy;
 
-              auto hierarchy_section_path = get_section_path(base, section, solver_name, hierarchy_p.first);
+              auto hierarchy_section_path = get_section_path(base, section, section_name, hierarchy_p.first);
               auto hierarchy_section = base->query_section(hierarchy_section_path);
 
               auto coarse_solver_p = hierarchy_section->query("coarse");
               if (!coarse_solver_p.second)
                 throw InternalError(__func__, __FILE__, __LINE__, "mg section without coarse key is not allowed!");
-              auto coarse_solver_section_path = get_section_path(base, section, solver_name, coarse_solver_p.first);
+              auto coarse_solver_section_path = get_section_path(base, section, section_name, coarse_solver_p.first);
 
               auto smoother_p = hierarchy_section->query("smoother");
               if (!smoother_p.second)
                 throw InternalError(__func__, __FILE__, __LINE__, "mg section without smoother key is not allowed!");
-              auto smoother_section_path = get_section_path(base, section, solver_name, smoother_p.first);
+              auto smoother_section_path = get_section_path(base, section, section_name, smoother_p.first);
 
               //for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
               for(Index level(matrix_stock.systems.size()) ; level > Index(0) ; )
@@ -512,6 +428,7 @@ namespace FEAT
               }
             }
 
+            // These parameters have to be known befor calling the constructor, so we have to parse them here
             auto cycle_p = section->query("cycle");
             if (!cycle_p.second)
               throw InternalError(__func__, __FILE__, __LINE__, "mg section without cycle key is not allowed!");
@@ -568,10 +485,12 @@ namespace FEAT
           }
           else if (solver_type == "schwarz")
           {
-            result = create_schwarz_precon<SolverVectorType_>(matrix_stock, base, solver_name, section, back_level, nullptr);
+            result = create_schwarz_precon<SolverVectorType_>(matrix_stock, base, section_name, section, back_level, nullptr);
           }
           else
+          {
             throw InternalError(__func__, __FILE__, __LINE__, "solver with type " + solver_type + " unkown!");
+          }
 
           return result;
         }
@@ -582,30 +501,34 @@ namespace FEAT
          * \param[in] base
          * The PropertyMap containing the configuration of this solver
          *
-         * \param[in] solver_name
+         * \param[in] functional
+         * The nonlinear functional the line search is used for
+         *
+         * \param[in] filter
+         * The filter for the nonlinear functional's gradient
+         *
+         * \param[in] section_name
          * The name to identify our section in the PropertyMap
          *
          * \returns An std::shared_ptr to the new solver object.
          */
-        template
-        <
-          typename Functional_,
-          typename Filter_
-        >
+        template<typename Functional_, typename Filter_>
         static std::shared_ptr<Solver::Linesearch<Functional_, Filter_>> create_linesearch(
-          Functional_& functional, Filter_& filter, PropertyMap* base, const String& solver_name)
+          Functional_& functional, Filter_& filter, PropertyMap* base, const String& section_name)
         {
 
+          // This is the type for the state vector used in the functional
           typedef typename Functional_::VectorTypeR VectorTypeR;
 
+          // In the end, we return this guy
           std::shared_ptr<Solver::Linesearch<Functional_, Filter_> > result;
 
           // Get the section where our solver is configured
-          auto section = base->query_section(solver_name);
+          auto section = base->query_section(section_name);
           if(section == nullptr)
           {
             throw InternalError(__func__, __FILE__, __LINE__,
-            "could not find section "+solver_name+" in PropertyMap!");
+            "could not find section "+section_name+" in PropertyMap!");
           }
 
           // Get the required type String
@@ -613,10 +536,9 @@ namespace FEAT
           if (!solver_p.second)
           {
             throw InternalError(__func__, __FILE__, __LINE__,
-            "No type key found in PropertyMap section with name " + solver_name + "!");
+            "No type key found in PropertyMap section with name " + section_name + "!");
           }
-
-          String solver_type = solver_p.first;
+          String solver_type(solver_p.first);
 
           // \todo: NewtonRaphsonLinesearch requires the operator to compute hessians, which has to be caught at
           // runtime
@@ -630,58 +552,61 @@ namespace FEAT
           if(solver_type == "SecantLinesearch")
           {
             result = Solver::new_secant_linesearch(
-              derefer<VectorTypeR>(functional, nullptr),
-              derefer<VectorTypeR>(filter, nullptr));
+              section_name, section,derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
           }
           else if(solver_type == "StrongWolfeLinesearch")
           {
             result = Solver::new_strong_wolfe_linesearch(
-              derefer<VectorTypeR>(functional, nullptr),
-              derefer<VectorTypeR>(filter, nullptr));
+              section_name, section,derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
           }
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "Unknown linesearch type " + solver_name + "!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Unknown linesearch type " + section_name + "!");
           }
-
-          // Now read the other configuration options from this section
-          result->read_config(section);
 
           return result;
         }
 
         /**
+         * \brief Creates a new nonlinear optimiser according to a configuration
          *
+         * \param[in] base
+         * The PropertyMap containing the configuration of this solver
+         *
+         * \param[in] functional
+         * The nonlinear functional the line search is used for
+         *
+         * \param[in] filter
+         * The filter for the nonlinear functional's gradient
+         *
+         * \param[in] section_name
+         * The name to identify our section in the PropertyMap
+         *
+         * \param[in] precon
+         * The preconditioner
+         *
+         * \returns An IterativeSolver std::shared_ptr to the new solver object.
          */
-        template
-        <
-          typename Functional_,
-          typename Filter_
-        >
+        template<typename Functional_, typename Filter_>
         static std::shared_ptr<Solver::IterativeSolver<typename Functional_::VectorTypeR>>
-        create_nonlinear_optimiser(Functional_& functional, Filter_& filter, PropertyMap* base, String solver_name,
-        std::shared_ptr
-        <
-          Solver::NLOptPrecond<typename Functional_::VectorTypeR, Filter_>
-        >
-        precon = nullptr)
+        create_nonlinear_optimiser(Functional_& functional, Filter_& filter, PropertyMap* base, String section_name,
+        std::shared_ptr<Solver::NLOptPrecond<typename Functional_::VectorTypeR, Filter_>> precon = nullptr)
         {
-          typedef typename Functional_::DataType DataType;
           typedef typename Functional_::VectorTypeR VectorTypeR;
 
           // At the end, we return this guy
           std::shared_ptr<Solver::IterativeSolver<VectorTypeR>> result;
 
-          auto section = base->query_section(solver_name);
+          auto section = base->query_section(section_name);
 
+          // Get the String identifying the solver type
           auto solver_p = section->query("type");
           if (!solver_p.second)
           {
             throw InternalError(__func__, __FILE__, __LINE__,
-            "no type key found in property map: " + solver_name + "!");
+            "no type key found in property map: " + section_name + "!");
           }
-
-          String solver_type = solver_p.first;
+          String solver_type(solver_p.first);
 
           if(solver_type == "QPenalty")
           {
@@ -694,9 +619,8 @@ namespace FEAT
             std::shared_ptr<Solver::IterativeSolver<VectorTypeR>> inner_solver;
             inner_solver = create_nonlinear_optimiser(functional, filter, base, inner_solver_p.first, precon);
 
-            DataType initial_penalty_param(1);
-            result = Solver::new_qpenalty(derefer<VectorTypeR>(functional, nullptr), inner_solver,
-            initial_penalty_param);
+            result = Solver::new_qpenalty(
+              section_name, section, derefer<VectorTypeR>(functional, nullptr), inner_solver);
 
           }
           else if(solver_type == "ALGLIBMinLBFGS")
@@ -706,22 +630,16 @@ namespace FEAT
             "ALGLIBMinLBFGS is only available if FEAT was built with the alglib token in the buildid.");
 #else
 
-            if( Util::Comm::size() != 1)
+            Dist::Comm comm_world(Dist::Comm::world());
+            if(comm_world.size() != 1)
             {
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
             }
 
-            // Get some default parameters for the constructor
-            alglib::ae_int_t lbfgs_dim(0);
-            bool keep_iterates(false);
+            result = Solver::new_alglib_minlbfgs(
+              section_name, section,
+              derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
 
-            auto solver = Solver::new_alglib_minlbfgs(
-              derefer<VectorTypeR>(functional, nullptr),
-              derefer<VectorTypeR>(filter, nullptr),
-              lbfgs_dim,
-              keep_iterates);
-
-            result = solver;
 #endif // FEAT_HAVE_ALGLIB
           }
           else if (solver_type == "ALGLIBMinCG")
@@ -730,61 +648,44 @@ namespace FEAT
             throw InternalError(__func__,__FILE__,__LINE__,
             "ALGLIBMinCG is only available if FEAT was built with the alglib token in the buildid.");
 #else
-            if( Util::Comm::size() != 1)
+            Dist::Comm comm_world(Dist::Comm::world());
+            if(comm_world.size() != 1)
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinCG is only available with 1 process!");
+              throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
             }
 
-            // Get default direction update
-            Solver::NLCGDirectionUpdate my_update(
-              Solver::ALGLIBMinCG<Functional_, Filter_>::direction_update_default);
+            result = Solver::new_alglib_mincg(
+              section_name, section, derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
 
-            // By default, do not keep the iterates
-            bool keep_iterates(false);
-
-            auto solver = Solver::new_alglib_mincg(
-              derefer<VectorTypeR>(functional, nullptr),
-              derefer<VectorTypeR>(filter, nullptr),
-              my_update,
-              keep_iterates);
-
-            result = solver;
 #endif // FEAT_HAVE_ALGLIB
           }
           else if (solver_type == "NLCG")
           {
-            // Get default direction update
-            Solver::NLCGDirectionUpdate my_update(Solver::NLCG<Functional_, Filter_>::direction_update_default);
-            // Set this to false for the constructor
-            bool keep_iterates(false);
-
             std::shared_ptr<Solver::Linesearch<Functional_, Filter_>> my_linesearch;
 
-            // Default linesearch is StrongWolfeLinesearch
-            String linesearch_name("StrongWolfeLinesearch");
+            String linesearch_name("");
             auto linesearch_p = section->query("linesearch");
             if(linesearch_p.second)
             {
               linesearch_name = linesearch_p.first;
             }
+            else
+            {
+              throw InternalError(__func__,__FILE__,__LINE__,
+              "NLCG config section "+section_name+" is missing the mandatory linesearch key!");
+            }
 
             my_linesearch = create_linesearch(functional, filter, base, linesearch_name);
 
-            auto solver = Solver::new_nlcg(
-              derefer<VectorTypeR>(functional, nullptr),
-              derefer<VectorTypeR>(filter, nullptr),
-              my_linesearch,
-              my_update,
-              keep_iterates,
-              precon);
-            result = solver;
+            result = Solver::new_nlcg(
+              section_name, section, derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr),
+              my_linesearch, precon);
+
           }
           else
           {
             throw InternalError(__func__,__FILE__,__LINE__,"Solver type key "+stringify(solver_type)+" unknown.");
           }
-
-          result->read_config(section);
 
           return result;
         } // create_nonlinear_optimiser

@@ -84,7 +84,8 @@ namespace FEAT
          * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
          *
          */
-        explicit NLSD(Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
+        explicit NLSD(Operator_& op_, Filter_& filter_,
+        std::shared_ptr<LinesearchType> linesearch_,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLSD", op_, filter_, precond),
           _linesearch(linesearch_),
@@ -102,6 +103,47 @@ namespace FEAT
           }
 
         /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         * \param[in] precond
+         * The preconditioner. May be \c nullptr.
+         *
+         * \param[in] linesearch
+         * The linesearch to use.
+         *
+         */
+        explicit NLSD(const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
+        std::shared_ptr<PrecondType> precond = nullptr) :
+          BaseClass("NLSD", section_name, section, op_, filter_, precond),
+          _linesearch(linesearch_),
+          _precond(precond),
+          iterates(nullptr)
+          {
+            XASSERT(_linesearch != nullptr);
+
+            this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
+
+            auto keep_iterates_p = section->query("keep_iterates");
+            if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
+            {
+              iterates = new std::deque<VectorType>;
+            }
+          }
+
+        /**
          * \brief Virtual destructor
          */
         virtual ~NLSD()
@@ -112,21 +154,21 @@ namespace FEAT
           }
         }
 
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
+        /// \copydoc BaseClass::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
         {
-          BaseClass::read_config(section);
+          XASSERT(parent != nullptr);
 
-          // Check if we have to keep the iterates
-          bool keep_iterates(false);
-          auto keep_iterates_p = section->query("keep_iterates");
-          if(keep_iterates_p.second && std::stoul(keep_iterates_p.first) == 1)
-          {
-            keep_iterates = true;
-          }
-          set_keep_iterates(keep_iterates);
+          Dist::Comm comm(Dist::Comm::world());
+
+          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+
+          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
+          my_section->add_entry("linesearch", _linesearch->get_section_name());
+
+          _linesearch->write_config(parent);
+
+          return my_section;
 
         }
 
@@ -383,6 +425,59 @@ namespace FEAT
       {
         return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
         keep_iterates, precond);
+      }
+#endif
+
+    /**
+     * \brief Creates a new NLSD solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     * \param[in] linesearch
+     * The linesearch to use.
+     *
+     * \returns
+     * A shared pointer to a new NLSD object.
+     */
+    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename Operator_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter, Linesearch_& linesearch)
+      {
+        return std::make_shared<NLSD<Operator_, Filter_>>(section_name, section, op, filter, linesearch, nullptr);
+      }
+
+    template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
+    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter, Linesearch_& linesearch,
+      std::shared_ptr<Precond_> precond)
+      {
+        return std::make_shared<NLSD<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
+      }
+#else
+    template<typename Operator_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter, Linesearch_& linesearch,
+      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
+      {
+        return std::make_shared<NLSD<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
       }
 #endif
   } //namespace Solver

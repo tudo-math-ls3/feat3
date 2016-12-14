@@ -82,25 +82,30 @@ namespace FEAT
         }
       }
 
-      /// Returns the name of the solver.
-      virtual String name() const override
+      explicit SSORPrecond(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter),
+        _omega(1)
       {
-        return "SSOR";
-      }
+        if (_matrix.columns() != _matrix.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
 
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _krylov_vim
+        // Check if we have set _omega
         auto omega_p = section->query("omega");
         if(omega_p.second)
         {
           set_omega(DataType(std::stod(omega_p.first)));
         }
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "SSOR";
       }
 
       /**
@@ -309,25 +314,30 @@ namespace FEAT
         }
       }
 
-      /// Returns the name of the solver.
-      virtual String name() const override
+      explicit SSORPrecond(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter),
+        _omega(1)
       {
-        return "SSOR";
-      }
+        if (_matrix.columns() != _matrix.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
 
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _krylov_vim
+        // Check if we have set _omega
         auto omega_p = section->query("omega");
         if(omega_p.second)
         {
           set_omega(DataType(std::stod(omega_p.first)));
         }
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "SSOR";
       }
 
       /**
@@ -399,6 +409,10 @@ namespace FEAT
       {
       }
 
+      explicit SSORPrecond(const String&, PropertyMap*, const Matrix_&, const Filter_&)
+      {
+      }
+
       Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
           throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
@@ -427,10 +441,38 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<SSORPrecond<Matrix_, Filter_>> new_ssor_precond(
-      const Matrix_& matrix, const Filter_& filter, const typename Matrix_::DataType omega = 1.0)
+      const Matrix_& matrix, const Filter_& filter,
+      const typename Matrix_::DataType omega = typename Matrix_::DataType(1))
     {
       return std::make_shared<SSORPrecond<Matrix_, Filter_>>
         (matrix, filter, omega);
+    }
+
+    /**
+     * \brief Creates a new SSORPrecond solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new SSORPrecond object.
+     */
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<SSORPrecond<Matrix_, Filter_>> new_ssor_precond(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<SSORPrecond<Matrix_, Filter_>>
+        (section_name, section, matrix, filter);
     }
   } // namespace Solver
 } // namespace FEAT

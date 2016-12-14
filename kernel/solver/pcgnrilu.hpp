@@ -86,25 +86,46 @@ namespace FEAT
       }
 
       /**
-       * \brief Empty virtual destructor
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
        */
-      virtual ~PCGNRILU()
+      explicit PCGNRILU(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter) :
+        BaseClass("PCGNRILU", section_name, section),
+        _system_matrix(matrix),
+        _system_filter(filter),
+        _ilu_p(-1)
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
         // Check if we have set _p
         auto fill_in_param_p = section->query("fill_in_param");
         if(fill_in_param_p.second)
         {
           set_fill_in_param(int(std::stoi(fill_in_param_p.first)));
         }
+        else
+        {
+          throw InternalError(__func__,__FILE__,__LINE__,
+          name()+" config section is missing the mandatory fill_in_param key!");
+        }
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~PCGNRILU()
+      {
       }
 
       /**
@@ -340,6 +361,32 @@ namespace FEAT
       const Matrix_& matrix, const Filter_& filter, int ilu_p = -1)
     {
       return std::make_shared<PCGNRILU<Matrix_, Filter_>>(matrix, filter, ilu_p);
+    }
+
+    /**
+     * \brief Creates a new PCGNRILU solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new PCGNRILU object.
+     */
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<PCGNRILU<Matrix_, Filter_>> new_pcgnrilu(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<PCGNRILU<Matrix_, Filter_>>(section_name, section, matrix, filter);
     }
   } // namespace Solver
 } // namespace FEAT

@@ -94,6 +94,36 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] matrix
+       * A reference to the system matrix.
+       *
+       * \param[in] filter
+       * A reference to the system filter.
+       *
+       * \param[in] precond_l
+       * A pointer to the left preconditioner M_L. May be \c nullptr.
+       *
+       * \param[in] precond_r
+       * A pointer to the right preconditioner M_R. May be \c nullptr.
+       *
+       * \note
+       * \p precond_l and \p precond_r may point to the same object.
+       */
+      explicit PCGNR(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter,
+        std::shared_ptr<PrecondType> precond_l = nullptr,
+        std::shared_ptr<PrecondType> precond_r = nullptr) :
+        BaseClass("PCGNR", section_name, section),
+        _system_matrix(matrix),
+        _system_filter(filter),
+        _precond_l(precond_l),
+        _precond_r(precond_r)
+      {
+      }
+
       virtual String name() const override
       {
         return "PCGNR";
@@ -354,6 +384,7 @@ namespace FEAT
     {
       return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter);
     }
+
     template<typename Matrix_, typename Filter_, typename PrecondL_, typename PrecondR_>
     inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter,
@@ -370,6 +401,61 @@ namespace FEAT
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond_r = nullptr)
     {
       return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
+    }
+#endif
+
+    /**
+     * \brief Creates a new PCGNR solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond_l
+     * The left preconditioner. May be \c nullptr.
+     *
+     * \param[in] precond_r
+     * The right preconditioner. May be \c nullptr.
+     *
+     * \returns
+     * A shared pointer to a new PCGNR object.
+     */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(section_name, section, matrix, filter);
+    }
+
+    template<typename Matrix_, typename Filter_, typename PrecondL_, typename PrecondR_>
+    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter,
+      std::shared_ptr<PrecondL_> precond_l,
+      std::shared_ptr<PrecondR_> precond_r)
+    {
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(section_name, section, matrix, filter, precond_l, precond_r);
+    }
+#else
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter,
+      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond_l = nullptr,
+      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond_r = nullptr)
+    {
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(section_name, section, matrix, filter, precond_l, precond_r);
     }
 #endif
   } // namespace Solver

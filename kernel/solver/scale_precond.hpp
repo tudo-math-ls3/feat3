@@ -42,6 +42,38 @@ namespace FEAT
       {
       }
 
+    /**
+     * \brief Constructor using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     */
+      explicit ScalePrecond(const String& section_name, PropertyMap* section,
+      const Filter_& filter) :
+        BaseClass(section_name, section),
+        _filter(filter),
+        _omega(0)
+      {
+        // Check if we have set _krylov_vim
+        auto omega_p = section->query("omega");
+        if(omega_p.second)
+        {
+          set_omega(DataType(std::stod(omega_p.first)));
+        }
+        else
+        {
+          throw InternalError(__func__,__FILE__,__LINE__,
+          name() +" config section is missing the mandatory omega key!");
+        }
+      }
+
       /**
        * \brief Empty virtual destructor
        */
@@ -53,21 +85,6 @@ namespace FEAT
       virtual String name() const override
       {
         return "Scale";
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
-        // Check if we have set _krylov_vim
-        auto omega_p = section->query("omega");
-        if(omega_p.second)
-        {
-          set_omega(DataType(std::stod(omega_p.first)));
-        }
       }
 
       /**
@@ -110,6 +127,30 @@ namespace FEAT
       const Filter_& filter, DataType_ omega)
     {
       return std::make_shared<ScalePrecond<typename Filter_::VectorType, Filter_>>(filter, omega);
+    }
+
+    /**
+     * \brief Creates a new ScalePrecond solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new ScalePrecond object.
+     */
+    template<typename Filter_>
+    inline std::shared_ptr<ScalePrecond<typename Filter_::VectorType, Filter_>> new_scale_precond(
+      const String& section_name, PropertyMap* section,
+      const Filter_& filter)
+    {
+      return std::make_shared<ScalePrecond<typename Filter_::VectorType, Filter_>>(
+        section_name, section, filter);
     }
   } // namespace Solver
 } // namespace FEAT

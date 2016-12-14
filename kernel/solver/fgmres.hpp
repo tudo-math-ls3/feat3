@@ -88,28 +88,14 @@ namespace FEAT
         _krylov_dim(krylov_dim),
         _inner_res_scale(inner_res_scale)
       {
-        _c.reserve(krylov_dim);
-        _s.reserve(krylov_dim);
-        _q.reserve(krylov_dim);
-        _h.resize(krylov_dim);
-        for(Index i(0); i < krylov_dim; ++i)
-          _h.at(i).resize(i+1);
       }
 
-      /**
-       * \brief Empty virtual destructor
-       */
-      virtual ~FGMRES()
+      explicit FGMRES(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("FGMRES", section_name, section, precond),
+        _system_matrix(matrix),
+        _system_filter(filter)
       {
-      }
-
-      /**
-       * \brief Reads a solver configuration from a PropertyMap
-       */
-      virtual void read_config(PropertyMap* section) override
-      {
-        BaseClass::read_config(section);
-
         // Check if we have set _inner_res_scale
         auto inner_res_scale_p = section->query("inner_res_scale");
         if(inner_res_scale_p.second)
@@ -122,7 +108,20 @@ namespace FEAT
         if(krylov_dim_p.second)
         {
           set_krylov_dim(Index(std::stoul(krylov_dim_p.first)));
+          this->set_plot_name("FGMRES("+stringify(_krylov_dim)+")");
         }
+        else
+        {
+          throw InternalError(__func__,__FILE__,__LINE__,
+          "FGMRES config section is missing the mandatory krylov_dim!");
+        }
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~FGMRES()
+      {
       }
 
       /// \copydoc BaseClass::name()
@@ -134,6 +133,17 @@ namespace FEAT
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
+
+        _c.reserve(_krylov_dim);
+        _s.reserve(_krylov_dim);
+        _q.reserve(_krylov_dim);
+        _h.resize(_krylov_dim);
+
+        for(Index i(0); i < _krylov_dim; ++i)
+        {
+          _h.at(i).resize(i+1);
+        }
+
         _vec_v.push_back(this->_system_matrix.create_vector_r());
         for(Index i(0); i < _krylov_dim; ++i)
         {
@@ -386,6 +396,55 @@ namespace FEAT
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {
       return std::make_shared<FGMRES<Matrix_, Filter_>>(matrix, filter, krylov_dim, inner_res_scale, precond);
+    }
+#endif
+
+    /**
+     * \brief Creates a new FGMRES solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     * \returns
+     * A shared pointer to a new FGMRES object.
+     */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<FGMRES<Matrix_, Filter_>>(section_name, section, matrix, filter);
+    }
+
+    template<typename Matrix_, typename Filter_, typename Precond_>
+    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
+    {
+      return std::make_shared<FGMRES<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+    }
+#else
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter,
+      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
+    {
+      return std::make_shared<FGMRES<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
 #endif
   } // namespace Solver

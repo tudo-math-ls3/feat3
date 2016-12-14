@@ -79,7 +79,7 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in] name_
+         * \param[in] plot_name_
          * String to use in solver plots to console
          *
          * \param[in, out] op_
@@ -92,8 +92,8 @@ namespace FEAT
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit Linesearch(String name_, Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
-          BaseClass(name_),
+        explicit Linesearch(const String& plot_name, Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
+          BaseClass(plot_name),
           _op(op_),
           _filter(filter_),
           _fval_min(Math::huge<DataType>()),
@@ -106,7 +106,57 @@ namespace FEAT
           iterates(nullptr)
           {
             if(keep_iterates)
+            {
               iterates = new std::deque<VectorType>;
+            }
+          }
+
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] plot_name_
+         * String to use in solver plots to console
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in, out] op_
+         * The (nonlinear) operator. Cannot be const because it saves its own state
+         *
+         * \param[in] filter_
+         * Filter to apply to the operator's gradient
+         *
+         */
+        explicit Linesearch(const String& plot_name, const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_) :
+          BaseClass(plot_name, section_name, section),
+          _op(op_),
+          _filter(filter_),
+          _fval_min(Math::huge<DataType>()),
+          _fval_0(Math::huge<DataType>()),
+          _trim_threshold(Math::huge<DataType>()),
+          _alpha_min(DataType(0)),
+          _norm_dir(DataType(0)),
+          _norm_sol(DataType(0)),
+          _tol_step(DataType(Math::pow(Math::eps<DataType>(), DataType(0.85)))),
+          iterates(nullptr)
+          {
+            // Check if we have to keep the iterates
+            auto keep_iterates_p = section->query("keep_iterates");
+            if(keep_iterates_p.second)
+            {
+              iterates = new std::deque<VectorType>;
+            }
+
+            // Check if we have to keep the iterates
+            auto tol_step_p = section->query("tol_step");
+            if(tol_step_p.second)
+            {
+              set_tol_step(DataType(std::stod(tol_step_p.first)));
+            }
           }
 
         /// \copydoc ~BaseClass()
@@ -115,28 +165,6 @@ namespace FEAT
           if(iterates != nullptr)
           {
             delete iterates;
-          }
-        }
-
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
-        {
-          BaseClass::read_config(section);
-
-          // Check if we have to keep the iterates
-          auto keep_iterates_p = section->query("keep_iterates");
-          if(keep_iterates_p.second)
-          {
-            set_keep_iterates(std::stoi(keep_iterates_p.first) == 1);
-          }
-
-          // Check if we have to keep the iterates
-          auto tol_step_p = section->query("tol_step");
-          if(tol_step_p.second)
-          {
-            set_tol_step(DataType(std::stod(tol_step_p.first)));
           }
         }
 
@@ -300,22 +328,6 @@ namespace FEAT
         }
 
         /**
-         * \brief Sets the iterates deque according to a bool
-         */
-        void set_keep_iterates(bool keep_iterates)
-        {
-          if(iterates != nullptr)
-          {
-            delete iterates;
-          }
-
-          if(keep_iterates)
-          {
-            iterates = new std::deque<VectorType>;
-          }
-        }
-
-        /**
          * \brief Sets the step length tolerance
          *
          */
@@ -370,31 +382,53 @@ namespace FEAT
           BaseClass("FS-LS", op_, filter_, keep_iterates),
           _steplength(steplength_)
           {
+            this->_alpha_min = _steplength;
+          }
+
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         * \returns
+         * A shared pointer to a new FixedStepLinesearch object.
+         */
+        explicit FixedStepLinesearch(const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_) :
+          BaseClass("FS-LS", section_name, section, op_, filter_),
+          _steplength(-1)
+          {
             this->set_max_iter(0);
             this->_alpha_min = _steplength;
+
+            // Check if we need to set the step length
+            auto step_length_p = section->query("step_length");
+            if(step_length_p.second)
+            {
+              set_step_length(std::stod(step_length_p.first));
+            }
+            else
+            {
+              throw InternalError(__func__,__FILE__,__LINE__,
+              name()+" config section is missing the mandatory step_length key!");
+            }
+
           }
 
         /// \copydoc ~BaseClass()
         virtual ~FixedStepLinesearch()
         {
         }
-
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
-        {
-          BaseClass::read_config(section);
-
-          // Check if we need to set the step length
-          auto step_length_p = section->query("step_length");
-          if(step_length_p.second)
-          {
-            set_step_length(std::stod(step_length_p.first));
-          }
-
-        }
-
 
         /// \copydoc BaseClass::name()
         virtual String name() const override
@@ -464,6 +498,55 @@ namespace FEAT
     }; // class FixedStepLinesearch
 
     /**
+     * \brief Creates a new FixedStepLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] steplength
+     * The step length the "line search" is to take
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new FixedStepLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<FixedStepLinesearch<Operator_, Filter_>> new_fixed_step_linesearch(
+      Operator_& op, Filter_& filter, typename Operator_::DataType steplength, bool keep_iterates = false)
+      {
+        return std::make_shared<FixedStepLinesearch<Operator_, Filter_>>(op, filter, steplength, keep_iterates);
+      }
+
+    /**
+     * \brief Creates a new FixedStepLinesearch object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new FixedStepLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<FixedStepLinesearch<Operator_, Filter_>> new_fixed_step_linesearch(
+      const String& section_name, PropertyMap* section, Operator_& op, Filter_& filter)
+      {
+        return std::make_shared<FixedStepLinesearch<Operator_, Filter_>>(section_name, section, op, filter);
+      }
+    /**
      * \brief Newton Raphson linesearch
      *
      * \tparam Operator_
@@ -509,7 +592,30 @@ namespace FEAT
         explicit NewtonRaphsonLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
           BaseClass("NR-LS", op_, filter_, keep_iterates)
           {
-            this->set_max_iter(20);
+          }
+
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         * \returns
+         * A shared pointer to a new NewtonRaphsonLinesearch object.
+         */
+        explicit NewtonRaphsonLinesearch(const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_) :
+          BaseClass("NR-LS", section_name, section, op_, filter_)
+          {
           }
 
         /// \copydoc ~BaseClass()
@@ -679,6 +785,54 @@ namespace FEAT
     }; // class NewtonRaphsonLinesearch
 
     /**
+     * \brief Creates a new NewtonRaphsonLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new NewtonRaphsonLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<NewtonRaphsonLinesearch<Operator_, Filter_>> new_newton_raphson_linesearch(
+      Operator_& op, Filter_& filter, bool keep_iterates = false)
+      {
+        return std::make_shared<NewtonRaphsonLinesearch<Operator_, Filter_>>(op, filter, keep_iterates);
+      }
+
+    /**
+     * \brief Creates a new NewtonRaphsonLinesearch object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new NewtonRaphsonLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<NewtonRaphsonLinesearch<Operator_, Filter_>> new_newton_raphson_linesearch(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter)
+      {
+        return std::make_shared<NewtonRaphsonLinesearch<Operator_, Filter_>>(section_name, section, op, filter);
+      }
+
+    /**
      * \brief Secant linesearch
      *
      * \tparam Operator_
@@ -741,26 +895,24 @@ namespace FEAT
           _secant_step(initial_step_),
           _eta(DataType(0))
           {
-            this->set_max_iter(20);
+          }
+
+        explicit SecantLinesearch(const String& section_name, PropertyMap* section,
+          Operator_& op_, Filter_& filter_) :
+          BaseClass("S-LS", section_name, section, op_, filter_),
+          _secant_step(initial_step_default),
+          _eta(DataType(0))
+          {
+            auto secant_step_p = section->query("secant_step");
+            if(secant_step_p.second)
+            {
+              set_secant_step(DataType(std::stod(secant_step_p.first)));
+            }
           }
 
         /// \copydoc ~BaseClass()
         virtual ~SecantLinesearch()
         {
-        }
-
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
-        {
-          BaseClass::read_config(section);
-
-          auto secant_step_p = section->query("secant_step");
-          if(secant_step_p.second)
-          {
-            set_secant_step(DataType(std::stod(secant_step_p.first)));
-          }
         }
 
         /// \copydoc BaseClass::name()
@@ -971,6 +1123,59 @@ namespace FEAT
     }; // class SecantLinesearch
 
     /**
+     * \brief Creates a new SecantLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] initial_step
+     * Length for first secant step.
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new SecantLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
+      Operator_& op, Filter_& filter,
+      typename Operator_::DataType initial_step = SecantLinesearch<Operator_, Filter_>::initial_step_default,
+      bool keep_iterates = false)
+      {
+        return std::make_shared<SecantLinesearch<Operator_, Filter_>>(op, filter, initial_step, keep_iterates);
+      }
+
+    /**
+     * \brief Creates a new SecantLinesearch object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new SecantLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
+      const String& section_name, PropertyMap* section,
+      Operator_& op, Filter_& filter)
+      {
+        return std::make_shared<SecantLinesearch<Operator_, Filter_>>(section_name, section, op, filter);
+      }
+
+    /**
      * \brief Strong Wolfe linesearch
      *
      * \tparam Operator_
@@ -1072,7 +1277,51 @@ namespace FEAT
           _tol_decrease(tol_decrease_),
           _tol_curvature(tol_curvature_)
           {
-            this->set_max_iter(20);
+          }
+
+
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] op
+         * The operator
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         * \returns
+         * A shared pointer to a new StrongWolfeLinesearch object.
+         */
+        explicit StrongWolfeLinesearch(const String& section_name, PropertyMap* section,
+        Operator_& op_, Filter_& filter_) :
+          BaseClass("SW-LS", section_name, section, op_, filter_),
+          _alpha_0(DataType(1)),
+          _alpha_hard_max(DataType(0)),
+          _alpha_hard_min(DataType(0)),
+          _alpha_soft_max(DataType(0)),
+          _alpha_soft_min(DataType(0)),
+          _delta_0(Math::huge<DataType>()),
+          _tol_decrease(tol_decrease_default),
+          _tol_curvature(tol_curvature_default)
+          {
+
+            auto tol_curvature_p = section->query("tol_curvature");
+            if(tol_curvature_p.second)
+            {
+              set_tol_curvature(DataType(std::stod(tol_curvature_p.first)));
+            }
+
+            auto tol_decrease_p = section->query("tol_decrease");
+            if(tol_decrease_p.second)
+            {
+              set_tol_decrease(DataType(std::stod(tol_decrease_p.first)));
+            }
           }
 
         /// \copydoc ~BaseClass()
@@ -1080,25 +1329,6 @@ namespace FEAT
         {
         }
 
-        /**
-         * \brief Reads a solver configuration from a PropertyMap
-         */
-        virtual void read_config(PropertyMap* section) override
-        {
-          BaseClass::read_config(section);
-
-          auto tol_curvature_p = section->query("tol_curvature");
-          if(tol_curvature_p.second)
-          {
-            set_tol_curvature(DataType(std::stod(tol_curvature_p.first)));
-          }
-
-          auto tol_decrease_p = section->query("tol_decrease");
-          if(tol_decrease_p.second)
-          {
-            set_tol_decrease(DataType(std::stod(tol_decrease_p.first)));
-          }
-        }
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
@@ -1805,79 +2035,6 @@ namespace FEAT
     }; // class StrongWolfeLinesearch
 
     /**
-     * \brief Creates a new FixedStepLinesearch object
-     *
-     * \param[in] op
-     * The operator
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     * \param[in] steplength
-     * The step length the "line search" is to take
-     *
-     * \param[in] keep_iterates
-     * Flag for keeping the iterates, defaults to false
-     *
-     * \returns
-     * A shared pointer to a new FixedStepLinesearch object.
-     */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<FixedStepLinesearch<Operator_, Filter_>> new_fixed_step_linesearch(
-      Operator_& op, Filter_& filter, typename Operator_::DataType steplength, bool keep_iterates = false)
-      {
-        return std::make_shared<FixedStepLinesearch<Operator_, Filter_>>(op, filter, steplength, keep_iterates);
-      }
-
-    /**
-     * \brief Creates a new NewtonRaphsonLinesearch object
-     *
-     * \param[in] op
-     * The operator
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     * \param[in] keep_iterates
-     * Flag for keeping the iterates, defaults to false
-     *
-     * \returns
-     * A shared pointer to a new NewtonRaphsonLinesearch object.
-     */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<NewtonRaphsonLinesearch<Operator_, Filter_>> new_newton_raphson_linesearch(
-      Operator_& op, Filter_& filter, bool keep_iterates = false)
-      {
-        return std::make_shared<NewtonRaphsonLinesearch<Operator_, Filter_>>(op, filter, keep_iterates);
-      }
-
-    /**
-     * \brief Creates a new SecantLinesearch object
-     *
-     * \param[in] op
-     * The operator
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     * \param[in] initial_step
-     * Length for first secant step.
-     *
-     * \param[in] keep_iterates
-     * Flag for keeping the iterates, defaults to false
-     *
-     * \returns
-     * A shared pointer to a new SecantLinesearch object.
-     */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
-      Operator_& op, Filter_& filter,
-      typename Operator_::DataType initial_step = SecantLinesearch<Operator_, Filter_>::initial_step_default,
-      bool keep_iterates = false)
-      {
-        return std::make_shared<SecantLinesearch<Operator_, Filter_>>(op, filter, initial_step, keep_iterates);
-      }
-    /**
      * \brief Creates a new StrongWolfeLinesearch object
      *
      * \param[in] op
@@ -1906,6 +2063,31 @@ namespace FEAT
       {
         return std::make_shared<StrongWolfeLinesearch<Operator_, Filter_>>
           (op, filter, keep_iterates, tol_decrease, tol_curvature);
+      }
+
+    /**
+     * \brief Creates a new StrongWolfeLinesearch object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new StrongWolfeLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<StrongWolfeLinesearch<Operator_, Filter_>> new_strong_wolfe_linesearch(
+      const String& section_name, PropertyMap* section, Operator_& op, Filter_& filter)
+      {
+        return std::make_shared<StrongWolfeLinesearch<Operator_, Filter_>> (section_name, section, op, filter);
       }
 
   } // namespace Solver
