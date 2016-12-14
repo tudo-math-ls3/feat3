@@ -19,6 +19,9 @@ namespace FEAT
         int* & colored_row_ptr, int* & rows_per_color, int* & inverse_row_ptr);
     }
 
+    template<typename Matrix_, typename Filter_>
+    class SORPrecond;
+
     /**
      * \brief SOR preconditioner implementation
      *
@@ -33,21 +36,22 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template<typename Matrix_, typename Filter_>
-    class SORPrecond :
-      public SolverBase<typename Matrix_::VectorTypeL>
+    template<template<class,class,class> class ScalarMatrix_, typename DT_, typename IT_, typename Filter_>
+    class SORPrecond<ScalarMatrix_<Mem::Main, DT_, IT_>, Filter_> :
+      public SolverBase<typename ScalarMatrix_<Mem::Main, DT_, IT_>::VectorTypeL>
     {
     public:
-      typedef Matrix_ MatrixType;
+      typedef ScalarMatrix_<Mem::Main, DT_, IT_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DT_ DataType;
+      typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
-      typedef typename MatrixType::DataType DataType;
-      typedef typename MatrixType::IndexType IndexType;
 
     protected:
       const MatrixType& _matrix;
       const FilterType& _filter;
-      double _omega;
+      DataType _omega;
 
       void _apply_intern(const LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
       {
@@ -197,7 +201,7 @@ namespace FEAT
     protected:
       const MatrixType& _matrix;
       const FilterType& _filter;
-      double _omega;
+      DataType _omega;
       // row ptr permutation, sorted by color(each color sorted by amount of rows), start/end index per row
       int * _colored_row_ptr;
       // amount of rows per color (sorted by amount of rows)
@@ -279,6 +283,32 @@ namespace FEAT
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class SORPrecond<SparseMatrixCSR<Mem::CUDA>>
+
+    /// Dummy class for not implemented specialisations
+    template<typename Matrix_, typename Filter_>
+    class SORPrecond :
+      public SolverBase<typename Matrix_::VectorTypeL>
+    {
+      public:
+      template<typename DT_>
+      explicit SORPrecond(const Matrix_&, const Filter_&, const DT_)
+      {
+      }
+
+      explicit SORPrecond(const Matrix_&, const Filter_&)
+      {
+      }
+
+      Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+
+      String name() const override
+      {
+          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+      }
+    };
 
     /**
      * \brief Creates a new SORPrecond solver object

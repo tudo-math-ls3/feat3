@@ -16,6 +16,7 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/ilu_precond.hpp>
+#include <kernel/solver/sor_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/convert_precond.hpp>
@@ -124,6 +125,34 @@ namespace FEAT
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
           auto result = Solver::new_ilu_precond(systems.at(back_level), filters.at(back_level), 0ul);
           return result;
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_sor_precon(MST_ & , PropertyMap * /*section*/, size_t, typename SolverVectorType_::GateType *)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "sor precon section is only allowed in local context!");
+          return nullptr;
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_sor_precon(MST_ & matrix_stock, PropertyMap * section, size_t back_level, ...)
+        {
+          auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+
+          auto omega_p = section->get_entry("omega");
+          if (omega_p.second)
+          {
+            auto result = Solver::new_sor_precond(systems.at(back_level), filters.at(back_level), (typename SolverVectorType_::DataType)std::stod(omega_p.first));
+            return result;
+          }
+          else
+          {
+            auto result = Solver::new_sor_precond(systems.at(back_level), filters.at(back_level));
+            return result;
+          }
         }
 
         template <typename SolverVectorType_, typename MST_>
@@ -391,6 +420,10 @@ namespace FEAT
           else if (solver_type == "ilu")
           {
             result = create_ilu_precon<SolverVectorType_>(matrix_stock, back_level, nullptr);
+          }
+          else if (solver_type == "sor")
+          {
+            result = create_sor_precon<SolverVectorType_>(matrix_stock, section, back_level, nullptr);
           }
           else if (solver_type == "ssor")
           {
