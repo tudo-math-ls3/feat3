@@ -155,32 +155,54 @@ namespace FEAT
      * \tparam Vector_
      * The class of the vector that is passed to the solver in the \c solve() method.
      *
+     * If the solver was created by calling the PropertyMap based constructor, it can return the name of the
+     * corresponding section by \c get_section_name(). Otherwise, it returns its name through the virtual \c name()
+     * function.
+     *
      * \author Peter Zajac
      */
     template<typename Vector_>
     class SolverBase
     {
     public:
-
+      /// The type of vector this solver can be applied to
       typedef Vector_ VectorType;
 
     private:
+      /// The name of the PropertyMap sectio this solver was configured by (if any)
       String _section_name;
 
     public:
-
+      /**
+       * \brief Empty standard constructor
+       */
       SolverBase()
         : _section_name("")
       {
       }
 
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * This configures the solver using the key/value pairs in the PropertyMap. This base class has nothing to
+       * configure, but this constructor is called from the derived classes as well.
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       */
       explicit SolverBase(const String& config_section_name, PropertyMap* config_section) :
         _section_name(config_section_name)
       {
         XASSERT(config_section != nullptr);
       }
 
-      /// virtual destructor
+      /**
+       * \brief Virtual destructor
+       */
       virtual ~SolverBase()
       {
       }
@@ -259,6 +281,13 @@ namespace FEAT
        */
       virtual String name() const = 0;
 
+      /**
+       * \brief Returns the name of the PropertyMap section this solver was configured by
+       *
+       * If the standard constructor was used, _section_name is the empty String and name() is returned instead.
+       * This is important for derived classes' write_config() functionality, so that the written section can be
+       * assigned a name.
+       */
       virtual String get_section_name() const
       {
         if(_section_name == "")
@@ -277,7 +306,7 @@ namespace FEAT
        * \param[in] parent
        * The PropertyMap to add a new section to
        *
-       * \param[in] name
+       * \param[in] new_section_name
        * The name the new section will have
        *
        */

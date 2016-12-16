@@ -28,8 +28,11 @@ namespace FEAT
       public SolverBase<Vector_>
     {
     public:
+      /// The vector type this solver can be applied to
       typedef Vector_ VectorType;
+      /// Floating point type
       typedef typename VectorType::DataType DataType;
+      /// The base class
       typedef SolverBase<VectorType> BaseClass;
 
     protected:
@@ -428,6 +431,11 @@ namespace FEAT
 
       /**
        * \brief Plot a summary of the last solver run
+       *
+       * \param[in] st
+       * The status code from the last run. As the solver does not remember this, it has to be passed again from the
+       * calling function.
+       *
        */
       virtual void plot_summary(Status st) const
       {
@@ -610,11 +618,8 @@ namespace FEAT
      * for the initialisation and finalisation methods of the SolverBase class template, which take
      * care of forwarding these steps to the preconditioner.
      *
-     * \tparam Matrix_
-     * The matrix class to be used by the solver.
-     *
-     * \tparam Filter_
-     * The filter class to be used by the solver.
+     * \tparam Vector_
+     * The vector type this solver can be applied to
      *
      * \author Peter Zajac
      */
@@ -623,10 +628,12 @@ namespace FEAT
       public IterativeSolver<Vector_>
     {
     public:
+      /// The vector type this solver can be applied to
       typedef Vector_ VectorType;
+      /// Floating point data type
       typedef typename VectorType::DataType DataType;
+      /// Our base class
       typedef IterativeSolver<VectorType> BaseClass;
-
       /// the interface for the preconditioner
       typedef SolverBase<VectorType> PrecondType;
 
@@ -700,6 +707,7 @@ namespace FEAT
 
       }
 
+      /// \copydoc BaseClass::init_symbolic()
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
@@ -707,6 +715,7 @@ namespace FEAT
           _precond->init_symbolic();
       }
 
+      /// \copydoc BaseClass::init_numeric()
       virtual void init_numeric() override
       {
         BaseClass::init_numeric();
@@ -714,6 +723,7 @@ namespace FEAT
           _precond->init_numeric();
       }
 
+      /// \copydoc BaseClass::done_numeric()
       virtual void done_numeric() override
       {
         if(_precond)
@@ -721,6 +731,7 @@ namespace FEAT
         BaseClass::done_numeric();
       }
 
+      /// \copydoc BaseClass::done_symbolic()
       virtual void done_symbolic() override
       {
         if(_precond)
