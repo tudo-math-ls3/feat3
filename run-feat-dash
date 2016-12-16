@@ -507,11 +507,12 @@ for branch in branch_names:
   if not mpi_distributed:
     #if is_found ("valgrind") and is_found ("nvcc") and is_found("g++") and not novalgrind and not nocudamemcheck:
     # run_test("gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-    if is_found ("valgrind") and is_found("g++") and not novalgrind:
-      addition_without_cuda = addition.replace("-cuda", "");
-      run_test("gcc-debug-valgrind" + addition_without_cuda + quadmath_add, branch, myDB, extra_opts)
-    if is_found ("nvcc") and is_found("g++") and not nocudamemcheck:
-      run_test("gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+    if branch == "develop":
+      if is_found ("valgrind") and is_found("g++") and not novalgrind:
+        addition_without_cuda = addition.replace("-cuda", "");
+        run_test("gcc-debug-valgrind" + addition_without_cuda + quadmath_add, branch, myDB, extra_opts)
+      if is_found ("nvcc") and is_found("g++") and not nocudamemcheck:
+        run_test("gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
 
     if is_found("g++"):
       run_test("gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
