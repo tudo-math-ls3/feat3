@@ -12,7 +12,7 @@
 #include <kernel/meshopt/rumpf_functionals/2d_q1_unrolled.hpp>
 #include <kernel/meshopt/rumpf_functionals/3d_p1_unrolled.hpp>
 //#include <kernel/meshopt/rumpf_functionals/3d_q1_unrolled.hpp>
-#include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/mqc_linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/util/runtime.hpp>
 
@@ -192,7 +192,7 @@ template
     writer_initial_pre.write(filename);
 
     // Create a solver
-    auto linesearch = Solver::new_strong_wolfe_linesearch(rumpflpumpfl, my_filter);
+    auto linesearch = Solver::new_mqc_linesearch(rumpflpumpfl, my_filter);
 
     auto solver = Solver::new_nlcg(
       rumpflpumpfl, // operator

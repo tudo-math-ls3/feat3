@@ -23,8 +23,12 @@
 #include <kernel/solver/matrix_stock.hpp>
 
 // Includes for nonlinear optimisers
-#include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/fixed_step_linesearch.hpp>
+#include <kernel/solver/newton_raphson_linesearch.hpp>
+#include <kernel/solver/secant_linesearch.hpp>
+#include <kernel/solver/mqc_linesearch.hpp>
+#include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/nlsd.hpp>
 #include <kernel/solver/nloptls.hpp>
@@ -554,9 +558,9 @@ namespace FEAT
             result = Solver::new_secant_linesearch(
               section_name, section,derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
           }
-          else if(solver_type == "StrongWolfeLinesearch")
+          else if(solver_type == "MQCLinesearch")
           {
-            result = Solver::new_strong_wolfe_linesearch(
+            result = Solver::new_mqc_linesearch(
               section_name, section,derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
           }
           else

@@ -15,7 +15,7 @@
 // Not implemented yet due to too bloody much stuff for Maple to compute
 //#include <kernel/meshopt/rumpf_functionals/3d_q1_unrolled.hpp>
 
-#include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/mqc_linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
 
 using namespace FEAT;
@@ -143,7 +143,8 @@ template
       rumpflpumpfl.eval_fval_cellwise(fval_pre, &func_norm, &func_cof, &func_det);
 
       // Create a solver
-      auto linesearch = Solver::new_strong_wolfe_linesearch(rumpflpumpfl, my_filter);
+      auto linesearch = Solver::new_mqc_linesearch(rumpflpumpfl, my_filter);
+      linesearch->set_max_iter(20);
 
       auto solver = Solver::new_nlcg(
         rumpflpumpfl, // operator

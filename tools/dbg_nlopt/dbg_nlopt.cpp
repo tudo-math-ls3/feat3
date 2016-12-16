@@ -8,12 +8,20 @@
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/none_filter.hpp>
+
+#include <kernel/solver/fixed_step_linesearch.hpp>
+#include <kernel/solver/newton_raphson_linesearch.hpp>
+#include <kernel/solver/secant_linesearch.hpp>
+#include <kernel/solver/mqc_linesearch.hpp>
+
 #include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/nlsd.hpp>
 #include <kernel/solver/hessian_precond.hpp>
+
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
+
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/runtime.hpp>
@@ -95,8 +103,8 @@ int run(Solver_& solver, Operator_& op)
   solver->set_plot(true);
 
   PropertyMap config;
-  PropertyMap* my_config_section = solver->write_config(&config, "dbg-nlopt-solver");
-  my_config_section->dump(std::cout);
+  solver->write_config(&config, "dbg-nlopt-solver");
+  config.dump(std::cout);
 
   // This will hold the solution
   auto sol = op.create_vector_r();
@@ -250,7 +258,7 @@ static void display_help()
   std::cout << " --help: Displays this text" << std::endl;
   std::cout << " --linesearch [String]: Available linesearches for NLCG and NLSD are NewtonRaphsonLinesearch,"
   << std::endl;
-  std::cout << "                    SecantLinesearch and StrongWolfeLinesearch (default)"
+  std::cout << "                    SecantLinesearch and MQCLinesearch (default)"
   << std::endl;
   std::cout <<
     " --precon [String]: Available preconditioners for NLCG and NLSD are Hessian, ApproximateHessian, none(default)"
@@ -336,8 +344,8 @@ int main(int argc, char* argv[])
 
   if(solver_name == "NLCG")
   {
-    // The default linesearch is StrongWolfeLinesearch
-    String linesearch_name("StrongWolfeLinesearch");
+    // The default linesearch is MQCLinesearch
+    String linesearch_name("MQCLinesearch");
     auto* linesearch_pair(args.query("linesearch"));
     if(linesearch_pair != nullptr)
       linesearch_name = linesearch_pair->second.front();
@@ -346,9 +354,9 @@ int main(int argc, char* argv[])
       my_linesearch = new_newton_raphson_linesearch(my_op, my_filter);
     else if(linesearch_name== "SecantLinesearch")
       my_linesearch = new_secant_linesearch(my_op, my_filter);
-    else if(linesearch_name== "StrongWolfeLinesearch")
+    else if(linesearch_name== "MQCLinesearch")
     {
-      my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter);
+      my_linesearch = new_mqc_linesearch(my_op, my_filter);
       my_linesearch->set_max_iter(20);
     }
     else if(linesearch_name== "FixedStepLinesearch")
@@ -392,8 +400,8 @@ int main(int argc, char* argv[])
   }
   else if(solver_name == "NLSD")
   {
-    // The default linesearch is StrongWolfeLinesearch
-    String linesearch_name("StrongWolfeLinesearch");
+    // The default linesearch is MQCLinesearch
+    String linesearch_name("MQCLinesearch");
     auto* linesearch_pair(args.query("linesearch"));
     if(linesearch_pair != nullptr)
       linesearch_name = linesearch_pair->second.front();
@@ -402,8 +410,8 @@ int main(int argc, char* argv[])
       my_linesearch = new_newton_raphson_linesearch(my_op, my_filter);
     else if(linesearch_name== "SecantLinesearch")
       my_linesearch = new_secant_linesearch(my_op, my_filter);
-    else if(linesearch_name== "StrongWolfeLinesearch")
-      my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter);
+    else if(linesearch_name== "MQCLinesearch")
+      my_linesearch = new_mqc_linesearch(my_op, my_filter);
     else if(linesearch_name== "FixedStepLinesearch")
     {
       DataType steplength(1);

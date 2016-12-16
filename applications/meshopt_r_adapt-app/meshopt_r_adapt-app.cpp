@@ -1016,7 +1016,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "plot = 1" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "max_iter = 500" << std::endl;
-  iss << "linesearch = StrongWolfeLinesearch" << std::endl;
+  iss << "linesearch = MQCLinesearch" << std::endl;
   iss << "direction_update = DYHSHybrid" << std::endl;
   iss << "keep_iterates = 0" << std::endl;
 
@@ -1029,8 +1029,8 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "plot = 1" << std::endl;
   iss << "inner_solver = NLCG" << std::endl;
 
-  iss << "[strongwolfelinesearch]" << std::endl;
-  iss << "type = StrongWolfeLinesearch" << std::endl;
+  iss << "[MQCLinesearch]" << std::endl;
+  iss << "type = MQCLinesearch" << std::endl;
   iss << "plot = 0" << std::endl;
   iss << "max_iter = 20" << std::endl;
   iss << "tol_decrease = 1e-3" << std::endl;

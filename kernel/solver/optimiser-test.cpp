@@ -2,6 +2,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/lafem/none_filter.hpp>
+#include <kernel/solver/mqc_linesearch.hpp>
+#include <kernel/solver/newton_raphson_linesearch.hpp>
+#include <kernel/solver/secant_linesearch.hpp>
 #include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/nlsd.hpp>
@@ -70,8 +73,8 @@ class NLCGTest:
         my_linesearch = new_newton_raphson_linesearch(my_op, my_filter, false);
       else if(_linesearch_type == "SecantLinesearch")
         my_linesearch = new_secant_linesearch(my_op, my_filter, DT_(1e-2), false);
-      else if(_linesearch_type == "StrongWolfeLinesearch")
-        my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter, false);
+      else if(_linesearch_type == "MQCLinesearch")
+        my_linesearch = new_mqc_linesearch(my_op, my_filter, false);
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
 
@@ -135,13 +138,13 @@ class NLCGTest:
 };
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f(float(0.5),Index(13),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_hb_f(float(0.5),Index(13),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_rb_d(double(0.8),Index(40),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_rb_d(double(0.8),Index(40),"MQCLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.33),Index(58),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_bs_d(double(0.33),Index(58),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 nlcg_s_hb_d(float(0.9),Index(14),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
@@ -153,10 +156,10 @@ NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_d(double(0.5), Index(35),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_hessian_rb_d(double(1), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_hessian_rb_d(double(1), Index(25),"MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
-nlcg_sw_hessian_gp_d(double(0.5), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
+nlcg_sw_hessian_gp_d(double(0.5), Index(25),"MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
 
 #ifdef FEAT_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
@@ -164,14 +167,14 @@ nlcg_nr_rb_q(__float128(0.55), Index(33), "NewtonRaphsonLinesearch", "Hessian",
 NLCGDirectionUpdate::PolakRibiere);
 
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_bs_q(__float128(1), Index(23), "StrongWolfeLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
+nlcg_sw_bs_q(__float128(1), Index(23), "MQCLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(1), Index(11), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_sw_hb_f_cuda(float(1), Index(11), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_s_bs_d_cuda(double(0.18), Index(37), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
@@ -230,8 +233,8 @@ class NLSDTest:
         my_linesearch = new_newton_raphson_linesearch(my_op, my_filter, false);
       else if(_linesearch_type == "SecantLinesearch")
         my_linesearch = new_secant_linesearch(my_op, my_filter, DT_(1e-2), false);
-      else if(_linesearch_type == "StrongWolfeLinesearch")
-        my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter, false);
+      else if(_linesearch_type == "MQCLinesearch")
+        my_linesearch = new_mqc_linesearch(my_op, my_filter, false);
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
 
@@ -296,10 +299,10 @@ class NLSDTest:
 };
 
 NLSDTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f(float(0.5), Index(18), "SecantLinesearch", "ApproximateHessian");
+nlsd_hb_f(float(0.5), Index(19), "SecantLinesearch", "ApproximateHessian");
 
 NLSDTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
-nlsd_rb_d(double(0.75), Index(20), "StrongWolfeLinesearch", "Hessian");
+nlsd_rb_d(double(0.75), Index(20), "MQCLinesearch", "Hessian");
 
 NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
 nlsd_rb_d_sw(double(0.6), Index(13), "NewtonRaphsonLinesearch", "none");
@@ -313,7 +316,7 @@ nlsd_rb_q(__float128(0.9), Index(96), "SecantLinesearch", "Hessian");
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f_cuda(float(0.75), Index(8), "StrongWolfeLinesearch", "Hessian");
+nlsd_hb_f_cuda(float(0.75), Index(8), "MQCLinesearch", "Hessian");
 #endif
 
 #ifdef FEAT_HAVE_ALGLIB

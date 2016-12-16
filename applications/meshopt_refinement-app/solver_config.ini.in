@@ -21,13 +21,13 @@ type = NLCG
 precon = DuDvPrecon
 tol_rel = 1e-8
 max_iter = 10000
-linesearch = StrongWolfeLinesearch
+linesearch = MQCLinesearch
 direction_update = DYHSHybrid
 plot = 1
 keep_iterates = 0
 
-[strongwolfelinesearch]
-type = StrongWolfeLinesearch
+[MQCLinesearch]
+type = MQCLinesearch
 plot = 0
 max_iter = 20
 tol_decrease = 1e-3
