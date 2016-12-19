@@ -186,18 +186,21 @@ namespace FEAT
           {
             precon = create_scalar_solver<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, back_level);
           }
+#ifdef FEAT_SF_ESOTERIC
           else if (precon_memory == "main" && precon_datatype == "float" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, float, unsigned long>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
+#endif
           else if (precon_memory == "main" && precon_datatype == "double" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, double, unsigned long>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
+#ifdef FEAT_SF_ESOTERIC
 #ifdef FEAT_HAVE_CUDA
           else if (precon_memory == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned long")
           {
@@ -212,6 +215,8 @@ namespace FEAT
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
+#endif
+#ifdef FEAT_SF_ESOTERIC
           else if (precon_memory == "main" && precon_datatype == "float" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, float, unsigned int>;
@@ -224,13 +229,16 @@ namespace FEAT
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
+#endif
 #ifdef FEAT_HAVE_CUDA
+#ifdef FEAT_SF_ESOTERIC
           else if (precon_memory == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned int>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, back_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
+#endif
           else if (precon_memory == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned int>;
