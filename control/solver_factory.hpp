@@ -631,7 +631,7 @@ namespace FEAT
             std::shared_ptr<Solver::IterativeSolver<VectorTypeR>> inner_solver;
             inner_solver = create_nonlinear_optimiser(functional, filter, base, inner_solver_p.first, precon);
 
-            result = Solver::new_qpenalty(
+            result = Solver::new_qpenalty<Functional_>(
               section_name, section, derefer<VectorTypeR>(functional, nullptr), inner_solver);
 
           }
@@ -648,7 +648,7 @@ namespace FEAT
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
             }
 
-            result = Solver::new_alglib_minlbfgs(
+            result = Solver::new_alglib_minlbfgs<Functional_, Filter_>(
               section_name, section,
               derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
 
@@ -666,7 +666,7 @@ namespace FEAT
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
             }
 
-            result = Solver::new_alglib_mincg(
+            result = Solver::new_alglib_mincg<Functional_, Filter_>(
               section_name, section, derefer<VectorTypeR>(functional, nullptr), derefer<VectorTypeR>(filter, nullptr));
 
 #endif // FEAT_HAVE_ALGLIB
