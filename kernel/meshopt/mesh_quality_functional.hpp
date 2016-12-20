@@ -3,6 +3,7 @@
 #define KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP 1
 
 #include <kernel/base_header.hpp>
+#include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/meshopt/base.hpp>
@@ -105,6 +106,17 @@ namespace FEAT
         static String name()
         {
           return "MeshQualityFunctional<"+MeshType_::name()+">";
+        }
+
+        /**
+         * \brief Adds relevant quantities of this object to a VTK exporter
+         *
+         * \param[in, out] exporter
+         * The exporter to add our data to.
+         *
+         */
+        virtual void add_to_vtk_exporter(Geometry::ExportVTK<MeshType>& DOXY(exporter)) const
+        {
         }
 
         /// \returns The root mesh

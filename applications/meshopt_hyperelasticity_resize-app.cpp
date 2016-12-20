@@ -75,8 +75,6 @@ template
     typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
     /// The corresponding transformation
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    /// The FE space for the transformation
-    typedef typename FEAT::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
     /// Our functional type
     typedef FunctionalType_<DataType, TrafoType> FunctionalType;
     /// The Rumpf smoother
@@ -97,9 +95,6 @@ template
     Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
     // Create the mesh
     MeshType* mesh(new MeshType(mesh_factory));
-    // The filters will be empty, but we still need the filter and assembler objects
-    std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
-    std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
     FilterType my_filter;
 
     // Create the root mesh node
@@ -131,10 +126,13 @@ template
 
     // Trafo and trafo FE space
     TrafoType trafo(*(rmn->get_mesh()));
-    TrafoSpace trafo_space(trafo);
+
+    // (Empty) deques for the boundaries
+    std::deque<String> dirichlet_list;
+    std::deque<String> slip_list;
 
     // Create the mesh quality functional
-    HyperelasticityFunctionalType rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional, Meshopt::ScaleComputation::current_uniform);
+    HyperelasticityFunctionalType rumpflpumpfl(rmn, trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
     // Print information
     rumpflpumpfl.print();
 

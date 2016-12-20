@@ -109,28 +109,30 @@ namespace FEAT
         typedef LAFEM::FilterChain<SlipFilterSequence, DirichletFilterSequence> FilterType;
 
         /// Finite Element space for the transformation
-        typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+        typedef typename Intern::TrafoFE<TrafoType>::Space SpaceType;
         /// Maximum polynomial degree
         // 2 * (degree of trafo) for both trial and test spaces, +1 for safety reasons
         // This could be decreased by the degree of the operator, i.e. 2 for Du:Dv
-        static constexpr int _local_degree = 4*TrafoSpace::local_degree + 1;
+        static constexpr int _local_degree = 4*SpaceType::local_degree + 1;
 
         /// The system matrix
         MatrixType matrix_sys;
 
       protected:
         /// The transformation defining the physical mesh
-        TrafoType* _trafo;
-        /// The FE space for the transformation, needed for filtering
-        TrafoSpace* _trafo_space;
+        TrafoType& _trafo;
         /// Vector saving the cell sizes on the reference mesh
         ScalarVectorType _lambda;
         /// Assembler for Dirichlet boundary conditions
-        std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* _dirichlet_asm;
+        std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> _dirichlet_asm;
         /// Assembler for slip boundary conditions
-        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>* _slip_asm;
+        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> _slip_asm;
         /// Cubature factory, for P1/Q1 transformations in 2d degree 5 is enough
         Cubature::DynamicFactory _cubature_factory;
+
+      public:
+        /// The FE space for the transformation, needed for filtering
+        SpaceType trafo_space;
 
       public:
         /**
@@ -151,25 +153,61 @@ namespace FEAT
          */
         explicit DuDvFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
-          TrafoSpace* trafo_space_,
-          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* dirichlet_asm_,
-          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>* slip_asm_) :
+          TrafoType& trafo,
+          const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list):
           BaseClass(rmn_),
           matrix_sys(),
-          _trafo(&(trafo_space_->get_trafo())),
-          _trafo_space(trafo_space_),
+          _trafo(trafo),
           _lambda(rmn_->get_mesh()->get_num_entities(MeshType::shape_dim)),
-          _dirichlet_asm(dirichlet_asm_),
-          _slip_asm(slip_asm_),
-          _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
+          _dirichlet_asm(),
+          _slip_asm(),
+          _cubature_factory("auto-degree:"+stringify(int(_local_degree))),
+          trafo_space(trafo)
           {
-            XASSERT(_trafo != nullptr);
-            XASSERT(_trafo_space != nullptr);
-            XASSERT(_dirichlet_asm != nullptr);
-            XASSERT(_slip_asm != nullptr);
             // The symbolic assembly has to happen in the constructor because the matrix is shallow copied immediately
             // after construction in the Control::QuadraticSystemLevel
-            Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, *_trafo_space);
+            Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, trafo_space);
+
+            // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
+            // insert it into the std::map
+            for(auto& it : dirichlet_list)
+            {
+              // Create empty assembler
+              auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
+
+              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+              auto* mpp = rmn_->find_mesh_part(it);
+              if(mpp != nullptr)
+              {
+                new_asm->add_mesh_part(*mpp);
+              }
+
+              // Insert into the map
+              String identifier(it);
+              _dirichlet_asm.emplace(identifier, new_asm);
+            }
+
+            // For every MeshPart specified in the list of slip boundaries, create a SlipFilterAssembler and
+            // insert it into the std::map
+            for(auto& it : slip_list)
+            {
+              // Create empty assembler
+              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(*this->get_mesh());
+
+              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+              auto* mpp = rmn_->find_mesh_part(it);
+              if(mpp != nullptr)
+              {
+                new_asm->add_mesh_part(*mpp);
+              }
+
+              // Insert into the map
+              String identifier(it);
+              _slip_asm.emplace(identifier, new_asm);
+            }
+
           }
 
         /// Explicitly delete copy constructor
@@ -178,11 +216,6 @@ namespace FEAT
         /// \brief Virtual destructor
         virtual ~DuDvFunctional()
         {
-          _trafo = nullptr;
-          _trafo_space = nullptr;
-          _dirichlet_asm = nullptr;
-          _slip_asm = nullptr;
-          _lambda.clear();
         }
 
         /**
@@ -193,11 +226,8 @@ namespace FEAT
          */
         virtual void init() override
         {
-          //XASSERT(_trafo != nullptr);
-          //XASSERT(_trafo_space != nullptr);
-          //XASSERT(_dirichlet_asm != nullptr);
-          //XASSERT(_slip_asm != nullptr);
-          //Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, *_trafo_space);
+          //Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_sys, trafo_space);
+          assemble_system_matrix();
         }
 
         /// \copydoc BaseClass::name()
@@ -206,14 +236,23 @@ namespace FEAT
           return "DuDvFunctional<"+MeshType::name()+">";
         }
 
+        /**
+         * \brief Adds relevant quantities of this object to a VTK exporter
+         *
+         * \param[in, out] exporter
+         * The exporter to add our data to.
+         *
+         */
+        virtual void add_to_vtk_exporter(Geometry::ExportVTK<MeshType>& exporter) const override
+        {
+          exporter.add_cell_scalar("lambda", this->_lambda.elements());
+        }
 
         /**
          * \brief Assembles the system matrix
          */
         virtual void assemble_system_matrix()
         {
-          XASSERT(_trafo_space != nullptr);
-
           matrix_sys.format();
 
           Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
@@ -221,7 +260,7 @@ namespace FEAT
           Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
             matrix_sys,           // the matrix that receives the assembled operator
             my_operator, // the operator that is to be assembled
-            *_trafo_space,            // the finite element space in use
+            trafo_space,            // the finite element space in use
             _cubature_factory  // the cubature factory to be used for integration
             );
         }
@@ -240,26 +279,23 @@ namespace FEAT
          */
         virtual void prepare(VectorTypeR& vec_state, FilterType& filter)
         {
-          XASSERT(_dirichlet_asm != nullptr);
-          XASSERT(_slip_asm != nullptr);
-
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
           {
-            _lambda(cell, DataType(_trafo->template compute_vol<typename MeshType::ShapeType>(cell)));
+            _lambda(cell, DataType(_trafo.template compute_vol<typename MeshType::ShapeType>(cell)));
           }
 
           auto& dirichlet_filters = filter.template at<1>();
 
           for(auto& it : dirichlet_filters)
           {
-            const auto& assembler = _dirichlet_asm->find(it.first);
-            if(assembler == _dirichlet_asm->end())
+            const auto& assembler = _dirichlet_asm.find(it.first);
+            if(assembler == _dirichlet_asm.end())
             {
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find dirichlet assembler for filter with key "+it.first);
             }
 
-            assembler->second->assemble(it.second, *_trafo_space, vec_state);
+            assembler->second->assemble(it.second, trafo_space, vec_state);
           }
 
           // The slip filter contains the outer unit normal, so reassemble it
@@ -267,14 +303,14 @@ namespace FEAT
 
           for(auto& it : slip_filters)
           {
-            const auto& assembler = _slip_asm->find(it.first);
-            if(assembler == _slip_asm->end())
+            const auto& assembler = _slip_asm.find(it.first);
+            if(assembler == _slip_asm.end())
             {
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find slip filter assembler for filter with key "+it.first);
             }
 
-            assembler->second->assemble(it.second, *_trafo_space);
+            assembler->second->assemble(it.second, trafo_space);
           }
 
           for(const auto& it:slip_filters)
@@ -358,7 +394,7 @@ namespace FEAT
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            CoordType my_vol = this->_trafo->template compute_vol<ShapeType, CoordType>(cell);
+            CoordType my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
             vol_min = Math::min(vol_min, my_vol);
             vol_max = Math::max(vol_min, my_vol);
             vol += my_vol;
@@ -400,7 +436,7 @@ namespace FEAT
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            size_defect += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
             lambda_min = Math::min(lambda_min, CoordType(this->_lambda(cell)));
             lambda_max = Math::max(lambda_max, CoordType(this->_lambda(cell)));
           }
@@ -420,6 +456,23 @@ namespace FEAT
         {
           return matrix_sys.empty();
         }
+
+        /**
+         * \brief Creates an L-vector for the functional's gradient
+         */
+        VectorTypeL create_vector_l() const
+        {
+          return VectorTypeL(trafo_space.get_num_dofs());
+        }
+
+        /**
+         * \brief Creates an R-vector for the functional and its gradient
+         */
+        VectorTypeR create_vector_r() const
+        {
+          return VectorTypeR(trafo_space.get_num_dofs());
+        }
+
 
     }; // class DuDvFunctional
 

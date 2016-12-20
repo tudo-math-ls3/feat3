@@ -259,7 +259,7 @@ namespace FEAT
         typedef LAFEM::FilterChain<SlipFilterSequence, DirichletFilterSequence> FilterType;
 
         /// Finite Element space for the transformation
-        typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+        typedef typename Intern::TrafoFE<TrafoType>::Space SpaceType;
 
         /// Output vector type of the operator
         typedef LAFEM::DenseVectorBlocked<MemType, DT_, IT_, MeshType::world_dim> VectorTypeL;
@@ -274,24 +274,11 @@ namespace FEAT
         static_assert(std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
         "ShapeTypes of the transformation / functional have to agree" );
 
-        /// The transformation defining the physical mesh
-        TrafoType& _trafo;
-        /// The FE space for the transformation, needed for filtering
-        TrafoSpace& _trafo_space;
-        /// Assembler for Dirichlet boundary conditions
-        std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& _dirichlet_asm;
-        /// Assembler for slip boundary conditions
-        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& _slip_asm;
+      protected:
         /// The functional for determining mesh quality
         std::shared_ptr<FunctionalType> _functional;
-        /// The mesh concentration function (if any)
-        std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
-        /// These are the scalars that need to be synchronised in init() or prepare()
-        std::map<String, DataType*> sync_scalars;
-        /// These are the vectors that need to be synchronised (type-0 to type-1)
-        std::set<VectorTypeR*> sync_vecs;
-
-      protected:
+        /// The transformation defining the physical mesh
+        TrafoType& _trafo;
         /// Weights for the local contributions to the global functional value.
         ScalarVectorType _mu;
         /// Weights for local mesh size
@@ -299,6 +286,20 @@ namespace FEAT
         ScalarVectorType _lambda;
         /// Size parameters for the local reference element.
         ScalarVectorType _h;
+        /// Assembler for Dirichlet boundary conditions
+        std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> _dirichlet_asm;
+        /// Assembler for slip boundary conditions
+        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> _slip_asm;
+        /// The mesh concentration function (if any)
+        std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
+
+      public:
+        /// The FE space for the transformation, needed for filtering
+        SpaceType trafo_space;
+        /// These are the scalars that need to be synchronised in init() or prepare()
+        std::map<String, DataType*> sync_scalars;
+        /// These are the vectors that need to be synchronised (type-0 to type-1)
+        std::set<VectorTypeR*> sync_vecs;
 
       private:
         /// This is the number of DoFs in the trial space (= number of mesh vertices)
@@ -346,24 +347,24 @@ namespace FEAT
          */
         explicit HyperelasticityFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
-          TrafoSpace& trafo_space_,
-          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& dirichlet_asm_,
-          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& slip_asm_,
+          TrafoType& trafo,
+          const std::deque<String>& dirichlet_list,
+          const std::deque<String>& slip_list,
           std::shared_ptr<FunctionalType_> functional_)
           : BaseClass(rmn_),
-          _trafo(trafo_space_.get_trafo()),
-          _trafo_space(trafo_space_),
-          _dirichlet_asm(dirichlet_asm_),
-          _slip_asm(slip_asm_),
           _functional(functional_),
-          _mesh_conc(nullptr),
-          sync_scalars(),
-          sync_vecs(),
+          _trafo(trafo),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension), DataType(1)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
-          _columns(_trafo_space.get_num_dofs()),
-          _rows(_trafo_space.get_num_dofs()),
+          _dirichlet_asm(),
+          _slip_asm(),
+          _mesh_conc(nullptr),
+          trafo_space(trafo),
+          sync_scalars(),
+          sync_vecs(),
+          _columns(trafo_space.get_num_dofs()),
+          _rows(trafo_space.get_num_dofs()),
           _scale_computation(ScaleComputation::once_uniform),
           _penalty_param(0),
           _alignment_constraint(0),
@@ -373,6 +374,46 @@ namespace FEAT
           {
 
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
+
+            // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
+            // insert it into the std::map
+            for(auto& it : dirichlet_list)
+            {
+              // Create empty assembler
+              auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
+
+              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+              auto* mpp = rmn_->find_mesh_part(it);
+              if(mpp != nullptr)
+              {
+                new_asm->add_mesh_part(*mpp);
+              }
+
+              // Insert into the map
+              String identifier(it);
+              _dirichlet_asm.emplace(identifier, new_asm);
+            }
+
+            // For every MeshPart specified in the list of slip boundaries, create a SlipFilterAssembler and
+            // insert it into the std::map
+            for(auto& it : slip_list)
+            {
+              // Create empty assembler
+              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(*this->get_mesh());
+
+              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+              auto* mpp = rmn_->find_mesh_part(it);
+              if(mpp != nullptr)
+              {
+                new_asm->add_mesh_part(*mpp);
+              }
+
+              // Insert into the map
+              String identifier(it);
+              _slip_asm.emplace(identifier, new_asm);
+            }
 
             for(Index i(0); i < _mu.size(); ++i)
             {
@@ -416,27 +457,27 @@ namespace FEAT
          */
         explicit HyperelasticityFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
-          TrafoSpace& trafo_space_,
-          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& dirichlet_asm_,
-          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& slip_asm_,
+          TrafoType& trafo,
+          const std::deque<String>& dirichlet_list,
+          const std::deque<String>& slip_list,
           std::shared_ptr<FunctionalType_> functional_,
           ScaleComputation scale_computation_,
           std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr,
           DataType penalty_param_ = DataType(0))
           : BaseClass(rmn_),
-          _trafo(trafo_space_.get_trafo()),
-          _trafo_space(trafo_space_),
-          _dirichlet_asm(dirichlet_asm_),
-          _slip_asm(slip_asm_),
           _functional(functional_),
-          _mesh_conc(nullptr),
-          sync_scalars(),
-          sync_vecs(),
+          _trafo(trafo),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension), DataType(1)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
-          _columns(_trafo_space.get_num_dofs()),
-          _rows(_trafo_space.get_num_dofs()),
+          _dirichlet_asm(),
+          _slip_asm(),
+          _mesh_conc(mesh_conc_),
+          trafo_space(trafo),
+          sync_scalars(),
+          sync_vecs(),
+          _columns(trafo_space.get_num_dofs()),
+          _rows(trafo_space.get_num_dofs()),
           _scale_computation(scale_computation_),
           _penalty_param(penalty_param_),
           _alignment_constraint(0),
@@ -448,22 +489,51 @@ namespace FEAT
             XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr!\n");
             XASSERTM(_penalty_param >= DataType(0), "penalty_param must be >= 0!\n");
 
+            // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
+            // insert it into the std::map
+            for(auto& it : dirichlet_list)
+            {
+              // Create empty assembler
+              auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
+
+              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+              auto* mpp = rmn_->find_mesh_part(it);
+              if(mpp != nullptr)
+              {
+                new_asm->add_mesh_part(*mpp);
+              }
+
+              // Insert into the map
+              String identifier(it);
+              _dirichlet_asm.emplace(identifier, new_asm);
+            }
+
+            // For every MeshPart specified in the list of slip boundaries, create a SlipFilterAssembler and
+            // insert it into the std::map
+            for(auto& it : slip_list)
+            {
+              // Create empty assembler
+              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(*this->get_mesh());
+
+              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+              auto* mpp = rmn_->find_mesh_part(it);
+              if(mpp != nullptr)
+              {
+                new_asm->add_mesh_part(*mpp);
+              }
+
+              // Insert into the map
+              String identifier(it);
+              _slip_asm.emplace(identifier, new_asm);
+            }
+
             for(Index i(0); i < _mu.size(); ++i)
             {
               _sum_mu += _mu(i);
             }
-
             sync_scalars.emplace("_sum_mu",&_sum_mu);
-
-            if(
-              ( _scale_computation == ScaleComputation::once_concentration ||
-                _scale_computation == ScaleComputation::current_concentration ||
-                _scale_computation == ScaleComputation::iter_concentration ) &&
-              mesh_conc_ == nullptr)
-              {
-                throw InternalError(__func__,__FILE__,__LINE__,
-                "Scale computation set to "+stringify(_scale_computation)+", but no concentration function was given");
-              }
 
             if(mesh_conc_ != nullptr)
             {
@@ -493,7 +563,7 @@ namespace FEAT
          */
         bool empty() const
         {
-          return (_trafo_space.get_num_dofs() == Index(0));
+          return (trafo_space.get_num_dofs() == Index(0));
         }
 
         /**
@@ -501,7 +571,7 @@ namespace FEAT
          */
         VectorTypeL create_vector_l() const
         {
-          return VectorTypeL(_trafo_space.get_num_dofs());
+          return VectorTypeL(trafo_space.get_num_dofs());
         }
 
         /**
@@ -509,7 +579,7 @@ namespace FEAT
          */
         VectorTypeR create_vector_r() const
         {
-          return VectorTypeR(_trafo_space.get_num_dofs());
+          return VectorTypeR(trafo_space.get_num_dofs());
         }
 
         /**
@@ -558,7 +628,9 @@ namespace FEAT
 
           _functional->print();
           if(_mesh_conc != nullptr)
+          {
             _mesh_conc->print();
+          }
 
         }
 
@@ -573,7 +645,7 @@ namespace FEAT
          * you know these things (e.g. in the application itself, or in Control::Meshopt::HyperelasticityControl).
          *
          */
-        virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename Trafo_::MeshType>& exporter) const
+        virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename Trafo_::MeshType>& exporter) const override
         {
           exporter.add_cell_scalar("h", this->_h.elements());
           exporter.add_cell_scalar("lambda", this->_lambda.elements());
@@ -778,7 +850,7 @@ namespace FEAT
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find unit filter assembler for filter with key "+it.first);
 
-            assembler->second->assemble(it.second, _trafo_space, vec_state);
+            assembler->second->assemble(it.second, trafo_space, vec_state);
           }
 
           // The slip filter contains the outer unit normal, so reassemble it
@@ -799,7 +871,7 @@ namespace FEAT
               "Could not find slip filter assembler for filter with key "+it.first);
             }
 
-            assembler->second->assemble(it.second, _trafo_space);
+            assembler->second->assemble(it.second, trafo_space);
           }
 
           if( (this->_scale_computation == ScaleComputation::iter_concentration) ||
@@ -1004,7 +1076,7 @@ namespace FEAT
         virtual void eval_fval_grad(CoordType& fval, VectorTypeL& grad, const bool& add_penalty_fval = true)
         {
           typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+          typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
 
           // Increase number of functional evaluations
           this->_num_func_evals++;
@@ -1026,7 +1098,7 @@ namespace FEAT
           fval = DataType(0);
 
           TrafoEvaluator trafo_eval(this->_trafo);
-          SpaceEvaluator space_eval(this->_trafo_space);
+          SpaceEvaluator space_eval(this->trafo_space);
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
@@ -1100,7 +1172,7 @@ namespace FEAT
         CoordType* fval_det) const
         {
           typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-          typedef typename TrafoSpace::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+          typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
 
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
@@ -1118,7 +1190,7 @@ namespace FEAT
           fval = DataType(0);
 
           TrafoEvaluator trafo_eval(this->_trafo);
-          SpaceEvaluator space_eval(this->_trafo_space);
+          SpaceEvaluator space_eval(this->trafo_space);
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)

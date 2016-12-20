@@ -33,8 +33,8 @@ namespace FEAT
     {
       /// \cond internal
       /// Forward declarations
-      template<typename>
-      class MeshoptAssemblerLevel;
+      template<typename, typename, typename, template<typename, typename, typename> class>
+      class MeshoptSystemLevel;
 
       template<typename, typename, typename, template<typename, typename, typename> class>
       class QuadraticSystemLevel;
@@ -51,7 +51,7 @@ namespace FEAT
        * Type of the underlying domain control
        *
        * For every mesh quality functional, there is a control class which inherits from this. This class only knows
-       * the base minimum.
+       * the bare minimum.
        *
        */
       template<typename DomainControl_>
@@ -74,7 +74,6 @@ namespace FEAT
           /// operate
           typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, world_dim> LocalCoordsBuffer;
           /// corresponding vector mirror
-          //typedef LAFEM::VectorMirrorBlocked<Mem::Main, CoordType, Index, world_dim> CoordsMirror;
           typedef LAFEM::VectorMirror<Mem::Main, CoordType, Index> CoordsMirror;
           /// The global version of LocalCoordsBuffer, needed for prepare setting the internal state variable
           typedef Global::Vector<LocalCoordsBuffer, CoordsMirror> GlobalCoordsBuffer;
@@ -85,14 +84,21 @@ namespace FEAT
         protected:
           /// The domain control whose mesh objects can be modified
           DomainControl& _dom_ctrl;
+          /// List of all meshparts with dirichlet boundary conditions
+          std::deque<String> _dirichlet_boundaries;
+          /// List of all meshparts with slipboundary conditions
+          std::deque<String> _slip_boundaries;
 
         public:
 
           /**
            * \brief The simplest constructor possible
            */
-          explicit MeshoptControlBase(DomainControl& dom_ctrl_)
-            : _dom_ctrl(dom_ctrl_)
+          explicit MeshoptControlBase(DomainControl& dom_ctrl_, const std::deque<String>& dirichlet_boundaries,
+          const std::deque<String>& slip_boundaries)
+            : _dom_ctrl(dom_ctrl_),
+            _dirichlet_boundaries(dirichlet_boundaries),
+            _slip_boundaries(slip_boundaries)
             {
             }
 
@@ -181,7 +187,10 @@ namespace FEAT
            *
            * \returns A deque of Strings with all Dirichlet boundary names
            */
-          virtual std::deque<String> get_dirichlet_boundaries() const = 0;
+          const std::deque<String>& get_dirichlet_boundaries() const
+          {
+            return _dirichlet_boundaries;
+          }
 
           /**
            * \brief Gets the names of all slip boundaries
@@ -191,7 +200,10 @@ namespace FEAT
            *
            * \returns A deque of Strings with all slip boundary names
            */
-          virtual std::deque<String> get_slip_boundaries() const = 0;
+          const std::deque<String>& get_slip_boundaries() const
+          {
+            return _slip_boundaries;
+          }
 
           /**
            * \brief Get the number of levels in this object
@@ -223,8 +235,9 @@ namespace FEAT
 
       }; // class MeshoptControlBase
 
+
       /**
-       * \brief SystemLevel for a quadratic mesh quality functional leading to a linear system
+       * \brief SystemLevel base class
        *
        * \tparam Mem_
        * Memory architecture for the system of equations wrt. the solver
@@ -236,9 +249,7 @@ namespace FEAT
        * Index type
        *
        * \tparam Functional_
-       * The (patch-) local quadratic mesh quality functional
-       *
-       * Since the mesh quality functional is quadratic, its gradient gives the linear system of equations to solve.
+       * The (patch-) local mesh quality functional
        *
        */
       template
@@ -246,7 +257,7 @@ namespace FEAT
         typename Mem_, typename DT_, typename IT_,
         template<typename, typename, typename> class Functional_
       >
-      class QuadraticSystemLevel
+      class MeshoptSystemLevel
       {
         public:
           /// Memory architecture for the solver
@@ -256,9 +267,15 @@ namespace FEAT
           /// Index type for the solver
           typedef IT_ IndexType;
 
-          /// (Patch-) Local mesh quality functional type
+          /// The (patch-)local mesh quality functional
           typedef Functional_<Mem_, DT_, IT_> LocalFunctional;
-          typedef typename LocalFunctional::MatrixType LocalMatrix;
+
+          /// The finite element space
+          typedef typename LocalFunctional::SpaceType SpaceType;
+          /// The underlying transformation
+          typedef typename LocalFunctional::TrafoType TrafoType;
+          /// The type of mesh we use
+          typedef typename TrafoType::MeshType MeshType;
 
           /// Local left-vectors (dual space)
           typedef typename LocalFunctional::VectorTypeL LocalSystemVectorL;
@@ -291,8 +308,6 @@ namespace FEAT
           /// Gates for scalar vectors
           typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 
-          /// Global mesh quality functional type
-          typedef Global::Matrix<LocalMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
           /// Global system filter type
           typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
           /// Global scalar vector type
@@ -317,8 +332,6 @@ namespace FEAT
           SystemGate gate_sys;
           /// The global filter
           GlobalSystemFilter filter_sys;
-          /// The global system matrix
-          GlobalSystemMatrix matrix_sys;
           /// This contains a shallow copy of the operator's coords_buffer
           GlobalCoordsBuffer coords_buffer;
           /// The global partition muxer on this level
@@ -334,21 +347,38 @@ namespace FEAT
           /**
            * \brief Variadic template constructor
            *
+           * \tparam Args_
+           * For passing to the constructor of local_functional
+           *
+           * \param[in] level_index
+           * The refinement level since the mesh was constructed
+           *
+           * \param[in] rmn
+           * The root mesh node on this level
+           *
+           * \param[in] trafo
+           * The transformation on this level
+           *
            * \param[in] dirichlet_list
            * List of the names of all Dirichlet boundaries
            *
            * \param[in] slip_list
            * List of the names of all slip boundaries
+           *
+           * \param[in] args
+           * Additional arguments that get passed to the constructor of local_functional
+           *
            */
           template<typename... Args_>
-          explicit QuadraticSystemLevel(const int level_index,
+          explicit MeshoptSystemLevel(const int level_index,
+          Geometry::RootMeshNode<MeshType>* rmn,
+          TrafoType& trafo,
           const std::deque<String>& dirichlet_list,
           const std::deque<String>& slip_list,
           Args_&&... args) :
-            local_functional(std::forward<Args_>(args)...),
+            local_functional(rmn, trafo, dirichlet_list, slip_list, std::forward<Args_>(args)...),
             gate_sys(),
             filter_sys(),
-            matrix_sys(&gate_sys, &gate_sys, local_functional.matrix_sys.clone(LAFEM::CloneMode::Shallow)),
             coords_buffer(&gate_sys, local_functional.get_coords().clone(LAFEM::CloneMode::Shallow)),
             coarse_muxer_sys(),
             transfer_sys(&coarse_muxer_sys),
@@ -364,27 +394,18 @@ namespace FEAT
 
             }
 
+          /// Explicitly delete default constructor
+          MeshoptSystemLevel() = delete;
+          /// Explicitly delete the copy constructor
+          MeshoptSystemLevel(const MeshoptSystemLevel&) = delete;
+          /// Explicitly delete the move constructor. This could be useful to have, though.
+          MeshoptSystemLevel(MeshoptSystemLevel&&) = delete;
+
           /**
            * \brief Empty virtual destructor
            */
-          virtual ~QuadraticSystemLevel()
+          virtual ~MeshoptSystemLevel()
           {
-          }
-
-          /**
-           * \brief Creates a new (left) vector
-           */
-          GlobalSystemVectorL create_vector_l() const
-          {
-            return matrix_sys.create_vector_l();
-          }
-
-          /**
-           * \brief Creates a new (right) vector
-           */
-          GlobalSystemVectorL create_vector_r() const
-          {
-            return matrix_sys.create_vector_r();
           }
 
           /**
@@ -392,7 +413,7 @@ namespace FEAT
            *
            * The level index is the number of times the underlying mesh was refined since reading its construction.
            */
-          int get_level_index()
+          int get_level_index() const
           {
             return _level_index;
           }
@@ -405,6 +426,363 @@ namespace FEAT
           bool empty() const
           {
             return local_functional.empty();
+          }
+
+          /**
+           * \brief Creates a new (left) vector
+           */
+          GlobalSystemVectorL create_vector_l() const
+          {
+            return GlobalSystemVectorL(&gate_sys, local_functional.create_vector_l());
+          }
+
+          /**
+           * \brief Creates a new (right) vector
+           */
+          GlobalSystemVectorR create_vector_r() const
+          {
+            return GlobalSystemVectorR(&gate_sys, local_functional.create_vector_r());
+          }
+
+
+          /**
+           * \brief Synchronises the system filters
+           *
+           * If there is a global functional (like Global::Functional<SomeClass>) that handles the synchronisation
+           * after each call to prepare(), is is not needed. For quadratic functionals, where there is no global
+           * functional but only a Global::Matrix, this routine is provided.
+           */
+          void sync_system_filter()
+          {
+            // Sync the filter vectors in the SlipFilters
+            auto& slip_filters = filter_sys.local().template at<0>();
+            {
+              for(auto& it : slip_filters)
+              {
+                // Get the filter vector
+                auto& slip_filter_vector = it.second.get_filter_vector();
+
+                if(slip_filter_vector.used_elements() > 0)
+                {
+                  // Temporary DenseVector for syncing
+                  LocalSystemVectorL tmp(slip_filter_vector.size());
+                  auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
+                  auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
+
+                  // Copy sparse filter vector contents to DenseVector
+                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  {
+                    Index idense(slip_filter_vector.indices()[isparse]);
+                    tmp_elements[idense] = sfv_elements[isparse];
+                  }
+
+                  gate_sys.sync_0(tmp);
+
+                  // Copy sparse filter vector contents to DenseVector
+                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  {
+                    Index idense(slip_filter_vector.indices()[isparse]);
+                    sfv_elements[isparse] = tmp_elements[idense];
+                  }
+                }
+                else
+                {
+                  // Temporary DenseVector for syncing
+                  LocalSystemVectorL tmp(slip_filter_vector.size());
+                  gate_sys.sync_0(tmp);
+                }
+              }
+
+            } // evil slip filter sync
+
+          }
+
+          /**
+           * \brief Assembles a right hand side vector
+           *
+           * Note that this is always homogeneous and filtered.
+           *
+           * \returns A right hand side vector for the mesh optimisation problem on this level.
+           */
+          GlobalSystemVectorL assemble_rhs_vector() const
+          {
+            XASSERTM(!empty(), "Assemble_rhs_vector for empty functional");
+
+            // create new vector
+            GlobalSystemVectorL vec_rhs(create_vector_l());
+
+            vec_rhs.format();
+            filter_sys.filter_rhs(vec_rhs);
+
+            return vec_rhs;
+          }
+
+          /**
+           * \brief Assembles an intial guess vector
+           *
+           * \returns A vector to be passed to an iterative solver as initial guess.
+           */
+          GlobalSystemVectorR assemble_sol_vector() const
+          {
+            XASSERTM(!empty(), "Assemble_sol_vector for empty functional");
+            GlobalSystemVectorR vec_sol(create_vector_r());
+
+            vec_sol.local().copy(coords_buffer.local());
+
+            return vec_sol;
+          }
+
+          /**
+           * \brief Assembles the gates on this level on a given DomainLayer
+           *
+           * \tparam DomainLayer_
+           * Type for the layer
+           *
+           * \param[in] dom_layer
+           * The layer to assemble the gates on
+           *
+           */
+          template<typename DomainLayer_>
+          void assemble_gates(const DomainLayer_& dom_layer)
+          {
+            // set the gate comm
+            gate_sys.set_comm(dom_layer.comm_ptr());
+            gate_scalar.set_comm(dom_layer.comm_ptr());
+
+            // Loop over all ranks
+            for(Index i(0); i < dom_layer.neighbour_count(); ++i)
+            {
+              int rank(dom_layer.neighbour_rank(i));
+
+              // try to find our halo
+              auto* halo = local_functional.get_mesh_node()->find_halo_mesh_part(rank);
+              XASSERTM(halo != nullptr, "Halo not found.");
+
+              // assemble the system mirror
+              SystemMirror sys_mirror;
+              Assembly::MirrorAssembler::assemble_mirror(sys_mirror, local_functional.trafo_space, *halo);
+
+              // push mirror into gates
+              gate_sys.push(rank, std::move(sys_mirror));
+
+              // assemble the scalar mirror
+              ScalarMirror scalar_mirror;
+              Assembly::MirrorAssembler::assemble_mirror(scalar_mirror, local_functional.trafo_space, *halo);
+
+              // push mirror into gates
+              gate_scalar.push(rank, std::move(scalar_mirror));
+            }
+
+            // create local template vectors
+            LocalSystemVectorR tmp_sys(local_functional.trafo_space.get_num_dofs());
+            LocalScalarVector tmp_scalar(local_functional.trafo_space.get_num_dofs());
+
+            // compile gates
+            gate_sys.compile(std::move(tmp_sys));
+            gate_scalar.compile(std::move(tmp_scalar));
+          }
+
+          /**
+           * \brief Assembles the transfer operators from this level to a coarser one
+           *
+           * \param[in] level_coarse
+           * Target coarse level for the transfer operators.
+           *
+           */
+          void assemble_system_transfer(const MeshoptSystemLevel& level_coarse)
+          {
+            // get global transfer operator
+            GlobalSystemTransfer& glob_trans = this->transfer_sys;
+
+            // get local transfer operator
+            LocalSystemTransfer& loc_trans = glob_trans.local();
+
+            // get local transfer matrices
+            typename LocalSystemTransferMatrix::BaseClass& loc_prol = loc_trans.get_mat_prol();
+            typename LocalSystemTransferMatrix::BaseClass& loc_rest = loc_trans.get_mat_rest();
+
+            // assemble structure?
+            if (loc_prol.empty())
+            {
+              Assembly::SymbolicAssembler::assemble_matrix_2lvl(
+                loc_prol, local_functional.trafo_space, level_coarse.local_functional.trafo_space);
+            }
+
+            // Create a global scalar weight vector
+            GlobalScalarVector glob_vec_weight( &this->gate_scalar, loc_prol.create_vector_l());
+            // Get local scalar weight vector
+            auto& loc_vec_weight = glob_vec_weight.local();
+
+            // Assemble the underlying scalar prolongation matrix
+            {
+              Cubature::DynamicFactory cubature_factory("auto-degree:2");
+
+              loc_prol.format();
+              loc_vec_weight.format();
+
+              // Assemble prolongation matrix
+              Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
+              local_functional.trafo_space, level_coarse.local_functional.trafo_space, cubature_factory);
+
+              // Synchronise weight vector
+              glob_vec_weight.sync_0();
+
+              // Invert components
+              loc_vec_weight.component_invert(loc_vec_weight);
+
+              // Scale prolongation matrix
+              loc_prol.scale_rows(loc_prol, loc_vec_weight);
+
+              // Copy and transpose
+              loc_rest = loc_prol.transpose();
+            }
+          }
+
+      }; // class MeshoptSystemLevel
+
+      /**
+       * \brief SystemLevel for a quadratic mesh quality functional leading to a linear system
+       *
+       * \tparam Mem_
+       * Memory architecture for the system of equations wrt. the solver
+       *
+       * \tparam DT_
+       * Floating point type
+       *
+       * \tparam IT_
+       * Index type
+       *
+       * \tparam Functional_
+       * The (patch-) local quadratic mesh quality functional
+       *
+       * Since the mesh quality functional is quadratic, its gradient gives the linear system of equations to solve.
+       *
+       */
+      template
+      <
+        typename Mem_, typename DT_, typename IT_,
+        template<typename, typename, typename> class Functional_
+      >
+      class QuadraticSystemLevel : public MeshoptSystemLevel<Mem_, DT_, IT_, Functional_>
+      {
+        public:
+          /// Memory architecture for the solver
+          typedef Mem_ MemType;
+          /// Floating point precision for the solver
+          typedef DT_ DataType;
+          /// Index type for the solver
+          typedef IT_ IndexType;
+
+          /// Our base class
+          typedef MeshoptSystemLevel<Mem_, DT_, IT_, Functional_> BaseClass;
+
+          /// (Patch-) Local mesh quality functional type
+          typedef Functional_<Mem_, DT_, IT_> LocalFunctional;
+
+          /// The finite element space
+          typedef typename LocalFunctional::SpaceType SpaceType;
+          /// The underlying transformation
+          typedef typename LocalFunctional::TrafoType TrafoType;
+          /// The type of mesh we use
+          typedef typename TrafoType::MeshType MeshType;
+
+          /// The local system matrix type (for the gradient)
+          typedef typename LocalFunctional::MatrixType LocalMatrix;
+          /// Local left-vectors (dual space)
+          typedef typename BaseClass::LocalSystemVectorL LocalSystemVectorL;
+          /// Local right-vectors (primal space)
+          typedef typename BaseClass::LocalSystemVectorR LocalSystemVectorR;
+          /// Local vectors of scalar quantities
+          typedef typename BaseClass::LocalScalarVector LocalScalarVector;
+          /// Local coordinates buffer type for passing information to or from the mesh
+          typedef typename BaseClass::LocalCoordsBuffer LocalCoordsBuffer;
+          /// Local inter-level transfer matrix
+          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, LocalFunctional::MeshType::world_dim>
+            LocalSystemTransferMatrix;
+          /// Local transfer operator
+          typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
+
+          /// Filter for the local system
+          typedef typename LocalFunctional::FilterType LocalSystemFilter;
+          /// This is comprised of a sequence of SlipFilters...
+          typedef typename LocalFunctional::SlipFilterSequence LocalSlipFilterSequence;
+          /// ... and a sequence of UnitFilters
+          typedef typename LocalFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
+
+          /// Mirrors for system vectors
+          typedef typename BaseClass::SystemMirror SystemMirror;
+          /// Gates for the system
+          typedef typename BaseClass::SystemGate SystemGate;
+          /// Mirrors for scalar vectors
+          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
+          /// Gates for scalar vectors
+          typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
+
+          /// Global mesh quality functional type
+          typedef Global::Matrix<LocalMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
+          /// Global system filter type
+          typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
+          /// Global scalar vector type
+          typedef Global::Vector<LocalScalarVector, ScalarMirror> GlobalScalarVector;
+          /// Global left-vectors
+          typedef Global::Vector<LocalSystemVectorL, SystemMirror> GlobalSystemVectorL;
+          /// Global right-vectors
+          typedef Global::Vector<LocalSystemVectorR, SystemMirror> GlobalSystemVectorR;
+          /// Global coordinates buffer
+          typedef Global::Vector<LocalCoordsBuffer, SystemMirror> GlobalCoordsBuffer;
+          /// Global system transfer operator
+          typedef Global::Transfer<LocalSystemTransfer, SystemMirror> GlobalSystemTransfer;
+          /// The global muxer for mapping data from one partitioning to the other on this level
+          typedef Global::Muxer<LocalSystemVectorR, SystemMirror> GlobalSystemMuxer;
+
+        public:
+          /// The global system matrix
+          GlobalSystemMatrix matrix_sys;
+
+        public:
+          /**
+           * \brief Variadic template constructor
+           *
+           * \tparam Args_
+           * For passing to the constructor of local_functional
+           *
+           * \param[in] level_index
+           * The refinement level since the mesh was constructed
+           *
+           * \param[in] rmn
+           * The root mesh node on this level
+           *
+           * \param[in] trafo
+           * The transformation on this level
+           *
+           * \param[in] dirichlet_list
+           * List of the names of all Dirichlet boundaries
+           *
+           * \param[in] slip_list
+           * List of the names of all slip boundaries
+           *
+           * \param[in] args
+           * Additional arguments that get passed to the constructor of local_functional
+           *
+           */
+          template<typename... Args_>
+          explicit QuadraticSystemLevel(const int level_index,
+          Geometry::RootMeshNode<MeshType>* rmn,
+          TrafoType& trafo,
+          const std::deque<String>& dirichlet_list,
+          const std::deque<String>& slip_list,
+          Args_&&... args) :
+            BaseClass(level_index, rmn, trafo, dirichlet_list, slip_list, std::forward<Args_>(args)...),
+            matrix_sys(&(BaseClass::gate_sys), &(BaseClass::gate_sys),
+            BaseClass::local_functional.matrix_sys.clone(LAFEM::CloneMode::Shallow))
+            {
+            }
+
+          /**
+           * \brief Empty virtual destructor
+           */
+          virtual ~QuadraticSystemLevel()
+          {
           }
 
       }; // class QuadraticSystemLevel<...>
@@ -432,7 +810,7 @@ namespace FEAT
         typename Mem_, typename DT_, typename IT_,
         template<typename, typename, typename> class Functional_
       >
-      class NonlinearSystemLevel
+      class NonlinearSystemLevel : public MeshoptSystemLevel<Mem_, DT_, IT_, Functional_>
       {
         public:
           /// Memory architecture for the solver
@@ -444,6 +822,16 @@ namespace FEAT
 
           /// (Patch-) Local mesh quality functional type
           typedef Functional_<Mem_, DT_, IT_> LocalFunctional;
+
+          /// Our base class
+          typedef MeshoptSystemLevel<Mem_, DT_, IT_, Functional_> BaseClass;
+
+          /// The finite element space
+          typedef typename LocalFunctional::SpaceType SpaceType;
+          /// The underlying transformation
+          typedef typename LocalFunctional::TrafoType TrafoType;
+          /// The type of mesh we use
+          typedef typename TrafoType::MeshType MeshType;
 
           /// Local left-vectors (dual space)
           typedef typename LocalFunctional::VectorTypeL LocalSystemVectorL;
@@ -493,56 +881,45 @@ namespace FEAT
           typedef Global::Muxer<LocalSystemVectorR, SystemMirror> GlobalSystemMuxer;
 
         public:
-          /// The scalar gate
-          ScalarGate gate_scalar;
-          /// The system gate
-          SystemGate gate_sys;
-          /// The global filter
-          GlobalSystemFilter filter_sys;
-          /// The global system matrix
+          /// The global nonlinear functional
           GlobalFunctional global_functional;
-          /// This contains a shallow copy of the operator's coords_buffer
-          GlobalCoordsBuffer coords_buffer;
-          /// The global partition muxer on this level
-          GlobalSystemMuxer coarse_muxer_sys;
-          /// The global transfer operator from this level to the next coarser one
-          GlobalSystemTransfer transfer_sys;
-
-        private:
-          /// This is the number of refines it took from the mesh at the file level to here
-          const int _level_index;
 
         public:
           /**
            * \brief Variadic template constructor
+           *
+           * \tparam Args_
+           * For passing to the constructor of local_functional
+           *
+           * \param[in] level_index
+           * The refinement level since the mesh was constructed
+           *
+           * \param[in] rmn
+           * The root mesh node on this level
+           *
+           * \param[in] trafo
+           * The transformation on this level
            *
            * \param[in] dirichlet_list
            * List of the names of all Dirichlet boundaries
            *
            * \param[in] slip_list
            * List of the names of all slip boundaries
+           *
+           * \param[in] args
+           * Additional arguments that get passed to the constructor of local_functional
+           *
            */
           template<typename... Args_>
           explicit NonlinearSystemLevel(const int level_index,
+          Geometry::RootMeshNode<MeshType>* rmn,
+          TrafoType& trafo,
           const std::deque<String>& dirichlet_list,
           const std::deque<String>& slip_list,
           Args_&&... args) :
-            gate_sys(),
-            filter_sys(),
-            global_functional(&gate_sys, &gate_sys, std::forward<Args_>(args)...),
-            coords_buffer(&gate_sys, global_functional.local().get_coords().clone(LAFEM::CloneMode::Shallow)),
-            coarse_muxer_sys(),
-            transfer_sys(&coarse_muxer_sys),
-            _level_index(level_index)
+            BaseClass(level_index, rmn, trafo, dirichlet_list, slip_list, std::forward<Args_>(args)...),
+            global_functional(&(BaseClass::gate_sys), &(BaseClass::gate_sys), BaseClass::local_functional)
             {
-
-              LocalSlipFilterSequence slip_sequence(slip_list);
-              LocalDirichletFilterSequence dirichlet_sequence(dirichlet_list);
-
-              LocalSystemFilter local_filter (std::move(slip_sequence), std::move(dirichlet_sequence));
-
-              filter_sys.local() = std::move(local_filter);
-
             }
 
           /**
@@ -552,438 +929,7 @@ namespace FEAT
           {
           }
 
-          /**
-           * \brief Returns the level index
-           *
-           * The level index is the number of times the underlying mesh was refined since reading its construction.
-           */
-          int get_level_index()
-          {
-            return _level_index;
-          }
-
-          /**
-           * \brief Returns if the local functional is empty
-           *
-           * \returns True if the local functional is empty
-           */
-          bool empty() const
-          {
-            return global_functional.local().empty();
-          }
-
-          /**
-           * \brief Creates a new (left) vector
-           */
-          GlobalSystemVectorL create_vector_l() const
-          {
-            return global_functional.create_vector_l();
-          }
-
-          /**
-           * \brief Creates a new (right) vector
-           */
-          GlobalSystemVectorR create_vector_r() const
-          {
-            return global_functional.create_vector_r();
-          }
-
       }; // class NonlinearSystemLevel<...>
-
-      /**
-       * \brief Base class for assembler levels for mesh optimisation
-       *
-       * Control objects inheriting from MeshControlBase may overwrite this, but it contains all basic
-       * functionality.
-       *
-       */
-      template<typename DomainLevel_>
-      class MeshoptAssemblerLevel
-      {
-        public:
-          /// Type for one level of the DomainControl, needed i.e. for multigrid solvers
-          typedef DomainLevel_ DomainLevelType;
-          /// Type for one layer of the DomainControl, needed i.e. for ScaRC
-          typedef Control::Domain::DomainLayer DomainLayerType;
-
-          /// The finite element space
-          typedef typename DomainLevel_::SpaceType SpaceType;
-          /// The underlying transformation
-          typedef typename DomainLevel_::TrafoType TrafoType;
-          /// The type of mesh we use
-          typedef typename TrafoType::MeshType MeshType;
-
-        public:
-          /// The domain level holding the RootMeshNode this refers to
-          DomainLevelType& domain_level;
-          /// The mesh the transformation and our FE spaces live on
-          MeshType& mesh;
-          /// The transformation
-          TrafoType& trafo;
-          /// The FE space we solve our problem on
-          SpaceType& trafo_space;
-          /// Cubature factory for integration
-          Cubature::DynamicFactory cubature;
-
-          /// All UnitFilterAssemblers for mesh optimisation
-          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
-          /// All SlipFilterAssemblers for mesh optimisation
-          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
-
-        public:
-          /**
-           * \brief Standard constructor
-           */
-          explicit MeshoptAssemblerLevel(DomainLevelType& dom_lvl, const std::deque<String>& dirichlet_list,
-          const std::deque<String>& slip_list) :
-            domain_level(dom_lvl),
-            mesh(domain_level.get_mesh()),
-            trafo(domain_level.trafo),
-            trafo_space(domain_level.space),
-            cubature("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree)+2)),
-            dirichlet_asm(),
-            slip_asm()
-            {
-              // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
-              // insert it into the std::map
-              for(auto& it : dirichlet_list)
-              {
-                // Create empty assembler
-                auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
-
-                // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
-                // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
-                auto* mpp = domain_level.get_mesh_node()->find_mesh_part(it);
-                if(mpp != nullptr)
-                {
-                  new_asm->add_mesh_part(*mpp);
-                }
-
-                // Insert into the map
-                String identifier(it);
-                dirichlet_asm.emplace(identifier, new_asm);
-              }
-
-              // For every MeshPart specified in the list of slip boundaries, create a SlipFilterAssembler and
-              // insert it into the std::map
-              for(auto& it : slip_list)
-              {
-                // Create empty assembler
-                auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(mesh);
-
-                // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
-                // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
-                auto* mpp = domain_level.get_mesh_node()->find_mesh_part(it);
-                if(mpp != nullptr)
-                {
-                  new_asm->add_mesh_part(*mpp);
-                }
-
-                // Insert into the map
-                String identifier(it);
-                slip_asm.emplace(identifier, new_asm);
-              }
-
-            }
-
-          /// Explicitly delete default constructor
-          MeshoptAssemblerLevel() = delete;
-          /// Explicitly delete the copy constructor
-          MeshoptAssemblerLevel(const MeshoptAssemblerLevel&) = delete;
-          /// Explicitly delete the move constructor. This could be useful to have, though.
-          MeshoptAssemblerLevel(MeshoptAssemblerLevel&&) = delete;
-
-          /**
-           * \brief Empty virtual destructor
-           */
-          virtual ~MeshoptAssemblerLevel()
-          {
-          }
-
-          template<typename SystemLevel_>
-          void assemble_system_filter(SystemLevel_& sys_level)
-          {
-            // get our global system filter
-            typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
-            // get our local system filter
-            typename SystemLevel_::LocalSystemFilter& fil_loc = fil_glob.local();
-
-            // Assemble homogeneous dirichlet filters
-            auto& dirichlet_filters = fil_loc.template at<1>();
-            for(auto& it : dirichlet_filters)
-            {
-              const auto& assembler = dirichlet_asm.find(it.first);
-              if(assembler == dirichlet_asm.end())
-              {
-                throw InternalError(__func__,__FILE__,__LINE__,
-                "Could not find dirichlet assembler for filter with key "+it.first);
-              }
-
-              assembler->second->assemble(it.second, trafo_space);
-            }
-
-            // The slip filter contains the outer unit normal, so reassemble it
-            auto& slip_filters = fil_loc.template at<0>();
-            for(auto& it : slip_filters)
-            {
-              const auto& assembler = slip_asm.find(it.first);
-              if(assembler == slip_asm.end())
-              {
-                throw InternalError(__func__,__FILE__,__LINE__,
-                "Could not find slip filter assembler for filter with key "+it.first);
-              }
-
-              assembler->second->assemble(it.second, trafo_space);
-            }
-
-            // Sync the filter vectors in the SlipFilters
-            {
-              for(auto& it : slip_filters)
-              {
-                // Get the filter vector
-                auto& slip_filter_vector = it.second.get_filter_vector();
-
-                if(slip_filter_vector.used_elements() > 0)
-                {
-                  // Temporary DenseVector for syncing
-                  typename SystemLevel_::LocalSystemVectorL tmp(slip_filter_vector.size());
-                  auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-                  auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
-
-                  // Copy sparse filter vector contents to DenseVector
-                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-                  {
-                    Index idense(slip_filter_vector.indices()[isparse]);
-                    tmp_elements[idense] = sfv_elements[isparse];
-                  }
-
-                  sys_level.gate_sys.sync_0(tmp);
-
-                  // Copy sparse filter vector contents to DenseVector
-                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-                  {
-                    Index idense(slip_filter_vector.indices()[isparse]);
-                    sfv_elements[isparse] = tmp_elements[idense];
-                  }
-                }
-                else
-                {
-                  // Temporary DenseVector for syncing
-                  typename SystemLevel_::LocalSystemVectorL tmp(slip_filter_vector.size());
-                  sys_level.gate_sys.sync_0(tmp);
-                }
-              }
-
-            } // evil slip filter sync
-
-          }
-
-          template<typename SystemLevel_>
-          void assemble_system_filter(SystemLevel_& sys_level,
-          /* const */ typename SystemLevel_::GlobalSystemVectorR& vec)
-          {
-          // get our global system filter
-          typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
-          // get our local system filter
-          typename SystemLevel_::LocalSystemFilter& fil_loc = fil_glob.local();
-
-          typename SystemLevel_::LocalSystemVectorR& vec_loc = vec.local();
-
-          // Assemble Dirichlet boundary conditions from sol, as this->_coords contains the new boundary
-          // coordinates
-          auto& dirichlet_filters = fil_loc.template at<1>();
-
-          for(auto& it : dirichlet_filters)
-          {
-            const auto& assembler = dirichlet_asm.find(it.first);
-            if(assembler == dirichlet_asm.end())
-            {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find dirichlet assembler for filter with key "+it.first);
-            }
-
-            assembler->second->assemble(it.second, trafo_space, vec_loc);
-          }
-
-          // The slip filter contains the outer unit normal, so reassemble it
-          auto& slip_filters = fil_loc.template at<0>();
-
-          for(auto& it : slip_filters)
-          {
-            const auto& assembler = slip_asm.find(it.first);
-            if(assembler == slip_asm.end())
-            {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find slip filter assembler for filter with key "+it.first);
-            }
-
-            assembler->second->assemble(it.second, trafo_space);
-          }
-
-          // Sync the filter vectors in the SlipFilters
-          {
-            for(auto& it : slip_filters)
-            {
-              // Get the filter vector
-              auto& slip_filter_vector = it.second.get_filter_vector();
-
-              if(slip_filter_vector.used_elements() > 0)
-              {
-                // Temporary DenseVector for syncing
-                typename SystemLevel_::LocalSystemVectorL tmp(slip_filter_vector.size());
-                auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-                auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
-
-                // Copy sparse filter vector contents to DenseVector
-                for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-                {
-                  Index idense(slip_filter_vector.indices()[isparse]);
-                  tmp_elements[idense] = sfv_elements[isparse];
-                }
-
-                sys_level.gate_sys.sync_0(tmp);
-
-                // Copy sparse filter vector contents to DenseVector
-                for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-                {
-                  Index idense(slip_filter_vector.indices()[isparse]);
-                  sfv_elements[isparse] = tmp_elements[idense];
-                }
-              }
-              else
-              {
-                // Temporary DenseVector for syncing
-                typename SystemLevel_::LocalSystemVectorL tmp;
-                sys_level.gate_sys.sync_0(tmp);
-              }
-            }
-
-          } // evil slip filter sync
-
-          }
-
-          template<typename SystemLevel_>
-          typename SystemLevel_::GlobalSystemVectorL assemble_rhs_vector(SystemLevel_& sys_level)
-          {
-            XASSERTM(!sys_level.empty(), "Assemble_rhs_vector for empty functional");
-            // create new vector
-            typename SystemLevel_::GlobalSystemVectorL vec_rhs(sys_level.create_vector_l());
-
-            vec_rhs.format();
-
-            // get our local system filter
-            typename SystemLevel_::LocalSystemFilter& fil_loc = sys_level.filter_sys.local();
-
-            fil_loc.filter_rhs(vec_rhs.local());
-
-            return vec_rhs;
-          }
-
-          template<typename SystemLevel_>
-          typename SystemLevel_::GlobalSystemVectorR assemble_sol_vector(SystemLevel_& sys_level)
-          {
-            XASSERTM(!sys_level.empty(), "Assemble_sol_vector for empty functional");
-            typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.create_vector_r());
-            vec_sol.local().copy(sys_level.coords_buffer.local());
-
-            return vec_sol;
-          }
-
-          template<typename SystemLevel_>
-          void assemble_gates(const DomainLayerType& dom_layer, SystemLevel_& sys_level)
-          {
-            // Create the system gate
-            typename SystemLevel_::SystemGate& gate_sys = sys_level.gate_sys;
-            // Create the scalar gate
-            typename SystemLevel_::ScalarGate& gate_scalar = sys_level.gate_scalar;
-
-            // set the gate comm
-            gate_sys.set_comm(dom_layer.comm_ptr());
-            gate_scalar.set_comm(dom_layer.comm_ptr());
-
-            // Loop over all ranks
-            for(Index i(0); i < dom_layer.neighbour_count(); ++i)
-            {
-              int rank(dom_layer.neighbour_rank(i));
-
-              // try to find our halo
-              auto* halo = domain_level.find_halo_part(rank);
-              XASSERTM(halo != nullptr, "Halo not found.");
-
-              // assemble the system mirror
-              typename SystemLevel_::SystemMirror sys_mirror;
-              Assembly::MirrorAssembler::assemble_mirror(sys_mirror, this->trafo_space, *halo);
-
-              // push mirror into gates
-              gate_sys.push(rank, std::move(sys_mirror));
-
-              // assemble the scalar mirror
-              typename SystemLevel_::ScalarMirror scalar_mirror;
-              Assembly::MirrorAssembler::assemble_mirror(scalar_mirror, this->trafo_space, *halo);
-
-              // push mirror into gates
-              gate_scalar.push(rank, std::move(scalar_mirror));
-            }
-
-            // create local template vectors
-            typename SystemLevel_::LocalSystemVectorR tmp_sys(trafo_space.get_num_dofs());
-            typename SystemLevel_::LocalScalarVector tmp_scalar(trafo_space.get_num_dofs());
-
-            // compile gates
-            gate_sys.compile(std::move(tmp_sys));
-            gate_scalar.compile(std::move(tmp_scalar));
-          }
-
-          template<typename SystemLevel_>
-          void assemble_system_transfer(SystemLevel_& sys_level_fine, MeshoptAssemblerLevel& level_coarse)
-          {
-            // get global transfer operator
-            typename SystemLevel_::GlobalSystemTransfer& glob_trans = sys_level_fine.transfer_sys;
-
-            // get local transfer operator
-            typename SystemLevel_::LocalSystemTransfer& loc_trans = glob_trans.local();
-
-            // get local transfer matrices
-            typename SystemLevel_::LocalSystemTransferMatrix::BaseClass& loc_prol = loc_trans.get_mat_prol();
-            typename SystemLevel_::LocalSystemTransferMatrix::BaseClass& loc_rest = loc_trans.get_mat_rest();
-
-            // assemble structure?
-            if (loc_prol.empty())
-            {
-              Assembly::SymbolicAssembler::assemble_matrix_2lvl(
-                loc_prol, this->trafo_space, level_coarse.trafo_space);
-            }
-
-            // Create a global scalar weight vector
-            typename SystemLevel_::GlobalScalarVector glob_vec_weight(
-              &sys_level_fine.gate_scalar, loc_prol.create_vector_l());
-            // Get local scalar weight vector
-            auto& loc_vec_weight = glob_vec_weight.local();
-
-            // Assemble the underlying scalar prolongation matrix
-            {
-              loc_prol.format();
-              loc_vec_weight.format();
-
-              // Assemble prolongation matrix
-              Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
-              this->trafo_space, level_coarse.trafo_space, this->cubature);
-
-              // Synchronise weight vector
-              glob_vec_weight.sync_0();
-
-              // Invert components
-              loc_vec_weight.component_invert(loc_vec_weight);
-
-              // Scale prolongation matrix
-              loc_prol.scale_rows(loc_prol, loc_vec_weight);
-
-              // Copy and transpose
-              loc_rest = loc_prol.transpose();
-            }
-          }
-
-      }; // class MeshoptAssemblerLevel
 
     } // namespace Meshopt
 

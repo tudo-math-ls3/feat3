@@ -87,8 +87,6 @@ namespace FEAT
           using LocalFunctionalType =  FEAT::Meshopt::DuDvFunctional<A, B, C, TrafoType>;
           /// Linear system of equations on one refinement level
           typedef QuadraticSystemLevel<Mem_, DT_, IT_, LocalFunctionalType> SystemLevelType;
-          /// The assembler level type
-          typedef DuDvFunctionalAssemblerLevel<DomainLevelType> AssemblerLevelType;
 
           /// Inter-level transfer matrix
           typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
@@ -96,17 +94,19 @@ namespace FEAT
           typedef typename SystemLevelType::GlobalSystemVectorL GlobalSystemVectorL;
           /// Global right vector type
           typedef typename SystemLevelType::GlobalSystemVectorR GlobalSystemVectorR;
+          /// Global system matrix
+          typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
+          /// Global system filter
+          typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
 
-          /// For every level of refinement we have one assembler level
-          std::deque<AssemblerLevelType*> _assembler_levels;
           /// For every level of refinement, we have one system level
           std::deque<SystemLevelType*> _system_levels;
 
           /// The MatrixStock to be passed to the SolverFactory
           Solver::MatrixStock
           <
-            typename SystemLevelType::GlobalSystemMatrix,
-            typename SystemLevelType::GlobalSystemFilter,
+            GlobalSystemMatrix,
+            GlobalSystemFilter,
             typename SystemLevelType::GlobalSystemTransfer
           > _mst;
 
@@ -152,8 +152,7 @@ namespace FEAT
             const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
             const String& solver_name_, PropertyMap& solver_config_,
             bool fixed_reference_domain_):
-            BaseClass(dom_ctrl),
-            _assembler_levels(),
+            BaseClass(dom_ctrl, dirichlet_list, slip_list),
             _system_levels(),
             _mst(),
             solver_config(solver_config_),
@@ -187,17 +186,11 @@ namespace FEAT
 
               for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
               {
-                // dereference dom_ctrl to get the physical level from the virtual one
-                _assembler_levels.push_back(new AssemblerLevelType(*dom_ctrl.at(i),
-                dirichlet_list, slip_list));
-
                 _system_levels.push_back( new SystemLevelType(
                   dom_ctrl.at(i)->get_level_index(),
-                  dirichlet_list, slip_list,
                   dom_ctrl.at(i)->get_mesh_node(),
-                  &(_assembler_levels.at(i)->trafo_space),
-                  &(_assembler_levels.at(i)->dirichlet_asm),
-                  &(_assembler_levels.at(i)->slip_asm)));
+                  dom_ctrl.at(i)->trafo,
+                  dirichlet_list, slip_list));
 
                 // This assembles the system matrix symbolically
                 _system_levels.at(i)->local_functional.init();
@@ -206,41 +199,20 @@ namespace FEAT
               // Now that _system_levels has the correct size, we can use get_num_levels()
               for(Index i(0); i < get_num_levels(); ++i)
               {
-                _assembler_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer(), *_system_levels.at(i));
+                _system_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer());
               }
 
               // Assemble the transfer matrices on all levels except for the coarsest
               for(Index i(0); i+1 < get_num_levels(); ++i)
               {
-                _assembler_levels.at(i)->assemble_system_transfer(*_system_levels.at(i), *_assembler_levels.at(i+1));
+                _system_levels.at(i)->assemble_system_transfer(*_system_levels.at(i+1));
               }
 
-              for(Index i(0); i < get_num_levels(); ++i)
-              {
-                _assembler_levels.at(i)->assemble_system_matrix(*_system_levels.at(i));
-              }
-
-              typename SystemLevelType::LocalSystemVectorR vec_buf;
-              vec_buf.convert(_system_levels.front()->coords_buffer.local());
-
-              for(size_t level(0); level < dom_ctrl.size_physical(); ++level )
-              {
-                Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
-
-                // At this point, what we really need is a primal restriction operator that restricts the FE function
-                // representing the coordinate distribution to the coarser level. This is very simple for continuous
-                // Lagrange elements (just discard the additional information from the fine level), but not clear in
-                // the generic case. So we use an evil hack here:
-                // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
-                // the fine level vector.
-                typename SystemLevelType::GlobalSystemVectorR
-                  global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
-
-                _system_levels.at(level)->local_functional.prepare(
-                    global_vec_level.local(), _system_levels.at(level)->filter_sys.local());
-
-                _assembler_levels.at(level)->assemble_system_filter(*(_system_levels.at(level)), global_vec_level);
-              }
+              // Now we need to assemble the filters on all levels before any shallow copies are made. This is done
+              // by calling prepare()
+              typename SystemLevelType::GlobalSystemVectorR vec_buf;
+              vec_buf.local().convert(_system_levels.front()->coords_buffer.local());
+              prepare(vec_buf);
 
               for(Index i(0); i < get_num_levels(); ++i)
               {
@@ -273,12 +245,6 @@ namespace FEAT
            */
           virtual ~DuDvFunctionalControl()
           {
-            while(!_assembler_levels.empty())
-            {
-              delete _assembler_levels.back();
-              _assembler_levels.pop_back();
-            }
-
             while(!_system_levels.empty())
             {
               delete _system_levels.back();
@@ -319,13 +285,13 @@ namespace FEAT
               + stringify(fixed_reference_domain);
             comm_world.print(msg);
 
-            for(const auto& it : get_dirichlet_boundaries())
+            for(const auto& it : this->get_dirichlet_boundaries())
             {
               msg = String("Displacement BC on").pad_back(pad_width, '.') + String(": ") + it;
               comm_world.print(msg);
             }
 
-            for(const auto& it : get_slip_boundaries())
+            for(const auto& it : this->get_slip_boundaries())
             {
               msg = String("Unilateral BC of place on").pad_back(pad_width, '.') + String(": ") + it;
               comm_world.print(msg);
@@ -393,7 +359,7 @@ namespace FEAT
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(0); level < get_num_levels(); ++level)
             {
-              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(level)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -421,7 +387,7 @@ namespace FEAT
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(0); level < get_num_levels(); ++level )
             {
-              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(level)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -437,26 +403,26 @@ namespace FEAT
 
           }
 
-          /// \copydoc BaseClass::get_dirichlet_boundaries()
-          virtual std::deque<String> get_dirichlet_boundaries() const override
+          /// \copydoc BaseClass::add_to_vtk_exporter()
+          virtual void add_to_vtk_exporter(
+            Geometry::ExportVTK<MeshType>& exporter, const int lvl_index) const override
           {
-            std::deque<String> dirichlet_boundaries;
+            for(size_t pos(0); pos < get_num_levels(); ++pos)
+            {
+              if(this->_system_levels.at(pos)->get_level_index() == lvl_index)
+              {
+                const auto& sys_lvl = this->_system_levels.at(pos);
+                sys_lvl->local_functional.add_to_vtk_exporter(exporter);
 
-            for(const auto& it:_assembler_levels.front()->dirichlet_asm)
-              dirichlet_boundaries.push_back(it.first);
-
-            return dirichlet_boundaries;
-          }
-
-          /// \copydoc BaseClass::get_slip_boundaries()
-          virtual std::deque<String> get_slip_boundaries() const override
-          {
-            std::deque<String> slip_boundaries;
-
-            for(const auto& it:_assembler_levels.front()->slip_asm)
-              slip_boundaries.push_back(it.first);
-
-            return slip_boundaries;
+                for(auto& it:sys_lvl->filter_sys.local().template at<0>())
+                {
+                  const String field_name("nu_"+it.first);
+                  // WARNING: This explicitly assumes that the filter vector belong to a P1/Q1 space and thus "lives"
+                  // in the mesh's vertices
+                  exporter.add_vertex_vector(field_name, it.second.get_filter_vector());
+                }
+              }
+            }
           }
 
           /**
@@ -472,7 +438,7 @@ namespace FEAT
             {
               for(size_t lvl(0); lvl < size_t(get_num_levels()); ++lvl)
               {
-                _assembler_levels.at(lvl)->assemble_system_matrix(*(_system_levels.at(lvl)));
+                _system_levels.at(lvl)->local_functional.assemble_system_matrix();
               }
             }
           }
@@ -485,7 +451,7 @@ namespace FEAT
 
             for(size_t level(0); level < get_num_levels(); ++level)
             {
-              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(level)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -499,7 +465,8 @@ namespace FEAT
               _system_levels.at(level)->local_functional.prepare(
                 vec_buf, _system_levels.at(level)->filter_sys.local());
 
-              _assembler_levels.at(level)->assemble_system_filter(*(_system_levels.at(level)), global_vec_level);
+              _system_levels.at(level)->sync_system_filter();
+
             }
 
           }
@@ -538,11 +505,10 @@ namespace FEAT
 
             // fetch our finest levels
             SystemLevelType& the_system_level = *_system_levels.at(meshopt_lvl_pos);
-            AssemblerLevelType& the_asm_level = *_assembler_levels.at(meshopt_lvl_pos);
 
             // Create our RHS and SOL vectors
-            GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
-            GlobalSystemVectorL vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+            GlobalSystemVectorR vec_rhs = the_system_level.assemble_rhs_vector();
+            GlobalSystemVectorL vec_sol = the_system_level.assemble_sol_vector();
 
             // Let it be knownst to Statitics that it was Us who called the solver
             FEAT::Statistics::expression_target = name();
@@ -586,7 +552,7 @@ namespace FEAT
               _system_levels.at(pos)->local_functional.buffer_to_mesh();
               // Now call adapt() on the slip boundaries
               auto* fine_mesh_node = this->_dom_ctrl.at(pos)->get_mesh_node();
-              for(const auto& it:get_slip_boundaries())
+              for(const auto& it:this->get_slip_boundaries())
               {
                 fine_mesh_node->adapt_by_name(it);
               }
@@ -595,7 +561,7 @@ namespace FEAT
             // Now we need to update all coarser levels
             for(size_t pos(meshopt_lvl_pos+1); pos < get_num_levels(); ++pos)
             {
-              Index ndofs(_assembler_levels.at(pos)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(pos)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -611,60 +577,12 @@ namespace FEAT
               _system_levels.at(pos)->local_functional.prepare(
                 global_sol_level.local(), _system_levels.at(pos)->filter_sys.local());
 
-              _assembler_levels.at(pos)->assemble_system_filter(*(_system_levels.at(pos)), global_sol_level);
-
               _system_levels.at(pos)->local_functional.get_coords().copy(global_sol_level.local());
               _system_levels.at(pos)->local_functional.buffer_to_mesh();
             }
 
           } // void optimise()
       };
-
-      /**
-       * \copydoc Control::Meshopt::MeshoptAssemblerLevel
-       */
-      template<typename DomainLevel_>
-      class DuDvFunctionalAssemblerLevel : public MeshoptAssemblerLevel<DomainLevel_>
-      {
-        public:
-          /// Our baseclass
-          typedef Control::Meshopt::MeshoptAssemblerLevel<DomainLevel_> BaseClass;
-          /// Type of the underlying transformation
-          typedef typename BaseClass::TrafoType TrafoType;
-          /// The shape dimension of the mesh's cells
-          static constexpr int shape_dim = BaseClass::MeshType::ShapeType::dimension;
-
-          // Copy baseclass constructors
-          using BaseClass::BaseClass;
-
-          /**
-           * \brief Assembles the system matrix on the given system level
-           *
-           * This is just a wrapper around the local functional's routine
-           */
-          template<typename SystemLevel_>
-          void assemble_system_matrix(SystemLevel_& sys_level)
-          {
-            sys_level.local_functional.assemble_system_matrix();
-          }
-
-          /**
-           * \brief Assembles the initial guess on the given system level
-           *
-           * This just copies the mesh's vertex coordinates and filters them.
-           */
-          template<typename SystemLevel_>
-          typename SystemLevel_::GlobalSystemVectorR assemble_sol_vector(SystemLevel_& sys_level)
-          {
-            XASSERTM(!sys_level.matrix_sys.local().empty(), "assemble_sol_vector for empty operator");
-            typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.matrix_sys.create_vector_r());
-            vec_sol.clone(sys_level.coords_buffer, LAFEM::CloneMode::Deep);
-
-            sys_level.filter_sys.filter_sol(vec_sol);
-
-            return vec_sol;
-          }
-      }; // class DuDvFunctionalAssemblerLevel
 
     } // namespace Meshopt
   } // namespace Control

@@ -100,7 +100,7 @@ namespace FEAT
           > SystemLevelType;
 
           /// Type for assembling FE space based quantities like filters, gates etc.
-          typedef MeshoptAssemblerLevel<DomainLevelType> AssemblerLevelType;
+          //typedef MeshoptAssemblerLevel<DomainLevelType> AssemblerLevelType;
 
           /// Preconditioner type. Becaus the preconditioner is expensive to assemble symbolically and numerically,
           /// it is kept and recycled between nonlinear solver calls, so we have to keep it.
@@ -110,8 +110,6 @@ namespace FEAT
             typename SystemLevelType::GlobalSystemFilter
           > PrecondType;
 
-          /// One assembler for every level
-          std::deque<AssemblerLevelType*> _assembler_levels;
           /// These hold the system information for each level
           std::deque<SystemLevelType*> _system_levels;
 
@@ -168,8 +166,7 @@ namespace FEAT
             const String& solver_name_,
             PropertyMap& solver_config_,
             Args_&&... args):
-            BaseClass(dom_ctrl),
-            _assembler_levels(),
+            BaseClass(dom_ctrl, dirichlet_list, slip_list),
             _system_levels(),
             solver_config(solver_config_),
             solver_name(solver_name_),
@@ -198,35 +195,27 @@ namespace FEAT
 
               XASSERT(meshopt_lvl_pos < dom_ctrl.size_physical());
 
-              for(Index i(0); i < dom_ctrl.size_physical(); ++i)
+              for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
               {
-                // Push new assembler level first
-                _assembler_levels.push_back(
-                  new AssemblerLevelType(*dom_ctrl.at(i), dirichlet_list, slip_list));
-                // Push new system level, this needs some references to members of the assembler level
-                _system_levels.push_back(new SystemLevelType(
+                _system_levels.push_back( new SystemLevelType(
                   dom_ctrl.at(i)->get_level_index(),
-                  dirichlet_list, slip_list,
                   dom_ctrl.at(i)->get_mesh_node(),
-                  _assembler_levels.at(i)->trafo_space,
-                  _assembler_levels.at(i)->dirichlet_asm,
-                  _assembler_levels.at(i)->slip_asm,
+                  dom_ctrl.at(i)->trafo,
+                  dirichlet_list, slip_list,
                   std::forward<Args_>(args)...));
               }
 
               for(Index i(0); i < get_num_levels(); ++i)
               {
-                _assembler_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer(), *_system_levels.at(i));
-                // Assemble the system filter, all homogeneous
-                _assembler_levels.at(i)->assemble_system_filter(*_system_levels.at(i));
+                _system_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer());
                 // Call the operator's init() on the current level. This needs the gates, so it cannot be called
                 // earlier
                 _system_levels.at(i)->global_functional.init();
               }
 
-              for(Index i(0); i < get_num_levels(); ++i)
+              for(Index i(0); i+1 < get_num_levels(); ++i)
               {
-                _assembler_levels.at(i)->assemble_system_transfer(*_system_levels.at(i), *_assembler_levels.at(i));
+                _system_levels.at(i+1)->assemble_system_transfer(*_system_levels.at(i));
               }
 
               auto* solver_section = solver_config.query_section(solver_name);
@@ -250,12 +239,6 @@ namespace FEAT
           /// \brief Virtual destructor
           virtual ~HyperelasticityFunctionalControl()
           {
-            while(!_assembler_levels.empty())
-            {
-              delete _assembler_levels.back();
-              _assembler_levels.pop_back();
-            }
-
             while(!_system_levels.empty())
             {
               delete _system_levels.back();
@@ -325,13 +308,13 @@ namespace FEAT
               + stringify(meshopt_lvl);
             comm_world.print(msg);
 
-            for(const auto& it : get_dirichlet_boundaries())
+            for(const auto& it : this->get_dirichlet_boundaries())
             {
               msg = String("Displacement BC on").pad_back(pad_width, '.') + String(": ") + it;
               comm_world.print(msg);
             }
 
-            for(const auto& it : get_slip_boundaries())
+            for(const auto& it : this->get_slip_boundaries())
             {
               msg = String("Unilateral BC of place on").pad_back(pad_width, '.') + String(": ") + it;
               comm_world.print(msg);
@@ -380,7 +363,7 @@ namespace FEAT
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(0); level < get_num_levels(); ++level )
             {
-              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(level)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -408,7 +391,7 @@ namespace FEAT
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(0); level < get_num_levels(); ++level )
             {
-              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(level)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -420,33 +403,6 @@ namespace FEAT
 
               _system_levels.at(level)->global_functional.local().get_coords().copy(vec_level);
             }
-
-          }
-
-          /// \copydoc BaseClass::get_dirichlet_boundaries()
-          virtual std::deque<String> get_dirichlet_boundaries() const override
-          {
-            std::deque<String> dirichlet_boundaries;
-
-            for(const auto& it:_assembler_levels.front()->dirichlet_asm)
-            {
-              dirichlet_boundaries.push_back(it.first);
-            }
-
-            return dirichlet_boundaries;
-          }
-
-          /// \copydoc BaseClass::get_slip_boundaries()
-          virtual std::deque<String> get_slip_boundaries() const override
-          {
-            std::deque<String> slip_boundaries;
-
-            for(const auto& it:_assembler_levels.front()->slip_asm)
-            {
-              slip_boundaries.push_back(it.first);
-            }
-
-            return slip_boundaries;
           }
 
           /// \copydoc BaseClass::add_to_vtk_exporter()
@@ -460,7 +416,7 @@ namespace FEAT
               {
 
                 const auto& sys_lvl = this->_system_levels.at(pos);
-                (*(sys_lvl->global_functional)).add_to_vtk_exporter(exporter);
+                sys_lvl->global_functional.local().add_to_vtk_exporter(exporter);
 
                 DataType fval(0);
                 auto grad = sys_lvl->global_functional.create_vector_r();
@@ -493,7 +449,7 @@ namespace FEAT
             for(size_t level(get_num_levels()); level > 0; )
             {
               --level;
-              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(level)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -518,11 +474,10 @@ namespace FEAT
           {
             // fetch our finest levels
             SystemLevelType& the_system_level = *_system_levels.at(meshopt_lvl_pos);
-            AssemblerLevelType& the_asm_level = *_assembler_levels.at(meshopt_lvl_pos);
 
             // create our RHS and SOL vectors
-            typename SystemLevelType::GlobalSystemVectorR vec_rhs(the_asm_level.assemble_rhs_vector(the_system_level));
-            typename SystemLevelType::GlobalSystemVectorL vec_sol(the_asm_level.assemble_sol_vector(the_system_level));
+            typename SystemLevelType::GlobalSystemVectorR vec_rhs(the_system_level.assemble_rhs_vector());
+            typename SystemLevelType::GlobalSystemVectorL vec_sol(the_system_level.assemble_sol_vector());
 
             TimeStamp at;
 
@@ -567,7 +522,7 @@ namespace FEAT
               _system_levels.at(pos)->global_functional.local().buffer_to_mesh();
               // Now call adapt() on the slip boundaries
               auto* fine_mesh_node = this->_dom_ctrl.at(pos)->get_mesh_node();
-              for(const auto& it:get_slip_boundaries())
+              for(const auto& it:this->get_slip_boundaries())
               {
                 fine_mesh_node->adapt_by_name(it);
               }
@@ -576,7 +531,7 @@ namespace FEAT
             // Now we need to update all coarser levels
             for(size_t pos(meshopt_lvl_pos+1); pos < get_num_levels(); ++pos)
             {
-              Index ndofs(_assembler_levels.at(pos)->trafo_space.get_num_dofs());
+              Index ndofs(_system_levels.at(pos)->local_functional.trafo_space.get_num_dofs());
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -587,12 +542,8 @@ namespace FEAT
               typename SystemLevelType::GlobalCoordsBuffer
                 global_sol_level( &(_system_levels.at(pos)->gate_sys), vec_sol.local(), ndofs, Index(0));
 
-              // prepare() needs to be called of the local object, because there is a Global::Matrix around it
-              // which knows nothing of prepare()
-              _system_levels.at(pos)->global_functional.local().prepare(
-                global_sol_level.local(), _system_levels.at(pos)->filter_sys.local());
-
-              _assembler_levels.at(pos)->assemble_system_filter(*(_system_levels.at(pos)), global_sol_level);
+              _system_levels.at(pos)->global_functional.prepare(
+                global_sol_level, _system_levels.at(pos)->filter_sys);
 
               _system_levels.at(pos)->global_functional.local().get_coords().copy(global_sol_level.local());
               _system_levels.at(pos)->global_functional.local().buffer_to_mesh();

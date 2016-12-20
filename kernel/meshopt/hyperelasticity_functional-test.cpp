@@ -92,8 +92,8 @@ template
       // Create the mesh
       MeshType* mesh(new MeshType(mesh_factory));
       // The filters will be empty, but we still need the filter and assembler objects
-      std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
-      std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
+      std::deque<String> dirichlet_list;
+      std::deque<String> slip_list;
       FilterType my_filter;
 
       // Create the root mesh node
@@ -116,7 +116,8 @@ template
       TrafoSpace trafo_space(trafo);
 
       // Create the mesh quality functional
-      MeshQualityFunctional rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional, Meshopt::ScaleComputation::current_uniform);
+      MeshQualityFunctional rumpflpumpfl(
+        rmn, trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
 
       // init() sets the coordinates in the mesh and computes h
       rumpflpumpfl.init();

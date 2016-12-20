@@ -61,29 +61,37 @@ namespace FEAT
         /// Gate for syncing column vectors
         GateColType* _col_gate;
         /// The underlying local nonlinear functional
-        LocalNonlinearFunctional_ _nonlinear_functional;
+        LocalNonlinearFunctional_& _nonlinear_functional;
 
       public:
 
-        /**
-         * \brief Variadic template constructor
-         *
-         * \param[in] row_gate
-         * Gate for communicating row-wise
-         *
-         * \param[in] column_gate
-         * Gate for communicating column-wise
-         *
-         * \note The gates might not be compiled yet, so they cannot be used for synchronisation in the constructor.
-         *
-         */
-        template<typename... Args_>
-        explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate, Args_&&... args) :
+        explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate,
+        LocalNonlinearFunctional_& nonlinear_functional) :
           _row_gate(row_gate),
           _col_gate(col_gate),
-          _nonlinear_functional(std::forward<Args_>(args)...)
+          _nonlinear_functional(nonlinear_functional)
           {
           }
+
+        ///**
+        // * \brief Variadic template constructor
+        // *
+        // * \param[in] row_gate
+        // * Gate for communicating row-wise
+        // *
+        // * \param[in] column_gate
+        // * Gate for communicating column-wise
+        // *
+        // * \note The gates might not be compiled yet, so they cannot be used for synchronisation in the constructor.
+        // *
+        // */
+        //template<typename... Args_>
+        //explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate, Args_&&... args) :
+        //  _row_gate(row_gate),
+        //  _col_gate(col_gate),
+        //  _nonlinear_functional(std::forward<Args_>(args)...)
+        //  {
+        //  }
 
         /// Explicitly delete default constructor
         NonlinearFunctional() = delete;
@@ -232,7 +240,7 @@ namespace FEAT
         {
 
           // Prepare the patch local nonlinear functional, computing everything that does need synchronising
-          _nonlinear_functional.prepare_pre_sync(*vec_state, *filter);
+          _nonlinear_functional.prepare_pre_sync(vec_state.local(), filter.local());
 
           // Synchronise the necessary parts
           while(!_nonlinear_functional.sync_scalars.empty())
@@ -254,13 +262,13 @@ namespace FEAT
           }
 
           // Prepare the rest of the functional
-          _nonlinear_functional.prepare_post_sync(*vec_state, *filter);
+          _nonlinear_functional.prepare_post_sync(vec_state.local(), filter.local());
 
           // Sync the filter vector in the SlipFilter
           if(_col_gate != nullptr )
           {
             // For all slip filters...
-            for(auto& it : (*filter).template at<0>())
+            for(auto& it : filter.local().template at<0>())
             {
               // get the filter vector
               auto& slip_filter_vector = it.second.get_filter_vector();
