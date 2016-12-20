@@ -304,7 +304,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
         const Index* row_ptr(matrix.row_ptr());
-        DT_* v(matrix.val());
+        auto* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
