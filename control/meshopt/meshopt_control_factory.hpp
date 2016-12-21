@@ -320,29 +320,45 @@ namespace FEAT
          * \tparam DomCtrl_
          * The domain control type.
          *
+         * \tparam CellFunctional_
+         * The cell-local functional's type
+         *
          * \param[in] dom_ctrl
          * The DomainControl containing meshes on all levels, the atlas etc.
          *
-         * \param[in] section_key
-         * The name of the parameter section which configures this object.
+         * \param[in] meshopt_lvl
+         * The level (as in domain level) to optimise the mesh on. For all other levels, this solution gets
+         * prolongated/restricted.
+         *
+         * \param[in] hyperelasticity_config_section
+         * The PropertyMap(section) containing the configuration for the new object.
          *
          * \param[in] meshopt_config
-         * Meshopt configuration.
+         * Meshopt configuration PropertyMap.
          *
          * \param[in] solver_config
-         * Solver configuration.
+         * Solver configuration PropertyMap.
+         *
+         * \param[in] my_functional
+         * The cell-local functional that was created at the first stage.
+         *
+         * \param[in] dirichlet_list
+         * List of meshpart identifiers for Dirichlet boundary conditions
+         *
+         * \param[in] slip_list
+         * List of meshpart identifiers for slip boundary conditions
          *
          * \returns
          * A BaseClass std::shared_ptr to the new object
          *
-         * This is the first stage, where the (cell-) local functional is determined, configured, created and then
-         * passed to the next stage.
+         * This is the second stage, where the (cell-) local functional is already finished and gets passed to the
+         * HyperelasticityFunctional object's constructor.
          */
-        template<typename DomCtrl_, typename FunctionalType_>
+        template<typename DomCtrl_, typename CellFunctional_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_>>
         create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl, const int meshopt_lvl,
         PropertyMap* hyperelasticity_config_section, PropertyMap* meshopt_config, PropertyMap* solver_config,
-        std::shared_ptr<FunctionalType_> my_functional,
+        std::shared_ptr<CellFunctional_> my_functional,
         const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list)
         {
           typedef typename DomCtrl_::LevelType::TrafoType TrafoType;
@@ -383,7 +399,8 @@ namespace FEAT
 
           if(global_functional_p.first == "HyperelasticityFunctional")
           {
-            typedef typename FEAT::Meshopt::HyperelasticityFunctional<Mem_, DT_, IT_, TrafoType, FunctionalType_>::RefCellTrafo RefCellTrafo;
+            typedef typename FEAT::Meshopt::
+              HyperelasticityFunctional<Mem_, DT_, IT_, TrafoType, CellFunctional_>::RefCellTrafo RefCellTrafo;
 
             std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunctionBase<TrafoType, RefCellTrafo>>
               mesh_conc_func(nullptr);
@@ -400,7 +417,7 @@ namespace FEAT
 
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_,
-            SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
+            SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, CellFunctional_>::template Functional>>
               (dom_ctrl, meshopt_lvl, dirichlet_list, slip_list, solver_p.first,
               *solver_config, my_functional, scale_computation, mesh_conc_func, DT_(align_mesh));
           }
@@ -412,6 +429,26 @@ namespace FEAT
           return result;
         } // create_hyperelasticity_control_with_functional
 
+        /**
+         * \brief Creates a MeshoptControlBase object according to a PropertyMap
+         *
+         * \tparam DomCtrl_
+         * The type of domain control
+         *
+         * \param[in] dom_ctrl
+         * The domain control containing the meshes etc. for the mesh optimisation
+         *
+         * \param[in] section_key
+         * The name of the configuration section for this object
+         *
+         * \param[in] meshopt_config
+         * The PropertyMap containing the configuration referenced by section_key
+         *
+         * \param[in] solver_config
+         * The PropertyMap containing the solver configuration
+         *
+         * \returns An std::shared_ptr<MeshoptControlBase> to the new object
+         */
         template<typename DomCtrl_>
         static std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>>
         create_meshopt_control(DomCtrl_& dom_ctrl, const String& section_key,

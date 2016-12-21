@@ -139,16 +139,16 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] rmn_
-         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts.
          *
-         * \param[in] trafo_space_
-         * The FE space the transformation lives in.
+         * \param[in] trafo
+         * The transformation on the root mesh node.
          *
-         * \param[in] dirichlet_asm_
-         * The set of unit filter assemblers.
+         * \param[in] dirichlet_list
+         * The list of dirichlet boundaries.
          *
-         * \param[in] slip_asm_
-         * The set of slip filter assemblers.
+         * \param[in] slip_list
+         * The list of slip boundaries.
          *
          */
         explicit DuDvFunctional(

@@ -327,16 +327,16 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] rmn_
-         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts.
          *
-         * \param[in] trafo_space_
-         * A reference to the Finite Element space used for the transformation
+         * \param[in] trafo
+         * The transformation on the root mesh node.
          *
-         * \param[in] dirichlet_asm_
-         * A map of Strings to UnitFilterAssemblers for all Dirichlet boundaries
+         * \param[in] dirichlet_list
+         * The list of dirichlet boundaries.
          *
-         * \param[in] slip_asm_
-         * A map of Strings to SlipFilterAssemblers for all slip boundaries
+         * \param[in] slip_list
+         * The list of slip boundaries.
          *
          * \param[in] functional_
          * The (cell-local) functional used
@@ -430,16 +430,16 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] rmn_
-         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts.
          *
-         * \param[in] trafo_space_
-         * A reference to the Finite Element space used for the transformation
+         * \param[in] trafo
+         * The transformation on the root mesh node.
          *
-         * \param[in] dirichlet_asm_
-         * A map of Strings to UnitFilterAssemblers for all Dirichlet boundaries
+         * \param[in] dirichlet_list
+         * The list of dirichlet boundaries.
          *
-         * \param[in] slip_asm_
-         * A map of Strings to SlipFilterAssemblers for all slip boundaries
+         * \param[in] slip_list
+         * The list of slip boundaries.
          *
          * \param[in] functional_
          * The (cell-local) functional used

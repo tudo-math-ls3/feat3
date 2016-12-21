@@ -221,6 +221,12 @@ namespace FEAT
 
           /**
            * \brief Adds quantities of the underlying mesh quality functional to a given exporter object
+           *
+           * \param[in,out] exporter
+           * The vtk exporter to add our data to
+           *
+           * \param[in] lvl_index
+           * This level's data gets added.
            */
           virtual void add_to_vtk_exporter
             (Geometry::ExportVTK<typename TrafoType::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
@@ -412,6 +418,8 @@ namespace FEAT
            * \brief Returns the level index
            *
            * The level index is the number of times the underlying mesh was refined since reading its construction.
+           *
+           * \returns This SystemLevel's level index.
            */
           int get_level_index() const
           {
@@ -655,7 +663,8 @@ namespace FEAT
        * \tparam Functional_
        * The (patch-) local quadratic mesh quality functional
        *
-       * Since the mesh quality functional is quadratic, its gradient gives the linear system of equations to solve.
+       * Since the mesh quality functional is quadratic, it can be minimised by solving the the linear system of
+       * equations given by its gradient, represented by the GlobalSystemMatrix.
        *
        */
       template

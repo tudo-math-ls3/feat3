@@ -145,6 +145,10 @@ namespace FEAT
            * \param[in] solver_config_
            * PropertyMap holding the solver configuration
            *
+           * \param[in] fixed_reference_domain_
+           * If this is set to true, the system matrix is only assembled once, corresponding to a fixed reference
+           * domain.
+           *
            */
           explicit DuDvFunctionalControl(
             DomainControl_& dom_ctrl,
@@ -481,14 +485,15 @@ namespace FEAT
            * Right hand side.
            *
            * This is for using this functional as a preconditioner i.e. for the HyperelasticityFunctional
+           *
+           * \returns
+           * The status the solver finished with
            */
           virtual Solver::Status apply(GlobalSystemVectorR& vec_sol, const GlobalSystemVectorL& vec_rhs)
           {
             // Get our global system matrix and filter
-            typename SystemLevelType::GlobalSystemMatrix& mat_sys =
-              _system_levels.at(meshopt_lvl_pos)->matrix_sys;
-            typename SystemLevelType::GlobalSystemFilter& filter_sys =
-              _system_levels.at(meshopt_lvl_pos)->filter_sys;
+            GlobalSystemMatrix& mat_sys = _system_levels.at(meshopt_lvl_pos)->matrix_sys;
+            GlobalSystemFilter& filter_sys = _system_levels.at(meshopt_lvl_pos)->filter_sys;
 
             // Update the containers in the MatrixStock
             _mst.hierarchy_done_numeric();
