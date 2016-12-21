@@ -35,7 +35,7 @@ namespace FEAT
       using ContainerTypeByMDI = class Vector<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
     protected:
-      GateType* _gate;
+      const GateType* _gate;
       LocalVector_ _vector;
 
     public:
@@ -46,7 +46,7 @@ namespace FEAT
       }
 
       template<typename... Args_>
-      explicit Vector(GateType* gate, Args_&&... args) :
+      explicit Vector(const GateType* gate, Args_&&... args) :
         _gate(gate),
         _vector(std::forward<Args_>(args)...)
       {
@@ -73,13 +73,13 @@ namespace FEAT
       }
 
       template<typename OtherGlobalVector_>
-      void convert(GateType* gate, const OtherGlobalVector_ & other)
+      void convert(const GateType* gate, const OtherGlobalVector_ & other)
       {
         this->_gate = gate;
         this->_vector.convert(*other);
       }
 
-      GateType * get_gate()
+      const GateType* get_gate()
       {
         return _gate;
       }
