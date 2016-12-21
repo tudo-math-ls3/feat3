@@ -26,13 +26,13 @@ namespace FEAT
         typedef typename BaseClass::AtlasType AtlasType;
 
       public:
-        explicit UnitCubeDomainControl(const Dist::Comm& comm, int lvl_max, int lvl_min = -1) :
-          BaseClass(comm)
+        explicit UnitCubeDomainControl(const Dist::Comm& comm_, int lvl_max, int lvl_min = -1) :
+          BaseClass(comm_)
         {
           typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
 
-          int rank = comm.rank();
-          int nprocs = comm.size();
+          int rank = comm_.rank();
+          int nprocs = comm_.size();
 
           // communication data structures
           std::vector<int> ranks;
@@ -91,14 +91,14 @@ namespace FEAT
         static_assert(MeshType::shape_dim == 2, "HierarchUnitCubeDomainControl works only for 2D meshes");
 
       public:
-        explicit HierarchUnitCubeDomainControl(const Dist::Comm& comm, const std::deque<int>& lvls) :
-          BaseClass(comm)
+        explicit HierarchUnitCubeDomainControl(const Dist::Comm& comm_, const std::deque<int>& lvls) :
+          BaseClass(comm_)
         {
           _create(lvls);
         }
 
-        explicit HierarchUnitCubeDomainControl(const Dist::Comm& comm, const std::vector<String>& lvls) :
-          BaseClass(comm)
+        explicit HierarchUnitCubeDomainControl(const Dist::Comm& comm_, const std::vector<String>& lvls) :
+          BaseClass(comm_)
         {
           std::deque<int> ilvls;
           XASSERT(!lvls.empty());
@@ -108,7 +108,7 @@ namespace FEAT
           {
             if(!lvls.at(i).parse(ilvls.at(i)))
             {
-              comm.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as level");
+              comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as level");
               FEAT::Runtime::abort();
             }
           }
