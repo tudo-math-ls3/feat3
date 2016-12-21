@@ -74,7 +74,10 @@ class NLCGTest:
       else if(_linesearch_type == "SecantLinesearch")
         my_linesearch = new_secant_linesearch(my_op, my_filter, DT_(1e-2), false);
       else if(_linesearch_type == "MQCLinesearch")
+      {
         my_linesearch = new_mqc_linesearch(my_op, my_filter, false);
+        my_linesearch->set_max_iter(20);
+      }
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
 
@@ -125,7 +128,9 @@ class NLCGTest:
       {
         DT_ dist((sol(0) - *it).norm_euclid());
         if(dist  < min_dist)
+        {
           min_dist = dist;
+        }
       }
 
       // Check if we stayed in the iteration number bound
@@ -234,7 +239,10 @@ class NLSDTest:
       else if(_linesearch_type == "SecantLinesearch")
         my_linesearch = new_secant_linesearch(my_op, my_filter, DT_(1e-2), false);
       else if(_linesearch_type == "MQCLinesearch")
+      {
         my_linesearch = new_mqc_linesearch(my_op, my_filter, false);
+        my_linesearch->set_max_iter(20);
+      }
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
 
