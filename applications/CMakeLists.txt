@@ -106,7 +106,7 @@ else (FEAT_HAVE_MPI)
     --build-target hierarch_transfer_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/foundation_psystem_test-app)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app)
   SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
