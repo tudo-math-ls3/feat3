@@ -19,6 +19,8 @@ namespace FEAT
        */
       static constexpr SpaceTags ref_caps = SpaceTags::ref_value | SpaceTags::ref_grad | SpaceTags::ref_hess;
 
+      static constexpr SpaceTags ref_caps_hexa = SpaceTags::ref_value | SpaceTags::ref_grad;
+
       /// \cond internal
       namespace Intern
       {
@@ -300,7 +302,7 @@ namespace FEAT
           return 16;
         }
 
-        void prepare(const TrafoEvaluator_& trafo_eval)
+        void NOINLINE prepare(const TrafoEvaluator_& trafo_eval)
         {
           // compute edge orientations
           Geometry::Intern::SubIndexMapping<Shape::Hypercube<2>, 1, 0> sim(
@@ -309,14 +311,13 @@ namespace FEAT
             trafo_eval.get_trafo().get_mesh().template get_index_set<1,0>());
 
           // fetch edge dof indices
-          ek[0][0] =  4 + int(sim.map(0, 0));
-          ek[0][1] =  5 - int(sim.map(0, 0));
-          ek[1][0] =  6 + int(sim.map(1, 0));
-          ek[1][1] =  7 - int(sim.map(1, 0));
-          ek[2][0] =  8 + int(sim.map(2, 0));
-          ek[2][1] =  9 - int(sim.map(2, 0));
-          ek[3][0] = 10 + int(sim.map(3, 0));
-          ek[3][1] = 11 - int(sim.map(3, 0));
+          for(int i(0); i < 4; ++i)
+          {
+            for(int j(0); j < 2; ++j)
+            {
+              ek[i][j] = 4 + 2*i + int(sim.map(i, j));
+            }
+          }
         }
 
         /**
@@ -488,6 +489,403 @@ namespace FEAT
           data.phi[15].ref_hess[1][0] = d1p3(point[0]) * d1p3(point[1]);
         }
       }; // class Evaluator<...,Hypercube<2>>
+
+      /**
+       * \brief Lagrange-3 Element evaluator implementation for Hexahedron shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Space_,
+        typename TrafoEvaluator_,
+        typename SpaceEvalTraits_>
+      class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube<3> > :
+        public ParametricEvaluator<
+          Evaluator<
+            Space_,
+            TrafoEvaluator_,
+            SpaceEvalTraits_,
+            Shape::Hypercube<3> >,
+          TrafoEvaluator_,
+          SpaceEvalTraits_,
+          ref_caps_hexa>
+      {
+      public:
+        /// base-class typedef
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_hexa> BaseClass;
+
+        /// space type
+        typedef Space_ SpaceType;
+
+        /// space evaluation traits
+        typedef SpaceEvalTraits_ SpaceEvalTraits;
+
+        /// evaluation policy
+        typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
+
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+
+        /// data type
+        typedef typename SpaceEvalTraits::DataType DataType;
+
+      protected:
+        /// edge dof indices
+        int ek[12][2];
+        /// quad dof indices
+        int qk[6][4];
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] space
+         * A reference to the Element using this evaluator.
+         */
+        explicit Evaluator(const SpaceType& DOXY(space))
+        {
+        }
+
+        /**
+         * \brief Returns the number of local DOFs.
+         *
+         * \returns
+         * The number of local dofs.
+         */
+        int get_num_local_dofs() const
+        {
+          return 64;
+        }
+
+        void NOINLINE prepare(const TrafoEvaluator_& trafo_eval)
+        {
+          // compute edge orientations
+          Geometry::Intern::SubIndexMapping<Shape::Hypercube<3>, 1, 0> sim1(
+            trafo_eval.get_trafo().get_mesh().template get_index_set<3,0>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<3,1>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<1,0>());
+
+          // compute quad orientations
+          Geometry::Intern::SubIndexMapping<Shape::Hypercube<3>, 2, 0> sim2(
+            trafo_eval.get_trafo().get_mesh().template get_index_set<3,0>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<3,2>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<2,0>());
+
+          // fetch edge dof indices (9,...,31)
+          for(int i(0); i < 12; ++i)
+          {
+            for(int j(0); j < 2; ++j)
+            {
+              ek[i][j] = 8 + 2*i + int(sim1.map(i, j));
+            }
+          }
+
+          // fetch quad dof indices (32,...,55)
+          for(int i(0); i < 6; ++i)
+          {
+            for(int j(0); j < 4; ++j)
+            {
+              qk[i][j] = 32 + 4*i + int(sim2.map(i, j));
+            }
+          }
+        }
+
+        /**
+         * \brief Evaluates the basis function values on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis value vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_values(EvalData_& data, const DomainPointType& point) const
+        {
+          using namespace Lagrange3::Intern;
+
+          // vertex dofs
+          data.phi[0].ref_value = p0(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[1].ref_value = p1(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[2].ref_value = p0(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[3].ref_value = p1(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[4].ref_value = p0(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[5].ref_value = p1(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[6].ref_value = p0(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[7].ref_value = p1(point[0]) * p1(point[1]) * p1(point[2]);
+          // edge dofs
+          data.phi[ek[ 0][0]].ref_value = p2(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[ek[ 0][1]].ref_value = p3(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[ek[ 1][0]].ref_value = p2(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[ek[ 1][1]].ref_value = p3(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[ek[ 2][0]].ref_value = p2(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[ek[ 2][1]].ref_value = p3(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[ek[ 3][0]].ref_value = p2(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[ek[ 3][1]].ref_value = p3(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[ek[ 4][0]].ref_value = p0(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[ek[ 4][1]].ref_value = p0(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[ek[ 5][0]].ref_value = p1(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[ek[ 5][1]].ref_value = p1(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[ek[ 6][0]].ref_value = p0(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[ek[ 6][1]].ref_value = p0(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[ek[ 7][0]].ref_value = p1(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[ek[ 7][1]].ref_value = p1(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[ek[ 8][0]].ref_value = p0(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[ek[ 8][1]].ref_value = p0(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[ek[ 9][0]].ref_value = p1(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[ek[ 9][1]].ref_value = p1(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[ek[10][0]].ref_value = p0(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[ek[10][1]].ref_value = p0(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[ek[11][0]].ref_value = p1(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[ek[11][1]].ref_value = p1(point[0]) * p1(point[1]) * p3(point[2]);
+          // face dofs
+          data.phi[qk[0][0]].ref_value = p2(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[qk[0][1]].ref_value = p3(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[qk[0][2]].ref_value = p2(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[qk[0][3]].ref_value = p3(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[qk[1][0]].ref_value = p2(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[qk[1][1]].ref_value = p3(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[qk[1][2]].ref_value = p2(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[qk[1][3]].ref_value = p3(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[qk[2][0]].ref_value = p2(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[qk[2][1]].ref_value = p3(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[qk[2][2]].ref_value = p2(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[qk[2][3]].ref_value = p3(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[qk[3][0]].ref_value = p2(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[qk[3][1]].ref_value = p3(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[qk[3][2]].ref_value = p2(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[qk[3][3]].ref_value = p3(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[qk[4][0]].ref_value = p0(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[qk[4][1]].ref_value = p0(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[qk[4][2]].ref_value = p0(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[qk[4][3]].ref_value = p0(point[0]) * p3(point[1]) * p3(point[2]);
+          data.phi[qk[5][0]].ref_value = p1(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[qk[5][1]].ref_value = p1(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[qk[5][2]].ref_value = p1(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[qk[5][3]].ref_value = p1(point[0]) * p3(point[1]) * p3(point[2]);
+          // center dofs
+          data.phi[56].ref_value = p2(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[57].ref_value = p3(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[58].ref_value = p2(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[59].ref_value = p3(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[60].ref_value = p2(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[61].ref_value = p3(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[62].ref_value = p2(point[0]) * p3(point[1]) * p3(point[2]);
+          data.phi[63].ref_value = p3(point[0]) * p3(point[1]) * p3(point[2]);
+        }
+
+        /**
+         * \brief Evaluates the basis function gradients on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis gradient vector receiveing the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_gradients(EvalData_& data, const DomainPointType& point) const
+        {
+          using namespace Lagrange3::Intern;
+
+          // vertex dofs
+          data.phi[0].ref_grad[0] = d1p0(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[0].ref_grad[1] = p0(point[0]) * d1p0(point[1]) * p0(point[2]);
+          data.phi[0].ref_grad[2] = p0(point[0]) * p0(point[1]) * d1p0(point[2]);
+          data.phi[1].ref_grad[0] = d1p1(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[1].ref_grad[1] = p1(point[0]) * d1p0(point[1]) * p0(point[2]);
+          data.phi[1].ref_grad[2] = p1(point[0]) * p0(point[1]) * d1p0(point[2]);
+          data.phi[2].ref_grad[0] = d1p0(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[2].ref_grad[1] = p0(point[0]) * d1p1(point[1]) * p0(point[2]);
+          data.phi[2].ref_grad[2] = p0(point[0]) * p1(point[1]) * d1p0(point[2]);
+          data.phi[3].ref_grad[0] = d1p1(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[3].ref_grad[1] = p1(point[0]) * d1p1(point[1]) * p0(point[2]);
+          data.phi[3].ref_grad[2] = p1(point[0]) * p1(point[1]) * d1p0(point[2]);
+          data.phi[4].ref_grad[0] = d1p0(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[4].ref_grad[1] = p0(point[0]) * d1p0(point[1]) * p1(point[2]);
+          data.phi[4].ref_grad[2] = p0(point[0]) * p0(point[1]) * d1p1(point[2]);
+          data.phi[5].ref_grad[0] = d1p1(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[5].ref_grad[1] = p1(point[0]) * d1p0(point[1]) * p1(point[2]);
+          data.phi[5].ref_grad[2] = p1(point[0]) * p0(point[1]) * d1p1(point[2]);
+          data.phi[6].ref_grad[0] = d1p0(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[6].ref_grad[1] = p0(point[0]) * d1p1(point[1]) * p1(point[2]);
+          data.phi[6].ref_grad[2] = p0(point[0]) * p1(point[1]) * d1p1(point[2]);
+          data.phi[7].ref_grad[0] = d1p1(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[7].ref_grad[1] = p1(point[0]) * d1p1(point[1]) * p1(point[2]);
+          data.phi[7].ref_grad[2] = p1(point[0]) * p1(point[1]) * d1p1(point[2]);
+          // edge dofs
+          data.phi[ek[ 0][0]].ref_grad[0] = d1p2(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[ek[ 0][0]].ref_grad[1] = p2(point[0]) * d1p0(point[1]) * p0(point[2]);
+          data.phi[ek[ 0][0]].ref_grad[2] = p2(point[0]) * p0(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 0][1]].ref_grad[0] = d1p3(point[0]) * p0(point[1]) * p0(point[2]);
+          data.phi[ek[ 0][1]].ref_grad[1] = p3(point[0]) * d1p0(point[1]) * p0(point[2]);
+          data.phi[ek[ 0][1]].ref_grad[2] = p3(point[0]) * p0(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 1][0]].ref_grad[0] = d1p2(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[ek[ 1][0]].ref_grad[1] = p2(point[0]) * d1p1(point[1]) * p0(point[2]);
+          data.phi[ek[ 1][0]].ref_grad[2] = p2(point[0]) * p1(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 1][1]].ref_grad[0] = d1p3(point[0]) * p1(point[1]) * p0(point[2]);
+          data.phi[ek[ 1][1]].ref_grad[1] = p3(point[0]) * d1p1(point[1]) * p0(point[2]);
+          data.phi[ek[ 1][1]].ref_grad[2] = p3(point[0]) * p1(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 2][0]].ref_grad[0] = d1p2(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[ek[ 2][0]].ref_grad[1] = p2(point[0]) * d1p0(point[1]) * p1(point[2]);
+          data.phi[ek[ 2][0]].ref_grad[2] = p2(point[0]) * p0(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 2][1]].ref_grad[0] = d1p3(point[0]) * p0(point[1]) * p1(point[2]);
+          data.phi[ek[ 2][1]].ref_grad[1] = p3(point[0]) * d1p0(point[1]) * p1(point[2]);
+          data.phi[ek[ 2][1]].ref_grad[2] = p3(point[0]) * p0(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 3][0]].ref_grad[0] = d1p2(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[ek[ 3][0]].ref_grad[1] = p2(point[0]) * d1p1(point[1]) * p1(point[2]);
+          data.phi[ek[ 3][0]].ref_grad[2] = p2(point[0]) * p1(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 3][1]].ref_grad[0] = d1p3(point[0]) * p1(point[1]) * p1(point[2]);
+          data.phi[ek[ 3][1]].ref_grad[1] = p3(point[0]) * d1p1(point[1]) * p1(point[2]);
+          data.phi[ek[ 3][1]].ref_grad[2] = p3(point[0]) * p1(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 4][0]].ref_grad[0] = d1p0(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[ek[ 4][0]].ref_grad[1] = p0(point[0]) * d1p2(point[1]) * p0(point[2]);
+          data.phi[ek[ 4][0]].ref_grad[2] = p0(point[0]) * p2(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 4][1]].ref_grad[0] = d1p0(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[ek[ 4][1]].ref_grad[1] = p0(point[0]) * d1p3(point[1]) * p0(point[2]);
+          data.phi[ek[ 4][1]].ref_grad[2] = p0(point[0]) * p3(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 5][0]].ref_grad[0] = d1p1(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[ek[ 5][0]].ref_grad[1] = p1(point[0]) * d1p2(point[1]) * p0(point[2]);
+          data.phi[ek[ 5][0]].ref_grad[2] = p1(point[0]) * p2(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 5][1]].ref_grad[0] = d1p1(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[ek[ 5][1]].ref_grad[1] = p1(point[0]) * d1p3(point[1]) * p0(point[2]);
+          data.phi[ek[ 5][1]].ref_grad[2] = p1(point[0]) * p3(point[1]) * d1p0(point[2]);
+          data.phi[ek[ 6][0]].ref_grad[0] = d1p0(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[ek[ 6][0]].ref_grad[1] = p0(point[0]) * d1p2(point[1]) * p1(point[2]);
+          data.phi[ek[ 6][0]].ref_grad[2] = p0(point[0]) * p2(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 6][1]].ref_grad[0] = d1p0(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[ek[ 6][1]].ref_grad[1] = p0(point[0]) * d1p3(point[1]) * p1(point[2]);
+          data.phi[ek[ 6][1]].ref_grad[2] = p0(point[0]) * p3(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 7][0]].ref_grad[0] = d1p1(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[ek[ 7][0]].ref_grad[1] = p1(point[0]) * d1p2(point[1]) * p1(point[2]);
+          data.phi[ek[ 7][0]].ref_grad[2] = p1(point[0]) * p2(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 7][1]].ref_grad[0] = d1p1(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[ek[ 7][1]].ref_grad[1] = p1(point[0]) * d1p3(point[1]) * p1(point[2]);
+          data.phi[ek[ 7][1]].ref_grad[2] = p1(point[0]) * p3(point[1]) * d1p1(point[2]);
+          data.phi[ek[ 8][0]].ref_grad[0] = d1p0(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[ek[ 8][0]].ref_grad[1] = p0(point[0]) * d1p0(point[1]) * p2(point[2]);
+          data.phi[ek[ 8][0]].ref_grad[2] = p0(point[0]) * p0(point[1]) * d1p2(point[2]);
+          data.phi[ek[ 8][1]].ref_grad[0] = d1p0(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[ek[ 8][1]].ref_grad[1] = p0(point[0]) * d1p0(point[1]) * p3(point[2]);
+          data.phi[ek[ 8][1]].ref_grad[2] = p0(point[0]) * p0(point[1]) * d1p3(point[2]);
+          data.phi[ek[ 9][0]].ref_grad[0] = d1p1(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[ek[ 9][0]].ref_grad[1] = p1(point[0]) * d1p0(point[1]) * p2(point[2]);
+          data.phi[ek[ 9][0]].ref_grad[2] = p1(point[0]) * p0(point[1]) * d1p2(point[2]);
+          data.phi[ek[ 9][1]].ref_grad[0] = d1p1(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[ek[ 9][1]].ref_grad[1] = p1(point[0]) * d1p0(point[1]) * p3(point[2]);
+          data.phi[ek[ 9][1]].ref_grad[2] = p1(point[0]) * p0(point[1]) * d1p3(point[2]);
+          data.phi[ek[10][0]].ref_grad[0] = d1p0(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[ek[10][0]].ref_grad[1] = p0(point[0]) * d1p1(point[1]) * p2(point[2]);
+          data.phi[ek[10][0]].ref_grad[2] = p0(point[0]) * p1(point[1]) * d1p2(point[2]);
+          data.phi[ek[10][1]].ref_grad[0] = d1p0(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[ek[10][1]].ref_grad[1] = p0(point[0]) * d1p1(point[1]) * p3(point[2]);
+          data.phi[ek[10][1]].ref_grad[2] = p0(point[0]) * p1(point[1]) * d1p3(point[2]);
+          data.phi[ek[11][0]].ref_grad[0] = d1p1(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[ek[11][0]].ref_grad[1] = p1(point[0]) * d1p1(point[1]) * p2(point[2]);
+          data.phi[ek[11][0]].ref_grad[2] = p1(point[0]) * p1(point[1]) * d1p2(point[2]);
+          data.phi[ek[11][1]].ref_grad[0] = d1p1(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[ek[11][1]].ref_grad[1] = p1(point[0]) * d1p1(point[1]) * p3(point[2]);
+          data.phi[ek[11][1]].ref_grad[2] = p1(point[0]) * p1(point[1]) * d1p3(point[2]);
+          // face dofs
+          data.phi[qk[0][0]].ref_grad[0] = d1p2(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[qk[0][0]].ref_grad[1] = p2(point[0]) * d1p2(point[1]) * p0(point[2]);
+          data.phi[qk[0][0]].ref_grad[2] = p2(point[0]) * p2(point[1]) * d1p0(point[2]);
+          data.phi[qk[0][1]].ref_grad[0] = d1p3(point[0]) * p2(point[1]) * p0(point[2]);
+          data.phi[qk[0][1]].ref_grad[1] = p3(point[0]) * d1p2(point[1]) * p0(point[2]);
+          data.phi[qk[0][1]].ref_grad[2] = p3(point[0]) * p2(point[1]) * d1p0(point[2]);
+          data.phi[qk[0][2]].ref_grad[0] = d1p2(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[qk[0][2]].ref_grad[1] = p2(point[0]) * d1p3(point[1]) * p0(point[2]);
+          data.phi[qk[0][2]].ref_grad[2] = p2(point[0]) * p3(point[1]) * d1p0(point[2]);
+          data.phi[qk[0][3]].ref_grad[0] = d1p3(point[0]) * p3(point[1]) * p0(point[2]);
+          data.phi[qk[0][3]].ref_grad[1] = p3(point[0]) * d1p3(point[1]) * p0(point[2]);
+          data.phi[qk[0][3]].ref_grad[2] = p3(point[0]) * p3(point[1]) * d1p0(point[2]);
+          data.phi[qk[1][0]].ref_grad[0] = d1p2(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[qk[1][0]].ref_grad[1] = p2(point[0]) * d1p2(point[1]) * p1(point[2]);
+          data.phi[qk[1][0]].ref_grad[2] = p2(point[0]) * p2(point[1]) * d1p1(point[2]);
+          data.phi[qk[1][1]].ref_grad[0] = d1p3(point[0]) * p2(point[1]) * p1(point[2]);
+          data.phi[qk[1][1]].ref_grad[1] = p3(point[0]) * d1p2(point[1]) * p1(point[2]);
+          data.phi[qk[1][1]].ref_grad[2] = p3(point[0]) * p2(point[1]) * d1p1(point[2]);
+          data.phi[qk[1][2]].ref_grad[0] = d1p2(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[qk[1][2]].ref_grad[1] = p2(point[0]) * d1p3(point[1]) * p1(point[2]);
+          data.phi[qk[1][2]].ref_grad[2] = p2(point[0]) * p3(point[1]) * d1p1(point[2]);
+          data.phi[qk[1][3]].ref_grad[0] = d1p3(point[0]) * p3(point[1]) * p1(point[2]);
+          data.phi[qk[1][3]].ref_grad[1] = p3(point[0]) * d1p3(point[1]) * p1(point[2]);
+          data.phi[qk[1][3]].ref_grad[2] = p3(point[0]) * p3(point[1]) * d1p1(point[2]);
+          data.phi[qk[2][0]].ref_grad[0] = d1p2(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[qk[2][0]].ref_grad[1] = p2(point[0]) * d1p0(point[1]) * p2(point[2]);
+          data.phi[qk[2][0]].ref_grad[2] = p2(point[0]) * p0(point[1]) * d1p2(point[2]);
+          data.phi[qk[2][1]].ref_grad[0] = d1p3(point[0]) * p0(point[1]) * p2(point[2]);
+          data.phi[qk[2][1]].ref_grad[1] = p3(point[0]) * d1p0(point[1]) * p2(point[2]);
+          data.phi[qk[2][1]].ref_grad[2] = p3(point[0]) * p0(point[1]) * d1p2(point[2]);
+          data.phi[qk[2][2]].ref_grad[0] = d1p2(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[qk[2][2]].ref_grad[1] = p2(point[0]) * d1p0(point[1]) * p3(point[2]);
+          data.phi[qk[2][2]].ref_grad[2] = p2(point[0]) * p0(point[1]) * d1p3(point[2]);
+          data.phi[qk[2][3]].ref_grad[0] = d1p3(point[0]) * p0(point[1]) * p3(point[2]);
+          data.phi[qk[2][3]].ref_grad[1] = p3(point[0]) * d1p0(point[1]) * p3(point[2]);
+          data.phi[qk[2][3]].ref_grad[2] = p3(point[0]) * p0(point[1]) * d1p3(point[2]);
+          data.phi[qk[3][0]].ref_grad[0] = d1p2(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[qk[3][0]].ref_grad[1] = p2(point[0]) * d1p1(point[1]) * p2(point[2]);
+          data.phi[qk[3][0]].ref_grad[2] = p2(point[0]) * p1(point[1]) * d1p2(point[2]);
+          data.phi[qk[3][1]].ref_grad[0] = d1p3(point[0]) * p1(point[1]) * p2(point[2]);
+          data.phi[qk[3][1]].ref_grad[1] = p3(point[0]) * d1p1(point[1]) * p2(point[2]);
+          data.phi[qk[3][1]].ref_grad[2] = p3(point[0]) * p1(point[1]) * d1p2(point[2]);
+          data.phi[qk[3][2]].ref_grad[0] = d1p2(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[qk[3][2]].ref_grad[1] = p2(point[0]) * d1p1(point[1]) * p3(point[2]);
+          data.phi[qk[3][2]].ref_grad[2] = p2(point[0]) * p1(point[1]) * d1p3(point[2]);
+          data.phi[qk[3][3]].ref_grad[0] = d1p3(point[0]) * p1(point[1]) * p3(point[2]);
+          data.phi[qk[3][3]].ref_grad[1] = p3(point[0]) * d1p1(point[1]) * p3(point[2]);
+          data.phi[qk[3][3]].ref_grad[2] = p3(point[0]) * p1(point[1]) * d1p3(point[2]);
+          data.phi[qk[4][0]].ref_grad[0] = d1p0(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[qk[4][0]].ref_grad[1] = p0(point[0]) * d1p2(point[1]) * p2(point[2]);
+          data.phi[qk[4][0]].ref_grad[2] = p0(point[0]) * p2(point[1]) * d1p2(point[2]);
+          data.phi[qk[4][1]].ref_grad[0] = d1p0(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[qk[4][1]].ref_grad[1] = p0(point[0]) * d1p3(point[1]) * p2(point[2]);
+          data.phi[qk[4][1]].ref_grad[2] = p0(point[0]) * p3(point[1]) * d1p2(point[2]);
+          data.phi[qk[4][2]].ref_grad[0] = d1p0(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[qk[4][2]].ref_grad[1] = p0(point[0]) * d1p2(point[1]) * p3(point[2]);
+          data.phi[qk[4][2]].ref_grad[2] = p0(point[0]) * p2(point[1]) * d1p3(point[2]);
+          data.phi[qk[4][3]].ref_grad[0] = d1p0(point[0]) * p3(point[1]) * p3(point[2]);
+          data.phi[qk[4][3]].ref_grad[1] = p0(point[0]) * d1p3(point[1]) * p3(point[2]);
+          data.phi[qk[4][3]].ref_grad[2] = p0(point[0]) * p3(point[1]) * d1p3(point[2]);
+          data.phi[qk[5][0]].ref_grad[0] = d1p1(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[qk[5][0]].ref_grad[1] = p1(point[0]) * d1p2(point[1]) * p2(point[2]);
+          data.phi[qk[5][0]].ref_grad[2] = p1(point[0]) * p2(point[1]) * d1p2(point[2]);
+          data.phi[qk[5][1]].ref_grad[0] = d1p1(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[qk[5][1]].ref_grad[1] = p1(point[0]) * d1p3(point[1]) * p2(point[2]);
+          data.phi[qk[5][1]].ref_grad[2] = p1(point[0]) * p3(point[1]) * d1p2(point[2]);
+          data.phi[qk[5][2]].ref_grad[0] = d1p1(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[qk[5][2]].ref_grad[1] = p1(point[0]) * d1p2(point[1]) * p3(point[2]);
+          data.phi[qk[5][2]].ref_grad[2] = p1(point[0]) * p2(point[1]) * d1p3(point[2]);
+          data.phi[qk[5][3]].ref_grad[0] = d1p1(point[0]) * p3(point[1]) * p3(point[2]);
+          data.phi[qk[5][3]].ref_grad[1] = p1(point[0]) * d1p3(point[1]) * p3(point[2]);
+          data.phi[qk[5][3]].ref_grad[2] = p1(point[0]) * p3(point[1]) * d1p3(point[2]);
+          // center dofs
+          data.phi[56].ref_grad[0] = d1p2(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[56].ref_grad[1] = p2(point[0]) * d1p2(point[1]) * p2(point[2]);
+          data.phi[56].ref_grad[2] = p2(point[0]) * p2(point[1]) * d1p2(point[2]);
+          data.phi[57].ref_grad[0] = d1p3(point[0]) * p2(point[1]) * p2(point[2]);
+          data.phi[57].ref_grad[1] = p3(point[0]) * d1p2(point[1]) * p2(point[2]);
+          data.phi[57].ref_grad[2] = p3(point[0]) * p2(point[1]) * d1p2(point[2]);
+          data.phi[58].ref_grad[0] = d1p2(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[58].ref_grad[1] = p2(point[0]) * d1p3(point[1]) * p2(point[2]);
+          data.phi[58].ref_grad[2] = p2(point[0]) * p3(point[1]) * d1p2(point[2]);
+          data.phi[59].ref_grad[0] = d1p3(point[0]) * p3(point[1]) * p2(point[2]);
+          data.phi[59].ref_grad[1] = p3(point[0]) * d1p3(point[1]) * p2(point[2]);
+          data.phi[59].ref_grad[2] = p3(point[0]) * p3(point[1]) * d1p2(point[2]);
+          data.phi[60].ref_grad[0] = d1p2(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[60].ref_grad[1] = p2(point[0]) * d1p2(point[1]) * p3(point[2]);
+          data.phi[60].ref_grad[2] = p2(point[0]) * p2(point[1]) * d1p3(point[2]);
+          data.phi[61].ref_grad[0] = d1p3(point[0]) * p2(point[1]) * p3(point[2]);
+          data.phi[61].ref_grad[1] = p3(point[0]) * d1p2(point[1]) * p3(point[2]);
+          data.phi[61].ref_grad[2] = p3(point[0]) * p2(point[1]) * d1p3(point[2]);
+          data.phi[62].ref_grad[0] = d1p2(point[0]) * p3(point[1]) * p3(point[2]);
+          data.phi[62].ref_grad[1] = p2(point[0]) * d1p3(point[1]) * p3(point[2]);
+          data.phi[62].ref_grad[2] = p2(point[0]) * p3(point[1]) * d1p3(point[2]);
+          data.phi[63].ref_grad[0] = d1p3(point[0]) * p3(point[1]) * p3(point[2]);
+          data.phi[63].ref_grad[1] = p3(point[0]) * d1p3(point[1]) * p3(point[2]);
+          data.phi[63].ref_grad[2] = p3(point[0]) * p3(point[1]) * d1p3(point[2]);
+        }
+      }; // class Evaluator<...,Hypercube<3>>
     } // namespace Lagrange3
   } // namespace Space
 } // namespace FEAT
