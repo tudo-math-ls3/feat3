@@ -26,6 +26,7 @@
 #include <kernel/space/hermite3/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/lagrange3/element.hpp>
 
 namespace ElementRegression
 {
@@ -206,9 +207,9 @@ namespace ElementRegression
         std::cout << " |";
         if(i > nl_min)
         {
-          if(h0_) std::cout << " " << stringify_fp_sci(errs[i-1][0] / errs[i][0], 12);
-          if(h1_) std::cout << " " << stringify_fp_sci(errs[i-1][1] / errs[i][1], 12);
-          if(h2_) std::cout << " " << stringify_fp_sci(errs[i-1][2] / errs[i][2], 12);
+          if(h0_) std::cout << " " << stringify_fp_fix(errs[i-1][0] / errs[i][0], 12, 15);
+          if(h1_) std::cout << " " << stringify_fp_fix(errs[i-1][1] / errs[i][1], 12, 15);
+          if(h2_) std::cout << " " << stringify_fp_fix(errs[i-1][2] / errs[i][2], 12, 15);
         }
         std::cout << std::endl;
       }
@@ -607,6 +608,19 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
+  // Lagrange-3 element (aka P3/Q3)
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Lagrange3::Element, true, true, true>
+    int_hy1_lagrange3_lvl3(3, 5.827604037749e-06, 4.532331052798e-04, 4.614141962464e-02);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Lagrange3::Element, true, true, true>
+    int_hy2_lagrange3_lvl2(2, 9.681259729620e-05, 3.511475119192e-03, 1.817255430750e-01);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
   // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // Interpolation Simplex<2>
@@ -750,6 +764,19 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
+  // Lagrange-3 element (aka P3/Q3)
+
+  // L2-Projection Hypercube<1>
+  ElementRegressionL2<Shape::Hypercube<1>, Space::Lagrange3::Element, true, true, true>
+    l2_hy1_lagrange3_lvl3(3, 3.705555369110e-06, 5.353104476857e-04, 4.914033489827e-02);
+
+  // L2-Projection Hypercube<2>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::Lagrange3::Element, true, true, true>
+    l2_hy2_lagrange3_lvl2(2, 5.669616427416e-05, 4.127890030540e-03, 1.935740980428e-01);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
   // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // L2-Projection Simplex<2>
@@ -845,6 +872,19 @@ namespace ElementRegression
   // H1-Projection Simplex<3>
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
     h1_sx3_lagrange2_lvl1(2, 1.008388594508e-003, 5.001897374726e-002, 1.934606569160e+000);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Lagrange-3 element (aka P3/Q3)
+
+  // H1-Projection Hypercube<1>
+  ElementRegressionH1<Shape::Hypercube<1>, Space::Lagrange3::Element, true, true, true>
+    h1_hy1_lagrange3_lvl3(3, 6.055286245881e-06, 4.467795535019e-04, 4.525416000780e-02);
+
+  // H1-Projection Hypercube<2>
+  ElementRegressionH1<Shape::Hypercube<2>, Space::Lagrange3::Element, true, true, true>
+    h1_hy2_lagrange3_lvl2(2, 9.071330961779e-05, 3.455837580502e-03, 1.779910155696e-01);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
