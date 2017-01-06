@@ -32,6 +32,20 @@ namespace FEAT
         static constexpr int count = 1;
       };
 
+      template<int shape_dim_>
+      struct DofTraits<Shape::Simplex<shape_dim_>, 1>
+      {
+        /// 2 dofs per simplex edge
+        static constexpr int count = 2;
+      };
+
+      template<int shape_dim_>
+      struct DofTraits<Shape::Simplex<shape_dim_>, 2>
+      {
+        /// 1 dof per triangle
+        static constexpr int count = 1;
+      };
+
       template<int shape_dim_, int face_dim_>
       struct DofTraits<Shape::Hypercube<shape_dim_>, face_dim_>
       {
@@ -39,6 +53,7 @@ namespace FEAT
         static constexpr int count = (1 << face_dim_);
       };
 
+      // this one is only required for disambiguation
       template<int shape_dim_>
       struct DofTraits<Shape::Hypercube<shape_dim_>, 0>
       {

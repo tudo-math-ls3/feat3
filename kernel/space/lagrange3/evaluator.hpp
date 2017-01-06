@@ -246,6 +246,211 @@ namespace FEAT
         typename Space_,
         typename TrafoEvaluator_,
         typename SpaceEvalTraits_>
+      class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Simplex<2> > :
+        public ParametricEvaluator<
+          Evaluator<
+            Space_,
+            TrafoEvaluator_,
+            SpaceEvalTraits_,
+            Shape::Simplex<2> >,
+          TrafoEvaluator_,
+          SpaceEvalTraits_,
+          ref_caps>
+      {
+      public:
+        /// base-class typedef
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
+
+        /// space type
+        typedef Space_ SpaceType;
+
+        /// space evaluation traits
+        typedef SpaceEvalTraits_ SpaceEvalTraits;
+
+        /// evaluation policy
+        typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
+
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+
+        /// data type
+        typedef typename SpaceEvalTraits::DataType DataType;
+
+      protected:
+        /// edge dof indices
+        int ek[3][2];
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] space
+         * A reference to the Element using this evaluator.
+         */
+        explicit Evaluator(const SpaceType& DOXY(space))
+        {
+        }
+
+        /**
+         * \brief Returns the number of local DOFs.
+         *
+         * \returns
+         * The number of local dofs.
+         */
+        int get_num_local_dofs() const
+        {
+          return 10;
+        }
+
+        void NOINLINE prepare(const TrafoEvaluator_& trafo_eval)
+        {
+          // compute edge orientations
+          Geometry::Intern::SubIndexMapping<Shape::Simplex<2>, 1, 0> sim(
+            trafo_eval.get_trafo().get_mesh().template get_index_set<2,0>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<2,1>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<1,0>());
+
+          // fetch edge dof indices
+          for(int i(0); i < 3; ++i)
+          {
+            for(int j(0); j < 2; ++j)
+            {
+              ek[i][j] = 3 + 2*i + int(sim.map(i, j));
+            }
+          }
+        }
+
+        /**
+         * \brief Evaluates the basis function values on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis value vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_values(EvalData_& data, const DomainPointType& point) const
+        {
+          // vertex dofs
+          data.phi[0].ref_value = - DataType(4.5) * (point[0] + point[1] - (DataType(1) / DataType(3))) * (point[0] + point[1] - (DataType(2) / DataType(3))) * (point[0] + point[1] - DataType(1));
+          data.phi[1].ref_value = DataType(4.5) * point[0] * (point[0] - (DataType(1) / DataType(3))) * (point[0] - (DataType(2) / DataType(3)));
+          data.phi[2].ref_value = DataType(4.5) * point[1] * (point[1] - (DataType(1) / DataType(3))) * (point[1] - (DataType(2) / DataType(3)));
+          // edge dofs
+          data.phi[ek[0][0]].ref_value = DataType(13.5) * point[0] * point[1] * (point[0] - (DataType(1) / DataType(3)));
+          data.phi[ek[0][1]].ref_value = DataType(13.5) * point[0] * point[1] * (point[1] - (DataType(1) / DataType(3)));
+          data.phi[ek[1][0]].ref_value = - DataType(13.5) * point[1] * (point[1] - (DataType(1) / DataType(3))) * (point[0] + point[1] - DataType(1));
+          data.phi[ek[1][1]].ref_value = DataType(13.5) * point[1] * (point[0] + point[1] - DataType(1)) * (point[0] + point[1] - (DataType(2) / DataType(3)));
+          data.phi[ek[2][0]].ref_value = DataType(13.5) * point[0] * (point[0] + point[1] - DataType(1)) * (point[0] + point[1] - (DataType(2) / DataType(3)));
+          data.phi[ek[2][1]].ref_value = - DataType(13.5) * point[0] * (point[0] - (DataType(1) / DataType(3))) * (point[0] + point[1] - DataType(1));
+          // center dofs
+          data.phi[9].ref_value = - DataType(27) * point[0] * point[1] * (point[0] + point[1] - DataType(1));
+        }
+
+        /**
+         * \brief Evaluates the basis function gradients on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis gradient vector receiveing the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_gradients(EvalData_& data, const DomainPointType& point) const
+        {
+          // vertex dofs
+          data.phi[0].ref_grad[0] = - DataType(0.5) * (DataType(27) * point[0] * point[0] + (DataType(54) * point[1] - DataType(36)) * point[0] + DataType(27) * point[1] * point[1] - DataType(36) * point[1] + DataType(11));
+          data.phi[0].ref_grad[1] = - DataType(0.5) * (DataType(27) * point[1] * point[1] + (DataType(54) * point[0] - DataType(36)) * point[1] + DataType(27) * point[0] * point[0] - DataType(36) * point[0] + DataType(11));
+          data.phi[1].ref_grad[0] = DataType(0.5) * (DataType(27) * point[0] * point[0] - DataType(18) * point[0] + DataType(2));
+          data.phi[1].ref_grad[1] = DataType(0);
+          data.phi[2].ref_grad[0] = DataType(0);
+          data.phi[2].ref_grad[1] = DataType(0.5) * (DataType(27) * point[1] * point[1] - DataType(18) * point[1] + DataType(2));
+          // edge dofs
+          data.phi[ek[0][0]].ref_grad[0] = DataType(0.5) * (DataType(9) * point[1] * (DataType(6) * point[0] - DataType(1)));
+          data.phi[ek[0][0]].ref_grad[1] = DataType(0.5) * (DataType(9) * point[0] * (DataType(3) * point[0] - DataType(1)));
+          data.phi[ek[0][1]].ref_grad[0] = DataType(0.5) * (DataType(9) * point[1] * (DataType(3) * point[1] - DataType(1)));
+          data.phi[ek[0][1]].ref_grad[1] = DataType(0.5) * (DataType(9) * point[0] * (DataType(6) * point[1] - DataType(1)));
+          data.phi[ek[1][0]].ref_grad[0] = DataType(0.5) * (- DataType(9) * point[1] * (DataType(3) * point[1] - DataType(1)));
+          data.phi[ek[1][0]].ref_grad[1] = DataType(0.5) * (- DataType(81) * point[1] * point[1] - (DataType(54) * point[0] - DataType(72)) * point[1] + DataType(9) * point[0] - DataType(9));
+          data.phi[ek[1][1]].ref_grad[0] = DataType(0.5) * (DataType(9) * point[1] * (DataType(6) * point[0] + DataType(6) * point[1] - DataType(5)));
+          data.phi[ek[1][1]].ref_grad[1] = DataType(0.5) * (DataType(81) * point[1] * point[1] + ( DataType(108) * point[0] - DataType(90)) * point[1] + DataType(27) * point[0] * point[0] - DataType(45) * point[0] + DataType(18));
+          data.phi[ek[2][0]].ref_grad[0] = DataType(0.5) * (DataType(81) * point[0] * point[0] + ( DataType(108) * point[1] - DataType(90)) * point[0] + DataType(27) * point[1] * point[1] - DataType(45) * point[1] + DataType(18));
+          data.phi[ek[2][0]].ref_grad[1] = DataType(0.5) * (DataType(9) * point[0] * (DataType(6) * point[1] + DataType(6) * point[0] - DataType(5)));
+          data.phi[ek[2][1]].ref_grad[0] = DataType(0.5) * (- DataType(81) * point[0] * point[0] - (DataType(54) * point[1] - DataType(72)) * point[0] + DataType(9) * point[1] - DataType(9));
+          data.phi[ek[2][1]].ref_grad[1] = DataType(0.5) * (DataType(27) * (DataType(1) / DataType(3) - point[0]) * point[0]);
+          // center dofs
+          data.phi[9].ref_grad[0] = - DataType(27) * point[1] * (DataType(2) * point[0] + point[1] - DataType(1));
+          data.phi[9].ref_grad[1] = - DataType(27) * point[0] * (DataType(2) * point[1] + point[0] - DataType(1));
+        }
+
+        /**
+         * \brief Evaluates the basis function hessians on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis hessian vector receiveing the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_hessians(EvalData_& data, const DomainPointType& point) const
+        {
+          // vertex dofs
+          data.phi[0].ref_hess[0][0] = - DataType(27) * (point[0] + point[1]) + DataType(18); // dxx
+          data.phi[0].ref_hess[1][1] = - DataType(27) * (point[1] + point[0]) + DataType(18); // dyy
+          data.phi[0].ref_hess[1][0] =
+          data.phi[0].ref_hess[0][1] = - DataType(27) * (point[1] + point[0]) + DataType(18); // dxy
+          data.phi[1].ref_hess[0][0] = DataType(27) * point[0] - DataType(9);
+          data.phi[1].ref_hess[1][1] = DataType(0);
+          data.phi[1].ref_hess[1][0] =
+          data.phi[1].ref_hess[0][1] = DataType(0);
+          data.phi[2].ref_hess[0][0] = DataType(0);
+          data.phi[2].ref_hess[1][1] = DataType(27) * point[1] - DataType(9);
+          data.phi[2].ref_hess[1][0] =
+          data.phi[2].ref_hess[0][1] = DataType(0);
+          // edge dofs
+          data.phi[ek[0][0]].ref_hess[0][0] = DataType(27) * point[1];
+          data.phi[ek[0][0]].ref_hess[1][1] = DataType(0);
+          data.phi[ek[0][0]].ref_hess[0][1] =
+          data.phi[ek[0][0]].ref_hess[1][0] = DataType(0.5) * (DataType(54) * point[0] - DataType(9));
+          data.phi[ek[0][1]].ref_hess[0][0] = DataType(0);
+          data.phi[ek[0][1]].ref_hess[1][1] = DataType(27) * point[0];
+          data.phi[ek[0][1]].ref_hess[0][1] =
+          data.phi[ek[0][1]].ref_hess[1][0] = DataType(0.5) * (DataType(54) * point[1] - DataType(9));
+          data.phi[ek[1][0]].ref_hess[0][0] = DataType(0);
+          data.phi[ek[1][0]].ref_hess[1][1] = - DataType(81) * point[1] - DataType(27) * point[0] + DataType(36);
+          data.phi[ek[1][0]].ref_hess[0][1] =
+          data.phi[ek[1][0]].ref_hess[1][0] = - DataType(0.5) * (DataType(54) * point[1] - DataType(9));
+          data.phi[ek[1][1]].ref_hess[0][0] = DataType(27) * point[1];
+          data.phi[ek[1][1]].ref_hess[1][1] = DataType(81) * point[1] + DataType(54) * point[0] - DataType(45);
+          data.phi[ek[1][1]].ref_hess[0][1] =
+          data.phi[ek[1][1]].ref_hess[1][0] = DataType(0.5) * (DataType(108) * point[1] + DataType(54) * point[0] - DataType(45));
+          data.phi[ek[2][0]].ref_hess[0][0] = DataType(81) * point[0] + DataType(54) * point[1] - DataType(45);
+          data.phi[ek[2][0]].ref_hess[1][1] = DataType(27) * point[0];
+          data.phi[ek[2][0]].ref_hess[0][1] =
+          data.phi[ek[2][0]].ref_hess[1][0] = DataType(0.5) * (DataType(108) * point[0] + DataType(54) * point[1] - DataType(45));
+          data.phi[ek[2][1]].ref_hess[0][0] = - DataType(81) * point[0] - DataType(27) * point[1] + DataType(36);
+          data.phi[ek[2][1]].ref_hess[1][1] = DataType(0);
+          data.phi[ek[2][1]].ref_hess[0][1] =
+          data.phi[ek[2][1]].ref_hess[1][0] = - DataType(0.5) * (DataType(54) * point[0] - DataType(9));
+          // center dofs
+          data.phi[9].ref_hess[0][0] = - DataType(54) * point[1];
+          data.phi[9].ref_hess[1][1] = - DataType(54) * point[0];
+          data.phi[9].ref_hess[0][1] =
+          data.phi[9].ref_hess[1][0] = DataType(27) * (DataType(1) - DataType(2)*(point[0] + point[1]));
+        }
+      }; // class Evaluator<...,Simplex<2>>
+
+      /**
+       * \brief Lagrange-3 Element evaluator implementation for Quadrilateral shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Space_,
+        typename TrafoEvaluator_,
+        typename SpaceEvalTraits_>
       class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube<2> > :
         public ParametricEvaluator<
           Evaluator<

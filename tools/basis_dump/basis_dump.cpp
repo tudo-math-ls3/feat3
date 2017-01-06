@@ -50,6 +50,8 @@ int main(int, char**)
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
     // Lagrange-2
     dump_basis< Space::Lagrange2::Element<TrafoType> >("2d_tria_lagrange-2.vtk");
+    // Lagrange-3
+    dump_basis< Space::Lagrange3::Element<TrafoType> >("2d_tria_lagrange-3.vtk");
     // Crouzeix-Raviart
     dump_basis< Space::CroRavRanTur::Element<TrafoType> >("2d_tria_crouzeix_raviart.vtk");
     // Hermite-3
