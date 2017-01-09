@@ -76,16 +76,16 @@ namespace FEAT
                     DT_ *Adags, unsigned int *Jks, unsigned int *lensJk)
             {
                 const unsigned int kchunk = blockIdx.x * blockDim.x + threadIdx.x;
-                const unsigned int k = kchunk + first_row_in_chunk;
-                DT_ *thisadag = Adags + kchunk*mrl*mrl*mrl;
-                unsigned int *thisjk = Jks + kchunk*mrl*mrl;
-
                 if (kchunk < this_chunk_size)
                 {
-                    // all entries in row k
-                    int nj = 0; // count the size of set Jk
-                    for (int i = 0; i < rowlens[k]; i++)
-                    {
+                  const unsigned int k = kchunk + first_row_in_chunk;
+                  DT_ *thisadag = Adags + kchunk*mrl*mrl*mrl;
+                  unsigned int *thisjk = Jks + kchunk*mrl*mrl;
+
+                  // all entries in row k
+                  int nj = 0; // count the size of set Jk
+                  for (int i = 0; i < rowlens[k]; i++)
+                  {
                         const int ii = colind[rowptr[k] + i];
                         for (int j = 0; j < rowlens[ii]; j++)
                         {
@@ -97,6 +97,7 @@ namespace FEAT
                                 {
                                     // insert at this position
                                     thisadag[i*mrl*mrl + l] = Aval[rowptr[ii] + j];
+                                    /// \todo remove goto
                                     goto nextj; // break inner loop and skip rest of outer loop
                                 }
                             }
@@ -120,14 +121,14 @@ namespace FEAT
                     const unsigned int mrl, const unsigned int *lensJk, const unsigned int *rowlens, DT_ *Adags)
             {
                 const unsigned int kchunk = blockIdx.x * blockDim.x + threadIdx.x;
-                const unsigned int k = kchunk + first_row_in_chunk;
-                DT_ *thisadag = Adags + kchunk*mrl*mrl*mrl;
-
                 if (kchunk < this_chunk_size)
                 {
-                    int blockdim = mrl - rowlens[k];
-                    for (int offset = 0; offset < blockdim; offset++)
-                        thisadag[(rowlens[k] + offset)*mrl*mrl + (lensJk[kchunk] + offset)] = 1.0;
+                  const unsigned int k = kchunk + first_row_in_chunk;
+                  DT_ *thisadag = Adags + kchunk*mrl*mrl*mrl;
+
+                  int blockdim = mrl - rowlens[k];
+                  for (int offset = 0; offset < blockdim; offset++)
+                    thisadag[(rowlens[k] + offset)*mrl*mrl + (lensJk[kchunk] + offset)] = 1.0;
                 }
             }
 
@@ -139,23 +140,23 @@ namespace FEAT
                     DT_ *Erhs, const unsigned int *Jks, const unsigned int *lenJks)
             {
                 const unsigned int kchunk = blockIdx.x * blockDim.x + threadIdx.x;
-                const unsigned int k = kchunk + first_row_in_chunk;
-
-                const unsigned int *thisJk = Jks + kchunk*mrl*mrl;
-                DT_ *thisrhs = Erhs + kchunk*mrl*mrl;
-                const unsigned int thislen = *(lenJks + kchunk);
-
                 if (kchunk < this_chunk_size)
                 {
-                    for (int i = 0; i < thislen; i++)
+                  const unsigned int k = kchunk + first_row_in_chunk;
+
+                  const unsigned int *thisJk = Jks + kchunk*mrl*mrl;
+                  DT_ *thisrhs = Erhs + kchunk*mrl*mrl;
+                  const unsigned int thislen = *(lenJks + kchunk);
+
+                  for (int i = 0; i < thislen; i++)
+                  {
+                    if (thisJk[i] == k)
                     {
-                        if (thisJk[i] == k)
-                        {
-                            thisrhs[i] = 1.0;
-                            // Jks are unique by construction
-                            break;
-                        }
+                      thisrhs[i] = 1.0;
+                      // Jks are unique by construction
+                      break;
                     }
+                  }
                 }
             }
 
