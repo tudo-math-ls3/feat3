@@ -338,6 +338,7 @@ namespace FEAT
 
         // Upload assembled result to the filter
         filter.convert(buffer);
+
       }
 
       /**

@@ -32,6 +32,10 @@ namespace FEAT
       template<typename Mem2_, typename DT2_, typename IT2_>
       using FilterType = class MeanFilter<Mem2_, DT2_, IT2_>;
 
+      /// this typedef lets you create a filter with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+
     protected:
       /// communicator
       const Dist::Comm* _comm;

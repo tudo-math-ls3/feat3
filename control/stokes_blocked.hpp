@@ -549,6 +549,103 @@ namespace FEAT
         (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
       }
     };
+
+    /**
+     * \brief System level using a MeanFilter for the pressure
+     *
+     * This is necessary when there are only Dirichlet BCs for the velocity
+     */
+    template
+    <
+      int dim_,
+      typename MemType_ = Mem::Main,
+      typename DataType_ = Real,
+      typename IndexType_ = Index,
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+    >
+    struct StokesBlockedUnitVeloMeanPresSystemLevel :
+      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+    {
+      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+
+      // define local filter types
+      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
+      typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
+
+      // define global filter types
+      typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+      typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+      typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
+
+      // (global) filters
+      GlobalSystemFilter filter_sys;
+      GlobalVeloFilter filter_velo;
+      GlobalPresFilter filter_pres;
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return (*this->matrix_sys).bytes () + (*this->matrix_s).bytes() + (*filter_sys).bytes();
+      }
+
+      void compile_system_filter()
+      {
+        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+      }
+
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
+       *
+       */
+      template<typename M_, typename D_, typename I_, typename SM_>
+      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_velo.convert(other.filter_velo);
+        filter_pres.convert(other.filter_pres);
+
+        compile_system_filter();
+      }
+
+      template<typename SpacePres_, typename Cubature_>
+      void assemble_pressure_mean_filter(const SpacePres_& space_pres, const Cubature_& cubature)
+      {
+        // get our local pressure filter
+        LocalPresFilter& fil_loc_p = this->filter_pres.local();
+
+        // create two global vectors
+        typename BaseClass::GlobalPresVector vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
+
+        // fetch the local vectors
+        typename BaseClass::LocalPresVector& vec_loc_v = *vec_glob_v;
+        typename BaseClass::LocalPresVector& vec_loc_w = *vec_glob_w;
+
+        // fetch the frequency vector of the pressure gate
+        typename BaseClass::LocalPresVector& vec_loc_f = this->gate_pres._freqs;
+
+        // assemble the mean filter
+        Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space_pres, cubature);
+
+        // synchronise the vectors
+        vec_glob_v.sync_1();
+        vec_glob_w.sync_0();
+
+        // build the mean filter
+        fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
+      }
+    }; // struct StokesBlockedUnitVeloMeanPresSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
 

@@ -65,6 +65,9 @@ namespace FEAT
           /// The index type
           typedef IT_ IndexType;
 
+          /// Our base class
+          typedef MeshoptControlBase<DomainControl_> BaseClass;
+
           /// The type of the domain control
           typedef DomainControl_ DomainControlType;
           /// Domain layers
@@ -74,20 +77,18 @@ namespace FEAT
 
           /// The transformation we solve for
           typedef typename DomainLevelType::TrafoType TrafoType;
+
+          /// Type of the "system matrix" for the solver
+          template<typename A, typename B, typename C>
+          using LocalQualityFunctionalType = Hyperelasticity_<A, B, C, TrafoType>;
+
           /// The FE space the transformation lives in
-          typedef typename DomainLevelType::SpaceType TrafoSpace;
+          typedef typename LocalQualityFunctionalType<Mem_, DT_, IT_>::SpaceType TrafoSpace;
 
           /// The underlying mesh type
           typedef typename DomainControl_::MeshType MeshType;
           /// The floating point type the mesh's coordinates use
           typedef typename MeshType::CoordType CoordType;
-
-          /// Our base class
-          typedef MeshoptControlBase<DomainControl_> BaseClass;
-
-          /// Type of the "system matrix" for the solver
-          template<typename A, typename B, typename C>
-          using LocalQualityFunctionalType = Hyperelasticity_<A, B, C, TrafoType>;
 
           /// Inter level transfer matrix
           typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
@@ -479,8 +480,6 @@ namespace FEAT
             // create our RHS and SOL vectors
             typename SystemLevelType::GlobalSystemVectorR vec_rhs(the_system_level.assemble_rhs_vector());
             typename SystemLevelType::GlobalSystemVectorL vec_sol(the_system_level.assemble_sol_vector());
-
-            TimeStamp at;
 
             // solve
             //Solver::solve(*solver, vec_sol, vec_rhs, the_system_level.global_functional, the_system_level.filter_sys);

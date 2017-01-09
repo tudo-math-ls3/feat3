@@ -9,6 +9,7 @@ ADD_SUBDIRECTORY( meshopt_boundary-app )
 ADD_SUBDIRECTORY( meshopt_r_adapt-app )
 ADD_SUBDIRECTORY( meshopt_refinement-app )
 ADD_SUBDIRECTORY( meshopt_screws-app )
+ADD_SUBDIRECTORY( navier_stokes_screws-app )
 
 # applications to build
 SET (app_list

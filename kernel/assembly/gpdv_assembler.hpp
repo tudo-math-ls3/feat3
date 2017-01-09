@@ -122,14 +122,15 @@ namespace FEAT
         {
           Adjacency::Graph graph_b(SymbolicAssembler::assemble_graph_std2(space_velo, space_pres));
           matrix_b = MatrixB(graph_b);
-          matrix_b.format();
         }
+        matrix_b.format();
         if(matrix_d.empty())
         {
           Adjacency::Graph graph_d(SymbolicAssembler::assemble_graph_std2(space_pres, space_velo));
           matrix_d = MatrixD(graph_d);
           matrix_d.format();
         }
+        matrix_d.format();
 
         // create matrix scatter-axpy
         typename MatrixB::ScatterAxpy scatter_b(matrix_b);

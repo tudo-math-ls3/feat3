@@ -2177,6 +2177,274 @@ namespace FEAT
 
       template<int dim_>
         using ExpFunction = Analytic::StaticWrapperFunction<dim_, ExpStatic, true, true, true>;
+
+      template<typename DT_, int dim_>
+      class XYPlaneRotation : public Analytic::Function
+      {
+      public:
+        typedef DT_ DataType;
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        static constexpr int domain_dim = 2;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+        typedef Tiny::Vector<DT_, dim_> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// The angular velocity
+          const DataType _angular_velocity;
+          /// our origin
+          const PointType& _origin;
+
+        public:
+          /// Constructor
+          explicit Evaluator(const XYPlaneRotation& function) :
+            _angular_velocity(function._angular_velocity),
+            _origin(function._origin)
+          {
+          }
+
+          void value(ValueType& val, const PointType& point)
+          {
+            val.format();
+            val[0] = _angular_velocity*(-(point[1] - _origin[1]));
+            val[1] = _angular_velocity*( (point[0] - _origin[0]));
+            //val[0] = _angular_velocity*point[1]*((point[1] - _origin[1]));
+          }
+
+          void gradient(GradientType& grad, const PointType& point) const
+          {
+            grad.format();
+            grad[0][1] = -DataType(1);
+            grad[1][0] = DataType(1);
+            //grad[0][1] = (point[1] - _origin[1]);
+          }
+
+          void hessian(HessianType& hess, const PointType&) const
+          {
+            hess.format();
+          }
+
+        }; // class XYPlaneRotation::Evaluator<...>
+
+      public:
+        /// The angular velocity
+        const DataType _angular_velocity;
+        /// Point to rotate around
+        const PointType _origin;
+
+      public:
+        /// Constructor
+        explicit XYPlaneRotation(const DataType angular_velocity, const PointType& origin) :
+          _angular_velocity(angular_velocity),
+          _origin(origin)
+        {
+        }
+      }; // class XYPlaneRotation
+
+      /**
+       * \brief Velocity field for a parabolic profile in the y,z plane, constant in x
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * This is the mapping
+       * \f[
+       *    f: \mathbb{R}^d \to \mathbb{R}^d, f_0(x_0, x_1, x_2)^T =
+       *    \alpha \frac{2^d}{\prod_{i=0}^{d-1}(b_i - a_i)}\prod_{i=0}^{d-1}( (x_i - a_i)(b_i - x_i) ),
+       *    f_i \equiv 0, i=1,\dots,d
+       * \f]
+       *
+       * for a given amplitude \f$ \alpha \f$. This means the function's \f$ x \f$-component is \f$ \alpha \f$ at
+       * the midpoint of the rectangle \f$ \{x\}\times [a_1, b_1] \times [a_2, b_2] \f$ and zero on its boundary.
+       *
+       * \author Jordi Paul
+       */
+      template<typename DT_, int dim_>
+      class YZPlaneParabolic : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// The scaling factor according to the amplitude
+          DataType _fac;
+          /// The points where the function becomes zero
+          const std::vector<Tiny::Vector<DataType, 2>>& _zeros;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
+          explicit Evaluator(const YZPlaneParabolic& function) :
+            _fac(function._amplitude),
+            _zeros(function._zeros)
+
+          {
+            XASSERT(_zeros.size() == size_t(domain_dim-1));
+
+            for(int d(1); d < dim_; ++d)
+            {
+              _fac *= DataType(2)/Math::sqr(_zeros.at(d-1)[1]-_zeros.at(d-1)[0]);
+            }
+          }
+
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void value(ValueType& val, const PointType& point)
+          {
+            val.format();
+            val(0) = _fac;
+
+            for(int d(1); d < PointType::n; ++d)
+            {
+              val(0) *= (point[d] - _zeros.at(d-1)[0])*(_zeros.at(d-1)[1] - point[d]);
+            }
+          }
+
+          /**
+           * \brief Computes the gradient
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& point) const
+          {
+            grad.format();
+            for(int d(1); d < domain_dim; ++d)
+            {
+              grad[d][0] = _fac[d]*(_zeros.at(d-1)[0] + _zeros.at(d-1)[1] - DataType(2)*point(d));
+            }
+          }
+
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          {
+            hess.format();
+          }
+
+        }; // class YZPlaneParabolic::Evaluator<...>
+
+      public:
+        /// The maximum value of the parabolic profile
+        const DataType _amplitude;
+        /// The points where the function becomes zero
+        std::vector<Tiny::Vector<DataType, 2>> _zeros;
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         * \param[in] amplitude
+         * The amplitude to use
+         *
+         * \param[in] zeros_y
+         * The roots for the y part
+         *
+         * \param[in] zeros_z
+         * The roots for the z part
+         *
+         */
+        explicit YZPlaneParabolic(const DataType amplitude, const PointType& zeros_y) :
+          _amplitude(amplitude),
+          _zeros(1)
+        {
+          _zeros.at(0) = zeros_y;
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] amplitude
+         * The amplitude to use
+         *
+         * \param[in] zeros_y
+         * The roots for the y part
+         *
+         * \param[in] zeros_z
+         * The roots for the z part
+         *
+         */
+        explicit YZPlaneParabolic(const DataType amplitude, const PointType& zeros_y, const PointType& zeros_z) :
+          _amplitude(amplitude),
+          _zeros(2)
+        {
+          _zeros.at(0) = zeros_y;
+          _zeros.at(1) = zeros_z;
+        }
+      }; // class YZPlaneParabolic
+
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

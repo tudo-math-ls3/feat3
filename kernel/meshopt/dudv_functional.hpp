@@ -263,6 +263,7 @@ namespace FEAT
             trafo_space,            // the finite element space in use
             _cubature_factory  // the cubature factory to be used for integration
             );
+
         }
 
         /**

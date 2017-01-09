@@ -74,17 +74,19 @@ namespace FEAT
 
           /// The transformation we solve for
           typedef typename DomainLevelType::TrafoType TrafoType;
+
+          /// Template-alias away the Trafo so the SystemLevel can take it as a template template parameter
+          template<typename A, typename B, typename C>
+          using LocalFunctionalType =  FEAT::Meshopt::DuDvFunctional<A, B, C, TrafoType>;
+
           /// The FE space the transformation lives in
-          typedef typename DomainLevelType::SpaceType TrafoSpace;
+          typedef typename LocalFunctionalType<Mem_, DT_, IT_>::SpaceType TrafoSpace;
 
           /// The underlying mesh type
           typedef typename DomainControl_::MeshType MeshType;
           /// The floating point type the mesh's coordinates use
           typedef typename MeshType::CoordType CoordType;
 
-          /// Template-alias away the Trafo so the SystemLevel can take it as a template template parameter
-          template<typename A, typename B, typename C>
-          using LocalFunctionalType =  FEAT::Meshopt::DuDvFunctional<A, B, C, TrafoType>;
           /// Linear system of equations on one refinement level
           typedef QuadraticSystemLevel<Mem_, DT_, IT_, LocalFunctionalType> SystemLevelType;
 
@@ -196,7 +198,7 @@ namespace FEAT
                   dom_ctrl.at(i)->trafo,
                   dirichlet_list, slip_list));
 
-                // This assembles the system matrix symbolically
+                // This assembles the system matrix numerically
                 _system_levels.at(i)->local_functional.init();
               }
 
@@ -451,7 +453,7 @@ namespace FEAT
           virtual void prepare(const GlobalSystemVectorR& vec_state) override
           {
             typename SystemLevelType::LocalCoordsBuffer vec_buf;
-            vec_buf.convert(*vec_state);
+            vec_buf.convert(vec_state.local());
 
             for(size_t level(0); level < get_num_levels(); ++level)
             {
@@ -523,7 +525,7 @@ namespace FEAT
 
             // Write the solution to the control object's buffer and the buffer to mesh
             typename SystemLevelType::LocalCoordsBuffer vec_buf;
-            vec_buf.convert(*vec_sol);
+            vec_buf.convert(vec_sol.local());
             the_system_level.coords_buffer.local().copy(vec_buf);
 
             the_system_level.local_functional.buffer_to_mesh();

@@ -1,0 +1,19 @@
+[ApplicationSettings]
+mesh_files = screws_2d_chart_bezier_24_28.xml screws_2d_mesh_quad_360_1.xml
+meshopt_config_file = ./meshopt_config.ini
+solver_config_file = ./solver_config.ini
+mesh_optimiser = HyperelasticityDefault
+delta_t = 1e-4
+t_end = 1
+reynolds = 1e-2
+use_deformation = 0
+nl_its_max = 3
+uzawa_its_max = 20
+
+[DomainControlSettings]
+lvl_min = 0
+lvl_max = 1
+parti-type = parmetis fallback
+#parti-name = default
+parti-rank-elems = 4
+adapt_mode = chart

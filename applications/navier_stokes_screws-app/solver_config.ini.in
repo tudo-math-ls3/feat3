@@ -1,0 +1,123 @@
+[linsolver_a]
+type = richardson
+max_iter = 1000
+tol_rel = 1e-8
+precon = mgv_a
+
+[mgv_a]
+type = mg
+hierarchy = h1_a
+lvl_min = 0
+lvl_max = -1
+cycle = v
+
+[h1_a]
+smoother = rich
+coarse = BiCGStab-Jacobi
+
+[linsolver_s]
+type = pcg
+max_iter = 1000
+tol_rel = 1e-8
+precon = mgv_s
+
+[mgv_s]
+type = mg
+hierarchy = h1_s
+lvl_min = 0
+lvl_max = -1
+cycle = v
+
+[h1_s]
+smoother = rich
+coarse = PCG-Jacobi
+
+[BiCGStab-Jacobi]
+type = bicgstab
+precon = jac
+max_iter = 1000
+
+[ALGLIBMinLBFGS]
+type = ALGLIBMinLBFGS
+plot = 1
+max_iter = 30000
+tol_rel = 1e-8
+lbfgs_dim = 10
+keep_iterates = 0
+
+[ALGLIBMinCG]
+type = ALGLIBMinCG
+plot = 1
+tol_rel = 1e-8
+max_iter = 30000
+direction_update = DYHSHybrid
+keep_iterates = 0
+
+[NLCG]
+type = NLCG
+precon = none
+plot = 1
+tol_rel = 1e-8
+max_iter = 30000
+linesearch = strongwolfelinesearch
+direction_update = DYHSHybrid
+keep_iterates = 0
+
+[DuDvPrecon]
+type = DuDvPrecon
+dirichlet_boundaries = screw:i screw:o
+linear_solver = PCG-Jacobi
+
+[PCG-MGV]
+type = pcg
+max_iter = 500
+tol_rel = 1e-8
+plot = 1
+precon = Richardson-MGV
+
+[Richardson-MGV]
+type = richardson
+plot = 1
+tol_rel = 1e-8
+max_iter = 1
+precon = mgv
+
+[strongwolfelinesearch]
+type = StrongWolfeLinesearch
+plot = 0
+max_iter = 20
+tol_decrease = 1e-3
+tol_curvature = 0.3
+keep_iterates = 0
+
+[rich]
+type = richardson
+max_iter = 4
+min_iter = 4
+precon = jac
+
+[jac]
+type = jac
+omega = 0.5
+
+[MG]
+type = mg
+hierarchy = h1_a
+lvl_min = 0
+lvl_max = -1
+cycle = v
+
+[h_cg]
+smoother = cg
+coarse = PCG-Jacobi
+
+[cg]
+type = pcg
+min_iter = 4
+max_iter = 4
+
+[PCG-Jacobi]
+type = pcg
+max_iter = 1000
+tol_rel = 1e-8
+precon = jac

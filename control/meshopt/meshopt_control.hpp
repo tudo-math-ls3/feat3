@@ -536,6 +536,7 @@ namespace FEAT
             GlobalSystemVectorR vec_sol(create_vector_r());
 
             vec_sol.local().copy(coords_buffer.local());
+            filter_sys.local().template at<1>().filter_sol(vec_sol.local());
 
             return vec_sol;
           }
