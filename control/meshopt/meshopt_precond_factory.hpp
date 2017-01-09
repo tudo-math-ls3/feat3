@@ -17,13 +17,42 @@ namespace FEAT
   {
     namespace Meshopt
     {
+      /**
+       * \brief Factory class for specialised preconditioners
+       */
       struct MeshoptPrecondFactory
       {
+        /**
+         * \brief Creates a preconditioner for nonlinear mesh optimisation problems
+         *
+         * \tparam MeshoptCtrl_
+         * The type of the control object for mesh optimisation
+         *
+         * \tparam DomCtrl_
+         * The type of the control object for the domain.
+         *
+         * \tparam SolverVectorType_
+         * The input vector type for the preconditioner.
+         *
+         * \tparam FilterType_
+         * The filter type for the preconditioner.
+         *
+         * \param[in] my_ctrl
+         * The mesh optimisation control object.
+         *
+         * \param[in] dom_ctrl
+         * The domain control object.
+         *
+         * \param[in] current_section
+         * The configuration section of the solver this preconditioner is built for.
+         *
+         * \returns An std::shared_ptr to the new NLOptPrecond object.
+         */
         template
         <
           typename MeshoptCtrl_,
           typename DomCtrl_ = typename MeshoptCtrl_::DomainControlType,
-          typename SolverVectorType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemVectorR,
+          typename SolverVectorType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemVectorL,
           typename FilterType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemFilter
         >
         static std::shared_ptr<Solver::NLOptPrecond<SolverVectorType_, FilterType_>>
@@ -100,7 +129,7 @@ namespace FEAT
           }
 
           return result;
-        } // create_nonlinear_optimiser_precon
+        } // create_nlopt_precond
       };
     } // namespace Meshopt
   } // namespace Control
