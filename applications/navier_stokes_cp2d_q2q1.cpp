@@ -203,7 +203,7 @@
 
 #include <deque>
 
-namespace NaverStokesCP2D
+namespace NavierStokesCP2D
 {
   using namespace FEAT;
 
@@ -1545,12 +1545,12 @@ namespace NaverStokesCP2D
 
     // okay
   }
-} // namespace NaverStokesCP2D
+} // namespace NavierStokesCP2D
 
 
 int main(int argc, char* argv [])
 {
   FEAT::Runtime::initialise(argc, argv);
-  NaverStokesCP2D::main(argc, argv);
+  NavierStokesCP2D::main(argc, argv);
   return FEAT::Runtime::finalise();
 }
