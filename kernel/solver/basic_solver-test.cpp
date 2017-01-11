@@ -11,6 +11,7 @@
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>
+#include <kernel/solver/rgcr.hpp>
 #include <kernel/solver/pcr.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/ilu_precond.hpp>
@@ -213,6 +214,13 @@ public:
       PCGNRILU<MatrixType, FilterType> solver(matrix, filter, 0);
       test_solver("PCGNRILU", solver, vec_sol, vec_ref, vec_rhs, 31);
     }
+
+    // test RGCR-JAC
+    {
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      RGCR<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("RGCR-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
   }
 };
 
@@ -376,6 +384,13 @@ public:
       // create a FMGRES solver
       FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
       test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs, 32);
+    }
+
+    // test RGCR-SPAI
+    {
+      auto precon = Solver::new_spai_precond(matrix, filter);
+      RGCR<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("RGCR-SPAI", solver, vec_sol, vec_ref, vec_rhs, 17);
     }
 
 #ifdef FEAT_HAVE_CUSOLVER

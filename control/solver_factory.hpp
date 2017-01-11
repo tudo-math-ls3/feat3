@@ -12,6 +12,7 @@
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/rgcr.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/ilu_precond.hpp>
@@ -311,7 +312,6 @@ namespace FEAT
 
           if (solver_type == "pcg")
           {
-            std::shared_ptr<Solver::PreconditionedIterativeSolver<SolverVectorType_> > solver;
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_pcg(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
@@ -353,6 +353,12 @@ namespace FEAT
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_psd(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+          }
+          else if (solver_type == "rgcr")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            result = Solver::new_rgcr(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "jac")
           {
