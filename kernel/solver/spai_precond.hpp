@@ -250,8 +250,11 @@ nextj:
         /// Applies the preconditioner.
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
+          TimeStamp ts_start;
           _precond.apply(vec_cor, vec_def);
           this->_filter.filter_cor(vec_cor);
+          TimeStamp ts_stop;
+          Statistics::add_time_precon(ts_stop.elapsed(ts_start));
           return Status::success;
         }
     };
@@ -285,8 +288,11 @@ nextj:
         /// Applies the preconditioner.
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
+          TimeStamp ts_start;
           _precond.apply(vec_cor, vec_def);
           this->_filter.filter_cor(vec_cor);
+          TimeStamp ts_stop;
+          Statistics::add_time_precon(ts_stop.elapsed(ts_start));
           return Status::success;
         }
     };
@@ -376,15 +382,10 @@ nextj:
 
           virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
           {
-            TimeStamp ts_start;
-
             // multiply with the SPAI
             _M.apply(vec_cor, vec_def);
             // apply filter
             this->_filter.filter_cor(vec_cor);
-
-            TimeStamp ts_stop;
-            Statistics::add_time_precon(ts_stop.elapsed(ts_start));
 
             return Status::success;
           }
@@ -467,15 +468,10 @@ nextj:
 
           virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
           {
-            TimeStamp ts_start;
-
             // multiply with the SPAI
             _M.apply(vec_cor, vec_def);
             // apply filter
             this->_filter.filter_cor(vec_cor);
-
-            TimeStamp ts_stop;
-            Statistics::add_time_precon(ts_stop.elapsed(ts_start));
 
             return Status::success;
           }
