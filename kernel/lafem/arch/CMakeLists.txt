@@ -41,6 +41,7 @@ if (FEAT_HAVE_MKL)
     max_element_mkl.cpp
     norm_mkl.cpp
     product_matmat_mkl.cpp
+    unit_filter_mkl.cpp
     scale_mkl.cpp
   )
 endif(FEAT_HAVE_MKL)

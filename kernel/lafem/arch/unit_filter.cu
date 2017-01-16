@@ -80,8 +80,8 @@ void UnitFilter<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, co
 }
 
 template void UnitFilter<Mem::CUDA>::filter_def(float *, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_def(double *,  const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_def(float *,  const unsigned int * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_def(double *,  const unsigned int * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(double *, const unsigned long * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(float *, const unsigned int * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(double *, const unsigned int * const, const Index);
 
 /// \endcond
