@@ -25,12 +25,21 @@ yields a classical pcg-jac setup with the solver tree root section 'solver' and 
 \warning Do not create circles e.g. cg-richardson-cg, as they will crash your application.
 
 The supported solver/precon types are (with a list of supported keys, in addition to the mandatory type key):
+- richardson (precon, max_iter, min_iter, tol_rel, plot, omega)
 - pcg (precon, max_iter, min_iter, tol_rel, plot)
 - bicgstab (precon, max_iter, min_iter, tol_rel, plot)
 - fgmres (precon, max_iter, min_iter, tol_rel, plot, krylov_dim)
-- mgv (smoother, coarse)
+- pmr (precon, max_iter, min_iter, tol_rel, plot)
+- pcr (precon, max_iter, min_iter, tol_rel, plot)
+- psd (precon, max_iter, min_iter, tol_rel, plot)
+- rgcr (precon, max_iter, min_iter, tol_rel, plot)
+- mg (hierarchy, lvl_min, lvl_max, cycle)
+- scarcmg (hierarchy, lvl_min, lvl_max, cycle)
+- hierarchy (coarse, smoother)
 - ilu
+- spai
 - jac (omega)
+- sor (omega)
 - ssor (omega)
 - scale (omega)
 - schwarz (solver)
@@ -42,6 +51,10 @@ The supported keys semantics:
 - tol_rel: Relative convergence criterium.
 - plot: 1/0 - plot / do not plot convergence progression.
 - krylov_dim: Maximum krylov subspace dimension.
+- hierarchy: Reference to another section, which shall be used as the multigrid hierarchy
+- lvl_min: coarsest multigrid level (relative to the hierarchy)
+- lvl_max: finest multigrid level (-1 denotes maximum level in hierarchy)
+- cycle: multigrid cycle type: v, w, f
 - smoother: Reference to another section, which shall be used as the pre/post smoother.
 - coarse: Reference to another section, which shall be used as a coarse grid solver.
 - omega: Damping/Scaling multiplicator.
@@ -60,7 +73,14 @@ tol_rel = 1e-8
 plot = 1
 
   [mgv]
-  type = mgv
+  type = mg
+  hierarchy = h1
+  cycle = v
+  lvl_min = 0
+  lvl_max = -1
+
+  [h1]
+  type = hierarchy
   smoother = rich
   coarse = pcg
 }

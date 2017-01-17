@@ -412,14 +412,19 @@ namespace FEAT
               auto hierarchy_section_path = get_section_path(base, section, section_name, hierarchy_p.first);
               auto hierarchy_section = base->query_section(hierarchy_section_path);
 
+              auto hierarchy_type_p = hierarchy_section->query("type");
+              if (!hierarchy_type_p.second)
+                throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without type key is not allowed!");
+              XASSERTM(hierarchy_type_p.first == "hierarchy", "hierarchy key type must match string 'hierarchy'!");
+
               auto coarse_solver_p = hierarchy_section->query("coarse");
               if (!coarse_solver_p.second)
-                throw InternalError(__func__, __FILE__, __LINE__, "mg section without coarse key is not allowed!");
+                throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without coarse key is not allowed!");
               auto coarse_solver_section_path = get_section_path(base, section, section_name, coarse_solver_p.first);
 
               auto smoother_p = hierarchy_section->query("smoother");
               if (!smoother_p.second)
-                throw InternalError(__func__, __FILE__, __LINE__, "mg section without smoother key is not allowed!");
+                throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without smoother key is not allowed!");
               auto smoother_section_path = get_section_path(base, section, section_name, smoother_p.first);
 
               for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
