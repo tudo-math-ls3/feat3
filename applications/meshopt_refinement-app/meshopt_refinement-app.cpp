@@ -77,13 +77,21 @@ struct MeshoptRefinementApp
     int lvl_max(-1);
     // Do we want to write vtk files. Read from the command line arguments
     bool write_vtk(false);
+    // Do we want to write the optimised mesh to xml. Read from the command line arguments
+    bool write_xml(false);
     // Is the application running as a test? Read from the command line arguments
     int test_number(0);
 
-    // Check if we want to write vtk files and at what frequency
+    // Check if we want to write vtk files
     if(args.check("vtk") >= 0 )
     {
       write_vtk = true;
+    }
+
+    // Check if we want to write xml
+    if(args.check("xml") >= 0 )
+    {
+      write_xml = true;
     }
 
     // Check if we are to perform test 1 or test 2, if any
@@ -366,6 +374,39 @@ struct MeshoptRefinementApp
 
     }
 
+    if(write_xml)
+    {
+
+      if(comm.size() != 1)
+      {
+        throw InternalError(__func__,__FILE__,__LINE__,"Writing the mesh to xml is only possible with 1 process!");
+      }
+
+
+      for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
+      {
+        auto& dom_lvl = dom_ctrl.at(l);
+
+        int lvl_index(dom_lvl->get_level_index());
+        String xml_name(file_basename+"_"+stringify(lvl_index)+".xml");
+
+        comm.print("Writing "+xml_name);
+
+        std::ofstream ofs(xml_name);
+
+        ofs << std::setprecision(16);
+
+        if(!ofs.is_open() || !ofs.good())
+        {
+          throw FileError(String("Failed to open output file: ") + xml_name);
+        }
+
+        Geometry::MeshFileWriter mesh_writer(ofs, false);
+        mesh_writer.write_mesh(dom_lvl->get_mesh());
+
+      }
+    }
+
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
@@ -481,9 +522,12 @@ int run_app(int argc, char* argv[])
   args.support("help");
   args.support("test");
   args.support("vtk");
+  args.support("xml");
 
   if( args.check("help") > -1 || args.num_args()==1)
+  {
     display_help(comm);
+  }
 
   // Get unsupported command line arguments
   std::deque<std::pair<int,String> > unsupported = args.query_unsupported();
@@ -497,11 +541,15 @@ int run_app(int argc, char* argv[])
   if( args.check("test") >=0 )
   {
     if(args.check("test") > 1)
+    {
       throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
+    }
 
     args.parse("test",test_number);
     if(test_number != 1 && test_number != 2)
+    {
       throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
+    }
   }
 
   // Application settings, has to be created here because it gets filled differently according to test
@@ -530,7 +578,9 @@ int run_app(int argc, char* argv[])
         std::cout << "Reading application configuration from file " << application_config_filename << std::endl;
         std::ifstream ifs(application_config_filename);
         if(!ifs.good())
+        {
           throw FileNotFound(application_config_filename);
+        }
 
         synchstream_app_config << ifs.rdbuf();
       }
