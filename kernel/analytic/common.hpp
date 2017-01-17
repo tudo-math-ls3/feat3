@@ -2178,18 +2178,40 @@ namespace FEAT
       template<int dim_>
         using ExpFunction = Analytic::StaticWrapperFunction<dim_, ExpStatic, true, true, true>;
 
+      /**
+       * \brief Velocity field for a rigid body rotation in the x,y plane
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * This is the mapping
+       * \f[
+       *    f: \mathbb{R}^d \to \mathbb{R}^d, (x, y, z)^T \mapsto \omega (-(y - y_0), x - x_0, 0)
+       * \f]
+       * for a given angular velocity \f$ \omega \f$ and and origin \f$ (x_0, y_0, z_0)^T \f$.
+       *
+       * \author Jordi Paul
+       */
       template<typename DT_, int dim_>
       class XYPlaneRotation : public Analytic::Function
       {
       public:
+        /// The floating point type
         typedef DT_ DataType;
+        /// What type this mapping maps to
         typedef Analytic::Image::Vector<dim_> ImageType;
-        static constexpr int domain_dim = 2;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
         static constexpr bool can_value = true;
+        /// We can compute the gradient
         static constexpr bool can_grad = true;
+        /// We can compute the Hessian
         static constexpr bool can_hess = true;
-
-        typedef Tiny::Vector<DT_, dim_> PointType;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
 
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
@@ -2215,30 +2237,60 @@ namespace FEAT
           const PointType& _origin;
 
         public:
-          /// Constructor
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
           explicit Evaluator(const XYPlaneRotation& function) :
             _angular_velocity(function._angular_velocity),
             _origin(function._origin)
           {
           }
 
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
           void value(ValueType& val, const PointType& point)
           {
             val.format();
             val[0] = _angular_velocity*(-(point[1] - _origin[1]));
             val[1] = _angular_velocity*( (point[0] - _origin[0]));
-            //val[0] = _angular_velocity*point[1]*((point[1] - _origin[1]));
           }
 
-          void gradient(GradientType& grad, const PointType& point) const
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& DOXY(point)) const
           {
             grad.format();
             grad[0][1] = -DataType(1);
             grad[1][0] = DataType(1);
-            //grad[0][1] = (point[1] - _origin[1]);
           }
 
-          void hessian(HessianType& hess, const PointType&) const
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
           {
             hess.format();
           }
@@ -2252,7 +2304,16 @@ namespace FEAT
         const PointType _origin;
 
       public:
-        /// Constructor
+        /**
+         * \brief Constructor
+         *
+         * \param[in] angular_velocity
+         * The angular velocity to use
+         *
+         * \param[in] origin
+         * The origin around which to rotate
+         *
+         */
         explicit XYPlaneRotation(const DataType angular_velocity, const PointType& origin) :
           _angular_velocity(angular_velocity),
           _origin(origin)
