@@ -803,6 +803,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "cycle = w" << std::endl;
 
     iss << "[s:rich-c:pcg]" << std::endl;
+    iss << "type = hierarchy" << std::endl;
     iss << "smoother = rich" << std::endl;
     iss << "coarse = PCG-JAC" << std::endl;
 
