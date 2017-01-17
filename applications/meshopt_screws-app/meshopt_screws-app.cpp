@@ -1157,7 +1157,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "precon = jac" << std::endl;
 
     iss << "[jac]" << std::endl;
-    iss << "type = jac" << std::endl;
+    iss << "type = jacobi" << std::endl;
     iss << "omega = 0.5" << std::endl;
 
     iss << "[MG1]" << std::endl;
