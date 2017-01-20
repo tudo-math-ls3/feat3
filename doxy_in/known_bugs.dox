@@ -1,0 +1,24 @@
+/** \page known_bugs Known Bugs
+
+- Valgrind fails on mat mat product test with avx enabled cpus and mkl support
+\verbatim
+vex: the `impossible' happened:
+VEX temporary storage exhausted.
+Increase N_{TEMPORARY,PERMANENT}_BYTES and recompile.
+vex storage: T total 642219320 bytes allocated
+vex storage: P total 640 bytes allocated
+valgrind: the 'impossible' happened: LibVEX called failure_exit().
+
+Thread 1: status = VgTs_Runnable (lwpid 3709)
+==3709== at 0x888687: mkl_blas_avx2_sgemm_nocopy_anbn_b0 (in /export/data/scratch/feat-regression-build/kernel/lafem/dense_matrix-test)
+==3709== by 0x87367B: mkl_blas_avx2_xsgemm (in /export/data/scratch/feat-regression-build/kernel/lafem/dense_matrix-test)
+==3709== by 0x554B35: mkl_blas_sgemm (in /export/data/scratch/feat-regression-build/kernel/lafem/dense_matrix-test)
+\endverbatim
+
+- Valgrind detects still reachable memory from centos libc
+\verbatim
+==61823==    still reachable: 72,704 bytes in 1 blocks
+\endverbatim
+This even happens with empty main routines due to a bug in the libc.
+
+**/
