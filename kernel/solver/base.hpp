@@ -309,6 +309,7 @@ namespace FEAT
        * \param[in] new_section_name
        * The name the new section will have
        *
+       * \returns A pointer to the new section created in the PropertyMap
        */
       virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const
       {
