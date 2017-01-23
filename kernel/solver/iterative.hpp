@@ -348,13 +348,25 @@ namespace FEAT
       /// checks for convergence
       bool is_converged() const
       {
-        return (_def_cur <= _tol_abs) && (_def_cur <= (_tol_rel * _def_init));
+        return is_converged(_def_cur);
+      }
+
+      /// checks for convergence
+      bool is_converged(const DataType def_cur) const
+      {
+        return (def_cur <= _tol_abs) && (def_cur <= (_tol_rel * _def_init));
       }
 
       /// checks for divergence
       bool is_diverged() const
       {
-        return (_def_cur > _div_abs) || (_def_cur > (_div_rel * _def_init));
+        return is_diverged(_def_cur);
+      }
+
+      /// checks for divergence
+      bool is_diverged(const DataType def_cur) const
+      {
+        return (def_cur > _div_abs) || (def_cur > (_div_rel * _def_init));
       }
 
       /// Returns the initial defect
