@@ -185,7 +185,19 @@ namespace FEAT
         _inner_res_scale = inner_res_scale;
       }
 
-      /// \copydoc BaseClass::apply()
+      /// \copydoc SolverBase::write_config()
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+      {
+
+        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+        my_section->add_entry("inner_res_scale", stringify_fp_sci(_inner_res_scale));
+        my_section->add_entry("krylov_dim", stringify(_krylov_dim));
+
+        return my_section;
+      }
+
+      /// \copydoc IterativeSolver::apply()
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // save input rhs vector as initial defect

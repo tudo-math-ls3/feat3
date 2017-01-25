@@ -114,19 +114,6 @@ namespace FEAT
         return "SSOR";
       }
 
-      /**
-       * \brief Sets the damping parameter
-       *
-       * \param[in] omega
-       * The new damping parameter.
-       *
-       */
-      void set_omega(DataType omega)
-      {
-        XASSERT(omega > DataType(0));
-        _omega = omega;
-      }
-
       virtual void init_symbolic() override
       {
       }
@@ -141,6 +128,30 @@ namespace FEAT
 
       virtual void done_numeric() override
       {
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      void set_omega(DataType omega)
+      {
+        XASSERT(omega > DataType(0));
+        _omega = omega;
+      }
+
+      /// \copydoc SolverBase::write_config()
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+      {
+
+        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+        my_section->add_entry("omega", stringify_fp_sci(_omega));
+
+        return my_section;
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override

@@ -188,14 +188,14 @@ namespace FEAT
 
         }
 
-        /// \copydoc BaseClass::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
         {
           XASSERT(parent != nullptr);
 
           Dist::Comm comm(Dist::Comm::world());
 
-          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("tol_fval", stringify_fp_sci(_tol_fval));
           my_section->add_entry("tol_step", stringify_fp_sci(_tol_step));

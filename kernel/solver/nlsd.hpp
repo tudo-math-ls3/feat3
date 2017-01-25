@@ -154,14 +154,14 @@ namespace FEAT
           }
         }
 
-        /// \copydoc BaseClass::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
         {
           XASSERT(parent != nullptr);
 
           Dist::Comm comm(Dist::Comm::world());
 
-          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
           my_section->add_entry("linesearch", _linesearch->get_section_name());

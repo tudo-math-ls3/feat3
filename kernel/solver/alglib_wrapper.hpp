@@ -180,14 +180,14 @@ namespace FEAT
           }
         }
 
-        /// \copydoc BaseClass::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
         {
           XASSERT(parent != nullptr);
 
           Dist::Comm comm(Dist::Comm::world());
 
-          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("lbfgs_dim", stringify(_lbfgs_dim));
           my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
@@ -196,7 +196,7 @@ namespace FEAT
 
         }
 
-        /// \copydoc BaseClass::init_symbolic()
+        /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
@@ -222,7 +222,7 @@ namespace FEAT
           alglib::ae_int_t(this->_max_iter));
         }
 
-        /// \copydoc BaseClass::done_symbolic()
+        /// \copydoc SolverBase::done_symbolic()
         virtual void done_symbolic() override
         {
           this->_vec_def.clear();
@@ -230,7 +230,7 @@ namespace FEAT
           BaseClass::done_symbolic();
         }
 
-        /// \copydoc BaseClass::name()
+        /// \copydoc SolverBase::name()
         virtual String name() const override
         {
           return "ALGLIBMinLBFGS";
@@ -271,7 +271,7 @@ namespace FEAT
         }
 
         /**
-         * \copydoc BaseClass::set_max_iter()
+         * \copydoc IterativeSolver::set_max_iter()
          */
         void set_max_iter(Index max_iter)
         {
@@ -308,7 +308,7 @@ namespace FEAT
 
         }
 
-        /// \copydoc BaseClass::apply()
+        /// \copydoc SolverBase::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
 
@@ -329,7 +329,7 @@ namespace FEAT
           return _apply_intern(vec_cor);
         }
 
-        /// \copydoc BaseClass::correct()
+        /// \copydoc IterativeSolver::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
 
@@ -719,14 +719,14 @@ namespace FEAT
         }
 
 
-        /// \copydoc BaseClass::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
         {
           XASSERT(parent != nullptr);
 
           Dist::Comm comm(Dist::Comm::world());
 
-          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("direction_update", stringify(_direction_update));
           my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
@@ -735,7 +735,7 @@ namespace FEAT
 
         }
 
-        /// \copydoc BaseClass::init_symbolic()
+        /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
@@ -819,7 +819,7 @@ namespace FEAT
         }
 
         /**
-         * \copydoc BaseClass::set_max_iter()
+         * \copydoc IterativeSolver::set_max_iter()
          */
         void set_max_iter(Index max_iter)
         {
@@ -847,7 +847,7 @@ namespace FEAT
         }
 
 
-        /// \copydoc BaseClass::done_symbolic()
+        /// \copydoc SolverBase::done_symbolic()
         virtual void done_symbolic() override
         {
           this->_vec_def.clear();
@@ -855,13 +855,13 @@ namespace FEAT
           BaseClass::done_symbolic();
         }
 
-        /// \copydoc BaseClass::name()
+        /// \copydoc SolverBase::name()
         virtual String name() const override
         {
           return "ALGLIBMinCG";
         }
 
-        /// \copydoc BaseClass::apply()
+        /// \copydoc SolverBase::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
           // clear solution vector
@@ -878,7 +878,7 @@ namespace FEAT
           return _apply_intern(vec_cor);
         }
 
-        /// \copydoc BaseClass::correct()
+        /// \copydoc IterativeSolver::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
 

@@ -147,6 +147,17 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
+      /// \copydoc SolverBase::write_config()
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+      {
+
+        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+        my_section->add_entry("omega", stringify_fp_sci(_omega));
+
+        return my_section;
+      }
+
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // save defect
