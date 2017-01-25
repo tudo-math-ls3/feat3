@@ -1,4 +1,4 @@
-/** \page known_bugs Known Bugs
+/** \page known_issues Known Issues
 
 - Valgrind fails on mat mat product test with avx enabled cpus and mkl support
 \verbatim
@@ -20,5 +20,5 @@ Thread 1: status = VgTs_Runnable (lwpid 3709)
 ==61823==    still reachable: 72,704 bytes in 1 blocks
 \endverbatim
 This even happens with empty main routines due to a bug in the libc.
-
+\see http://stackoverflow.com/questions/30376601/valgrind-memory-still-reachable-with-trivial-program-using-iostream
 **/
