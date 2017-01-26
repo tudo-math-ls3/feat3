@@ -41,17 +41,25 @@ namespace FEAT
       public SolverBase<typename Matrix_::VectorTypeL>
     {
     public:
+      /// The matrix type
       typedef Matrix_ MatrixType;
+      /// The filter type
       typedef Filter_ FilterType;
+      /// The type of vector this solver can be applied to
       typedef typename MatrixType::VectorTypeL VectorType;
+      /// The floating point precision
       typedef typename MatrixType::DataType DataType;
       /// Our base class
       typedef SolverBase<VectorType> BaseClass;
 
     protected:
+      /// The system matrix
       const MatrixType& _matrix;
+      /// The filter for projecting solution and defect to subspaces
       const FilterType& _filter;
+      /// The damping parameter
       DataType _omega;
+      /// The component-wise inverted diagonal of _matrix
       VectorType _inv_diag;
 
     public:
@@ -121,22 +129,25 @@ namespace FEAT
       {
       }
 
-      /// Returns the name of the solver.
+      /// \copydoc SolverBase::name()
       virtual String name() const override
       {
         return "Jacobi";
       }
 
+      /// \copydoc SolverBase::init_symbolic()
       virtual void init_symbolic() override
       {
         _inv_diag = _matrix.create_vector_r();
       }
 
+      /// \copydoc SolverBase::done_symbolic()
       virtual void done_symbolic() override
       {
         _inv_diag.clear();
       }
 
+      /// \copydoc SolverBase::init_numeric()
       virtual void init_numeric() override
       {
         // extract matrix diagonal
@@ -170,6 +181,7 @@ namespace FEAT
         return my_section;
       }
 
+      /// \copydoc SolverBase::apply()
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         vec_cor.component_product(_inv_diag, vec_def);
