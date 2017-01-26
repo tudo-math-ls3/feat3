@@ -11,11 +11,11 @@ namespace FEAT
     /**
      * \brief Secant linesearch
      *
-     * \tparam Operator_
-     * The (nonlinear) operator to be evaluated
+     * \tparam Functional_
+     * The (nonlinear) functional to be evaluated
      *
      * \tparam Filter_
-     * The filter to be applied to the operator's gradient
+     * The filter to be applied to the functional's gradient
      *
      * This class implements a linesearch which approximately finds
      * \f[
@@ -25,20 +25,20 @@ namespace FEAT
      * secant.
      *
      */
-    template<typename Operator_, typename Filter_>
-    class SecantLinesearch : public Linesearch<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class SecantLinesearch : public Linesearch<Functional_, Filter_>
     {
       public:
-        /// Filter type to be applied to the gradient of the operator
+        /// Filter type to be applied to the gradient of the functional
         typedef Filter_ FilterType;
-        /// Input vector type for the operator's gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        /// Input vector type for the functional's gradient
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
         /// Our base class
-        typedef Linesearch<Operator_, Filter_> BaseClass;
+        typedef Linesearch<Functional_, Filter_> BaseClass;
         /// Default initial step length
-        static constexpr DataType initial_step_default = DataType(1e-2);
+        static constexpr DataType secant_step_default = DataType(1e-2);
 
       protected:
         /// Step for calculating the "other" secant point in the initial step. Crucial
@@ -50,33 +50,49 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state.
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state.
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient.
+         * \param[in] filter
+         * Filter to apply to the functional's gradient.
          *
-         * \param[in] initial_step_
+         * \param[in] secant_step
          * Step length for setting the "other" secant point in the first iteration. Crucial.
          *
-         * \param[in] keep_iterates_
+         * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
         explicit SecantLinesearch(
-          Operator_& op_, Filter_& filter_,
-          const DataType initial_step_ = initial_step_default,
-          const bool keep_iterates_ = false) :
-          BaseClass("S-LS", op_, filter_, keep_iterates_),
-          _secant_step(initial_step_),
+          Functional_& functional, Filter_& filter,
+          const DataType secant_step = secant_step_default,
+          const bool keep_iterates = false) :
+          BaseClass("S-LS", functional, filter, keep_iterates),
+          _secant_step(secant_step),
           _eta(DataType(0))
           {
           }
 
+        /**
+         * \brief Constructor using a PropertyMap
+         *
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver
+         *
+         * \param[in] functional
+         * The functional.
+         *
+         * \param[in] filter
+         * The system filter.
+         *
+         */
         explicit SecantLinesearch(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
-          BaseClass("S-LS", section_name, section, op_, filter_),
-          _secant_step(initial_step_default),
+        Functional_& functional, Filter_& filter) :
+          BaseClass("S-LS", section_name, section, functional, filter),
+          _secant_step(secant_step_default),
           _eta(DataType(0))
           {
             auto secant_step_p = section->query("secant_step");
@@ -108,6 +124,17 @@ namespace FEAT
           _secant_step = secant_step;
         }
 
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+        {
+
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+          my_section->add_entry("secant_step", stringify_fp_sci(_secant_step));
+
+          return my_section;
+        }
+
         /**
          * \brief Applies the solver, setting the initial guess to zero.
          *
@@ -123,7 +150,7 @@ namespace FEAT
         {
           // clear solution vector
           vec_cor.format();
-          this->_op.prepare(vec_cor, this->_filter);
+          this->_functional.prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor, vec_dir);
@@ -142,7 +169,7 @@ namespace FEAT
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
-          this->_op.prepare(vec_sol, this->_filter);
+          this->_functional.prepare(vec_sol, this->_filter);
           // apply
           Status st =_apply_intern(vec_sol, vec_dir);
 
@@ -193,8 +220,8 @@ namespace FEAT
             ++this->_num_iter;
 
             DataType fval(0);
-            this->_op.prepare(sol, this->_filter);
-            this->_op.eval_fval_grad(fval, this->_vec_grad);
+            this->_functional.prepare(sol, this->_filter);
+            this->_functional.eval_fval_grad(fval, this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
 
             if(fval < this->_fval_min)
@@ -301,13 +328,13 @@ namespace FEAT
     /**
      * \brief Creates a new SecantLinesearch object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] initial_step
+     * \param[in] secant_step
      * Length for first secant step.
      *
      * \param[in] keep_iterates
@@ -316,13 +343,14 @@ namespace FEAT
      * \returns
      * A shared pointer to a new SecantLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
-      Operator_& op, Filter_& filter,
-      typename Operator_::DataType initial_step = SecantLinesearch<Operator_, Filter_>::initial_step_default,
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<SecantLinesearch<Functional_, Filter_>> new_secant_linesearch(
+      Functional_& functional, Filter_& filter,
+      typename Functional_::DataType secant_step = SecantLinesearch<Functional_, Filter_>::secant_step_default,
       bool keep_iterates = false)
       {
-        return std::make_shared<SecantLinesearch<Operator_, Filter_>>(op, filter, initial_step, keep_iterates);
+        return std::make_shared<SecantLinesearch<Functional_, Filter_>>(functional, filter, secant_step,
+        keep_iterates);
       }
 
     /**
@@ -334,8 +362,8 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional
      *
      * \param[in] filter
      * The system filter.
@@ -343,12 +371,12 @@ namespace FEAT
      * \returns
      * A shared pointer to a new SecantLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<SecantLinesearch<Functional_, Filter_>> new_secant_linesearch(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter)
+      Functional_& functional, Filter_& filter)
       {
-        return std::make_shared<SecantLinesearch<Operator_, Filter_>>(section_name, section, op, filter);
+        return std::make_shared<SecantLinesearch<Functional_, Filter_>>(section_name, section, functional, filter);
       }
 
   } // namespace Solver

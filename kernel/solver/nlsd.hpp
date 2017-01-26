@@ -14,39 +14,39 @@ namespace FEAT
   namespace Solver
   {
     /**
-     * \brief Nonlinear Steepest Descent method for finding a minimum of an operator's gradient
+     * \brief Nonlinear Steepest Descent method for finding a minimum of an functional's gradient
      *
-     * \tparam Operator_
-     * Nonlinear Operator to minimise the gradient of
+     * \tparam Functional_
+     * Nonlinear Functional to minimise the gradient of
      *
      * \tparam Filter_
-     * Filter to apply to the operator's gradient
+     * Filter to apply to the functional's gradient
      *
      * See \cite NW06 for an overview of optimisation techniques.
      *
      */
-    template<typename Operator_, typename Filter_>
-    class NLSD : public NLOptLS<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class NLSD : public NLOptLS<Functional_, Filter_>
     {
       public:
-        /// The nonlinear operator type
-        typedef Operator_ OperatorType;
+        /// The nonlinear functional type
+        typedef Functional_ FunctionalType;
         /// The filter type
         typedef Filter_ FilterType;
         /// The baseclass for all applicable linesearches
-        typedef Linesearch<OperatorType, FilterType> LinesearchType;
+        typedef Linesearch<FunctionalType, FilterType> LinesearchType;
 
-        /// Type of the operator's gradient has
-        typedef typename Operator_::GradientType GradientType;
+        /// Type of the functional's gradient has
+        typedef typename Functional_::GradientType GradientType;
         /// Input type for the gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
 
         /// Our baseclass
-        typedef NLOptLS<Operator_, Filter_> BaseClass;
+        typedef NLOptLS<Functional_, Filter_> BaseClass;
         /// Generic preconditioner
-        typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
+        typedef NLOptPrecond<typename Functional_::VectorTypeL, Filter_> PrecondType;
 
       protected:
         /// The linesearch used along the descent direction
@@ -68,11 +68,11 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional_
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
          * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * Filter to apply to the functional's gradient
          *
          * \param[in, out] linesearch_
          * The linesearch to be used, cannot be const as internal data changes
@@ -84,10 +84,10 @@ namespace FEAT
          * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
          *
          */
-        explicit NLSD(Operator_& op_, Filter_& filter_,
+        explicit NLSD(Functional_& functional_, Filter_& filter_,
         std::shared_ptr<LinesearchType> linesearch_,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
-          BaseClass("NLSD", op_, filter_, precond),
+          BaseClass("NLSD", functional_, filter_, precond),
           _linesearch(linesearch_),
           _precond(precond),
           iterates(nullptr)
@@ -111,23 +111,23 @@ namespace FEAT
          * \param[in] section
          * A pointer to the PropertyMap section configuring this solver
          *
-         * \param[in] op
-         * The operator
+         * \param[in] functional_
+         * The functional.
          *
-         * \param[in] filter
+         * \param[in] filter_
          * The system filter.
          *
          * \param[in] precond
          * The preconditioner. May be \c nullptr.
          *
-         * \param[in] linesearch
+         * \param[in] linesearch_
          * The linesearch to use.
          *
          */
         explicit NLSD(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
+        Functional_& functional_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
         std::shared_ptr<PrecondType> precond = nullptr) :
-          BaseClass("NLSD", section_name, section, op_, filter_, precond),
+          BaseClass("NLSD", section_name, section, functional_, filter_, precond),
           _linesearch(linesearch_),
           _precond(precond),
           iterates(nullptr)
@@ -177,8 +177,8 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // create three temporary vectors
-          _vec_r = this->_op.create_vector_r();
-          _vec_p = this->_op.create_vector_r();
+          _vec_r = this->_functional.create_vector_r();
+          _vec_p = this->_functional.create_vector_r();
           _linesearch->init_symbolic();
         }
 
@@ -223,8 +223,8 @@ namespace FEAT
           // Clear solution vector
           vec_cor.format();
 
-          this->_op.prepare(vec_cor, this->_filter);
-          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
+          this->_functional.prepare(vec_cor, this->_filter);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_r);
 
           // Copy back given defect
           this->_vec_r.copy(vec_def);
@@ -241,9 +241,9 @@ namespace FEAT
         /// \copydoc IterativeSolver::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
-          this->_op.prepare(vec_sol, this->_filter);
+          this->_functional.prepare(vec_sol, this->_filter);
           // Compute functional value and gradient
-          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_r);
           this->_vec_r.scale(this->_vec_r,DataType(-1));
           this->_filter.filter_def(this->_vec_r);
 
@@ -268,8 +268,8 @@ namespace FEAT
          * \returns
          * A solver status code.
          *
-         * This does not have a right hand side because that is contained in the gradient of the operator and we
-         * always seek grad operator(vec_sol) = 0
+         * This does not have a right hand side because that is contained in the gradient of the functional and we
+         * always seek grad functional(vec_sol) = 0
          *
          */
         virtual Status _apply_intern(VectorType& vec_sol)
@@ -382,8 +382,8 @@ namespace FEAT
     /**
      * \brief Creates a new NLSD solver object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The nonlinear functional.
      *
      * \param[in] filter
      * The system filter.
@@ -402,28 +402,28 @@ namespace FEAT
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
-      Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false)
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false)
       {
-        return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
+        return std::make_shared<NLSD<Functional_, Filter_>>(functional, filter, linesearch,
         keep_iterates, nullptr);
       }
-    template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
-      Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
+    template<typename Functional_, typename Filter_, typename Linesearch_, typename Precond_>
+    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
+        return std::make_shared<NLSD<Functional_, Filter_>>(functional, filter, linesearch,
         keep_iterates, precond);
       }
 #else
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
-      Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false,
-      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false,
+      std::shared_ptr<NLOptPrecond<typename Functional_::VectorTypeL, Filter_>> precond = nullptr)
       {
-        return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
+        return std::make_shared<NLSD<Functional_, Filter_>>(functional, filter, linesearch,
         keep_iterates, precond);
       }
 #endif
@@ -432,13 +432,13 @@ namespace FEAT
      * \brief Creates a new NLSD solver object using a PropertyMap
      *
      * \param[in] section_name
-     * The name of the config section, which it does not know by itself
+     * The name of the config section, which it does not know by itself.
      *
      * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
+     * A pointer to the PropertyMap section configuring this solver.
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The nonlinear functional.
      *
      * \param[in] filter
      * The system filter.
@@ -454,30 +454,33 @@ namespace FEAT
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter, Linesearch_& linesearch)
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch)
       {
-        return std::make_shared<NLSD<Operator_, Filter_>>(section_name, section, op, filter, linesearch, nullptr);
+        return std::make_shared<NLSD<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
+        nullptr);
       }
 
-    template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
+    template<typename Functional_, typename Filter_, typename Linesearch_, typename Precond_>
+    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter, Linesearch_& linesearch,
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLSD<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
+        return std::make_shared<NLSD<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
+        precond);
       }
 #else
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter, Linesearch_& linesearch,
-      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
+      std::shared_ptr<NLOptPrecond<typename Functional_::VectorTypeL, Filter_>> precond = nullptr)
       {
-        return std::make_shared<NLSD<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
+        return std::make_shared<NLSD<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
+        precond);
       }
 #endif
   } //namespace Solver

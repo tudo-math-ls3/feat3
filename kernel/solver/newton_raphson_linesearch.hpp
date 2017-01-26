@@ -11,11 +11,11 @@ namespace FEAT
     /**
      * \brief Newton Raphson linesearch
      *
-     * \tparam Operator_
-     * The (nonlinear) operator to be evaluated
+     * \tparam Functional_
+     * The (nonlinear) functional to be evaluated
      *
      * \tparam Filter_
-     * The filter to be applied to the operator's gradient
+     * The filter to be applied to the functional's gradient
      *
      * This class implements a linesearch which approximately finds
      * \f[
@@ -24,35 +24,35 @@ namespace FEAT
      * for a given search direction \f$ d \f$ by applying a Newton Raphson iteration to this.
      *
      */
-    template<typename Operator_, typename Filter_>
-    class NewtonRaphsonLinesearch : public Linesearch<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class NewtonRaphsonLinesearch : public Linesearch<Functional_, Filter_>
     {
       public:
-        /// Filter type to be applied to the gradient of the operator
+        /// Filter type to be applied to the gradient of the functional
         typedef Filter_ FilterType;
-        /// Input vector type for the operator's gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        /// Input vector type for the functional's gradient
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
         /// Our base class
-        typedef Linesearch<Operator_, Filter_> BaseClass;
+        typedef Linesearch<Functional_, Filter_> BaseClass;
 
       public:
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * \param[in] filter
+         * Filter to apply to the functional's gradient
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit NewtonRaphsonLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
-          BaseClass("NR-LS", op_, filter_, keep_iterates)
+        explicit NewtonRaphsonLinesearch(Functional_& functional, Filter_& filter, bool keep_iterates = false) :
+          BaseClass("NR-LS", functional, filter, keep_iterates)
           {
           }
 
@@ -60,13 +60,13 @@ namespace FEAT
          * \brief Constructor using a PropertyMap
          *
          * \param[in] section_name
-         * The name of the config section, which it does not know by itself
+         * The name of the config section, which it does not know by itself.
          *
          * \param[in] section
-         * A pointer to the PropertyMap section configuring this solver
+         * A pointer to the PropertyMap section configuring this solver.
          *
-         * \param[in] op
-         * The operator
+         * \param[in] functional
+         * The functional.
          *
          * \param[in] filter
          * The system filter.
@@ -75,8 +75,8 @@ namespace FEAT
          * A shared pointer to a new NewtonRaphsonLinesearch object.
          */
         explicit NewtonRaphsonLinesearch(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
-          BaseClass("NR-LS", section_name, section, op_, filter_)
+        Functional_& functional, Filter_& filter) :
+          BaseClass("NR-LS", section_name, section, functional, filter)
           {
           }
 
@@ -106,7 +106,7 @@ namespace FEAT
         {
           // clear solution vector
           vec_cor.format();
-          this->_op.prepare(vec_cor, this->_filter);
+          this->_functional.prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor, vec_dir);
@@ -125,7 +125,7 @@ namespace FEAT
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
-          this->_op.prepare(vec_sol, this->_filter);
+          this->_functional.prepare(vec_sol, this->_filter);
           // apply
           Status st =_apply_intern(vec_sol, vec_dir);
 
@@ -169,7 +169,7 @@ namespace FEAT
             throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
                 +stringify_fp_sci(eta));
 
-          // Compute initial defect. We want to minimise d^T * grad(_op)
+          // Compute initial defect. We want to minimise d^T * grad(_functional)
           this->_def_init = Math::abs(dir.dot(this->_vec_grad));
 
           //sol.axpy(dir, this->_vec_initial_sol, alpha);
@@ -182,8 +182,8 @@ namespace FEAT
             ++this->_num_iter;
 
             DataType fval(0);
-            this->_op.prepare(sol, this->_filter);
-            this->_op.eval_fval_grad(fval, this->_vec_grad);
+            this->_functional.prepare(sol, this->_filter);
+            this->_functional.eval_fval_grad(fval, this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
 
             if(fval < this->_fval_min)
@@ -196,7 +196,7 @@ namespace FEAT
             this->_def_cur = Math::abs(this->_vec_grad.dot(dir));
 
             // Compute new _alpha <- _alpha - grad.dot(dir) / dir.dot(Hess*dir)
-            this->_op.apply_hess(this->_vec_tmp, dir);
+            this->_functional.apply_hess(this->_vec_tmp, dir);
             this->_filter.filter_def(this->_vec_tmp);
 
             alpha_hidate = - this->_vec_grad.dot(dir)/dir.dot(this->_vec_tmp);
@@ -249,8 +249,8 @@ namespace FEAT
     /**
      * \brief Creates a new NewtonRaphsonLinesearch object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
@@ -261,11 +261,11 @@ namespace FEAT
      * \returns
      * A shared pointer to a new NewtonRaphsonLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<NewtonRaphsonLinesearch<Operator_, Filter_>> new_newton_raphson_linesearch(
-      Operator_& op, Filter_& filter, bool keep_iterates = false)
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<NewtonRaphsonLinesearch<Functional_, Filter_>> new_newton_raphson_linesearch(
+      Functional_& functional, Filter_& filter, bool keep_iterates = false)
       {
-        return std::make_shared<NewtonRaphsonLinesearch<Operator_, Filter_>>(op, filter, keep_iterates);
+        return std::make_shared<NewtonRaphsonLinesearch<Functional_, Filter_>>(functional, filter, keep_iterates);
       }
 
     /**
@@ -277,8 +277,8 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional
      *
      * \param[in] filter
      * The system filter.
@@ -286,12 +286,12 @@ namespace FEAT
      * \returns
      * A shared pointer to a new NewtonRaphsonLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<NewtonRaphsonLinesearch<Operator_, Filter_>> new_newton_raphson_linesearch(
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<NewtonRaphsonLinesearch<Functional_, Filter_>> new_newton_raphson_linesearch(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter)
+      Functional_& functional, Filter_& filter)
       {
-        return std::make_shared<NewtonRaphsonLinesearch<Operator_, Filter_>>(section_name, section, op, filter);
+        return std::make_shared<NewtonRaphsonLinesearch<Functional_, Filter_>>(section_name, section, functional, filter);
       }
   } // namespace Solver
 } // namespace FEAT

@@ -13,11 +13,11 @@ namespace FEAT
     /**
      * \brief Linesearch base class
      *
-     * \tparam Operator_
-     * The (nonlinear) operator to be evaluated
+     * \tparam Functional_
+     * The (nonlinear) functional to be evaluated
      *
      * \tparam Filter_
-     * The filter to be applied to the operator's gradient
+     * The filter to be applied to the functional's gradient
      *
      * This class implements a linesearch which approximately finds
      * \f[
@@ -26,24 +26,24 @@ namespace FEAT
      * for a given search direction \f$ d \f$.
      *
      */
-    template<typename Operator_, typename Filter_>
-    class Linesearch : public IterativeSolver<typename Operator_::VectorTypeR>
+    template<typename Functional_, typename Filter_>
+    class Linesearch : public IterativeSolver<typename Functional_::VectorTypeR>
     {
       public:
-        /// Filter type to be applied to the gradient of the operator
+        /// Filter type to be applied to the gradient of the functional
         typedef Filter_ FilterType;
-        /// Input vector type for the operator's gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        /// Input vector type for the functional's gradient
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
         /// Our base class
-        typedef IterativeSolver<typename Operator_::VectorTypeR> BaseClass;
+        typedef IterativeSolver<typename Functional_::VectorTypeR> BaseClass;
 
       protected:
-        /// The (nonlinear) operator
-        // Note that this cannot be const, as the operator saves its state and thus changes
-        Operator_& _op;
-        /// The filter to be applied to the operator's gradient
+        /// The (nonlinear) functional
+        // Note that this cannot be const, as the functional saves its state and thus changes
+        Functional_& _functional;
+        /// The filter to be applied to the functional's gradient
         Filter_& _filter;
 
         /// Gradient vector
@@ -53,7 +53,7 @@ namespace FEAT
         /// temporary vector
         VectorType _vec_tmp;
 
-        /// Operator functional value
+        /// Functional functional value
         DataType _fval_min;
         /// Initial functional value
         DataType _fval_0;
@@ -78,23 +78,24 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in] plot_name_
+         * \param[in] plot_name
          * String to use in solver plots to console
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * \param[in] filter
+         * Filter to apply to the functional's gradient
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit Linesearch(const String& plot_name, Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
+        explicit Linesearch(const String& plot_name, Functional_& functional, Filter_& filter,
+        bool keep_iterates = false) :
           BaseClass(plot_name),
-          _op(op_),
-          _filter(filter_),
+          _functional(functional),
+          _filter(filter),
           _fval_min(Math::huge<DataType>()),
           _fval_0(Math::huge<DataType>()),
           _trim_threshold(Math::huge<DataType>()),
@@ -113,7 +114,7 @@ namespace FEAT
         /**
          * \brief Constructor using a PropertyMap
          *
-         * \param[in] plot_name_
+         * \param[in] plot_name
          * String to use in solver plots to console
          *
          * \param[in] section_name
@@ -122,18 +123,18 @@ namespace FEAT
          * \param[in] section
          * A pointer to the PropertyMap section configuring this solver
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * \param[in] filter
+         * Filter to apply to the functional's gradient
          *
          */
         explicit Linesearch(const String& plot_name, const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
+        Functional_& functional, Filter_& filter) :
           BaseClass(plot_name, section_name, section),
-          _op(op_),
-          _filter(filter_),
+          _functional(functional),
+          _filter(filter),
           _fval_min(Math::huge<DataType>()),
           _fval_0(Math::huge<DataType>()),
           _trim_threshold(Math::huge<DataType>()),
@@ -187,9 +188,9 @@ namespace FEAT
         virtual void init_symbolic() override
         {
           // Create temporary vectors
-          _vec_initial_sol = this->_op.create_vector_r();
-          _vec_tmp = this->_op.create_vector_r();
-          _vec_grad = this->_op.create_vector_r();
+          _vec_initial_sol = this->_functional.create_vector_r();
+          _vec_tmp = this->_functional.create_vector_r();
+          _vec_grad = this->_functional.create_vector_r();
           BaseClass::init_symbolic();
         }
 

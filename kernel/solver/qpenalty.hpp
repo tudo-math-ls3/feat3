@@ -8,8 +8,8 @@ namespace FEAT
     /**
      * \brief Quadratic penalty iteration
      *
-     * \tparam Operator_
-     * The operator (or functional) for the constrained optimisation problem.
+     * \tparam Functional_
+     * The functional (or functional) for the constrained optimisation problem.
      *
      * This class implements an outer solver for a quadratic penalty iteration. Assume we have an optimisation
      * problem of the form
@@ -29,7 +29,7 @@ namespace FEAT
      * is still applicable if \f$ \mathrm{dim}( \mathrm{ker} (\nabla c_{i_1}, \dots, \nabla c_{i_M}) ) > 0 \f$,
      * which is required by all more sophisticated methods like augmented Lagragian etc.
      *
-     * All of this means that the Operator_ \f$ Q \f$ must be assembled anew in every iteration and the inner solver
+     * All of this means that the Functional_ \f$ Q \f$ must be assembled anew in every iteration and the inner solver
      * needs to take care of this.
      *
      * One critical part is the choice of \f$\mu_k\f$. It needs to start small (i.e. \f$\mu_1 = 1\f$) because the initial state
@@ -40,22 +40,22 @@ namespace FEAT
      *
      * \author Jordi Paul
      */
-    template<typename Operator_>
-    class QPenalty : public IterativeSolver<typename Operator_::VectorTypeR>
+    template<typename Functional_>
+    class QPenalty : public IterativeSolver<typename Functional_::VectorTypeR>
     {
       public:
-        /// The operator type
-        typedef Operator_ OperatorType;
+        /// The functional type
+        typedef Functional_ FunctionalType;
         /// The input vector type
-        typedef typename Operator_::VectorTypeR VectorType;
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
         typedef typename VectorType::DataType DataType;
         /// Our base class
         typedef IterativeSolver<VectorType> BaseClass;
 
       private:
-        /// The operator that takes the penalty parameters and is assembled in the inner solver
-        OperatorType& _op;
+        /// The functional that takes the penalty parameters and is assembled in the inner solver
+        FunctionalType& _functional;
         /// The inner solver for the penalised, unconstrained optimisation problem
         std::shared_ptr<IterativeSolver<VectorType>> _inner_solver;
         /// We start with this initial penalty parameter
@@ -67,16 +67,19 @@ namespace FEAT
         /**
          * \brief Constructor
          *
-         * \param[in] op
-         * The operator for the inner constrained optimisation problem
+         * \param[in] functional
+         * The functional for the inner constrained optimisation problem.
          *
          * \param[in] inner_solver
-         * The solver for the inner penalised unconstrained optimisation problem
+         * The solver for the inner penalised unconstrained optimisation problem.
+         *
+         * \param[in] initial_penalty_param
+         * The starting penalty parameter, defaults to 1.
          */
-        explicit QPenalty(OperatorType& op, std::shared_ptr<IterativeSolver<VectorType>> inner_solver,
+        explicit QPenalty(FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver,
         DataType initial_penalty_param = DataType(1)) :
           BaseClass("QPenalty"),
-          _op(op),
+          _functional(functional),
           _inner_solver(inner_solver),
           _initial_penalty_param(initial_penalty_param),
           _tol_penalty(Math::pow(Math::huge<DataType>(), DataType(0.25)))
@@ -86,25 +89,25 @@ namespace FEAT
         /**
          * \brief Constructor using a PropertyMap
          *
-         * \tparam Operator_
+         * \tparam Functional_
          * The type of the quadratic penalty function \f$ Q \f$.
          *
          * \param[in] section_name
-         * The name of the config section, which it does not know by itself
+         * The name of the config section, which it does not know by itself.
          *
          * \param[in] section
-         * A pointer to the PropertyMap section configuring this solver
+         * A pointer to the PropertyMap section configuring this solver.
          *
-         * \param[in] op
+         * \param[in] functional
          * The quadratic penalty function \f$ Q \f$.
          *
          * \param[in] inner_solver
          * The inner solver for solving the penalised unconstrained optimisation problem.
          */
         explicit QPenalty(const String& section_name, PropertyMap* section,
-        OperatorType& op, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
+        FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
           BaseClass("QPenalty", section_name, section),
-          _op(op),
+          _functional(functional),
           _inner_solver(inner_solver),
           _initial_penalty_param(1),
           _tol_penalty(Math::pow(Math::huge<DataType>(), DataType(0.25)))
@@ -133,20 +136,20 @@ namespace FEAT
           _inner_solver = nullptr;
         }
 
-        /// \copydoc BaseClass::name()
+        /// \copydoc SolverBase::name()
         virtual String name() const override
         {
           return "QPenalty";
         }
 
-        /// \copydoc BaseClass::init_symbolic()
+        /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
           _inner_solver->init_symbolic();
         }
 
-        /// \copydoc BaseClass::init_symbolic()
+        /// \copydoc SolverBase::init_symbolic()
         virtual void done_symbolic() override
         {
           _inner_solver->done_symbolic();
@@ -185,10 +188,10 @@ namespace FEAT
           return my_section;
         }
 
-        /// \copydoc BaseClass::apply()
+        /// \copydoc SolverBase::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          _op.set_penalty_param(_initial_penalty_param);
+          _functional.set_penalty_param(_initial_penalty_param);
 
           // clear solution vector
           vec_cor.format();
@@ -197,10 +200,10 @@ namespace FEAT
           return _apply_intern(vec_cor, vec_def);
         }
 
-        /// \copydoc BaseClass::correct()
+        /// \copydoc IterativeSolver::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
         {
-          _op.set_penalty_param(_initial_penalty_param);
+          _functional.set_penalty_param(_initial_penalty_param);
 
           // apply
           Status st =_apply_intern(vec_sol, vec_rhs);
@@ -228,7 +231,7 @@ namespace FEAT
 
           const Index inner_iter_digits(Math::ilog10(_inner_solver->get_max_iter()));
 
-          Status st(_set_initial_defect(_op.get_constraint()));
+          Status st(_set_initial_defect(_functional.get_constraint()));
 
           IterationStats stat(*this);
 
@@ -248,8 +251,8 @@ namespace FEAT
             }
 
             // After the inner solver was called, the constraint is already there so we can just get() it
-            this->_def_cur = _op.get_constraint();
-            DataType penalty_param(_op.get_penalty_param());
+            this->_def_cur = _functional.get_constraint();
+            DataType penalty_param(_functional.get_penalty_param());
 
             if(this->_plot)
             {
@@ -309,7 +312,7 @@ namespace FEAT
               return Status::stagnated;
             }
 
-            _op.set_penalty_param(penalty_param);
+            _functional.set_penalty_param(penalty_param);
           }
 
           // We should never come to this point
@@ -369,10 +372,10 @@ namespace FEAT
     /**
      * \brief Creates a new QPenalty object.
      *
-     * \tparam Operator_
+     * \tparam Functional_
      * The type of the quadratic penalty function \f$ Q \f$.
      *
-     * \param[in] op
+     * \param[in] functional
      * The quadratic penalty function \f$ Q \f$.
      *
      * \param[in] inner_solver
@@ -380,19 +383,19 @@ namespace FEAT
      *
      * \returns An std::shared_ptr to the new QPenalty solver object
      */
-    template<typename Operator_>
-    inline std::shared_ptr<QPenalty<Operator_>> new_qpenalty( Operator_& op,
-    std::shared_ptr<IterativeSolver<typename Operator_::VectorTypeR>> inner_solver,
-    typename Operator_::VectorTypeR::DataType initial_penalty_param =
-    typename Operator_::VectorTypeR::DataType(1))
+    template<typename Functional_>
+    inline std::shared_ptr<QPenalty<Functional_>> new_qpenalty( Functional_& functional,
+    std::shared_ptr<IterativeSolver<typename Functional_::VectorTypeR>> inner_solver,
+    typename Functional_::VectorTypeR::DataType initial_penalty_param =
+    typename Functional_::VectorTypeR::DataType(1))
     {
-      return std::make_shared<QPenalty<Operator_>>(op, inner_solver, initial_penalty_param);
+      return std::make_shared<QPenalty<Functional_>>(functional, inner_solver, initial_penalty_param);
     }
 
     /**
      * \brief Creates a new QPenalty object using a PropertyMap
      *
-     * \tparam Operator_
+     * \tparam Functional_
      * The type of the quadratic penalty function \f$ Q \f$.
      *
      * \param[in] section_name
@@ -401,7 +404,7 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] op
+     * \param[in] functional
      * The quadratic penalty function \f$ Q \f$.
      *
      * \param[in] inner_solver
@@ -409,12 +412,12 @@ namespace FEAT
      *
      * \returns An std::shared_ptr to the new QPenalty solver object
      */
-    template<typename Operator_>
-    inline std::shared_ptr<QPenalty<Operator_>> new_qpenalty(
+    template<typename Functional_>
+    inline std::shared_ptr<QPenalty<Functional_>> new_qpenalty(
       const String& section_name, PropertyMap* section,
-      Operator_& op, std::shared_ptr<IterativeSolver<typename Operator_::VectorTypeR>> inner_solver)
+      Functional_& functional, std::shared_ptr<IterativeSolver<typename Functional_::VectorTypeR>> inner_solver)
     {
-      return std::make_shared<QPenalty<Operator_>>(section_name, section, op, inner_solver);
+      return std::make_shared<QPenalty<Functional_>>(section_name, section, functional, inner_solver);
     }
 
   }

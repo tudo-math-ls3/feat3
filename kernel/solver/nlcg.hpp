@@ -29,7 +29,7 @@ namespace FEAT
 
     /// \cond internal
     /**
-     * \brief Streaming operator for NLCGDirectionUpdates
+     * \brief Streaming functional for NLCGDirectionUpdates
      */
     inline std::ostream& operator<<(std::ostream& os, NLCGDirectionUpdate update)
     {
@@ -78,41 +78,41 @@ namespace FEAT
     /// \endcond
 
     /**
-     * \brief Nonlinear Conjugate Gradient method for finding a minimum of an operator's gradient
+     * \brief Nonlinear Conjugate Gradient method for finding a minimum of an functional's gradient
      *
-     * \tparam Operator_
-     * Nonlinear Operator to minimise the gradient of
+     * \tparam Functional_
+     * Nonlinear Functional to minimise the gradient of
      *
      * \tparam Filter_
-     * Filter to apply to the operator's gradient
+     * Filter to apply to the functional's gradient
      *
      * See \cite NW06 for an overview of optimisation techniques.
      *
      * Possible update strategies for the search direction are Dai-Yuan \cite DY99, Fletcher-Reeves \cite FR64,
      * Hager-Zhang \cite HZ05, Hestenes-Stiefel \cite HS52 and Polak-Ribiere \cite PR64.
      */
-    template<typename Operator_, typename Filter_>
-    class NLCG : public NLOptLS<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class NLCG : public NLOptLS<Functional_, Filter_>
     {
       public:
-        /// The nonlinear operator type
-        typedef Operator_ OperatorType;
+        /// The nonlinear functional type
+        typedef Functional_ FunctionalType;
         /// The filter type
         typedef Filter_ FilterType;
         /// Our type of linesearch
-        typedef Solver::Linesearch<Operator_, Filter_> LinesearchType;
+        typedef Solver::Linesearch<Functional_, Filter_> LinesearchType;
 
-        /// Type of the operator's gradient has
-        typedef typename Operator_::GradientType GradientType;
+        /// Type of the functional's gradient has
+        typedef typename Functional_::GradientType GradientType;
         /// Input type for the gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
 
         /// Our baseclass
-        typedef NLOptLS<OperatorType, FilterType> BaseClass;
+        typedef NLOptLS<FunctionalType, FilterType> BaseClass;
         /// Generic preconditioner
-        typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
+        typedef NLOptPrecond<typename Functional_::VectorTypeL, Filter_> PrecondType;
         /// Default search direction update
         static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::DYHSHybrid;
 
@@ -152,16 +152,16 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * \param[in] filter
+         * Filter to apply to the functional's gradient
          *
-         * \param[in, out] linesearch_
+         * \param[in, out] linesearch
          * The linesearch to be used, cannot be const as internal data changes
          *
-         * \param[in] du_
+         * \param[in] du
          * Which direction update to use
          *
          * \param[in] keep_iterates
@@ -171,13 +171,13 @@ namespace FEAT
          * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
          *
          */
-        explicit NLCG(Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
-        const NLCGDirectionUpdate du_ = direction_update_default,
+        explicit NLCG(Functional_& functional, Filter_& filter, std::shared_ptr<LinesearchType> linesearch,
+        const NLCGDirectionUpdate du = direction_update_default,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
-          BaseClass("NLCG", op_, filter_, precond),
-          _linesearch(linesearch_),
+          BaseClass("NLCG", functional, filter, precond),
+          _linesearch(linesearch),
           _precond(precond),
-          _direction_update(du_),
+          _direction_update(du),
           _max_num_restarts(10),
           _num_restarts(0),
           _restart_freq(0),
@@ -186,7 +186,7 @@ namespace FEAT
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
-            _restart_freq = this->_op.columns() + Index(3);
+            _restart_freq = this->_functional.columns() + Index(3);
 
             this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
 
@@ -195,7 +195,6 @@ namespace FEAT
               iterates = new std::deque<VectorType>;
             }
           }
-
 
         /**
          * \brief Constructor using a PropertyMap
@@ -206,8 +205,8 @@ namespace FEAT
          * \param[in] section
          * A pointer to the PropertyMap section configuring this solver
          *
-         * \param[in] op
-         * The operator
+         * \param[in] functional
+         * The functional.
          *
          * \param[in] filter
          * The system filter.
@@ -219,10 +218,10 @@ namespace FEAT
          * The linesearch to use.
          *
          */
-        explicit NLCG(const String& section_name, PropertyMap* section, Operator_& op_, Filter_& filter_,
-        std::shared_ptr<LinesearchType> linesearch_, std::shared_ptr<PrecondType> precond = nullptr) :
-          BaseClass("NLCG", section_name, section, op_, filter_, precond),
-          _linesearch(linesearch_),
+        explicit NLCG(const String& section_name, PropertyMap* section, Functional_& functional, Filter_& filter,
+        std::shared_ptr<LinesearchType> linesearch, std::shared_ptr<PrecondType> precond = nullptr) :
+          BaseClass("NLCG", section_name, section, functional, filter, precond),
+          _linesearch(linesearch),
           _precond(precond),
           _direction_update(direction_update_default),
           _max_num_restarts(10),
@@ -233,7 +232,7 @@ namespace FEAT
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
-            _restart_freq = this->_op.columns() + Index(3);
+            _restart_freq = this->_functional.columns() + Index(3);
 
             this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
 
@@ -271,13 +270,13 @@ namespace FEAT
         }
 
         /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
         {
           XASSERT(parent != nullptr);
 
           Dist::Comm comm(Dist::Comm::world());
 
-          PropertyMap* my_section = BaseClass::write_config(parent, section_name);
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("direction_update", stringify(_direction_update));
           my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
@@ -295,11 +294,11 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // create three temporary vectors
-          _vec_r = this->_op.create_vector_r();
-          _vec_p = this->_op.create_vector_r();
-          _vec_pn = this->_op.create_vector_r();
-          _vec_y = this->_op.create_vector_r();
-          _vec_z = this->_op.create_vector_r();
+          _vec_r = this->_functional.create_vector_r();
+          _vec_p = this->_functional.create_vector_r();
+          _vec_pn = this->_functional.create_vector_r();
+          _vec_y = this->_functional.create_vector_r();
+          _vec_z = this->_functional.create_vector_r();
 
           _vec_z.format();
           _linesearch->init_symbolic();
@@ -333,9 +332,9 @@ namespace FEAT
           // clear solution vector
           vec_cor.format();
 
-          // Evaluate the operator at the new state
-          this->_op.prepare(vec_cor, this->_filter);
-          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
+          // Evaluate the functional at the new state
+          this->_functional.prepare(vec_cor, this->_filter);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_r);
 
           // Copy back given defect
           this->_vec_r.copy(vec_def);
@@ -343,7 +342,9 @@ namespace FEAT
 
           // Prepare the preconditioner (if any)
           if(this->_precond != nullptr)
+          {
             this->_precond->prepare(vec_cor, this->_filter);
+          }
 
           // apply
           return _apply_intern(vec_cor);
@@ -354,16 +355,18 @@ namespace FEAT
         {
           //std::cout << std::scientific;
           //std::cout << std::setprecision(16);
-          // Evaluate the operator at the new state
-          this->_op.prepare(vec_sol, this->_filter);
+          // Evaluate the functional at the new state
+          this->_functional.prepare(vec_sol, this->_filter);
           // Compute defect
-          this->_op.eval_fval_grad(this->_fval, this->_vec_r);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_r);
           this->_vec_r.scale(this->_vec_r,DataType(-1));
           this->_filter.filter_def(this->_vec_r);
 
           // Prepare the preconditioner (if any)
           if(this->_precond != nullptr)
+          {
             this->_precond->prepare(vec_sol, this->_filter);
+          }
 
           // apply
           Status st =_apply_intern(vec_sol);
@@ -431,8 +434,8 @@ namespace FEAT
          * \returns
          * A solver status code.
          *
-         * This does not have a right hand side because that is contained in the gradient of the operator and we
-         * always seek grad operator(vec_sol) = 0
+         * This does not have a right hand side because that is contained in the gradient of the functional and we
+         * always seek grad functional(vec_sol) = 0
          *
          */
         virtual Status _apply_intern(VectorType& vec_sol)
@@ -907,8 +910,8 @@ namespace FEAT
     /**
      * \brief Creates a new NLCG solver object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
@@ -930,34 +933,34 @@ namespace FEAT
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
-      Operator_& op, Filter_& filter, Linesearch_& linesearch,
-      NLCGDirectionUpdate direction_update = NLCG<Operator_, Filter_>::direction_update_default,
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
+      NLCGDirectionUpdate direction_update = NLCG<Functional_, Filter_>::direction_update_default,
       bool keep_iterates = false)
       {
-        return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
+        return std::make_shared<NLCG<Functional_, Filter_>>(functional, filter, linesearch, direction_update,
         keep_iterates, nullptr);
       }
-    template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
-      Operator_& op, Filter_& filter, Linesearch_& linesearch,
+    template<typename Functional_, typename Filter_, typename Linesearch_, typename Precond_>
+    inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
       NLCGDirectionUpdate direction_update,
       bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
+        return std::make_shared<NLCG<Functional_, Filter_>>(functional, filter, linesearch, direction_update,
         keep_iterates, precond);
       }
 #else
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
-      Operator_& op, Filter_& filter, Linesearch_& linesearch,
-      NLCGDirectionUpdate direction_update = NLCG<Operator_, Filter_>::direction_update_default,
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
+      NLCGDirectionUpdate direction_update = NLCG<Functional_, Filter_>::direction_update_default,
       bool keep_iterates = false,
-      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
+      std::shared_ptr<NLOptPrecond<typename Functional_::VectorTypeL, Filter_>> precond = nullptr)
       {
-        return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
+        return std::make_shared<NLCG<Functional_, Filter_>>(functional, filter, linesearch, direction_update,
         keep_iterates, precond);
       }
 #endif
@@ -971,8 +974,8 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
@@ -988,28 +991,31 @@ namespace FEAT
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter, Linesearch_& linesearch)
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch)
       {
-        return std::make_shared<NLCG<Operator_, Filter_>>(section_name, section, op, filter, linesearch, nullptr);
+        return std::make_shared<NLCG<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
+        nullptr);
       }
-    template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+    template<typename Functional_, typename Filter_, typename Linesearch_, typename Precond_>
+    inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter, Linesearch_& linesearch, std::shared_ptr<Precond_> precond)
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch, std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLCG<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
+        return std::make_shared<NLCG<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
+        precond);
       }
 #else
-    template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+    template<typename Functional_, typename Filter_, typename Linesearch_>
+    inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
       const String& section_name, PropertyMap* section,
-      Operator_& op, Filter_& filter, Linesearch_& linesearch,
-      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
+      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
+      std::shared_ptr<NLOptPrecond<typename Functional_::VectorTypeL, Filter_>> precond = nullptr)
       {
-        return std::make_shared<NLCG<Operator_, Filter_>>(section_name, section, op, filter, linesearch, precond);
+        return std::make_shared<NLCG<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
+        precond);
       }
 #endif
   } //namespace Solver

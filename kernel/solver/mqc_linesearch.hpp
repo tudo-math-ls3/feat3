@@ -11,11 +11,11 @@ namespace FEAT
     /**
      * \brief Mixed quadratic-cubic line search
      *
-     * \tparam Operator_
-     * The (nonlinear) operator to be evaluated
+     * \tparam Functional_
+     * The (nonlinear) functional to be evaluated
      *
      * \tparam Filter_
-     * The filter to be applied to the operator's gradient
+     * The filter to be applied to the functional's gradient
      *
      * This class implements a linesearch which approximately finds
      * \f[
@@ -43,18 +43,18 @@ namespace FEAT
      *
      *
      */
-    template<typename Operator_, typename Filter_>
-    class MQCLinesearch : public Linesearch<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class MQCLinesearch : public Linesearch<Functional_, Filter_>
     {
       public:
-        /// Filter type to be applied to the gradient of the operator
+        /// Filter type to be applied to the gradient of the functional
         typedef Filter_ FilterType;
-        /// Input vector type for the operator's gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        /// Input vector type for the functional's gradient
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
         /// Our base class
-        typedef Linesearch<Operator_, Filter_> BaseClass;
+        typedef Linesearch<Functional_, Filter_> BaseClass;
         /// Default tolerance for functional value decrease for the strong Wolfe conditions
         static constexpr DataType tol_decrease_default = DataType(1e-3);
         /// Default tolerance for curvature decrease for the strong Wolfe conditions
@@ -82,33 +82,33 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * \param[in] filter
+         * Filter to apply to the functional's gradient
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
-         * \param[in] tol_decrease_
+         * \param[in] tol_decrease
          * Tolerance for sufficient decrease in function value.
          *
-         * \param[in] tol_curvature_
+         * \param[in] tol_curvature
          * Tolerance for the curvature condition.
          *
          */
-        explicit MQCLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false,
-        DataType tol_decrease_ = tol_decrease_default, DataType tol_curvature_ = tol_curvature_default) :
-          BaseClass("MQC-LS", op_, filter_, keep_iterates),
+        explicit MQCLinesearch(Functional_& functional, Filter_& filter, bool keep_iterates = false,
+        DataType tol_decrease = tol_decrease_default, DataType tol_curvature = tol_curvature_default) :
+          BaseClass("MQC-LS", functional, filter, keep_iterates),
           _alpha_0(DataType(1)),
           _alpha_hard_max(DataType(0)),
           _alpha_hard_min(DataType(0)),
           _alpha_soft_max(DataType(0)),
           _alpha_soft_min(DataType(0)),
           _delta_0(Math::huge<DataType>()),
-          _tol_decrease(tol_decrease_),
-          _tol_curvature(tol_curvature_)
+          _tol_decrease(tol_decrease),
+          _tol_curvature(tol_curvature)
           {
           }
 
@@ -122,18 +122,16 @@ namespace FEAT
          * \param[in] section
          * A pointer to the PropertyMap section configuring this solver
          *
-         * \param[in] op
-         * The operator
+         * \param[in] functional
+         * The functional.
          *
          * \param[in] filter
          * The system filter.
          *
-         * \returns
-         * A shared pointer to a new MQCLinesearch object.
          */
         explicit MQCLinesearch(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
-          BaseClass("SW-LS", section_name, section, op_, filter_),
+        Functional_& functional, Filter_& filter) :
+          BaseClass("SW-LS", section_name, section, functional, filter),
           _alpha_0(DataType(1)),
           _alpha_hard_max(DataType(0)),
           _alpha_hard_min(DataType(0)),
@@ -180,48 +178,6 @@ namespace FEAT
           _delta_0 = Math::huge<DataType>();
         }
 
-        /**
-         * \brief Applies the solver, setting the initial guess to zero.
-         *
-         * \param[out] vec_cor
-         * Solution, gets zeroed
-         *
-         * \param[in] vec_dir
-         * Search direction
-         *
-         * \returns The solver status (success, max_iter, stagnated)
-         */
-        virtual Status apply(VectorType& vec_cor, const VectorType& vec_dir) override
-        {
-          // clear solution vector
-          vec_cor.format();
-          this->_op.prepare(vec_cor, this->_filter);
-
-          // apply
-          return _apply_intern(vec_cor, vec_dir);
-        }
-
-        /**
-         * \brief Applies the solver, making use of an initial guess
-         *
-         * \param[out] vec_sol
-         * Initial guess, gets overwritten by the solution
-         *
-         * \param[in] vec_dir
-         * Search direction
-         *
-         * \returns The solver status (success, max_iter, stagnated)
-         */
-        virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
-        {
-          this->_op.prepare(vec_sol, this->_filter);
-
-          // apply
-          Status st =_apply_intern(vec_sol, vec_dir);
-
-          return st;
-        }
-
         /// \copydoc BaseClass::get_rel_update()
         virtual DataType get_rel_update() override
         {
@@ -246,6 +202,60 @@ namespace FEAT
           XASSERT(tol_decrease > DataType(0));
 
           _tol_decrease = tol_decrease;
+        }
+
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+        {
+
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+          my_section->add_entry("tol_decrease", stringify_fp_sci(_tol_decrease));
+          my_section->add_entry("tol_curvature", stringify_fp_sci(_tol_curvature));
+
+          return my_section;
+        }
+
+        /**
+         * \brief Applies the solver, setting the initial guess to zero.
+         *
+         * \param[out] vec_cor
+         * Solution, gets zeroed
+         *
+         * \param[in] vec_dir
+         * Search direction
+         *
+         * \returns The solver status (success, max_iter, stagnated)
+         */
+        virtual Status apply(VectorType& vec_cor, const VectorType& vec_dir) override
+        {
+          // clear solution vector
+          vec_cor.format();
+          this->_functional.prepare(vec_cor, this->_filter);
+
+          // apply
+          return _apply_intern(vec_cor, vec_dir);
+        }
+
+        /**
+         * \brief Applies the solver, making use of an initial guess
+         *
+         * \param[out] vec_sol
+         * Initial guess, gets overwritten by the solution
+         *
+         * \param[in] vec_dir
+         * Search direction
+         *
+         * \returns The solver status (success, max_iter, stagnated)
+         */
+        virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
+        {
+          this->_functional.prepare(vec_sol, this->_filter);
+
+          // apply
+          Status st =_apply_intern(vec_sol, vec_dir);
+
+          return st;
         }
 
       protected:
@@ -279,7 +289,7 @@ namespace FEAT
           // Norm of the initial guess
           this->_norm_sol = vec_sol.norm2();
 
-          // Compute initial defect. We want to minimise <dir^T, grad(_op)>, so everything delta are directional
+          // Compute initial defect. We want to minimise <dir^T, grad(_functional)>, so everything delta are directional
           // derivatives
           _delta_0 = vec_dir.dot(this->_vec_grad);
           this->_def_init = Math::abs(_delta_0);
@@ -354,10 +364,10 @@ namespace FEAT
             //std::cout << "sol " << *vec_sol << std::endl;
 
             // Prepare and evaluate
-            this->_op.prepare(vec_sol, this->_filter);
+            this->_functional.prepare(vec_sol, this->_filter);
 
             // Compute and filter the gradient
-            this->_op.eval_fval_grad(fval,this->_vec_grad);
+            this->_functional.eval_fval_grad(fval,this->_vec_grad);
             this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
@@ -486,8 +496,8 @@ namespace FEAT
             vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_lo);
 
             // Prepare and evaluate
-            this->_op.prepare(vec_sol, this->_filter);
-            this->_op.eval_fval_grad(fval, this->_vec_grad);
+            this->_functional.prepare(vec_sol, this->_filter);
+            this->_functional.eval_fval_grad(fval, this->_vec_grad);
             this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
           }
@@ -870,14 +880,14 @@ namespace FEAT
     /**
      * \brief Creates a new MQCLinesearch object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
      *
      * \param[in] keep_iterates
-     * Flag for keeping the iterates, defaults to false
+     * Flag for keeping the iterates, defaults to false.
      *
      * \param[in] tol_decrease
      * Tolerance for sufficient decrease in function value.
@@ -888,27 +898,27 @@ namespace FEAT
      * \returns
      * A shared pointer to a new MQCLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<MQCLinesearch<Operator_, Filter_>> new_mqc_linesearch(
-      Operator_& op, Filter_& filter, bool keep_iterates = false,
-      typename Operator_::DataType tol_decrease = MQCLinesearch<Operator_, Filter_>::tol_decrease_default,
-      typename Operator_::DataType tol_curvature = MQCLinesearch<Operator_, Filter_>::tol_curvature_default)
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<MQCLinesearch<Functional_, Filter_>> new_mqc_linesearch(
+      Functional_& functional, Filter_& filter, bool keep_iterates = false,
+      typename Functional_::DataType tol_decrease = MQCLinesearch<Functional_, Filter_>::tol_decrease_default,
+      typename Functional_::DataType tol_curvature = MQCLinesearch<Functional_, Filter_>::tol_curvature_default)
       {
-        return std::make_shared<MQCLinesearch<Operator_, Filter_>>
-          (op, filter, keep_iterates, tol_decrease, tol_curvature);
+        return std::make_shared<MQCLinesearch<Functional_, Filter_>>
+          (functional, filter, keep_iterates, tol_decrease, tol_curvature);
       }
 
     /**
      * \brief Creates a new MQCLinesearch object using a PropertyMap
      *
      * \param[in] section_name
-     * The name of the config section, which it does not know by itself
+     * The name of the config section, which it does not know by itself.
      *
      * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
+     * A pointer to the PropertyMap section configuring this solver.
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
@@ -916,11 +926,11 @@ namespace FEAT
      * \returns
      * A shared pointer to a new MQCLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<MQCLinesearch<Operator_, Filter_>> new_mqc_linesearch(
-      const String& section_name, PropertyMap* section, Operator_& op, Filter_& filter)
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<MQCLinesearch<Functional_, Filter_>> new_mqc_linesearch(
+      const String& section_name, PropertyMap* section, Functional_& functional, Filter_& filter)
       {
-        return std::make_shared<MQCLinesearch<Operator_, Filter_>> (section_name, section, op, filter);
+        return std::make_shared<MQCLinesearch<Functional_, Filter_>> (section_name, section, functional, filter);
       }
 
   } // namespace Solver

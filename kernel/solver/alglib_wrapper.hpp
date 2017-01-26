@@ -35,38 +35,38 @@ namespace FEAT
     } // namespace Intern
 
     /**
-     * \brief Wrapper around ALGLIB's lBFGS implementation for minimising an operator's gradient
+     * \brief Wrapper around ALGLIB's lBFGS implementation for minimising an functional's gradient
      *
-     * \tparam Operator_
-     * Nonlinear Operator to minimise the gradient of
+     * \tparam Functional_
+     * Nonlinear Functional to minimise the gradient of
      *
      * \tparam Filter_
-     * Filter to apply to the operator's gradient
+     * Filter to apply to the functional's gradient
      *
-     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Operator can specify other
+     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Functional can specify other
      * types, this will just to excess type conversions with no added benefit (like the speedup from computing in
      * float) and a general slow-down. It is not prohibited at this point so that these classes can be instantiated
      * so check if the implementation is clean.
      *
      */
-    template<typename Operator_, typename Filter_>
-    class ALGLIBMinLBFGS: public NLOptLS<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class ALGLIBMinLBFGS: public NLOptLS<Functional_, Filter_>
     {
       public:
-        /// The nonlinear operator type
-        typedef Operator_ OperatorType;
+        /// The nonlinear functional type
+        typedef Functional_ FunctionalType;
         /// The filter type
         typedef Filter_ FilterType;
 
-        /// Type of the operator's gradient has
-        typedef typename Operator_::GradientType GradientType;
+        /// Type of the functional's gradient has
+        typedef typename Functional_::GradientType GradientType;
         /// Input type for the gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
 
         /// Our baseclass
-        typedef NLOptLS<Operator_, Filter_> BaseClass;
+        typedef NLOptLS<Functional_, Filter_> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
@@ -78,7 +78,7 @@ namespace FEAT
         VectorType _vec_tmp;
 
         /// Optimisation variable for ALGLIB
-        alglib::real_1d_array _opt_var;
+        alglib::real_1d_array _functionalt_var;
         /// This will hold the state of the optimisation problem in ALGLIB
         alglib::minlbfgsstate _state;
         /// Convergence report etc.
@@ -94,23 +94,23 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state.
+         * \param[in, out] functional_
+         * The (nonlinear) functional. Cannot be const because it saves its own state.
          *
          * \param[in] filter_
-         * Filter to apply to the operator's gradient.
+         * Filter to apply to the functional's gradient.
          *
          * \param[in] lbfgs_dim_
-         * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, op_.columns()).
+         * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, functional_.columns()).
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
         explicit ALGLIBMinLBFGS(
-          Operator_& op_, Filter_& filter_, const alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
+          Functional_& functional_, Filter_& filter_, const alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
           const bool keep_iterates = false) :
-          BaseClass("ALGLIBMinLBFGS", op_, filter_, nullptr),
+          BaseClass("ALGLIBMinLBFGS", functional_, filter_, nullptr),
           _lbfgs_dim(lbfgs_dim_),
           iterates(nullptr)
           {
@@ -124,7 +124,7 @@ namespace FEAT
 
             if(_lbfgs_dim == alglib::ae_int_t(0))
             {
-              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), this->_op.columns()));
+              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), this->_functional.columns()));
             }
           }
 
@@ -132,21 +132,21 @@ namespace FEAT
          * \brief Constructor using a PropertyMap
          *
          * \param[in] section_name
-         * The name of the config section, which it does not know by itself
+         * The name of the config section, which it does not know by itself.
          *
          * \param[in] section
-         * A pointer to the PropertyMap section configuring this solver
+         * A pointer to the PropertyMap section configuring this solver.
          *
-         * \param[in] op
-         * The operator
+         * \param[in] functional
+         * The functional.
          *
          * \param[in] filter
          * The system filter.
          *
          */
         explicit ALGLIBMinLBFGS(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
-          BaseClass("ALGLIBMinLBFGS", section_name, section, op_, filter_, nullptr),
+        Functional_& functional_, Filter_& filter_) :
+          BaseClass("ALGLIBMinLBFGS", section_name, section, functional_, filter_, nullptr),
           _lbfgs_dim(0),
           iterates(nullptr)
           {
@@ -201,19 +201,19 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // create two temporary vectors
-          _vec_def = this->_op.create_vector_r();
-          _vec_tmp = this->_op.create_vector_r();
+          _vec_def = this->_functional.create_vector_r();
+          _vec_tmp = this->_functional.create_vector_r();
 
           // The length of the optimisation variable is the raw length of a temporary vector
-          _opt_var.setlength(alglib::ae_int_t(
+          _functionalt_var.setlength(alglib::ae_int_t(
             Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
 
-          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            _opt_var[i] = double(0);
+            _functionalt_var[i] = double(0);
           }
 
-          alglib::minlbfgscreate(_lbfgs_dim, _opt_var, _state);
+          alglib::minlbfgscreate(_lbfgs_dim, _functionalt_var, _state);
           alglib::minlbfgssetxrep(_state, true);
           // Set stopping criteria: absolute tolerance, function improvement, length of update step, max iterations
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
@@ -318,8 +318,8 @@ namespace FEAT
           // clear solution vector
           vec_cor.format();
 
-          this->_op.prepare(vec_cor, this->_filter);
-          this->_op.eval_fval_grad(fval, this->_vec_def);
+          this->_functional.prepare(vec_cor, this->_filter);
+          this->_functional.eval_fval_grad(fval, this->_vec_def);
 
           // Copy back defect
           this->_vec_def.copy(vec_def);
@@ -333,9 +333,9 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
 
-          this->_op.prepare(vec_sol, this->_filter);
+          this->_functional.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.eval_fval_grad(this->_fval, this->_vec_def);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -355,8 +355,8 @@ namespace FEAT
          * \returns
          * A solver status code.
          *
-         * This does not have a right hand side because that is contained in the gradient of the operator and we
-         * always seek grad operator(vec_sol) = 0
+         * This does not have a right hand side because that is contained in the gradient of the functional and we
+         * always seek grad functional(vec_sol) = 0
          *
          */
         virtual Status _apply_intern(VectorType& vec_sol)
@@ -381,20 +381,20 @@ namespace FEAT
 
           // Copy initial guess to optimisation state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
-          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            _opt_var[i] = vec_sol_elements[i];
+            _functionalt_var[i] = vec_sol_elements[i];
           }
 
-          alglib::minlbfgsrestartfrom(_state, _opt_var);
+          alglib::minlbfgsrestartfrom(_state, _functionalt_var);
 
           IterationStats stat(*this);
           alglib::minlbfgsoptimize(_state, _func_grad, _log, this);
-          alglib::minlbfgsresults(_state, _opt_var, _report);
+          alglib::minlbfgsresults(_state, _functionalt_var, _report);
 
-          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            vec_sol_elements[i] = DataType(_opt_var[i]);
+            vec_sol_elements[i] = DataType(_functionalt_var[i]);
           }
 
           switch(_report.terminationtype)
@@ -452,8 +452,8 @@ namespace FEAT
          */
         static void _log(const alglib::real_1d_array& DOXY(x), double DOXY(func), void* ptr)
         {
-          ALGLIBMinLBFGS<OperatorType, FilterType>* me =
-            reinterpret_cast<ALGLIBMinLBFGS<OperatorType, FilterType>*>(ptr);
+          ALGLIBMinLBFGS<FunctionalType, FilterType>* me =
+            reinterpret_cast<ALGLIBMinLBFGS<FunctionalType, FilterType>*>(ptr);
 
           // Because of how ALGLIB counts its iterations, we have to make sure we do not call this before the first
           // functional evaluation (repnfev is the reported number of functional evaluations)
@@ -481,7 +481,7 @@ namespace FEAT
          * The functional value
          *
          * \param[out] grad
-         * The operator's gradient
+         * The functional's gradient
          *
          * \param[in] ptr
          * this, as the function needs to be static because it gets passed around as a C-style function pointer
@@ -490,7 +490,7 @@ namespace FEAT
         static void _func_grad(const alglib::real_1d_array& x, double& fval, alglib::real_1d_array& grad, void* ptr)
         {
           // Downcast because we know what we are doing, right?
-          ALGLIBMinLBFGS<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinLBFGS<OperatorType, FilterType>*>
+          ALGLIBMinLBFGS<FunctionalType, FilterType>* me = reinterpret_cast<ALGLIBMinLBFGS<FunctionalType, FilterType>*>
             (ptr);
 
           auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template elements<LAFEM::Perspective::pod>();
@@ -500,15 +500,15 @@ namespace FEAT
             vec_tmp_elements[i] = DataType(x[i]);
 
           me->_fval_prev = me->_fval;
-          // Prepare the operator
-          me->_op.prepare(me->_vec_tmp, me->_filter);
+          // Prepare the functional
+          me->_functional.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
-          me->_op.eval_fval_grad(me->_fval, me->_vec_def);
+          me->_functional.eval_fval_grad(me->_fval, me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
           fval = double(me->_fval);
 
-          // Copy the operator's gradient to ALGLIB's grad variable
+          // Copy the functional's gradient to ALGLIB's grad variable
           auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
           {
@@ -522,14 +522,14 @@ namespace FEAT
     /**
      * \brief Creates a new ALGLIBMinLBFGS solver object
      *
-     * \param[in] op_
-     * The operator
+     * \param[in] functional_
+     * The functional
      *
      * \param[in] filter_
      * The system filter.
      *
      * \param[in] lbfgs_dim_
-     * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, op_.columns()).
+     * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, functional_.columns()).
      *
      * \param[in] keep_iterates
      * Keep all iterates in a std::deque. Defaults to false.
@@ -538,12 +538,12 @@ namespace FEAT
      * A shared pointer to a new ALGLIBMinLBFGS object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<ALGLIBMinLBFGS<Operator_, Filter_>> new_alglib_minlbfgs(
-      Operator_& op_, Filter_& filter_,
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinLBFGS<Functional_, Filter_>> new_alglib_minlbfgs(
+      Functional_& functional_, Filter_& filter_,
       alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0), bool keep_iterates = false)
       {
-        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(op_, filter_, lbfgs_dim_, keep_iterates);
+        return std::make_shared<ALGLIBMinLBFGS<Functional_, Filter_>>(functional_, filter_, lbfgs_dim_, keep_iterates);
       }
 
     /**
@@ -555,8 +555,8 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] op_
-     * The operator
+     * \param[in] functional_
+     * The functional
      *
      * \param[in] filter_
      * The system filter.
@@ -565,52 +565,52 @@ namespace FEAT
      * A shared pointer to a new ALGLIBMinLBFGS object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<ALGLIBMinLBFGS<Operator_, Filter_>> new_alglib_minlbfgs(
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinLBFGS<Functional_, Filter_>> new_alglib_minlbfgs(
       const String& section_name, PropertyMap* section,
-      Operator_& op_, Filter_& filter_)
+      Functional_& functional_, Filter_& filter_)
       {
-        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(section_name, section, op_, filter_);
+        return std::make_shared<ALGLIBMinLBFGS<Functional_, Filter_>>(section_name, section, functional_, filter_);
       }
 
     /**
-     * \brief Wrapper around ALGLIB's mincg implementation for minimising an operator's gradient
+     * \brief Wrapper around ALGLIB's mincg implementation for minimising an functional's gradient
      *
-     * \tparam Operator_
-     * Nonlinear Operator to minimise the gradient of
+     * \tparam Functional_
+     * Nonlinear Functional to minimise the gradient of
      *
      * \tparam Filter_
-     * Filter to apply to the operator's gradient
+     * Filter to apply to the functional's gradient
      *
      * \note ALGLIB's mincg appearantly supports preconditioning with the diagonal of the Hessian which can be set by
      * calling alglib::mincgsetprecdiag(state, [diagonal_of_hessian]). Every call like this triggers an internal
      * reset, seemingly turning the algorithm into steepest descent if called in every iteration. For strongly
      * nonlinear problems (like the ones we are interested in), this makes preconditioning awkward to useless.
      *
-     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Operator can specify other
+     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Functional can specify other
      * types, this will just to excess type conversions with no added benefit (like the speedup from computing in
      * float) and a general slow-down. It is not prohibited at this point so that these classes can be instantiated
      * so check if the implementation is clean.
      *
      */
-    template<typename Operator_, typename Filter_>
-    class ALGLIBMinCG :  public NLOptLS<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class ALGLIBMinCG :  public NLOptLS<Functional_, Filter_>
     {
       public:
-        /// The nonlinear operator type
-        typedef Operator_ OperatorType;
+        /// The nonlinear functional type
+        typedef Functional_ FunctionalType;
         /// The filter type
         typedef Filter_ FilterType;
 
-        /// Type of the operator's gradient has
-        typedef typename Operator_::GradientType GradientType;
+        /// Type of the functional's gradient has
+        typedef typename Functional_::GradientType GradientType;
         /// Input type for the gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
 
         /// Our baseclass
-        typedef NLOptLS<Operator_, Filter_> BaseClass;
+        typedef NLOptLS<Functional_, Filter_> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
@@ -627,7 +627,7 @@ namespace FEAT
         VectorType _vec_tmp;
 
         /// Optimisation variable for ALGLIB
-        alglib::real_1d_array _opt_var;
+        alglib::real_1d_array _functionalt_var;
         /// This will hold the state of the optimisation problem in ALGLIB
         alglib::mincgstate _state;
         /// Convergence report etc.
@@ -641,19 +641,19 @@ namespace FEAT
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional_
+         * The (nonlinear) functional. Cannot be const because it saves its own state
          *
          * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * Filter to apply to the functional's gradient
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit ALGLIBMinCG(Operator_& op_, Filter_& filter_,
+        explicit ALGLIBMinCG(Functional_& functional_, Filter_& filter_,
         NLCGDirectionUpdate du_ = direction_update_default, bool keep_iterates = false) :
-          BaseClass("ALGLIBMinCG", op_, filter_, nullptr),
+          BaseClass("ALGLIBMinCG", functional_, filter_, nullptr),
           _direction_update(du_),
           iterates(nullptr)
           {
@@ -677,15 +677,15 @@ namespace FEAT
          * A pointer to the PropertyMap section configuring this solver
          *
          * \param[in] op
-         * The operator
+         * The functional
          *
          * \param[in] filter
          * The system filter.
          *
          */
         explicit ALGLIBMinCG(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
-          BaseClass("ALGLIBMinCG", section_name, section, op_, filter_, nullptr),
+        Functional_& functional_, Filter_& filter_) :
+          BaseClass("ALGLIBMinCG", section_name, section, functional_, filter_, nullptr),
           _direction_update(direction_update_default),
           iterates(nullptr)
           {
@@ -740,19 +740,19 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // Create two temporary vectors
-          _vec_def = this->_op.create_vector_r();
-          _vec_tmp = this->_op.create_vector_r();
+          _vec_def = this->_functional.create_vector_r();
+          _vec_tmp = this->_functional.create_vector_r();
 
           // The length of the optimisation variable is the raw length of a temporary vector
-          _opt_var.setlength(alglib::ae_int_t(
+          _functionalt_var.setlength(alglib::ae_int_t(
             Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
 
-          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            _opt_var[i] = double(0);
+            _functionalt_var[i] = double(0);
           }
 
-          alglib::mincgcreate(_opt_var, _state);
+          alglib::mincgcreate(_functionalt_var, _state);
           alglib::mincgsetxrep(_state, true);
           // Set stopping criteria: Absolute tolerance, function improvement, length of update step, max iterations
           // Since we do not want the solver to stop based on the absolute criterion alone, we always pass 0 as the
@@ -867,8 +867,8 @@ namespace FEAT
           // clear solution vector
           vec_cor.format();
 
-          this->_op.prepare(vec_cor, this->_filter);
-          this->_op.eval_fval_grad(this->_fval, this->_vec_def);
+          this->_functional.prepare(vec_cor, this->_filter);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_def);
 
           // Copy back defect
           this->_vec_def.copy(vec_def);
@@ -882,9 +882,9 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
 
-          this->_op.prepare(vec_sol, this->_filter);
+          this->_functional.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.eval_fval_grad(this->_fval, this->_vec_def);
+          this->_functional.eval_fval_grad(this->_fval, this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -904,8 +904,8 @@ namespace FEAT
          * \returns
          * A solver status code.
          *
-         * This does not have a right hand side because that is contained in the gradient of the operator and we
-         * always seek grad operator(vec_sol) = 0
+         * This does not have a right hand side because that is contained in the gradient of the functional and we
+         * always seek grad functional(vec_sol) = 0
          *
          */
         virtual Status _apply_intern(VectorType& vec_sol)
@@ -926,19 +926,19 @@ namespace FEAT
 
           // Copy initial guess to optimisation state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
-          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            _opt_var[i] = vec_sol_elements[i];
+            _functionalt_var[i] = vec_sol_elements[i];
           }
 
-          alglib::mincgrestartfrom(_state, _opt_var);
+          alglib::mincgrestartfrom(_state, _functionalt_var);
           IterationStats stat(*this);
           alglib::mincgoptimize(_state, _func_grad, _log, this);
-          alglib::mincgresults(_state, _opt_var, _report);
+          alglib::mincgresults(_state, _functionalt_var, _report);
 
-          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+          for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            vec_sol_elements[i] = DataType(_opt_var[i]);
+            vec_sol_elements[i] = DataType(_functionalt_var[i]);
           }
 
           switch(_report.terminationtype)
@@ -996,7 +996,7 @@ namespace FEAT
          */
         static void _log(const alglib::real_1d_array& DOXY(x), double DOXY(func), void* ptr)
         {
-          ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
+          ALGLIBMinCG<FunctionalType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<FunctionalType, FilterType>*>(ptr);
 
           // Because of how ALGLIB counts its iterations, we have to make sure we do not call this before the first
           // functional evaluation (repnfev is the reported number of functional evaluations)
@@ -1024,7 +1024,7 @@ namespace FEAT
          * The functional value
          *
          * \param[out] grad
-         * The operator's gradient
+         * The functional's gradient
          *
          * \param[in] ptr
          * this, as the function needs to be static because it gets passed around as a C-style function pointer
@@ -1033,7 +1033,7 @@ namespace FEAT
         static void _func_grad(const alglib::real_1d_array& x, double& fval, alglib::real_1d_array& grad, void* ptr)
         {
           // Downcast because we know what we are doing, right?
-          ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
+          ALGLIBMinCG<FunctionalType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<FunctionalType, FilterType>*>(ptr);
 
           auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template
             elements<LAFEM::Perspective::pod>();
@@ -1044,15 +1044,15 @@ namespace FEAT
             vec_tmp_elements[i] = DataType(x[i]);
           }
 
-          // Prepare the operator
-          me->_op.prepare(me->_vec_tmp, me->_filter);
+          // Prepare the functional
+          me->_functional.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
-          me->_op.eval_fval_grad(me->_fval, me->_vec_def);
+          me->_functional.eval_fval_grad(me->_fval, me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
           fval = double(me->_fval);
 
-          // Copy the operator's gradient to ALGLIB's grad variable
+          // Copy the functional's gradient to ALGLIB's grad variable
           auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template
             elements<LAFEM::Perspective::pod>();
 
@@ -1068,8 +1068,8 @@ namespace FEAT
     /**
      * \brief Creates a new ALGLIBMinCG solver object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional
      *
      * \param[in] filter
      * The system filter.
@@ -1081,13 +1081,13 @@ namespace FEAT
      * A shared pointer to a new ALGLIBMinCG object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op_, Filter_& filter_,
-      NLCGDirectionUpdate du_ = ALGLIBMinCG<Operator_, Filter_>::direction_update_default,
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinCG<Functional_, Filter_>> new_alglib_mincg(
+      Functional_& functional_, Filter_& filter_,
+      NLCGDirectionUpdate du_ = ALGLIBMinCG<Functional_, Filter_>::direction_update_default,
       bool keep_iterates_ = false)
       {
-        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op_, filter_, du_, keep_iterates_);
+        return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(functional_, filter_, du_, keep_iterates_);
       }
 
     /**
@@ -1099,8 +1099,8 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional
      *
      * \param[in] filter
      * The system filter.
@@ -1109,12 +1109,12 @@ namespace FEAT
      * A shared pointer to a new ALGLIBMinCG object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinCG<Functional_, Filter_>> new_alglib_mincg(
       const String& section_name, PropertyMap* section,
-      Operator_& op_, Filter_& filter_)
+      Functional_& functional_, Filter_& filter_)
       {
-        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(section_name, section, op_, filter_);
+        return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(section_name, section, functional_, filter_);
       }
   } // namespace Solver
 } // namespace FEAT

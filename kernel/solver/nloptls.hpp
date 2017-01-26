@@ -15,7 +15,7 @@ namespace FEAT
     /**
      * \brief Base class for line search based nonlinear optimisers
      *
-     * \tparam Operator_
+     * \tparam Functional_
      * The nonlinear functional to be minimised
      *
      * \tparam Filter_
@@ -35,32 +35,32 @@ namespace FEAT
      * \author Jordi Paul
      *
      */
-    template<typename Operator_, typename Filter_>
-    class NLOptLS : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
+    template<typename Functional_, typename Filter_>
+    class NLOptLS : public PreconditionedIterativeSolver<typename Functional_::VectorTypeR>
     {
       public:
-        /// The nonlinear operator type
-        typedef Operator_ OperatorType;
+        /// The nonlinear functional type
+        typedef Functional_ FunctionalType;
         /// The filter type
         typedef Filter_ FilterType;
         /// Our type of linesearch
-        typedef Solver::Linesearch<Operator_, Filter_> LinesearchType;
+        typedef Solver::Linesearch<Functional_, Filter_> LinesearchType;
 
-        /// Type of the operator's gradient has
-        typedef typename Operator_::GradientType GradientType;
+        /// Type of the functional's gradient has
+        typedef typename Functional_::GradientType GradientType;
         /// Input type for the gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
 
         /// Our baseclass
         typedef PreconditionedIterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
-        typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
+        typedef NLOptPrecond<typename Functional_::VectorTypeL, Filter_> PrecondType;
 
       protected:
-        /// Our nonlinear operator
-        Operator_& _op;
+        /// Our nonlinear functional
+        Functional_& _functional;
         /// The filter we apply to the gradient
         Filter_& _filter;
 
@@ -89,21 +89,21 @@ namespace FEAT
          * \param[in] plot_name_
          * The String identifier used for plots.
          *
-         * \param[in] op_
+         * \param[in] functional
          * The nonlinear functional. Cannot be const as internal variables change upon functional evaluation.
          *
-         * \param[in] filter_
-         * The filter for essential boundary conditions. Cannot be const, see op_.
+         * \param[in] filter
+         * The filter for essential boundary conditions. Cannot be const, see functional.
          *
          * \param[in] precond
-         * The preconditioner, defaults to nullptr. Cannot be const, see op_.
+         * The preconditioner, defaults to nullptr. Cannot be const, see functional.
          *
          */
-        explicit NLOptLS(const String& plot_name_, Operator_& op_, Filter_& filter_,
+        explicit NLOptLS(const String& plot_name_, Functional_& functional, Filter_& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass(plot_name_, precond),
-          _op(op_),
-          _filter(filter_),
+          _functional(functional),
+          _filter(filter),
           _tol_fval(DataType(0)),
           _tol_step(Math::eps<DataType>()),
           _fval_init(-Math::huge<DataType>()),
@@ -118,24 +118,30 @@ namespace FEAT
         /**
          * \brief Constructor
          *
-         * \param[in] plot_name_
+         * \param[in] plot_name
          * The String identifier used for plots.
          *
-         * \param[in] op_
+         * \param[in] section_name
+         * The name of the config section, which it does not know by itself.
+         *
+         * \param[in] section
+         * A pointer to the PropertyMap section configuring this solver.
+         *
+         * \param[in] functional
          * The nonlinear functional. Cannot be const as internal variables change upon functional evaluation.
          *
-         * \param[in] filter_
-         * The filter for essential boundary conditions. Cannot be const, see op_.
+         * \param[in] filter
+         * The filter for essential boundary conditions. Cannot be const, see functional.
          *
          * \param[in] precond
-         * The preconditioner, defaults to nullptr. Cannot be const, see op_.
+         * The preconditioner, defaults to nullptr. Cannot be const, see functional.
          *
          */
         explicit NLOptLS(const String& plot_name, const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_, std::shared_ptr<PrecondType> precond = nullptr) :
+        Functional_& functional, Filter_& filter, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass(plot_name, section_name, section, precond),
-          _op(op_),
-          _filter(filter_),
+          _functional(functional),
+          _filter(filter),
           _tol_fval(DataType(0)),
           _tol_step(Math::eps<DataType>()),
           _fval_init(-Math::huge<DataType>()),
@@ -174,9 +180,9 @@ namespace FEAT
           Dist::Comm comm_world(Dist::Comm::world());
 
           String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
-              +", evals: "+stringify(_op.get_num_func_evals())+" (func) "
-              + stringify(_op.get_num_grad_evals()) + " (grad) "
-              + stringify(_op.get_num_hess_evals()) + " (hess)"
+              +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
+              + stringify(_functional.get_num_grad_evals()) + " (grad) "
+              + stringify(_functional.get_num_hess_evals()) + " (hess)"
               +" last step: "+stringify_fp_sci(_steplength)+"\n");
           msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_init)
             + " -> "+stringify_fp_sci(_fval)

@@ -15,56 +15,59 @@ namespace FEAT
      * This does not perform a line search, it just returns a constant step size
      *
      */
-    template<typename Operator_, typename Filter_>
-    class FixedStepLinesearch : public Linesearch<Operator_, Filter_>
+    template<typename Functional_, typename Filter_>
+    class FixedStepLinesearch : public Linesearch<Functional_, Filter_>
     {
       public:
-        /// Filter type to be applied to the gradient of the operator
+        /// Filter type to be applied to the gradient of the functional
         typedef Filter_ FilterType;
-        /// Input vector type for the operator's gradient
-        typedef typename Operator_::VectorTypeR VectorType;
+        /// Input vector type for the functional's gradient
+        typedef typename Functional_::VectorTypeR VectorType;
         /// Underlying floating point type
-        typedef typename Operator_::DataType DataType;
+        typedef typename Functional_::DataType DataType;
         /// Our base class
-        typedef Linesearch<Operator_, Filter_> BaseClass;
+        typedef Linesearch<Functional_, Filter_> BaseClass;
 
       private:
         /// The length of the step
-        DataType _steplength;
+        DataType _step_length;
 
       public:
         /**
          * \brief Standard constructor
          *
-         * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * \param[in, out] functional
+         * The (nonlinear) functional. Cannot be const because it saves its own state.
          *
-         * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * \param[in] filter
+         * Filter to apply to the functional's gradient.
+         *
+         * \param[in] step_length
+         * The length of the step returned by this "line search".
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit FixedStepLinesearch(Operator_& op_, Filter_& filter_, const DataType steplength_,
+        explicit FixedStepLinesearch(Functional_& functional, Filter_& filter, const DataType step_length,
         bool keep_iterates = false) :
-          BaseClass("FS-LS", op_, filter_, keep_iterates),
-          _steplength(steplength_)
+          BaseClass("FS-LS", functional, filter, keep_iterates),
+          _step_length(step_length)
           {
-            this->_alpha_min = _steplength;
+            this->_alpha_min = _step_length;
           }
 
         /**
          * \brief Constructor using a PropertyMap
          *
          * \param[in] section_name
-         * The name of the config section, which it does not know by itself
+         * The name of the config section, which it does not know by itself.
          *
          * \param[in] section
-         * A pointer to the PropertyMap section configuring this solver
+         * A pointer to the PropertyMap section configuring this solver.
          *
-         * \param[in] op
-         * The operator
+         * \param[in] functional
+         * The functional.
          *
          * \param[in] filter
          * The system filter.
@@ -73,12 +76,12 @@ namespace FEAT
          * A shared pointer to a new FixedStepLinesearch object.
          */
         explicit FixedStepLinesearch(const String& section_name, PropertyMap* section,
-        Operator_& op_, Filter_& filter_) :
-          BaseClass("FS-LS", section_name, section, op_, filter_),
-          _steplength(-1)
+        Functional_& functional, Filter_& filter) :
+          BaseClass("FS-LS", section_name, section, functional, filter),
+          _step_length(-1)
           {
             this->set_max_iter(0);
-            this->_alpha_min = _steplength;
+            this->_alpha_min = _step_length;
 
             // Check if we need to set the step length
             auto step_length_p = section->query("step_length");
@@ -108,7 +111,7 @@ namespace FEAT
         /// \copydoc BaseClass::get_rel_update()
         virtual DataType get_rel_update() override
         {
-          return _steplength;
+          return _step_length;
         }
 
         /**
@@ -118,7 +121,18 @@ namespace FEAT
         {
           XASSERT(step_length > DataType(0));
 
-          _steplength = step_length;
+          _step_length = step_length;
+        }
+
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+        {
+
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+
+          my_section->add_entry("step_length", stringify_fp_sci(_step_length));
+
+          return my_section;
         }
 
         /**
@@ -136,9 +150,9 @@ namespace FEAT
         {
           // clear solution vector
           vec_cor.format();
-          vec_cor.axpy(vec_dir, vec_cor, _steplength);
+          vec_cor.axpy(vec_dir, vec_cor, _step_length);
 
-          this->_op.prepare(vec_cor, this->_filter);
+          this->_functional.prepare(vec_cor, this->_filter);
 
           return Status::success;
         }
@@ -156,10 +170,10 @@ namespace FEAT
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
-          vec_sol.axpy(vec_dir, vec_sol, _steplength);
+          vec_sol.axpy(vec_dir, vec_sol, _step_length);
 
-          this->_op.prepare(vec_sol, this->_filter);
-          this->_op.eval_fval_grad(this->_fval_min, this->_vec_grad);
+          this->_functional.prepare(vec_sol, this->_filter);
+          this->_functional.eval_fval_grad(this->_fval_min, this->_vec_grad);
           this->_filter.filter_def(this->_vec_grad);
 
           return Status::success;
@@ -169,39 +183,40 @@ namespace FEAT
     /**
      * \brief Creates a new FixedStepLinesearch object
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] steplength
-     * The step length the "line search" is to take
+     * \param[in] step_length
+     * The step length the "line search" is to take.
      *
      * \param[in] keep_iterates
-     * Flag for keeping the iterates, defaults to false
+     * Flag for keeping the iterates, defaults to false.
      *
      * \returns
      * A shared pointer to a new FixedStepLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<FixedStepLinesearch<Operator_, Filter_>> new_fixed_step_linesearch(
-      Operator_& op, Filter_& filter, typename Operator_::DataType steplength, bool keep_iterates = false)
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<FixedStepLinesearch<Functional_, Filter_>> new_fixed_step_linesearch(
+      Functional_& functional, Filter_& filter, typename Functional_::DataType step_length, bool keep_iterates = false)
       {
-        return std::make_shared<FixedStepLinesearch<Operator_, Filter_>>(op, filter, steplength, keep_iterates);
+        return
+          std::make_shared<FixedStepLinesearch<Functional_, Filter_>>(functional, filter, step_length, keep_iterates);
       }
 
     /**
      * \brief Creates a new FixedStepLinesearch object using a PropertyMap
      *
      * \param[in] section_name
-     * The name of the config section, which it does not know by itself
+     * The name of the config section, which it does not know by itself.
      *
      * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
+     * A pointer to the PropertyMap section configuring this solver.
      *
-     * \param[in] op
-     * The operator
+     * \param[in] functional
+     * The functional.
      *
      * \param[in] filter
      * The system filter.
@@ -209,11 +224,12 @@ namespace FEAT
      * \returns
      * A shared pointer to a new FixedStepLinesearch object.
      */
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<FixedStepLinesearch<Operator_, Filter_>> new_fixed_step_linesearch(
-      const String& section_name, PropertyMap* section, Operator_& op, Filter_& filter)
+    template<typename Functional_, typename Filter_>
+    inline std::shared_ptr<FixedStepLinesearch<Functional_, Filter_>> new_fixed_step_linesearch(
+      const String& section_name, PropertyMap* section, Functional_& functional, Filter_& filter)
       {
-        return std::make_shared<FixedStepLinesearch<Operator_, Filter_>>(section_name, section, op, filter);
+        return
+          std::make_shared<FixedStepLinesearch<Functional_, Filter_>>(section_name, section, functional, filter);
       }
   } // namespace Solver
 } // namespace FEAT
