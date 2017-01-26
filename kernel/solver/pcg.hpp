@@ -24,19 +24,22 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<
-      typename Matrix_,
-      typename Filter_>
+    template<typename Matrix_, typename Filter_>
     class PCG :
       public PreconditionedIterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
+      /// The type of matrix this solver can be applied to
       typedef Matrix_ MatrixType;
+      /// The filter for projecting solution, rhs, defect and correction vectors to subspaces
       typedef Filter_ FilterType;
+      /// The vector type this solver can be applied to
       typedef typename MatrixType::VectorTypeR VectorType;
+      /// The floating point precision
       typedef typename MatrixType::DataType DataType;
+      /// Our base class
       typedef PreconditionedIterativeSolver<VectorType> BaseClass;
-
+      /// The type of the preconditioner that can be used
       typedef SolverBase<VectorType> PrecondType;
 
     protected:
@@ -44,8 +47,12 @@ namespace FEAT
       const MatrixType& _system_matrix;
       /// the filter for the solver
       const FilterType& _system_filter;
-      /// temporary vectors
-      VectorType _vec_r, _vec_p, _vec_t;
+      /// The defect vector
+      VectorType _vec_r;
+      /// The update (or search) direction
+      VectorType _vec_p;
+      /// Temporary vector, used for e.g. the preconditioned defect
+      VectorType _vec_t;
 
     public:
       /**
@@ -95,11 +102,13 @@ namespace FEAT
       {
       }
 
+      /// \copydoc SolverBase::name()
       virtual String name() const override
       {
         return "PCG";
       }
 
+      /// \copydoc SolverBase::init_symbolic()
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
@@ -109,6 +118,7 @@ namespace FEAT
         _vec_t = this->_system_matrix.create_vector_r();
       }
 
+      /// \copydoc SolverBase::done_symbolic()
       virtual void done_symbolic() override
       {
         this->_vec_t.clear();
@@ -117,6 +127,7 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
+      /// \copydoc SolverBase::apply()
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // save defect
@@ -130,6 +141,7 @@ namespace FEAT
         return _apply_intern(vec_cor, vec_def);
       }
 
+      /// \copydoc IterativeSolver::correct()
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // compute defect
@@ -141,6 +153,18 @@ namespace FEAT
       }
 
     protected:
+      /**
+       * \brief Internal function, applies the solver
+       *
+       * \param[in] vec_sol
+       * The current solution vector, gets overwritten
+       *
+       * \param[in] vec_rhs
+       * The right hand side vector. This is unused in this function, as the intial defect was alredy computed and
+       * stored in _vec_r.
+       *
+       * \returns A status code.
+       */
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
