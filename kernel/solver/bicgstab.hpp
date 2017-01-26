@@ -57,7 +57,16 @@ namespace FEAT
     /**
      * \brief (Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation
      *
-     * This class implements the BiCGStab solver from \cite Vor92.
+     * This class implements the BiCGStab solver from \cite Vor92 in a modified form to make it more readable,
+     * similar in PCG in structure and variables and to save one application of the preconditioner in each iteration.
+     * The solver has a left-only and a right-only preconditioned variant, which can be switched at runtime. They
+     * differ only in the choice of the scalar product to compute various quantities.
+     *
+     * \note Which variant gives the better convergence is highly problem dependent.
+     *
+     * \note Even if no preconditioning is used, the variant has to be set to left or right.
+     *
+     * \see BiCGStabPreconVariant
      *
      * \tparam Matrix_
      * The matrix class to be used by the solver.
@@ -65,16 +74,51 @@ namespace FEAT
      * \tparam Filter_
      * The filter class to be used by the solver.
      *
-     * Note that the preconditioner can be applied left-only or right-only - the algorithm differs only in the
-     * computation of the parameter \f$ \omega \f$. In the right-preconditioned variant, it is computed to minimise
-     * the residual of the unpreconditioned system. This saves one call to the preconditioner and the storage of one
-     * internal vector. However, even if both matrix and preconditioner are near-symmetric, this variant destroys
-     * the near-symmetry of the preconditioned operator.
+     * This is the algorithm:
+     * \f{align*}{
+     *   r_0 & := b - A x_0 \\
+     *   \hat{r}_0 & := r_0 \\
+     *   \tilde{r}_0 & := M^{-1} r \\
+     *   \tilde{p}_0 & := \tilde{r}_0 \\
+     *   \rho_0 & :=
+     *   \begin{cases}
+     *     \left< \hat{r}_0, \tilde{r}_0 \right>, & \mathrm{~left~preconditioned} \\
+     *     \left< \hat{r}_0, r_0 \right>, & \mathrm{~right~preconditioned}
+     *   \end{cases}\\
+     *   \intertext{For $k = 0, \dots, \mathrm{max\_iter}$}
+     *   q_k & = A \tilde{p}_k & \mathrm{(~first~application~of~the~matrix)}\\
+     *   \tilde{q}_k & = M^{-1} q_k &\mathrm{(~first~application~of~the~preconditioner)}\\
+     *   \alpha_k & =
+     *   \begin{cases}
+     *     \frac{\rho_k}{\left< \hat{r}_0, q_k \right>}, & \mathrm{~left~preconditioned} \\
+     *     \frac{\rho_k}{\left< \hat{r}_0, \tilde{q}_k \right>}, & \mathrm{~right~preconditioned} \\
+     *   \end{cases}\\
+     *   x_{k+1/2} & = x_k + \alpha_k \tilde{p}\\
+     *   r_{k+1/2} & = r_k - \alpha_k q_k \\
+     *   \mathrm{If~} x_{k+1/2}, r_{k+1/2}& \mathrm{~are~good~enough:~break}\\
+     *   \tilde{r}_{k+1/2} & = \tilde{r}_k - \alpha_k \tilde{q}_k \\
+     *   t_k & = A \tilde{r}_{k+1/2} & \mathrm{(~second~application~of~the~matrix)}\\
+     *   \tilde{t}_k & = M^{-1} t_k & \mathrm{(~second~application~of~the~preconditioner)}\\
+     *   \omega_k& =
+     *   \begin{cases}
+     *     \frac{\left< \tilde{t}_k, \tilde{r}_{k+1/2} \right>}{\left< \tilde{t}_k, \tilde{t}_k \right>},
+     *     & \mathrm{~left~preconditioned} \\
+     *     \frac{\left< t_k, r_{k+1/2} \right>}{\left< t_k, t_k \right>}, & \mathrm{~right~preconditioned} \\
+     *   \end{cases}\\
+     *   x_{k+1} & = x_{k+1/2} + \omega_k \tilde{r}_{k+1/2} \\
+     *   r_{k+1} & = r_{k+1/2} - \omega_k t_{k} \\
+     *   \mathrm{If~} x_{k+1}, r_{k+1} & \mathrm{~are~good~enough:~break}\\
+     *   \tilde{r}_{k+1} & = \tilde{r}_{k+1/2} - \omega_k \tilde{t}_{k} \\
+     *   \rho_{k+1} & :=
+     *   \begin{cases}
+     *     \left< \hat{r}_0, \tilde{r}_k \right>, & \mathrm{~left~preconditioned} \\
+     *     \left< \hat{r}_0, r_k \right>, & \mathrm{~right~preconditioned}
+     *   \end{cases}\\
+     *   \beta_k & = \frac{\rho_k \omega_k}{\rho_{k+1} \alpha_k} \\
+     *   \tilde{p}_{k+1} & = \tilde{r}_{k+1} + \beta_k (\tilde{p}_k - \omega \tilde{q}_k)
+     * \f}
      *
-     * So if you suspect your system to be near symmetric and you have a symmetric preconditioner (such as Jacobi),
-     * it might be beneficial to set_precon_variant(left). The right-variant is cheaper, though.
-     *
-     * \author Jordi Paul
+     * \author Jordi Paul and Peter Zajac
      */
     template<typename Matrix_, typename Filter_>
     class BiCGStab :
@@ -99,28 +143,22 @@ namespace FEAT
         const MatrixType& _system_matrix;
         /// the filter for the solver
         const FilterType& _system_filter;
-        /// The unpreconditioned primal search direction
-        VectorType _vec_p;
+        /// The preconditioned primal search direction
+        VectorType _vec_p_tilde;
+        /// q~[k] = M^{-1} A q[k]
+        VectorType _vec_q_tilde;
         /// The defect vector
         VectorType _vec_r;
-        /// The "dual" intial defect vector
-        VectorType _vec_r_tilde_0;
-        /// The defect vector after the "half" update
-        VectorType _vec_s;
-        /// t = A z
-        VectorType _vec_t;
-        /// v = A y
-        VectorType _vec_v;
-        /// The precontitioned _vec_t
-        VectorType _vec_w;
-        /// The preconditioned primal search direction
-        VectorType _vec_y;
-        /// The preconditioned defect vector after the "half" update
-        VectorType _vec_z;
-        /// Use the p_variant?
+        /// The preconditioned defect vector
+        VectorType _vec_r_tilde;
+        /// The arbitrary starting vector
+        VectorType _vec_r_hat_0;
+        /// t~[k] = M^{-1} A r~[k+1/2]
+        VectorType _vec_t_tilde;
+        /// Temporary vector
+        VectorType _vec_tmp;
+        /// Precondition from left or right?
         BiCGStabPreconVariant _precon_variant;
-        /// We need to know if init_symbolic was called because the _precon_variant cannot be switched then
-        bool _have_init_symbolic;
 
       public:
         /**
@@ -136,15 +174,15 @@ namespace FEAT
          * A pointer to the preconditioner. May be \c nullptr.
          *
          * \param[in] precon_variant
-         * Which preconditioning variant to use, defaults to right
+         * Which preconditioning variant to use, defaults to left
          */
         explicit BiCGStab(const MatrixType& matrix, const FilterType& filter,
-        std::shared_ptr<PrecondType> precond = nullptr, BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::right) :
+        std::shared_ptr<PrecondType> precond = nullptr,
+        BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left) :
           BaseClass("BiCGStab", precond),
           _system_matrix(matrix),
           _system_filter(filter),
-          _precon_variant(precon_variant),
-          _have_init_symbolic(false)
+          _precon_variant(precon_variant)
           {
           }
 
@@ -172,7 +210,7 @@ namespace FEAT
           BaseClass("BiCGStab", section_name, section, precond),
           _system_matrix(matrix),
           _system_filter(filter),
-          _have_init_symbolic(false)
+          _precon_variant(BiCGStabPreconVariant::left)
           {
             // Check if we have set _p_variant
             auto p_variant_p = section->query("precon_variant");
@@ -195,47 +233,27 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // create all temporary vectors
-          _vec_p = this->_system_matrix.create_vector_r();
+          _vec_p_tilde = this->_system_matrix.create_vector_r();
+          _vec_q_tilde = this->_system_matrix.create_vector_r();
           _vec_r = this->_system_matrix.create_vector_r();
-          _vec_r_tilde_0 = this->_system_matrix.create_vector_r();
-          _vec_s = this->_system_matrix.create_vector_r();
-          _vec_t = this->_system_matrix.create_vector_r();
-          _vec_v = this->_system_matrix.create_vector_r();
-          _vec_y = this->_system_matrix.create_vector_r();
-          _vec_z = this->_system_matrix.create_vector_r();
-
-          // If the p-variant is used, we skip one application of the preconditioner so this can be a shallow copy
-          if(_precon_variant == BiCGStabPreconVariant::right)
-          {
-            _vec_w.clone(_vec_t, LAFEM::CloneMode::Shallow);
-          }
-          else
-          {
-            _vec_w = this->_system_matrix.create_vector_r();
-          }
-
-          _have_init_symbolic = true;
+          _vec_r_hat_0 = this->_system_matrix.create_vector_r();
+          _vec_r_tilde = this->_system_matrix.create_vector_r();
+          _vec_t_tilde = this->_system_matrix.create_vector_r();
+          _vec_tmp = this->_system_matrix.create_vector_r();
         }
 
         /// \copydoc SolverBase::done_symbolic()
         virtual void done_symbolic() override
         {
-          _vec_p.clear();
+          _vec_p_tilde.clear();
+          _vec_q_tilde.clear();
           _vec_r.clear();
-          _vec_r_tilde_0.clear();
-          _vec_s.clear();
-          _vec_t.clear();
-          _vec_v.clear();
-          _vec_y.clear();
-          _vec_z.clear();
-          // If the right-variant is used, we skip one application of the preconditioner so this is a shallow copy
-          // and must not be cleared
-          if(_precon_variant != BiCGStabPreconVariant::right)
-          {
-            _vec_w.clear();
-          }
+          _vec_r_hat_0.clear();
+          _vec_r_tilde.clear();
+          _vec_t_tilde.clear();
+          _vec_tmp.clear();
+
           BaseClass::done_symbolic();
-          _have_init_symbolic = false;
         }
 
         /// \copydoc IterativeSolver::correct()
@@ -258,6 +276,7 @@ namespace FEAT
 
           // format solution vector
           vec_cor.format();
+
           return _apply_intern(vec_cor, vec_def);
         }
 
@@ -270,7 +289,7 @@ namespace FEAT
        */
       virtual void set_precon_variant(BiCGStabPreconVariant precon_variant)
       {
-        XASSERTM(!_have_init_symbolic,"precon_variant can only be switched before init_symbolic() is called!");
+        XASSERT(precon_variant == BiCGStabPreconVariant::left || precon_variant == BiCGStabPreconVariant::right);
         _precon_variant = precon_variant;
       }
 
@@ -299,31 +318,48 @@ namespace FEAT
        *
        * \returns A status code.
        */
-        virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
+        Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
-          VectorType& vec_p        (_vec_p);
+          VectorType& vec_p_tilde  (_vec_p_tilde);
           VectorType& vec_r        (_vec_r);
-          _vec_r_tilde_0.copy(_vec_r);
-          const VectorType& vec_r_tilde_0(_vec_r_tilde_0);
-          VectorType& vec_s        (_vec_s);
-          VectorType& vec_t        (_vec_t);
-          VectorType& vec_v        (_vec_v);
-          VectorType& vec_w        (_vec_w);
-          VectorType& vec_y        (_vec_y);
-          VectorType& vec_z        (_vec_z);
+          VectorType& vec_r_tilde  (_vec_r_tilde);
+          VectorType& vec_t        (_vec_tmp);
+          VectorType& vec_t_tilde  (_vec_t_tilde);
+          VectorType& vec_q        (_vec_tmp);
+          VectorType& vec_q_tilde  (_vec_q_tilde);
+
           const MatrixType& mat_sys(this->_system_matrix);
           const FilterType& fil_sys(this->_system_filter);
           Status status(Status::progress);
 
-          DataType alpha(1);
-          DataType rho(1);
-          DataType omega(1);
+          // Apply preconditioner to initial defect and save it to p_0
+          if(!this->_apply_precond(vec_p_tilde, _vec_r, fil_sys))
+          {
+            Statistics::add_solver_expression(
+              std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
+            return Status::aborted;
+          }
 
-          DataType rho2(rho);
+          // We set the arbitrary vector r^[0] = r[0]
+          _vec_r_hat_0.copy(vec_r);
+          // r~[0] = M^{-1} r[0]
+          vec_r_tilde.copy(vec_p_tilde);
 
-          vec_v.format();
-          vec_p.format();
+          const VectorType& vec_r_hat_0(_vec_r_hat_0);
+
+          DataType rho(0);
+
+          // Left preconditioned: rho[k] = <r^[0], r~[k]>
+          if(_precon_variant == BiCGStabPreconVariant::left)
+          {
+            rho = vec_r_hat_0.dot(vec_r_tilde);
+          }
+          // Right preconditioned: rho[k] = <r^[0], r[k]>
+          else
+          {
+            rho = vec_r_hat_0.dot(vec_r);
+          }
 
           // Compute initial defect
           status = this->_set_initial_defect(vec_r, vec_sol);
@@ -332,42 +368,44 @@ namespace FEAT
           {
             IterationStats stat(*this);
 
-            rho2 = rho;
-            rho = vec_r_tilde_0.dot(vec_r);
-
-            DataType beta((rho/rho2)*(alpha/omega));
-            XASSERTM(Math::isfinite(beta),"BiCGStab  breakdown!");
-
-            // p[k] = r[k] + beta(p[k-1] - omega[k-1]v[k-1])
-            vec_p.axpy(vec_v, vec_p, -omega);
-            vec_p.axpy(vec_p, vec_r, beta);
+            // q[k] = A p~[k]
+            mat_sys.apply(vec_q, vec_p_tilde);
+            fil_sys.filter_def(vec_q);
 
             // Apply preconditioner to primal search direction
-            if(!this->_apply_precond(vec_y, vec_p, fil_sys))
+            // q~[k] = M^{-1} q[k]
+            if(!this->_apply_precond(vec_q_tilde, vec_q, fil_sys))
             {
-              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
+              Statistics::add_solver_expression(
+                std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             }
 
-            // v[k] = Ay[k]
-            mat_sys.apply(vec_v, vec_y);
-            fil_sys.filter_def(vec_v);
-
-            alpha = rho / vec_r_tilde_0.dot(vec_v);
-
-            // s = r[k] - alpha v[k]
-            vec_s.axpy(vec_v, vec_r, -alpha);
+            DataType alpha(0);
+            // Left preconditioned: alpha[k] = rho[k] / <r^[0], q~[k]>
+            if(_precon_variant == BiCGStabPreconVariant::left)
+            {
+              alpha = rho / vec_r_hat_0.dot(vec_q_tilde);
+            }
+            // Right preconditioned: alpha[k] = rho[k] / <r^[0], q[k]>
+            else
+            {
+              alpha = rho / vec_r_hat_0.dot(vec_q);
+            }
 
             // First "half" update
-            // x[k+1/2] = x[k] + alpha y
-            vec_sol.axpy(vec_y, vec_sol, alpha);
+            // x[k+1/2] = x[k] + alpha[k] p~[k]
+            vec_sol.axpy(vec_p_tilde, vec_sol, alpha);
+
+            // r[k+1/2] = r[k] - alpha[k] q[k]
+            vec_r.axpy(vec_q, vec_r, -alpha);
 
             // Check if we are already converged or failed after the "half" update
             {
               Status status_half(Status::progress);
 
               DataType def_old(this->_def_cur);
-              DataType def_half(vec_s.norm2());
+              DataType def_half(vec_r.norm2());
 
               // ensure that the defect is neither NaN nor infinity
               if(!Math::isfinite(def_half))
@@ -410,43 +448,45 @@ namespace FEAT
               }
             }
 
+            // Update preconditioned defect: r~[k+1/2] = r~[k] - alpha q[k]
+            vec_r_tilde.axpy(vec_q_tilde, vec_r_tilde, -alpha);
+
+            // t = A r~[k+1/2]
+            mat_sys.apply(vec_t, vec_r_tilde);
+            fil_sys.filter_def(vec_t);
+
             // Apply preconditioner for correction direction
-            if(!this->_apply_precond(vec_z, vec_s, fil_sys))
+            // t~[k] = M^{-1} t
+            if(!this->_apply_precond(vec_t_tilde, vec_t, fil_sys))
             {
               Statistics::add_solver_expression(
                 std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             }
 
-            // t = Az
-            mat_sys.apply(vec_t, vec_z);
-            fil_sys.filter_def(vec_t);
-
-            // If the right-variant is used, we set omega[k] = < t, s > / < t, t >
-            // Otherwise (meaning the left-variant), compute w = M^{-1} t and set omega[k] = < w, s> / < w, w >
+            DataType omega(0);
+            // Left preconditioned: omega[k] = <t~[k], r~[k+1/2] / <t~[k], t~[k]>
             if(_precon_variant == BiCGStabPreconVariant::left)
             {
-              // Apply preconditioner for the computation of omega
-              if(!this->_apply_precond(vec_w, vec_t, fil_sys))
-              {
-                Statistics::add_solver_expression(
-                  std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
-                return Status::aborted;
-              }
+              omega = vec_t_tilde.dot(vec_r_tilde) / vec_t_tilde.dot(vec_t_tilde);
             }
-
-            DataType normsqr_vec_w(vec_w.norm2sqr());
-            omega = vec_w.dot(vec_z) / normsqr_vec_w;
+            // Right preconditioned: omega[k] = <t[k], r[k+1/2] / <t[k], t[k]>
+            else
+            {
+              omega = vec_t.dot(vec_r) / vec_t.dot(vec_t);
+            }
 
             XASSERTM(Math::isfinite(omega),"BiCGStab breakdown!");
 
             // Second "half" update
-            vec_sol.axpy(vec_z, vec_sol, omega);
+            // x[k+1] = x[k+1/2] + omega r~[k+1/2]
+            vec_sol.axpy(vec_r_tilde, vec_sol, omega);
 
             // Upate defect
-            vec_r.axpy(vec_t, vec_s, -omega);
+            // r[k+1] = r[k] - omega t[k]
+            vec_r.axpy(vec_t, vec_r, -omega);
 
-            // compute defect norm
+            // Compute defect norm
             status = this->_set_new_defect(vec_r, vec_sol);
 
             if(status != Status::progress)
@@ -456,10 +496,36 @@ namespace FEAT
               return status;
             }
 
+            // Update preconditioned defect
+            // r~[k+1] = r~[k] - omega t~[k]
+            vec_r_tilde.axpy(vec_t_tilde, vec_r_tilde, -omega);
+
+            // Save old rho
+            DataType rho2(rho);
+            // Left preconditioned: rho[k+1] = <r^[0], r~[k+1]>
+            if(_precon_variant == BiCGStabPreconVariant::left)
+            {
+              rho = vec_r_hat_0.dot(vec_r_tilde);
+            }
+            // Right preconditioned: rho[k+1] = <r^[0], r[k+1]>
+            else
+            {
+              rho = vec_r_hat_0.dot(vec_r);
+            }
+
+            // beta[k] = (rho[k+1]*alpha[k]) / (rho[k]*omega[k])
+            DataType beta((rho/rho2)*(alpha/omega));
+            XASSERTM(Math::isfinite(beta),"BiCGStab  breakdown!");
+
+            // p~[k+1] = r~[k+1] + beta(p~[k] - omega[k] q~[k])
+            vec_p_tilde.axpy(vec_q_tilde, vec_p_tilde, -omega);
+            vec_p_tilde.axpy(vec_p_tilde, vec_r_tilde, beta);
+
           }
 
           // we should never reach this point...
-          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
+          Statistics::add_solver_expression(
+            std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
           return Status::undefined;
         }
     }; // class BiCGStab<...>
@@ -477,7 +543,7 @@ namespace FEAT
      * The preconditioner. May be \c nullptr.
      *
      * \param[in] precon_variant
-     * Which preconditioning variant to use, defaults to right
+     * Which preconditioning variant to use, defaults to left
      *
      * \returns
      * A shared pointer to a new BiCGStab object.
@@ -493,7 +559,7 @@ namespace FEAT
     template<typename Matrix_, typename Filter_, typename Precond_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<Precond_> precond, BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::right)
+      std::shared_ptr<Precond_> precond, BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left)
       {
         return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
       }
@@ -502,7 +568,7 @@ namespace FEAT
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr,
-      BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::right)
+      BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left)
       {
         return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
       }

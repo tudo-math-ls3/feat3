@@ -85,18 +85,6 @@ public:
 
     // create 5-point star CSR matrix
     SparseMatrixCSR<Mem::Main, DataType, IndexType> csr_mat(psf.matrix_csr());
-    //const Index nrows(289);
-    //SparseMatrixCSR<Mem::Main, DataType, IndexType> csr_mat(nrows, nrows, nrows);
-    //IndexType* row_ptr(csr_mat.row_ptr());
-    //IndexType* col_ind(csr_mat.col_ind());
-    //DataType* val(csr_mat.val());
-    //for(Index i(0); i < nrows; ++i)
-    //{
-    //  row_ptr[i] = i;
-    //  col_ind[i] = i;
-    //  val[i] = DataType(2);
-    //}
-    //row_ptr[nrows] = Index(nrows);
 
     // create a Q2 bubble vector
     DenseVector<Mem::Main, DataType, IndexType> q2b_vec(psf.vector_q2_bubble());
@@ -119,7 +107,7 @@ public:
     // initialise sol vector
     VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
 
-    //// test plain CG
+    // test plain CG
     {
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter);
@@ -188,7 +176,7 @@ public:
       test_solver("Richardson-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs, 71);
     }
 
-    // test BiCGStab-ILU(0) (left)
+    // test BiCGStab-left-ILU(0)
     {
       // create a ILU(0) preconditioner
       auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
@@ -197,13 +185,12 @@ public:
       test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
-    // test BiCGStab-Jacobi (right)
+    // test BiCGStab-right-SOR(1) aka GS
     {
-      // create a ILU(0) preconditioner
-      auto precon = Solver::new_jacobi_precond(matrix, filter, DataType(0.5));
+      auto precon = Solver::new_sor_precond(matrix, filter, DataType(1));
       // create a BiCGStab solver
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::right);
-      test_solver("BiCGStab-Jacobi(0.5)", solver, vec_sol, vec_ref, vec_rhs, 33);
+      test_solver("BiCGStab-right-SOR(1)", solver, vec_sol, vec_ref, vec_rhs, 29);
     }
 
     // test PCG-jac-matrix
@@ -360,7 +347,7 @@ public:
       // create a ILU(0) preconditioner
       auto precon = Solver::new_ilu_precond(matrix, filter);
       // create a BiCGStab solver
-      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::right);
+      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::left);
       test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
@@ -418,19 +405,19 @@ public:
     // test BiCGStab-SOR
     {
       // create a SOR preconditioner
-      auto precon = Solver::new_sor_precond(matrix, filter);
+      auto precon = Solver::new_sor_precond(matrix, filter, DataType(1));
       // create a BiCGStab solver
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::left);
-      test_solver("BiCGStab-SOR(left)", solver, vec_sol, vec_ref, vec_rhs, 33);
+      test_solver("BiCGStab-left-SOR", solver, vec_sol, vec_ref, vec_rhs, 37);
     }
 
     // test BiCGStab-SSOR
     {
       // create a SSOR preconditioner
-      auto precon = Solver::new_ssor_precond(matrix, filter);
+      auto precon = Solver::new_jacobi_precond(matrix, filter, DataType(0.5));
       // create a CG solver
-      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::left);
-      test_solver("BiCGStab-SSOR(left)", solver, vec_sol, vec_ref, vec_rhs, 21);
+      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::right);
+      test_solver("BiCGStab-right-Jacobi(0.5)", solver, vec_sol, vec_ref, vec_rhs, 21);
     }
 
     // test BiCGStab-SSOR
@@ -439,7 +426,7 @@ public:
       auto precon = Solver::new_ssor_precond(matrix, filter);
       // create a CG solver
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::right);
-      test_solver("BiCGStab-SSOR(right)", solver, vec_sol, vec_ref, vec_rhs, 38);
+      test_solver("BiCGStab-right-SSOR", solver, vec_sol, vec_ref, vec_rhs, 20);
     }
 #endif // FEAT_HAVE_CUSOLVER
   }
