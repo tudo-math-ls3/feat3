@@ -270,7 +270,7 @@ namespace FEAT
             delete iterates;
         }
 
-        /// \copydoc BaseClass::write_config()
+        /// \copydoc SolverBase::write_config()
         virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
         {
           XASSERT(parent != nullptr);
@@ -290,7 +290,7 @@ namespace FEAT
 
         }
 
-        /// \copydoc BaseClass::init_symbolic()
+        /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
@@ -305,7 +305,7 @@ namespace FEAT
           _linesearch->init_symbolic();
         }
 
-        /// \copydoc BaseClass::done_symbolic()
+        /// \copydoc SolverBase::done_symbolic()
         virtual void done_symbolic() override
         {
           if(iterates != nullptr)
@@ -321,13 +321,13 @@ namespace FEAT
           BaseClass::done_symbolic();
         }
 
-        /// \copydoc BaseClass::name()
+        /// \copydoc SolverBase::name()
         virtual String name() const override
         {
           return "NLCG";
         }
 
-        /// \copydoc BaseClass::apply()
+        /// \copydoc SolverBase::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
           // clear solution vector
@@ -349,7 +349,7 @@ namespace FEAT
           return _apply_intern(vec_cor);
         }
 
-        /// \copydoc BaseClass::correct()
+        /// \copydoc IterativeSolver::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
           //std::cout << std::scientific;

@@ -268,7 +268,7 @@ namespace FEAT
 
       protected:
         /**
-         * \copydoc BaseClass::_set_initial_defect()
+         * \copydoc IterativeSolver::_set_initial_defect()
          */
         virtual Status _set_initial_defect(const VectorType& vec_def, const VectorType& vec_sol) override
         {

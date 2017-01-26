@@ -395,7 +395,7 @@ namespace FEAT
         return Math::pow(_def_cur / _def_init, DataType(1) / DataType(_num_iter));
       }
 
-      /// \copydoc BaseClass::write_config()
+      /// \copydoc SolverBase::write_config()
       virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const override
       {
         XASSERT(parent != nullptr);
@@ -696,7 +696,7 @@ namespace FEAT
       {
       }
 
-      /// \copydoc BaseClass::write_config()
+      /// \copydoc SolverBase::write_config()
       virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
       {
         XASSERT(parent != nullptr);
@@ -719,7 +719,7 @@ namespace FEAT
 
       }
 
-      /// \copydoc BaseClass::init_symbolic()
+      /// \copydoc SolverBase::init_symbolic()
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
@@ -727,7 +727,7 @@ namespace FEAT
           _precond->init_symbolic();
       }
 
-      /// \copydoc BaseClass::init_numeric()
+      /// \copydoc SolverBase::init_numeric()
       virtual void init_numeric() override
       {
         BaseClass::init_numeric();
@@ -735,7 +735,7 @@ namespace FEAT
           _precond->init_numeric();
       }
 
-      /// \copydoc BaseClass::done_numeric()
+      /// \copydoc SolverBase::done_numeric()
       virtual void done_numeric() override
       {
         if(_precond)
@@ -743,7 +743,7 @@ namespace FEAT
         BaseClass::done_numeric();
       }
 
-      /// \copydoc BaseClass::done_symbolic()
+      /// \copydoc SolverBase::done_symbolic()
       virtual void done_symbolic() override
       {
         if(_precond)
