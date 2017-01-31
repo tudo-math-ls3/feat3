@@ -229,12 +229,15 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
+        IterationStats pre_iter(*this);
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         const MatrixType& matrix(this->_system_matrix);
         const FilterType& filter(this->_system_filter);
 
         // compute initial defect
         Status status = this->_set_initial_defect(this->_vec_v.at(0), vec_sol);
+
+        pre_iter.destroy();
 
         // outer GMRES loop
         while(status == Status::progress)
@@ -256,6 +259,7 @@ namespace FEAT
             // apply preconditioner
             if(!this->_apply_precond(this->_vec_z.at(i), this->_vec_v.at(i), filter))
             {
+              stat.destroy();
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             }

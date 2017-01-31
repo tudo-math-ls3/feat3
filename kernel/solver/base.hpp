@@ -434,13 +434,13 @@ namespace FEAT
     private:
       const String _solver_name;
       TimeStamp _at;
-      TimeStamp _bt;
       double _mpi_execute_start;
       double _mpi_execute_stop;
       double _mpi_wait_start_reduction;
       double _mpi_wait_start_spmv;
       double _mpi_wait_stop_reduction;
       double _mpi_wait_stop_spmv;
+      bool _destroyed;
 
     public:
       /**
@@ -454,7 +454,8 @@ namespace FEAT
        */
       template<typename Vector_>
       explicit IterationStats(const SolverBase<Vector_>& solver) :
-        _solver_name(solver.name())
+        _solver_name(solver.name()),
+        _destroyed(false)
       {
         _mpi_execute_start = Statistics::get_time_mpi_execute();
         _mpi_wait_start_reduction    = Statistics::get_time_mpi_wait_reduction();
@@ -476,12 +477,23 @@ namespace FEAT
        */
       ~IterationStats()
       {
-        _bt.stamp();
+        if (!_destroyed)
+          destroy();
+      }
+
+      ///destroy the objects contents (and generate Statistics::expression) before the actual destructor call
+      void destroy()
+      {
+        if (_destroyed)
+          throw InternalError(__func__, __FILE__, __LINE__, "IterationStats destroy method was already called before!");
+
         _mpi_execute_stop = Statistics::get_time_mpi_execute();
         _mpi_wait_stop_reduction    = Statistics::get_time_mpi_wait_reduction();
         _mpi_wait_stop_spmv    = Statistics::get_time_mpi_wait_spmv();
-        Statistics::add_solver_expression(std::make_shared<ExpressionTimings>(_solver_name, _bt.elapsed(_at), _mpi_execute_stop - _mpi_execute_start,
+        Statistics::add_solver_expression(std::make_shared<ExpressionTimings>(_solver_name, _at.elapsed_now(), _mpi_execute_stop - _mpi_execute_start,
           _mpi_wait_stop_reduction - _mpi_wait_start_reduction, _mpi_wait_stop_spmv - _mpi_wait_start_spmv));
+
+        _destroyed = true;
       }
     }; // class IterationStats
   } // namespace Solver

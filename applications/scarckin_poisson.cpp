@@ -332,7 +332,7 @@ namespace PoissonDirichlet2D
 
     Statistics::reset_flops();
     Statistics::reset_times();
-    Statistics::reset_solver_statistics();
+    Statistics::compress_solver_expressions();
 
     TimeStamp at;
 

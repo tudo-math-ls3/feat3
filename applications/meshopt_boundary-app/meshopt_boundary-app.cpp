@@ -454,9 +454,6 @@ struct MeshoptBoundaryApp
 
       comm.print("Timestep "+stringify(n)+": t = "+stringify_fp_fix(time));
 
-      // Clear statistics data so it does not eat us alive
-      FEAT::Statistics::reset_solver_statistics();
-
       bool abort(false);
 
       // Save old vertex coordinates
@@ -590,6 +587,9 @@ struct MeshoptBoundaryApp
         ++ret;
         abort = true;
       }
+
+      // compress all statistics from the current timestep for further analysis after the solution is finished
+      FEAT::Statistics::compress_solver_expressions();
 
       if(abort)
       {

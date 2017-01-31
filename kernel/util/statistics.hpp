@@ -54,6 +54,24 @@ namespace FEAT
       /// a consecutive list of all solver actions
       static std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> _solver_expressions;
 
+      /// mapping of solver target name to formatted solver tree string
+      static std::map<String, String> _formatted_solver_trees;
+
+      /// overall time per reset call per solver name string.
+      static std::map<String, std::list<double>> _overall_toe;
+      static std::map<String, std::list<double>> _overall_mpi_execute;
+      static std::map<String, std::list<double>> _overall_mpi_wait_reduction;
+      static std::map<String, std::list<double>> _overall_mpi_wait_spmv;
+      /// mapping of solver name to list of outer multigrid level timings. each std::vector holds a complete level hierarchy of timings.
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_toe;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_reduction;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_spmv;
+      /// overall time of outer schwarz preconditioners internal solver
+      static std::map<String, std::list<double>> _outer_schwarz_toe;
+      /// overall iterations of outer schwarz preconditioners internal solver
+      static std::map<String, std::list<Index>> _outer_schwarz_iters;
+
       /*static String _format_solver_statistics(String branch, SolverStatistics & stat)
       {
         String result;
@@ -107,6 +125,8 @@ namespace FEAT
         return result;
       }*/
 
+      static String _generate_formatted_solver_tree(String target);
+
     public:
 
       /// time of partitioning in seconds, needs initialisation
@@ -124,7 +144,17 @@ namespace FEAT
       {
         reset_flops();
         reset_times();
-        reset_solver_statistics();
+        _solver_expressions.clear();
+        _overall_toe.clear();
+        _overall_mpi_execute.clear();
+        _overall_mpi_wait_reduction.clear();
+        _overall_mpi_wait_spmv.clear();
+        _outer_mg_toe.clear();
+        _outer_mg_mpi_execute.clear();
+        _outer_mg_mpi_wait_reduction.clear();
+        _outer_mg_mpi_wait_spmv.clear();
+        _outer_schwarz_toe.clear();
+        _outer_schwarz_iters.clear();
       }
 
       /// Add an amount of flops to the global flop counter
@@ -221,7 +251,7 @@ namespace FEAT
 
       static const std::list<std::shared_ptr<Solver::ExpressionBase>> & get_solver_expressions()
       {
-        return _solver_expressions[expression_target];
+        return _solver_expressions.at(expression_target);
       }
 
       /**
@@ -232,17 +262,78 @@ namespace FEAT
        * \note This method makes some simplifications, e.g. stating only one smoother
        * for the complete FEAT::Solver::BasicVCycle.
        *
-       * \note The solver must have been executed (successfully) at least one time after the last reset_solver_statistics() call.
+       * \note The solver must have been executed (successfully) at least one time before a compress_solver_expressions() call,
+       * to make the solver tree available.
        */
-      static String get_formatted_solver_tree();
+      static String get_formatted_solver_tree(String target = "default")
+      {
+        return _formatted_solver_trees.at(target);
+      }
 
       /// print out the complete solver expression list
       static void print_solver_expressions();
 
-      ///reset solver statistics (toe / defect norm)
-      inline static void reset_solver_statistics()
+      ///compress solver statistics (toe / defect norm / mpi timings) from previous calls
+      static void compress_solver_expressions();
+
+      /// retrieve list of all overall solver toe entries
+      static inline std::list<double> & get_time_toe(String target)
       {
-        _solver_expressions.clear();
+        return _overall_toe.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute toe entries
+      static inline std::list<double> & get_time_mpi_execute(String target)
+      {
+        return _overall_mpi_execute.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi reduction wait toe entries
+      static inline std::list<double> & get_time_mpi_wait_reduction(String target)
+      {
+        return _overall_mpi_wait_reduction.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi spmv wait toe entries
+      static inline std::list<double> & get_time_mpi_wait_spmv(String target)
+      {
+        return _overall_mpi_wait_spmv.at(target);
+      }
+
+      /// retrieve list of all overall solver toe entries per mg level
+      static inline std::list<std::vector<double>> & get_time_mg(String target)
+      {
+        return _outer_mg_toe.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute(String target)
+      {
+        return _outer_mg_mpi_execute.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi reduction wait toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_reduction(String target)
+      {
+        return _outer_mg_mpi_wait_reduction.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi spmv wait toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_spmv(String target)
+      {
+        return _outer_mg_mpi_wait_spmv.at(target);
+      }
+
+      /// retrieve list of all outer schwarz solver call toe entries
+      static inline std::list<double> & get_time_schwarz(String target)
+      {
+        return _outer_schwarz_toe.at(target);
+      }
+
+      /// retrieve list of all outer schwarz solver call iteration count entries
+      static inline std::list<Index> & get_iters_schwarz(String target)
+      {
+        return _outer_schwarz_iters.at(target);
       }
 
       /*
@@ -259,6 +350,9 @@ namespace FEAT
        * \note This method uses mpi collectives and thus needs to be called by all ranks, even if you don't use the result on every rank on your own.
        */
       static String get_formatted_times(double total_time);
+
+      /// Retrieve formatted timings and iteration counts of internal solver structures for the provided solver target
+      static String get_formatted_solver_internals(String target);
 
       /// Reset all global timer counters
       static void reset_times()

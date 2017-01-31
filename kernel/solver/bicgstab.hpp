@@ -328,6 +328,7 @@ namespace FEAT
        */
         Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
         {
+          IterationStats pre_iter(*this);
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
           VectorType& vec_p_tilde  (_vec_p_tilde);
           VectorType& vec_r        (_vec_r);
@@ -372,6 +373,8 @@ namespace FEAT
           // Compute initial defect
           status = this->_set_initial_defect(vec_r, vec_sol);
 
+          pre_iter.destroy();
+
           while(status == Status::progress)
           {
             IterationStats stat(*this);
@@ -384,6 +387,7 @@ namespace FEAT
             // q~[k] = M^{-1} q[k]
             if(!this->_apply_precond(vec_q_tilde, vec_q, fil_sys))
             {
+              stat.destroy();
               Statistics::add_solver_expression(
                 std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
@@ -449,6 +453,7 @@ namespace FEAT
                   << " / " << stringify_fp_fix(this->_def_cur / def_old)
                   << std::endl;
                 }
+                stat.destroy();
                 Statistics::add_solver_expression(
                   std::make_shared<ExpressionEndSolve>(this->name(), status_half, this->get_num_iter()));
 
@@ -467,6 +472,7 @@ namespace FEAT
             // t~[k] = M^{-1} t
             if(!this->_apply_precond(vec_t_tilde, vec_t, fil_sys))
             {
+              stat.destroy();
               Statistics::add_solver_expression(
                 std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
@@ -499,6 +505,7 @@ namespace FEAT
 
             if(status != Status::progress)
             {
+              stat.destroy();
               Statistics::add_solver_expression(
                 std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
               return status;

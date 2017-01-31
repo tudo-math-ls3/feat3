@@ -202,6 +202,7 @@
 #include <control/statistics.hpp>
 
 #include <deque>
+#include <numeric>
 
 namespace NavierStokesCP2D
 {
@@ -582,12 +583,10 @@ namespace NavierStokesCP2D
     /// \todo cover exactly all la op timings (some are not timed yet in the application) and replace t_total by them
     double solver_toe = t_total; //t_solver_a + t_solver_s + t_calc_def;
 
-    FEAT::Statistics::expression_target = "solver_a";
     comm.print("\nsolver_a:");
-    comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
-    FEAT::Statistics::expression_target = "solver_s";
+    comm.print(FEAT::Statistics::get_formatted_solver_tree("solver_a").trim());
     comm.print("solver_s:");
-    comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
+    comm.print(FEAT::Statistics::get_formatted_solver_tree("solver_s").trim());
 
     std::size_t la_size(0);
     std::size_t mpi_size(0);
@@ -631,75 +630,13 @@ namespace NavierStokesCP2D
     comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&nzes_fine_local, &nzes_fine_min, std::size_t(1), Dist::op_min);
 
-    double solver_a_mpi_wait_reduction(0.);
-    double solver_a_mpi_wait_spmv(0.);
-    FEAT::Statistics::expression_target = "solver_a";
-    auto& expressions_a = FEAT::Statistics::get_solver_expressions();
-    for (auto& expression : expressions_a)
-    {
-      if (expression->get_type() == FEAT::Solver::ExpressionType::timings)
-      {
-        auto t = dynamic_cast<Solver::ExpressionTimings*>(expression.get());
-        solver_a_mpi_wait_reduction += t->mpi_wait_reduction;
-        solver_a_mpi_wait_spmv += t->mpi_wait_spmv;
-      }
-      if (expression->get_type() == FEAT::Solver::ExpressionType::level_timings)
-      {
-        auto t = dynamic_cast<Solver::ExpressionLevelTimings*>(expression.get());
-        solver_a_mpi_wait_reduction += t->mpi_wait_reduction;
-        solver_a_mpi_wait_spmv += t->mpi_wait_spmv;
-      }
-    }
-    double solver_a_mpi_wait_reduction_max;
-    double solver_a_mpi_wait_reduction_min;
-    comm.allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_max, std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_a_mpi_wait_reduction, &solver_a_mpi_wait_reduction_min, std::size_t(1), Dist::op_min);
-    double solver_a_mpi_wait_spmv_max;
-    double solver_a_mpi_wait_spmv_min;
-    comm.allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_max, std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_a_mpi_wait_spmv, &solver_a_mpi_wait_spmv_min, std::size_t(1), Dist::op_min);
-
-    double solver_s_mpi_wait_reduction(0.);
-    double solver_s_mpi_wait_spmv(0.);
-    FEAT::Statistics::expression_target = "solver_s";
-    auto& expressions_s = FEAT::Statistics::get_solver_expressions();
-    for (auto& expression : expressions_s)
-    {
-      if (expression->get_type() == FEAT::Solver::ExpressionType::timings)
-      {
-        auto t = dynamic_cast<Solver::ExpressionTimings*>(expression.get());
-        solver_s_mpi_wait_reduction += t->mpi_wait_reduction;
-        solver_s_mpi_wait_spmv += t->mpi_wait_spmv;
-      }
-      if (expression->get_type() == FEAT::Solver::ExpressionType::level_timings)
-      {
-        auto t = dynamic_cast<Solver::ExpressionLevelTimings*>(expression.get());
-        solver_s_mpi_wait_reduction += t->mpi_wait_reduction;
-        solver_s_mpi_wait_spmv += t->mpi_wait_spmv;
-      }
-    }
-    double solver_s_mpi_wait_reduction_max;
-    double solver_s_mpi_wait_reduction_min;
-    comm.allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_max, std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_s_mpi_wait_reduction, &solver_s_mpi_wait_reduction_min, std::size_t(1), Dist::op_min);
-    double solver_s_mpi_wait_spmv_max;
-    double solver_s_mpi_wait_spmv_min;
-    comm.allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_max, std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_s_mpi_wait_spmv, &solver_s_mpi_wait_spmv_min, std::size_t(1), Dist::op_min);
-
     String flops = FEAT::Statistics::get_formatted_flops(solver_toe, (Index)nprocs);
     comm.print(flops + "\n");
     comm.print(op_timings);
-    comm.print("solver_a");
-    comm.print(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_reduction_max) + ", min: " + stringify(solver_a_mpi_wait_reduction_min) + ", local: " +
-        stringify(solver_a_mpi_wait_reduction));
-    comm.print(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_a_mpi_wait_spmv_max) + ", min: " + stringify(solver_a_mpi_wait_spmv_min) + ", local: " +
-        stringify(solver_a_mpi_wait_spmv));
-    comm.print("solver_s");
-    comm.print(String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_reduction_max) + ", min: " + stringify(solver_s_mpi_wait_reduction_min) + ", local: " +
-        stringify(solver_s_mpi_wait_reduction));
-    comm.print(String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_s_mpi_wait_spmv_max) + ", min: " + stringify(solver_s_mpi_wait_spmv_min) + ", local: " +
-        stringify(solver_s_mpi_wait_spmv) + "\n");
+    comm.print(FEAT::Statistics::get_formatted_solver_internals("solver_a"));
+    comm.print("");
+    comm.print(FEAT::Statistics::get_formatted_solver_internals("solver_s"));
+    comm.print("");
     comm.print(String("Domain size:").pad_back(20) + stringify(double(domain.bytes())  / (1024. * 1024.))  + " MByte");
     comm.print(String("MPI size:").pad_back(20) + stringify(double(mpi_size) / (1024. * 1024.)) + " MByte");
     comm.print(String("LA size:").pad_back(20) + stringify(double(la_size) / (1024. * 1024.)) + " MByte\n");
@@ -1087,9 +1024,6 @@ namespace NavierStokesCP2D
     // time-step loop
     for(Index time_step(1); time_step <= cfg.max_time_steps; ++time_step)
     {
-      // clear all solver statistics from previous time steps, thus preventing the list to grow forever, until we need to gather everything
-      FEAT::Statistics::reset_solver_statistics();
-
       // compute current time
       const DataType cur_time = DataType(time_step) * delta_t;
 
@@ -1307,6 +1241,9 @@ namespace NavierStokesCP2D
       vec_sol_v_2.copy(vec_sol_v_1);
       vec_sol_v_1.copy(vec_sol_v);
       vec_sol_p_1.copy(vec_sol_p);
+
+      // compress all statistics from the current timestep for further analysis after the solution is finished
+      FEAT::Statistics::compress_solver_expressions();
 
       // continue with next time-step
     } // time-step loop

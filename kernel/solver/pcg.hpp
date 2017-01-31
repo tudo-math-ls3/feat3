@@ -171,6 +171,7 @@ namespace FEAT
        */
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
+        IterationStats pre_iter(*this);
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
         const MatrixType& matrix(this->_system_matrix);
@@ -192,6 +193,7 @@ namespace FEAT
         Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
         {
+          pre_iter.destroy();
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
         }
@@ -200,6 +202,7 @@ namespace FEAT
         // p[0] := M^{-1} * r[0]
         if(!this->_apply_precond(vec_p, vec_r, filter))
         {
+          pre_iter.destroy();
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
           return Status::aborted;
         }
@@ -207,6 +210,8 @@ namespace FEAT
         // compute initial gamma:
         // gamma[0] := < r[0], p[0] >
         DataType gamma = vec_r.dot(vec_p);
+
+        pre_iter.destroy();
 
         // start iterating
         while(status == Status::progress)
@@ -233,6 +238,7 @@ namespace FEAT
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
           {
+            stat.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
           }
@@ -241,6 +247,7 @@ namespace FEAT
           // z[k+1] := M^{-1} * r[k+1]
           if(!this->_apply_precond(vec_z, vec_r, filter))
           {
+            stat.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
           }

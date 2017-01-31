@@ -549,9 +549,6 @@ struct MeshoptScrewsApp
       n++;
       time+= delta_t;
 
-      // Clear statistics data so it does not eat us alive
-      FEAT::Statistics::reset_solver_statistics();
-
       DataType alpha_old = alpha;
       alpha = -DataType(2)*pi*time;
       DataType delta_alpha = alpha - alpha_old;
@@ -726,6 +723,9 @@ struct MeshoptScrewsApp
         ++ret;
         abort = true;
       }
+
+      // compress all statistics from the current timestep for further analysis after the solution is finished
+      FEAT::Statistics::compress_solver_expressions();
 
       if(abort)
       {

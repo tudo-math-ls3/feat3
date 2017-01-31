@@ -137,6 +137,7 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
+        IterationStats pre_iter(*this);
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
         const MatrixType& matrix(this->_system_matrix);
@@ -158,12 +159,14 @@ namespace FEAT
         Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
         {
+          pre_iter.destroy();
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
           return status;
         }
 
         if(!this->_apply_precond(vec_z, vec_r, filter))
         {
+          pre_iter.destroy();
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
           return Status::aborted;
         }
@@ -183,6 +186,7 @@ namespace FEAT
           auto dot_t = vec_s.dot_async(vec_p);
           if(!this->_apply_precond(vec_S, vec_s, filter))
           {
+            stat.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
           }
@@ -212,6 +216,7 @@ namespace FEAT
           status = _update_defect(norm_def_cur->wait());
           if(status != Status::progress)
           {
+            stat.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
           }
