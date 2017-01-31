@@ -98,10 +98,10 @@ namespace FEAT
           _gate->sync_0(_vector);
       }
 
-      auto sync_0_async() -> decltype(_gate->sync_0(_vector))
+      auto sync_0_async() -> decltype(_gate->sync_0_async(_vector))
       //decltype(_gate->sync_0(_vector)) sync_0_async()
       {
-        return _gate->sync_0(_vector);
+        return _gate->sync_0_async(_vector);
       }
 
       void sync_1()
@@ -110,10 +110,10 @@ namespace FEAT
           _gate->sync_1(_vector);
       }
 
-      auto sync_1_async() -> decltype(_gate->sync_1(_vector))
+      auto sync_1_async() -> decltype(_gate->sync_1_async(_vector))
       //decltype(_gate->sync_1(_vector)) sync_1_async()
       {
-        return _gate->sync_1(_vector);
+        return _gate->sync_1_async(_vector);
       }
 
       Vector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const

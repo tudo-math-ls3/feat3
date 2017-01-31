@@ -185,10 +185,10 @@ namespace FEAT
         r.sync_0();
       }
 
-      auto apply_async(VectorTypeL& r, const VectorTypeR& x) const -> decltype(r.sync_0())
+      auto apply_async(VectorTypeL& r, const VectorTypeR& x) const -> decltype(r.sync_0_async())
       {
         _matrix.apply(*r, *x);
-        return r.sync_0();
+        return r.sync_0_async();
       }
 
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
@@ -206,7 +206,7 @@ namespace FEAT
         r.sync_0();
       }
 
-      auto apply_async(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const -> decltype(r.sync_0())
+      auto apply_async(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const -> decltype(r.sync_0_async())
       {
         // copy y to r
         r.copy(y);
@@ -218,7 +218,7 @@ namespace FEAT
         _matrix.apply(*r, *x, *r, alpha);
 
         // synchronise r
-        r.sync_0();
+        r.sync_0_async();
       }
 
       LocalMatrix convert_to_1() const
