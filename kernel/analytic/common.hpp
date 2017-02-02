@@ -2417,7 +2417,7 @@ namespace FEAT
             val.format();
             val(0) = _fac;
 
-            for(int d(1); d < PointType::n; ++d)
+            for(Index d(1); d < Index(PointType::n); ++d)
             {
               val(0) *= (point[d] - _zeros.at(d-1)[0])*(_zeros.at(d-1)[1] - point[d]);
             }
@@ -2505,6 +2505,271 @@ namespace FEAT
           _zeros.at(1) = zeros_z;
         }
       }; // class YZPlaneParabolic
+
+      /**
+       * \brief Time dependent divergence free velocity field
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * \author Jordi Paul
+       */
+      template<typename DT_, int dim_>
+      class SinYT0 : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// The scaling factor according to the amplitude
+          const DataType _t;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
+          explicit Evaluator(const SinYT0& function) :
+            _t(function._t)
+
+          {
+            XASSERT(_t >= DataType(0));
+          }
+
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void value(ValueType& val, const PointType& point)
+          {
+            val.format();
+            val(0) = Math::sin(_t*point[1]);
+          }
+
+          /**
+           * \brief Computes the gradient
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& point) const
+          {
+            grad.format();
+            grad[0][1] = _t*Math::cos(_t*point[1]);
+          }
+
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          {
+            hess.format();
+          }
+
+        }; // class SinYT0::Evaluator<...>
+
+      private:
+        /// The time
+        DataType _t;
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         */
+        explicit SinYT0(DataType t = DataType(0)) :
+          _t(t)
+        {
+        }
+
+        void set_time(const DataType t)
+        {
+          _t = t;
+        }
+
+      };
+
+      /**
+       * \brief Time dependent divergence free velocity field
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * \author Jordi Paul
+       */
+      template<typename DT_, int dim_>
+      class SinYT0StokesRhs : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = false;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const DataType _t;
+          const DataType _fac;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
+          explicit Evaluator(const SinYT0StokesRhs& function) :
+            _t(function._t),
+            _fac(DataType(1)/function._reynolds)
+
+          {
+            XASSERT(_t >= DataType(0));
+          }
+
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void value(ValueType& val, const PointType& point)
+          {
+            val.format();
+            val(0) = point[1]*Math::cos(_t*point[1]) - _fac*Math::sqr(_t)*Math::sin(point[1]*_t);
+          }
+
+          /**
+           * \brief Computes the gradient
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& DOXY(point)) const
+          {
+            grad.format();
+          }
+
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          {
+            hess.format();
+          }
+
+        }; // class SinYT0StokesRhs::Evaluator<...>
+
+      private:
+        /// The Reynolds number of the associated flow with the solution SinYT0
+        const DataType _reynolds;
+        /// The time
+        DataType _t;
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         */
+        explicit SinYT0StokesRhs(DataType reynolds, DataType t = DataType(0)) :
+          _reynolds(reynolds),
+          _t(t)
+        {
+          XASSERT(reynolds > DataType(0));
+        }
+
+        void set_time(const DataType t)
+        {
+          _t = t;
+        }
+      };
 
     } // namespace Common
   } // namespace Analytic
