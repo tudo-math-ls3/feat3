@@ -2847,6 +2847,8 @@ namespace FEAT
           void value(ValueType& val, const PointType& point)
           {
             val = Math::sin(point[0] - point[1] + _t);
+            // To make it mean value 0 on [0,1]x[0,1]
+            val -= (DataType(2)*Math::sin(_t) - Math::sin(DataType(1)+_t) - Math::sin(-DataType(1) + _t));
           }
 
           /**

@@ -2,25 +2,36 @@
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
 slip_boundaries = bnd:i bnd:o
+meshopt_lvl = 0
+preprocessor_config= DuDvPreproc
 
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
 dirichlet_boundaries = bnd:i bnd:o
+meshopt_lvl = -1
+
+[DuDvPreproc]
+type = DuDv
+config_section = DuDvDefaultParameters
+dirichlet_boundaries = bnd:i bnd:o
+meshopt_lvl = -1
 
 [DuDvDefaultParameters]
-solver_config = PCG-MGV
+solver_config = Meshopt-PCG
+fixed_reference_domain = 0
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional
 local_functional = RumpfFunctional
 solver_config = NLCG
-fac_norm = 1e-2
+fac_norm = 1e0
 fac_det = 1.0
 fac_cof = 0.0
-fac_reg = 1e-8
+fac_reg = 2e-7
 exponent_det = 2
-scale_computation = current_concentration
+#scale_computation = once_uniform
+scale_computation = iter_concentration
 conc_function = GapWidth
 
 [GapWidth]
