@@ -814,6 +814,19 @@ namespace FEAT
        */
       DataType norm_frobenius() const
       {
+        return Math::sqrt(norm_frobenius_sqr());
+      }
+
+      /**
+       * \brief Returns the Frobenius norm squared of the matrix.
+       *
+       * This function computes and returns
+       * \f[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\f]
+       *
+       * \returns The Frobenius norm of the matrix.
+       */
+      DataType norm_frobenius_sqr() const
+      {
         DataType r(0);
         for(int i(0); i < m_; ++i)
         {
@@ -822,7 +835,7 @@ namespace FEAT
             r += Math::sqr(v[i][j]);
           }
         }
-        return Math::sqrt(r);
+        return r;
       }
 
       /**
