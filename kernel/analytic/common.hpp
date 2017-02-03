@@ -2771,6 +2771,413 @@ namespace FEAT
         }
       };
 
+      /**
+       * \brief Pressure to GuermondStokesSol
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * \author Jordi Paul
+       */
+      template<typename DT_, int dim_>
+      class GuermondStokesSolPressure : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Scalar ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// The scaling factor according to the amplitude
+          const DataType _t;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
+          explicit Evaluator(const GuermondStokesSolPressure& function) :
+            _t(function._t)
+
+          {
+            XASSERT(_t >= DataType(0));
+          }
+
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void value(ValueType& val, const PointType& point)
+          {
+            val = Math::sin(point[0] - point[1] + _t);
+          }
+
+          /**
+           * \brief Computes the gradient
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& point) const
+          {
+            grad.format();
+
+            grad[0] = Math::cos(point[0] - point[1] + _t);
+            grad[1] = -grad[0];
+          }
+
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          {
+            hess.format();
+          }
+
+        }; // class GuermondStokesSolPressure::Evaluator<...>
+
+      private:
+        /// The time
+        DataType _t;
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         */
+        explicit GuermondStokesSolPressure(DataType t = DataType(0)) :
+          _t(t)
+        {
+        }
+
+        void set_time(const DataType t)
+        {
+          _t = t;
+        }
+
+      };
+
+      /**
+       * \brief Time dependent divergence free velocity field
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * \author Jordi Paul
+       */
+      template<typename DT_, int dim_>
+      class GuermondStokesSol : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// The scaling factor according to the amplitude
+          const DataType _t;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
+          explicit Evaluator(const GuermondStokesSol& function) :
+            _t(function._t)
+
+          {
+            XASSERT(_t >= DataType(0));
+          }
+
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void value(ValueType& val, const PointType& point)
+          {
+            val.format();
+            val(0) = Math::sin(point[0] + _t)*Math::sin(point[1] + _t);
+            val(1) = Math::cos(point[0] + _t)*Math::cos(point[1] + _t);
+          }
+
+          /**
+           * \brief Computes the gradient
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& point) const
+          {
+            grad.format();
+
+            grad[0][0] = Math::cos(point[0] + _t)*Math::sin(point[1] + _t);
+            grad[0][1] = Math::sin(point[0] + _t)*Math::cos(point[1] + _t);
+
+            grad[1][0] = -Math::sin(point[0] + _t)*Math::cos(point[1] + _t);
+            grad[1][1] = -Math::cos(point[0] + _t)*Math::sin(point[1] + _t);
+          }
+
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          {
+            hess.format();
+          }
+
+        }; // class GuermondStokesSol::Evaluator<...>
+
+      private:
+        /// The time
+        DataType _t;
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         */
+        explicit GuermondStokesSol(DataType t = DataType(0)) :
+          _t(t)
+        {
+        }
+
+        void set_time(const DataType t)
+        {
+          _t = t;
+        }
+
+      };
+
+      /**
+       * \brief Time dependent divergence free velocity field
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam dim_ The space dimension
+       *
+       * \author Jordi Paul
+       */
+      template<typename DT_, int dim_>
+      class GuermondStokesSolRhs : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = false;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const DataType _t;
+          const DataType _fac;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] function
+           * The x,y plane velocity field function
+           */
+          explicit Evaluator(const GuermondStokesSolRhs& function) :
+            _t(function._t),
+            _fac(DataType(1)/function._reynolds)
+
+          {
+            XASSERT(_t >= DataType(0));
+          }
+
+          /**
+           * \brief Computes the value
+           *
+           * \param[out] val
+           * The (vector valued) function value
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void value(ValueType& val, const PointType& point)
+          {
+            val.format();
+
+            val(0) =  Math::cos(point[0]+_t)*Math::sin(point[1]+_t) + Math::sin(point[0]+_t)*Math::cos(point[1]+_t)
+              + _fac*DataType(2)*Math::sin(point[0]+_t)*Math::sin(point[1]+_t) + Math::cos(point[0]-point[1]+_t);
+            val(1) = -Math::sin(point[0]+_t)*Math::cos(point[1]+_t) - Math::cos(point[0]+_t)*Math::sin(point[1]+_t)
+              + _fac*DataType(2)*Math::cos(point[0]+_t)*Math::cos(point[1]+_t) - Math::cos(point[0]-point[1]+_t);
+          }
+
+          /**
+           * \brief Computes the gradient
+           *
+           * \param[out] grad
+           * The (matrix valued) gradient
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void gradient(GradientType& grad, const PointType& DOXY(point)) const
+          {
+            grad.format();
+          }
+
+          /**
+           * \brief Computes the Hessian
+           *
+           * \param[out] hess
+           * The (tensor valued) Hessian
+           *
+           * \param[in] point
+           * The domain point
+           */
+          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          {
+            hess.format();
+          }
+
+        }; // class GuermondStokesSolRhs::Evaluator<...>
+
+      private:
+        /// The Reynolds number of the associated flow with the solution GuermondStokesSol
+        const DataType _reynolds;
+        /// The time
+        DataType _t;
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         */
+        explicit GuermondStokesSolRhs(DataType reynolds, DataType t = DataType(0)) :
+          _reynolds(reynolds),
+          _t(t)
+        {
+          XASSERT(reynolds > DataType(0));
+        }
+
+        void set_time(const DataType t)
+        {
+          _t = t;
+        }
+      };
+
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT
