@@ -18,6 +18,7 @@
 #include <kernel/solver/ilu_precond.hpp>
 #include <kernel/solver/sor_precond.hpp>
 #include <kernel/solver/spai_precond.hpp>
+#include <kernel/solver/polynomial_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/convert_precond.hpp>
@@ -365,6 +366,12 @@ namespace FEAT
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_jacobi_precond(section_name, section, systems.at(solver_level), filters.at(solver_level));
+          }
+          else if (solver_type == "polynomial")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            result = Solver::new_polynomial_precond(section_name, section, systems.at(solver_level), filters.at(solver_level));
           }
           else if (solver_type == "scale")
           {

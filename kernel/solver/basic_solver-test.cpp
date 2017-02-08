@@ -19,6 +19,7 @@
 #include <kernel/solver/sor_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/spai_precond.hpp>
+#include <kernel/solver/polynomial_precond.hpp>
 #include <kernel/solver/matrix_precond.hpp>
 #include <kernel/solver/pcgnr.hpp>
 #include <kernel/solver/pcgnrilu.hpp>
@@ -121,6 +122,13 @@ public:
       // create a PCG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
+
+    // test PCG-POLY
+    {
+      auto precon = Solver::new_polynomial_precond(matrix, filter, 3);
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-POLY", solver, vec_sol, vec_ref, vec_rhs, 11);
     }
 
     // test PCG-SSOR
@@ -330,6 +338,13 @@ public:
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
+
+    // test PCG-POLY
+    {
+      auto precon = Solver::new_polynomial_precond(matrix, filter, 3);
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-POLY", solver, vec_sol, vec_ref, vec_rhs, 11);
     }
 
     // test Richardson-JAC
