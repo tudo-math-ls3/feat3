@@ -127,7 +127,8 @@ namespace FEAT
 
 #elif defined(__unix__)
     struct rusage r_usage;
-    getrusage(RUSAGE_SELF, &r_usage);
+    if (0 != getrusage(RUSAGE_SELF, &r_usage))
+      throw InternalError(__func__, __FILE__, __LINE__, "Error in getrusage call!");
     info.peak_physical = (size_t)r_usage.ru_maxrss;
     info.peak_virtual = (size_t)r_usage.ru_maxrss;
     info.current_physical = (size_t)r_usage.ru_maxrss;
