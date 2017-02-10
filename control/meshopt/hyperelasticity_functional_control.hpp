@@ -213,9 +213,9 @@ namespace FEAT
                 _system_levels.at(i)->global_functional.init();
               }
 
-              for(Index i(0); i+1 < get_num_levels(); ++i)
+              for(Index i(0); (i+1) < get_num_levels(); ++i)
               {
-                _system_levels.at(i+1)->assemble_system_transfer(*_system_levels.at(i));
+                _system_levels.at(i)->assemble_system_transfer(*_system_levels.at(i+1));
               }
 
               auto* solver_section = solver_config.query_section(solver_name);

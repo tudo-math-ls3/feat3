@@ -623,7 +623,7 @@ namespace FEAT
 
             // Assemble the underlying scalar prolongation matrix
             {
-              Cubature::DynamicFactory cubature_factory("auto-degree:2");
+              Cubature::DynamicFactory cubature_factory("auto-degree:3");
 
               loc_prol.format();
               loc_vec_weight.format();
