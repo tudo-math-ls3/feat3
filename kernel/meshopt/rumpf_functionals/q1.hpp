@@ -238,7 +238,16 @@ namespace FEAT
            */
           DataType compute_rec_det_part()
           {
-            DataType fac(DataType(1)/(_det_grad_R + Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R))));
+            DataType fac;
+            if(_det_grad_R <= DataType(0))
+            {
+              fac = DataType(1)/this->_fac_reg;
+            }
+            else
+            {
+              fac = DataType(1)/( _det_grad_R + Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R)) );
+            }
+
             if(_exponent_det == 1)
             {
               return fac/_normalised_ref_cell_vol;
@@ -458,18 +467,30 @@ namespace FEAT
            */
           void add_grad_rec_det(Tx& grad, const SpaceEvalData& space_data, const TgradR& mat_tensor, const DataType fac)
           {
-            DataType my_fac(-fac);
+            DataType my_fac(-fac/_normalised_ref_cell_vol);
             if(_exponent_det == 1)
             {
-              my_fac *= _det_grad_R/_normalised_ref_cell_vol;
-              my_fac /= Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R))
-                *(_det_grad_R + Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R)));
+              my_fac *= _det_grad_R / Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R));
+              if(_det_grad_R > DataType(0))
+              {
+                my_fac /= (_det_grad_R + Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R)));
+              }
+              else
+              {
+                my_fac /= this->_fac_reg;
+              }
             }
             else
             {
-              my_fac *= DataType(2)*Math::sqr(_det_grad_R)/_normalised_ref_cell_vol;
-              my_fac /= (Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R))
-                *Math::sqr(_det_grad_R + Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R)));
+              my_fac *= DataType(2)*Math::sqr(_det_grad_R) / (Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R));
+              if(_det_grad_R > DataType(0))
+              {
+                my_fac /= Math::sqr(_det_grad_R + Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R)));
+              }
+              else
+              {
+                my_fac /= Math::sqr(this->_fac_reg);
+              }
             }
 
             for(int i(0); i < SpaceEvalData::max_local_dofs; ++i)
@@ -511,7 +532,16 @@ namespace FEAT
 
               det_der_h += weight*_det_grad_R/_normalised_ref_cell_vol;
 
-              DataType fac(Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R)));
+              DataType fac;
+              if(_det_grad_R >= DataType(0))
+              {
+                fac = Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R));
+              }
+              else
+              {
+                fac = this->_fac_reg;
+              }
+
               rec_det_der_h += weight*_det_grad_R/(fac*(_det_grad_R + fac))/_normalised_ref_cell_vol;
 
             }
