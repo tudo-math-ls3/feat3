@@ -210,7 +210,7 @@ def run_test(build_id, branch, myDB, extra_opts):
   if no_mpi:
     label_flag += " --label-exclude mpi"
 
-  test_command = "ctest " + label_flag + " --output-on-failure --output-log " + dump_filename_full + ".ctest"
+  test_command = "ctest " + label_flag + " -V --output-log " + dump_filename_full + ".ctest"
   test_output = get_output_utf8(test_command)
 
   idx = 0
