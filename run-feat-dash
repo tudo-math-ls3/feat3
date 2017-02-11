@@ -225,10 +225,11 @@ def run_test(build_id, branch, myDB, extra_opts):
       m.save()
       idx += 1
 
-    elif "***Failed" in test_output[idx] or "***Not Run" in test_output[idx] or ("runtime error"  in test_output[idx] and not "std::_Ios_Fmtflags" in test_output[idx]):
+    elif "***Failed" in test_output[idx] or "***Not Run" in test_output[idx] or ("runtime error"  in test_output[idx] and not "std::_Ios_Fmtflags" in test_output[idx] and not "load of value 4294967035" in test_output[idx]):
       # read out current test name
       test_name = test_output[idx].split(": ")
       test_name = test_name[1].split(" .")
+      test_name = test_name[0].split(":")
       test_name = test_name[0]
 
       #search for last line corresponding to current failed test
