@@ -112,5 +112,4 @@ public:
     TEST_CHECK(test_c_ordered(co));
 
   }
-
 } colouring_test;

@@ -6,9 +6,9 @@ def configure_pgi(cpu, buildid, compiler):
 
   cxxflags = "--c++11"
   if "debug" in buildid:
-    cxxflags += " -g -O0"
+    cxxflags += "  -O0" #-g
 
   elif "opt" in buildid:
-    cxxflags += " -O3 -gopt -mcmodel=medium -Minline -fastsse -Mipa=fast,inline -Msmartalloc -Mprefetch -Msafeptr"
+    cxxflags += " -O3 -mcmodel=medium -Minline -fastsse -Mipa=fast,inline -Msmartalloc -Mprefetch -Msafeptr" #-gopt
 
   return cxxflags

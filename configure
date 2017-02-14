@@ -306,19 +306,18 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["LD"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
-elif "pgi" in buildid or "pathscale" in buildid:
+elif "pgi" in buildid:
   if not compiler:
     compiler = "pgc++"
   if not is_found(compiler):
     print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "pgi")
-  remove_string(unused_tokens, "pathscale")
   os.environ["CC"] = "pgcc"
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
   cxxflags += " " + configure_pgi (cputype, buildid, compiler)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
+  cmake_flags += " -DFEAT_COMPILER_ID:STRING=pgi"
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)

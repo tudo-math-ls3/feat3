@@ -15,6 +15,10 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
+#include <deque>
+#include <vector>
+
+
 namespace FEAT
 {
   namespace Geometry

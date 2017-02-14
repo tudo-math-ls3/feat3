@@ -1,4 +1,5 @@
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/adjacency/colouring.hpp>
 #include <kernel/adjacency/graph.hpp>
 

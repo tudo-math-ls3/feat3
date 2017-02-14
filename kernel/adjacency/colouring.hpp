@@ -3,6 +3,7 @@
 #define KERNEL_ADJACENCY_COLOURING_HPP 1
 
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 
 namespace FEAT

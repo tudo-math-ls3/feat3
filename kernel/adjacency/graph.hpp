@@ -981,5 +981,4 @@ namespace FEAT
     }; // class Graph
   } // namespace Adjacency
 } // namespace FEAT
-
 #endif // KERNEL_ADJACENCY_GRAPH_HPP
