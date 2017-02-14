@@ -1138,18 +1138,21 @@ namespace FEAT
             }
           }
 
-          if(add_penalty_fval && (this->_penalty_param > DataType(0)) )
+          if(this->_penalty_param > DataType(0))
           {
             XASSERTM(this->_mesh_conc != nullptr,
             "You need a mesh concentration function for imposing a mesh alignment constraint!");
 
-            // Add the quadratic penalty term to the functional value
-            fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
+            if(add_penalty_fval)
+            {
+              // Add the quadratic penalty term to the functional value
+              fval += this->_penalty_param*DataType(0.5)*Math::sqr(this->_alignment_constraint);
+            }
 
             // Add the gradient of the penalty term
             this->_mesh_conc->add_constraint_grad(grad, this->_alignment_constraint, this->_penalty_param);
-          }
 
+          }
         }
 
         /**
