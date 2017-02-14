@@ -520,9 +520,9 @@ struct MeshoptRAdaptApp
         exporter.add_cell_scalar("Worst angle", edge_angle_cellwise);
         exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise);
 
-        meshopt_ctrl->add_to_vtk_exporter(exporter, -1);
+        meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.max_level_index());
 
-        exporter.write(vtk_name, comm);
+        exporter.write(vtk_name, comm.rank(), comm.size());
       }
 
       // Compute and print quality indicators on the finest level only
