@@ -240,7 +240,7 @@ def run_test(build_id, branch, myDB, extra_opts):
           break
       #gather all output lines of current failed test
       part_output = ""
-      for i in range(idx, test_end):
+      for i in range(idx if "runtime error" not in test_output[idx] else 0, test_end):
         part_output += test_output[i] + "\n"
 
       m = Message.create(runid=r, stage="test", status="failed", timestamp=time.time(), title=test_name, body=part_output)
