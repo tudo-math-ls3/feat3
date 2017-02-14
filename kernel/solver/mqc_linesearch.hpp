@@ -845,6 +845,11 @@ namespace FEAT
         {
           DataType alpha_c(alpha_lo);
 
+          if(alpha_lo == alpha_hi)
+          {
+            return alpha_lo;
+          }
+
           DataType d1 = DataType(3)*(fval_hi - fval_lo)/(alpha_lo - alpha_hi) + df_hi + df_lo;
           DataType scale = Math::max(Math::abs(df_lo), Math::abs(df_hi));
           scale = Math::max(scale, Math::abs(d1));
