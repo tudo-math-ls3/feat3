@@ -1146,6 +1146,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[PCG-MG]" << std::endl;
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 75" << std::endl;
+    iss << "min_stag_iter = 2" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "precon = MG1" << std::endl;
     iss << "plot = 1" << std::endl;
