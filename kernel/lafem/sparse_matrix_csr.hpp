@@ -380,6 +380,8 @@ namespace FEAT
       explicit SparseMatrixCSR(Index rows_in, Index columns_in, Index used_elements_in) :
         Container<Mem_, DT_, IT_> (rows_in * columns_in)
       {
+        XASSERT(rows_in != Index(0) && columns_in != Index(0));
+
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(used_elements_in);
@@ -444,6 +446,12 @@ namespace FEAT
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nnze = graph.get_num_indices();
+
+        if (num_nnze == 0)
+        {
+          this->assign(SparseMatrixCSR(num_rows, num_cols));
+          return;
+        }
 
         // create temporary vectors
         LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_ptr(num_rows+1);
@@ -512,6 +520,11 @@ namespace FEAT
                                DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
+        //todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
+        XASSERT(col_ind_in.size() > 0);
+        XASSERT(val_in.size() > 0);
+        XASSERT(row_ptr_in.size() > 0);
+
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size());
@@ -1763,6 +1776,13 @@ namespace FEAT
        */
       void transpose(const SparseMatrixCSR & x)
       {
+        if (x.used_elements() == 0)
+        {
+          SparseMatrixCSR r(x.rows(), x.columns());
+          this->assign(r);
+          return;
+        }
+
         SparseMatrixCSR<Mem::Main, DT_, IT_> tx;
         tx.convert(x);
 

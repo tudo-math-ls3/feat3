@@ -276,6 +276,26 @@ namespace FEAT
       /**
        * \brief Constructor
        *
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
+       *
+       * Creates an empty matrix.
+       * Because SparseMatrixCSR is a read-only container, it stays empty.
+       *
+       * \note This matrix does not allocate any memory
+       */
+      explicit SparseMatrixBCSR(Index rows_in, Index columns_in) :
+        Container<Mem_, DT_, IT_> (rows_in * columns_in)
+      {
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(0);
+        this->_scalar_dt.push_back(DT_(0));
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] layout_in The layout to be used.
        *
        * Creates an empty matrix with given layout.
@@ -308,6 +328,12 @@ namespace FEAT
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nnze = graph.get_num_indices();
+
+        if (num_nnze == 0)
+        {
+          this->assign(SparseMatrixBCSR(num_rows, num_cols));
+          return;
+        }
 
         // Create temporary vectors. Row and column pointer are block wise
         LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_ptr(num_rows+1);
@@ -377,7 +403,14 @@ namespace FEAT
                                       DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
+        //todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
+        XASSERT(col_ind_in.size() > 0);
+        XASSERT(val_in.size() > 0);
+        XASSERT(row_ptr_in.size() > 0);
+
+        XASSERT(rows_in != Index(0) && columns_in != Index(0));
         XASSERTM(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "input values size is not a multiple of container blocksize!");
+
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size() / Index(BlockHeight_ * BlockWidth_));

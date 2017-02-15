@@ -541,6 +541,7 @@ namespace FEAT
                                DenseVector<Mem_, IT_, IT_> & col_ind, DenseVector<Mem_, DT_, IT_> & val_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
+        XASSERT(rows_in != Index(0) && columns_in != Index(0));
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size());

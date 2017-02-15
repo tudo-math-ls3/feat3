@@ -248,6 +248,9 @@ namespace FEAT
       explicit DenseVector(Index size_in, Pinning pinning = Pinning::disabled) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+            return;
+
         XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
         if (pinning == Pinning::enabled)
@@ -278,6 +281,9 @@ namespace FEAT
       explicit DenseVector(Index size_in, DT_ value) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+            return;
+
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
         this->_elements_size.push_back(size_in);
 
@@ -302,6 +308,9 @@ namespace FEAT
       explicit DenseVector(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+            return;
+
         this->_elements.push_back(data);
         this->_elements_size.push_back(size_in);
 
@@ -325,6 +334,7 @@ namespace FEAT
       explicit DenseVector(const DenseVector & dv_in, Index size_in, Index offset_in) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        XASSERT(size_in > Index(0));
         XASSERTM(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds original vector size!");
 
         this->_foreign_memory = true;

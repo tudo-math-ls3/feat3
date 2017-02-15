@@ -132,6 +132,7 @@ namespace FEAT
                             DenseVector<Mem_, IT_, IT_> & indices_in, bool is_sorted = true) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        XASSERT(size_in != Index(0));
         if (indices_in.size() != elements_in.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
 

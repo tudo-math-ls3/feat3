@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/cuda_util.hpp>
 
@@ -160,10 +161,9 @@ namespace FEAT
         template <typename DT_>
         static DT_ * allocate_memory(const Index count)
         {
-          DT_ * memory(nullptr);
-          if (count == 0)
-            return memory;
+          XASSERT(count != 0);
 
+          DT_ * memory(nullptr);
           memory = (DT_*)::malloc(count * sizeof(DT_));
           if (memory == nullptr)
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
@@ -199,8 +199,7 @@ namespace FEAT
         /// increase memory counter
         static void increase_memory(void * address)
         {
-          if (address == nullptr)
-            return;
+          XASSERT(address != nullptr);
 
           std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
           if (it != _pool.end())

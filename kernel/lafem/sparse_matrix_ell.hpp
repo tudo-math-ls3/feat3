@@ -510,6 +510,8 @@ namespace FEAT
                                const Index C_in = 32) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
+        XASSERT(rows_in != Index(0) && columns_in != Index(0));
+
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(C_in);

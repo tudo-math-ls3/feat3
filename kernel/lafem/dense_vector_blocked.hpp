@@ -210,6 +210,9 @@ namespace FEAT
       explicit DenseVectorBlocked(Index size_in, Pinning pinning = Pinning::disabled) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+            return;
+
         XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
         if (pinning == Pinning::enabled)
@@ -243,6 +246,9 @@ namespace FEAT
       explicit DenseVectorBlocked(Index size_in, DT_ value) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+            return;
+
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
         this->_elements_size.push_back(size<Perspective::pod>());
 
@@ -260,6 +266,9 @@ namespace FEAT
       explicit DenseVectorBlocked(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+            return;
+
         this->_elements.push_back(data);
         this->_elements_size.push_back(size<Perspective::pod>());
 

@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <fstream>
+#include <cassert>
 
 #include <cublas_v2.h>
 #include "cusparse_v2.h"
@@ -91,10 +92,9 @@ void MemoryPool<Mem::CUDA>::finalise()
 template <typename DT_>
 DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
 {
-  DT_ * memory(nullptr);
-  if (count == 0)
-    return memory;
+  assert(count != 0);
 
+  DT_ * memory(nullptr);
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, count * sizeof(DT_)))
     throw InternalError("MemoryPool<CUDA> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == nullptr)
