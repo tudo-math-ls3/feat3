@@ -233,8 +233,9 @@ def run_test(build_id, branch, myDB, extra_opts):
       test_name = test_name[0]
 
       #search for first line corresponding to currend failed test
-      test_start = 0
+      test_start = idx
       if "runtime error" in test_output[idx]:
+        test_start = 0
         test_id = int(test_output[idx].split(": ")[0].strip())
         for i in reversed(range(2, idx)):
           if test_output[i].split(": ")[0].strip().isdigit():
