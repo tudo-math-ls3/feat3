@@ -312,7 +312,10 @@ namespace StokesVortex2D
       pcg->set_tol_rel(1E-2);
       pcg->set_tol_abs(def_init * tol_rel * 1E-1);
       pcg->set_max_iter(1000);
-      //pcg->set_plot(rank == 0);
+      //if(comm.rank() == 0)
+      //{
+      //  pcg->set_plot_mode(rank == 0);
+      //}
 
       // set our A-solver
       solver_a = pcg;
@@ -346,7 +349,10 @@ namespace StokesVortex2D
     auto solver = Solver::new_richardson(matrix, filter, DataType(1), schur);
 
     // enable plotting
-    solver->set_plot(comm.rank() == 0);
+    if(comm.rank() == 0)
+    {
+      solver->set_plot_mode(Solver::PlotMode::iter);
+    }
 
     // set tolerance
     solver->set_tol_rel(tol_rel);

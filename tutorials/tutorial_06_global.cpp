@@ -699,7 +699,10 @@ namespace Tutorial06
     auto solver = Solver::new_pcg(matrix, filter, schwarz);
 
     // Enable the convergence plot on rank 0.
-    solver->set_plot(comm.rank() == 0);
+    if(comm.rank() == 0)
+    {
+      solver->set_plot_mode(Solver::PlotMode::iter);
+    }
 
     // The rest of the solver step is identical to the previous tutorials:
 

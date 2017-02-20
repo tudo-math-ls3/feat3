@@ -450,7 +450,7 @@ namespace Tutorial05
     solver->init();
 
     // As always, enable the convergence plot:
-    solver->set_plot(true);
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // Solve our linear system
     Solver::solve(*solver, vec_sol, vec_rhs, lvl_fine.matrix, lvl_fine.filter);

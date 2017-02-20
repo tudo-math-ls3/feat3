@@ -230,6 +230,7 @@ namespace FEAT
                 (_system_levels.at(meshopt_lvl_pos)->global_functional,
                 _system_levels.at(meshopt_lvl_pos)->filter_sys, &solver_config, solver_name, precond);
               solver->init();
+              solver->set_plot_name(solver->name()+" (meshopt-Hyper)");
 
             }
 
@@ -488,10 +489,7 @@ namespace FEAT
             FEAT::Statistics::expression_target = name();
 
             the_system_level.global_functional.reset_num_evals();
-            Solver::Status st = solver->correct(vec_sol, vec_rhs);
-            TimeStamp bt;
-
-            solver->plot_summary(st);
+            solver->correct(vec_sol, vec_rhs);
 
             //If the mesh was not optimised on the finest domain level, we now need to prolongate the solution by:
             // - refine the coarse vertex set using the StandardRefinery

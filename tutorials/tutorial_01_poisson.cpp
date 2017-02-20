@@ -394,7 +394,7 @@ namespace Tutorial01
 
     // PCG is an iterative solver, so we want to enable plotting of the convergence process,
     // as otherwise our solver would not print anything to the console:
-    solver->set_plot(true);
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // Next, we need to initialise the solver. During this call, the solver and all of its
     // sub-solvers and preconditioners allocate required temporary vectors, perform factorisation

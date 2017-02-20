@@ -629,7 +629,10 @@ namespace Tutorial04
     auto solver = Solver::new_pcg(matrix, filter, precond);
 
     // Enable convergence plot
-    solver->set_plot(solver_plot);
+    if(solver_plot)
+    {
+      solver->set_plot_mode(Solver::PlotMode::iter);
+    }
 
     // Initialise the solver
     solver->init();

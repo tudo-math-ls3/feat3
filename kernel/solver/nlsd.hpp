@@ -235,7 +235,9 @@ namespace FEAT
           }
 
           // apply
-          return _apply_intern(vec_cor);
+          Status st(_apply_intern(vec_cor));
+          this->plot_summary(st);
+          return st;
         }
 
         /// \copydoc IterativeSolver::correct()
@@ -254,7 +256,7 @@ namespace FEAT
 
           // apply
           Status st =_apply_intern(vec_sol);
-
+          this->plot_summary(st);
           return st;
         }
 

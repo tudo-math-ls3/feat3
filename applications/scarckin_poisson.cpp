@@ -266,7 +266,10 @@ namespace PoissonDirichlet2D
       inner_solver->init();
       //inner_solver->set_max_iter(2);
       inner_solver->set_tol_rel(1e-1);
-      inner_solver->set_plot(comm.rank() == 0);
+      if(comm.rank() == 0)
+      {
+        inner_solver->set_plot_mode(Solver::PlotMode::iter);
+      }
 
       //auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
       //auto local_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), 1.0, local_precond);
@@ -305,7 +308,10 @@ namespace PoissonDirichlet2D
     //#### OUTER MG ####
 
     // enable plotting
-    outer_solver->set_plot(comm.rank() == 0);
+    if(comm.rank() == 0)
+    {
+      outer_solver->set_plot_mode(Solver::PlotMode::iter);
+    }
 
     //auto outer_krylov(Solver::new_pcg(system_levels_solve.back()->matrix_sys, system_levels_solve.back()->filter_sys, outer_solver));
 
@@ -317,7 +323,10 @@ namespace PoissonDirichlet2D
     //outer_krylov->set_max_iter(1000);
 
     // initialise
-    //outer_krylov->set_plot(rank == 0);
+    //if(comm.rank() == 0)
+    //{
+    //  outer_krylov->set_plot_mode(Solver::PlotMode::iter);
+    //}
     //outer_krylov->init();
     outer_solver->init();
 

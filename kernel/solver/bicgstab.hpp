@@ -264,7 +264,11 @@ namespace FEAT
           this->_system_filter.filter_def(this->_vec_r);
 
           // apply
-          return _apply_intern(vec_sol, vec_rhs);
+          Status st(_apply_intern(vec_sol, vec_rhs));
+
+          this->plot_summary(st);
+
+          return st;
         }
 
         /// \copydoc SolverBase::apply()
@@ -277,7 +281,11 @@ namespace FEAT
           // format solution vector
           vec_cor.format();
 
-          return _apply_intern(vec_cor, vec_def);
+          Status st(_apply_intern(vec_cor, vec_def));
+
+          this->plot_summary(st);
+
+          return st;
         }
 
 
@@ -432,7 +440,7 @@ namespace FEAT
               {
                 ++this->_num_iter;
                 // plot?
-                if(this->_plot)
+                if(this->_plot_iter())
                 {
                   std::cout << this->_plot_name
                   <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)

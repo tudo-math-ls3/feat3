@@ -270,7 +270,10 @@ namespace StokesPoiseuille2D
     auto solver = Solver::new_pcr(matrix, filter, schur);
 
     // enable plotting
-    solver->set_plot(comm.rank() == 0);
+    if(comm.rank() == 0)
+    {
+      solver->set_plot_mode(Solver::PlotMode::iter);
+    }
 
     solver->set_max_iter(1000);
 

@@ -746,7 +746,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[NLCG]" << std::endl;
     iss << "type = NLCG" << std::endl;
     iss << "precon = DuDvPrecon" << std::endl;
-    iss << "plot = 1" << std::endl;
+    iss << "plot = iter" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "max_iter = 1000" << std::endl;
     iss << "linesearch = MQCLinesearch" << std::endl;
@@ -755,7 +755,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
 
     iss << "[MQCLinesearch]" << std::endl;
     iss << "type = MQCLinesearch" << std::endl;
-    iss << "plot = 0" << std::endl;
+    iss << "plot = none" << std::endl;
     iss << "max_iter = 20" << std::endl;
     iss << "tol_decrease = 1e-3" << std::endl;
     iss << "tol_curvature = 0.3" << std::endl;
@@ -777,7 +777,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 2" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
-    iss << "plot = 1" << std::endl;
+    iss << "plot = iter" << std::endl;
     iss << "precon = MG1" << std::endl;
 
     iss << "[cg]" << std::endl;
@@ -813,7 +813,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[NLCG]" << std::endl;
     iss << "type = NLCG" << std::endl;
     iss << "precon = DuDvPrecon" << std::endl;
-    iss << "plot = 1" << std::endl;
+    iss << "plot = iter" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "max_iter = 100" << std::endl;
     iss << "linesearch = MQCLinesearch" << std::endl;
@@ -836,12 +836,12 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 2" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
-    iss << "plot = 1" << std::endl;
+    iss << "plot = iter" << std::endl;
     iss << "precon = MG1" << std::endl;
 
     iss << "[MQCLinesearch]" << std::endl;
     iss << "type = MQCLinesearch" << std::endl;
-    iss << "plot = 0" << std::endl;
+    iss << "plot = none" << std::endl;
     iss << "max_iter = 20" << std::endl;
     iss << "tol_decrease = 1e-3" << std::endl;
     iss << "tol_curvature = 0.3" << std::endl;

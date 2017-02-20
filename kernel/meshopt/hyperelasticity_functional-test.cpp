@@ -156,7 +156,7 @@ template
                 nullptr*/); // no preconditioner
 
       solver->init();
-      solver->set_plot(true);
+      solver->set_plot_mode(Solver::PlotMode::all);
       solver->set_tol_rel(Math::pow(Math::eps<DataType>(), DataType(0.9)));
       solver->correct(new_coords, rhs);
       solver->done();
@@ -186,7 +186,7 @@ template
       rumpflpumpfl.prepare(new_coords, my_filter);
 
       solver->init();
-      solver->set_plot(true);
+      solver->set_plot_mode(Solver::PlotMode::summary);
       solver->set_tol_rel(Math::eps<DataType>());
       solver->correct(new_coords, rhs);
       solver->done();

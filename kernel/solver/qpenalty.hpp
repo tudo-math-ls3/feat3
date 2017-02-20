@@ -197,7 +197,9 @@ namespace FEAT
           vec_cor.format();
 
           // apply
-          return _apply_intern(vec_cor, vec_def);
+          Status st(_apply_intern(vec_cor, vec_def));
+          this->plot_summary(st);
+          return st;
         }
 
         /// \copydoc IterativeSolver::correct()
@@ -206,8 +208,8 @@ namespace FEAT
           _functional.set_penalty_param(_initial_penalty_param);
 
           // apply
-          Status st =_apply_intern(vec_sol, vec_rhs);
-
+          Status st(_apply_intern(vec_sol, vec_rhs));
+          this->plot_summary(st);
           return st;
         }
 
@@ -254,7 +256,7 @@ namespace FEAT
             this->_def_cur = _functional.get_constraint();
             DataType penalty_param(_functional.get_penalty_param());
 
-            if(this->_plot)
+            if(this->_plot_iter())
             {
               std::cout << this->_plot_name
               << ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
@@ -345,7 +347,7 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
         // Plot?
-        if(this->_plot)
+        if(this->_plot_iter())
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(0).pad_front(this->_iter_digits)
@@ -354,11 +356,15 @@ namespace FEAT
 
         // Ensure that the defect is neither NaN nor infinity
         if(!Math::isfinite(this->_def_init))
+        {
           return Status::aborted;
+        }
 
         // Check if the initial defect lower than the absolute tolerance
         if(this->_def_init <= this->_tol_abs)
+        {
           return Status::success;
+        }
 
         // continue iterating
         return Status::progress;

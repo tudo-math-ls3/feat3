@@ -169,7 +169,7 @@ namespace FEAT
       typedef Vector_ VectorType;
 
     private:
-      /// The name of the PropertyMap sectio this solver was configured by (if any)
+      /// The name of the PropertyMap section this solver was configured by (if any)
       String _section_name;
 
     public:

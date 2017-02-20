@@ -130,10 +130,11 @@ namespace FEAT
         vec_cor.format();
 
         // apply
-        auto status = _apply_intern(vec_cor, vec_def);
+        Status st(_apply_intern(vec_cor, vec_def));
+        this->plot_summary(st);
         p_list.resize(p_list.size() / 4);
         q_list.resize(q_list.size() / 4);
-        return status;
+        return st;
       }
 
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -143,10 +144,11 @@ namespace FEAT
         this->_system_filter.filter_def(this->_vec_r);
 
         // apply
-        auto status =  _apply_intern(vec_sol, vec_rhs);
+        Status st(_apply_intern(vec_sol, vec_rhs));
+        this->plot_summary(st);
         p_list.resize(p_list.size() / 4);
         q_list.resize(q_list.size() / 4);
-        return status;
+        return st;
       }
 
     protected:

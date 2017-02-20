@@ -208,9 +208,12 @@ namespace FEAT
         vec_sol.format();
 
         // apply
-        return _apply_intern(vec_sol, vec_rhs);
+        Status st(_apply_intern(vec_sol, vec_rhs));
+        this->plot_summary(st);
+        return st;
       }
 
+      /// \copydoc SolverBase::correct()
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // compute initial defect
@@ -218,7 +221,9 @@ namespace FEAT
         this->_system_filter.filter_def(this->_vec_v.at(0));
 
         // apply
-        return _apply_intern(vec_sol, vec_rhs);
+        Status st(_apply_intern(vec_sol, vec_rhs));
+        this->plot_summary(st);
+        return st;
       }
 
     protected:
@@ -320,7 +325,7 @@ namespace FEAT
               this->_def_cur = def_cur;
 
               // plot?
-              if(this->_plot)
+              if(this->_plot_iter())
               {
                 std::cout << this->_plot_name
                   <<  "* " << stringify(this->_num_iter).pad_front(this->_iter_digits)

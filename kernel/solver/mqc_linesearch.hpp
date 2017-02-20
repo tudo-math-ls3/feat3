@@ -234,7 +234,9 @@ namespace FEAT
           this->_functional.prepare(vec_cor, this->_filter);
 
           // apply
-          return _apply_intern(vec_cor, vec_dir);
+          Status st(_apply_intern(vec_cor, vec_dir));
+          this->plot_summary(st);
+          return st;
         }
 
         /**
@@ -253,8 +255,8 @@ namespace FEAT
           this->_functional.prepare(vec_sol, this->_filter);
 
           // apply
-          Status st =_apply_intern(vec_sol, vec_dir);
-
+          Status st(_apply_intern(vec_sol, vec_dir));
+          this->plot_summary(st);
           return st;
         }
 
@@ -378,7 +380,7 @@ namespace FEAT
             //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
             // plot?
-            if(this->_plot)
+            if(this->_plot_iter())
             {
               std::cout << this->_plot_name
               <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)

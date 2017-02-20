@@ -81,7 +81,7 @@ class NLCGTest:
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
 
-      my_linesearch->set_plot(false);
+      my_linesearch->set_plot_mode(Solver::PlotMode::none);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
@@ -99,7 +99,7 @@ class NLCGTest:
       solver->init();
       solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot(false);
+      solver->set_plot_mode(Solver::PlotMode::none);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -246,7 +246,7 @@ class NLSDTest:
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
 
-      my_linesearch->set_plot(false);
+      my_linesearch->set_plot_mode(Solver::PlotMode::none);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
@@ -264,7 +264,7 @@ class NLSDTest:
       solver->init();
       solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot(false);
+      solver->set_plot_mode(Solver::PlotMode::none);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -373,7 +373,7 @@ class ALGLIBMinLBFGSTest:
       solver->init();
       solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot(false);
+      solver->set_plot_mode(Solver::PlotMode::none);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -475,7 +475,7 @@ class ALGLIBMinCGTest:
       solver->init();
       solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot(false);
+      solver->set_plot_mode(Solver::PlotMode::none);
       solver->set_max_iter(250);
 
       // This will hold the solution

@@ -12,6 +12,57 @@ namespace FEAT
 {
   namespace Solver
   {
+
+    /**
+     * \brief Solver plot modes enumeration
+     *
+     */
+    enum class PlotMode
+    {
+      /// No plotting whatsoever
+      none = 0,
+      /// Plot every iteration (if applicable)
+      iter,
+      /// Plot a summary after each solver run
+      summary,
+      /// Plot every iteration (if applicable) and a summary
+      all
+    };
+
+    /// \cond internal
+    inline std::ostream& operator<<(std::ostream& os, PlotMode mode)
+    {
+      switch(mode)
+      {
+        case PlotMode::none:
+          return os << "none";
+        case PlotMode::iter:
+          return os << "iter";
+        case PlotMode::summary:
+          return os << "summary";
+        case PlotMode::all:
+          return os << "all";
+        default:
+          return os << "-unknown-";
+      }
+    }
+
+    inline void operator<<(PlotMode& mode, const String& mode_name)
+    {
+        if(mode_name == "none")
+          mode = PlotMode::none;
+        else if(mode_name == "iter")
+          mode = PlotMode::iter;
+        else if(mode_name == "summary")
+          mode = PlotMode::summary;
+        else if(mode_name == "all")
+          mode = PlotMode::all;
+        else
+          throw InternalError(__func__, __FILE__, __LINE__, "Unknown PlotMode identifier string "
+              +mode_name);
+    }
+    /// \endcond
+
     /**
      * \brief Abstract base-class for iterative solvers.
      *
@@ -65,7 +116,7 @@ namespace FEAT
       /// iteration count digits for plotting
       Index _iter_digits;
       /// whether to plot something
-      bool _plot;
+      PlotMode _plot_mode;
       /// whether to skip defect computation if possible
       bool _skip_def_calc;
 
@@ -103,7 +154,7 @@ namespace FEAT
         _def_init(0),
         _def_cur(0),
         _iter_digits(Math::ilog10(_max_iter)),
-        _plot(false),
+        _plot_mode(PlotMode::none),
 #ifdef FEAT_HAVE_MPI
         _skip_def_calc(false) // not allowed as this may cause deadlocks
 #else
@@ -141,7 +192,7 @@ namespace FEAT
         _def_init(0),
         _def_cur(0),
         _iter_digits(Math::ilog10(_max_iter)),
-        _plot(false),
+        _plot_mode(PlotMode::none),
 #ifdef FEAT_HAVE_MPI
         _skip_def_calc(false) // not allowed as this may cause deadlocks
 #else
@@ -153,18 +204,11 @@ namespace FEAT
         auto plot_p = section->get_entry("plot");
         if (plot_p.second)
         {
-          Index plot(std::stoul(plot_p.first));
-          if (plot == 0)
+          PlotMode plot_mode;
+          plot_mode << plot_p.first;
+          if(comm.rank() == 0)
           {
-            set_plot(false);
-          }
-          else if (plot == 1)
-          {
-            set_plot(comm.rank() == 0);
-          }
-          else
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "plot value " + stringify(plot) + " unknown!");
+            set_plot_mode(plot_mode);
           }
         }
 
@@ -325,12 +369,12 @@ namespace FEAT
       /**
        * \brief Sets the plot mode of the solver.
        *
-       * \param[in] plot
-       * If set to \c true, the solver will print a convergence plot to std::cout.
+       * \param[in] plot_mode
+       * If set to anything but PlotMode::none, the solver will print information to std::cout
        */
-      void set_plot(bool plot)
+      void set_plot_mode(const PlotMode plot_mode)
       {
-        _plot = plot;
+        _plot_mode = plot_mode;
       }
 
       /// Sets the plot name of the solver.
@@ -404,7 +448,7 @@ namespace FEAT
 
         PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
-        my_section->add_entry("plot", stringify(_plot ? 1 : 0));
+        my_section->add_entry("plot_mode", stringify(_plot_mode));
         my_section->add_entry("tol_rel", stringify_fp_sci(_tol_rel));
         my_section->add_entry("tol_abs", stringify_fp_sci(_tol_abs));
         my_section->add_entry("div_rel", stringify_fp_sci(_div_rel));
@@ -417,7 +461,6 @@ namespace FEAT
         return my_section;
 
       }
-
 
       /**
        * \brief Solver correction method
@@ -441,26 +484,6 @@ namespace FEAT
        */
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) = 0;
 
-      /**
-       * \brief Plot a summary of the last solver run
-       *
-       * \param[in] st
-       * The status code from the last run. As the solver does not remember this, it has to be passed again from the
-       * calling function.
-       *
-       */
-      virtual void plot_summary(Status st) const
-      {
-        // Print solver summary
-        Dist::Comm comm_world(Dist::Comm::world());
-
-        String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")");
-            msg += this->get_plot_name()  +": defect norm: "+stringify_fp_sci(this->_def_init)
-            + " -> "+stringify_fp_sci(this->_def_cur)
-            + ", reduction factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
-            comm_world.print(msg);
-            }
-
     protected:
       /**
        * \brief Computes the defect norm.
@@ -474,6 +497,45 @@ namespace FEAT
       virtual DataType _calc_def_norm(const VectorType& vec_def, const VectorType& DOXY(vec_sol))
       {
         return vec_def.norm2();
+      }
+
+      /**
+       * \brief Plot a summary of the last solver run
+       *
+       */
+      virtual void plot_summary(const Status st) const
+      {
+        // Print solver summary
+        if(_plot_summary())
+        {
+          Dist::Comm comm_world(Dist::Comm::world());
+
+          String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")\n");
+          msg += this->get_plot_name()  +": defect norm: "+stringify_fp_sci(this->_def_init)
+            + " -> "+stringify_fp_sci(this->_def_cur)
+            + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+          comm_world.print(msg);
+        }
+      }
+
+      /**
+       * \brief Plot every iteration?
+       *
+       * \returns \c true if the plot mode is set to \c iter or \c all.
+       */
+      bool _plot_iter() const
+      {
+        return _plot_mode == PlotMode::iter || _plot_mode == PlotMode::all;
+      }
+
+      /**
+       * \brief Plot summary?
+       *
+       * \returns \c true if the plot mode is set to \c summary or \c all.
+       */
+      bool _plot_summary() const
+      {
+        return _plot_mode == PlotMode::summary || _plot_mode == PlotMode::all;
       }
 
       /**
@@ -497,7 +559,7 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
         // plot?
-        if(this->_plot)
+        if(this->_plot_mode == PlotMode::iter || this->_plot_mode == PlotMode::all)
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(0).pad_front(this->_iter_digits)
@@ -539,7 +601,7 @@ namespace FEAT
         // first, let's see if we have to compute the defect at all
         bool calc_def = !_skip_def_calc;
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
-        calc_def = calc_def || this->_plot;
+        calc_def = calc_def || (this->_plot_iter());
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
 
         // save previous defect
@@ -553,7 +615,7 @@ namespace FEAT
         }
 
         // plot?
-        if(this->_plot)
+        if(this->_plot_iter())
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)

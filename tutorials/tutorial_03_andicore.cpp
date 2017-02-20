@@ -558,7 +558,7 @@ namespace Tutorial03
     auto solver = Solver::new_bicgstab(matrix, filter, precond);
 
     // Enable convergence plot
-    solver->set_plot(true);
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // Initialise the solver
     solver->init();

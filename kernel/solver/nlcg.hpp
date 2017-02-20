@@ -347,7 +347,9 @@ namespace FEAT
           }
 
           // apply
-          return _apply_intern(vec_cor);
+          Status st(_apply_intern(vec_cor));
+          this->plot_summary(st);
+          return st;
         }
 
         /// \copydoc IterativeSolver::correct()
@@ -369,8 +371,8 @@ namespace FEAT
           }
 
           // apply
-          Status st =_apply_intern(vec_sol);
-
+          Status st(_apply_intern(vec_sol));
+          this->plot_summary(st);
           return st;
         }
 
@@ -704,11 +706,15 @@ namespace FEAT
           Status st = BaseClass::_set_new_defect(vec_r, vec_sol);
 
           if(st != Status::progress)
+          {
             return st;
+          }
 
           // If there were too many subsequent restarts, the solver is stagnated
           if(_max_num_restarts > Index(0) && _num_restarts > _max_num_restarts)
+          {
             return Status::stagnated;
+          }
 
           // continue iterating
           return Status::progress;

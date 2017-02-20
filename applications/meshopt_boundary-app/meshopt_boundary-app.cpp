@@ -1004,7 +1004,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "[NLCG]" << std::endl;
   iss << "type = NLCG" << std::endl;
   iss << "precon = DuDvPrecon" << std::endl;
-  iss << "plot = 1" << std::endl;
+  iss << "plot = iter" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "max_iter = 1000" << std::endl;
   iss << "linesearch = MQCLinesearch" << std::endl;
@@ -1013,7 +1013,7 @@ static void read_test_solver_config(std::stringstream& iss)
 
   iss << "[MQCLinesearch]" << std::endl;
   iss << "type = MQCLinesearch" << std::endl;
-  iss << "plot = 0" << std::endl;
+  iss << "plot = none" << std::endl;
   iss << "max_iter = 20" << std::endl;
   iss << "tol_decrease = 1e-3" << std::endl;
   iss << "tol_curvature = 0.3" << std::endl;
@@ -1036,7 +1036,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "max_iter = 10" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = MG1" << std::endl;
-  iss << "plot = 1" << std::endl;
+  iss << "plot = iter" << std::endl;
 
   iss << "[rich]" << std::endl;
   iss << "type = richardson" << std::endl;

@@ -182,7 +182,10 @@ namespace PoissonDirichlet2D
     auto solver = Solver::new_pcg(the_system_level.matrix_sys, the_system_level.filter_sys, mgv);
 
     // enable plotting
-    solver->set_plot(comm.rank() == 0);
+    if(comm.rank() == 0)
+    {
+      solver->set_plot_mode(Solver::PlotMode::iter);
+    }
 
     // set tolerance
     solver->set_tol_rel(1E-8);

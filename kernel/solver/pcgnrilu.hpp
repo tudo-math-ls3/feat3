@@ -208,7 +208,9 @@ namespace FEAT
         vec_cor.format();
 
         // apply
-        return _apply_intern(vec_cor, vec_def);
+        Status st(_apply_intern(vec_cor, vec_def));
+        this->plot_summary(st);
+        return st;
       }
 
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -218,7 +220,9 @@ namespace FEAT
         this->_system_filter.filter_def(this->_vec_r);
 
         // apply
-        return _apply_intern(vec_sol, vec_rhs);
+        Status st(_apply_intern(vec_sol, vec_rhs));
+        this->plot_summary(st);
+        return st;
       }
 
     protected:

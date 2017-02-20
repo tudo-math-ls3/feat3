@@ -174,23 +174,27 @@ namespace FEAT
         /**
          * \brief Plot a summary of the last solver run
          */
-        virtual void plot_summary(Status st) const override
+        virtual void plot_summary(const Status st) const override
         {
           // Print solver summary
-          Dist::Comm comm_world(Dist::Comm::world());
+          if(this->_plot_summary())
+          {
+            Dist::Comm comm_world(Dist::Comm::world());
 
-          String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
-              +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
-              + stringify(_functional.get_num_grad_evals()) + " (grad) "
-              + stringify(_functional.get_num_hess_evals()) + " (hess)"
-              +" last step: "+stringify_fp_sci(_steplength)+"\n");
-          msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_init)
-            + " -> "+stringify_fp_sci(_fval)
-            + ", reduction factor "+stringify_fp_sci(_fval/_fval_init)+"\n";
-          msg += this->get_plot_name()  +": grad: "+stringify_fp_sci(this->_def_init)
-            + " -> "+stringify_fp_sci(this->_def_cur)
-            + ", reduction factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
-          comm_world.print(msg);
+            String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
+                +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
+                + stringify(_functional.get_num_grad_evals()) + " (grad) "
+                + stringify(_functional.get_num_hess_evals()) + " (hess)"
+                +" last step: "+stringify_fp_sci(_steplength)+"\n");
+            msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_init)
+              + " -> "+stringify_fp_sci(_fval)
+              + ", factor "+stringify_fp_sci(_fval/_fval_init)
+              + ", last reduction "+stringify_fp_sci(_fval - _fval_prev)+"\n";
+            msg += this->get_plot_name()  +": grad: "+stringify_fp_sci(this->_def_init)
+              + " -> "+stringify_fp_sci(this->_def_cur)
+              + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+            comm_world.print(msg);
+          }
 
         }
 
@@ -291,7 +295,7 @@ namespace FEAT
           Statistics::add_solver_expression(
             std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
-          if(this->_plot)
+          if(this->_plot_iter())
           {
             std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
@@ -341,7 +345,7 @@ namespace FEAT
           // first, let's see if we have to compute the defect at all
           bool calc_def = false;
           calc_def = calc_def || (this->_min_iter < this->_max_iter);
-          calc_def = calc_def || this->_plot;
+          calc_def = calc_def || this->_plot_iter();
           calc_def = calc_def || (this->_min_stag_iter > Index(0));
 
           // compute new defect
@@ -353,7 +357,7 @@ namespace FEAT
           }
 
           // plot?
-          if(this->_plot)
+          if(this->_plot_iter())
           {
             std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)

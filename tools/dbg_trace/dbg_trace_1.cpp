@@ -148,7 +148,7 @@ namespace Tutorial01
     //auto precond = Solver::new_ilu_precond(matrix, filter);
     auto solver = Solver::new_pcg(matrix, filter/*, precond*/);
 
-    solver->set_plot(true);
+    solver->set_plot_mode(Solver::PlotMode::iter);
     solver->init();
     solver->set_max_iter(1000);
 
