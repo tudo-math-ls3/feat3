@@ -890,9 +890,6 @@ namespace FEAT
        */
       void write_out_dv(std::ostream& file) const
       {
-        if (! std::is_same<DT_, double>::value)
-          std::cout<<"Warning: You are writing out a dense vector that is not double precision!"<<std::endl;
-
         this->template _serialise<double, uint64_t>(FileMode::fm_dv, file);
       }
 

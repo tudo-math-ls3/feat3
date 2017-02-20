@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <cstdlib>
 #include <stdint.h>
+#include <typeindex>
 
 #define InsertWeakClone( TContainer )                             \
   /** \brief Clone operation                                      \
@@ -391,7 +392,7 @@ namespace FEAT
         Container<Mem::Main, DT2_, IT2_> tc(0);
         tc.assign(*this);
 
-        uint64_t gsize(2 * sizeof(uint64_t)); //raw array size + magic number
+        uint64_t gsize(4 * sizeof(uint64_t)); //raw array size + magic number + type_index DT_ + type_index IT_
         gsize += 6 * sizeof(uint64_t); // size of all six stl containers
         gsize += tc._elements_size.size() * sizeof(uint64_t); // _elements_size contents
         gsize += tc._indices_size.size() * sizeof(uint64_t); // _indices_size contents
@@ -422,14 +423,16 @@ namespace FEAT
 #endif
         uiarray[0] = gsize;
         uiarray[1] = magic;
-        uiarray[2] = tc._elements.size();
-        uiarray[3] = tc._indices.size();
-        uiarray[4] = tc._elements_size.size();
-        uiarray[5] = tc._indices_size.size();
-        uiarray[6] = tc._scalar_index.size();
-        uiarray[7] = tc._scalar_dt.size();
+        uiarray[2] = (uint64_t)std::type_index(typeid(DT_)).hash_code();
+        uiarray[3] = (uint64_t)std::type_index(typeid(IT_)).hash_code();
+        uiarray[4] = tc._elements.size();
+        uiarray[5] = tc._indices.size();
+        uiarray[6] = tc._elements_size.size();
+        uiarray[7] = tc._indices_size.size();
+        uiarray[8] = tc._scalar_index.size();
+        uiarray[9] = tc._scalar_dt.size();
 
-        Index global_i(8); // count how many elements of uint64_t have been inserted so far
+        Index global_i(10); // count how many elements of uint64_t have been inserted so far
 
         for (Index i(0) ; i < tc._elements_size.size() ; ++i)
         {
@@ -519,34 +522,40 @@ namespace FEAT
         if (magic != uiarray[1])
           throw InternalError(__func__, __FILE__, __LINE__, "_deserialise: given FileMode incompatible with given array!");
 
+        if(typeid(DT_) == typeid(double) && uiarray[2] == (uint64_t)std::type_index(typeid(float)).hash_code())
+          std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!"<<std::endl;
 
-        Index global_i(8);
-        for (uint64_t i(0) ; i < uiarray[4] ; ++i)
+        if(typeid(IT_) == typeid(unsigned long) && uiarray[3] == (uint64_t)std::type_index(typeid(unsigned int)).hash_code())
+          std::cerr<<"Warning: You are reading a container index array in higher precision then it was saved before!"<<std::endl;
+
+
+        Index global_i(10);
+        for (uint64_t i(0) ; i < uiarray[6] ; ++i)
         {
           tc._elements_size.push_back(Index(uiarray[i + global_i]));
         }
-        global_i += Index(uiarray[4]);
+        global_i += Index(uiarray[6]);
 
-        for (uint64_t i(0) ; i < uiarray[5] ; ++i)
+        for (uint64_t i(0) ; i < uiarray[7] ; ++i)
         {
           tc._indices_size.push_back(Index(uiarray[i + global_i]));
         }
-        global_i += Index(uiarray[5]);
+        global_i += Index(uiarray[7]);
 
-        for (uint64_t i(0) ; i < uiarray[6] ; ++i)
+        for (uint64_t i(0) ; i < uiarray[8] ; ++i)
         {
           tc._scalar_index.push_back(Index(uiarray[i + global_i]));
         }
-        global_i += Index(uiarray[6]);
+        global_i += Index(uiarray[8]);
 
         global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_));
-        for (uint64_t i(0) ; i < uiarray[7] ; ++i)
+        for (uint64_t i(0) ; i < uiarray[9] ; ++i)
         {
           tc._scalar_dt.push_back(dtarray[i + global_i]);
         }
-        global_i += Index(uiarray[7]);
+        global_i += Index(uiarray[9]);
 
-        for (Index i(0) ; i < Index(uiarray[2]) ; ++i)
+        for (Index i(0) ; i < Index(uiarray[4]) ; ++i)
         {
           tc._elements.push_back(MemoryPool<Mem::Main>::template allocate_memory<DT2_>(tc._elements_size.at(i)));
           MemoryPool<Mem::Main>::template upload<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
@@ -554,7 +563,7 @@ namespace FEAT
         }
 
         global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_));
-        for (Index i(0) ; i < Index(uiarray[3]) ; ++i)
+        for (Index i(0) ; i < Index(uiarray[5]) ; ++i)
         {
           tc._indices.push_back(MemoryPool<Mem::Main>::template allocate_memory<IT2_>(tc._indices_size.at(i)));
           MemoryPool<Mem::Main>::template upload<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));

@@ -1502,9 +1502,6 @@ namespace FEAT
        */
       void write_out_ell(std::ostream& file) const
       {
-        if (! std::is_same<DT_, double>::value)
-          std::cout<<"Warning: You are writing out an ell matrix that is not double precision!"<<std::endl;
-
         this->template _serialise<double, uint64_t>(FileMode::fm_ell, file);
       }
 

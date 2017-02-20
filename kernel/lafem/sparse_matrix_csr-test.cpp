@@ -184,11 +184,11 @@ public:
 
     BinaryStream bs;
     f.write_out(FileMode::fm_csr, bs);
-    TEST_CHECK_EQUAL(bs.tellg(), std::streampos(680));
+    TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
     bs.seekg(0);
     SparseMatrixCSR<Mem_, DT_, IT_> g(FileMode::fm_csr, bs);
     TEST_CHECK_EQUAL(g, f);
-    TEST_CHECK_EQUAL(bs.tellg(), std::streampos(680));
+    TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
 
     std::stringstream ts;
     f.write_out(FileMode::fm_mtx, ts);
