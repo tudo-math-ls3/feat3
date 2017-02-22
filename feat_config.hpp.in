@@ -111,7 +111,10 @@
 /// Should we unroll all banded matrix kernels via template meta programming?
 #cmakedefine FEAT_UNROLL_BANDED
 
-/// Should we explicitly instantiate all common kernel templates
+/// Should we explicitly instantiate all common kernel templates?
 #cmakedefine FEAT_EICKT
+
+/// Should we use uncommon datatype/indextype combinations in solver factory?
+#cmakedefine FEAT_SF_ESOTERIC
 
 #endif // FEAT_CONFIG_HPP
