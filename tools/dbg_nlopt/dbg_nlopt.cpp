@@ -112,13 +112,8 @@ int run(Solver_& solver, Operator_& op)
   // We need a dummy rhs
   auto rhs = op.create_vector_r();
 
-  //op.prepare(sol);
-
   // Solve the optimisation problem
-  Status st = solver->correct(sol, rhs);
-
-  // Print solver summary
-  solver->plot_summary(st);
+  solver->correct(sol, rhs);
 
   // Check the distance between solution and minimal points
   DataType min_dist(Math::Limits<DataType>::max());
@@ -223,11 +218,6 @@ int run(Solver_& solver, Operator_& op)
 
   // Print solver summary
   std::cout << "Used solver " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
-  std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
-  std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
-  std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
-  std::cout << "Needed evaluations: " << op.get_num_func_evals() << " (func) / " << op.get_num_grad_evals();
-  std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
 
   std::cout << String("max_iter").pad_back(30, '.') << ": " << stringify(solver->get_max_iter()) << std::endl;
   std::cout << String("tol_abs").pad_back(30, '.') << ": " << stringify(solver->get_tol_abs()) << std::endl;
