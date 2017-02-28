@@ -1048,6 +1048,7 @@ namespace FEAT
             vec_tmp_elements[i] = DataType(x[i]);
           }
 
+          me->_fval_prev = me->_fval;
           // Prepare the functional
           me->_functional.prepare(me->_vec_tmp, me->_filter);
           // Compute functional value and gradient
