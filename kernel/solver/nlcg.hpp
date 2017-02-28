@@ -442,6 +442,7 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          IterationStats pre_iter(*this);
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
           // p[k+1] <- r[k+1] + _beta * p[k+1]
@@ -515,6 +516,9 @@ namespace FEAT
           Index its_since_restart(0);
           _num_restarts = Index(0);
           Index first_restart(_restart_freq+Index(1));
+
+          pre_iter.destroy();
+
           // start iterating
           while(status == Status::progress)
           {
@@ -554,6 +558,7 @@ namespace FEAT
 
             if(status != Status::progress)
             {
+              stat.destroy();
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
               return status;
             }
@@ -567,6 +572,7 @@ namespace FEAT
             // apply preconditioner
             if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
             {
+              stat.destroy();
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             }
