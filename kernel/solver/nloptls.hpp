@@ -189,7 +189,7 @@ namespace FEAT
             msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_init)
               + " -> "+stringify_fp_sci(_fval)
               + ", factor "+stringify_fp_sci(_fval/_fval_init)
-              + ", last reduction "+stringify_fp_sci(_fval - _fval_prev)+"\n";
+              + ", last reduction "+stringify_fp_sci(_fval_prev - _fval)+"\n";
             msg += this->get_plot_name()  +": grad: "+stringify_fp_sci(this->_def_init)
               + " -> "+stringify_fp_sci(this->_def_cur)
               + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
