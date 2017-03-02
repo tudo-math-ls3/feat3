@@ -138,43 +138,37 @@ namespace FEAT
         /**
          * \brief Internal function: Applies the solver
          *
-         * \param[in, out] sol
+         * \param[in, out] vec_sol
          * Initial guess, gets overwritten by solution
          *
-         * \param[in] dir
+         * \param[in] vec_dir
          * Search direction
+         *
+         * \note This assumes that the initial functional value _fval_0 and the gradient were already set from the
+         * calling solver!
          *
          * \returns The solver status (success, max_iter, stagnated)
          */
-        virtual Status _apply_intern(VectorType& sol, const VectorType& dir)
+        virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_dir)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
           Status status(Status::progress);
-          this->_num_iter = Index(0);
-
-          this->_vec_initial_sol.copy(sol);
-
-          // Norm of the search direction
-          this->_norm_dir = dir.norm2();
-          // Norm of the initial guess
-          this->_norm_sol = sol.norm2();
-
-          this->_fval_min = this->_fval_0;
-          this->_alpha_min = DataType(0);
 
           DataType alpha(0);
-          DataType alpha_hidate(alpha);
+          // It is critical that this and _vec_grad were set from the outside!
+          DataType fval(this->_fval_0);
+          DataType df(vec_dir.dot(this->_vec_grad));
 
-          DataType eta = dir.dot(this->_vec_grad);
-          if(eta > DataType(0))
-            throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
-                +stringify_fp_sci(eta));
+          // Setup
+          status = this->_startup(fval, df, vec_sol, vec_dir);
 
-          // Compute initial defect. We want to minimise d^T * grad(_functional)
-          this->_def_init = Math::abs(dir.dot(this->_vec_grad));
+          // Compute new _alpha <- _alpha - grad.dot(vec_dir) / vec_dir.dot(Hess*vec_dir)
+          this->_functional.apply_hess(this->_vec_tmp, vec_dir);
+          this->_filter.filter_def(this->_vec_tmp);
 
-          //sol.axpy(dir, this->_vec_initial_sol, alpha);
+          alpha -= this->_vec_grad.dot(vec_dir)/vec_dir.dot(this->_vec_tmp);
+
           // start iterating
           while(status == Status::progress)
           {
@@ -183,10 +177,14 @@ namespace FEAT
             // Increase iteration count
             ++this->_num_iter;
 
-            DataType fval(0);
-            this->_functional.prepare(sol, this->_filter);
+            this->_functional.prepare(vec_sol, this->_filter);
             this->_functional.eval_fval_grad(fval, this->_vec_grad);
+            // DO NOT call trim() here, as this simple linesearch accepts bad steps too, which would then be trimmed
+            // and used.
+            //this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
+
+            df = vec_dir.dot(this->_vec_grad);
 
             if(fval < this->_fval_min)
             {
@@ -194,56 +192,41 @@ namespace FEAT
               this->_alpha_min = alpha;
             }
 
-            // Update defect
-            this->_def_cur = Math::abs(this->_vec_grad.dot(dir));
+            status = this->_check_convergence(fval, df, alpha);
 
-            // Compute new _alpha <- _alpha - grad.dot(dir) / dir.dot(Hess*dir)
-            this->_functional.apply_hess(this->_vec_tmp, dir);
-            this->_filter.filter_def(this->_vec_tmp);
-
-            alpha_hidate = - this->_vec_grad.dot(dir)/dir.dot(this->_vec_tmp);
-            alpha += alpha_hidate;
-
-            //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
-            sol.axpy(dir, this->_vec_initial_sol, alpha);
-
-            // plot?
-            if(this->_plot_iter())
-            {
-              std::cout << this->_plot_name
-              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-              << " : " << stringify_fp_sci(this->_def_cur)
-              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-              << std::endl;
-            }
-
-            // minimum number of iterations performed?
-            if(this->_num_iter < this->_min_iter)
-              continue;
-
-            // is converged?
-            if(this->is_converged())
-              status = Status::success;
-
-            // maximum number of iterations performed?
-            if(this->_num_iter >= this->_max_iter)
-              status = Status::max_iter;
-
-            // If we are not successful, update the solution with the best step found so far
             if(status != Status::progress)
             {
-              sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
-              {
-                Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
-                return status;
-              }
+              break;
             }
+
+            // Compute new _alpha <- _alpha - grad.dot(vec_dir) / vec_dir.dot(Hess*vec_dir)
+            this->_functional.apply_hess(this->_vec_tmp, vec_dir);
+            this->_filter.filter_def(this->_vec_tmp);
+
+            alpha -= this->_vec_grad.dot(vec_dir)/vec_dir.dot(this->_vec_tmp);
+
+            // Update solution
+            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
 
           }
 
-          // We should never come to this point
+          // If we are not successful, we update the best step length and need to re-evaluate everything for that
+          // step
+          if(status != Status::success)
+          {
+            vec_sol.axpy(vec_dir, this->_vec_initial_sol, this->_alpha_min);
+
+            // Prepare and evaluate
+            this->_functional.prepare(vec_sol, this->_filter);
+            this->_functional.eval_fval_grad(fval, this->_vec_grad);
+            // DO NOT call trim() here, as this simple linesearch accepts bad steps too, which would then be trimmed
+            // and used.
+            this->trim_func_grad(fval);
+            this->_filter.filter_def(this->_vec_grad);
+          }
+
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
-          return Status::undefined;
+          return status;
         }
 
     }; // class NewtonRaphsonLinesearch

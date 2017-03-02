@@ -55,10 +55,6 @@ namespace FEAT
         typedef typename Functional_::DataType DataType;
         /// Our base class
         typedef Linesearch<Functional_, Filter_> BaseClass;
-        /// Default tolerance for functional value decrease for the strong Wolfe conditions
-        static constexpr DataType tol_decrease_default = DataType(1e-3);
-        /// Default tolerance for curvature decrease for the strong Wolfe conditions
-        static constexpr DataType tol_curvature_default = DataType(0.3);
 
       protected:
         /// Last successful line step, needs to start with 1
@@ -71,12 +67,6 @@ namespace FEAT
         DataType _alpha_soft_max;
         /// Upper bound of the interval of uncertainty
         DataType _alpha_soft_min;
-        /// Initial delta
-        DataType _delta_0;
-        /// Tolerance for sufficient decrease in the functional value (Wolfe conditions)
-        DataType _tol_decrease;
-        /// Tolerance for sufficient decrease in the norm of the gradient (Wolfe conditions)
-        DataType _tol_curvature;
 
       public:
         /**
@@ -91,27 +81,16 @@ namespace FEAT
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
-         * \param[in] tol_decrease
-         * Tolerance for sufficient decrease in function value.
-         *
-         * \param[in] tol_curvature
-         * Tolerance for the curvature condition.
-         *
          */
-        explicit MQCLinesearch(Functional_& functional, Filter_& filter, bool keep_iterates = false,
-        DataType tol_decrease = tol_decrease_default, DataType tol_curvature = tol_curvature_default) :
+        explicit MQCLinesearch(Functional_& functional, Filter_& filter, bool keep_iterates = false) :
           BaseClass("MQC-LS", functional, filter, keep_iterates),
           _alpha_0(DataType(1)),
           _alpha_hard_max(DataType(0)),
           _alpha_hard_min(DataType(0)),
           _alpha_soft_max(DataType(0)),
-          _alpha_soft_min(DataType(0)),
-          _delta_0(Math::huge<DataType>()),
-          _tol_decrease(tol_decrease),
-          _tol_curvature(tol_curvature)
+          _alpha_soft_min(DataType(0))
           {
           }
-
 
         /**
          * \brief Constructor using a PropertyMap
@@ -136,23 +115,9 @@ namespace FEAT
           _alpha_hard_max(DataType(0)),
           _alpha_hard_min(DataType(0)),
           _alpha_soft_max(DataType(0)),
-          _alpha_soft_min(DataType(0)),
-          _delta_0(Math::huge<DataType>()),
-          _tol_decrease(tol_decrease_default),
-          _tol_curvature(tol_curvature_default)
+          _alpha_soft_min(DataType(0))
           {
 
-            auto tol_curvature_p = section->query("tol_curvature");
-            if(tol_curvature_p.second)
-            {
-              set_tol_curvature(DataType(std::stod(tol_curvature_p.first)));
-            }
-
-            auto tol_decrease_p = section->query("tol_decrease");
-            if(tol_decrease_p.second)
-            {
-              set_tol_decrease(DataType(std::stod(tol_decrease_p.first)));
-            }
           }
 
         /// \copydoc ~BaseClass()
@@ -175,45 +140,12 @@ namespace FEAT
           _alpha_hard_min = DataType(0);
           _alpha_soft_max = DataType(0);
           _alpha_soft_min = DataType(0);
-          _delta_0 = Math::huge<DataType>();
         }
 
         /// \copydoc BaseClass::get_rel_update()
         virtual DataType get_rel_update() override
         {
           return this->_alpha_min*this->_norm_dir;
-        }
-
-        /**
-         * \brief Sets the tolerance for the sufficient decrease in curvature
-         */
-        void set_tol_curvature(DataType tol_curvature)
-        {
-          XASSERT(tol_curvature > DataType(0));
-
-          _tol_curvature = tol_curvature;
-        }
-
-        /**
-         * \brief Sets the tolerance for the sufficient decrease in functional value
-         */
-        void set_tol_decrease(DataType tol_decrease)
-        {
-          XASSERT(tol_decrease > DataType(0));
-
-          _tol_decrease = tol_decrease;
-        }
-
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("tol_decrease", stringify_fp_sci(_tol_decrease));
-          my_section->add_entry("tol_curvature", stringify_fp_sci(_tol_curvature));
-
-          return my_section;
         }
 
         /**
@@ -282,27 +214,23 @@ namespace FEAT
           static constexpr DataType extrapolation_width = DataType(4);
           Status status(Status::progress);
 
-          this->_num_iter = Index(0);
+          // Set the first step
+          DataType alpha(_alpha_0);
+          // It is critical that this was set from the outside!
+          DataType fval(this->_fval_0);
+          // We want to minimise <vec_dir, vec_grad()>
+          DataType df(vec_dir.dot(this->_vec_grad));
 
-          // Save the initial state
-          this->_vec_initial_sol.copy(vec_sol);
-          // Norm of the search direction vector. It was normalised befor, but there might be rounding errors
-          this->_norm_dir = vec_dir.norm2();
-          // Norm of the initial guess
-          this->_norm_sol = vec_sol.norm2();
-
-          // Compute initial defect. We want to minimise <dir^T, grad(_functional)>, so everything delta are directional
-          // derivatives
-          _delta_0 = vec_dir.dot(this->_vec_grad);
-          this->_def_init = Math::abs(_delta_0);
-          XASSERTM(_delta_0 < DataType(0),"Initial search direction is not a descent direction!");
+          this->_startup(fval, df, vec_sol, vec_dir);
 
           // Set hard limits to default values if they have not been set
           _alpha_hard_min = DataType(0);
           // This bogus value should be around 1e50 for double precision. It is chosen make comparing results with
           // ALGLIB easier
           if(_alpha_hard_max < Math::eps<DataType>())
+          {
             _alpha_hard_max = Math::pow(Math::huge<DataType>(), DataType(0.1622));
+          }
 
           // Set the intervall of uncertainty
           _alpha_soft_min = DataType(0);
@@ -314,16 +242,11 @@ namespace FEAT
           DataType alpha_lo(0);
           // It is critical that _f_0 was set from the outside!
           DataType fval_lo(this->_fval_0);
-          DataType df_lo(_delta_0);
+          DataType df_lo(this->_delta_0);
 
           DataType alpha_hi(0);
           DataType fval_hi(this->_fval_0);
-          DataType df_hi(_delta_0);
-
-          // Set the first step
-          DataType alpha(_alpha_0);
-          DataType fval(0);
-          DataType df(0);
+          DataType df_hi(this->_delta_0);
 
           // This is the width of the search interval
           DataType width(Math::abs(_alpha_hard_max - _alpha_hard_min));
@@ -344,7 +267,7 @@ namespace FEAT
             IterationStats stat(*this);
             ++(this->_num_iter);
 
-            // If we know the minimum is in the search interval, the interval of uncertainty is the search inverval
+            // If we know the minimum is in the search interval, the interval of uncertainty is the search interval
             if(min_in_interval)
             {
               _alpha_soft_min = Math::min(alpha_lo, alpha_hi);
@@ -369,71 +292,47 @@ namespace FEAT
             this->_functional.prepare(vec_sol, this->_filter);
 
             // Compute and filter the gradient
-            this->_functional.eval_fval_grad(fval,this->_vec_grad);
+            this->_functional.eval_fval_grad(fval, this->_vec_grad);
             this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
             // New directional derivative and new defect
-            df = this->_vec_grad.dot(vec_dir);
-            this->_def_cur = Math::abs(df);
+            df = vec_dir.dot(this->_vec_grad);
+            status = this->_check_convergence(fval, df, alpha);
 
-            //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
-
-            // plot?
-            if(this->_plot_iter())
+            // If success is reported, check if it is a real success or if something fishy is going on
+            if(status == Status::success)
             {
-              std::cout << this->_plot_name
-              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-              << " : " << stringify_fp_sci(this->_def_cur)
-              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-              << " : " << stringify_fp_sci(fval) << " : " << stringify_fp_sci(alpha)
-              << std::endl;
+              this->_vec_tmp.axpy(vec_sol, this->_vec_initial_sol, -DataType(1));
+              if(fval >= this->_fval_0 || this->_vec_tmp.norm2() == DataType(0))
+              {
+                status = Status::stagnated;
+              }
             }
-
-            status = Status::progress;
-
+            // If we are not successful, check if the interval of uncertainty has become too small
+            else if(min_in_interval && (_alpha_soft_max - _alpha_soft_min) <= this->_tol_step*_alpha_soft_max)
+            {
+              //std::cout << "interval width " << _alpha_soft_max - _alpha_soft_min << " : " << this->_tol_step*_alpha_soft_max << std::endl;
+              status = Status::stagnated;
+            }
             // Stagnation due to rounding errors
             //if(min_in_interval && (alpha <= _alpha_soft_min || alpha >= _alpha_soft_max))
             //{
             //  std::cout << "Rounding errors" << std::endl;
             //  status = Status::stagnated;
             //}
+            // This is not used at the moment because it is only relevant if there are constraints limiting the
+            // step length
             //if( alpha == _alpha_hard_max)
             //if( alpha == _alpha_hard_min)
 
-            // If the maximum number of iterations was performed, return the iterate for the best step so far
-            if(this->_num_iter >= this->_max_iter)
-            {
-              //std::cout << "nfevmax " << this->_num_iter-1 << " >= " << this->_max_iter-1 << std::endl;
-              status = Status::max_iter;
-            }
-
-            if(min_in_interval && (_alpha_soft_max - _alpha_soft_min) <= this->_tol_step*_alpha_soft_max)
-            {
-              //std::cout << "interval width " << _alpha_soft_max - _alpha_soft_min << " : " << this->_tol_step*_alpha_soft_max << std::endl;
-              status = Status::stagnated;
-            }
-
-            // If the strong Wolfe conditions hold, we are successful
-            if(fval < this->_fval_0 +_tol_decrease*alpha*_delta_0
-                && Math::abs(df) < -_tol_curvature*_delta_0)
-                {
-                  status = Status::success;
-                }
-
-            // Stop if _bracket was successful or encountered an error
-            if(status == Status::success)
-            {
-              this->_vec_tmp.axpy(vec_sol, this->_vec_initial_sol, -DataType(1));
-              if(fval >= this->_fval_0 || this->_vec_tmp.norm2() == DataType(0))
-                status = Status::stagnated;
-            }
-
             if(status != Status::progress)
+            {
               break;
+            }
 
             if(!interval_known
-                && (fval < this->_fval_0 + this->_tol_decrease*alpha*_delta_0)
+                && (fval < this->_fval_0 + this->_tol_decrease*alpha*this->_delta_0)
                 && (df >= Math::min(this->_tol_decrease, this->_tol_curvature)))
                 {
                   interval_known = true;
@@ -442,14 +341,15 @@ namespace FEAT
             //std::cout << "interval known " << interval_known << std::endl;
             // If we do not know that the minimum was in the previous interval of uncertainty, we need to compute a
             // new step size to expand the interval of uncertainty at the start of the next iteration.
-            if(!interval_known && (fval <= fval_lo) && fval > this->_fval_0 + alpha*this->_tol_decrease*_delta_0)
+            if(!interval_known && (fval <= fval_lo)
+                && fval > this->_fval_0 + alpha*this->_tol_decrease*this->_delta_0)
             {
-              DataType fval_m(fval - alpha*this->_tol_decrease*_delta_0);
-              DataType df_m(df - this->_tol_decrease*_delta_0);
-              DataType fval_lo_m(fval_lo - alpha_lo*this->_tol_decrease*_delta_0);
-              DataType df_lo_m(df_lo - this->_tol_decrease*_delta_0);
-              DataType fval_hi_m(fval_hi - alpha_hi*this->_tol_decrease*_delta_0);
-              DataType df_hi_m(df_hi - this->_tol_decrease*_delta_0);
+              DataType fval_m(fval - alpha*this->_tol_decrease*this->_delta_0);
+              DataType df_m(df - this->_tol_decrease*this->_delta_0);
+              DataType fval_lo_m(fval_lo - alpha_lo*this->_tol_decrease*this->_delta_0);
+              DataType df_lo_m(df_lo - this->_tol_decrease*this->_delta_0);
+              DataType fval_hi_m(fval_hi - alpha_hi*this->_tol_decrease*this->_delta_0);
+              DataType df_hi_m(df_hi - this->_tol_decrease*this->_delta_0);
 
               // Note that the expansion step might already give us the information that the minimum is the the
               // new search interval
@@ -457,10 +357,10 @@ namespace FEAT
                 alpha, fval_m, df_m, alpha_lo, fval_lo_m, df_lo_m,
                 alpha_hi, fval_hi_m, df_hi_m, min_in_interval, drive_to_bndry);
 
-              fval_lo = fval_lo_m + alpha_lo*this->_tol_decrease*_delta_0;
-              df_lo = df_lo_m + this->_tol_decrease*_delta_0;
-              fval_hi = fval_hi_m * alpha_hi*this->_tol_decrease*_delta_0;
-              df_hi = df_hi_m + this->_tol_decrease*_delta_0;
+              fval_lo = fval_lo_m + alpha_lo*this->_tol_decrease*this->_delta_0;
+              df_lo = df_lo_m + this->_tol_decrease*this->_delta_0;
+              fval_hi = fval_hi_m * alpha_hi*this->_tol_decrease*this->_delta_0;
+              df_hi = df_hi_m + this->_tol_decrease*this->_delta_0;
 
             }
             else
@@ -483,13 +383,18 @@ namespace FEAT
               }
             }
 
-          }
+          } // while(status == Status:progress)
 
           this->_alpha_min = alpha;//*this->_norm_dir;
           this->_fval_min = fval;
 
+          // If we are successfull, we save the last step length as the new initial step length
           if(status == Status::success)
+          {
             this->_alpha_0 = alpha*this->_norm_dir;
+          }
+          // If we are not successful, we update the best step length and need to re-evaluate everything for that
+          // step
           else
           {
             this->_alpha_min = alpha_lo;//*this->_norm_dir;
@@ -896,23 +801,14 @@ namespace FEAT
      * \param[in] keep_iterates
      * Flag for keeping the iterates, defaults to false.
      *
-     * \param[in] tol_decrease
-     * Tolerance for sufficient decrease in function value.
-     *
-     * \param[in] tol_curvature
-     * Tolerance for the curvature condition.
-     *
      * \returns
      * A shared pointer to a new MQCLinesearch object.
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<MQCLinesearch<Functional_, Filter_>> new_mqc_linesearch(
-      Functional_& functional, Filter_& filter, bool keep_iterates = false,
-      typename Functional_::DataType tol_decrease = MQCLinesearch<Functional_, Filter_>::tol_decrease_default,
-      typename Functional_::DataType tol_curvature = MQCLinesearch<Functional_, Filter_>::tol_curvature_default)
+      Functional_& functional, Filter_& filter, bool keep_iterates = false)
       {
-        return std::make_shared<MQCLinesearch<Functional_, Filter_>>
-          (functional, filter, keep_iterates, tol_decrease, tol_curvature);
+        return std::make_shared<MQCLinesearch<Functional_, Filter_>>(functional, filter, keep_iterates);
       }
 
     /**

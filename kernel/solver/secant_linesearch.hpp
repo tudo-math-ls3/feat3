@@ -41,10 +41,10 @@ namespace FEAT
         static constexpr DataType secant_step_default = DataType(1e-2);
 
       protected:
-        /// Step for calculating the "other" secant point in the initial step. Crucial
+        /// Initial step for the "other" secant point.
+        DataType _alpha_0;
+        /// Default step for calculating the "other" secant point in the initial step. Crucial
         DataType _secant_step;
-        /// dir^T * preconditioned defect. We want to find the minimum of the functional value along dir
-        DataType _eta;
 
       public:
         /**
@@ -68,8 +68,8 @@ namespace FEAT
           const DataType secant_step = secant_step_default,
           const bool keep_iterates = false) :
           BaseClass("S-LS", functional, filter, keep_iterates),
-          _secant_step(secant_step),
-          _eta(DataType(0))
+          _alpha_0(secant_step),
+          _secant_step(secant_step)
           {
           }
 
@@ -92,8 +92,8 @@ namespace FEAT
         explicit SecantLinesearch(const String& section_name, PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass("S-LS", section_name, section, functional, filter),
-          _secant_step(secant_step_default),
-          _eta(DataType(0))
+          _alpha_0(secant_step_default),
+          _secant_step(secant_step_default)
           {
             auto secant_step_p = section->query("secant_step");
             if(secant_step_p.second)
@@ -111,6 +111,13 @@ namespace FEAT
         virtual String name() const override
         {
           return "SecantLinesearch";
+        }
+
+        /// \copydoc BaseClass::reset()
+        virtual void reset() override
+        {
+          BaseClass::reset();
+          _alpha_0 = _secant_step;
         }
 
         /**
@@ -180,39 +187,39 @@ namespace FEAT
         }
 
       protected:
-        /// \copydoc NewtonRaphsonLinesearch::_apply_intern()
-        virtual Status _apply_intern(VectorType& sol, const VectorType& dir)
+        /**
+         * \brief Internal function: Applies the solver
+         *
+         * \param[in, out] vec_sol
+         * Initial guess, gets overwritten by solution
+         *
+         * \param[in] vec_dir
+         * Search direction
+         *
+         * \note This assumes that the initial functional value _fval_0 and the gradient were already set from the
+         * calling solver!
+         *
+         * \returns The solver status (success, max_iter, stagnated)
+         */
+        virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_dir)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
-          // compute initial defect
           Status status(Status::progress);
-          this->_num_iter = Index(0);
 
-          this->_vec_initial_sol.copy(sol);
+          // It is critical that this was set from the outside!
+          DataType fval(this->_fval_0);
+          /// <vec_dir, vec_grad>. We want to find the minimum of the functional value along vec_dir
+          DataType df(vec_dir.dot(this->_vec_grad));
+          // Setup
+          status = this->_startup(fval, df, vec_sol, vec_dir);
 
-          // Norm of the search direction
-          this->_norm_dir = dir.norm2();
-          // Norm of the initial guess
-          this->_norm_sol = sol.norm2();
-
-          this->_fval_min = this->_fval_0;
-          this->_alpha_min = DataType(0);
-
-          // The second secant point in the first iteration is x + _secant_step * dir
-          DataType alpha(_secant_step/this->_norm_dir);
-          DataType alpha_hidate(alpha);
-
-          _eta = dir.dot(this->_vec_grad);
-          if(_eta > DataType(0))
-            throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
-                +stringify_fp_sci(_eta));
+          // The second secant point in the first iteration is x + _secant_step * vec_dir
+          DataType alpha(_alpha_0/this->_norm_dir);
+          DataType alpha_update(alpha);
 
           // The first "other" point for the secant
-          sol.axpy(dir, this->_vec_initial_sol, _secant_step/this->_norm_dir);
-
-          _eta = dir.dot(this->_vec_grad);
-          this->_def_init = Math::abs(_eta);
+          vec_sol.axpy(vec_dir, this->_vec_initial_sol, _secant_step/this->_norm_dir);
 
           // start iterating
           while(status == Status::progress)
@@ -222,9 +229,11 @@ namespace FEAT
             // Increase iteration count
             ++this->_num_iter;
 
-            DataType fval(0);
-            this->_functional.prepare(sol, this->_filter);
+            this->_functional.prepare(vec_sol, this->_filter);
             this->_functional.eval_fval_grad(fval, this->_vec_grad);
+            // DO NOT call trim() here, as this simple linesearch accepts bad steps too, which would then be trimmed
+            // and used.
+            //this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
             if(fval < this->_fval_min)
@@ -234,96 +243,52 @@ namespace FEAT
             }
 
             // Set new defect, do convergence checks and compute the new _alpha
-            DataType eta_prev = _eta;
+            DataType df_prev = df;
+            df = vec_dir.dot(this->_vec_grad);
 
-            // Compute eta and alpha
-            _eta = this->_vec_grad.dot(dir);
-            this->_def_cur = Math::abs(_eta);
-
-            // ensure that the defect is neither NaN nor infinity
-            if(!Math::isfinite(this->_def_cur))
-            {
-              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
-              return Status::aborted;
-            }
-
-            // is diverged?
-            if(this->is_diverged())
-            {
-              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::diverged, this->get_num_iter()));
-              return Status::diverged;
-            }
+            status = this->_check_convergence(fval, df, alpha);
 
             // Check if the diffence in etas is too small, thus leading to a huge update of relative size > sqrt(eps)
-            if(Math::abs(_eta - eta_prev) < Math::abs(alpha*_eta)*this->_norm_dir*Math::sqrt(Math::eps<DataType>()))
+            if(Math::abs(df - df_prev) < Math::abs(alpha_update*df)*Math::sqrt(Math::eps<DataType>()))
             {
-              // If we are not successful, update the solution with the best step found so far
-              sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
-              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
-              return Status::stagnated;
+              status = Status::stagnated;
+            }
+
+            if(status != Status::progress)
+            {
+              break;
             }
 
             // Update alpha according to secant formula
-            alpha_hidate *= _eta/(eta_prev - _eta);
-            alpha += alpha_hidate;
+            alpha_update *= df/(df_prev - df);
+            alpha += alpha_update;
 
             // Update the solution
-            sol.axpy(dir, this->_vec_initial_sol, alpha);
+            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
+          }
 
-            //Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+          // If we are successfull, we could save the last step length as the new initial step length. This is
+          // disabled by default, as it can lead to stagnation e.g. for minimising the Rosenbrock function.
+          //if(status == Status::success)
+          //{
+          //  this->_alpha_0 = this->_alpha_min*this->_norm_dir;
+          //}
+          // If we are not successful, we update the best step length and need to re-evaluate everything for that
+          // step
+          if(status != Status::success)
+          {
+            vec_sol.axpy(vec_dir, this->_vec_initial_sol, this->_alpha_min);
 
-            // plot?
-            if(this->_plot_iter())
-            {
-              std::cout << this->_plot_name
-              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-              << " : " << stringify_fp_sci(this->_def_cur)
-              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-              << std::endl;
-            }
-
-            // minimum number of iterations performed?
-            if(this->_num_iter < this->_min_iter)
-              continue;
-
-            // is converged?
-            if(this->is_converged())
-              status = Status::success;
-
-            // maximum number of iterations performed?
-            if(this->_num_iter >= this->_max_iter)
-              status = Status::max_iter;
-
-            //// check for stagnation?
-            //if(this->_min_stag_iter > Index(0))
-            //{
-            //  // did this iteration stagnate?
-            //  if(this->_def_cur >= this->_stag_rate * def_old)
-            //  {
-            //    // increment stagnation count
-            //    ++this->_num_stag_iter;
-
-            //    if(this->_num_stag_iter >= this->_min_stag_iter)
-            //      return Status::stagnated;
-            //  }
-            //  else
-            //  {
-            //    // this iteration did not stagnate
-            //    this->_num_stag_iter = Index(0);
-            //  }
-            //}
-
-            // If we are not successful, update the solution with the best step found so far
-            if(status != Status::progress)
-            {
-              sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
-              Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
-              return status;
-            }
-
+            // Prepare and evaluate
+            this->_functional.prepare(vec_sol, this->_filter);
+            this->_functional.eval_fval_grad(fval, this->_vec_grad);
+            // DO NOT call trim() here, as this simple linesearch accepts bad steps too, which would then be trimmed
+            // and used.
+            //this->trim_func_grad(fval);
+            this->_filter.filter_def(this->_vec_grad);
           }
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
-          return Status::undefined;
+          return status;
         }
 
     }; // class SecantLinesearch

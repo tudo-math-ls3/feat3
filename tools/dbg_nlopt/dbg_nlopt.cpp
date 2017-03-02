@@ -216,15 +216,6 @@ int run(Solver_& solver, Operator_& op)
   // Clean up
   delete mesh;
 
-  // Print solver summary
-  std::cout << "Used solver " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
-
-  std::cout << String("max_iter").pad_back(30, '.') << ": " << stringify(solver->get_max_iter()) << std::endl;
-  std::cout << String("tol_abs").pad_back(30, '.') << ": " << stringify(solver->get_tol_abs()) << std::endl;
-  std::cout << String("tol_rel").pad_back(30, '.') << ": " << stringify(solver->get_tol_rel()) << std::endl;
-  std::cout << String("tol_step").pad_back(30, '.') << ": " << stringify(solver->get_tol_step()) << std::endl;
-  std::cout << String("tol_fval").pad_back(30, '.') << ": " << stringify(solver->get_tol_fval()) << std::endl;
-
   // Finish the solver
   solver->done();
 
@@ -277,7 +268,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -341,13 +332,16 @@ int main(int argc, char* argv[])
       linesearch_name = linesearch_pair->second.front();
 
     if(linesearch_name== "NewtonRaphsonLinesearch")
+    {
       my_linesearch = new_newton_raphson_linesearch(my_op, my_filter);
+    }
     else if(linesearch_name== "SecantLinesearch")
+    {
       my_linesearch = new_secant_linesearch(my_op, my_filter);
+    }
     else if(linesearch_name== "MQCLinesearch")
     {
       my_linesearch = new_mqc_linesearch(my_op, my_filter);
-      my_linesearch->set_max_iter(20);
     }
     else if(linesearch_name== "FixedStepLinesearch")
     {
@@ -355,10 +349,14 @@ int main(int argc, char* argv[])
       auto* steplength_pair(args.query("steplength"));
 
       if(steplength_pair != nullptr)
+      {
         steplength = DataType(std::stod(steplength_pair->second.front()));
+      }
 
       my_linesearch = new_fixed_step_linesearch(my_op, my_filter, steplength);
     }
+    my_linesearch->set_max_iter(20);
+    my_linesearch->set_plot_mode(Solver::PlotMode::all);
 
     // The default is no preconditioner
     String precon_name("none");

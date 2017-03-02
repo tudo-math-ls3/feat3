@@ -21,7 +21,7 @@ namespace FEAT
      *
      * This class implements a linesearch which approximately finds
      * \f[
-     *   \alpha^* = \mathrm{argmin} \nabla f(x + \alpha d) \cdot d
+     *   \alpha^* = \mathrm{argmin} \left< \nabla f(x + \alpha d), d \right>
      * \f]
      * for a given search direction \f$ d \f$.
      *
@@ -62,11 +62,17 @@ namespace FEAT
 
         /// Line search parameter
         DataType _alpha_min;
+        /// Initial <vec_dir, vec_grad>
+        DataType _delta_0;
         /// The 2-norm of the search direction
         DataType _norm_dir;
         /// The 2-norm of the iterate
         DataType _norm_sol;
 
+        /// Tolerance for sufficient decrease in the norm of the gradient (Wolfe conditions)
+        DataType _tol_curvature;
+        /// Tolerance for sufficient decrease in the functional value (Wolfe conditions)
+        DataType _tol_decrease;
         /// Tolerance for the update step
         DataType _tol_step;
 
@@ -99,9 +105,12 @@ namespace FEAT
           _fval_min(Math::huge<DataType>()),
           _fval_0(Math::huge<DataType>()),
           _trim_threshold(Math::huge<DataType>()),
-          _alpha_min(DataType(0)),
-          _norm_dir(DataType(0)),
-          _norm_sol(DataType(0)),
+          _alpha_min(0),
+          _delta_0(Math::huge<DataType>()),
+          _norm_dir(0),
+          _norm_sol(0),
+          _tol_curvature(DataType(0.3)),
+          _tol_decrease(DataType(1e-3)),
           _tol_step(DataType(Math::pow(Math::eps<DataType>(), DataType(0.85)))),
           iterates(nullptr)
           {
@@ -139,8 +148,11 @@ namespace FEAT
           _fval_0(Math::huge<DataType>()),
           _trim_threshold(Math::huge<DataType>()),
           _alpha_min(DataType(0)),
+          _delta_0(Math::huge<DataType>()),
           _norm_dir(DataType(0)),
           _norm_sol(DataType(0)),
+          _tol_curvature(0.3),
+          _tol_decrease(1e-3),
           _tol_step(DataType(Math::pow(Math::eps<DataType>(), DataType(0.85)))),
           iterates(nullptr)
           {
@@ -151,6 +163,17 @@ namespace FEAT
               iterates = new std::deque<VectorType>;
             }
 
+            auto tol_curvature_p = section->query("tol_curvature");
+            if(tol_curvature_p.second)
+            {
+              set_tol_curvature(DataType(std::stod(tol_curvature_p.first)));
+            }
+
+            auto tol_decrease_p = section->query("tol_decrease");
+            if(tol_decrease_p.second)
+            {
+              set_tol_decrease(DataType(std::stod(tol_decrease_p.first)));
+            }
             // Check if we have to keep the iterates
             auto tol_step_p = section->query("tol_step");
             if(tol_step_p.second)
@@ -159,12 +182,39 @@ namespace FEAT
             }
           }
 
-        /// \copydoc ~BaseClass()
+        /**
+         * \brief Virtual destructor
+         */
         virtual ~Linesearch()
         {
           if(iterates != nullptr)
           {
             delete iterates;
+          }
+        }
+
+        /**
+         * \brief Plot a summary of the last solver run
+         */
+        virtual void plot_summary(const Status st) const override
+        {
+          // Print solver summary
+          if(this->_plot_summary())
+          {
+            Dist::Comm comm_world(Dist::Comm::world());
+
+            String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
+                +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
+                + stringify(_functional.get_num_grad_evals()) + " (grad) "
+                + stringify(_functional.get_num_hess_evals()) + " (hess)"
+                +" last step: "+stringify_fp_sci(_alpha_min)+"\n");
+            msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_0)
+              + " -> "+stringify_fp_sci(_fval_min)
+              + ", factor "+stringify_fp_sci(_fval_min/_fval_0)+"\n";
+            msg += this->get_plot_name()  +": <dir, grad>: "+stringify_fp_sci(this->_def_init)
+              + " -> "+stringify_fp_sci(this->_def_cur)
+              + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+            comm_world.print(msg);
           }
         }
 
@@ -178,10 +228,43 @@ namespace FEAT
           PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
+          my_section->add_entry("tol_decrease", stringify_fp_sci(_tol_decrease));
+          my_section->add_entry("tol_curvature", stringify_fp_sci(_tol_curvature));
           my_section->add_entry("tol_step", stringify_fp_sci(_tol_step));
 
           return my_section;
 
+        }
+
+        /**
+         * \brief Sets the tolerance for the sufficient decrease in curvature
+         */
+        void set_tol_curvature(DataType tol_curvature)
+        {
+          XASSERT(tol_curvature > DataType(0));
+
+          _tol_curvature = tol_curvature;
+        }
+
+        /**
+         * \brief Sets the tolerance for the sufficient decrease in functional value
+         */
+        void set_tol_decrease(DataType tol_decrease)
+        {
+          XASSERT(tol_decrease > DataType(0));
+
+          _tol_decrease = tol_decrease;
+        }
+
+        /**
+         * \brief Sets the step length tolerance
+         *
+         */
+        void set_tol_step(DataType tol_step)
+        {
+          XASSERT(tol_step > DataType(0));
+
+          _tol_step = tol_step;
         }
 
         /// \copydoc BaseClass::init_symbolic()
@@ -213,6 +296,7 @@ namespace FEAT
           _fval_0 = Math::huge<DataType>();
           _trim_threshold = Math::huge<DataType>();
           _alpha_min = DataType(0);
+          _delta_0 = Math::huge<DataType>();
           _norm_dir = DataType(0);
           _norm_sol = DataType(0);
 
@@ -240,7 +324,7 @@ namespace FEAT
          */
         virtual DataType get_rel_update()
         {
-          return Math::abs(_alpha_min)*_norm_dir/Math::max(_norm_sol, DataType(1));
+          return Math::abs(_alpha_min)*_norm_dir;
         }
 
         /**
@@ -343,16 +427,143 @@ namespace FEAT
           }
         }
 
-        /**
-         * \brief Sets the step length tolerance
-         *
-         */
-        void set_tol_step(DataType tol_step)
-        {
-          XASSERT(tol_step > DataType(0));
+      protected:
 
-          _tol_step = tol_step;
+        /**
+         * \brief Performs the startup of the iteration
+         *
+         * \param[in] fval
+         * The initial functional value.
+         *
+         * \param[in] df
+         * The initial direction derivative value: \f$ df = \left< dir, grad \right>\f$.
+         *
+         * \param[in] vec_sol
+         * The initial guess.
+         *
+         * \param[in] vec_dir
+         * The search direction.
+         *
+         * The routine sets the initial data from "iteration 0" (needed for checking the strong Wolfe conditions
+         * later) and does some error checking.
+         *
+         * \returns Status::progress if no error occured.
+         */
+        virtual Status _startup(const DataType fval, const DataType df, const VectorType& vec_sol,
+        const VectorType& vec_dir)
+        {
+          Status status(Status::progress);
+
+          this->_num_iter = Index(0);
+          this->_vec_initial_sol.copy(vec_sol);
+
+          this->_fval_0 = fval;
+          this->_fval_min = this->_fval_0;
+          this->_delta_0 = df;
+
+          if(this->_delta_0 > DataType(0))
+          {
+            throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
+                +stringify_fp_sci(this->_delta_0));
+          }
+
+          // Compute initial defect. We want to minimise d^T * grad(_functional)
+          this->_def_init = Math::abs(this->_delta_0);
+
+          // Norm of the search direction
+          this->_norm_dir = vec_dir.norm2();
+          // Norm of the initial guess
+          this->_norm_sol = vec_sol.norm2();
+
+          this->_alpha_min = DataType(0);
+
+          // plot?
+          if(this->_plot_iter())
+          {
+            std::cout << this->_plot_name
+            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
+            << " : " << stringify_fp_sci(this->_def_init)
+            << " : " << stringify_fp_sci(this->_fval_0) << ", ||dir|| = " << stringify_fp_sci(this->_norm_dir)
+            << std::endl;
+          }
+
+          if(!Math::isfinite(fval) || !Math::isfinite(this->_delta_0) || !Math::isfinite(this->_norm_dir))
+          {
+            status = Status::aborted;
+          }
+
+          return status;
         }
+
+        /**
+         * \brief Performs the line search convergence checks using the strong Wolfe conditions
+         *
+         * \param[in] fval
+         * The current functional value
+         *
+         * \param[in] df
+         * The current directional derivative value: \f$ df = \left< \nabla f(x_0), d \right>\f$.
+         *
+         * \param[in] alpha
+         * The step size of the last update.
+         *
+         * Also sets the current defect.
+         * The strong Wolfe conditions are
+         * \f[
+         *    f(x) < f(x_0) + \alpha c_1 \left< \nabla f(x_0), d \right> \wedge
+         *    |\left< \nabla f(x), d \right>| < - c_2 \left< \nabla f(x_0), d \right>,
+         * \f]
+         * where \f$c_1\f$ is known as \c tol_decrease and \f$ c_2 \f$ is known as \c tol_curvature.
+         *
+         * \returns Status::success if the strong Wolfe conditions hold.
+         */
+        virtual Status _check_convergence(const DataType fval, const DataType df, const DataType alpha)
+        {
+          Status status(Status::progress);
+
+          this->_def_cur = Math::abs(df);
+
+          Statistics::add_solver_expression(
+            std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
+
+          // plot?
+          if(this->_plot_iter())
+          {
+            std::cout << this->_plot_name
+            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
+            << " : " << stringify_fp_sci(this->_def_cur)
+            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+            << " : " << stringify_fp_sci(fval) << " : " << stringify_fp_sci(alpha)
+            << std::endl;
+          }
+
+          // ensure that the defect is neither NaN nor infinity
+          if(!Math::isfinite(this->_def_cur))
+          {
+            status = Status::aborted;
+          }
+
+          // is diverged?
+          if(this->is_diverged())
+          {
+            status = Status::diverged;
+          }
+
+          // If the maximum number of iterations was performed, return the iterate for the best step so far
+          if(this->_num_iter >= this->_max_iter)
+          {
+            status = Status::max_iter;
+          }
+
+          // If the strong Wolfe conditions hold, we are successful
+          if((fval < this->_fval_0 +_tol_decrease*alpha*_delta_0) && (Math::abs(df) < -_tol_curvature*_delta_0))
+          {
+            status = Status::success;
+          }
+
+          return status;
+        }
+
     }; // class Linesearch
   } // namespace Solver
 } // namespace FEAT
