@@ -1,10 +1,11 @@
 [ApplicationSettings]
-mesh_files = screws_2d_chart_bezier_24_28.xml screws_2d_mesh_quad_opt_ss_360_1.xml
+mesh_files = screws_2d_chart_bezier_24_28_smaller.xml screws_2d_mesh_quad_360_1_smaller.xml
+#mesh_files = screws_2d_chart_bezier_24_28.xml screws_2d_mesh_quad_opt_ss_360_1.xml
 #mesh_files = unit-square-small-quad.xml
 meshopt_config_file = ./meshopt_config.ini
 solver_config_file = ./solver_config.ini
 mesh_optimiser = HyperelasticityDefault
-t_end = 1.0
+t_end = 1e-3
 reynolds = 1e1
 convection = impl
 use_deformation = 0
@@ -14,9 +15,11 @@ solve_flow = 1
 lvl_min = 0
 lvl_max = 2
 parti-type = parmetis fallback
-#parti-name = default
 parti-rank-elems = 4
 adapt_mode = chart
+z_min = 0.0
+z_max = 1.0
+slices = 4
 
 [TimeDiscretisation]
 delta_t = 1e-4

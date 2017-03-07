@@ -42,8 +42,8 @@ namespace FEAT
       {
         typedef Space::Lagrange1::Element<Trafo::Standard::Mapping<Mesh_>> Space;
       };
+      /// \endcond
     } // namespace Intern
   } // namespace Meshopt
 } // namespace FEAT
-/// \endcond
 #endif // KERNEL_MESHOPT_BASE_HPP

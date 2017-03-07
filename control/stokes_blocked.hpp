@@ -40,19 +40,19 @@ namespace FEAT
   namespace Control
   {
     template<
-      int dim_,
-      typename MemType_ = Mem::Main,
-      typename DataType_ = Real,
-      typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
-      >
-    class StokesBlockedSystemLevel
-    {
+    int dim_,
+    typename MemType_ = Mem::Main,
+    typename DataType_ = Real,
+    typename IndexType_ = Index,
+    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+    typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
+    typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+  >
+  class StokesBlockedSystemLevel
+  {
     public:
       // basic types
       typedef MemType_ MemType;
@@ -153,8 +153,8 @@ namespace FEAT
         transfer_velo(&coarse_muxer_velo),
         transfer_pres(&coarse_muxer_pres),
         transfer_sys(&coarse_muxer_sys)
-      {
-      }
+        {
+        }
 
       virtual ~StokesBlockedSystemLevel()
       {
@@ -351,141 +351,141 @@ namespace FEAT
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
         const Cubature_& cubature)
-      {
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
-
-        const auto& space_f = level_f.space_velo;
-        const auto& space_c = level_c.space_velo;
-
-        // get local transfer operator
-        LocalVeloTransfer& loc_trans = this->transfer_velo.local();
-
-        // get local transfer matrices
-        LocalVeloTransferMatrix& loc_prol_wrapped = loc_trans.get_mat_prol();
-        LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
-
-        // get the unwrapped types
-        typename LocalVeloTransferMatrix::BaseClass& loc_prol = loc_prol_wrapped;
-        typename LocalVeloTransferMatrix::BaseClass& loc_rest = loc_rest_wrapped;
-
-        // assemble structure?
-        if (loc_prol.empty())
         {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
-        }
+          // get fine and coarse domain levels
+          const DomainLevel_& level_f = *virt_lvl_fine;
+          const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
 
-        // create a local weight vector
-        LocalVeloVector loc_vec_weight = loc_prol_wrapped.create_vector_l();
+          const auto& space_f = level_f.space_velo;
+          const auto& space_c = level_c.space_velo;
 
-        // create a scalar weight vector for the assembly
-        auto loc_scal_vec_weight = loc_prol.create_vector_l();
+          // get local transfer operator
+          LocalVeloTransfer& loc_trans = this->transfer_velo.local();
 
-        // get the data arrays of the weight vectors
-        auto* v_wb = loc_vec_weight.elements();
-        auto* v_ws = loc_scal_vec_weight.elements();
+          // get local transfer matrices
+          LocalVeloTransferMatrix& loc_prol_wrapped = loc_trans.get_mat_prol();
+          LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
 
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_scal_vec_weight.format();
+          // get the unwrapped types
+          typename LocalVeloTransferMatrix::BaseClass& loc_prol = loc_prol_wrapped;
+          typename LocalVeloTransferMatrix::BaseClass& loc_rest = loc_rest_wrapped;
+
+          // assemble structure?
+          if (loc_prol.empty())
+          {
+            Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
+          }
+
+          // create a local weight vector
+          LocalVeloVector loc_vec_weight = loc_prol_wrapped.create_vector_l();
+
+          // create a scalar weight vector for the assembly
+          auto loc_scal_vec_weight = loc_prol.create_vector_l();
+
+          // get the data arrays of the weight vectors
+          auto* v_wb = loc_vec_weight.elements();
+          auto* v_ws = loc_scal_vec_weight.elements();
 
           // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_scal_vec_weight,
+          {
+            loc_prol.format();
+            loc_scal_vec_weight.format();
+
+            // assemble prolongation matrix
+            Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_scal_vec_weight,
             space_f, space_c, cubature);
 
-          // copy weights from scalar to blocked
-          for(Index i(0); i < loc_prol.rows(); ++i)
-            v_wb[i] = v_ws[i];
+            // copy weights from scalar to blocked
+            for(Index i(0); i < loc_prol.rows(); ++i)
+              v_wb[i] = v_ws[i];
 
-          // synchronise blocked weight vector
-          this->gate_velo.sync_0(loc_vec_weight);
+            // synchronise blocked weight vector
+            this->gate_velo.sync_0(loc_vec_weight);
 
-          // copy weights from blocked to scalar
-          for(Index i(0); i < loc_prol.rows(); ++i)
-            v_ws[i] = v_wb[i][0];
+            // copy weights from blocked to scalar
+            for(Index i(0); i < loc_prol.rows(); ++i)
+              v_ws[i] = v_wb[i][0];
 
-          // invert weight components
-          loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
+            // invert weight components
+            loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
 
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_scal_vec_weight);
+            // scale prolongation matrix
+            loc_prol.scale_rows(loc_prol, loc_scal_vec_weight);
 
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
+            // copy and transpose
+            loc_rest = loc_prol.transpose();
+          }
         }
-      }
 
       template<typename DomainLevel_, typename Cubature_>
       void assemble_pressure_transfer(
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
         const Cubature_& cubature)
-      {
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
-
-        const auto& space_f = level_f.space_pres;
-        const auto& space_c = level_c.space_pres;
-
-        // get local transfer operator
-        LocalPresTransfer& loc_trans = this->transfer_pres.local();
-
-        // get local transfer matrices
-        LocalPresTransferMatrix& loc_prol = loc_trans.get_mat_prol();
-        LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-
-        // assemble structure?
-        if (loc_prol.empty())
         {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
-        }
+          // get fine and coarse domain levels
+          const DomainLevel_& level_f = *virt_lvl_fine;
+          const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
 
-        // get local pressure weight vector
-        LocalPresVector loc_vec_weight = loc_prol.create_vector_l();
+          const auto& space_f = level_f.space_pres;
+          const auto& space_c = level_c.space_pres;
 
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_vec_weight.format();
+          // get local transfer operator
+          LocalPresTransfer& loc_trans = this->transfer_pres.local();
+
+          // get local transfer matrices
+          LocalPresTransferMatrix& loc_prol = loc_trans.get_mat_prol();
+          LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
+
+          // assemble structure?
+          if (loc_prol.empty())
+          {
+            Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
+          }
+
+          // get local pressure weight vector
+          LocalPresVector loc_vec_weight = loc_prol.create_vector_l();
 
           // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
+          {
+            loc_prol.format();
+            loc_vec_weight.format();
+
+            // assemble prolongation matrix
+            Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
             space_f, space_c, cubature);
 
-          // synchronise weight vector
-          this->gate_pres.sync_0(loc_vec_weight);
+            // synchronise weight vector
+            this->gate_pres.sync_0(loc_vec_weight);
 
-          // invert components
-          loc_vec_weight.component_invert(loc_vec_weight);
+            // invert components
+            loc_vec_weight.component_invert(loc_vec_weight);
 
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_vec_weight);
+            // scale prolongation matrix
+            loc_prol.scale_rows(loc_prol, loc_vec_weight);
 
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
+            // copy and transpose
+            loc_rest = loc_prol.transpose();
+          }
         }
-      }
 
       template<typename DomainLevel_, typename Cubature_>
       void assemble_transfers(
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
         const Cubature_& cubature)
-      {
-        this->assemble_velocity_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
-        this->assemble_pressure_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
+        {
+          this->assemble_velocity_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
+          this->assemble_pressure_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
 
-        this->compile_system_transfer();
-      }
+          this->compile_system_transfer();
+        }
 
       template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
       void assemble_grad_div_matrices(const SpaceVelo_& space_velo, const SpacePres_& space_pres, const Cubature_& cubature)
       {
         Assembly::GradPresDivVeloAssembler::assemble(this->matrix_b.local(), this->matrix_d.local(),
-          space_velo, space_pres, cubature);
+        space_velo, space_pres, cubature);
       }
 
       template<typename SpaceVelo_>
@@ -502,54 +502,104 @@ namespace FEAT
         // assemble matrix structure
         Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_s.local(), space_pres);
       }
-    }; // class StokesBlockedSystemLevel<...>
+  }; // class StokesBlockedSystemLevel<...>
 
     template<
-      int dim_,
-      typename MemType_ = Mem::Main,
-      typename DataType_ = Real,
-      typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
-      >
-    class StokesBlockedUnitVeloNonePresSystemLevel :
-      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
-        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+    int dim_,
+    typename MemType_ = Mem::Main,
+    typename DataType_ = Real,
+    typename IndexType_ = Index,
+    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+    typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
+    typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+  >
+  class StokesBlockedUnitVeloNonePresSystemLevel :
+    public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+    MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
-    public:
-      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      public:
+        typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
-      // define local filter types
-      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
-      typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
-      typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
+        // define local filter types
+        typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
+        typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+        typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
-      // define global filter types
-      typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
-      typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
-      typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
+        // define global filter types
+        typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+        typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+        typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
 
-      // (global) filters
-      GlobalSystemFilter filter_sys;
-      GlobalVeloFilter filter_velo;
-      GlobalPresFilter filter_pres;
+        // (global) filters
+        GlobalSystemFilter filter_sys;
+        GlobalVeloFilter filter_velo;
+        GlobalPresFilter filter_pres;
 
-      /// \brief Returns the total amount of bytes allocated.
-      std::size_t bytes() const
-      {
-        return this->filter_sys.bytes() + BaseClass::bytes();
-      }
+        /// \brief Returns the total amount of bytes allocated.
+        std::size_t bytes() const
+        {
+          return this->filter_sys.bytes() + BaseClass::bytes();
+        }
 
-      void compile_system_filter()
-      {
-        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
-        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
-      }
+        void compile_system_filter()
+        {
+          (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+          (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        }
+    };
+
+    template<
+    int dim_,
+    typename MemType_ = Mem::Main,
+    typename DataType_ = Real,
+    typename IndexType_ = Index,
+    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+    typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
+    typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+  >
+  class StokesBlockedSlipUnitVeloNonePresSystemLevel :
+    public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+    MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+    {
+      public:
+        typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+
+        // define local filter types
+        typedef LAFEM::SlipFilter<MemType_, DataType_, IndexType_, dim_> LocalVeloSlipFilter;
+        typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloUnitFilter;
+        typedef LAFEM::FilterChain<LocalVeloSlipFilter, LocalVeloUnitFilter> LocalVeloFilter;
+        typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+        typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
+
+        // define global filter types
+        typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+        typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+        typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
+
+        // (global) filters
+        GlobalSystemFilter filter_sys;
+        GlobalVeloFilter filter_velo;
+        GlobalPresFilter filter_pres;
+
+        /// \brief Returns the total amount of bytes allocated.
+        std::size_t bytes() const
+        {
+          return this->filter_sys.bytes() + BaseClass::bytes();
+        }
+
+        void compile_system_filter()
+        {
+          (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+          (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        }
     };
 
     /**
@@ -572,10 +622,10 @@ namespace FEAT
     >
     struct StokesBlockedUnitVeloMeanPresSystemLevel :
       public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
-        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+      MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
       typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
-        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+      MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
       typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
@@ -648,6 +698,145 @@ namespace FEAT
         fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
       }
     }; // struct StokesBlockedUnitVeloMeanPresSystemLevel<...>
+
+    template<
+    int dim_,
+    typename MemType_ = Mem::Main,
+    typename DataType_ = Real,
+    typename IndexType_ = Index,
+    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
+    typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
+    typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+  >
+  class StokesBlockedSlipUnitVeloMeanPresSystemLevel :
+    public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+    MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+    {
+      public:
+        typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+
+        // define local filter types
+        typedef LAFEM::SlipFilter<MemType_, DataType_, IndexType_, dim_> LocalVeloSlipFilter;
+        typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloUnitFilter;
+        typedef LAFEM::FilterChain<LocalVeloSlipFilter, LocalVeloUnitFilter> LocalVeloFilter;
+        typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+        typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
+
+        // define global filter types
+        typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+        typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+        typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
+
+        // (global) filters
+        GlobalSystemFilter filter_sys;
+        GlobalVeloFilter filter_velo;
+        GlobalPresFilter filter_pres;
+
+        /// \brief Returns the total amount of bytes allocated.
+        std::size_t bytes() const
+        {
+          return this->filter_sys.bytes() + BaseClass::bytes();
+        }
+
+        void compile_system_filter()
+        {
+          (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+          (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        }
+
+        /**
+         *
+         * \brief Conversion method
+         *
+         * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
+         *
+         */
+        template<typename M_, typename D_, typename I_, typename SM_>
+        void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+        {
+          BaseClass::convert(other);
+          filter_velo.convert(other.filter_velo);
+          filter_pres.convert(other.filter_pres);
+
+          compile_system_filter();
+        }
+
+        template<typename SpacePres_, typename Cubature_>
+        void assemble_global_filters(const SpacePres_& space_pres, const Cubature_& cubature)
+        {
+          // get our local pressure filter
+          LocalPresFilter& fil_loc_p = this->filter_pres.local();
+
+          // create two global vectors
+          typename BaseClass::GlobalPresVector vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
+
+          // fetch the local vectors
+          typename BaseClass::LocalPresVector& vec_loc_v = *vec_glob_v;
+          typename BaseClass::LocalPresVector& vec_loc_w = *vec_glob_w;
+
+          // fetch the frequency vector of the pressure gate
+          typename BaseClass::LocalPresVector& vec_loc_f = this->gate_pres._freqs;
+
+          // assemble the mean filter
+          Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space_pres, cubature);
+
+          // synchronise the vectors
+          vec_glob_v.sync_1();
+          vec_glob_w.sync_0();
+
+          // build the mean filter
+          fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
+
+          // Sync the filter vector in the SlipFilter
+          const typename BaseClass::VeloGate& my_col_gate(this->gate_velo);
+
+          // For all slip filters...
+          //for(auto& it : filter_sys.local().template at<0>())
+          //{
+
+          auto& it = filter_velo.local().template at<0>();
+          // get the filter vector
+          auto& slip_filter_vector = it.get_filter_vector();
+
+          if(slip_filter_vector.used_elements() > 0)
+          {
+            // Temporary DenseVector for syncing
+            typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
+
+            auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
+            auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
+
+            // Copy sparse filter vector contents to DenseVector
+            for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+            {
+              Index idense(slip_filter_vector.indices()[isparse]);
+              tmp_elements[idense] = sfv_elements[isparse];
+            }
+
+            my_col_gate.sync_0(tmp);
+            // Copy sparse filter vector contents to DenseVector
+            for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+            {
+              Index idense(slip_filter_vector.indices()[isparse]);
+              tmp_elements[idense].normalise();
+              sfv_elements[isparse] = tmp_elements[idense];
+
+            }
+          }
+          else
+          {
+            // Temporary DenseVector for syncing
+            typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
+            my_col_gate.sync_0(tmp);
+          }
+        }
+        //}
+    };
+
   } // namespace Control
 } // namespace FEAT
 

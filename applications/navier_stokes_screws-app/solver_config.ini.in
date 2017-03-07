@@ -36,8 +36,8 @@ max_iter = 1000
 #tol_abs = 1e-4
 tol_rel = 1e-8
 precon = mgv_s
-min_stag_iter = 3
-plot = summary
+#min_stag_iter = 3
+plot = all
 
 [mgv_s]
 type = mg
@@ -48,7 +48,7 @@ cycle = v
 
 [h1_s]
 type = hierarchy
-smoother = cg
+smoother = rich
 coarse = Coarse-S
 
 [Coarse-S]
@@ -151,9 +151,13 @@ precon = mgv_a
 
 [rich]
 type = richardson
-max_iter = 4
-min_iter = 4
-precon = jac
+max_iter = 8
+min_iter = 8
+precon = jac-smoother
+
+[jac-smoother]
+type = jacobi
+omega = 0.4
 
 [jac]
 type = jacobi

@@ -51,6 +51,16 @@ namespace FEAT
           return _level_index;
         }
 
+        std::shared_ptr<MeshNodeType> get_mesh_node_ptr()
+        {
+          return _mesh_node;
+        }
+
+        const std::shared_ptr<MeshNodeType> get_mesh_node_ptr() const
+        {
+          return _mesh_node;
+        }
+
         MeshNodeType* get_mesh_node()
         {
           return _mesh_node.get();
