@@ -63,8 +63,10 @@ namespace FEAT
           /// The type of levels of DomainControl
           typedef typename DomainControl_::LevelType DomainLevel;
 
+          typedef typename DomainControl_::MeshType MeshType;
+
           /// The type of transformation we optimise the mesh for
-          typedef typename DomainLevel::TrafoType TrafoType;
+          //typedef typename DomainLevel::TrafoType TrafoType;
           /// The world dimension, i.e. number of coordinates
           static constexpr int world_dim = DomainControl_::MeshType::world_dim;
           /// Floating point type for coordinates
@@ -79,7 +81,7 @@ namespace FEAT
           typedef Global::Vector<LocalCoordsBuffer, CoordsMirror> GlobalCoordsBuffer;
 
           /// Type of the vtk exporter this (and derived classes) can write to
-          typedef Geometry::ExportVTK<typename TrafoType::MeshType> VTKExporterType;
+          typedef Geometry::ExportVTK<MeshType> VTKExporterType;
 
         protected:
           /// The domain control whose mesh objects can be modified
@@ -107,6 +109,11 @@ namespace FEAT
            */
           virtual ~MeshoptControlBase()
           {
+          }
+
+          const MeshType& get_mesh(Index lvl)
+          {
+            return _dom_ctrl.at(lvl)->get_mesh();
           }
 
           /**
@@ -229,7 +236,7 @@ namespace FEAT
            * This level's data gets added.
            */
           virtual void add_to_vtk_exporter
-            (Geometry::ExportVTK<typename TrafoType::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
+            (Geometry::ExportVTK<MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
             {
             }
 
