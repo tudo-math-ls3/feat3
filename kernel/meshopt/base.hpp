@@ -6,7 +6,6 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 
-/// \cond internal
 namespace FEAT
 {
   /**
@@ -20,6 +19,7 @@ namespace FEAT
    */
   namespace Meshopt
   {
+    /// \cond internal
     namespace Intern
     {
       /**
