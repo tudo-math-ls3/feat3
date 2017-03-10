@@ -4,6 +4,7 @@
 
 // includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/geometry/intern/face_ref_trafo.hpp>
 #include <kernel/geometry/intern/congruency_sampler.hpp>

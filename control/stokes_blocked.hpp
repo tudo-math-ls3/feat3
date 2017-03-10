@@ -5,6 +5,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/lafem/filter_chain.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
@@ -13,6 +14,7 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/mean_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
+#include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
 #include <kernel/lafem/tuple_mirror.hpp>
 #include <kernel/lafem/tuple_diag_matrix.hpp>
