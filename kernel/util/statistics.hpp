@@ -262,11 +262,12 @@ namespace FEAT
        * \note This method makes some simplifications, e.g. stating only one smoother
        * for the complete FEAT::Solver::BasicVCycle.
        *
-       * \note The solver must have been executed (successfully) at least one time before a compress_solver_expressions() call,
-       * to make the solver tree available.
+       * \note The solver must have been executed (successfully) at least one time, to make the solver tree available.
        */
       static String get_formatted_solver_tree(String target = "default")
       {
+        if (_formatted_solver_trees.count(target) == 0)
+          compress_solver_expressions();
         return _formatted_solver_trees.at(target);
       }
 
