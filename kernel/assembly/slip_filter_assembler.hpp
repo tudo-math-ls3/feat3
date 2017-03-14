@@ -478,7 +478,12 @@ namespace FEAT
           OuterNormalComputer<Trafo_>::compute_outer_unit_normal(
             buffer.get_nu(), _facets, _orientation, space.get_trafo());
 
-          Intern::Lagrange2InterpolatorWrapper<SpaceType>::project(buffer.get_filter_vector(), buffer.get_nu(), space, _target_set_holder);
+          // We only have something to do if the filter is not empty after recompute_target_set_holder()
+          if(buffer.get_nu().used_elements() > Index(0))
+          {
+            Intern::Lagrange2InterpolatorWrapper<SpaceType>::project(
+              buffer.get_filter_vector(), buffer.get_nu(), space, _target_set_holder);
+          }
           // Upload assembled result
           filter.convert(buffer);
 
