@@ -27,7 +27,11 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
   if "ccache" in buildid:
     cxxflags += " -Qunused-arguments"
   if "debug" in buildid or "noop" in buildid:
-    cxxflags += " -O0  -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+    if major < 4:
+      cxxflags += " -O0"
+    else:
+      cxxflags += " -Og"
+    cxxflags += " -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     if platform.system() != "Darwin":
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
     if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
