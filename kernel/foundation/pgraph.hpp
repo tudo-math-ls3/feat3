@@ -251,7 +251,7 @@ namespace FEAT
           const Index* xadjc(xadj);
           const Index* adjncyc(adjncy);
 
-          Adjacency::Graph g((Index)num_dualvtx, Index(num_vtx), (Index)num_dualvtx * vtxcount_at_elem, xadjc, nullptr, adjncyc);
+          Adjacency::Graph g((Index)num_dualvtx, Index(num_vtx), (Index)num_dualvtx * vtxcount_at_elem, xadjc, adjncyc);
           Adjacency::Graph gt(Adjacency::rt_transpose, g);
           Adjacency::Graph n(Adjacency::rt_injectify, g, gt);
 
@@ -459,7 +459,7 @@ namespace FEAT
           const Index* xadjc(xadj);
           const Index* adjncyc(adjncy);
 
-          Adjacency::Graph g((Index)num_dualvtx, Index(num_vtx), (Index)num_dualvtx * vtxcount_at_elem, xadjc, nullptr, adjncyc);
+          Adjacency::Graph g((Index)num_dualvtx, Index(num_vtx), (Index)num_dualvtx * vtxcount_at_elem, xadjc, adjncyc);
           Adjacency::Graph gt(Adjacency::rt_transpose, g);
           Adjacency::Graph n(Adjacency::rt_injectify, g, gt);
 
@@ -784,7 +784,7 @@ namespace FEAT
           const Index* xadjc(xadj);
           const Index* adjncyc(adjncy);
 
-          Adjacency::Graph g((Index)num_dualvtx, Index(num_vtx), (Index)num_dualvtx * vtxcount_at_elem, xadjc, nullptr, adjncyc);
+          Adjacency::Graph g((Index)num_dualvtx, Index(num_vtx), (Index)num_dualvtx * vtxcount_at_elem, xadjc, adjncyc);
           Adjacency::Graph gt(Adjacency::rt_transpose, g);
           Adjacency::Graph n(Adjacency::rt_injectify, g, gt);
 

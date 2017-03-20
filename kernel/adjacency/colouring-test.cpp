@@ -89,7 +89,7 @@ public:
       0, 2,
       1, 3, 6
     };
-    Graph g(7, 7, 20, g_ptr, nullptr, g_idx);
+    Graph g(7, 7, 20, g_ptr, g_idx);
 
     // create a colouring object for this graph
     Colouring c(g);

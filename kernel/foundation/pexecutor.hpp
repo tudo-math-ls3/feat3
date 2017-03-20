@@ -115,18 +115,15 @@ namespace FEAT
 
             Adjacency::Graph rank_at_element()
             {
-              Index*  ptr(new Index[std::size_t(_size + 1)]);
-              for(Index i(0) ; i < Index(_size) + 1 ; ++i)
+              Adjacency::Graph result(Index(_size), Index(_comm->size()), Index(_size));
+
+              Index* ptr = result.get_domain_ptr();
+              for(Index i(0) ; i <= Index(_size) ; ++i)
                 ptr[i] = i;
 
-              Index* part(new Index[std::size_t(_size)]);
+              Index* part = result.get_image_idx();
               for(Index i(0) ; i < Index(_size) ; ++i)
                 part[i] = Index(_part[i]);
-
-              Adjacency::Graph result(Index(_size), Index(_comm->size()), Index(_size), ptr, nullptr, part);
-
-              delete[] ptr;
-              delete[] part;
 
               return result;
             }

@@ -49,13 +49,6 @@ namespace FEAT
       Index* _domain_ptr;
 
       /**
-       * \brief Domain end-pointer array
-       *
-       * Dimension: #_num_nodes_domain
-       */
-      Index* _domain_end;
-
-      /**
        * \brief Image node index array
        *
        * Dimension: #_num_indices_image
@@ -95,15 +88,11 @@ namespace FEAT
        *
        * \param[in] num_indices_image
        * The total number of image node indices for the graph.
-       *
-       * \param[in] alloc_domain_end
-       * If \c true, then the #_domain_end array will be allocated, otherwise #_domain_end is set to \c nullptr.
        */
       Graph(
         Index num_nodes_domain,
         Index num_nodes_image,
-        Index num_indices_image,
-        bool alloc_domain_end = false);
+        Index num_indices_image);
 
       /**
        * \brief "Using-Arrays" Constructor
@@ -122,9 +111,6 @@ namespace FEAT
        * \param[in] domain_ptr
        * The domain pointer array for the graph. Must not be \c nullptr.
        *
-       * \param[in] domain_end
-       * The domain end-pointer array for the graph. May be \c nullptr.
-       *
        * \param[in] image_idx
        * The image node index array for the graph. Must not be \c nullptr.
        *
@@ -139,7 +125,6 @@ namespace FEAT
         Index num_nodes_image,
         Index num_indices_image,
         Index* domain_ptr,
-        Index* domain_end,
         Index* image_idx,
         bool shared);
 
@@ -160,9 +145,6 @@ namespace FEAT
        * \param[in] domain_ptr
        * The domain pointer array for the graph. Must not be \c nullptr.
        *
-       * \param[in] domain_end
-       * The domain end-pointer array for the graph. May be \c nullptr.
-       *
        * \param[in] image_idx
        * The image node index array for the graph. Must not be \c nullptr.
        */
@@ -171,7 +153,6 @@ namespace FEAT
         Index num_nodes_image,
         Index num_indices_image,
         const Index* domain_ptr,
-        const Index* domain_end,
         const Index* image_idx);
 
       /**
@@ -194,7 +175,6 @@ namespace FEAT
         _num_nodes_image(0),
         _num_indices_image(0),
         _domain_ptr(nullptr),
-        _domain_end(nullptr),
         _image_idx(nullptr),
         _shared(false)
       {
@@ -247,7 +227,6 @@ namespace FEAT
         _num_nodes_image(0),
         _num_indices_image(0),
         _domain_ptr(nullptr),
-        _domain_end(nullptr),
         _image_idx(nullptr),
         _shared(false)
       {
@@ -308,7 +287,7 @@ namespace FEAT
       Graph clone() const
       {
         if(_domain_ptr != nullptr)
-          return Graph(_num_nodes_domain, _num_nodes_image, _num_indices_image, _domain_ptr, _domain_end, _image_idx);
+          return Graph(_num_nodes_domain, _num_nodes_image, _num_indices_image, _domain_ptr, _image_idx);
         else
           return Graph();
       }
@@ -330,10 +309,7 @@ namespace FEAT
       Index degree(Index domain_node) const
       {
         ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
-        if(_domain_end != nullptr)
-          return _domain_end[domain_node] - _domain_ptr[domain_node];
-        else
-          return _domain_ptr[domain_node+1] - _domain_ptr[domain_node];
+        return _domain_ptr[domain_node+1] - _domain_ptr[domain_node];
       }
 
       /**
@@ -365,25 +341,6 @@ namespace FEAT
       const Index* get_domain_ptr() const
       {
         return _domain_ptr;
-      }
-
-      /**
-       * \brief Returns the domain end-pointer array.
-       *
-       * \warning Please note that a graph does not necessarily have a domain end-pointer array, thus this function
-       * might return a \c nullptr even if the graph is not empty.
-       *
-       * \returns The domain end-pointer array.
-       */
-      Index* get_domain_end()
-      {
-        return _domain_end;
-      }
-
-      /** \copydoc get_domain_end() */
-      const Index* get_domain_end() const
-      {
-        return _domain_end;
       }
 
       /**
@@ -972,11 +929,7 @@ namespace FEAT
       inline ImageIterator image_end(Index domain_node) const
       {
         ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
-
-        if(_domain_end != nullptr)
-          return &_image_idx[_domain_end[domain_node]];
-        else
-          return &_image_idx[_domain_ptr[domain_node+1]];
+        return &_image_idx[_domain_ptr[domain_node+1]];
       }
     }; // class Graph
   } // namespace Adjacency

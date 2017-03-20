@@ -68,7 +68,7 @@ namespace FEAT
         }
 
         // create an adjacency graph
-        return Adjacency::Graph(num_cells, num_dofs, dom_ptr[num_cells], dom_ptr, nullptr, img_idx, false);
+        return Adjacency::Graph(num_cells, num_dofs, dom_ptr[num_cells], dom_ptr, img_idx, false);
       }
     }; // class DofMappingRenderer
   } // namespace Space

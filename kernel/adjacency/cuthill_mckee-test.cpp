@@ -322,7 +322,7 @@ public:
       5, 8, 9, 10,
       8, 9, 11
     };
-    Graph g(12, 12, 40, g_ptr, nullptr, g_idx);
+    Graph g(12, 12, 40, g_ptr, g_idx);
 
     // test Cuthill McKee algorithm
     TEST_CHECK(test_min_root(g));

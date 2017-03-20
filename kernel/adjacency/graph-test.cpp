@@ -322,7 +322,7 @@ public:
       2, 4, 6, 1, 3
     };
 
-    Graph g(7, 7, 41, g_ptr, nullptr, g_idx);
+    Graph g(7, 7, 41, g_ptr, g_idx);
 
     // sort the graph
     g.sort_indices();
@@ -369,7 +369,7 @@ public:
       1, 3, 6,
       0, 3, 4
     };
-    Graph g(5, 7, 17, g_ptr, nullptr, g_idx);
+    Graph g(5, 7, 17, g_ptr, g_idx);
 
     // transpose the graph G
     Graph f(rt_transpose, g);

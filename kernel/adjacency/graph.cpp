@@ -12,7 +12,6 @@ namespace FEAT
       _num_nodes_image(0),
       _num_indices_image(0),
       _domain_ptr(nullptr),
-      _domain_end(nullptr),
       _image_idx(nullptr),
       _shared(false)
     {
@@ -22,22 +21,16 @@ namespace FEAT
     Graph::Graph(
       Index num_nodes_domain,
       Index num_nodes_image,
-      Index num_indices_image,
-      bool alloc_domain_end)
+      Index num_indices_image)
         :
       _num_nodes_domain(num_nodes_domain),
       _num_nodes_image(num_nodes_image),
       _num_indices_image(num_indices_image),
       _domain_ptr(nullptr),
-      _domain_end(nullptr),
       _image_idx(nullptr),
       _shared(false)
     {
       _domain_ptr = new Index[_num_nodes_domain+1];
-      if(alloc_domain_end)
-      {
-        _domain_end = new Index[_num_nodes_domain];
-      }
       _image_idx = new Index[_num_indices_image];
     }
 
@@ -47,7 +40,6 @@ namespace FEAT
       Index num_nodes_image,
       Index num_indices_image,
       Index* domain_ptr,
-      Index* domain_end,
       Index* image_idx,
       bool shared)
         :
@@ -55,7 +47,6 @@ namespace FEAT
       _num_nodes_image(num_nodes_image),
       _num_indices_image(num_indices_image),
       _domain_ptr(domain_ptr),
-      _domain_end(domain_end),
       _image_idx(image_idx),
       _shared(shared)
     {
@@ -67,14 +58,12 @@ namespace FEAT
       Index num_nodes_image,
       Index num_indices_image,
       const Index* domain_ptr,
-      const Index* domain_end,
       const Index* image_idx)
         :
       _num_nodes_domain(num_nodes_domain),
       _num_nodes_image(num_nodes_image),
       _num_indices_image(num_indices_image),
       _domain_ptr(nullptr),
-      _domain_end(nullptr),
       _image_idx(nullptr),
       _shared(false)
     {
@@ -82,14 +71,6 @@ namespace FEAT
       for(Index i(0); i <= num_nodes_domain; ++i)
       {
         _domain_ptr[i] = domain_ptr[i];
-      }
-      if(domain_end != nullptr)
-      {
-        _domain_end = new Index[num_nodes_domain];
-        for(Index i(0); i < num_nodes_domain; ++i)
-        {
-          _domain_end[i] = domain_end[i];
-        }
       }
       _image_idx = new Index[num_indices_image];
       for(Index i(0); i < num_indices_image; ++i)
@@ -104,12 +85,11 @@ namespace FEAT
       _num_nodes_image(other._num_nodes_image),
       _num_indices_image(other._num_indices_image),
       _domain_ptr(other._domain_ptr),
-      _domain_end(other._domain_end),
       _image_idx(other._image_idx),
       _shared(other._shared)
     {
       other._num_nodes_domain = other._num_nodes_image = other._num_indices_image = Index(0);
-      other._domain_ptr = other._domain_end = nullptr;
+      other._domain_ptr = nullptr;
       other._image_idx = nullptr;
       other._shared = false;
     }
@@ -127,20 +107,17 @@ namespace FEAT
           delete [] _image_idx;
         if(_domain_ptr != nullptr)
           delete [] _domain_ptr;
-        if(_domain_end != nullptr)
-          delete [] _domain_end;
       }
 
       _num_nodes_domain = other._num_nodes_domain;
       _num_nodes_image = other._num_nodes_image;
       _num_indices_image = other._num_indices_image;
       _domain_ptr = other._domain_ptr;
-      _domain_end = other._domain_end;
       _image_idx = other._image_idx;
       _shared = other._shared;
 
       other._num_nodes_domain = other._num_nodes_image = other._num_indices_image = Index(0);
-      other._domain_ptr = other._domain_end = nullptr;
+      other._domain_ptr = nullptr;
       other._image_idx = nullptr;
       other._shared = false;
 
@@ -153,7 +130,6 @@ namespace FEAT
       _num_nodes_image(other.get_num_nodes_image()),
       _num_indices_image(other.get_num_indices()),
       _domain_ptr(new Index[_num_nodes_domain+1]),
-      _domain_end(nullptr),
       _image_idx(new Index[_num_indices_image]),
       _shared(false)
     {
@@ -195,27 +171,15 @@ namespace FEAT
           delete [] _image_idx;
         if(_domain_ptr != nullptr)
           delete [] _domain_ptr;
-        if(_domain_end != nullptr)
-          delete [] _domain_end;
       }
     }
 
     Index Graph::degree() const
     {
       Index deg = 0;
-      if(_domain_end != nullptr)
+      for(Index i(0); i < _num_nodes_domain; ++i)
       {
-        for(Index i(0); i < _num_nodes_domain; ++i)
-        {
-          deg = std::max(deg, _domain_end[i] - _domain_ptr[i]);
-        }
-      }
-      else
-      {
-        for(Index i(0); i < _num_nodes_domain; ++i)
-        {
-          deg = std::max(deg, _domain_ptr[i+1] - _domain_ptr[i]);
-        }
+        deg = std::max(deg, _domain_ptr[i+1] - _domain_ptr[i]);
       }
       return deg;
     }
@@ -225,14 +189,11 @@ namespace FEAT
       XASSERTM(_domain_ptr != nullptr, "domain pointer array is missing");
       XASSERTM(_image_idx != nullptr, "image index array is missing");
 
-      // fetch row-end pointer
-      Index* domain_end = _domain_end != nullptr ? _domain_end : &_domain_ptr[1];
-
       // loop over all domain nodes
       for(Index i(0); i < _num_nodes_domain; ++i)
       {
         // apply linear insertion sort onto the adjacency indices
-        for(Index j(_domain_ptr[i] + 1); j < domain_end[i]; ++j)
+        for(Index j(_domain_ptr[i] + 1); j < _domain_ptr[i+1]; ++j)
         {
           Index x = _image_idx[j];
           Index k(j);
