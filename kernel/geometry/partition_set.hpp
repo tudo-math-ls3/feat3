@@ -220,7 +220,7 @@ namespace FEAT
        * A pointer to a Partition object that meets the requirements or \c nullptr,
        * if no suitable partition was found in the set.
        */
-      const Partition* find_partition(Index size, const String& name = "", int prio = 0) const
+      const Partition* find_partition(int size, const String& name = "", int prio = 0) const
       {
         const Partition* part(nullptr);
 
@@ -228,7 +228,7 @@ namespace FEAT
         for(auto it = _parts.begin(); it != _parts.end(); ++it)
         {
           // check size
-          if(it->size() != size)
+          if(int(it->size()) != size)
             continue;
 
           // check name

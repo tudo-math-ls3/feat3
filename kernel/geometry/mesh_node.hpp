@@ -799,34 +799,61 @@ namespace FEAT
       /**
        * \brief Extracts a patch from the root mesh as a new mesh node
        *
+       * This function also computes the communication neighbour ranks.
+       *
+       * \param[out] comm_ranks
+       * The communication neighbour ranks vector for this process.
+       *
+       * \param[in] elems_at_rank
+       * The elements-at-rank graph representing the partitioning
+       * from which the patch is to be extracted.
+       *
        * \param[in] rank
        * The rank of the patch to be created.
-       *
-       * \param[in] ranks_at_elem
-       * A graph specifies the ranks for each element of the base mesh
-       *
-       * \param[in] comm_ranks
-       * A vector of all ranks adjacent to the current rank
        *
        * \returns
        * A new mesh node representing the extracted patch.
        */
       RootMeshNode* extract_patch(
-        const Index rank,
-        const Adjacency::Graph& ranks_at_elem,
-        const std::vector<Index>& comm_ranks)
+        std::vector<int>& comm_ranks,
+        const Adjacency::Graph& elems_at_rank,
+        const int rank)
       {
-        // get base root mesh
-        MeshType& base_root_mesh = *this->get_mesh();
+        // get dimensions of graph
+        const Index num_elems = elems_at_rank.get_num_nodes_image();
 
-        // get all mesh part names
-        std::deque<String> part_names = this->get_mesh_part_names();
+        // get our mesh
+        const MeshType* base_root_mesh = this->get_mesh();
+        XASSERTM(base_root_mesh != nullptr, "mesh node has no mesh");
 
-        // Step 1: create mesh part of the patch
+        // validate element count
+        XASSERTM(num_elems == base_root_mesh->get_num_elements(), "mesh vs partition: element count mismatch");
+
+        // Step 1: compute neighbour ranks
+        {
+          // get vertices-at-element
+          const auto& verts_at_elem = base_root_mesh->template get_index_set<MeshType::shape_dim, 0>();
+
+          // build vertices-at-rank
+          Adjacency::Graph verts_at_rank(Adjacency::rt_injectify, elems_at_rank, verts_at_elem);
+
+          // transpose and build ranks-at-rank (via vertices)
+          Adjacency::Graph ranks_at_vert(Adjacency::rt_transpose, verts_at_rank);
+          Adjacency::Graph ranks_at_rank(Adjacency::rt_injectify, verts_at_rank, ranks_at_vert);
+
+          // build comm neighbour ranks vector
+          for(auto it = ranks_at_rank.image_begin(Index(rank)); it != ranks_at_rank.image_end(Index(rank)); ++it)
+          {
+            if(int(*it) != rank)
+              comm_ranks.push_back(int(*it));
+          }
+        }
+
+        // Step 2: create mesh part of the patch
         MeshPartType* patch_mesh_part = nullptr;
         {
           // create a factory for our partition
-          PatchMeshPartFactory<MeshType> part_factory(rank, ranks_at_elem);
+          PatchMeshPartFactory<MeshType> part_factory(Index(rank), elems_at_rank);
 
           // ensure that the partition is not empty
           if(part_factory.empty())
@@ -840,27 +867,30 @@ namespace FEAT
           // create patch mesh part
           patch_mesh_part = new MeshPartType(part_factory);
           patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
-            base_root_mesh.get_index_set_holder());
+            base_root_mesh->get_index_set_holder());
 
           /// \todo really add to this mesh node?
           this->add_mesh_part(String("_patch:") + stringify(rank), patch_mesh_part);
         }
 
-        // Step 2: Create root mesh of partition by using PatchFactory
+        // Step 3: Create root mesh of partition by using PatchFactory
         MeshType* patch_root_mesh = nullptr;
         {
           // create patch root mesh
-          PatchFactory<MeshType> patch_factory(base_root_mesh, *patch_mesh_part);
+          PatchFactory<MeshType> patch_factory(*base_root_mesh, *patch_mesh_part);
           patch_root_mesh = new MeshType(patch_factory);
         }
 
-        // Step 3: Create root mesh node for mesh
+        // Step 4: Create root mesh node for mesh
         RootMeshNode* patch_node = new RootMeshNode(patch_root_mesh, this->_atlas);
 
-        // Step 4: intersect boundary and other base mesh parts
+        // Step 5: intersect boundary and other base mesh parts
         {
           // create mesh part splitter
-          PatchMeshPartSplitter<MeshType> part_splitter(base_root_mesh, *patch_mesh_part);
+          PatchMeshPartSplitter<MeshType> part_splitter(*base_root_mesh, *patch_mesh_part);
+
+          // get all mesh part names
+          std::deque<String> part_names = this->get_mesh_part_names();
 
           // loop over all base-mesh mesh parts
           for(auto it = part_names.begin(); it != part_names.end(); ++it)
@@ -888,16 +918,16 @@ namespace FEAT
           }
         }
 
-        // Step 5: Create halos
+        // Step 6: Create halos
         {
           // create halo builder
-          PatchHaloBuilder<MeshType> halo_builder(ranks_at_elem, base_root_mesh, *patch_mesh_part);
+          PatchHaloBuilder<MeshType> halo_builder(elems_at_rank, *base_root_mesh, *patch_mesh_part);
 
           // loop over all comm ranks
           for(auto it = comm_ranks.begin(); it != comm_ranks.end(); ++it)
           {
             // build halo
-            halo_builder.build(*it);
+            halo_builder.build(Index(*it));
 
             // create halo mesh part
             MeshPartType* halo_part = new MeshPartType(halo_builder);
@@ -909,79 +939,6 @@ namespace FEAT
 
         // return patch mesh part
         return patch_node;
-      }
-
-      /**
-       * \brief Extracts a patch from a manual partition represented by a graph.
-       *
-       * This function also computes the communication ranks and tags.
-       *
-       * \param[out] comm_ranks
-       * The communication ranks vector for this rank.
-       *
-       * \param[out] comm_tags
-       * The communication tags vector for this rank.
-       *
-       * \param[in] elems_at_rank
-       * The elements-at-rank graph representing the partition
-       * from which the patch is to be extracted.
-       *
-       * \param[in] rank
-       * The rank of the patch to be created.
-       *
-       * \returns
-       * A new mesh node representing the extracted patch.
-       */
-      RootMeshNode* extract_patch(
-        std::vector<Index>& comm_ranks,
-        std::vector<Index>& comm_tags,
-        const Adjacency::Graph& elems_at_rank,
-        const Index rank)
-      {
-        // get dimensions of graph
-        //const Index num_ranks = elems_at_rank.get_num_nodes_domain();
-        const Index num_elems = elems_at_rank.get_num_nodes_image();
-
-        // get our mesh
-        const MeshType* mesh = this->get_mesh();
-        XASSERTM(mesh != nullptr, "mesh node has no mesh");
-
-        // validate element count
-        XASSERTM(num_elems == mesh->get_num_elements(), "mesh vs partition: element count mismatch");
-
-        // transpose for ranks-at-elem
-        Adjacency::Graph ranks_at_elem(Adjacency::rt_transpose, elems_at_rank);
-
-        // get vertices-at-element
-        const auto& verts_at_elem = mesh->template get_index_set<MeshType::shape_dim, 0>();
-
-        // build vertices-at-rank
-        Adjacency::Graph verts_at_rank(Adjacency::rt_injectify, elems_at_rank, verts_at_elem);
-
-        // transpose and build ranks-at-rank (via vertices)
-        Adjacency::Graph ranks_at_vert(Adjacency::rt_transpose, verts_at_rank);
-        Adjacency::Graph ranks_at_rank(Adjacency::rt_injectify, verts_at_rank, ranks_at_vert);
-
-        // compute uni-directional edge set
-        Adjacency::UniEdgeSet edge_set(ranks_at_rank);
-
-        // build comm ranks and tags
-        const Index* ptr = ranks_at_rank.get_domain_ptr();
-        const Index* idx = ranks_at_rank.get_image_idx();
-        for(Index i = ptr[rank]; i < ptr[rank+1]; ++i)
-        {
-          Index other = idx[i];
-          if(other == rank)
-            continue;
-          comm_ranks.push_back(other);
-
-          Index edge = edge_set.find_edge(rank, other);
-          XASSERTM(edge != ~Index(0), "could not find comm edge");
-          comm_tags.push_back(edge);
-        }
-
-        // okay, extract our patch
-        return extract_patch(rank, ranks_at_elem, comm_ranks);
       }
 
       /**
@@ -1005,12 +962,11 @@ namespace FEAT
        * A new mesh node representing the extracted patch.
        */
       RootMeshNode* extract_patch(
-        std::vector<Index>& comm_ranks,
-        std::vector<Index>& comm_tags,
+        std::vector<int>& comm_ranks,
         const Partition& partition,
-        const Index rank)
+        const int rank)
       {
-        return extract_patch(comm_ranks, comm_tags, partition.get_patches(), rank);
+        return extract_patch(comm_ranks, partition.get_patches(), rank);
       }
 
       /**

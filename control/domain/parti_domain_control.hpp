@@ -650,8 +650,8 @@ namespace FEAT
         bool _create_partition_auto_manual()
         {
           // get rank and nprocs
-          Index rank = Index(this->_comm.rank());
-          Index nprocs = Index(this->_comm.size());
+          int rank = this->_comm.rank();
+          int nprocs = this->_comm.size();
 
           //if(rank == Index(0))
           //  std::cout << "Searching for suitable manual partition..." << std::endl;
@@ -674,10 +674,10 @@ namespace FEAT
           this->_refine_base_mesh_to_level(part->get_level());
 
           // comm ranks and tags
-          std::vector<Index> ranks, ctags;
+          std::vector<int> ranks;
 
           // extract our patch
-          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, ctags, *part, rank));
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, *part, rank));
 
           // >>>>> DEBUG >>>>>
           /*
@@ -693,9 +693,7 @@ namespace FEAT
           // <<<<< DEBUG <<<<<
 
           // set neighbour ranks
-          LayerType& layer = *this->_layers.front();
-          for(auto r : ranks)
-            layer.push_neighbour(int(r));
+          this->_layers.front()->set_neighbour_ranks(ranks);
 
           // okay
           return true;
@@ -718,7 +716,7 @@ namespace FEAT
         bool _create_partition_2level()
         {
           // get rank and nprocs
-          Index rank = Index(this->_comm.rank());
+          int rank = this->_comm.rank();
           Index nprocs = Index(this->_comm.size());
 
           // create a 2-lvl partitioner
@@ -740,15 +738,13 @@ namespace FEAT
           Adjacency::Graph elems_at_rank(partitioner.build_elems_at_rank());
 
           // comm ranks and tags
-          std::vector<Index> ranks, ctags;
+          std::vector<int> ranks;
 
           // extract our patch
-          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, ctags, elems_at_rank, rank));
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, elems_at_rank, rank));
 
           // set neighbour ranks
-          LayerType& layer = *this->_layers.front();
-          for(auto r : ranks)
-            layer.push_neighbour(int(r));
+          this->_layers.front()->set_neighbour_ranks(ranks);
 
           // okay
           return true;
@@ -829,7 +825,7 @@ namespace FEAT
           typedef PExecutorT_ PartT;
 
           // get rank and nprocs
-          const Index rank = Index(this->_comm.rank());
+          const int rank = this->_comm.rank();
           const Index nprocs = Index(this->_comm.size());
 
           // refine base mesh if necessary
@@ -857,20 +853,19 @@ namespace FEAT
           PartT::fill_comm_structs_global(synched_part, global_dual);
 
           // get ranks-at-element graph
-          Adjacency::Graph ranks_at_elem(synched_part.rank_at_element());
+          //Adjacency::Graph ranks_at_elem(synched_part.rank_at_element());
+          Adjacency::Graph elems_at_rank(Adjacency::rt_transpose, synched_part.rank_at_element());
 
           /// \todo ensure that each rank has at least one element.
 
           // get comm ranks and tags
-          std::vector<Index> ranks(synched_part.get_comm_ranks());
+          std::vector<int> ranks;
 
           // extract our patch
-          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(rank, ranks_at_elem, ranks));
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, elems_at_rank, rank));
 
           // set neighbour ranks
-          LayerType& layer = *this->_layers.front();
-          for(auto r : ranks)
-            layer.push_neighbour(int(r));
+          this->_layers.front()->set_neighbour_ranks(ranks);
 
           // okay
           return true;

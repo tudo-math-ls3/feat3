@@ -50,32 +50,20 @@ namespace FEAT
          * \param[in] my_rank
          * Identifier for this patch. Usually this is the MPI rank
          *
-         * \param[in] ranks_at_cells
-         * For all cells in the BaseMesh, this contains the patches it is present in (this means that true overlap
-         * is supported)
-         *
+         * \param[in] elems_at_rank
+         * The graph representing the elements-at-rank adjacency.
          */
-        explicit PatchMeshPartFactory(Index my_rank, const Adjacency::Graph& ranks_at_cells)
+        explicit PatchMeshPartFactory(Index my_rank, const Adjacency::Graph& elems_at_rank)
         {
           // The patch initially has no entities
           for(int i(0); i < shape_dim + 1; ++i)
             _num_entities[i] = 0;
 
-          // Number of cells in the BaseMesh
-          Index ncells_base(ranks_at_cells.get_num_nodes_domain());
+          XASSERT(my_rank <= elems_at_rank.get_num_nodes_domain());
 
-          // For each cell in the BaseMesh, find out if it belongs to this patch
-          for(Index cell(0); cell < ncells_base; ++cell)
-          {
-            for(auto it(ranks_at_cells.image_begin(cell)); it != ranks_at_cells.image_end(cell); ++it)
-            {
-              if(*it == my_rank)
-              {
-                _cells_patch.push_back(cell);
-                continue;
-              }
-            }
-          }
+          // extract the elements of our rank
+          for(auto it = elems_at_rank.image_begin(my_rank); it != elems_at_rank.image_end(my_rank); ++it)
+            _cells_patch.push_back(*it);
 
           // Now we know the number of cells
           _num_entities[shape_dim] = Index(_cells_patch.size());
