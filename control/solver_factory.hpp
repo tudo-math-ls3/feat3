@@ -11,6 +11,7 @@
 #include <kernel/solver/psd.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/richardson.hpp>
+#include <kernel/solver/chebyshev.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/rgcr.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
@@ -336,6 +337,14 @@ namespace FEAT
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_richardson(
               section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+          }
+          else if (solver_type == "chebyshev")
+          {
+            XASSERTM(precon == nullptr, "Chebyshev solver accepts no preconditioner!");
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            result = Solver::new_chebyshev(
+              section_name, section, systems.at(solver_level), filters.at(solver_level));
           }
           else if (solver_type == "pmr")
           {

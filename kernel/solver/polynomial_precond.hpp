@@ -3,6 +3,7 @@
 #define KERNEL_SOLVER_POLYNOMIAL_PRECOND_HPP 1
 
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 
 namespace FEAT

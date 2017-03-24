@@ -3,6 +3,7 @@
 #define KERNEL_SOLVER_RICHARDSON_HPP 1
 
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/solver/iterative.hpp>
 
 namespace FEAT
