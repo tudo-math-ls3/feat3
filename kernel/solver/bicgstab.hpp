@@ -41,15 +41,15 @@ namespace FEAT
 
     inline void operator<<(BiCGStabPreconVariant& precon_variant, const String& precon_variant_name)
     {
-        if(precon_variant_name == "undefined")
-          precon_variant = BiCGStabPreconVariant::undefined;
-        else if(precon_variant_name == "left")
-          precon_variant = BiCGStabPreconVariant::left;
-        else if(precon_variant_name == "right")
-          precon_variant = BiCGStabPreconVariant::right;
-        else
-          throw InternalError(__func__, __FILE__, __LINE__, "Unknown BiCGStabPreconVariant identifier string "
-              +precon_variant_name);
+      if(precon_variant_name == "undefined")
+        precon_variant = BiCGStabPreconVariant::undefined;
+      else if(precon_variant_name == "left")
+        precon_variant = BiCGStabPreconVariant::left;
+      else if(precon_variant_name == "right")
+        precon_variant = BiCGStabPreconVariant::right;
+      else
+        throw InternalError(__func__, __FILE__, __LINE__, "Unknown BiCGStabPreconVariant identifier string "
+            +precon_variant_name);
     }
 
     /// \endcond
@@ -177,14 +177,15 @@ namespace FEAT
          * Which preconditioning variant to use, defaults to left
          */
         explicit BiCGStab(const MatrixType& matrix, const FilterType& filter,
-        std::shared_ptr<PrecondType> precond = nullptr,
-        BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left) :
+          std::shared_ptr<PrecondType> precond = nullptr,
+          BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left)
+           :
           BaseClass("BiCGStab", precond),
           _system_matrix(matrix),
           _system_filter(filter),
           _precon_variant(precon_variant)
-          {
-          }
+        {
+        }
 
         /**
          * \brief Constructor using a PropertyMap
@@ -206,21 +207,23 @@ namespace FEAT
          *
          */
         explicit BiCGStab(const String& section_name, PropertyMap* section,
-        const MatrixType& matrix, const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
+          const MatrixType& matrix, const FilterType& filter,
+          std::shared_ptr<PrecondType> precond = nullptr)
+           :
           BaseClass("BiCGStab", section_name, section, precond),
           _system_matrix(matrix),
           _system_filter(filter),
           _precon_variant(BiCGStabPreconVariant::left)
+        {
+          // Check if we have set _p_variant
+          auto p_variant_p = section->query("precon_variant");
+          if(p_variant_p.second)
           {
-            // Check if we have set _p_variant
-            auto p_variant_p = section->query("precon_variant");
-            if(p_variant_p.second)
-            {
-              BiCGStabPreconVariant precon_variant;
-              precon_variant << p_variant_p.first;
-              set_precon_variant(precon_variant);
-            }
+            BiCGStabPreconVariant precon_variant;
+            precon_variant << p_variant_p.first;
+            set_precon_variant(precon_variant);
           }
+        }
 
         /// \copydoc SolverBase::name()
         virtual String name() const override
@@ -289,43 +292,43 @@ namespace FEAT
         }
 
 
-      /**
-       * \brief Sets the preconditioning variant (left or right)
-       *
-       * \param[in] precon_variant
-       * Which preconditioning variant to use.
-       */
-      virtual void set_precon_variant(BiCGStabPreconVariant precon_variant)
-      {
-        XASSERT(precon_variant == BiCGStabPreconVariant::left || precon_variant == BiCGStabPreconVariant::right);
-        _precon_variant = precon_variant;
-      }
+        /**
+         * \brief Sets the preconditioning variant (left or right)
+         *
+         * \param[in] precon_variant
+         * Which preconditioning variant to use.
+         */
+        virtual void set_precon_variant(BiCGStabPreconVariant precon_variant)
+        {
+          XASSERT(precon_variant == BiCGStabPreconVariant::left || precon_variant == BiCGStabPreconVariant::right);
+          _precon_variant = precon_variant;
+        }
 
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-        XASSERT(parent != nullptr);
+        /// \copydoc SolverBase::write_config()
+        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+        {
+          XASSERT(parent != nullptr);
 
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
-        my_section->add_entry("precon_variant", stringify(_precon_variant));
+          my_section->add_entry("precon_variant", stringify(_precon_variant));
 
-        return my_section;
-      }
+          return my_section;
+        }
 
       protected:
-      /**
-       * \brief Internal function, applies the solver
-       *
-       * \param[in] vec_sol
-       * The current solution vector, gets overwritten
-       *
-       * \param[in] vec_rhs
-       * The right hand side vector. This is unused in this function, as the intial defect was alredy computed and
-       * stored in _vec_r.
-       *
-       * \returns A status code.
-       */
+        /**
+         * \brief Internal function, applies the solver
+         *
+         * \param[in] vec_sol
+         * The current solution vector, gets overwritten
+         *
+         * \param[in] vec_rhs
+         * The right hand side vector. This is unused in this function, as the intial defect
+         * was alredy computed and stored in _vec_r.
+         *
+         * \returns A status code.
+         */
         Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
         {
           IterationStats pre_iter(*this);
@@ -424,16 +427,14 @@ namespace FEAT
               {
                 status_half = Status::aborted;
               }
-
               // is diverged?
-              if(this->is_diverged(def_half))
+              else if(this->is_diverged(def_half))
               {
                 this->_def_cur = def_half;
                 status_half = Status::diverged;
               }
-
               // is converged?
-              if(this->is_converged(def_half))
+              else if(this->is_converged(def_half))
               {
                 this->_def_cur = def_half;
                 status_half = Status::success;
@@ -490,7 +491,15 @@ namespace FEAT
               omega = vec_t.dot(vec_r) / vec_t.dot(vec_t);
             }
 
-            XASSERTM(Math::isfinite(omega),"BiCGStab breakdown!");
+            if(!Math::isfinite(omega))
+            {
+              // This should not happen: BiCGStab breakdown
+              status = Status::aborted;
+              stat.destroy();
+              Statistics::add_solver_expression(
+                std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
+              return status;
+            }
 
             // Second "half" update
             // x[k+1] = x[k+1/2] + omega r~[k+1/2]
@@ -530,7 +539,15 @@ namespace FEAT
 
             // beta[k] = (rho[k+1]*alpha[k]) / (rho[k]*omega[k])
             DataType beta((rho/rho2)*(alpha/omega));
-            XASSERTM(Math::isfinite(beta),"BiCGStab  breakdown!");
+            if(!Math::isfinite(beta))
+            {
+              // This should not happen: BiCGStab breakdown
+              status = Status::aborted;
+              stat.destroy();
+              Statistics::add_solver_expression(
+                std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
+              return status;
+            }
 
             // p~[k+1] = r~[k+1] + beta(p~[k] - omega[k] q~[k])
             vec_p_tilde.axpy(vec_q_tilde, vec_p_tilde, -omega);
@@ -568,25 +585,25 @@ namespace FEAT
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter)
-      {
-        return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, nullptr);
-      }
+    {
+      return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, nullptr);
+    }
     template<typename Matrix_, typename Filter_, typename Precond_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<Precond_> precond, BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left)
-      {
-        return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
-      }
+    {
+      return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
+    }
 #else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr,
       BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left)
-      {
-        return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
-      }
+    {
+      return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
+    }
 #endif
 
     /**
@@ -616,27 +633,27 @@ namespace FEAT
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const String& section_name, PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
-      {
-        return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
-      }
+    {
+      return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
+    }
 
     template<typename Matrix_, typename Filter_, typename Precond_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const String& section_name, PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<Precond_> precond)
-      {
-        return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-      }
+    {
+      return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+    }
 #else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const String& section_name, PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
-      {
-        return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-      }
+    {
+      return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+    }
 #endif
   } // namespace Solver
 } // namespace FEAT
