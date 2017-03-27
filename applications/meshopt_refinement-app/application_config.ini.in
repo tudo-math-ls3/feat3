@@ -7,7 +7,8 @@ solver_config_file = ./solver_config.ini
 [DomainControlSettings]
 lvl_min = 1
 lvl_max = 7
-adapt_mode = none
+refinement_adapt_mode = none
+finest_adapt_mode = chart
 parti-type = parmetis fallback
 #parti-name = default
 parti-rank-elems = 4

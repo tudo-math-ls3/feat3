@@ -141,18 +141,27 @@ struct MeshoptRefinementApp
     }
 
     // Get the mode for adapting the mesh upon refinement
-    Geometry::AdaptMode adapt_mode(Geometry::AdaptMode::none);
-    auto adapt_mode_p = domain_control_settings_section->query("adapt_mode");
+    Geometry::AdaptMode refinement_adapt_mode(Geometry::AdaptMode::none);
+    auto adapt_mode_p = domain_control_settings_section->query("refinement_adapt_mode");
     if(adapt_mode_p.second)
     {
-      adapt_mode << adapt_mode_p.first;
+      refinement_adapt_mode << adapt_mode_p.first;
+    }
+
+    // Get the mode for adapting the finest mesh
+    Geometry::AdaptMode finest_adapt_mode(Geometry::AdaptMode::none);
+    adapt_mode_p = domain_control_settings_section->query("finest_adapt_mode");
+    if(adapt_mode_p.second)
+    {
+      finest_adapt_mode << adapt_mode_p.first;
+      std::cout << finest_adapt_mode;
     }
 
     TimeStamp at;
 
     // Create domain control
     DomCtrl dom_ctrl(comm);
-    dom_ctrl.set_adapt_mode(adapt_mode);
+    dom_ctrl.set_adapt_mode(refinement_adapt_mode);
     dom_ctrl.read_mesh(mesh_file_reader);
     dom_ctrl.parse_property_map(domain_control_settings_section);
     dom_ctrl.create_partition();
@@ -176,6 +185,7 @@ struct MeshoptRefinementApp
     String file_basename(name()+"_n"+stringify(comm.size()));
 
     // Adapt the finest level
+    dom_ctrl.set_adapt_mode(finest_adapt_mode);
     dom_ctrl.front()->get_mesh_node()->adapt();
 
     // Save new coordinates. We need them for calling prepare() to set the initial guess
@@ -440,9 +450,9 @@ int run_app(int argc, char* argv[])
 
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> H2M2D;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> H3M3D;
+  //typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> H3M3D;
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> S2M2D;
-  typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> S3M3D;
+  //typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> S3M3D;
   //typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, 3, Real> S2M3D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 1, 1, Real> H1M1D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 2, 2, Real> H1M2D;
@@ -626,21 +636,21 @@ int run_app(int argc, char* argv[])
     ret = MeshoptRefinementApp<MemType, DataType, IndexType, H2M2D>::run(
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
-  else if(mesh_type == "conformal:hypercube:3:3")
-  {
-    ret = MeshoptRefinementApp<MemType, DataType, IndexType, H3M3D>::run(
-      args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
-  }
+  //else if(mesh_type == "conformal:hypercube:3:3")
+  //{
+  //  ret = MeshoptRefinementApp<MemType, DataType, IndexType, H3M3D>::run(
+  //    args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
+  //}
   else if(mesh_type == "conformal:simplex:2:2")
   {
     ret = MeshoptRefinementApp<MemType, DataType, IndexType, S2M2D>::run(
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
-  else if(mesh_type == "conformal:simplex:3:3")
-  {
-    ret = MeshoptRefinementApp<MemType, DataType, IndexType, S3M3D>::run(
-      args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
-  }
+  //else if(mesh_type == "conformal:simplex:3:3")
+  //{
+  //  ret = MeshoptRefinementApp<MemType, DataType, IndexType, S3M3D>::run(
+  //    args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
+  //}
   else
   {
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
@@ -672,7 +682,8 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "[DomainControlSettings]" << std::endl;
     iss << "parti-type = fallback parmetis" << std::endl;
     iss << "parti-rank-elems = 4" << std::endl;
-    iss << "adapt_mode = none" << std::endl;
+    iss << "refinement_adapt_mode = none" << std::endl;
+    iss << "finest_adapt_mode = chart" << std::endl;
     iss << "lvl_min = 1" << std::endl;
     iss << "lvl_max = 3" << std::endl;
   }
@@ -685,7 +696,8 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "[DomainControlSettings]" << std::endl;
     iss << "parti-type = fallback parmetis" << std::endl;
     iss << "parti-rank-elems = 4" << std::endl;
-    iss << "adapt_mode = none" << std::endl;
+    iss << "refinement_adapt_mode = none" << std::endl;
+    iss << "finest_adapt_mode = chart" << std::endl;
     iss << "lvl_min = 1" << std::endl;
     iss << "lvl_max = 3" << std::endl;
   }
@@ -777,7 +789,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 2" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
-    iss << "plot = iter" << std::endl;
+    iss << "plot = summary" << std::endl;
     iss << "precon = MG1" << std::endl;
 
     iss << "[cg]" << std::endl;
@@ -836,7 +848,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 2" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
-    iss << "plot = iter" << std::endl;
+    iss << "plot = summary" << std::endl;
     iss << "precon = MG1" << std::endl;
 
     iss << "[MQCLinesearch]" << std::endl;
