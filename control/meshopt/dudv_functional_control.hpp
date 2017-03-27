@@ -237,7 +237,6 @@ namespace FEAT
 
               // After this, we can initialise the solver
               solver->init();
-              solver->set_plot_name(solver->name()+" (meshopt-D(u):D(v))");
             }
 
           /// Explicitly delete empty default constructor
