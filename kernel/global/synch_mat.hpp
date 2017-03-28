@@ -105,9 +105,9 @@ namespace FEAT
       }
 #endif // FEAT_HAVE_MPI
 
-      /// Unwanted copy constructor: Do not implement!
+      /// deleted copy constructor
       SynchMatrix(const SynchMatrix &) = delete;
-      /// Unwanted copy assignment operator: Do not implement!
+      /// deleted copy assignment operator
       SynchMatrix & operator=(const SynchMatrix &) = delete;
 
       /**
@@ -131,7 +131,7 @@ namespace FEAT
         }
 
         // receive buffer dimensions vector
-        std::vector<std::array<Index,4>> recv_dims(n);
+        std::vector<std::array<Index,4>> recv_dims(n), send_dims(n);
 
         // post send-buffer dimension receives
         for(std::size_t i(0); i < n; ++i)
@@ -143,14 +143,11 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           const BufferMatrixType& sbuf = _send_bufs.at(i);
-          Index dims[4] =
-          {
-            sbuf.rows(),
-            sbuf.columns(),
-            sbuf.entries_per_nonzero(),
-            sbuf.used_elements()
-          };
-          _send_reqs[i] = _comm.isend(dims, std::size_t(4), _ranks.at(i));
+          send_dims.at(i)[0] = sbuf.rows();
+          send_dims.at(i)[1] = sbuf.columns();
+          send_dims.at(i)[2] = sbuf.entries_per_nonzero();
+          send_dims.at(i)[3] = sbuf.used_elements();
+          _send_reqs[i] = _comm.isend(send_dims.at(i).data(), std::size_t(4), _ranks.at(i));
         }
 
         // wait for all receives to finish
@@ -187,7 +184,7 @@ namespace FEAT
         // wait for all previous receives to finish
         _recv_reqs.wait_all();
 
-        // post buffer row-pointer array receives
+        // post buffer column-index array receives
         for(std::size_t i(0); i < n; ++i)
         {
           _recv_reqs[i] = _comm.irecv(_recv_bufs.at(i).col_ind(), _recv_bufs.at(i).used_elements(), _ranks.at(i));
@@ -196,7 +193,7 @@ namespace FEAT
         // wait for all previous sends to finish
         _send_reqs.wait_all();
 
-        // post buffer row-pointer array sends
+        // post buffer column-index array sends
         for(std::size_t i(0); i < n; ++i)
         {
           _send_reqs[i] = _comm.isend(_send_bufs.at(i).col_ind(), _send_bufs.at(i).used_elements(), _ranks.at(i));
@@ -328,7 +325,7 @@ namespace FEAT
             mirrors_col_split.at((size_t)block).push_back(mirrors_col.at(i).get(block).clone(LAFEM::CloneMode::Shallow));
           }
 
-        synch_matrix_list.at((size_t)block) = std::make_shared<SynchMatrix<MT_, VMT_>>(comm, ranks, mirrors_row_split.at((size_t)block), mirrors_col_split.at((size_t)block));
+          synch_matrix_list.at((size_t)block) = std::make_shared<SynchMatrix<MT_, VMT_>>(comm, ranks, mirrors_row_split.at((size_t)block), mirrors_col_split.at((size_t)block));
 
         }
       }
