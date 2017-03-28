@@ -176,8 +176,12 @@ rem ============================================================================
 set LIBFLAGS=%LIBFLAGS% /NOLOGO
 
 echo.
+echo Linking 'metis.vc14-%1-%2'
+lib %LIBFLAGS% /OUT:"..\lib\metis.vc14-%1-%2.lib" ..\obj\gklib.vc14-%1-%2\*.obj ..\obj\metis.vc14-%1-%2\*.obj
+
+echo.
 echo Linking 'parmetis.vc14-%1-%2'
-lib %LIBFLAGS% /OUT:"..\lib\parmetis.vc14-%1-%2.lib" ..\obj\gklib.vc14-%1-%2\*.obj ..\obj\metis.vc14-%1-%2\*.obj ..\obj\parmetis.vc14-%1-%2\*.obj
+lib %LIBFLAGS% /OUT:"..\lib\parmetis.vc14-%1-%2.lib" ..\obj\parmetis.vc14-%1-%2\*.obj
 echo.
 
 rem ===============================================================================================

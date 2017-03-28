@@ -72,7 +72,10 @@
   <PropertyGroup Condition="Exists('..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveFParser>true</FeatHaveFParser>
   </PropertyGroup>
-    <!-- Note: ParMETIS can only be used in combination with MPI -->
+  <PropertyGroup Condition="Exists('..\lib\metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveMetis>true</FeatHaveMetis>
+  </PropertyGroup>
+  <!-- Note: ParMETIS can only be used in combination with MPI -->
   <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
@@ -99,6 +102,8 @@
       Include="FEAT_HAVE_ALGLIB" />
     <FeatDef Condition="'$(FeatHaveFParser)'=='true'"
       Include="FEAT_HAVE_FPARSER" />
+    <FeatDef Condition="'$(FeatHaveMetis)'=='true'"
+      Include="FEAT_HAVE_METIS" />
     <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
       Include="FEAT_HAVE_PARMETIS" />
   </ItemGroup>
@@ -115,8 +120,10 @@
       Include="$(FeatRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeatRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeatRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
     <FeatIncDir Condition="'$(FeatHaveFParser)'=='true'"
       Include="$(FeatRootPath)\thirdparty\fparser;" />
+    <FeatIncDir Condition="'$(FeatHaveMetis)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
     <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
-      Include="$(FeatRootPath)\thirdparty\parmetis\include;$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
+      Include="$(FeatRootPath)\thirdparty\parmetis\include;" />
   </ItemGroup>
 
   <!-- FEAT additional library search path list -->
@@ -154,6 +161,8 @@
       Include="alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveFParser)'=='true'"
       Include="fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveMetis)'=='true'"
+      Include="metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
       Include="parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>

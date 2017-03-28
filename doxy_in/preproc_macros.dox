@@ -19,6 +19,11 @@ This macro is defined as 1 by the <i>hand-made</i> Visual Studio project files. 
 and any other build system, independent of whether the MS VC++ compiler is used or not.
 
 <hr>
+\subsection ppm_feat_testing_vc FEAT_TESTING_VC
+This macro is defined as 1 by the Visual Studio regression test system to disable error popup dialogs and install
+a custom exception filter for the Windows OS.
+
+<hr>
 \subsection ppm_feat_src_dir FEAT_SRC_DIR
 This macro contains a string literal specifying the full absolute path to the root source directory.
 
@@ -190,11 +195,27 @@ This section enlists macros defined by the build system, which specify what type
 are available to FEAT.
 
 <hr>
+\subsection ppm_feat_have_alglib FEAT_HAVE_ALGLIB
+This macro is defined by the build system if the FEAT kernel is linked against the ALGLIB library.
+
+<hr>
 \subsection ppm_feat_have_cuda FEAT_HAVE_CUDA
 This macro is defined by the build system if the FEAT kernel is linked against the CUDA library.
 
 If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the containters and
 operations using CUDA as a work-horse.
+
+<hr>
+\subsection ppm_feat_have_cusolver FEAT_HAVE_CUSOLVER
+This macro is defined by the build system detects a cuda sdk version equal or greater 7, which includes the cusolver library.
+
+<hr>
+\subsection ppm_feat_have_fparser FEAT_HAVE_FPARSER
+This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
+
+<hr>
+\subsection ppm_feat_have_metis FEAT_HAVE_METIS
+This macro is defined by the build system if the FEAT kernel is linked against the METIS library.
 
 <hr>
 \subsection ppm_feat_have_mkl FEAT_HAVE_MKL
@@ -204,16 +225,13 @@ If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding spec
 the MKL as a work-horse.
 
 <hr>
-\subsection ppm_feat_have_alglib FEAT_HAVE_ALGLIB
-This macro is defined by the build system if the FEAT kernel is linked against the ALGLIB library.
+\subsection ppm_feat_have_mpi FEAT_HAVE_MPI
+This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
 
 <hr>
-\subsection ppm_feat_have_cusolver FEAT_HAVE_CUSOLVER
-This macro is defined by the build system detects a cuda sdk version equal or greater 7, which includes the cusolver library.
-
-<hr>
-\subsection ppm_feat_have_fparser FEAT_HAVE_FPARSER
-This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
+\subsection ppm_feat_have_parmetis FEAT_HAVE_PARMETIS
+This macro is defined by the build system if the FEAT kernel is linked against the ParMETIS library.
+\note If this macro is defined, then \c FEAT_HAVE_METIS is also defined.
 
 <hr>
 \subsection ppm_feat_have_quadmath FEAT_HAVE_QUADMATH
@@ -229,10 +247,6 @@ If defined, the LAFEM subsystem of the FEAT kernel will implement the "LAFEM::Um
 
 \note The Visual Studio build system detects whether an UMFPACK library suitable for the current build-id
 has been compiled and linked. If so, it will define the FEAT_HAVE_UMFPACK macro automatically.
-
-<hr>
-\subsection ppm_feat_have_mpi FEAT_HAVE_MPI
-This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
 
 <hr><hr>
 \section preproc_sec_user_def User-Defineable Macros
