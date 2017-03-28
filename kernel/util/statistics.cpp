@@ -20,6 +20,7 @@ KahanAccumulation Statistics::_time_mpi_wait_spmv;
 std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> Statistics::_solver_expressions;
 std::map<String, String> Statistics::_formatted_solver_trees;
 std::map<String, std::list<double>> Statistics::_overall_toe;
+std::map<String, std::list<Index>> Statistics::_overall_iters;
 std::map<String, std::list<double>> Statistics::_overall_mpi_execute;
 std::map<String, std::list<double>> Statistics::_overall_mpi_wait_reduction;
 std::map<String, std::list<double>> Statistics::_overall_mpi_wait_spmv;
@@ -529,6 +530,12 @@ String Statistics::get_formatted_solver_internals(String target)
   double solver_toe_min;
   comm.allreduce(&solver_toe, &solver_toe_max, std::size_t(1), Dist::op_max);
   comm.allreduce(&solver_toe, &solver_toe_min, std::size_t(1), Dist::op_min);
+  Index solver_iters(std::accumulate(FEAT::Statistics::get_iters(target).begin(),
+        FEAT::Statistics::get_iters(target).end(), Index(0)));
+  Index solver_iters_max;
+  Index solver_iters_min;
+  comm.allreduce(&solver_iters, &solver_iters_max, std::size_t(1), Dist::op_max);
+  comm.allreduce(&solver_iters, &solver_iters_min, std::size_t(1), Dist::op_min);
   double solver_mpi_execute(std::accumulate(FEAT::Statistics::get_time_mpi_execute(target).begin(),
         FEAT::Statistics::get_time_mpi_execute(target).end(), 0.));
   double solver_mpi_execute_max;
@@ -635,6 +642,8 @@ String Statistics::get_formatted_solver_internals(String target)
   String result = target + "\n";
   result += String("toe:").pad_back(20) + "max: " + stringify(solver_toe_max) + ", min: " + stringify(solver_toe_min) + ", local: " +
       stringify(solver_toe) + "\n";
+  result += String("ites:").pad_back(20) + "max: " + stringify(solver_iters_max) + ", min: " + stringify(solver_iters_min) + ", local: " +
+      stringify(solver_iters) + "\n";
   result += String("mpi execute:").pad_back(20) + "max: " + stringify(solver_mpi_execute_max) + ", min: " + stringify(solver_mpi_execute_min) + ", local: " +
       stringify(solver_mpi_execute) + "\n";
   result += String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_mpi_wait_reduction_max) + ", min: " + stringify(solver_mpi_wait_reduction_min) + ", local: " +
@@ -694,6 +703,7 @@ void Statistics::compress_solver_expressions()
     }
 
     _overall_toe[target].push_back(0.);
+    _overall_iters[target].push_back(Index(0));
     _overall_mpi_execute[target].push_back(0.);
     _overall_mpi_wait_reduction[target].push_back(0.);
     _overall_mpi_wait_spmv[target].push_back(0.);
@@ -724,6 +734,7 @@ void Statistics::compress_solver_expressions()
           outer_schwarz_depth = (Index)names.size();
       }
 
+      //fetch iters from top-lvl (lying insided of schwarz or global)
       if (expression->get_type() == Solver::ExpressionType::end_solve && expression->solver_name == names.back())
       {
         if (names.size() > 1 && names.size() == outer_schwarz_depth + 1 && names.at(names.size() - 2) == "Schwarz")
@@ -731,6 +742,13 @@ void Statistics::compress_solver_expressions()
           auto t = dynamic_cast<Solver::ExpressionEndSolve*>(expression.get());
           _outer_schwarz_iters[target].back() += t->iters;
         }
+        if (names.size() < 2)
+        {
+          auto t = dynamic_cast<Solver::ExpressionEndSolve*>(expression.get());
+
+          _overall_iters[target].back() += t->iters;
+        }
+
         names.pop_back();
         continue;
       }
@@ -765,7 +783,7 @@ void Statistics::compress_solver_expressions()
         }
       }
 
-      //grep the solver which lies in the schwarz solver to get its iteration count, too
+      //grep the solver which lies in the schwarz solver to get its toe
       if (names.size() > 1 && names.size() == outer_schwarz_depth + 1 && names.at(names.size() - 2) == "Schwarz" && expression->get_type() == FEAT::Solver::ExpressionType::timings)
       {
         auto t = dynamic_cast<Solver::ExpressionTimings*>(expression.get());

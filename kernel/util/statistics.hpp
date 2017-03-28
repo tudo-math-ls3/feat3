@@ -59,6 +59,7 @@ namespace FEAT
 
       /// overall time per reset call per solver name string.
       static std::map<String, std::list<double>> _overall_toe;
+      static std::map<String, std::list<Index>> _overall_iters;
       static std::map<String, std::list<double>> _overall_mpi_execute;
       static std::map<String, std::list<double>> _overall_mpi_wait_reduction;
       static std::map<String, std::list<double>> _overall_mpi_wait_spmv;
@@ -146,6 +147,7 @@ namespace FEAT
         reset_times();
         _solver_expressions.clear();
         _overall_toe.clear();
+        _overall_iters.clear();
         _overall_mpi_execute.clear();
         _overall_mpi_wait_reduction.clear();
         _overall_mpi_wait_spmv.clear();
@@ -281,6 +283,12 @@ namespace FEAT
       static inline std::list<double> & get_time_toe(String target)
       {
         return _overall_toe.at(target);
+      }
+
+      /// retrieve list of all overall solver iteration entries
+      static inline std::list<Index> & get_iters(String target)
+      {
+        return _overall_iters.at(target);
       }
 
       /// retrieve list of all overall solver mpi execute toe entries
