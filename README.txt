@@ -10,7 +10,7 @@ Additionally you will need a proper buildsystem, e.g. gnumake.
 
 === BUILDING FEAT ===
 In its simplest shape, building FEAT is just as easy as
-./configure-feat
+./configure
 make all
 This will automagically detect a proper tool/setting setup and build all FEAT components.
 
