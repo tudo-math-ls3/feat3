@@ -229,7 +229,6 @@ namespace FEAT
           gamma = dot_gamma->wait();
           delta = dot_delta->wait();
 
-          /// set new defect with our own method, to not use synchronous _set_new_defect method
           status = this->_update_defect(norm_def_cur->wait());
           if(status != Status::progress)
           {

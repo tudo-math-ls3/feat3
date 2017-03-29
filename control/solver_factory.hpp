@@ -16,6 +16,7 @@
 #include <kernel/solver/rgcr.hpp>
 #include <kernel/solver/pipepcg.hpp>
 #include <kernel/solver/gropppcg.hpp>
+#include <kernel/solver/rbicgstab.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/ilu_precond.hpp>
@@ -160,6 +161,40 @@ namespace FEAT
         create_gropppcg(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
         {
           throw InternalError(__func__, __FILE__, __LINE__, "gropppcg solver section is only allowed in global context!");
+          return nullptr;
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_rbicgstab(MST_& matrix_stock, PropertyMap* base, String section_name, PropertyMap* section,
+            size_t solver_level, typename SolverVectorType_::GateType*)
+        {
+
+          std::shared_ptr<Solver::SolverBase<SolverVectorType_> > precon(nullptr);
+          auto precon_p = section->query("precon");
+          if (precon_p.second)
+          {
+            if (precon_p.first == "none")
+            {
+              precon = nullptr;
+            }
+            else
+            {
+              auto precon_section_path = get_section_path(base, section, section_name, precon_p.first);
+              precon = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, solver_level);
+            }
+          }
+
+          auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          return Solver::new_rbicgstab(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_rbicgstab(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "rbicgstab solver section is only allowed in global context!");
           return nullptr;
         }
 
@@ -447,6 +482,10 @@ namespace FEAT
           else if (solver_type == "gropppcg")
           {
             result = create_gropppcg<SolverVectorType_>(matrix_stock, base, section_name, section, solver_level, nullptr);
+          }
+          else if (solver_type == "rbicgstab")
+          {
+            result = create_rbicgstab<SolverVectorType_>(matrix_stock, base, section_name, section, solver_level, nullptr);
           }
           else if (solver_type == "jacobi")
           {

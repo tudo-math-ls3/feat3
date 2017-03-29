@@ -233,7 +233,6 @@ namespace FEAT
           vec_p.axpy(vec_p, vec_z, beta);
           vec_s.axpy(vec_s, vec_Z, beta);
 
-          /// set new defect with our own method, to not use synchronous _set_new_defect method
           status = this->_update_defect(norm_def_cur->wait());
           if(status != Status::progress)
           {
