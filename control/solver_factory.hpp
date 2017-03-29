@@ -14,6 +14,7 @@
 #include <kernel/solver/chebyshev.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/rgcr.hpp>
+#include <kernel/solver/pipepcg.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/ilu_precond.hpp>
@@ -64,7 +65,7 @@ namespace FEAT
         template <typename SolverVectorType_, typename MST_>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_schwarz_precon(MST_& matrix_stock, PropertyMap* base, String section_name, PropertyMap* section,
-        size_t solver_level, typename SolverVectorType_::GateType*)
+            size_t solver_level, typename SolverVectorType_::GateType*)
         {
           using SolverVectorType = SolverVectorType_;
           std::shared_ptr<Solver::SolverBase<typename SolverVectorType::LocalVectorType> > precon_schwarz;
@@ -90,6 +91,41 @@ namespace FEAT
         {
           throw InternalError(__func__, __FILE__, __LINE__,
           "Schwarz precon section is only allowed in global context! Maybe you have two in one solver branch?");
+          return nullptr;
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_pipepcg(MST_& matrix_stock, PropertyMap* base, String section_name, PropertyMap* section,
+            size_t solver_level, typename SolverVectorType_::GateType*)
+        {
+
+          std::shared_ptr<Solver::SolverBase<SolverVectorType_> > precon(nullptr);
+          auto precon_p = section->query("precon");
+          if (precon_p.second)
+          {
+            if (precon_p.first == "none")
+            {
+              precon = nullptr;
+            }
+            else
+            {
+              auto precon_section_path = get_section_path(base, section, section_name, precon_p.first);
+              precon = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, solver_level);
+            }
+          }
+
+          auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+          return Solver::new_pipepcg(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+        }
+
+        template <typename SolverVectorType_, typename MST_>
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
+        create_pipepcg(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "pipepcg solver section is only allowed in global context!");
+          return nullptr;
           return nullptr;
         }
 
@@ -369,6 +405,10 @@ namespace FEAT
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_rgcr(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+          }
+          else if (solver_type == "pipepcg")
+          {
+            result = create_pipepcg<SolverVectorType_>(matrix_stock, base, section_name, section, solver_level, nullptr);
           }
           else if (solver_type == "jacobi")
           {

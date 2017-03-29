@@ -73,6 +73,34 @@ namespace FEAT
       {
       }
 
+    /**
+     * \brief Constructor using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     */
+      explicit PipePCG(const String& section_name, PropertyMap* section,
+      const MatrixType& matrix, const FilterType& filter,
+        std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("PipePCG", section_name, section, precond),
+        _system_matrix(matrix),
+        _system_filter(filter)
+      {
+      }
+
       virtual String name() const override
       {
         return "PipePCG";
@@ -266,7 +294,7 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
 
         // plot?
-        if(this->_plot)
+        if(this->_plot_iter())
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
@@ -355,6 +383,55 @@ namespace FEAT
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {
       return std::make_shared<PipePCG<Matrix_, Filter_>>(matrix, filter, precond);
+    }
+#endif
+
+    /**
+     * \brief Creates a new PipePCG solver object using a PropertyMap
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
+     *
+     * \returns
+     * A shared pointer to a new PipePCG object.
+     */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<PipePCG<Matrix_, Filter_>> new_pipepcg(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<PipePCG<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
+    }
+
+    template<typename Matrix_, typename Filter_, typename Precond_>
+    inline std::shared_ptr<PipePCG<Matrix_, Filter_>> new_pipepcg(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
+    {
+      return std::make_shared<PipePCG<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+    }
+#else
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<PipePCG<Matrix_, Filter_>> new_pipepcg(
+      const String& section_name, PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter,
+      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
+    {
+      return std::make_shared<PipePCG<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
 #endif
   } // namespace Solver
