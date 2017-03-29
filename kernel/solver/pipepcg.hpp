@@ -109,7 +109,7 @@ namespace FEAT
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
-        // create three temporary vectors
+        // create temporary vectors
         _vec_r = this->_system_matrix.create_vector_r();
         _vec_u = this->_system_matrix.create_vector_r();
         _vec_w = this->_system_matrix.create_vector_r();
@@ -204,6 +204,8 @@ namespace FEAT
 
         matrix.apply(vec_w, vec_u);
         filter.filter_def(vec_w);
+
+        pre_iter.destroy();
 
         // start iterating
         while(status == Status::progress)
