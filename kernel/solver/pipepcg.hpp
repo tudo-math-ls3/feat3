@@ -228,7 +228,7 @@ namespace FEAT
           delta = dot_delta->wait();
 
           /// set new defect with our own method, to not use synchronous _set_new_defect method
-          status = _update_defect(norm_def_cur->wait());
+          status = this->_update_defect(norm_def_cur->wait());
           if(status != Status::progress)
           {
             stat.destroy();
@@ -281,69 +281,6 @@ namespace FEAT
         return Status::undefined;
       }
 
-      Status _update_defect(const DataType def_cur_norm)
-      {
-        // increase iteration count
-        ++this->_num_iter;
-
-        // save previous defect
-        const DataType def_old = this->_def_cur;
-
-        this->_def_cur = def_cur_norm;
-
-        Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
-
-        // plot?
-        if(this->_plot_iter())
-        {
-          std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " / " << stringify_fp_fix(this->_def_cur / def_old)
-            << std::endl;
-        }
-
-        // ensure that the defect is neither NaN nor infinity
-        if(!Math::isfinite(this->_def_cur))
-          return Status::aborted;
-
-        // is diverged?
-        if(this->is_diverged())
-          return Status::diverged;
-
-        // minimum number of iterations performed?
-        if(this->_num_iter < this->_min_iter)
-          return Status::progress;
-
-        // is converged?
-        if(this->is_converged())
-          return Status::success;
-
-        // maximum number of iterations performed?
-        if(this->_num_iter >= this->_max_iter)
-          return Status::max_iter;
-
-        // check for stagnation?
-        if(this->_min_stag_iter > Index(0))
-        {
-          // did this iteration stagnate?
-          if(this->_def_cur >= this->_stag_rate * def_old)
-          {
-            // increment stagnation count
-            if(++this->_num_stag_iter >= this->_min_stag_iter)
-              return Status::stagnated;
-          }
-          else
-          {
-            // this iteration did not stagnate
-            this->_num_stag_iter = Index(0);
-          }
-        }
-
-        // continue iterating
-        return Status::progress;
-      }
     }; // class PipePCG<...>
 
     /**
