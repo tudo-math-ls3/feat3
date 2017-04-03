@@ -466,9 +466,6 @@ String Statistics::get_formatted_times(double total_time)
   measured_time = KahanSum(measured_time, get_time_mpi_wait_reduction());
   measured_time = KahanSum(measured_time, get_time_mpi_wait_spmv());
 
-  if (measured_time.sum > total_time)
-    throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
-
   result += "\n";
   result += "Accumulated op time: " + stringify(measured_time.sum) + "\n";
 
@@ -517,6 +514,13 @@ String Statistics::get_formatted_times(double total_time)
   comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
   comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
   result += String("Not covered:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+
+  if (t_min < 0.0)
+  {
+    // total_time < measured_time.sum for at least one process
+    result += "WARNING: Accumulated op time is greater than the provided total execution time !";
+  }
+
   return result;
 }
 

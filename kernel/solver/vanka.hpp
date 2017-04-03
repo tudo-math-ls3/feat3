@@ -17,6 +17,7 @@
 #include <kernel/lafem/power_col_matrix.hpp>
 #include <kernel/lafem/power_full_matrix.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
+#include <kernel/util/stop_watch.hpp>
 
 // includes, system
 #include <map>
@@ -1065,6 +1066,13 @@ namespace FEAT
       /// temporary vectors (additive types only)
       VectorType _vec_scale, _vec_tmp1, _vec_tmp2;
 
+      // stop watch for symbolic factorisation
+      StopWatch watch_init_symbolic;
+      // stop watch for numeric factorisation
+      StopWatch watch_init_numeric;
+      // stop watch for apply time
+      StopWatch watch_apply;
+
     public:
       /**
        * \brief Constructor
@@ -1103,6 +1111,8 @@ namespace FEAT
       /// Performs symbolic factorisation
       virtual void init_symbolic() override
       {
+        watch_init_symbolic.start();
+
         bool block = ((int(_type) & 0x010) != 0);
         bool multi = ((int(_type) & 0x100) == 0);
 
@@ -1129,6 +1139,8 @@ namespace FEAT
           this->_vec_tmp1 = this->_matrix.create_vector_r();
           this->_vec_tmp2 = this->_matrix.create_vector_r();
         }
+
+        watch_init_symbolic.stop();
       }
 
       /// Releases the symbolic factorisation data
@@ -1149,6 +1161,8 @@ namespace FEAT
       /// Performs numeric factorisation
       virtual void init_numeric() override
       {
+        watch_init_numeric.start();
+
         bool full = ((int(_type) & 0x001) != 0);
         bool multi = ((int(_type) & 0x100) == 0);
 
@@ -1165,10 +1179,14 @@ namespace FEAT
         {
           this->_calc_scale();
         }
+
+        watch_init_numeric.stop();
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
+        watch_apply.start();
+
         bool full = ((int(_type) & 0x001) != 0);
         if(full)
         {
@@ -1178,6 +1196,8 @@ namespace FEAT
         {
           this->_apply_diag(vec_cor, vec_def);
         }
+
+        watch_apply.stop();
 
         return Status::success;
       }
@@ -1193,6 +1213,27 @@ namespace FEAT
           + sizeof(DataType) * (_data.size() + _vdef.size() + _vcor.size())
           + _vec_scale.bytes() + _vec_tmp1.bytes() + _vec_tmp2.bytes();
       }
+
+      void reset_timings()
+      {
+        watch_init_symbolic.reset();
+        watch_init_numeric.reset();
+        watch_apply.reset();
+      }
+
+      double time_init_symbolic() const
+      {
+        return watch_init_symbolic.elapsed();
+      }
+      double time_init_numeric() const
+      {
+        return watch_init_numeric.elapsed();
+      }
+      double time_apply() const
+      {
+        return watch_apply.elapsed();
+      }
+
     protected:
       /**
        * \brief Builds the 'blocked' pressure graph
@@ -1542,6 +1583,8 @@ namespace FEAT
         DataType* lcor = _vcor.data();
         DataType* ldef = _vdef.data();
 
+        Index flops(0);
+
         // iterate
         for(IndexType iter(0); iter < _num_iter; ++iter)
         {
@@ -1552,6 +1595,8 @@ namespace FEAT
             this->_matrix.apply(_vec_tmp1, vec_cor, vec_def, -DataType(1));
             _vec_tmp2.format();
           }
+
+          TimeStamp stamp_kernel;
 
           // reset block offset
           IndexType block_offset = IndexType(0);
@@ -1601,6 +1646,7 @@ namespace FEAT
                 lcor[i] += lmat[i*n + j] * ldef[j];
               }
             }
+            flops += 2*n*n;
 
             // scatter result
             vanka_v.scatter_cor(_omega, lcor_v, loc_vidx, nv, IndexType(0));
@@ -1609,6 +1655,8 @@ namespace FEAT
             // update block offset
             block_offset += n*n;
           }
+
+          Statistics::add_time_precon(stamp_kernel.elapsed_now());
 
           // additive variant?
           if(!multi)
@@ -1623,6 +1671,8 @@ namespace FEAT
           // apply filter
           _filter.filter_cor(vec_cor);
         }
+
+        Statistics::add_flops(flops);
       }
 
       /// Performs the 'diagonal' numerical factorisation
@@ -1776,6 +1826,8 @@ namespace FEAT
         DataType* lcor = _vcor.data();
         DataType* ldef = _vdef.data();
 
+        Index flops(0);
+
         // iterate
         for(IndexType iter(0); iter < _num_iter; ++iter)
         {
@@ -1786,6 +1838,8 @@ namespace FEAT
             this->_matrix.apply(_vec_tmp1, vec_cor, vec_def, -DataType(1));
             _vec_tmp2.format();
           }
+
+          TimeStamp stamp_kernel;
 
           // reset block offset
           IndexType block_offset = IndexType(0);
@@ -1845,6 +1899,7 @@ namespace FEAT
               }
               ldef_p[i] -= r;
             }
+            flops += 2*np*dnv;
 
             // solve pressure:
             // p := S^{-1} * g_p
@@ -1857,6 +1912,7 @@ namespace FEAT
               }
               lcor_p[i] = r;
             }
+            flops += 2*np*np;
 
             // update velocity RHS and solve velocity
             for(IndexType i(0); i < dnv; ++i)
@@ -1869,6 +1925,7 @@ namespace FEAT
               // solve: u := diag(A)^{-1} * (f_u - B*p)
               lcor_v[i] = loc_a[i] * (ldef_v[i] - xb);
             }
+            flops += dnv * (2*np + 2);
 
             // scatter result
             vanka_v.scatter_cor(_omega, lcor_v, loc_vidx, nv, IndexType(0));
@@ -1877,6 +1934,8 @@ namespace FEAT
             // update block offset
             block_offset += block_size;
           }
+
+          Statistics::add_time_precon(stamp_kernel.elapsed_now());
 
           // additive variant?
           if(!multi)
@@ -1891,6 +1950,8 @@ namespace FEAT
           // apply filter
           _filter.filter_cor(vec_cor);
         }
+
+        Statistics::add_flops(flops);
       }
     }; // class Vanka<...>
 
