@@ -642,7 +642,7 @@ String Statistics::get_formatted_solver_internals(String target)
   String result = target + "\n";
   result += String("toe:").pad_back(20) + "max: " + stringify(solver_toe_max) + ", min: " + stringify(solver_toe_min) + ", local: " +
       stringify(solver_toe) + "\n";
-  result += String("ites:").pad_back(20) + "max: " + stringify(solver_iters_max) + ", min: " + stringify(solver_iters_min) + ", local: " +
+  result += String("iters:").pad_back(20) + "max: " + stringify(solver_iters_max) + ", min: " + stringify(solver_iters_min) + ", local: " +
       stringify(solver_iters) + "\n";
   result += String("mpi execute:").pad_back(20) + "max: " + stringify(solver_mpi_execute_max) + ", min: " + stringify(solver_mpi_execute_min) + ", local: " +
       stringify(solver_mpi_execute) + "\n";

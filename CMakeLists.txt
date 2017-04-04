@@ -18,7 +18,7 @@ endif (FEAT_COTIRE)
 
 if (FEAT_HAVE_CUDA)
   FIND_PACKAGE(CUDA)
-  set(CUDA_NVCC_FLAGS " -g -lineinfo -arch=${FEAT_CUDA_ARCH} -O3 --restrict --compiler-options -Wall;-g;-std=c++11")
+  set(CUDA_NVCC_FLAGS " -g -lineinfo -arch=${FEAT_CUDA_ARCH} -std=c++11 -O3 --restrict --compiler-options -Wall,-g")
   if(BUILD_ID MATCHES ".*fast.*")
     set(CUDA_NVCC_FLAGS " --use_fast_math ${CUDA_NVCC_FLAGS}")
   endif(BUILD_ID MATCHES ".*fast.*")
