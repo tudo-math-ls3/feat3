@@ -46,6 +46,11 @@ namespace FEAT
       DataType_ beta_scale_matrix;
       DataType_ beta_scale_vector;
 
+      /// convection Frechet scaling parameter:
+      DataType_ frechet_beta;
+      DataType_ frechet_beta_scale_matrix;
+      //DataType_ frechet_beta_scale_vector;
+
       /// reaction scaling parameter:
       DataType_ theta;
       DataType_ theta_scale_matrix;
@@ -59,6 +64,9 @@ namespace FEAT
         beta(DataType_(0)),
         beta_scale_matrix(DataType(1)),
         beta_scale_vector(DataType(1)),
+        frechet_beta(DataType_(0)),
+        frechet_beta_scale_matrix(DataType(1)),
+        //frechet_beta_scale_vector(DataType(1)),
         theta(DataType_(0)),
         theta_scale_matrix(DataType(1)),
         theta_scale_vector(DataType(1))
@@ -106,6 +114,7 @@ namespace FEAT
         // first of all, let's see what we have to assemble
         const bool need_diff = (nu > DataType(0));
         const bool need_conv = (beta > DataType(0));
+        const bool need_conv_frechet = (frechet_beta > DataType(0));
         const bool need_reac = (theta > DataType(0));
 
         const bool have_matrix = (matrix != nullptr);
@@ -206,17 +215,24 @@ namespace FEAT
             // pre-compute cubature weight
             const DataType weight = trafo_data.jac_det * cubature_rule.get_weight(point);
 
-            // clear local velocity
-            loc_v.format();
-            loc_grad_v.format();
-
-            // evaluate velocity function and its gradient
-            for(int i(0); i < num_loc_dofs; ++i)
+            // evaluate velocity function and its gradient (if required)
+            if(need_conv)
             {
-              // update velocity value
-              loc_v += local_conv_dofs[i] * space_data.phi[i].value;
-              // update velocity gradient
-              loc_grad_v.add_outer_product(local_conv_dofs[i], space_data.phi[i].grad);
+              loc_v.format();
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // update velocity value
+                loc_v += local_conv_dofs[i] * space_data.phi[i].value;
+              }
+            }
+            if(need_conv_frechet)
+            {
+              loc_grad_v.format();
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // update velocity gradient
+                loc_grad_v.add_outer_product(local_conv_dofs[i], space_data.phi[i].grad);
+              }
             }
 
             // assemble diffusion matrix?
@@ -310,6 +326,27 @@ namespace FEAT
                     // update vector
                     local_vector[i][k] += beta_vec * value * local_conv_dofs[j][k];
                   }
+                }
+              }
+            }
+
+            // assemble convection Frechet?
+            if(need_conv_frechet)
+            {
+              const DataType frechet_beta_mat = frechet_beta * frechet_beta_scale_matrix;
+              //const DataType frechet_beta_vec = frechet_beta * frechet_beta_scale_vector;
+
+              // test function loop
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // trial function loop
+                for(int j(0); j < num_loc_dofs; ++j)
+                {
+                  // compute scalar value
+                  const DataType value = weight * space_data.phi[i].value * space_data.phi[j].value;
+
+                  // update local matrix
+                  local_matrix[i][j].axpy(frechet_beta_mat * value, loc_grad_v);
                 }
               }
             }
