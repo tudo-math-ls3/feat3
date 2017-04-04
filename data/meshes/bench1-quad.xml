@@ -812,7 +812,7 @@
       4
     </Attribute>
   </MeshPart>
-  <MeshPart name="circle" parent="root" chart="circle" topology="full" size="13 12">
+  <MeshPart name="bnd:c" parent="root" chart="circle" topology="full" size="13 12">
     <Topology dim="1">
       0 1
       1 2
