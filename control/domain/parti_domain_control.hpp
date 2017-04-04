@@ -162,9 +162,12 @@ namespace FEAT
           args.parse("parti-rank-elems", _min_elems_per_rank);
 
           // parse --adapt_mode
-          String adapt_mode_string("none");
-          args.parse("adapt_mode", adapt_mode_string);
-          _adapt_mode << adapt_mode_string;
+          if(args.check("adapt_mode") > 0)
+          {
+            String adapt_mode_string("none");
+            args.parse("adapt_mode", adapt_mode_string);
+            _adapt_mode << adapt_mode_string;
+          }
 
           // okay
           return true;
