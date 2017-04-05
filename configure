@@ -80,8 +80,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Be aware that icc needs the path to a gcc binary and clang needs the path to folder containing the whole toolchain.")
   print ("--cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
-  print ("--cuda_arch=sm_20")
-  print ("  Selects the cuda architecture target (defaults to sm_20 if not set).")
+  print ("--cuda_arch=sm_30")
+  print ("  Selects the cuda architecture target (defaults to sm_30 if not set).")
   print ("--export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json.")
   print ("--cpu=cputype")
@@ -363,7 +363,7 @@ if "cuda" in buildid:
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
   if not cuda_arch:
-    cuda_arch = "sm_20"
+    cuda_arch = "sm_30"
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
 
   if cuda_verbose:
@@ -376,6 +376,11 @@ if "cuda" in buildid:
   if not cuda_host_compiler:
     cuda_host_compiler = find_exe("g++")
   cmake_flags += " -DFEAT_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
+
+# at least cuda 8 needs openmp and clang/gcc/intel understand the -fopenmp flag
+# until now, clang needs the openmp library explicitly provided, which is not funny to be automated
+if "gcc" in buildid or "gnu" in buildid or "g++" in buildid or "icc" in buildid or "intel" in buildid or "icpc" in buildid:
+  cxxflags += " -fopenmp"
 
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
@@ -467,6 +472,9 @@ print
 print ("cxxflags: " + os.environ["CXXFLAGS"])
 print
 print ("ldflags: " + os.environ["LDFLAGS"])
+print
+if (cuda_arch != ""):
+  print ("cuda_arch: " + cuda_arch)
 print
 print ("Generator: " + generator)
 print
