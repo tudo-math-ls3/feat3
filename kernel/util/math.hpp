@@ -943,15 +943,15 @@ namespace FEAT
     }
 
     /**
-     * \brief Inverts a matrix and returns its determinant.
+     * \brief Inverts a matrix.
      *
      * This function inverts a dense n x n matrix by means of partially pivoted Gaussian elimination
-     * and returns its determinant.
+     * and returns the quotient of the maximum and minimum pivot elements.
      *
      * \attention
      * This function does not check whether the input matrix is regular, therefore one should
-     * always check whether the determinant returned by this function is \e normal by using
-     * the Math::isnormal() function. If the returned determinant is not normal, i.e. if
+     * always check whether the return value of this function is \e normal by using the
+     * Math::isnormal() function. If the returned pivtor quotient is not normal, i.e. if
      * Math::isnormal returns \c false, then the matrix inversion most failed and the output
      * matrix \p a most probably contains garbage!
      *
@@ -971,7 +971,8 @@ namespace FEAT
      * A temporary pivot array of length at least <b>n</b>. Must not be \c nullptr.
      *
      * \returns
-     * The determinant of the input matrix \p a.
+     * The quotient of the maximum and minimum pivot elements that occured during
+     * the matrix inversion process.
      *
      * <b>Implementational Details:</b>\n
      * This functions implements the 'classical' column-pivoted Gauss-Jordan
@@ -1020,9 +1021,9 @@ namespace FEAT
       // invert 1x1 explicitly
       if(n == IT_(1))
       {
-        DT_ det = a[0];
-        a[0] = DT_(1) / det;
-        return det;
+        DT_ ret = (Math::isnormal(a[0]) ? DT_(1) : DT_(0));
+        a[0] = DT_(1) / a[0];
+        return ret;
       }
 
       // initialise identity permutation
@@ -1031,8 +1032,9 @@ namespace FEAT
         p[i] = i;
       }
 
-      // initialise determinant to 1
-      DT_ det = DT_(1);
+      // initialise min/max pivots to a huge value
+      DT_ pmax = DT_(0);
+      DT_ pmin = Math::huge<DT_>();
 
       // primary column elimination loop
       for(IT_ k(0); k < n; ++k)
@@ -1072,8 +1074,8 @@ namespace FEAT
 
         // step 2: process pivot row
         {
-          // update determinant by multiplying with the pivot element
-          det *= a[pk_off + p[k]];
+          // update minimum/maximum pivot elements
+          Math::minimax(Math::abs(a[pk_off + p[k]]), pmin, pmax);
 
           // get our inverted pivot element
           const DT_ pivot = DT_(1) / a[pk_off + p[k]];
@@ -1114,8 +1116,8 @@ namespace FEAT
         }
       }
 
-      // return determinant
-      return det;
+      // return pivot quotient
+      return pmax / pmin;
     }
 
     /**

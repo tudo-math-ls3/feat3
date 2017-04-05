@@ -310,7 +310,7 @@ public:
         // that all generated matrices are fit for inversion.
 
         // invert our matrix
-        const DT_ det = Math::invert_matrix(n, s, b, p);
+        const DT_ ret = Math::invert_matrix(n, s, b, p);
 
         // compute xl := ||I - A^{-1}*A||, xr := ||I - A*A^{-1}||
         DT_ xl(0), xr(0);
@@ -332,16 +332,16 @@ public:
 
         // print some numbers to the console
         std::cout << n << "/" << k << ": ";
-        std::cout << stringify_fp_sci(Math::abs(det)) << " : ";
+        std::cout << stringify_fp_sci(Math::abs(ret)) << " : ";
         std::cout << stringify_fp_sci(xl) << " / " << stringify_fp_sci(xr) << std::endl;
 
-        // make sure the determinant is not bogus
-        TEST_CHECK(Math::isfinite(det));
+        // make sure the pivot quotient is not bogus
+        TEST_CHECK(Math::isfinite(ret));
 
-        // only check result if matrix determinant is normal
-        if(!Math::isnormal(det))
+        // only check result ifpivot quotient is normal
+        if(!Math::isnormal(ret))
         {
-          std::cerr << "WARNING: matrix determinant is not normal!" << std::endl;;
+          std::cerr << "WARNING: pivot quotient is not normal!" << std::endl;;
           continue;
         }
 

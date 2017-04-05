@@ -1478,8 +1478,8 @@ namespace FEAT
           vanka_d.gather_full(block_data, loc_pidx, loc_vidx, np, nv, n, ao.first, IndexType(0));
 
           // invert local matrix block
-          DataType det = Math::invert_matrix(n, n, block_data, pivot.data());
-          if(!Math::isnormal(det))
+          DataType ret = Math::invert_matrix(n, n, block_data, pivot.data());
+          if(!Math::isnormal(ret))
           {
             throw VankaFactorError();
           }
