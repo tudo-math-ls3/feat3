@@ -82,6 +82,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
       cxxflags += " -march=corei7-avx"
     elif cpu == "haswell":
       cxxflags += " -march=core-avx2"
+    elif cpu == "broadwell":
+      cxxflags += " -march=core-avx2"
     elif cpu == "skylake":
       cxxflags += " -march=core-avx2"
     elif cpu == "itanium":

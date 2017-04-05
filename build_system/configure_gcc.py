@@ -38,8 +38,8 @@ def configure_gcc(cpu, buildid, compiler):
   else:
     cxxflags += " -Wpedantic"
 
-  # gcc 6.1 creates floating point code that lets the navstoke app diverge, if using avx support
-  if major == 6 and minor <= 2 and (cpu == "sandybridge" or cpu == "ivybridge" or cpu == "haswell" or cpu == "skylake"):
+  # gcc up to 6.2 creates floating point code that lets the navstoke app diverge, if using avx support
+  if (major < 6 or (major == 6 and minor <= 2)) and (cpu == "sandybridge" or cpu == "ivybridge" or cpu == "haswell" or cpu == "skylake" or cpu == "broadwell"):
     cpu="westmere"
 
   if "debug" in buildid or "noop" in buildid:
@@ -118,6 +118,11 @@ def configure_gcc(cpu, buildid, compiler):
       else:
         cxxflags += " -march=corei7-avx -mavx -m64"
     elif cpu == "haswell":
+      if platform.system() == "Darwin":
+        cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+      else:
+        cxxflags += " -march=core-avx2 -mavx2 -m64"
+    elif cpu == "broadwell":
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
