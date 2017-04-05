@@ -42,8 +42,12 @@ endif()
 
 if (FEAT_HAVE_MKL)
  TARGET_LINK_LIBRARIES(kernel-util
-     -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
-)
+     -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lm -ldl)
+ if (FEAT_HAVE_MPI)
+   if (NOT "${MPI_CXX_LIBRARIES}" MATCHES ".*libpthread.*")
+     TARGET_LINK_LIBRARIES(kernel-util -lpthread)
+   endif ()
+ endif (FEAT_HAVE_MPI)
 endif(FEAT_HAVE_MKL)
 
 if (FEAT_HAVE_CUDA)
