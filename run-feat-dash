@@ -321,6 +321,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print (" do not execute any test with more than one process (i.e. mpi based tests)")
   print ("insource")
   print (" allow for in source build")
+  print ("mpi_thread_multiple")
+  print (" use MPI_THREAD_MULTIPLE support")
   sys.exit();
 
 dump_filename = ""
@@ -343,6 +345,7 @@ lto = ""
 mpi_distributed = False
 no_mpi = False
 insource = False
+mpi_thread_multiple = False
 
 for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("dump="):
@@ -388,6 +391,8 @@ for i in range(1, len(sys.argv)):
     no_mpi = True
   if sys.argv[i].startswith("insource"):
     insource = True
+  if sys.argv[i].startswith("mpi_thread_multiple"):
+    mpi_thread_multiple = True
 
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -453,6 +458,8 @@ if is_found ("nvcc"):
   extra_opts += " --cuda_arch=" + cuda_arch + " "
 if (unroll_banded):
   extra_opts += " --unroll_banded "
+if (mpi_thread_multiple):
+  extra_opts += " --mpi_thread_multiple "
 
 addition = ""
 if is_found ("ninja"):

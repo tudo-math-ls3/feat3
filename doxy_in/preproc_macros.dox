@@ -168,6 +168,19 @@ datatypes is required.
 This macro is defined if the command line option <code>\--ovr_mpi_ops</code> is passed to the configure script.
 
 <hr>
+\subsection ppm_feat_mpi_thread_multiple FEAT_MPI_THREAD_MULTIPLE
+
+This macro can be defined to distribute the actual executoin of asynchronous mpi calls to separate threads.
+
+<b>Effects:</b><br>
+If defined, the SynchScalarTicket starts a new thread for its MPI calls and thus enforces truly asynchronous execution.
+In accordance to \cite Wittmann13, the MPI_Wait call follows directly after the previous mpi call to
+unconditionally trigger the start of all mpi communication.
+
+\note
+This macro is defined if the command line option <code>\--mpi_thread_multiple</code> is passed to the configure script.
+
+<hr>
 \subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
 This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
 

@@ -123,4 +123,7 @@
 /// Should we use our custom MPI operations?
 #cmakedefine FEAT_OVERRIDE_MPI_OPS
 
+/// Should we use separate threads for asynchronous mpi communication?
+#cmakedefine FEAT_MPI_THREAD_MULTIPLE
+
 #endif // FEAT_CONFIG_HPP

@@ -97,8 +97,17 @@ namespace FEAT
     bool initialise(int& argc, char**& argv)
     {
       // initialise MPI runtime first
-      if(MPI_Init(&argc, &argv) != MPI_SUCCESS)
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+      int required = MPI_THREAD_MULTIPLE;
+      int provided = MPI_THREAD_SINGLE;
+      if (::MPI_Init_thread(&argc, &argv, required, &provided) != MPI_SUCCESS)
         return false;
+      if (provided != MPI_THREAD_MULTIPLE)
+        return false;
+#else
+      if (::MPI_Init(&argc, &argv) != MPI_SUCCESS)
+        return false;
+#endif //FEAT_MPI_THREAD_MULTIPLE
 
 #ifdef FEAT_HAVE_QUADMATH
       // Create a custom MPI datatype for '__float128'

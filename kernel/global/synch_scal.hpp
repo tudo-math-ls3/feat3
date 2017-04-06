@@ -7,6 +7,11 @@
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/statistics.hpp>
 
+#include <thread>
+#include <functional>
+#include <mutex>
+#include <condition_variable>
+
 namespace FEAT
 {
   namespace Global
@@ -14,27 +19,41 @@ namespace FEAT
     /**
      * \brief Ticket class for asynchronous global operations on scalars
      *
+     * Internally a cpp thread is used to process the mpi call and ensure proper processing by calling MPI_Wait ahead of the actual tickets wait call.
+     *
      * \author Dirk Ribbrock, Peter Zajac
      */
     template <typename DT_>
     class SynchScalarTicket
     {
     protected:
-      /// buffer containing the send data
-      DT_ _x;
       /// buffer containing the received data
       DT_ _r;
+      /// buffer containing the send data
+      DT_ _x;
       /// should we compute the sqrt of the result
       bool _sqrt;
-      /// signals, whether wait was already called
-      bool _finished;
-
+      /// holds our mpi execution toe
+      DT_ _mpi_exec;
+      /// holds our mpi reduction wait toe
+      DT_ _mpi_wait;
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
-      /// our communicator
-      const Dist::Comm& _comm;
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+      /// mutex for our cv
+      std::mutex _mutex;
+      /// did the thread call allreduce already?
+      std::condition_variable _cv_allreduce_called;
+      /// predicate for our cv
+      bool _flag_allreduce_called;
+      /// thread handle
+      std::thread _thread;
+#else // no MPI_THREAD_MULTIPLE
       /// Our request for the corresponding iallreduce mpi call
       Dist::Request _req;
-#endif // FEAT_HAVE_MPI || DOXYGEN
+#endif // MPI_THREAD_MULTIPLE
+#endif //(defined(FEAT_HAVE_MPI) && defined(FEAT_MPI_THREAD_MULTIPLE)) || defined(DOXYGEN)
+      /// signals, whether wait was already called
+      bool _finished;
 
     public:
       /**
@@ -54,21 +73,33 @@ namespace FEAT
        */
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       explicit SynchScalarTicket(DT_ x, const Dist::Comm& comm, const Dist::Operation& op, bool sqrt = false) :
+        _r(DT_(0)),
         _x(x),
-        _r(),
         _sqrt(sqrt),
-        _finished(false),
-        _comm(comm),
-        _req()
+        _mpi_exec(DT_(0)),
+        _mpi_wait(DT_(0)),
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        _flag_allreduce_called(false),
+        _thread(_wait_function, std::cref(_x), std::cref(comm), std::cref(op), std::ref(_r), std::ref(_mpi_exec), std::ref(_mpi_wait),
+            std::ref(_mutex), std::ref(_cv_allreduce_called), std::ref(_flag_allreduce_called)),
+#else
+        _req(),
+#endif
+        _finished(false)
       {
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        std::unique_lock<std::mutex> l(_mutex);
+        _cv_allreduce_called.wait(l, [this]() {return _flag_allreduce_called == true; });
+#else // no FEAT_MPI_THREAD_MULTIPLE
         TimeStamp ts_start;
-        _req = _comm.iallreduce(&_x, &_r, std::size_t(1), op);
+        _req = comm.iallreduce(&_x, &_r, std::size_t(1), op);
         Statistics::add_time_mpi_execute(ts_start.elapsed_now());
+#endif // FEAT_MPI_THREAD_MULTIPLE
       }
 #else // non-MPI version
       explicit SynchScalarTicket(const DT_ & in, const Dist::Comm&, const Dist::Operation&, bool sqrt = false) :
-        _x(in),
         _r(in),
+        _x(in),
         _sqrt(sqrt),
         _finished(false)
       {
@@ -92,15 +123,17 @@ namespace FEAT
         XASSERTM(!_finished, "ticket was already completed by a wait call");
 
 #ifdef FEAT_HAVE_MPI
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        _thread.join();
+        Statistics::add_time_mpi_execute(_mpi_exec);
+        Statistics::add_time_mpi_wait_reduction(_mpi_wait);
+#else // no FEAT_MPI_THREAD_MULTIPLE
         TimeStamp ts_start;
-
         _req.wait();
-
         Statistics::add_time_mpi_wait_reduction(ts_start.elapsed_now());
+#endif // FEAT_MPI_THREAD_MULTIPLE
 #endif // FEAT_HAVE_MPI
-
         _finished = true;
-
         return (_sqrt ?  Math::sqrt(_r) : _r);
       }
 
@@ -109,6 +142,24 @@ namespace FEAT
       {
         XASSERT(_finished);
       }
+
+    private:
+#ifdef FEAT_HAVE_MPI
+      static void _wait_function(const DT_ & x, const Dist::Comm& comm, const Dist::Operation & op, DT_ & r, DT_ & mpi_exec, DT_ & mpi_wait, std::mutex & mutex,
+          std::condition_variable & cv_allreduce_called, bool & flag_allreduce_called)
+      {
+        TimeStamp ts_start;
+        std::unique_lock<std::mutex> l(mutex);
+        Dist::Request req = comm.iallreduce(&x, &r, std::size_t(1), op);
+        flag_allreduce_called = true;
+        l.unlock();
+        cv_allreduce_called.notify_all();
+        mpi_exec = ts_start.elapsed_now();
+        ts_start.stamp();
+        req.wait();
+        mpi_wait = ts_start.elapsed_now();
+      }
+#endif // FEAT_HAVE_MPI
     }; // class SynchScalarTicket
 
     /**

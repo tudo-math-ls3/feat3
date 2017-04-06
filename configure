@@ -101,6 +101,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Override MPI operations with custom implementations.")
   print ("--in-source")
   print ("  Allow for in-source builds.")
+  print ("--mpi_thread_multiple.")
+  print ("  Use multiple threads for asynchronous mpi calls.")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
@@ -287,6 +289,9 @@ for option in extra_options:
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
 
+  if option.startswith("--mpi_thread_multiple"):
+    unused_extra_options.remove(option)
+    cmake_flags +=" -DFEAT_MPI_THREAD_MULTIPLE:BOOL=TRUE"
 
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
