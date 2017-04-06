@@ -1478,11 +1478,12 @@ namespace FEAT
           vanka_d.gather_full(block_data, loc_pidx, loc_vidx, np, nv, n, ao.first, IndexType(0));
 
           // invert local matrix block
-          DataType ret = Math::invert_matrix(n, n, block_data, pivot.data());
-          if(!Math::isnormal(ret))
-          {
-            throw VankaFactorError();
-          }
+          /*DataType ret =*/ Math::invert_matrix(n, n, block_data, pivot.data());
+          //if(!Math::isnormal(ret))
+          //{
+            // Don't throw any exceptions, as this often leads to false alerts
+            //throw VankaFactorError();
+          //}
 
           // increment block data offset
           block_offset += block_size;
@@ -1714,6 +1715,7 @@ namespace FEAT
           DataType det = Math::invert_matrix(np, np, loc_s, pivot.data());
           if(!Math::isnormal(det))
           {
+            /// \todo does this produce false alerts?
             throw VankaFactorError();
           }
 
