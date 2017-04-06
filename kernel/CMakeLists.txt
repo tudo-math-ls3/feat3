@@ -50,6 +50,10 @@ if (FEAT_HAVE_PARMETIS)
   TARGET_LINK_LIBRARIES (feat thirdparty-parmetis)
 endif (FEAT_HAVE_PARMETIS)
 
+if (FEAT_HAVE_ZLIB)
+  TARGET_LINK_LIBRARIES(feat zlib)
+endif (FEAT_HAVE_ZLIB)
+
 #libquadmath needs to be the last library linked against
 if (FEAT_HAVE_QUADMATH)
   TARGET_LINK_LIBRARIES (feat -lquadmath)

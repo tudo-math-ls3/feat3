@@ -454,6 +454,7 @@ if is_found ("ccache"):
   addition = addition + "-ccache"
 
 #delete third party folders to trigger new unpacking, if used
+shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"zlib", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"alglib", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"fparser", True)
@@ -470,6 +471,7 @@ if (not nothirdparty):
   addition = addition + "-umfpack"
   addition = addition + "-fparser"
   addition = addition + "-alglib"
+  addition = addition + "-zlib"
 
 if (not nomkl):
   addition = addition + "-mkl"

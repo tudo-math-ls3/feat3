@@ -75,3 +75,7 @@ if (FEAT_HAVE_PARMETIS)
   TARGET_LINK_LIBRARIES(thirdparty-parmetis thirdparty-metis)
 
 endif (FEAT_HAVE_PARMETIS)
+
+if (FEAT_HAVE_ZLIB)
+  add_subdirectory(zlib/zlib-1.2.11)
+endif (FEAT_HAVE_ZLIB)

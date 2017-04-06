@@ -97,6 +97,10 @@ if (FEAT_HAVE_PARMETIS)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
 endif (FEAT_HAVE_PARMETIS)
 
+if (FEAT_HAVE_ZLIB)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/zlib/zlib-1.2.11/")
+endif(FEAT_HAVE_ZLIB)
+
 
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
