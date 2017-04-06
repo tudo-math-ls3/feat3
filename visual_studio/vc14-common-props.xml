@@ -79,6 +79,9 @@
   <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\lib\zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveZlib>true</FeatHaveZlib>
+  </PropertyGroup>
 
   <!-- ********************************************************************* -->
   <!-- FEAT Additional Paths and Dependencies -->
@@ -106,6 +109,8 @@
       Include="FEAT_HAVE_METIS" />
     <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
       Include="FEAT_HAVE_PARMETIS" />
+    <FeatDef Condition="'$(FeatHaveZlib)'=='true'"
+      Include="FEAT_HAVE_ZLIB" />
   </ItemGroup>
 
   <!-- FEAT additional include directory list -->
@@ -124,6 +129,8 @@
       Include="$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
     <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
       Include="$(FeatRootPath)\thirdparty\parmetis\include;" />
+    <FeatIncDir Condition="'$(FeatHaveZlib)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\zlib;" />
   </ItemGroup>
 
   <!-- FEAT additional library search path list -->
@@ -165,6 +172,8 @@
       Include="metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
       Include="parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveZlib)'=='true'"
+      Include="zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->
