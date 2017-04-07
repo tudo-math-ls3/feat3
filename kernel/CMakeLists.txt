@@ -51,7 +51,7 @@ if (FEAT_HAVE_PARMETIS)
 endif (FEAT_HAVE_PARMETIS)
 
 if (FEAT_HAVE_ZLIB)
-  TARGET_LINK_LIBRARIES(feat zlib)
+  TARGET_LINK_LIBRARIES(feat thirdparty-zlib)
 endif (FEAT_HAVE_ZLIB)
 
 #libquadmath needs to be the last library linked against
