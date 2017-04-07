@@ -271,4 +271,84 @@
       1
     </Attribute>
   </MeshPart>
+  <Partition name="auto" priority="1" level="0" size="2 32">
+    <Patch rank="0" size="16">
+      0
+      1
+      4
+      5
+      8
+      10
+      12
+      13
+      16
+      17
+      20
+      21
+      24
+      25
+      28
+      29
+    </Patch>
+    <Patch rank="1" size="16">
+      2
+      3
+      6
+      7
+      9
+      11
+      14
+      15
+      18
+      19
+      22
+      23
+      26
+      27
+      30
+      31
+    </Patch>
+  </Partition>
+  <Partition name="auto" priority="1" level="0" size="4 32">
+    <Patch rank="0" size="8">
+      0
+      1
+      4
+      5
+      8
+      10
+      12
+      13
+    </Patch>
+    <Patch rank="1" size="8">
+      2
+      3
+      6
+      7
+      9
+      11
+      14
+      15
+    </Patch>
+    <Patch rank="2" size="8">
+      16
+      17
+      20
+      21
+      24
+      25
+      28
+      29
+    </Patch>
+    <Patch rank="3" size="8">
+      18
+      19
+      22
+      23
+      26
+      27
+      30
+      31
+    </Patch>
+  </Partition>
 </FeatMeshFile>
