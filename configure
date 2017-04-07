@@ -446,10 +446,12 @@ if "lto" in buildid:
     sys.exit()
   ldflags += cxxflags
 os.environ["LDFLAGS"] = ldflags
+os.environ["CFLAGS"] = "-O3"
 #set system host compiler in cflags to pass cmake's c compiler check
 if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if system_host_compiler:
-    os.environ["CFLAGS"] = " -gcc-name=" + system_host_compiler
+    os.environ["CFLAGS"] = "-O3  -gcc-name=" + system_host_compiler
+
 
 print("cmake version: " + get_output("cmake --version")[0])
 
