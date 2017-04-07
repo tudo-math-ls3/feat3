@@ -137,7 +137,6 @@ thirdparty
   ...
 \endverbatim
 
-
 \subsection windows_thirdparty_suitesparse SuiteSparse (UMFPACK)
 <c>SuiteSparse</c> is a library collection that offers various algorithms for sparse linear systems. Currently, the
 only component of the <c>SuiteSparse</c> library is <c>UMFPACK</c>, a direct linear solver for CSR matrices, which
@@ -158,6 +157,28 @@ thirdparty
     UMFPACK
   ...
 \endverbatim
+
+\subsection windows_thirdparty_zlib zlib
+<c>zlib</c> is a library that offers functions for compression and decompression of binary data using the <c>DEFLATE</c>
+algorithm.
+- Lastest tested Version: 1.2.11 (from 2017-01-15)
+- Download Link: http://zlib.net
+
+<b>Instructions:</b>
+-# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty</c>.
+-# Rename the sub-directory from <c>zlib-1.2.11</c> (or whatever version you have downloaded) to <c>zlib</c>.
+-# The <c>thirdparty</c> directory should now have the following sub-directory structure:
+\verbatim
+thirdparty
+  zlib
+    amiga
+    contrib
+    doc
+    ...
+  ...
+\endverbatim
+
+
 
 \section windows_vcgen_tool Creating Visual Studio Project and Solution files
 Before you can compile any FEAT application, test or tutorial  with Visual Studio, you will first need generate a
