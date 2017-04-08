@@ -12,6 +12,128 @@ namespace FEAT
   {
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
 
+#ifdef FEAT_OVERRIDE_MPI_OPS
+    // operation: x <- x + y
+    struct OpSum
+    {
+      template<typename T_>
+      static inline void eval(T_& x, T_& y)
+      {
+        x += y;
+      }
+    };
+
+    /// operation: x <- max(x, y)
+    struct OpMax
+    {
+      template<typename T_>
+      static inline void eval(T_& x, T_& y)
+      {
+        if(x < y)
+          x = y;
+      }
+    };
+
+    /// operation: x <- min(x, y)
+    struct OpMin
+    {
+      template<typename T_>
+      static inline void eval(T_& x, T_& y)
+      {
+        if(y < x)
+          x = y;
+      }
+    };
+
+    // Helper function:
+    // Interprets iv and iov as arrays of type T_ and
+    // applies Op_ on each pair of array elements
+    template<typename Op_, typename T_>
+    inline void func_op_t(void* iv, void* iov, int* n)
+    {
+      T_* y = reinterpret_cast<T_*>(iv);
+      T_* x = reinterpret_cast<T_*>(iov);
+      for(int i(0); i < *n; ++i)
+      {
+        Op_::eval(x[i], y[i]);
+      }
+    }
+
+    // Callback function for MPI operation overrides
+    template<typename Op_>
+    void op_callback(void* iv, void* iov, int* n, MPI_Datatype* dt)
+    {
+      if(*dt == MPI_SIGNED_CHAR)         func_op_t<Op_, signed char>       (iv, iov, n); else
+      if(*dt == MPI_SHORT)               func_op_t<Op_, short>             (iv, iov, n); else
+      if(*dt == MPI_INT)                 func_op_t<Op_, int>               (iv, iov, n); else
+      if(*dt == MPI_LONG)                func_op_t<Op_, long>              (iv, iov, n); else
+      if(*dt == MPI_LONG_LONG)           func_op_t<Op_, long long>         (iv, iov, n); else
+      if(*dt == MPI_UNSIGNED_CHAR)       func_op_t<Op_, unsigned char>     (iv, iov, n); else
+      if(*dt == MPI_UNSIGNED_SHORT)      func_op_t<Op_, unsigned short>    (iv, iov, n); else
+      if(*dt == MPI_UNSIGNED)            func_op_t<Op_, unsigned int>      (iv, iov, n); else
+      if(*dt == MPI_UNSIGNED_LONG)       func_op_t<Op_, unsigned long>     (iv, iov, n); else
+      if(*dt == MPI_UNSIGNED_LONG_LONG)  func_op_t<Op_, unsigned long long>(iv, iov, n); else
+      if(*dt == MPI_FLOAT)               func_op_t<Op_, float>             (iv, iov, n); else
+      if(*dt == MPI_DOUBLE)              func_op_t<Op_, double>            (iv, iov, n); else
+      if(*dt == MPI_LONG_DOUBLE)         func_op_t<Op_, long double>       (iv, iov, n); else
+      if(*dt == MPI_INT8_T)              func_op_t<Op_, std::int8_t>       (iv, iov, n); else
+      if(*dt == MPI_INT16_T)             func_op_t<Op_, std::int16_t>      (iv, iov, n); else
+      if(*dt == MPI_INT32_T)             func_op_t<Op_, std::int32_t>      (iv, iov, n); else
+      if(*dt == MPI_INT64_T)             func_op_t<Op_, std::int64_t>      (iv, iov, n); else
+      if(*dt == MPI_UINT8_T)             func_op_t<Op_, std::uint8_t>      (iv, iov, n); else
+      if(*dt == MPI_UINT16_T)            func_op_t<Op_, std::uint16_t>     (iv, iov, n); else
+      if(*dt == MPI_UINT32_T)            func_op_t<Op_, std::uint32_t>     (iv, iov, n); else
+      if(*dt == MPI_UINT64_T)            func_op_t<Op_, std::uint64_t>     (iv, iov, n); else
+#ifdef FEAT_HAVE_QUADMATH
+      if(*dt == dt__float128.dt)         func_op_t<Op_, __float128>        (iv, iov, n); else
+#endif
+      {
+        // unsupported datatype
+        MPI_Abort(MPI_COMM_WORLD, 1);
+      }
+    }
+#endif // FEAT_OVERRIDE_MPI_OPS
+
+    bool initialise(int& argc, char**& argv)
+    {
+      // initialise MPI runtime first
+      if(MPI_Init(&argc, &argv) != MPI_SUCCESS)
+        return false;
+
+#ifdef FEAT_HAVE_QUADMATH
+      // Create a custom MPI datatype for '__float128'
+      Datatype& dt_f128 = const_cast<Datatype&>(Dist::dt__float128);
+      MPI_Type_contiguous(int(sizeof(__float128)), MPI_BYTE, &dt_f128.dt);
+      MPI_Type_commit(&dt_f128.dt);
+#endif // FEAT_HAVE_QUADMATH
+
+#ifdef FEAT_OVERRIDE_MPI_OPS
+      // override MPI operations
+      MPI_Op_create(op_callback<OpSum>, 1, &const_cast<Operation&>(Dist::op_sum).op);
+      MPI_Op_create(op_callback<OpMax>, 1, &const_cast<Operation&>(Dist::op_max).op);
+      MPI_Op_create(op_callback<OpMin>, 1, &const_cast<Operation&>(Dist::op_min).op);
+#endif // FEAT_OVERRIDE_MPI_OPS
+
+      return true;
+    }
+
+    void finalise()
+    {
+
+#ifdef FEAT_OVERRIDE_MPI_OPS
+      Operation& my_op_sum = const_cast<Operation&>(Dist::op_sum);
+      MPI_Op_free(&my_op_sum.op);
+#endif // FEAT_OVERRIDE_MPI_OPS
+
+#ifdef FEAT_HAVE_QUADMATH
+      Datatype& dt_f128 = const_cast<Datatype&>(Dist::dt__float128);
+      MPI_Type_free(&dt_f128.dt);
+#endif // FEAT_HAVE_QUADMATH
+
+      // finalise MPI
+      MPI_Finalize();
+    }
+
     // datatypes
     const Datatype dt_byte               (MPI_BYTE,               sizeof(char));
     const Datatype dt_char               (MPI_CHAR,               sizeof(char));
@@ -37,6 +159,10 @@ namespace FEAT
     const Datatype dt_unsigned_int16     (MPI_UINT16_T,           sizeof(std::uint16_t));
     const Datatype dt_unsigned_int32     (MPI_UINT32_T,           sizeof(std::uint32_t));
     const Datatype dt_unsigned_int64     (MPI_UINT64_T,           sizeof(std::uint64_t));
+#ifdef FEAT_HAVE_QUADMATH
+    // This needs to initialised by Dist::initialise() !
+    const Datatype dt__float128          (0,                      sizeof(__float128));
+#endif
 
     // operations
     const Operation op_sum(MPI_SUM);
@@ -644,6 +770,17 @@ namespace FEAT
     /* ######################################################################################### */
     /* ######################################################################################### */
 
+    bool initialise(int& /*argc*/, char**& /*argv*/)
+    {
+      // nothing to do here
+      return true;
+    }
+
+    void finalise()
+    {
+      // nothing to do here
+    }
+
     // datatypes
     // Note: The numbers for the datatypes are arbitrary; it is just important that each datatype
     // has its own unique number.
@@ -663,6 +800,9 @@ namespace FEAT
     const Datatype dt_float              (31, sizeof(float));
     const Datatype dt_double             (32, sizeof(double));
     const Datatype dt_long_double        (33, sizeof(long double));
+#ifdef FEAT_HAVE_QUADMATH
+    const Datatype dt__float128          (34, sizeof(__float128));
+#endif
     const Datatype dt_signed_int8        (41, sizeof(std::int8_t));
     const Datatype dt_signed_int16       (42, sizeof(std::int16_t));
     const Datatype dt_signed_int32       (43, sizeof(std::int32_t));

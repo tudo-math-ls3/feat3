@@ -28,6 +28,36 @@ namespace FEAT
   namespace Dist
   {
     /**
+     * \brief Initialises the distributed communication system.
+     *
+     * This function is effectively a wrapper around the \c MPI_Init function.
+     *
+     * In addition, this function may perform further setup to initialise
+     * additional datatypes, operations, etc.:
+     *
+     * - If FEAT_HAVE_QUADMATH is defined, this function will initialise the
+     *   dt__float128 datatype.
+     * - If FEAT_OVERRIDE_MPI_OPS is defined, this function will override
+     *   the standard op_sum, op_max and op_min operations by custom
+     *   implementations.
+     *
+     * \see \cite MPI31 Section 8.7, page 355
+     */
+    bool initialise(int& argc, char**& argv);
+
+    /**
+     * \brief Initialises the distributed communication system.
+     *
+     * This function is effectively a wrapper around the \c MPI_Init function.
+     *
+     * In addition, this function may perform further cleanup to release
+     * additionally defined datatype, operations, etc.
+     *
+     * \see \cite MPI31 Section 8.7, page 357
+     */
+    void finalise();
+
+    /**
      * \brief Communication Datatype class
      *
      * This class effectively wraps around the \c MPI_Datatype handle.
@@ -133,6 +163,11 @@ namespace FEAT
     /// Datatype wrapper for \c MPI_UINT64_T
     extern const Datatype dt_unsigned_int64;
 
+#if defined(FEAT_HAVE_QUADMATH) || defined(DOXYGEN)
+    /// custom Datatype for __float128
+    extern const Datatype dt__float128;
+#endif
+
     /**
      * \brief Automatic Datatype deduction function template
      *
@@ -162,6 +197,11 @@ namespace FEAT
     template<> inline const Datatype& autotype<float>()             {return dt_float;}
     template<> inline const Datatype& autotype<double>()            {return dt_double;}
     template<> inline const Datatype& autotype<long double>()       {return dt_long_double;}
+
+#if defined(FEAT_HAVE_QUADMATH) || defined(DOXYGEN)
+    template<> inline const Datatype& autotype<__float128>()        {return dt__float128;}
+#endif
+
     /// \endcond
 
     /* ************************************************************************************************************* */

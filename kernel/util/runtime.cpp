@@ -1,5 +1,6 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/os_windows.hpp>
 
@@ -57,17 +58,16 @@ void Runtime::initialise(int& argc, char**& argv)
     Runtime::abort();
   }
 
-  int rank = 0;
-#ifdef FEAT_HAVE_MPI
-  // initialise MPI
-  if(::MPI_Init(&argc, &argv) != MPI_SUCCESS)
-    abort();
-  // get rank for MemPool initialisation
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#else
-  (void)argc;
-  (void)argv;
-#endif
+  // initialise Dist operations
+  if(!Dist::initialise(argc, argv))
+  {
+    std::cerr << "ERROR: Failed to initialise Dist operations!" << std::endl;
+    std::cerr.flush();
+    Runtime::abort();
+  }
+
+  // get MPI_COMM_WORLD rank:
+  int rank = Dist::Comm::world().rank();
 
   // read in initial settings from provided ini file via system environment variable FEAT3_INI_FILE
   if (const char* c_file_path = std::getenv("FEAT3_INI_FILE"))
@@ -153,10 +153,8 @@ int Runtime::finalise()
   MemoryPool<Mem::CUDA>::finalise();
 #endif
 
-#ifdef FEAT_HAVE_MPI
-  // finalise MPI
-  ::MPI_Finalize();
-#endif
+  // finalise Dist operations
+  Dist::finalise();
 
   _finished = true;
 

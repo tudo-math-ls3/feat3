@@ -120,4 +120,7 @@
 /// Should we use uncommon datatype/indextype combinations in solver factory?
 #cmakedefine FEAT_SF_ESOTERIC
 
+/// Should we use our custom MPI operations?
+#cmakedefine FEAT_OVERRIDE_MPI_OPS
+
 #endif // FEAT_CONFIG_HPP
