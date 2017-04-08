@@ -180,6 +180,9 @@ namespace FEAT
         // our local velocity gradient
         Tiny::Matrix<DataType, dim_, dim_> loc_grad_v;
 
+        loc_v.format();
+        loc_grad_v.format();
+
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
@@ -222,7 +225,7 @@ namespace FEAT
               for(int i(0); i < num_loc_dofs; ++i)
               {
                 // update velocity value
-                loc_v += local_conv_dofs[i] * space_data.phi[i].value;
+                loc_v.axpy(space_data.phi[i].value, local_conv_dofs[i]);
               }
             }
             if(need_conv_frechet)
