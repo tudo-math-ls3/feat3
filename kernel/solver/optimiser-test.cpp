@@ -169,7 +169,7 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_rb_d(double(0.8),Index(40), Index(118),"MQCLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.33),Index(57), Index(204),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_bs_d(double(0.33),Index(58), Index(204),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 // This is the weird Hager-Zhang update
 NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
