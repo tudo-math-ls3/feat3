@@ -315,6 +315,13 @@ namespace Tutorial03
       // we want to use internally and the function class itself:
       typedef Analytic::EvalTraits<DataType, SolFunction_> AnalyticEvalTraits;
 
+      // Return value of the analytic function, can be scalar or vector-valued in general but is scalar here
+      // Has to be public for the ForceFunctional
+    public:
+      typedef typename AnalyticEvalTraits::ValueType ValueType;
+
+    protected:
+
       // With that type, we can now define the type of the solution function evaluator:
       typedef typename SolFunction_::template Evaluator<AnalyticEvalTraits> SolEvaluator;
 

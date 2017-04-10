@@ -74,6 +74,8 @@ namespace FEAT
 
         // create a functor evaluator
         typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
+        // Type that evaluator returns
+        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType FunctorValueType;
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -82,7 +84,7 @@ namespace FEAT
         typename AsmTraits::TestEvalData test_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad;
+        typename Tiny::Vector<FunctorValueType, AsmTraits::max_local_test_dofs> lvad;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);

@@ -59,6 +59,8 @@ namespace FEAT
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// test-function data type
           typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// Function return value, can be scalar or vector-valued
+          typedef typename Analytic::EvalTraits<DataType, Function_>::ValueType ValueType;
 
         protected:
           /// declare our analytic eval traits
@@ -96,7 +98,7 @@ namespace FEAT
            * \returns
            * The value of the linear functional.
            **/
-          DataType operator()(const TestBasisData& psi) const
+          ValueType operator()(const TestBasisData& psi) const
           {
             return _func_value * psi.value;
           }
@@ -136,7 +138,6 @@ namespace FEAT
 
         /// trafo config tag
         static constexpr TrafoTags trafo_config = TrafoTags::img_point;
-
         /// test space config tag
         static constexpr SpaceTags test_config = SpaceTags::value;
 
@@ -161,6 +162,8 @@ namespace FEAT
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// test-function data type
           typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// Function return value, can be scalar or vector-valued
+          typedef typename Analytic::EvalTraits<DataType, Function_>::ValueType ValueType;
 
         protected:
           /// declare our analytic eval traits
