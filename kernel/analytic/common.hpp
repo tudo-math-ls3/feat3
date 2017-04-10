@@ -2714,7 +2714,7 @@ namespace FEAT
           void value(ValueType& val, const PointType& point)
           {
             val.format();
-            val(0) = point[1]*Math::cos(_t*point[1]) - _fac*Math::sqr(_t)*Math::sin(point[1]*_t);
+            val(0) = point[1]*Math::cos(_t*point[1]) + _fac*Math::sqr(_t)*Math::sin(point[1]*_t);
           }
 
           /**
@@ -3119,6 +3119,10 @@ namespace FEAT
           void value(ValueType& val, const PointType& point)
           {
             val.format();
+
+            // Stationary
+            //val(0) = _fac*DataType(2)*Math::sin(point[0]+_t)*Math::sin(point[1]+_t) + Math::cos(point[0]-point[1]+_t);
+            //val(1) = _fac*DataType(2)*Math::cos(point[0]+_t)*Math::cos(point[1]+_t) - Math::cos(point[0]-point[1]+_t);
 
             val(0) =  Math::cos(point[0]+_t)*Math::sin(point[1]+_t) + Math::sin(point[0]+_t)*Math::cos(point[1]+_t)
               + _fac*DataType(2)*Math::sin(point[0]+_t)*Math::sin(point[1]+_t) + Math::cos(point[0]-point[1]+_t);

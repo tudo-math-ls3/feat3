@@ -6,6 +6,7 @@
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/fe_interpolator.hpp>
 #include <kernel/assembly/grad_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -24,6 +25,7 @@
 #include <control/meshopt/meshopt_control_factory.hpp>
 #include <control/stokes_blocked.hpp>
 
+//#define ANALYTIC_SOLUTION
 using namespace FEAT;
 
 static void display_help(const Dist::Comm&);
@@ -31,6 +33,42 @@ static void read_test_application_config(std::stringstream&, const int);
 static void read_test_meshopt_config(std::stringstream&, const int);
 static void read_test_solver_config(std::stringstream&, const int);
 static void read_test_mesh_file_names(std::deque<String>&, const int);
+
+enum class TermHandling
+{
+  off = 0,
+  expl,
+  impl
+};
+
+inline std::ostream& operator<<(std::ostream& os, TermHandling convection_handling)
+{
+  switch(convection_handling)
+  {
+    case TermHandling::off:
+      return os << "off";
+    case TermHandling::expl:
+      return os << "expl";
+    case TermHandling::impl:
+      return os << "impl";
+    default:
+      return os << "-unknown-";
+  }
+}
+
+inline void operator<<(TermHandling& convection_handling, const String& convection_handling_name)
+{
+  if(convection_handling_name == "off")
+    convection_handling = TermHandling::off;
+  else if(convection_handling_name == "expl")
+    convection_handling = TermHandling::expl;
+  else if(convection_handling_name == "impl")
+    convection_handling = TermHandling::impl;
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "Unknown TermHandling identifier string "
+        +convection_handling_name);
+}
+
 
 template<typename DT_>
 class BDFTimeDiscretisation
@@ -45,35 +83,53 @@ class BDFTimeDiscretisation
     Index _p_extrapolation_steps_startup;
     const DataType _reynolds;
     DataType _delta_t;
+    bool _use_deformation;
     bool _use_rotational_form;
     bool _startup;
 
   public:
     std::vector<DataType> coeff_lhs_v;
-    std::vector<DataType> coeff_rhs_v_v;
+    std::vector<DataType> coeff_rhs_v_1;
     std::vector<DataType> coeff_rhs_v_psi;
     std::vector<DataType> coeff_extrapolation_p;
 
-    DataType coeff_rhs_v_p;
-    DataType coeff_rhs_psi;
+    DataType coeff_lhs_ale;
+    DataType coeff_rhs_ale;
+    DataType coeff_rhs_f;
     DataType coeff_rhs_proj_D_v;
+    DataType coeff_rhs_psi;
+    DataType coeff_rhs_v_2;
+    DataType coeff_rhs_v_p;
 
-    explicit BDFTimeDiscretisation(PropertyMap* config_section, const DataType reynolds, const bool startup):
+    TermHandling ale_handling;
+    TermHandling conv_handling;
+    TermHandling visc_handling;
+
+    explicit BDFTimeDiscretisation(PropertyMap* config_section, const DataType reynolds, const bool use_deformation,
+    const bool startup):
       _num_steps(~Index(0)),
       _num_steps_startup(1),
       _p_extrapolation_steps(~Index(0)),
       _p_extrapolation_steps_startup(~Index(0)),
       _reynolds(reynolds),
       _delta_t(0),
+      _use_deformation(use_deformation),
       _use_rotational_form(false),
       _startup(startup),
       coeff_lhs_v(3),
-      coeff_rhs_v_v(0),
+      coeff_rhs_v_1(3),
       coeff_rhs_v_psi(0),
       coeff_extrapolation_p(0),
-      coeff_rhs_v_p(0),
+      coeff_lhs_ale(0),
+      coeff_rhs_ale(0),
+      coeff_rhs_f(0),
+      coeff_rhs_proj_D_v(0),
       coeff_rhs_psi(0),
-      coeff_rhs_proj_D_v(0)
+      coeff_rhs_v_2(0),
+      coeff_rhs_v_p(0),
+      ale_handling(TermHandling::off),
+      conv_handling(TermHandling::off),
+      visc_handling(TermHandling::off)
       {
         XASSERT(config_section != nullptr);
         // Get time discretisation order
@@ -104,8 +160,23 @@ class BDFTimeDiscretisation
         _delta_t = DataType(std::stod(delta_t_p.first));
         XASSERT(_delta_t > DataType(0));
 
-        coeff_rhs_v_v.clear();
-        coeff_rhs_v_v = std::vector<DataType>(_num_steps, DataType(0));
+        // Use ale (meaning solve Navier-Stokes instead of plain Stokes)?
+        auto ale_p = config_section->query("ALE");
+        XASSERTM(ale_p.second,
+        "TimeDiscretisation section is missing the mandatory ALE entry!");
+        ale_handling << ale_p.first;
+
+        // Use convection (meaning solve Navier-Stokes instead of plain Stokes)?
+        auto convection_p = config_section->query("convection");
+        XASSERTM(convection_p.second,
+        "TimeDiscretisation section is missing the mandatory convection entry!");
+        conv_handling << convection_p.first;
+
+        // Use viscous (meaning solve Navier-Stokes instead of plain Stokes)?
+        auto viscous_p = config_section->query("viscous");
+        XASSERTM(viscous_p.second,
+        "TimeDiscretisation section is missing the mandatory viscous entry!");
+        visc_handling << viscous_p.first;
 
         coeff_rhs_v_psi.clear();
         coeff_rhs_v_psi = std::vector<DataType>(_num_steps, DataType(0));
@@ -130,6 +201,11 @@ class BDFTimeDiscretisation
     DataType delta_t()
     {
       return _delta_t;
+    }
+
+    bool is_rotational()
+    {
+      return _use_rotational_form;
     }
 
     Index get_num_steps()
@@ -167,45 +243,91 @@ class BDFTimeDiscretisation
         // Mass matrix
         coeff_lhs_v.at(0) = DataType(1);
         // Convection matrix
-        coeff_lhs_v.at(1) = _delta_t;
+        coeff_lhs_v.at(1) = (conv_handling == TermHandling::impl) ? _delta_t : DataType(0);
         // Stiffness matrix
-        coeff_lhs_v.at(2) = _delta_t/_reynolds;
+        coeff_lhs_v.at(2) = (visc_handling == TermHandling::impl) ? _delta_t/_reynolds : DataType(0);
 
-        coeff_rhs_v_v.at(0) = DataType(1);
+        // ALE term
+        coeff_lhs_ale = (ale_handling == TermHandling::impl) ? -DataType(1) : DataType(0);
+
+        // Mass matrix
+        coeff_rhs_v_1.at(0) = DataType(1);
+        // Convection matrix
+        coeff_rhs_v_1.at(1) = (conv_handling == TermHandling::expl) ? -_delta_t : DataType(0);
+        // Stiffness matrix
+        coeff_rhs_v_1.at(2) = (visc_handling == TermHandling::expl) ? -_delta_t/_reynolds : DataType(0);
+
+        // ALE term rhs
+        coeff_rhs_ale = (ale_handling == TermHandling::impl) ? DataType(1) : DataType(0);
+
+        // Mass matrix coefficient for previous time step vector
+        coeff_rhs_v_2 = DataType(0);
+
+        coeff_rhs_f = _delta_t;
 
         // coefficient for -(p*[k], div phi) on the rhs for the velocity eq.
         coeff_rhs_v_p = -_delta_t;
         // coefficient for -(psi[k], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_psi.at(0) = _delta_t;
+        coeff_rhs_v_psi.at(0) = -_delta_t;
 
         coeff_rhs_psi = DataType(1)/_delta_t;
-
-        coeff_rhs_proj_D_v = _use_rotational_form ? DataType(1)/_reynolds : DataType(0);
 
       }
       else if(num_steps == Index(2))
       {
+        // Mass matrix
         coeff_lhs_v.at(0) = DataType(1);
-        coeff_lhs_v.at(1) = DataType(2)/DataType(3)*_delta_t;
-        coeff_lhs_v.at(2) = DataType(2)/DataType(3)*_delta_t/_reynolds;
+        // Convection matrix
+        coeff_lhs_v.at(1) = (conv_handling == TermHandling::impl) ? DataType(2)/DataType(3)*_delta_t : DataType(0);
+        // Stiffness matrix
+        coeff_lhs_v.at(2) =
+          (visc_handling == TermHandling::impl) ? DataType(2)/DataType(3)*_delta_t/_reynolds : DataType(0);
 
-        coeff_rhs_v_v.at(0) = DataType(4)/DataType(3);
-        coeff_rhs_v_v.at(1) = -DataType(1)/DataType(3);
+        // ALE term lhs
+        coeff_lhs_ale = (ale_handling == TermHandling::impl) ? -DataType(1) : DataType(0);
+
+        // Mass matrix
+        coeff_rhs_v_1.at(0) = DataType(4)/DataType(3);
+        // Convection matrix
+        coeff_rhs_v_1.at(1) = (conv_handling == TermHandling::expl) ? -DataType(2)/DataType(3)*_delta_t : DataType(0);
+        // Stiffness matrix
+        coeff_rhs_v_1.at(2) =
+          (visc_handling == TermHandling::expl) ? -DataType(2)/DataType(3)*_delta_t/_reynolds : DataType(0);
+
+        // ALE term rhs
+        coeff_rhs_ale = (ale_handling == TermHandling::impl) ? DataType(1) : DataType(0);
+
+        coeff_rhs_f = DataType(2)/DataType(3)*_delta_t;
+
+        // Mass matrix coefficient for previous time step vector
+        coeff_rhs_v_2 = -DataType(1)/DataType(3);
 
         // coefficient for -(p*[k], div phi) on the rhs for the velocity eq.
         coeff_rhs_v_p = -DataType(2)/DataType(3)*_delta_t;
 
         // coefficient for -(psi[k], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_psi.at(0) =  DataType(8)/DataType(9)*_delta_t;
+        coeff_rhs_v_psi.at(0) =  -DataType(8)/DataType(9)*_delta_t;
         // coefficient for -(psi[k-1], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_psi.at(1) = -DataType(2)/DataType(9)*_delta_t;
+        coeff_rhs_v_psi.at(1) = DataType(2)/DataType(9)*_delta_t;
 
         coeff_rhs_psi = DataType(3)/(DataType(2)*_delta_t);
 
-        coeff_rhs_proj_D_v = _use_rotational_form ? DataType(1)/_reynolds : DataType(0);
-
+      }
+      else
+      {
+        throw InternalError(__func__,__FILE__,__LINE__,
+        "Invalid number of BDF steps: "+stringify(num_steps));
       }
 
+      // Coefficient for the div v term for the projection step
+      coeff_rhs_proj_D_v = _use_rotational_form ? DataType(1)/_reynolds : DataType(0);
+
+      if(_use_deformation)
+      {
+        coeff_rhs_proj_D_v *= DataType(2);
+      }
+
+      // Coefficients for the extrapolation of the pressure
       if(p_extrapolation_steps == Index(1))
       {
         coeff_extrapolation_p.at(0) = DataType(1);
@@ -218,41 +340,6 @@ class BDFTimeDiscretisation
 
     }
 };
-
-enum class Convection
-{
-  off = 0,
-  expl,
-  impl
-};
-
-inline std::ostream& operator<<(std::ostream& os, Convection convection_handling)
-{
-  switch(convection_handling)
-  {
-    case Convection::off:
-      return os << "off";
-    case Convection::expl:
-      return os << "expl";
-    case Convection::impl:
-      return os << "impl";
-    default:
-      return os << "-unknown-";
-  }
-}
-
-inline void operator<<(Convection& convection_handling, const String& convection_handling_name)
-{
-  if(convection_handling_name == "off")
-    convection_handling = Convection::off;
-  else if(convection_handling_name == "expl")
-    convection_handling = Convection::expl;
-  else if(convection_handling_name == "impl")
-    convection_handling = Convection::impl;
-  else
-    throw InternalError(__func__, __FILE__, __LINE__, "Unknown Convection identifier string "
-        +convection_handling_name);
-}
 
 template<typename Mesh_, bool extrude>
 struct MeshExtrudeHelper
@@ -420,103 +507,101 @@ class ExtrudedPartiDomainControl :
       _vtx_map(),
       _dom_ctrl_2d(dom_ctrl_2d)
       {
-      XASSERTM(!this->_have_hierarchy, "domain control already has a hierarchy!");
-      //XASSERTM(dom_ctrl_2d._have_hierarchy, "2d domain control has no hierarchy!");
+        XASSERTM(!this->_have_hierarchy, "domain control already has a hierarchy!");
+        //XASSERTM(dom_ctrl_2d._have_hierarchy, "2d domain control has no hierarchy!");
 
-//#ifdef FEAT_HAVE_MPI
-//      XASSERTM(dom_ctrl_2d._have_partition, "domain needs to be partitioned before creating a hierarchy");
-//#endif
+        //#ifdef FEAT_HAVE_MPI
+        //      XASSERTM(dom_ctrl_2d._have_partition, "domain needs to be partitioned before creating a hierarchy");
+        //#endif
 
-//#ifdef FEAT_HAVE_MPI
-//      // create hierarchy from our patch mesh
-//      XASSERTM(this->_patch_mesh_node != nullptr, "domain control does not have a patch mesh");
-//      mesh_node = this->_patch_mesh_node;
-//      this->_patch_mesh_node = nullptr;
-//#else
-//      // create hierarchy from our base mesh
-//      XASSERTM(this->_base_mesh_node != nullptr, "domain control does not have a base mesh");
-//      mesh_node = _base_mesh_node;
-//      this->_base_mesh_node = nullptr;
-//#endif // FEAT_HAVE_MPI
+        //#ifdef FEAT_HAVE_MPI
+        //      // create hierarchy from our patch mesh
+        //      XASSERTM(this->_patch_mesh_node != nullptr, "domain control does not have a patch mesh");
+        //      mesh_node = this->_patch_mesh_node;
+        //      this->_patch_mesh_node = nullptr;
+        //#else
+        //      // create hierarchy from our base mesh
+        //      XASSERTM(this->_base_mesh_node != nullptr, "domain control does not have a base mesh");
+        //      mesh_node = _base_mesh_node;
+        //      this->_base_mesh_node = nullptr;
+        //#endif // FEAT_HAVE_MPI
 
-      auto coarse_mesh_node_2d = _dom_ctrl_2d.back()->get_mesh_node_ptr();
-      int lvl_min(_dom_ctrl_2d.min_level_index());
-      int lvl_max(_dom_ctrl_2d.max_level_index());
+        auto coarse_mesh_node_2d = _dom_ctrl_2d.back()->get_mesh_node_ptr();
+        int lvl_min(_dom_ctrl_2d.min_level_index());
+        int lvl_max(_dom_ctrl_2d.max_level_index());
 
-      // Create coarse mesh node for this domain control
-      std::shared_ptr<MeshNodeType> mesh_node(nullptr);
-      MeshExtruder::create(mesh_node, coarse_mesh_node_2d, slices, z_min, z_max, z_min_part_name, z_max_part_name);
-      // Set the patch mesh node to the new coarse mesh node
-      this->_patch_mesh_node = mesh_node;
-      // Copy the neighbours information from the lower dimensional domain control
-      this->_layers.front()->set_neighbour_ranks(_dom_ctrl_2d.front().layer().get_neighbour_ranks());
+        // Create coarse mesh node for this domain control
+        std::shared_ptr<MeshNodeType> mesh_node(nullptr);
+        MeshExtruder::create(mesh_node, coarse_mesh_node_2d, slices, z_min, z_max, z_min_part_name, z_max_part_name);
+        // Set the patch mesh node to the new coarse mesh node
+        this->_patch_mesh_node = mesh_node;
+        // Copy the neighbours information from the lower dimensional domain control
+        this->_layers.front()->set_neighbour_ranks(_dom_ctrl_2d.front().layer().get_neighbour_ranks());
 
-      // Add coarse mesh node to layer_levels
-      auto& laylevs = this->_layer_levels.front();
-      laylevs.push_front(std::make_shared<LevelType>(lvl_min, mesh_node));
+        // Add coarse mesh node to layer_levels
+        auto& laylevs = this->_layer_levels.front();
+        laylevs.push_front(std::make_shared<LevelType>(lvl_min, mesh_node));
 
-      // Refine up to desired maximum level
-      for(int lvl(lvl_min); lvl < lvl_max; ++lvl)
-      {
-        std::shared_ptr<MeshNodeType> coarse_node = mesh_node;
-        mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(this->_adapt_mode));
-
-        laylevs.push_front(std::make_shared<LevelType>(lvl+1, mesh_node));
-      }
-
-
-      // Okay, we're done here
-      this->_have_hierarchy = true;
-      this->_have_partition = true;
-
-      // Finally, compile the virtual levels
-      this->compile_virtual_levels();
-
-      // Build vertex mapping by brute force
-      const auto& finest_mesh_2d = _dom_ctrl_2d.front()->get_mesh();
-      const auto& finest_extruded_mesh = laylevs.front()->get_mesh();
-
-      const auto& vtx_2d = finest_mesh_2d.get_vertex_set();
-      const auto& extruded_vtx = finest_extruded_mesh.get_vertex_set();
-
-      Index num_verts(finest_mesh_2d.get_num_entities(0));
-      Index extruded_num_verts(finest_extruded_mesh.get_num_entities(0));
-
-      _vtx_map = std::move(std::vector<Index>(extruded_num_verts));
-
-      const CoordType tol(Math::eps<CoordType>());
-
-      for(Index i_extruded(0); i_extruded < extruded_num_verts; ++i_extruded)
-      {
-        bool found(false);
-        Tiny::Vector<CoordType, 2> tmp(0);
-        tmp(0) = extruded_vtx[i_extruded](0);
-        tmp(1) = extruded_vtx[i_extruded](1);
-        CoordType min_dist(Math::huge<CoordType>());
-        Index best_index(0);
-        for(Index j(0); j < num_verts; ++j)
+        // Refine up to desired maximum level
+        for(int lvl(lvl_min); lvl < lvl_max; ++lvl)
         {
-          CoordType my_dist((tmp - vtx_2d[j]).norm_euclid_sqr());
-          if(my_dist < min_dist)
+          std::shared_ptr<MeshNodeType> coarse_node = mesh_node;
+          mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(this->_adapt_mode));
+
+          laylevs.push_front(std::make_shared<LevelType>(lvl+1, mesh_node));
+        }
+
+
+        // Okay, we're done here
+        this->_have_hierarchy = true;
+        this->_have_partition = true;
+
+        // Finally, compile the virtual levels
+        this->compile_virtual_levels();
+
+        // Build vertex mapping by brute force
+        const auto& finest_mesh_2d = _dom_ctrl_2d.front()->get_mesh();
+        const auto& finest_extruded_mesh = laylevs.front()->get_mesh();
+
+        const auto& vtx_2d = finest_mesh_2d.get_vertex_set();
+        const auto& extruded_vtx = finest_extruded_mesh.get_vertex_set();
+
+        Index num_verts(finest_mesh_2d.get_num_entities(0));
+        Index extruded_num_verts(finest_extruded_mesh.get_num_entities(0));
+
+        _vtx_map = std::move(std::vector<Index>(extruded_num_verts));
+
+        const CoordType tol(Math::eps<CoordType>());
+
+        for(Index i_extruded(0); i_extruded < extruded_num_verts; ++i_extruded)
+        {
+          bool found(false);
+          Tiny::Vector<CoordType, 2> tmp(0);
+          tmp(0) = extruded_vtx[i_extruded](0);
+          tmp(1) = extruded_vtx[i_extruded](1);
+          CoordType min_dist(Math::huge<CoordType>());
+          //Index best_index(0);
+          for(Index j(0); j < num_verts; ++j)
           {
-            best_index = j;
-            min_dist = my_dist;
+            CoordType my_dist((tmp - vtx_2d[j]).norm_euclid_sqr());
+            if(my_dist < min_dist)
+            {
+              //best_index = j;
+              min_dist = my_dist;
+            }
+            if(my_dist <= tol )
+            {
+              found = true;
+              _vtx_map.at(i_extruded) = j;
+              break;
+            }
           }
-          if(my_dist <= tol )
+          if(!found)
           {
-            found = true;
-            _vtx_map.at(i_extruded) = j;
-            break;
+            throw InternalError(__func__,__FILE__,__LINE__,
+            "Could not find 2d point for "+stringify(extruded_vtx[i_extruded]));
           }
         }
-        if(!found)
-        {
-          //throw InternalError(__func__,__FILE__,__LINE__,
-          //"Could not find 2d point for "+stringify(extruded_vtx[i_extruded]));
-          std::cout << "Not found: " << i_extruded << " " << extruded_vtx[i_extruded] <<
-            " best " << best_index << " " << stringify_fp_sci(min_dist) << " " << vtx_2d[best_index] << std::endl;
-        }
-      }
 
 
       }
@@ -566,7 +651,7 @@ class ExtrudedPartiDomainControl :
 template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
 struct NavierStokesScrewsApp
 {
-  static constexpr bool extrude = true;
+  static constexpr bool extrude = false;
 
   /// The memory architecture. Although this looks freely chosable, it has to be Mem::Main for now because all the
   /// Hyperelasticity functionals are implemented for Mem::Main only
@@ -675,10 +760,10 @@ struct NavierStokesScrewsApp
     int test_number(0);
 
     bool solve_flow(false);
+    bool solve_mesh_optimisation(false);
 
     DataType reynolds(1);
     bool use_deformation(false);
-    Convection convection(Convection::off);
 
     // Need some pi for all the angles
     DataType pi(Math::pi<DataType>());
@@ -742,6 +827,12 @@ struct NavierStokesScrewsApp
     XASSERTM(t_end_p.second, "Application config section is missing the mandatory t_end entry!");
     t_end = DataType(std::stod(t_end_p.first));
 
+    // Solve the mesh_optimisation problem?
+    auto solve_mesh_optimisation_p = app_settings_section->query("solve_mesh_optimisation");
+    XASSERTM(solve_mesh_optimisation_p.second,
+    "Application config section is missing the mandatory solve_mesh_optimisation entry!");
+    solve_mesh_optimisation = (std::stoi(solve_mesh_optimisation_p.first) == 1);
+
     // Solve the flow problem?
     auto solve_flow_p = app_settings_section->query("solve_flow");
     XASSERTM(solve_flow_p.second, "Application config section is missing the mandatory solve_flow entry!");
@@ -754,12 +845,6 @@ struct NavierStokesScrewsApp
       XASSERTM(reynolds_p.second, "ApplicationConfig section is missing the mandatory reynolds entry!");
       reynolds = std::stod(reynolds_p.first);
       XASSERT(reynolds > DataType(0));
-
-      // Use convection (meaning solve Navier-Stokes instead of plain Stokes)?
-      auto convection_p = app_settings_section->query("convection");
-      XASSERTM(convection_p.second,
-      "ApplicationSettings section is missing the mandatory convection entry!");
-      convection << convection_p.first;
 
       // Use the D(u) : D(v) bilinear form instead of the grad(u):grad(v) bilinear form?
       auto use_deformation_p = app_settings_section->query("use_deformation");
@@ -820,7 +905,7 @@ struct NavierStokesScrewsApp
     "Application config is missing the mandatory TimeDiscretisation section!");
 
     // Create BDF time discretisation coefficients in startup mode
-    BDFTimeDiscretisation<DataType> time_disc(time_disc_settings,reynolds, true);
+    BDFTimeDiscretisation<DataType> time_disc(time_disc_settings, reynolds, use_deformation, true);
 
     // Create domain control
     DomCtrl dom_ctrl(comm);
@@ -852,7 +937,11 @@ struct NavierStokesScrewsApp
       msg = String("t_end").pad_back(pad_width, '.') + String(": "+ stringify_fp_fix(t_end));
       comm.print(msg);
 
-      msg = String("convection").pad_back(pad_width, '.') + String(": "+ stringify(convection));
+      msg = String("ALE term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.ale_handling));
+      comm.print(msg);
+      msg = String("Convection term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.conv_handling));
+      comm.print(msg);
+      msg = String("Viscous term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.visc_handling));
       comm.print(msg);
 
       dom_ctrl.print();
@@ -921,9 +1010,9 @@ struct NavierStokesScrewsApp
       }
     }
 
-    comm.print("\n");
+    comm.print("");
     meshopt_ctrl->print();
-    comm.print("\n");
+    comm.print("");
 
     String file_basename(name()+"_n"+stringify(comm.size()));
 
@@ -1038,12 +1127,16 @@ struct NavierStokesScrewsApp
       }
     }
 
-    // Optimise the mesh
-    meshopt_ctrl->optimise();
-    extruded_dom_ctrl.extrude_vertex_sets();
-
-    // Compute and print quality indicators on the finest level only
+    if(solve_mesh_optimisation)
     {
+      // Optimise the mesh
+      watch_meshopt.start();
+      meshopt_ctrl->optimise();
+      extruded_dom_ctrl.extrude_vertex_sets();
+      watch_meshopt.stop();
+
+      // Compute and print quality indicators on the finest level only
+
       watch_quality.start();
       DT_ lambda_min(Math::huge<DT_>());
       DT_ lambda_max(0);
@@ -1080,28 +1173,28 @@ struct NavierStokesScrewsApp
       comm.print(msg);
       watch_quality.stop();
 
-    }
 
-    // Check for the hard coded settings for test mode
-    if(test_number == 1)
-    {
-      if( edge_angle < DT_(28))
+      // Check for the hard coded settings for test mode
+      if(test_number == 1)
       {
-        comm.print("FAILED: Optimised worst edge angle should be >= "+stringify_fp_fix(28)
-            + " but is "+stringify_fp_fix(edge_angle));
-        ++failed_checks;
-      }
-      if( qi_min < DT_(3e-2))
-      {
-        comm.print("FAILED: Optimised minimal quality indicator should be >= "+stringify_fp_fix(3e-2)
-            + " but is "+stringify_fp_fix(edge_angle));
-        ++failed_checks;
-      }
-      if( cell_size_defect > DT_(6.8e-1))
-      {
-        comm.print("FAILED: Optimised cell size defect should be <= "+stringify_fp_fix(6.8e-1)
-            + " but is "+stringify_fp_fix(edge_angle));
-        ++failed_checks;
+        if( edge_angle < DT_(28))
+        {
+          comm.print("FAILED: Optimised worst edge angle should be >= "+stringify_fp_fix(28)
+              + " but is "+stringify_fp_fix(edge_angle));
+          ++failed_checks;
+        }
+        if( qi_min < DT_(3e-2))
+        {
+          comm.print("FAILED: Optimised minimal quality indicator should be >= "+stringify_fp_fix(3e-2)
+              + " but is "+stringify_fp_fix(edge_angle));
+          ++failed_checks;
+        }
+        if( cell_size_defect > DT_(6.8e-1))
+        {
+          comm.print("FAILED: Optimised cell size defect should be <= "+stringify_fp_fix(6.8e-1)
+              + " but is "+stringify_fp_fix(edge_angle));
+          ++failed_checks;
+        }
       }
     }
 
@@ -1167,7 +1260,6 @@ struct NavierStokesScrewsApp
       }
     }
 
-
     for(Index i(0); i < num_levels; ++i)
     {
       // assemble velocity matrix structure
@@ -1200,8 +1292,10 @@ struct NavierStokesScrewsApp
 
     comm.print("Assembling system filters...");
 
+#ifndef ANALYTIC_SOLUTION
     Analytic::Common::XYPlaneRotation<DataType, ExtrudedMeshType::world_dim> rotation_inner(angular_velocity_inner, extruded_centre_inner);
     Analytic::Common::XYPlaneRotation<DataType, ExtrudedMeshType::world_dim> rotation_outer(angular_velocity_outer, extruded_centre_outer);
+#else
     //Tiny::Vector<DataType, 2> zeros_y(0);
     //zeros_y(0) = -DataType(1);
     //zeros_y(1) = DataType(1);
@@ -1214,11 +1308,12 @@ struct NavierStokesScrewsApp
     //AnalyticSolP pres_sol(DataType(0));
     //Analytic::Common::SinYT0StokesRhs<DataType, MeshType::world_dim> velo_rhs(reynolds);
 
-    //typedef Analytic::Common::GuermondStokesSol<DataType, MeshType::world_dim> AnalyticSolV;
-    //typedef Analytic::Common::GuermondStokesSolPressure<DataType, MeshType::world_dim> AnalyticSolP;
-    //AnalyticSolV velo_sol;
-    //AnalyticSolP pres_sol;
-    //Analytic::Common::GuermondStokesSolRhs<DataType, MeshType::world_dim> velo_rhs(reynolds);
+    typedef Analytic::Common::GuermondStokesSol<DataType, ExtrudedMeshType::world_dim> AnalyticSolV;
+    typedef Analytic::Common::GuermondStokesSolPressure<DataType, ExtrudedMeshType::world_dim> AnalyticSolP;
+    AnalyticSolV velo_sol;
+    AnalyticSolP pres_sol;
+    Analytic::Common::GuermondStokesSolRhs<DataType, ExtrudedMeshType::world_dim> velo_rhs(reynolds);
+#endif
 
     std::vector<Assembly::UnitFilterAssembler<ExtrudedMeshType>>
       unit_asm_velo_i(num_levels), unit_asm_velo_o(num_levels);
@@ -1231,7 +1326,6 @@ struct NavierStokesScrewsApp
       // get our local system filters
       typename SystemLevelType::LocalVeloUnitFilter& unit_fil_loc_v = system_levels.at(i)->filter_velo.local().template at<1>();
       typename SystemLevelType::LocalVeloSlipFilter& slip_fil_loc_v = system_levels.at(i)->filter_velo.local().template at<0>();
-      //typename SystemLevelType::LocalVeloFilter& unit_fil_loc_v = system_levels.at(i)->filter_velo.local();
 
       // Add inner boundary to assembler
       {
@@ -1306,11 +1400,14 @@ struct NavierStokesScrewsApp
       }
 
       // assemble the velocity filter
+#ifndef ANALYTIC_SOLUTION
       unit_asm_velo_i[i].assemble(unit_fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, rotation_inner);
       unit_asm_velo_o[i].assemble(unit_fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, rotation_outer);
+#else
+      unit_asm_velo_o[i].assemble(unit_fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, velo_sol);
+#endif
       slip_asm_velo_b.at(i)->assemble(slip_fil_loc_v, extruded_dom_ctrl.at(i)->space_velo);
       slip_asm_velo_t.at(i)->assemble(slip_fil_loc_v, extruded_dom_ctrl.at(i)->space_velo);
-      //unit_asm_velo_o[i].assemble(fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, velo_rhs);
 
       // assembly of the pressure filter is done in the system level
       system_levels.at(i)->assemble_global_filters(extruded_dom_ctrl.at(i)->space_pres, cubature);
@@ -1480,45 +1577,51 @@ struct NavierStokesScrewsApp
     Index time_step(0);
 
     // set up a burgers assembler for the velocity matrix
-    Assembly::BurgersAssembler<DataType, IndexType, ExtrudedMeshType::world_dim> burgers_mat;
-    burgers_mat.deformation = use_deformation;
-    burgers_mat.theta = time_disc.coeff_lhs_v.at(0);
-    burgers_mat.beta = time_disc.coeff_lhs_v.at(1);
-    burgers_mat.nu = time_disc.coeff_lhs_v.at(2);
+    Assembly::BurgersAssembler<DataType, IndexType, ExtrudedMeshType::world_dim> burgers_lhs;
+    burgers_lhs.deformation = use_deformation;
+    burgers_lhs.theta = time_disc.coeff_lhs_v.at(0);
+    burgers_lhs.beta = time_disc.coeff_lhs_v.at(1);
+    burgers_lhs.nu = time_disc.coeff_lhs_v.at(2);
 
-    // Set up a burgers assembler for the RHS vector, mass matrix terms
-    Assembly::BurgersAssembler<DataType, IndexType, ExtrudedMeshType::world_dim> burgers_rhs_mass;
-    burgers_rhs_mass.deformation = use_deformation;
-    burgers_rhs_mass.nu = DataType(0);
-    burgers_rhs_mass.beta = DataType(0);
-    burgers_rhs_mass.theta = DataType(1);
+    // Set up a burgers assembler for the RHS vector that uses the last velocity vector (BDF1 and BDF2)
+    Assembly::BurgersAssembler<DataType, IndexType, ExtrudedMeshType::world_dim> burgers_rhs_1;
+    burgers_rhs_1.deformation = use_deformation;
+    burgers_rhs_1.theta = time_disc.coeff_rhs_v_1.at(0);
+    burgers_rhs_1.beta = time_disc.coeff_rhs_v_1.at(1);
+    burgers_rhs_1.nu = time_disc.coeff_rhs_v_1.at(2);
 
-    // Set up a burgers assembler for the RHS vector, convection terms if convection_explicit == true
-    Assembly::BurgersAssembler<DataType, IndexType, ExtrudedMeshType::world_dim> burgers_rhs_conv;
-    burgers_rhs_conv.deformation = use_deformation;
-    burgers_rhs_conv.nu = DataType(0);
-    burgers_rhs_conv.beta = -time_disc.coeff_lhs_v.at(1);
-    burgers_rhs_conv.theta = DataType(0);
+    // Set up a burgers assembler for the RHS vector that uses the previous velocity vector (BDF2)
+    Assembly::BurgersAssembler<DataType, IndexType, ExtrudedMeshType::world_dim> burgers_rhs_2;
+    burgers_rhs_2.deformation = use_deformation;
+    burgers_rhs_2.theta = time_disc.coeff_rhs_v_2;
+    burgers_rhs_2.beta = DataType(0);
+    burgers_rhs_2.nu = DataType(0);
 
     // This is the absolute turning angle of the screws
     DataType alpha(0);
     WorldPoint rotation_angles(0);
 
-    //DataType err_v_L2_max(0);
-    //DataType err_v_H1_max(0);
-    //DataType err_p_L2_max(0);
+#ifdef ANALYTIC_SOLUTION
+    // Hackish way to start with the analytic solution at something other than t=0
+    DataType start_time(0);
 
-    //DataType err_v_l2_L2(0);
-    //DataType err_v_l2_H1(0);
-    //DataType err_p_l2_L2(0);
+    velo_sol.set_time(start_time);
+    pres_sol.set_time(start_time);
+    velo_rhs.set_time(start_time);
 
-    //// Hackish way to start with the analytic solution at something other than t=0
-    //DataType start_time(1);
-    //velo_sol.set_time(start_time);
-    ////pres_sol.set_time(start_time);
-    //velo_rhs.set_time(start_time);
-    //Assembly::Interpolator::project(vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo);
+    Assembly::Interpolator::project(vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo);
+    // For starting with an exact pressure or psi
     //Assembly::Interpolator::project(vec_sol_p.at(0).local(), pres_sol, the_domain_level.space_pres);
+    //Assembly::Interpolator::project(vec_sol_psi.at(0).local(), pres_sol, the_domain_level.space_pres);
+
+    DataType err_v_L2_max(0);
+    DataType err_v_H1_max(0);
+    DataType err_p_L2_max(0);
+
+    DataType err_v_l2_L2(0);
+    DataType err_v_l2_H1(0);
+    DataType err_p_l2_L2(0);
+#endif
 
     // Write output again
     if(write_vtk)
@@ -1541,56 +1644,42 @@ struct NavierStokesScrewsApp
 
         meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
 
-
-        //Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
-        //exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
-
-        //Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-        //exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
-
         exporter.write(vtk_name, comm.rank(), comm.size());
       }
 
-      for(size_t l(0); l < extruded_dom_ctrl.size_physical(); ++l)
+      if(solve_flow)
       {
-        auto& dom_lvl = extruded_dom_ctrl.at(l);
+        for(size_t l(0); l < extruded_dom_ctrl.size_physical(); ++l)
+        {
+          auto& dom_lvl = extruded_dom_ctrl.at(l);
 
-        int lvl_index(dom_lvl->get_level_index());
+          int lvl_index(dom_lvl->get_level_index());
 
-        String vtk_name = String("flow_initial_n"+stringify(comm.size())+"_lvl_"+stringify(lvl_index));
-        comm.print("Writing "+vtk_name+".vtk");
+          String vtk_name = String("flow_initial_n"+stringify(comm.size())+"_lvl_"+stringify(lvl_index));
+          comm.print("Writing "+vtk_name+".vtk");
 
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<ExtrudedMeshType> exporter(dom_lvl->get_mesh());
+          // Create a VTK exporter for our mesh
+          Geometry::ExportVTK<ExtrudedMeshType> exporter(dom_lvl->get_mesh());
 
-        exporter.add_vertex_scalar("extrude_idx", extruded_dom_ctrl._vtx_map.data());
-        exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-        exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-        //exporter.add_vertex_vector("nu", system_levels.at(l)->filter_velo.local().template at<0>().get_filter_vector());
+          exporter.add_vertex_scalar("extrude_idx", extruded_dom_ctrl._vtx_map.data());
+          exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
+          exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
+          //exporter.add_vertex_vector("nu", system_levels.at(l)->filter_velo.local().template at<0>().get_filter_vector());
+#ifdef ANALYTIC_SOLUTION
+          Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
+          exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
 
-        exporter.write(vtk_name, comm.rank(), comm.size());
+          Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_rhs, the_domain_level.trafo);
+          exporter.add_vertex_vector("v_rhs_analytic", vec_sol_v_analytic.local());
+
+          Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
+          exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
+#endif
+
+          exporter.write(vtk_name, comm.rank(), comm.size());
+        }
       }
-      comm.print("\n");
 
-      //// Create a VTK exporter for our mesh
-      //const auto& dom_lvl = extruded_dom_ctrl.front();
-      //  int lvl_index(dom_lvl->get_level_index());
-      //String vtk_name = String("flow_post_initial_lvl_"+stringify(lvl_index));
-      //comm.print("Writing "+vtk_name+".vtk");
-
-      //Geometry::ExportVTK<ExtrudedMeshType> exporter(dom_lvl->get_mesh());
-
-      //exporter.add_vertex_scalar("extrude_idx", extruded_dom_ctrl._vtx_map.data());
-      ////exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-      ////exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-
-      ////Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
-      ////exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
-
-      ////Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-      ////exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
-
-      //exporter.write(vtk_name, comm.rank(), comm.size());
       watch_vtk.stop();
     }
 
@@ -1642,133 +1731,136 @@ struct NavierStokesScrewsApp
       comm.print("Timestep "+stringify(time_step)+": t = "+stringify_fp_fix(time)+", angle = "
           +stringify_fp_fix(alpha/(DataType(2)*pi)*DataType(360)) + " degrees\n");
 
-      watch_meshopt.start();
-      // Save old vertex coordinates
-      meshopt_ctrl->mesh_to_buffer();
-      old_coords.copy(meshopt_ctrl->get_coords());
-      new_coords.copy(meshopt_ctrl->get_coords());
-      auto& coords_loc(new_coords.local());
-
-      // Rotate the charts
-      rotation_angles(0) = time_disc.delta_t()*angular_velocity_outer;
-      rotation_angles(1) = DataType(0);
-
-      if(outer_chart != nullptr)
+      if(solve_mesh_optimisation)
       {
-        outer_chart->transform(centre_outer, rotation_angles, centre_outer);
-      }
+        watch_meshopt.start();
+        // Save old vertex coordinates
+        meshopt_ctrl->mesh_to_buffer();
+        old_coords.copy(meshopt_ctrl->get_coords());
+        new_coords.copy(meshopt_ctrl->get_coords());
+        auto& coords_loc(new_coords.local());
 
-      rotation_angles(0) = time_disc.delta_t()*angular_velocity_inner;
-      if(inner_chart != nullptr)
-      {
-        inner_chart->transform(centre_inner, rotation_angles, centre_inner);
-      }
+        // Rotate the charts
+        rotation_angles(0) = time_disc.delta_t()*angular_velocity_outer;
+        rotation_angles(1) = DataType(0);
 
-      // Update boundary of the inner screw
-      // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
-      if(inner_indices != nullptr)
-      {
-        Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
-
-        rot.set_rotation_2d(time_disc.delta_t()*angular_velocity_inner);
-
-        WorldPoint tmp(DataType(0));
-        WorldPoint tmp2(DataType(0));
-
-        for(Index i(0); i < inner_indices->get_num_entities(); ++i)
+        if(outer_chart != nullptr)
         {
-          // Index of boundary vertex i in the mesh
-          Index j(inner_indices->operator[](i));
-          // Translate the point to the centre of rotation
-          tmp = coords_loc(j) - centre_inner;
-          // Rotate
-          tmp2.set_mat_vec_mult(rot, tmp);
-          // Translate the point by the new centre of rotation
-          coords_loc(j, centre_inner + tmp2);
+          outer_chart->transform(centre_outer, rotation_angles, centre_outer);
         }
-      }
 
-      // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
-      if(outer_indices != nullptr)
-      {
-        Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
-        rot.set_rotation_2d(time_disc.delta_t()*angular_velocity_outer);
-
-        WorldPoint tmp(DataType(0));
-        WorldPoint tmp2(DataType(0));
-
-        // The outer screw rotates centrically, so centre_outer remains the same at all times
-        for(Index i(0); i < outer_indices->get_num_entities(); ++i)
+        rotation_angles(0) = time_disc.delta_t()*angular_velocity_inner;
+        if(inner_chart != nullptr)
         {
-          // Index of boundary vertex i in the mesh
-          Index j(outer_indices->operator[](i));
-          tmp = coords_loc(j) - centre_outer;
-
-          tmp2.set_mat_vec_mult(rot, tmp);
-
-          coords_loc(j, centre_outer+tmp2);
+          inner_chart->transform(centre_inner, rotation_angles, centre_inner);
         }
-      }
 
-      watch_meshopt.stop();
-      if(meshopt_preproc!=nullptr)
-      {
-        comm.print("Meshopt preprocessor:");
-        meshopt_preproc->prepare(new_coords);
-        meshopt_preproc->optimise();
+        // Update boundary of the inner screw
+        // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
+        if(inner_indices != nullptr)
+        {
+          Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
+
+          rot.set_rotation_2d(time_disc.delta_t()*angular_velocity_inner);
+
+          WorldPoint tmp(DataType(0));
+          WorldPoint tmp2(DataType(0));
+
+          for(Index i(0); i < inner_indices->get_num_entities(); ++i)
+          {
+            // Index of boundary vertex i in the mesh
+            Index j(inner_indices->operator[](i));
+            // Translate the point to the centre of rotation
+            tmp = coords_loc(j) - centre_inner;
+            // Rotate
+            tmp2.set_mat_vec_mult(rot, tmp);
+            // Translate the point by the new centre of rotation
+            coords_loc(j, centre_inner + tmp2);
+          }
+        }
+
+        // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
+        if(outer_indices != nullptr)
+        {
+          Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
+          rot.set_rotation_2d(time_disc.delta_t()*angular_velocity_outer);
+
+          WorldPoint tmp(DataType(0));
+          WorldPoint tmp2(DataType(0));
+
+          // The outer screw rotates centrically, so centre_outer remains the same at all times
+          for(Index i(0); i < outer_indices->get_num_entities(); ++i)
+          {
+            // Index of boundary vertex i in the mesh
+            Index j(outer_indices->operator[](i));
+            tmp = coords_loc(j) - centre_outer;
+
+            tmp2.set_mat_vec_mult(rot, tmp);
+
+            coords_loc(j, centre_outer+tmp2);
+          }
+        }
+
+        watch_meshopt.stop();
+        if(meshopt_preproc!=nullptr)
+        {
+          comm.print("Meshopt preprocessor:");
+          meshopt_preproc->prepare(new_coords);
+          meshopt_preproc->optimise();
+          comm.print("");
+          new_coords.copy(meshopt_preproc->get_coords());
+
+          if(write_vtk && ( (time_step%vtk_freq == 0) || failure))
+          {
+            watch_vtk.start();
+
+            // Compute mesh quality on the finest
+            dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+
+            String vtk_name = String("mesh_pre_n"+stringify(comm.size())+"_"+stringify(time_step));
+            // Create a VTK exporter for our mesh
+            Geometry::ExportVTK<MeshType> exporter(dom_ctrl.front()->get_mesh());
+
+            exporter.add_cell_scalar("Worst angle", edge_angle_cellwise.data());
+            exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise.data());
+
+            meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.front()->get_level_index());
+
+            exporter.add_vertex_vector("mesh velocity", mesh_velocity.local());
+
+            exporter.write(vtk_name, comm);
+
+            watch_vtk.stop();
+          }
+        }
+        watch_meshopt.start();
+
+        comm.print("Mesh optimisation:");
+        // Now prepare the functional
+        meshopt_ctrl->prepare(new_coords);
+        meshopt_ctrl->optimise();
+        extruded_dom_ctrl.extrude_vertex_sets();
         comm.print("");
-        new_coords.copy(meshopt_preproc->get_coords());
+        watch_meshopt.stop();
 
-        if(write_vtk && ( (time_step%vtk_freq == 0) || failure))
+        // Compute mesh velocity
         {
-          watch_vtk.start();
+          mesh_velocity.axpy(old_coords, meshopt_ctrl->get_coords(), DataType(-1));
+          mesh_velocity.scale(mesh_velocity, DataType(1)/time_disc.delta_t());
 
-          // Compute mesh quality on the finest
-          dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+          // Compute maximum of the mesh velocity
+          DataType max_mesh_velocity(0);
+          for(IT_ i(0); i < (*mesh_velocity).size(); ++i)
+          {
+            max_mesh_velocity = Math::max(max_mesh_velocity, (*mesh_velocity)(i).norm_euclid());
+          }
 
-          String vtk_name = String("mesh_pre_n"+stringify(comm.size())+"_"+stringify(time_step));
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(dom_ctrl.front()->get_mesh());
+          String msg = String("max. mesh velocity").pad_back(pad_width, ' ') + ": " + stringify_fp_sci(max_mesh_velocity)+"\n";
+          comm.print(msg);
 
-          exporter.add_cell_scalar("Worst angle", edge_angle_cellwise.data());
-          exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise.data());
-
-          meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.front()->get_level_index());
-
-          exporter.add_vertex_vector("mesh velocity", mesh_velocity.local());
-
-          exporter.write(vtk_name, comm);
-
-          watch_vtk.stop();
+          extruded_dom_ctrl.extrude_vertex_vector(extruded_mesh_velocity.local(), mesh_velocity.local());
         }
-      }
-      watch_meshopt.start();
-
-      comm.print("Mesh optimisation:");
-      // Now prepare the functional
-      meshopt_ctrl->prepare(new_coords);
-      meshopt_ctrl->optimise();
-      extruded_dom_ctrl.extrude_vertex_sets();
-      comm.print("");
-      watch_meshopt.stop();
-
-      // Compute mesh velocity
-      {
-        mesh_velocity.axpy(old_coords, meshopt_ctrl->get_coords(), DataType(-1));
-        mesh_velocity.scale(mesh_velocity, DataType(1)/time_disc.delta_t());
-
-        // Compute maximum of the mesh velocity
-        DataType max_mesh_velocity(0);
-        for(IT_ i(0); i < (*mesh_velocity).size(); ++i)
-        {
-          max_mesh_velocity = Math::max(max_mesh_velocity, (*mesh_velocity)(i).norm_euclid());
-        }
-
-        String msg = String("max. mesh velocity").pad_back(pad_width, ' ') + ": " + stringify_fp_sci(max_mesh_velocity)+"\n";
-        comm.print(msg);
-
-        extruded_dom_ctrl.extrude_vertex_vector(extruded_mesh_velocity.local(), mesh_velocity.local());
-      }
+      } // solve_mesh_optimisation
 
       // Now the flow problem
       if(solve_flow)
@@ -1785,22 +1877,32 @@ struct NavierStokesScrewsApp
               time_disc.finish_startup();
 
               // Update the coefficients in the Burgers matrix assembler
-              burgers_mat.theta = time_disc.coeff_lhs_v.at(0);
-              burgers_mat.beta = time_disc.coeff_lhs_v.at(1);
-              burgers_mat.nu = time_disc.coeff_lhs_v.at(2);
+              burgers_lhs.theta = time_disc.coeff_lhs_v.at(0);
+              burgers_lhs.beta = time_disc.coeff_lhs_v.at(1);
+              burgers_lhs.nu = time_disc.coeff_lhs_v.at(2);
+
+              burgers_rhs_1.theta = time_disc.coeff_rhs_v_1.at(0);
+              burgers_rhs_1.beta = time_disc.coeff_rhs_v_1.at(1);
+              burgers_rhs_1.nu = time_disc.coeff_rhs_v_1.at(2);
+
+              burgers_rhs_2.theta = time_disc.coeff_rhs_v_2;
+              burgers_rhs_2.beta = DataType(0);
+              burgers_rhs_2.nu = DataType(0);
 
             }
 
         // Save previous velocity solutions
-        for(Index step(2); step > Index(0); --step)
+        for(Index step(time_disc.get_num_steps()); step > Index(0); --step)
         {
           vec_sol_v.at(step).copy(vec_sol_v.at(step-Index(1)));
         }
 
+        // Save previous psi solutions
         for(Index step(time_disc.get_num_steps()); step > Index(0); --step)
         {
           vec_sol_psi.at(step).copy(vec_sol_psi.at(step-Index(1)));
         }
+
         // Save previous pressure solutions
         for(Index step(time_disc.get_p_extrapolation_steps()); step > Index(0); --step)
         {
@@ -1809,9 +1911,10 @@ struct NavierStokesScrewsApp
 
         // Extrapolate previous pressure solutions
         vec_extrapolated_p.format();
-        for(Index step(1); step < time_disc.get_p_extrapolation_steps() + Index(1); ++step)
+        for(Index step(0); step < time_disc.get_p_extrapolation_steps(); ++step)
         {
-          vec_extrapolated_p.axpy(vec_sol_p.at(step), vec_extrapolated_p, time_disc.coeff_extrapolation_p.at(step-Index(1)));
+          vec_extrapolated_p.axpy(
+            vec_sol_p.at(step+Index(1)), vec_extrapolated_p, time_disc.coeff_extrapolation_p.at(step));
         }
 
         // Assemble filters on all levels
@@ -1822,9 +1925,12 @@ struct NavierStokesScrewsApp
           //typename SystemLevelType::LocalVeloFilter& fil_loc_v = system_levels.at(i)->filter_velo.local();
 
           // assemble the velocity filter
+#ifndef ANALYTIC_SOLUTION
           unit_asm_velo_i.at(i).assemble(fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, rotation_inner);
           unit_asm_velo_o.at(i).assemble(fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, rotation_outer);
-          //unit_asm_velo_o.at(i).assemble(fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, velo_sol);
+#else
+          unit_asm_velo_o.at(i).assemble(fil_loc_v, extruded_dom_ctrl.at(i)->space_velo, velo_sol);
+#endif
 
           // assembly of the pressure filter is done in the system level
           system_levels.at(i)->assemble_global_filters(extruded_dom_ctrl.at(i)->space_pres, cubature);
@@ -1835,6 +1941,12 @@ struct NavierStokesScrewsApp
         filter_v.filter_sol(vec_sol_v.at(0));
         filter_p.filter_sol(vec_sol_p.at(0));
 
+        // Does the old velocity have to be filtered with the new BCs? - I think not!
+        //for (Index step(0); step< time_disc.get_num_steps(); ++step)
+        //{
+        //  filter_v.filter_sol(vec_sol_v.at(step+Index(1)));
+        //}
+
         // assemble B/D matrices on finest level
         watch_asm_mat.start();
         system_levels.front()->assemble_grad_div_matrices(
@@ -1844,7 +1956,7 @@ struct NavierStokesScrewsApp
         Assembly::BilinearOperatorAssembler::assemble_matrix1(
           matrix_m_p.local(), mass_p_op, extruded_dom_ctrl.front()->space_pres, cubature);
 
-        // assemble pressure laplace matrices on all levels
+        // assemble pressure Laplace matrices on all levels
         for(std::size_t i(0); i < system_levels.size(); ++i)
         {
           auto& loc_mat_s = system_levels.at(i)->matrix_s.local();
@@ -1854,30 +1966,38 @@ struct NavierStokesScrewsApp
           Assembly::BilinearOperatorAssembler::assemble_matrix1(
             loc_mat_s, laplace_op, extruded_dom_ctrl.at(i)->space_pres, cubature);
 
-          // Add Robin boundary terms to the lhs
-          Assembly::Common::IdentityOperator mass_op;
-          robin_asm_p.at(i)->assemble_operator_matrix1(
-            system_levels.at(i)->matrix_s.local(), mass_op, extruded_dom_ctrl.at(i)->space_pres, cubature, DT_(0e3));
+          //// Add Robin boundary terms to the lhs
+          //Assembly::Common::IdentityOperator mass_op;
+          //robin_asm_p.at(i)->assemble_operator_matrix1(
+          //  system_levels.at(i)->matrix_s.local(), mass_op, extruded_dom_ctrl.at(i)->space_pres, cubature, DT_(0e3));
         }
         watch_asm_mat.stop();
 
-        // Update the corresponding matrix stock and initialise the solver
+        // Update the pressure Laplace matrix stock and initialise the solver
         watch_sol_init.start();
         matrix_stock_pres.hierarchy_init_numeric();
         solver_s->init_numeric();
 
-        // Update the corresponding matrix stock and initialise the solver
+        // Update the pressure mass matrix and initialise the solver
         ms_mass_p.refresh();
         solver_m_p->init_numeric();
         watch_sol_init.stop();
 
         // Assemble RHS vector for the velocity
         watch_asm_rhs.start();
-        vec_rhs_v.format();
 
-        // Compute convection vector
+        // Compute convection vector for rhs assembly
+
+        // Interpolate the mesh velocity to Q2
+        if(time_disc.ale_handling != TermHandling::off)
+        {
+          Assembly::FEInterpolator<SpaceVeloType, ExtrudedTrafoFESpace>::interpolate(
+            mesh_velocity_q2.local(), extruded_mesh_velocity.local(),
+            the_domain_level.space_velo, the_domain_level.space_pres);
+        }
+
         vec_conv.format();
-        if(convection != Convection::off)
+        if(time_disc.conv_handling == TermHandling::expl)
         {
           if((time_step > Index(2)))
           {
@@ -1892,66 +2012,93 @@ struct NavierStokesScrewsApp
           }
         }
 
-        // Add the convection term on the rhs if convection is treated explicitly
-        if(convection == Convection::expl)
+        // Use ALE velocity if necessary
+        if(time_disc.ale_handling == TermHandling::expl)
         {
-          //burgers_rhs_conv.assemble(
-            //the_domain_level.space_velo, cubature, vec_conv.local(), nullptr, &vec_rhs_v.local());
-          burgers_rhs_conv.assemble_vector(
-            vec_rhs_v.local(), vec_conv.local(), vec_conv.local(), the_domain_level.space_velo, cubature);
-          // Now we clear it so later, it contains only -mesh_velocity for assembling the matrix
-          vec_conv.format();
+          vec_conv.axpy(mesh_velocity_q2, vec_conv, time_disc.coeff_rhs_ale);
         }
 
-        // Add the mass matrix terms on the rhs
-        for(Index step(0); step < time_disc.get_num_steps(); ++step)
+        // Assemble rhs for NVS
+        vec_rhs_v.format();
+
+        // Add the terms depending on the last solution to the rhs
+        burgers_rhs_1.assemble_vector(
+          vec_rhs_v.local(), vec_conv.local(), vec_sol_v.at(Index(1)).local(),
+          the_domain_level.space_velo, cubature);
+
+        vec_conv.format();
+
+        // Add the terms depending on the previous solution to the rhs
+        if(time_disc.get_num_steps() == Index(2))
         {
           // Does the old velocity have to be filtered with the new BCs? - I think not!
           //filter_v.filter_sol(vec_sol_v.at(step+Index(1)));
-          //burgers_rhs_mass.assemble(
-            //the_domain_level.space_velo, cubature, vec_sol_v.at(step+Index(1)).local(),
-            //nullptr, &vec_rhs_v.local(), DataType(0), time_disc.coeff_rhs_v_v.at(step));
-          burgers_rhs_mass.assemble_vector(
-            vec_rhs_v.local(), vec_sol_v.at(step+Index(1)).local(), vec_sol_v.at(step+Index(1)).local(),
-            the_domain_level.space_velo, cubature, time_disc.coeff_rhs_v_v.at(step));
+          burgers_rhs_2.assemble_vector(
+            vec_rhs_v.local(), vec_conv.local(), vec_sol_v.at(Index(2)).local(),
+            the_domain_level.space_velo, cubature);
         }
 
-        // Add psi gradient on rhs
-        for(Index step(0); step < time_disc.get_num_steps(); ++step)
-        {
-          Assembly::GradOperatorAssembler::assemble(
-            vec_rhs_v.local(), vec_sol_psi.at(step+Index(1)).local(),
-            the_domain_level.space_velo, the_domain_level.space_pres,
-            cubature, time_disc.coeff_rhs_v_psi.at(step));
-        }
+#ifdef ANALYTIC_SOLUTION
+        // Add analytic rhs as force functional
+        Assembly::Common::ForceFunctional<decltype(velo_rhs)> velo_rhs_func(velo_rhs);
+        Assembly::LinearFunctionalAssembler::assemble_vector(
+          vec_rhs_v.local(), velo_rhs_func, extruded_dom_ctrl.front()->space_velo, cubature, time_disc.coeff_rhs_f);
+#endif
+
+        //// Add psi gradient on rhs
+        //for(Index step(0); step < time_disc.get_num_steps(); ++step)
+        //{
+        //  Assembly::GradOperatorAssembler::assemble(
+        //    vec_rhs_v.local(), vec_sol_psi.at(step+Index(1)).local(),
+        //    the_domain_level.space_velo, the_domain_level.space_pres,
+        //    cubature, time_disc.coeff_rhs_v_psi.at(step));
+        //}
 
         // Synchronise the rhs vector after the local assemblers are finished
         vec_rhs_v.sync_0();
 
-        // Add pressure gradient on rhs if it got extrapolated at all
+        // Add psi gradient on rhs
+        for(Index step(0); step < time_disc.get_num_steps(); ++step)
+        {
+          matrix_b.apply(vec_rhs_v, vec_sol_psi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_psi.at(step));
+        }
+
+        // Add pressure gradient on rhs if it got extrapolated at all. This does not have to be synchronised because
+        // it is a multiplication with a Global::Matrix
         if(time_disc.get_p_extrapolation_steps() > Index(0))
         {
           matrix_b.apply(vec_rhs_v, vec_extrapolated_p, vec_rhs_v, time_disc.coeff_rhs_v_p);
         }
 
-        // Add psi gradient on rhs - superseeded by GradOperatorAssembler above
-        //for(Index step(0); step < time_disc.get_num_steps(); ++step)
-        //{
-        //  matrix_b.apply(vec_rhs_v, vec_sol_psi.at(step+Index(1)), vec_rhs_v, -time_disc.coeff_rhs_v_psi.at(step));
-        //}
-
-        // apply RHS filter
+        // Apply RHS filter
         filter_v.filter_rhs(vec_rhs_v);
 
         watch_asm_rhs.stop();
 
+        // Start of matrix assembly
         watch_asm_mat.start();
-        // Now we subtract the ALE velocity from vec_conv
-        Assembly::FEInterpolator<SpaceVeloType, ExtrudedTrafoFESpace>::interpolate(
-          mesh_velocity_q2.local(), extruded_mesh_velocity.local(),
-          the_domain_level.space_velo, the_domain_level.space_pres);
+        vec_conv.format();
+        // Compute convection vector for matrix assemly
+        if(time_disc.conv_handling == TermHandling::impl)
+        {
+          if((time_step > Index(2)))
+          {
+            // linear extrapolation of solution in time
+            vec_conv.scale(vec_sol_v.at(1), DataType(2));
+            vec_conv.axpy(vec_sol_v.at(2), vec_conv, -DataType(1));
+          }
+          else
+          {
+            // constant extrapolation of solution in time
+            vec_conv.copy(vec_sol_v.at(1));
+          }
+        }
 
-        vec_conv.axpy(mesh_velocity_q2, vec_conv, -time_disc.coeff_lhs_v.at(1));
+        // Use ALE velocity if necessary
+        if(time_disc.ale_handling == TermHandling::impl)
+        {
+          vec_conv.axpy(mesh_velocity_q2, vec_conv, time_disc.coeff_lhs_ale);
+        }
 
         // Phase 2: loop over all levels and assemble the burgers matrices
 
@@ -1961,58 +2108,9 @@ struct NavierStokesScrewsApp
           auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
           typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
           loc_mat_a.format();
-          //burgers_mat.assemble(extruded_dom_ctrl.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
-          burgers_mat.assemble_matrix(loc_mat_a, vec_cv, extruded_dom_ctrl.at(i)->space_velo, cubature);
+          burgers_lhs.assemble_matrix(loc_mat_a, vec_cv, extruded_dom_ctrl.at(i)->space_velo, cubature);
         }
         watch_asm_mat.stop();
-
-        //// Early 3d export for debugging
-        //{
-        //  auto& dom_lvl = extruded_dom_ctrl.front();
-
-        //  String vtk_name = String("flow_early_n"+stringify(comm.size())+"_"+stringify(time_step));
-        //  comm.print("Writing "+vtk_name+".vtk");
-
-        //  // Create a VTK exporter for our mesh
-        //  Geometry::ExportVTK<ExtrudedMeshType> exporter(dom_lvl->get_mesh());
-
-        //  exporter.add_vertex_vector("mesh velocity", extruded_mesh_velocity.local());
-
-        //  if(solve_flow)
-        //  {
-        //    //GlobalVeloVector def(matrix_a.create_vector_l());
-        //    //matrix_a.apply(def, vec_sol_v.at(0), vec_rhs_v, -DataType(1));
-        //    //filter_v.filter_def(def);
-        //    //comm.print("vtk def norm "+stringify_fp_sci(def.norm2()));
-
-        //    exporter.add_vertex_vector("def_0", def.local());
-        //    exporter.add_vertex_vector("rhs_v", vec_rhs_v.local());
-        //    exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-        //    exporter.add_vertex_vector("vec_conv", vec_conv.local());
-        //    exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
-
-        //    exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-        //    exporter.add_vertex_scalar("psi", vec_sol_psi.at(0).local().elements());
-
-        //    // compute and write time-derivatives
-        //    vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
-        //    vec_der_p.axpy(vec_sol_p.at(1), vec_sol_p.at(0), -DataType(1));
-
-        //    vec_der_v.scale(vec_der_v, DataType(1) / time_disc.delta_t());
-        //    vec_der_p.scale(vec_der_p, DataType(1) / time_disc.delta_t());
-
-        //    exporter.add_vertex_vector("v_dt", vec_der_v.local());
-        //    exporter.add_vertex_scalar("p_dt", vec_der_p.local().elements());
-        //    //Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
-        //    //exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
-
-        //    //Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-        //    //exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
-
-        //  }
-
-        //  exporter.write(vtk_name, comm.rank(), comm.size());
-        //}
 
         // Phase 3: initialise linear solvers
         watch_sol_init.start();
@@ -2063,13 +2161,17 @@ struct NavierStokesScrewsApp
         watch_asm_rhs.start();
         vec_rhs_p.format();
         // rhs_p = M (p + psi) + 1/reynolds D v
+        matrix_m_p.apply(vec_rhs_p, vec_sol_psi.at(0), vec_rhs_p, DataType(1));
         // Add pressure on rhs if it got extrapolated at all
         if(time_disc.get_p_extrapolation_steps() > Index(0))
         {
           matrix_m_p.apply(vec_rhs_p, vec_extrapolated_p, vec_rhs_p, DataType(1));
         }
-        matrix_m_p.apply(vec_rhs_p, vec_sol_psi.at(0), vec_rhs_p, DataType(1));
-        vec_rhs_p.axpy(vec_D_v, vec_rhs_p, time_disc.coeff_rhs_proj_D_v);
+        // Add rotational part (or not)
+        if(time_disc.is_rotational())
+        {
+          vec_rhs_p.axpy(vec_D_v, vec_rhs_p, time_disc.coeff_rhs_proj_D_v);
+        }
         watch_asm_rhs.stop();
 
         // Solve pressure projection problem: M_p p[k+1] = M_p p[k] + M_p psi[k+1] + 1/Re D u[k+1]
@@ -2096,39 +2198,40 @@ struct NavierStokesScrewsApp
 
         solver_m_p->done_numeric();
 
-        comm.print("");
+#ifdef ANALYTIC_SOLUTION
+        {
+          comm.print("");
+          // compute local errors
+          Assembly::VectorErrorInfo<DataType> error_v = Assembly::VectorErrorComputer<1>::compute(
+            vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo, cubature);
 
-        //{
-        //  // compute local errors
-        //  Assembly::VectorErrorInfo<DataType> error_v = Assembly::VectorErrorComputer<1>::compute(
-        //    vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo, cubature);
+          Assembly::ScalarErrorInfo<DataType> error_p = Assembly::ScalarErrorComputer<0>::compute(
+            vec_sol_p.at(0).local(), pres_sol, the_domain_level.space_pres, cubature);
 
-        //  Assembly::ScalarErrorInfo<DataType> error_p = Assembly::ScalarErrorComputer<0>::compute(
-        //    vec_sol_p.at(0).local(), pres_sol, the_domain_level.space_pres, cubature);
+          // synchronise all local errors
+          error_v.synchronise(comm);
+          error_p.synchronise(comm);
 
-        //  // synchronise all local errors
-        //  error_v.synchronise(comm);
-        //  error_p.synchronise(comm);
+          err_v_L2_max = Math::max(err_v_L2_max, error_v.norm_h0);
+          err_v_H1_max = Math::max(err_v_H1_max, error_v.norm_h1);
+          err_p_L2_max = Math::max(err_p_L2_max, error_p.norm_h0);
 
-        //  err_v_L2_max = Math::max(err_v_L2_max, error_v.norm_h0);
-        //  err_v_H1_max = Math::max(err_v_H1_max, error_v.norm_h1);
-        //  err_p_L2_max = Math::max(err_p_L2_max, error_p.norm_h0);
+          err_v_l2_L2 += Math::sqr(error_v.norm_h0)*time_disc.delta_t();
+          err_v_l2_H1 += Math::sqr(error_v.norm_h1)*time_disc.delta_t();
+          err_p_l2_L2 += Math::sqr(error_p.norm_h0)*time_disc.delta_t();
 
-        //  err_v_l2_L2 += Math::sqr(error_v.norm_h0)*time_disc.delta_t();
-        //  err_v_l2_H1 += Math::sqr(error_v.norm_h1)*time_disc.delta_t();
-        //  err_p_l2_L2 += Math::sqr(error_p.norm_h0)*time_disc.delta_t();
-
-        //  // print errors
-        //  if (comm.rank() == 0)
-        //  {
-        //    std::cout << "||u - u_ex||_L2: " << stringify_fp_sci(error_v.norm_h0) << ", time-l2: " <<
-        //      stringify_fp_sci(Math::sqrt(err_v_l2_L2)) << std::endl;
-        //    std::cout << " |u - u_ex|_H1 : " << stringify_fp_sci(error_v.norm_h1) << ", time-l2: " <<
-        //      stringify_fp_sci(Math::sqrt(err_v_l2_H1)) << std::endl;
-        //    std::cout << "||p - p_ex||_L2: " << stringify_fp_sci(error_p.norm_h0) << ", time-l2: " <<
-        //      stringify_fp_sci(Math::sqrt(err_p_l2_L2)) << std::endl;
-        //  }
-        //}
+          // print errors
+          if (comm.rank() == 0)
+          {
+            std::cout << "||u - u_ex||_L2: " << stringify_fp_sci(error_v.norm_h0) << ", time-l2: " <<
+              stringify_fp_sci(Math::sqrt(err_v_l2_L2)) << std::endl;
+            std::cout << " |u - u_ex|_H1 : " << stringify_fp_sci(error_v.norm_h1) << ", time-l2: " <<
+              stringify_fp_sci(Math::sqrt(err_v_l2_H1)) << std::endl;
+            std::cout << "||p - p_ex||_L2: " << stringify_fp_sci(error_p.norm_h0) << ", time-l2: " <<
+              stringify_fp_sci(Math::sqrt(err_p_l2_L2)) << std::endl;
+          }
+        }
+#endif
       } // solve_flow
 
       // Write output on the finest level only if scheduled or something went wrong
@@ -2137,6 +2240,7 @@ struct NavierStokesScrewsApp
 
         watch_vtk.start();
         // 2d export
+        if(solve_mesh_optimisation)
         {
           String vtk_name = String("mesh_post_n"+stringify(comm.size())+"_"+stringify(time_step));
           comm.print("Writing "+vtk_name+".vtk");
@@ -2159,6 +2263,7 @@ struct NavierStokesScrewsApp
         }
 
         // 3d export
+        if(solve_flow)
         {
           auto& dom_lvl = extruded_dom_ctrl.front();
 
@@ -2170,31 +2275,54 @@ struct NavierStokesScrewsApp
 
           exporter.add_vertex_vector("mesh velocity", extruded_mesh_velocity.local());
 
-          if(solve_flow)
+          exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
+          for(Index step(0); step < time_disc.get_num_steps(); ++step)
           {
-            exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-            exporter.add_vertex_vector("vec_conv", vec_conv.local());
-            exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
-
-            exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-            exporter.add_vertex_scalar("psi", vec_sol_psi.at(0).local().elements());
-
-            // compute and write time-derivatives
-            vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
-            vec_der_p.axpy(vec_sol_p.at(1), vec_sol_p.at(0), -DataType(1));
-
-            vec_der_v.scale(vec_der_v, DataType(1) / time_disc.delta_t());
-            vec_der_p.scale(vec_der_p, DataType(1) / time_disc.delta_t());
-
-            exporter.add_vertex_vector("v_dt", vec_der_v.local());
-            exporter.add_vertex_scalar("p_dt", vec_der_p.local().elements());
-            //Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
-            //exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
-
-            //Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-            //exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
-
+            exporter.add_vertex_vector("v_"+stringify(step+1), vec_sol_v.at(step+1).local());
           }
+
+          exporter.add_vertex_vector("vec_conv", vec_conv.local());
+          exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
+
+          exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
+          exporter.add_vertex_scalar("psi", vec_sol_psi.at(0).local().elements());
+
+          // compute and write time-derivatives
+          vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
+          vec_der_p.axpy(vec_sol_p.at(1), vec_sol_p.at(0), -DataType(1));
+
+          vec_der_v.scale(vec_der_v, DataType(1) / time_disc.delta_t());
+          vec_der_p.scale(vec_der_p, DataType(1) / time_disc.delta_t());
+
+          exporter.add_vertex_vector("v_dt", vec_der_v.local());
+          exporter.add_vertex_scalar("p_dt", vec_der_p.local().elements());
+
+          exporter.add_vertex_vector("v_rhs", vec_rhs_v.local());
+
+#ifdef ANALYTIC_SOLUTION
+          Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_rhs, the_domain_level.trafo);
+          exporter.add_vertex_vector("v_rhs_analytic", vec_sol_v_analytic.local());
+
+          Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
+          exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
+
+          Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
+          exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
+#endif
+
+          vec_rhs_v.format();
+          Assembly::GradOperatorAssembler::assemble(
+            vec_rhs_v.local(), vec_sol_p.at(0).local(),
+            the_domain_level.space_velo, the_domain_level.space_pres,
+            cubature, time_disc.coeff_rhs_v_psi.at(0));
+          vec_rhs_v.sync_0();
+          filter_v.filter_cor(vec_rhs_v);
+          exporter.add_vertex_vector("grad_p_phi", vec_rhs_v.local());
+
+          vec_rhs_v.format();
+          matrix_b.apply(vec_rhs_v, vec_sol_p.at(0), vec_rhs_v, -time_disc.coeff_rhs_v_psi.at(0));
+          filter_v.filter_cor(vec_rhs_v);
+          exporter.add_vertex_vector("p_div_phi", vec_rhs_v.local());
 
           exporter.write(vtk_name, comm.rank(), comm.size());
         }
@@ -2320,20 +2448,22 @@ struct NavierStokesScrewsApp
       }
     }
 
-    //err_v_l2_L2 = Math::sqrt(err_v_l2_L2);
-    //err_v_l2_H1 = Math::sqrt(err_v_l2_H1);
-    //err_p_l2_L2 = Math::sqrt(err_p_l2_L2);
+#ifdef ANALYTIC_SOLUTION
+    err_v_l2_L2 = Math::sqrt(err_v_l2_L2);
+    err_v_l2_H1 = Math::sqrt(err_v_l2_H1);
+    err_p_l2_L2 = Math::sqrt(err_p_l2_L2);
 
-    //// print errors
-    //if (comm.rank() == 0)
-    //{
-    //  std::cout << "Velocity error: " << stringify_fp_sci(err_v_L2_max) << " (l_infty-L2) " <<
-    //    stringify_fp_sci(err_v_l2_L2) << " (l2-L2)" << std::endl;
-    //  std::cout << "Velocity error: " << stringify_fp_sci(err_v_H1_max) << " (l_infty-H1) " <<
-    //    stringify_fp_sci(err_v_l2_H1) << " (l2-H1)"<< std::endl;
-    //  std::cout << "Pressure error: " << stringify_fp_sci(err_p_L2_max) << " (l_infty-L2) " <<
-    //    stringify_fp_sci(err_p_l2_L2) << " (l2-L2)" << std::endl;
-    //}
+    // print errors
+    if (comm.rank() == 0)
+    {
+      std::cout << "Velocity error: " << stringify_fp_sci(err_v_L2_max) << " (l_infty-L2) " <<
+        stringify_fp_sci(err_v_l2_L2) << " (l2-L2)" << std::endl;
+      std::cout << "Velocity error: " << stringify_fp_sci(err_v_H1_max) << " (l_infty-H1) " <<
+        stringify_fp_sci(err_v_l2_H1) << " (l2-H1)"<< std::endl;
+      std::cout << "Pressure error: " << stringify_fp_sci(err_p_L2_max) << " (l_infty-L2) " <<
+        stringify_fp_sci(err_p_l2_L2) << " (l2-L2)" << std::endl;
+    }
+#endif
 
     solver_a->done_symbolic();
     matrix_stock_velo.hierarchy_done_symbolic();
@@ -2418,8 +2548,8 @@ struct NavierStokesScrewsApp
       dump_time(comm, "Solver-A time", t_solver_a, t_total);
       dump_time(comm, "Solver-S time", t_solver_s, t_total);
       dump_time(comm, "Solver-M_p time", t_solver_m_p, t_total);
-      dump_time(comm, "Mesh quality computation time", t_mesh_quality, t_total);
       dump_time(comm, "Mesh optimisation time", t_meshopt, t_total);
+      dump_time(comm, "Mesh quality computation time", t_mesh_quality, t_total);
       dump_time(comm, "VTK write time", t_vtk, t_total);
       dump_time(comm, "Other time", t_total-t_sum, t_total);
     }
@@ -2639,6 +2769,11 @@ int run_app(int argc, char* argv[])
   mesh_type = mesh_file_reader.get_meshtype_string();
 
   // Call the appropriate class' run() function
+  //if(mesh_type == "conformal:simplex:2:2")
+  //{
+  //  ret = NavierStokesScrewsApp<MemType, DataType, IndexType, S2M2D>::run(
+  //    args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
+  //}
   if(mesh_type == "conformal:hypercube:2:2")
   {
     ret = NavierStokesScrewsApp<MemType, DataType, IndexType, H2M2D>::run(
