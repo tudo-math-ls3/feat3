@@ -14,12 +14,51 @@ namespace FEAT
     /**
      * \brief Assembles the gradient operator
      *
+     * This is the gradient bilinear form using blocked types without partial integration:
+     * \f$ g(\psi, \phi)_m = \alpha \int_\Omega(\nabla \psi, \phi e_m) dx, m=1,\dots,d \f$
+     *
+     * \author Jordi Paul
+     *
      */
     class GradOperatorAssembler
     {
     public:
 
       /**
+       * \brief Assembles the bilinear form into a matrix
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam IT_
+       * The index type for our containers
+       *
+       * \tparam dim_
+       * The world dimension, which is also the block size
+       *
+       * \tparam SpaceVelo_
+       * The space for \f$ \phi \f$
+       *
+       * \tparam SpacePres_
+       * The space for \f$ \psi \f$
+       *
+       * \tparam CubatureFactory_
+       * For creating the cubature rule
+       *
+       * \param[out] matrix_g
+       * The matrix we assemble into, gets overwritten
+       *
+       * \param[in] space_velo
+       * The space for \f$ \phi \f$
+       *
+       * \param[in] space_pres
+       * The space for \f$ \psi \f$
+       *
+       * \param[in] cubature_factory
+       * Creates the cubature rule we want to use
+       *
+       * \param[in] scale
+       * Scaling parameter \f$ \alpha \f$
        */
       template<typename DT_, typename IT_, int dim_,
         typename SpaceVelo_, typename SpacePres_,
@@ -166,6 +205,45 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Assembles the application of the bilinear form to a vector into a vector
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \tparam IT_
+       * The index type for our containers
+       *
+       * \tparam dim_
+       * The world dimension, which is also the block size
+       *
+       * \tparam SpaceVelo_
+       * The space for \f$ \phi \f$
+       *
+       * \tparam SpacePres_
+       * The space for \f$ \psi \f$
+       *
+       * \tparam CubatureFactory_
+       * For creating the cubature rule
+       *
+       * \param[in, out] vec_asm
+       * The vector we assemble onto
+       *
+       * \param[in] vec_in
+       * The vector we apply the bilinear form to
+       *
+       * \param[in] space_velo
+       * The space for \f$ \phi \f$
+       *
+       * \param[in] space_pres
+       * The space for \f$ \psi \f$
+       *
+       * \param[in] cubature_factory
+       * Creates the cubature rule we want to use
+       *
+       * \param[in] scale
+       * Scaling parameter \f$ \alpha \f$
+       */
       template<typename DT_, typename IT_, int dim_,
         typename SpaceVelo_, typename SpacePres_,
         typename CubatureFactory_>
