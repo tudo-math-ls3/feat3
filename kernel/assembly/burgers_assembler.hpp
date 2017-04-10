@@ -112,10 +112,10 @@ namespace FEAT
         typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
 
         // first of all, let's see what we have to assemble
-        const bool need_diff = (nu > DataType(0));
-        const bool need_conv = (beta > DataType(0));
+        const bool need_diff = (Math::abs(nu) > DataType(0));
+        const bool need_conv = (Math::abs(beta) > DataType(0));
         const bool need_conv_frechet = (frechet_beta > DataType(0));
-        const bool need_reac = (theta > DataType(0));
+        const bool need_reac = (Math::abs(theta) > DataType(0));
 
         const bool have_matrix = (matrix != nullptr);
         const bool have_vector = (vector != nullptr);
