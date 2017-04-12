@@ -486,7 +486,7 @@ if is_found("g++"):
   gcc_minor = int(gcc_version["__GNUC_MINOR__"])
   gcc_minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
 if gcc_major > 4 or (gcc_major == 4 and gcc_minor > 5):
-  quadmath_add = "-quadmath"
+  quadmath_add = "-quadmath --ovr_mpi_ops"
 parmetis_add = ""
 if (not nothirdparty):
   parmetis_add = "-parmetis"
