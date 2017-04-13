@@ -9,6 +9,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # list of trafo tests
 SET (test_list
   standard_trafo-test
+  inverse_mapping-test
 )
 
 # create all tests
