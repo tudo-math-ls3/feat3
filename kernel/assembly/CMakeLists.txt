@@ -10,6 +10,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 SET (test_list
   base_splitter-test
   bilinear_operator-test
+  discrete_evaluator-test
   grid_transfer-test
   grid_transfer-mass-test
   interpolator-test
