@@ -73,8 +73,8 @@ public:
     typedef typename ScalarEvalTraits::ValueType ScalarValueType;
     typedef typename VectorEvalTraits::ValueType VectorValueType;
 
-    typename ScalarFuncType::Evaluator<ScalarEvalTraits> scalar_func_eval(scalar_func);
-    typename VectorFuncType::Evaluator<VectorEvalTraits> vector_func_eval(vector_func);
+    typename ScalarFuncType::template Evaluator<ScalarEvalTraits> scalar_func_eval(scalar_func);
+    typename VectorFuncType::template Evaluator<VectorEvalTraits> vector_func_eval(vector_func);
 
     ScalarVectorType scalar_vec;
     BlockedVectorType blocked_vec;
