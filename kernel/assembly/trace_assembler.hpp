@@ -84,7 +84,7 @@ namespace FEAT
           _facet_mask.at(trg[i]) = 1;
       }
 
-      void compile_facets()
+      void compile_facets(bool only_boundary = true)
       {
         _cell_facet.clear();
         _facet_ori.clear();
@@ -102,22 +102,26 @@ namespace FEAT
           if(_facet_mask[iface] == 0)
             continue;
 
-          // ensure that this is a boundary facet
-          if(elem_at_facet.degree(iface) != Index(1))
+          // ensure that this is a boundary facet if required
+          if(only_boundary && (elem_at_facet.degree(iface) != Index(1)))
             throw InternalError(__func__, __FILE__, __LINE__, "facet is adjacent to more than 1 element");
 
-          Index icell = *elem_at_facet.image_begin(iface);
+          // add all elements
+          for(auto it = elem_at_facet.image_begin(iface); it != elem_at_facet.image_end(iface); ++it)
+          {
+            Index icell = *it;
 
-          // try to compute local facet index and orientation
-          int loc_face(0), face_ori(0);
-          if(!find_local_facet(iface, icell, loc_face, face_ori))
-            throw InternalError(__func__, __FILE__, __LINE__, "failed to find local facet");
+            // try to compute local facet index and orientation
+            int loc_face(0), face_ori(0);
+            if(!find_local_facet(iface, icell, loc_face, face_ori))
+              throw InternalError(__func__, __FILE__, __LINE__, "failed to find local facet");
 
-          // alright, add this facet to our list
-          _facets.push_back(iface);
-          _cells.push_back(icell);
-          _cell_facet.push_back(loc_face);
-          _facet_ori.push_back(face_ori);
+            // alright, add this facet to our list
+            _facets.push_back(iface);
+            _cells.push_back(icell);
+            _cell_facet.push_back(loc_face);
+            _facet_ori.push_back(face_ori);
+          }
         }
       }
 
@@ -474,6 +478,234 @@ namespace FEAT
 
           // finish dof-mapping
           dof_mapping.finish();
+
+          // continue with next cell
+        }
+      }
+
+      /**
+       * \brief Assembles a flow accumulator.
+       *
+       * This function assembles a so-called accumulator on a sub-dimensional
+       * mesh region, which can be used to assemble body forces on a boundary.
+       *
+       * \attention
+       * This assembly function is somewhat provisional - use at own risk!
+       *
+       * The accumulator that is assembled by this function has to provide
+       * an overloaded "operator()" with the following function parameters:
+       * - cubature weight (scalar)
+       * - mapped image point (Tiny::Vector)
+       * - jacobi matrix (Tiny::Matrix)
+       * - velocity value (Tiny::Vector)
+       * - velocity gradient (Tiny::Matrix)
+       * - pressure value (scalar)
+       *
+       * \param[inout] accum
+       * The accumulator to be assembled. The "operator()" of this object
+       * is called for each cubature point on each facet.
+       *
+       * \param[in] vector_v
+       * The velocity vector.
+       *
+       * \param[in] vector_p
+       * The pressure vector.
+       *
+       * \param[in] space_v
+       * The velocity space.
+       *
+       * \param[in] space_p
+       * The pressure space.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory that is to be used for integration.
+       */
+      template<
+        typename Accum_,
+        typename DataType_,
+        typename IndexType_,
+        int dim_,
+        typename SpaceV_,
+        typename SpaceP_,
+        typename CubatureFactory_>
+      void assemble_flow_accum(
+        Accum_& accum,
+        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector_v,
+        const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& vector_p,
+        const SpaceV_& space_v,
+        const SpaceP_& space_p,
+        const CubatureFactory_& cubature_factory)
+      {
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VeloVector;
+        typedef LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> PresVector;
+
+        // assembly traits
+        typedef Assembly::AsmTraits2<
+          DataType_,
+          SpaceP_,
+          SpaceV_,
+          TrafoTags::none,
+          SpaceTags::value,
+          SpaceTags::value|SpaceTags::grad> AsmTraits;
+
+        typedef typename AsmTraits::DataType DataType;
+        typedef typename AsmTraits::TrafoType TrafoType;
+
+        // shape types
+        typedef typename AsmTraits::ShapeType ShapeType;
+        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = space_v.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a trafo facet evaluator
+        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
+        TrafoFacetEvaluator trafo_facet_eval(trafo);
+
+        typedef typename TrafoFacetEvaluator::template ConfigTraits
+          <TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat>::EvalDataType TrafoFacetEvalData;
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::TrialEvaluator space_eval_v(space_v);
+        typename AsmTraits::TestEvaluator space_eval_p(space_p);
+
+        // create a dof-mapping
+        typename AsmTraits::TrialDofMapping dof_mapping_v(space_v);
+        typename AsmTraits::TestDofMapping dof_mapping_p(space_p);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+        TrafoFacetEvalData trafo_facet_data;
+
+        // create space evaluation data
+        typename AsmTraits::TrialEvalData space_data_v;
+        typename AsmTraits::TestEvalData space_data_p;
+
+        // create cubature rule
+        typename Assembly::Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create matrix scatter-axpy
+        typename VeloVector::GatherAxpy gather_v(vector_v);
+        typename PresVector::GatherAxpy gather_p(vector_p);
+
+        // get maximum number of local dofs
+        static constexpr int max_local_dofs_v = AsmTraits::max_local_trial_dofs;
+        static constexpr int max_local_dofs_p = AsmTraits::max_local_test_dofs;
+
+        // create local vector data
+        typedef Tiny::Vector<DataType, dim_> VectorValue;
+        typedef Tiny::Vector<VectorValue, max_local_dofs_v> LocalVectorTypeV;
+        typedef Tiny::Vector<DataType, max_local_dofs_p> LocalVectorTypeP;
+        LocalVectorTypeV local_vector_v;
+        LocalVectorTypeP local_vector_p;
+
+        // our local velocity gradient
+        Tiny::Vector<DataType, dim_> loc_value_v;
+        Tiny::Matrix<DataType, dim_, dim_> loc_grad_v;
+
+        // trafo matrices and vectors
+        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
+        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
+        Tiny::Vector<DataType, shape_dim> face_vec;
+        Tiny::Vector<DataType, facet_dim> ori_vec;
+
+        face_mat.format();
+        ori_mat.format();
+        face_vec.format();
+        ori_vec.format();
+
+        // loop over all cells of the mesh
+        for(Index f(0); f < Index(this->_facets.size()); ++f)
+        {
+          // get facet index
+          const Index face = this->_facets[f];
+          const Index cell = this->_cells[f];
+
+          // compute facet trafos
+          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, this->_cell_facet[f]);
+
+          // compute orientation trafos
+          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, this->_facet_ori[f]);
+
+          // prepare trafo evaluators
+          trafo_facet_eval.prepare(face);
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluators
+          space_eval_v.prepare(trafo_eval);
+          space_eval_p.prepare(trafo_eval);
+
+          // initialise dof-mappings
+          dof_mapping_v.prepare(cell);
+          dof_mapping_p.prepare(cell);
+
+          // fetch number of local dofs
+          const int num_loc_dofs_v = space_eval_v.get_num_local_dofs();
+          const int num_loc_dofs_p = space_eval_p.get_num_local_dofs();
+
+          // gather our local velocity dofs
+          local_vector_v.format();
+          local_vector_p.format();
+          gather_v(local_vector_v, dof_mapping_v);
+          gather_p(local_vector_p, dof_mapping_p);
+
+          // finish dof-mapping
+          dof_mapping_p.finish();
+          dof_mapping_v.finish();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // get cubature point
+            auto cub_pt = cubature_rule.get_point(k);
+
+            // transform to local facet
+            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
+
+            // compute trafo data
+            trafo_facet_eval(trafo_facet_data, cub_pt);
+            trafo_eval(trafo_data, cub_cf);
+
+            // compute test basis function data
+            space_eval_v(space_data_v, trafo_data);
+            space_eval_p(space_data_p, trafo_data);
+
+            // compute local velocity value
+            loc_value_v.format();
+            for(int i(0); i < num_loc_dofs_v; ++i)
+              loc_value_v.axpy(space_data_v.phi[i].value, local_vector_v[i]);
+
+            // compute local velocity gradient
+            loc_grad_v.format();
+            for(int i(0); i < num_loc_dofs_v; ++i)
+              loc_grad_v.add_outer_product(local_vector_v[i], space_data_v.phi[i].grad);
+
+            // compute local pressure value
+            DataType loc_value_p = DataType(0);
+            for(int i(0); i < num_loc_dofs_p; ++i)
+              loc_value_p += local_vector_p[i] * space_data_p.phi[i].value;
+
+            // call accumulator
+            accum(
+              trafo_facet_data.jac_det * cubature_rule.get_weight(k),
+              trafo_facet_data.img_point,
+              trafo_facet_data.jac_mat,
+              loc_value_v,
+              loc_grad_v,
+              loc_value_p
+            );
+
+            // continue with next basis function
+          }
+
+          // finish evaluators
+          space_eval_p.finish();
+          space_eval_v.finish();
+          trafo_eval.finish();
+          trafo_facet_eval.finish();
 
           // continue with next cell
         }
