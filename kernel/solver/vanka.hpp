@@ -1187,6 +1187,12 @@ namespace FEAT
         return _data.size();
       }
 
+      std::size_t bytes() const
+      {
+        return sizeof(IndexType) * (_block_v_ptr.size() + _block_v_idx.size() + _block_p_ptr.size() + _block_p_idx.size())
+          + sizeof(DataType) * (_data.size() + _vdef.size() + _vcor.size())
+          + _vec_scale.bytes() + _vec_tmp1.bytes() + _vec_tmp2.bytes();
+      }
     protected:
       /**
        * \brief Builds the 'blocked' pressure graph
