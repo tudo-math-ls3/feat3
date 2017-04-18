@@ -2414,6 +2414,74 @@ namespace FEAT
         this->assign(local);
       }
 
+      /// Shrink matrix and drop small values
+      /**
+       *
+       * Shrinks the matrix by dropping all values, that have a smaller absoute value than eps.
+       *
+       * \param[in] eps The dropping criterion
+       *
+       **/
+      void shrink(DT_ eps)
+      {
+        SparseMatrixCSR<Mem::Main, DT_, IT_> tm;
+        tm.convert(*this);
+
+        std::vector<IT_> row_entries(tm.rows(), IT_(0));
+        for (Index row(0) ; row < tm.rows() ; ++row)
+        {
+          for (Index el(tm.row_ptr()[row]) ; el < tm.row_ptr()[row + 1] ; ++el)
+          {
+            if (Math::abs(tm.val()[el]) >= eps)
+            {
+              row_entries.at(row) += IT_(1);
+            }
+          }
+        }
+
+        Index ue(0);
+        for (auto& n : row_entries)
+        {
+          ue += n;
+        }
+        if (ue == Index(0))
+        {
+          SparseMatrixCSR<Mem::Main, DT_, IT_> t(this->rows(), this->columns());
+          this->assign(t);
+          return;
+        }
+
+        DenseVector<Mem::Main, IT_, IT_> new_row_ptr(tm.rows() + 1);
+        new_row_ptr(0, IT_(0));
+        for (Index row(0) ; row < tm.rows() ; ++row)
+        {
+          new_row_ptr(row + 1, new_row_ptr(row) + row_entries.at(row));
+        }
+
+        row_entries.clear();
+
+        DenseVector<Mem::Main, IT_, IT_> new_col_ind(ue);
+        DenseVector<Mem::Main, DT_, IT_> new_val(ue);
+        Index counter(0);
+        for (Index row(0) ; row < tm.rows() ; ++row)
+        {
+          for (Index el(tm.row_ptr()[row]) ; el < tm.row_ptr()[row + 1] ; ++el)
+          {
+            if (Math::abs(tm.val()[el]) >= eps)
+            {
+              new_col_ind(counter, tm.col_ind()[el]);
+              new_val(counter, tm.val()[el]);
+              ++counter;
+            }
+          }
+        }
+
+        tm.clear();
+        SparseMatrixCSR<Mem::Main, DT_, IT_> t(this->rows(), this->columns(), new_col_ind, new_val, new_row_ptr);
+
+        this->assign(t);
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {

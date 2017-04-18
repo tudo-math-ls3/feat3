@@ -228,7 +228,13 @@ public:
     TEST_CHECK_EQUAL(clone4, clone1);
     TEST_CHECK_EQUAL((void*)clone4.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone4.row_ptr(), (void*)clone1.row_ptr());
+
+    // shrink test
+    SparseMatrixCSR<Mem_, DT_, IT_> l(f.clone());
+    l.shrink(DT_(1.9));
+    TEST_CHECK_EQUAL(l.used_elements(), 10ul);
   }
+
 };
 
 SparseMatrixCSRTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_test_float_ulong;
