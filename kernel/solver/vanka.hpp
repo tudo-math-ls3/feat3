@@ -128,7 +128,7 @@ namespace FEAT
             const ValueType& vi = vdef[idx[i]];
             for(int j(0); j < dim; ++j)
             {
-              x[off + IT_(i*dim + j)] = vi[j];
+              x[off + i*IT_(dim) + IT_(j)] = vi[j];
             }
           }
           return off + IT_(dim)*n;
@@ -141,7 +141,7 @@ namespace FEAT
             ValueType& vi = _vec_cor[idx[i]];
             for(int j(0); j < dim; ++j)
             {
-              vi[j] += omega * x[off + IT_(i*dim + j)];
+              vi[j] += omega * x[off + i*IT_(dim) + IT_(j)];
             }
           }
           return off + IT_(dim)*n;
@@ -425,7 +425,7 @@ namespace FEAT
                 // copy block diagonal
                 for(int k(0); k < row_dim; ++k)
                 {
-                  data[mo + i*IT_(row_dim) + k] = mv[k][k];
+                  data[mo + i*IT_(row_dim) + IT_(k)] = mv[k][k];
                 }
                 break;
               }
@@ -465,7 +465,7 @@ namespace FEAT
                 {
                   r += mv[ii][jj] * vv[jj];
                 }
-                x[off + i*IT_(row_dim) + ii] += alpha * r;
+                x[off + i*IT_(row_dim) + IT_(ii)] += alpha * r;
               }
             }
           }
@@ -502,9 +502,9 @@ namespace FEAT
                 // loop over all block columns
                 for(int jj(0); jj < col_dim; ++jj)
                 {
-                  r += mv[ii][jj] * v[vo + jj];
+                  r += mv[ii][jj] * v[vo + IT_(jj)];
                 }
-                x[off + i*IT_(row_dim) + ii] += alpha * r;
+                x[off + i*IT_(row_dim) + IT_(ii)] += alpha * r;
               }
             }
           }
