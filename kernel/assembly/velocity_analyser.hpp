@@ -4,6 +4,7 @@
 
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/dist.hpp>
@@ -330,6 +331,166 @@ namespace FEAT
             DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
 
             // update info
+            for(int i(0); i < dim_; ++i)
+            {
+              // update H0 component norm
+              info.norm_h0_comp[i] += omega * Math::sqr(vals[i]);
+
+              // update H1 component norm
+              info.norm_h1_comp[i] += omega * Tiny::dot(ders[i], ders[i]);
+
+            }
+
+            // update divergence
+            info.divergence += omega * Math::sqr(ders.trace());
+
+            // update vorticity
+            info.vorticity += omega * calc_vorticity(ders);
+
+            // continue with next cubature point
+          }
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+
+          // continue with next cell
+        }
+
+        // finally, compute the rest
+        for(int i(0); i < dim_; ++i)
+        {
+          info.norm_h0 += info.norm_h0_comp[i];
+          info.norm_h1 += info.norm_h1_comp[i];
+          info.norm_h0_comp[i] = Math::sqrt(info.norm_h0_comp[i]);
+          info.norm_h1_comp[i] = Math::sqrt(info.norm_h1_comp[i]);
+        }
+
+        // take the roots
+        info.norm_h0 = Math::sqrt(info.norm_h0);
+        info.norm_h1 = Math::sqrt(info.norm_h1);
+        info.divergence = Math::sqrt(info.divergence);
+        info.vorticity  = Math::sqrt(info.vorticity);
+
+        // okay
+        return info;
+      }
+
+      /**
+       * \brief Performs the analysis of a velocity field.
+       *
+       * \param[in] vector
+       * The vector representing the velocity field to be analysed.
+       *
+       * \param[in] space
+       * The finite element space for the velocity.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
+       *
+       * \returns
+       * A VelocityInfo structure containing the computed information.
+       */
+      template<typename DataType_, typename IndexType_, int dim_, typename Space_, typename CubatureFactory_>
+      static VelocityInfo<DataType_, dim_> compute(
+        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
+        const Space_& space, const CubatureFactory_& cubature_factory)
+      {
+        // first of all, verify the dimensions
+        static_assert(Space_::shape_dim == dim_, "invalid velocity field dimension");
+
+        /// space type
+        typedef Space_ SpaceType;
+
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+
+        /// assembly traits
+        typedef AsmTraits1<DataType_, SpaceType, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
+
+        /// data type
+        typedef typename AsmTraits::DataType DataType;
+
+        // create the cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+        typedef typename AsmTraits::SpaceEvaluator  SpaceEvaluator;
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // create matrix scatter-axpy
+        typename VectorType::GatherAxpy gather(vector);
+
+        // initialise result
+        VelocityInfo<DataType_, dim_> info;
+
+        // local velocity values
+        Tiny::Vector<Tiny::Vector<DataType, dim_>, SpaceEvaluator::max_local_dofs> basis_val;
+
+        // vector field values
+        Tiny::Vector<DataType_, dim_> vals;
+
+        // vector field derivatives
+        Tiny::Matrix<DataType_, dim_, dim_> ders;
+
+        // loop over all cells of the mesh
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+        {
+          // initialise dof-mapping
+          dof_mapping.prepare(cell);
+
+          // fetch local basis values
+          basis_val.format();
+          gather(basis_val, dof_mapping);
+
+          // finish dof-mapping
+          dof_mapping.finish();
+
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+
+          // fetch number of local dofs
+          const int num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
+
+            // compute basis function data
+            space_eval(space_data, trafo_data);
+
+            // compute basis function values and derivatives
+            vals.format();
+            ders.format();
+            for(int i(0); i < num_loc_dofs; ++i)
+            {
+              vals.axpy(space_data.phi[i].value, basis_val[i]);
+              ders.add_outer_product(basis_val[i], space_data.phi[i].grad);
+            }
+
+            // compute integration weight
+            const DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
+
+            // update norms
             for(int i(0); i < dim_; ++i)
             {
               // update H0 component norm
