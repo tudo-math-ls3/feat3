@@ -448,10 +448,28 @@ namespace FEAT
         /// four temporary vectors
         SystemVectorType vec_rhs, vec_sol, vec_def, vec_cor;
 
+        /// total smoother application time
+        double time_smooth;
+
+        /// coarse grid solver application time
+        double time_coarse;
+
+        /// defect computation time
+        double time_defect;
+
+        /// prolongation/restriction times
+        double time_transfer;
+
         explicit LevelInfo(std::shared_ptr<LevelType> lvl) :
           level(lvl),
           unique_solvers()
         {
+          reset_timings();
+        }
+
+        void reset_timings()
+        {
+          time_smooth = time_coarse = time_defect = time_transfer = 0.0;
         }
 
         void init_symbolic()
@@ -808,6 +826,107 @@ namespace FEAT
       bool have_numeric() const
       {
         return _have_init_numeric;
+      }
+
+      /**
+       * \brief Resets the internal timing statistics.
+       */
+      void reset_timings()
+      {
+        for(const auto& li : _levels)
+          li.reset_timings();
+      }
+
+      /**
+       * \brief Returns the time for smoother application.
+       *
+       * \param[in] lvl
+       * The level for which the timing is to be retrieved.
+       * If set to -1, the sum of all level timings is returned.
+       *
+       * \returns The time for smoother application.
+       */
+      double get_time_smooth(int lvl = -1) const
+      {
+        if(lvl < 0)
+        {
+          double t(0.0);
+          for(const auto& li : _levels)
+            t += li.time_smooth;
+          return t;
+        }
+
+        XASSERT(lvl < int(_levels.size()));
+        return _levels.at(std::size_t(lvl)).time_smooth;
+      }
+
+      /**
+       * \brief Returns the time for coarse grid solver application.
+       *
+       * \param[in] lvl
+       * The level for which the timing is to be retrieved.
+       * If set to -1, the sum of all level timings is returned.
+       *
+       * \returns The time for coarse grid solver application.
+       */
+      double get_time_coarse(int lvl = -1) const
+      {
+        if(lvl < 0)
+        {
+          double t(0.0);
+          for(const auto& li : _levels)
+            t += li.time_coarse;
+          return t;
+        }
+
+        XASSERT(lvl < int(_levels.size()));
+        return _levels.at(std::size_t(lvl)).time_coarse;
+      }
+
+      /**
+       * \brief Returns the time for defect computation.
+       *
+       * \param[in] lvl
+       * The level for which the timing is to be retrieved.
+       * If set to -1, the sum of all level timings is returned.
+       *
+       * \returns The time for defect computation.
+       */
+      double get_time_defect(int lvl = -1) const
+      {
+        if(lvl < 0)
+        {
+          double t(0.0);
+          for(const auto& li : _levels)
+            t += li.time_defect;
+          return t;
+        }
+
+        XASSERT(lvl < int(_levels.size()));
+        return _levels.at(std::size_t(lvl)).time_defect;
+      }
+
+      /**
+       * \brief Returns the time for grid transfer application.
+       *
+       * \param[in] lvl
+       * The level for which the timing is to be retrieved.
+       * If set to -1, the sum of all level timings is returned.
+       *
+       * \returns The time for grid transfer application.
+       */
+      double get_time_transfer(int lvl = -1) const
+      {
+        if(lvl < 0)
+        {
+          double t(0.0);
+          for(const auto& li : _levels)
+            t += li.time_transfer;
+          return t;
+        }
+
+        XASSERT(lvl < int(_levels.size()));
+        return _levels.at(std::size_t(lvl)).time_transfer;
       }
     }; // class MultiGridHierarchy<...>
 
@@ -1339,6 +1458,7 @@ namespace FEAT
         std::shared_ptr<SolverType> coarse_solver = lvl_crs.level->get_coarse_solver();
 
         // if the have a coarse grid solver, apply it
+        TimeStamp stamp_coarse;
         if(coarse_solver)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionCallCoarseSolver>(this->name(), coarse_solver->name()));
@@ -1353,6 +1473,7 @@ namespace FEAT
           // apply the correction filter
           system_filter.filter_cor(lvl_crs.vec_sol);
         }
+        lvl_crs.time_coarse += stamp_coarse.elapsed_now();
 
         TimeStamp bt;
         _toes.at(std::size_t(_crs_level)) = bt.elapsed(at);
@@ -1376,9 +1497,11 @@ namespace FEAT
         const FilterType& system_filter = lvl.level->get_system_filter();
 
         // apply peak-smoother
+        TimeStamp stamp_smooth;
         Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother.name()));
         if(!status_success(smoother.apply(lvl.vec_cor, lvl.vec_def)))
           return false;
+        lvl.time_smooth += stamp_smooth.elapsed_now();
 
         // apply correction filter
         system_filter.filter_cor(lvl.vec_cor);
@@ -1387,7 +1510,9 @@ namespace FEAT
         lvl.vec_sol.axpy(lvl.vec_cor, lvl.vec_sol);
 
         // re-compute defect
+        TimeStamp stamp_defect;
         system_matrix.apply(lvl.vec_def, lvl.vec_sol, lvl.vec_rhs, -DataType(1));
+        lvl.time_defect += stamp_defect.elapsed_now();
 
         // apply defect filter
         system_filter.filter_def(lvl.vec_def);
@@ -1417,7 +1542,9 @@ namespace FEAT
         const FilterType& system_filter = lvl.level->get_system_filter();
 
         // compute defect
+        TimeStamp stamp_defect;
         system_matrix.apply(lvl.vec_def, lvl.vec_sol, lvl.vec_rhs, -DataType(1));
+        lvl.time_defect += stamp_defect.elapsed_now();
 
         // apply defect filter
         system_filter.filter_def(lvl.vec_def);
@@ -1504,12 +1631,16 @@ namespace FEAT
             if(smoother)
             {
               // apply pre-smoother
+              TimeStamp stamp_smooth;
               Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
               if(!status_success(smoother->apply(lvl_f.vec_sol, lvl_f.vec_rhs)))
                 return Status::aborted;
+              lvl_f.time_smooth += stamp_smooth.elapsed_now();
 
               // compute defect
+              TimeStamp stamp_defect;
               system_matrix.apply(lvl_f.vec_def, lvl_f.vec_sol, lvl_f.vec_rhs, -DataType(1));
+              lvl_f.time_defect += stamp_defect.elapsed_now();
             }
             else
             {
@@ -1526,7 +1657,9 @@ namespace FEAT
 
           // restrict onto coarse level
           Statistics::add_solver_expression(std::make_shared<ExpressionRestriction>(this->name(), i));
+          TimeStamp stamp_rest;
           transfer_operator->rest(lvl_f.vec_def, lvl_c.vec_rhs);
+          lvl_f.time_transfer += stamp_rest.elapsed_now();
 
           // filter coarse fefect
           system_filter_c.filter_def(lvl_c.vec_rhs);
@@ -1580,7 +1713,9 @@ namespace FEAT
 
           // prolongate coarse grid solution
           Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
+          TimeStamp stamp_prol;
           transfer_operator->prol(lvl_f.vec_cor, lvl_c.vec_sol);
+          lvl_f.time_transfer += stamp_prol.elapsed_now();
 
           // apply correction filter
           system_filter_f.filter_cor(lvl_f.vec_cor);
@@ -1595,15 +1730,19 @@ namespace FEAT
           if(smoother && (cur_smooth || (i < cur_lvl)))
           {
             // compute new defect
+            TimeStamp stamp_defect;
             system_matrix.apply(lvl_f.vec_def, lvl_f.vec_sol, lvl_f.vec_rhs, -DataType(1));
+            lvl_f.time_defect += stamp_defect.elapsed_now();
 
             // apply defect filter
             system_filter_f.filter_def(lvl_f.vec_def);
 
             // apply post-smoother
             Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
+            TimeStamp stamp_smooth;
             if(!status_success(smoother->apply(lvl_f.vec_cor, lvl_f.vec_def)))
               return Status::aborted;
+            lvl_f.time_smooth += stamp_smooth.elapsed_now();
 
             // update solution vector
             lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol);
