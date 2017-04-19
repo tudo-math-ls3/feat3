@@ -228,8 +228,8 @@ namespace FEAT
       /**
        * \brief Returns the coordinate of a reference cell vertex.
        *
-       * \note By our definition, all reference vertex coordinates are integral, therefore this function
-       * returns an \p int rather than a floating point type.
+       * \tparam T_
+       * The desired type of the coordinate.
        *
        * \param[in] vertex_idx
        * The index of the vertex whose coordinate is to be returned.
@@ -240,7 +240,35 @@ namespace FEAT
        * \returns
        * The desired coordinate of the reference cell vertex.
        */
-      static int coord(int vertex_idx, int coord_idx);
+      template<typename T_>
+      static T_ vertex(int vertex_idx, int coord_idx);
+
+      /**
+       * \brief Returns the coordinate of the reference cell centre.
+       *
+       * \tparam T_
+       * The desired type of the coordinate.
+       *
+       * \param[in] coord_idx
+       * The index of the coordinate of the centre that is to be returned.
+       *
+       * \returns
+       * The desired coordinate of the reference cell centre.
+       */
+      template<typename T_>
+      static T_ centre(int coord_idx);
+
+      /**
+       * \brief Returns the volume of the reference cell.
+       *
+       * \tparam T_
+       * The desired type of the volume.
+       *
+       * \returns
+       * The volume of the reference cell.
+       */
+      template<typename T_>
+      static T_ volume();
 
       /**
        * \brief Returns the orientation of a facet.
@@ -267,9 +295,22 @@ namespace FEAT
     template<>
     struct ReferenceCell<Shape::Vertex>
     {
-      static int coord(int, int)
+      template<typename T_>
+      static T_ vertex(int, int)
       {
-        return 0;
+        return T_(0);
+      }
+
+      template<typename T_>
+      static T_ centre(int)
+      {
+        return T_(0);
+      }
+
+      template<typename T_>
+      static T_ volume()
+      {
+        return T_(0);
       }
 
       // orientation is not implemented due to being nonsensical
@@ -284,9 +325,22 @@ namespace FEAT
     template<int dim_>
     struct ReferenceCell< Shape::Simplex<dim_> >
     {
-      static int coord(int vertex_idx, int coord_idx)
+      template<typename T_>
+      static T_ vertex(int vertex_idx, int coord_idx)
       {
-        return (coord_idx + 1) == vertex_idx ? 1 : 0;
+        return (coord_idx + 1) == vertex_idx ? T_(1) : T_(0);
+      }
+
+      template<typename T_>
+      static T_ centre(int)
+      {
+        return T_(1) / T_(dim_+1);
+      }
+
+      template<typename T_>
+      static T_ volume()
+      {
+        return T_(1) / T_(MetaMath::Factorial<dim_>::value);
       }
 
       /**
@@ -322,9 +376,22 @@ namespace FEAT
     template<int dim_>
     struct ReferenceCell< Shape::Hypercube<dim_> >
     {
-      static int coord(int vertex_idx, int coord_idx)
+      template<typename T_>
+      static T_ vertex(int vertex_idx, int coord_idx)
       {
-        return (((vertex_idx >> coord_idx) & 1) << 1) - 1;
+        return T_((((vertex_idx >> coord_idx) & 1) << 1) - 1);
+      }
+
+      template<typename T_>
+      static T_ centre(int)
+      {
+        return T_(0);
+      }
+
+      template<typename T_>
+      static T_ volume()
+      {
+        return T_(1 << dim_); // = 2^dim
       }
 
       /**

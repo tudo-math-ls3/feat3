@@ -91,6 +91,135 @@ public:
     int hcube3_nface2 = FaceTraits<Hypercube<3>,2>::count;
     TEST_CHECK_EQUAL(hcube3_nface2, 6);
 
+    const double eps = 1E-12;
+
+    // test simplex vertex coords
+
+    // 1-Simplex: {[0], [1]}
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<1>>::vertex<double>(0, 0), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<1>>::vertex<double>(1, 0), 1.0, eps);
+
+    // 2-Simplex: {[0,0], [1,0], [0,1]}
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::vertex<double>(0, 0), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::vertex<double>(0, 1), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::vertex<double>(1, 0), 1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::vertex<double>(1, 1), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::vertex<double>(2, 0), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::vertex<double>(2, 1), 1.0, eps);
+
+    // 3-Simplex: {[0,0,0], [1,0,0], [0,1,0], [0,0,1]}
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(0, 0), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(0, 1), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(0, 2), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(1, 0), 1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(1, 1), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(1, 2), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(2, 0), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(2, 1), 1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(2, 2), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(3, 0), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(3, 1), 0.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::vertex<double>(3, 2), 1.0, eps);
+
+    // test hypercube vertex coords
+
+    // 1-Hypercube: {[-1], [+1]}
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<1>>::vertex<double>(0, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<1>>::vertex<double>(1, 0), +1.0, eps);
+
+    // 2-Hypercube
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(0, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(0, 1), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(1, 0), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(1, 1), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(2, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(2, 1), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(3, 0), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::vertex<double>(3, 1), +1.0, eps);
+
+    // 3-Hypercube
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(0, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(0, 1), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(0, 2), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(1, 0), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(1, 1), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(1, 2), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(2, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(2, 1), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(2, 2), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(3, 0), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(3, 1), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(3, 2), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(4, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(4, 1), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(4, 2), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(5, 0), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(5, 1), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(5, 2), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(6, 0), -1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(6, 1), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(6, 2), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(7, 0), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(7, 1), +1.0, eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::vertex<double>(7, 2), +1.0, eps);
+
+    // test simplex centre coords
+
+    // 1-Simplex: [1/2]
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<1>>::centre<double>(0), 1.0/2.0, eps);
+
+    // 2-Simplex: [1/3, 1/3]
+    for(int i(0); i < 2; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::centre<double>(i), 1.0/3.0, eps);
+    }
+
+    // 3-Simplex: [1/4, 1/4, 1/4]
+    for(int i(0); i < 3; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::centre<double>(i), 1.0/4.0, eps);
+    }
+
+    // test hypercube centre coords
+
+    // 1-Hypercube
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<1>>::centre<double>(0), 0.0, eps);
+
+    // 2-Hypercube
+    for(int i(0); i < 2; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::centre<double>(i), 0.0, eps);
+    }
+
+    // 3-Hypercube
+    for(int i(0); i < 3; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::centre<double>(i), 0.0, eps);
+    }
+
+    // test simplex volumes
+
+    // 1-Simplex: 1
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<1>>::volume<double>(), 1.0, eps);
+
+    // 2-Simplex: 1/2
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<2>>::volume<double>(), 1.0/2.0, eps);
+
+    // 3-Simplex: 1/6
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Simplex<3>>::volume<double>(), 1.0/6.0, eps);
+
+    // test hypercube volumes
+
+    // 1-Hypercube: 2
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<1>>::volume<double>(), 2.0, eps);
+
+    // 2-Hypercube: 4
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<2>>::volume<double>(), 4.0, eps);
+
+    // 3-Hypercube: 8
+    TEST_CHECK_EQUAL_WITHIN_EPS(ReferenceCell<Hypercube<3>>::volume<double>(), 8.0, eps);
+
+
     // Check reference cell facet orientations
     // For Simplex<1>, these are -1, +1
     TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::orientation(0), -1);
@@ -98,9 +227,13 @@ public:
 
     // For all other simplices, all facet orientations are positive
     for(int facet_index(0); facet_index < FaceTraits<Simplex<2>,1>::count; ++facet_index)
+    {
       TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<2>>::orientation(facet_index), 1);
+    }
 
     for(int facet_index(0); facet_index < FaceTraits<Simplex<3>,2>::count; ++facet_index)
+    {
       TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::orientation(facet_index), 1);
+    }
   }
 } shape_test;

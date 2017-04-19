@@ -430,8 +430,9 @@ namespace FEAT
         // define the trafo eval data
         typename TrafoEvaluator::template ConfigTraits<trafo_tags>::EvalDataType trafo_data;
 
-        // format output domain point
-        dom_point.format();
+        // initialise output domain point to cell centre
+        for(int i(0); i < shape_dim; ++i)
+          dom_point[i] = Shape::ReferenceCell<ShapeType>::centre<DataType>(i);
 
         // compute squared tolerance
         const DataType tol_sqr = Math::sqr(_newton_tol);

@@ -58,9 +58,6 @@ namespace FEAT
         // get our value type
         typedef typename VectorOut_::ValueType ValueType;
 
-        // define the reference cell type
-        typedef Shape::ReferenceCell<ShapeType> RefCell;
-
         // fetch the trafo and the mesh
         const TrafoType& trafo(space.get_trafo());
         const MeshType& mesh(space.get_mesh());
@@ -131,7 +128,7 @@ namespace FEAT
             // initialise domain point
             for(int i(0); i < shape_dim; ++i)
             {
-              dom_point[i] = DataType(RefCell::coord(k, i));
+              dom_point[i] = Shape::ReferenceCell<ShapeType>::vertex<DataType>(k, i);
             }
 
             // compute trafo data
