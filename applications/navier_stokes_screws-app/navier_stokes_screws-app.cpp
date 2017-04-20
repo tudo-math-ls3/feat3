@@ -1895,8 +1895,10 @@ struct NavierStokesScrewsApp
         // Add the convection term on the rhs if convection is treated explicitly
         if(convection == Convection::expl)
         {
-          burgers_rhs_conv.assemble(
-            the_domain_level.space_velo, cubature, vec_conv.local(), nullptr, &vec_rhs_v.local());
+          //burgers_rhs_conv.assemble(
+            //the_domain_level.space_velo, cubature, vec_conv.local(), nullptr, &vec_rhs_v.local());
+          burgers_rhs_conv.assemble_vector(
+            vec_rhs_v.local(), vec_conv.local(), vec_conv.local(), the_domain_level.space_velo, cubature);
           // Now we clear it so later, it contains only -mesh_velocity for assembling the matrix
           vec_conv.format();
         }
@@ -1906,9 +1908,12 @@ struct NavierStokesScrewsApp
         {
           // Does the old velocity have to be filtered with the new BCs? - I think not!
           //filter_v.filter_sol(vec_sol_v.at(step+Index(1)));
-          burgers_rhs_mass.assemble(
-            the_domain_level.space_velo, cubature, vec_sol_v.at(step+Index(1)).local(),
-            nullptr, &vec_rhs_v.local(), DataType(0), time_disc.coeff_rhs_v_v.at(step));
+          //burgers_rhs_mass.assemble(
+            //the_domain_level.space_velo, cubature, vec_sol_v.at(step+Index(1)).local(),
+            //nullptr, &vec_rhs_v.local(), DataType(0), time_disc.coeff_rhs_v_v.at(step));
+          burgers_rhs_mass.assemble_vector(
+            vec_rhs_v.local(), vec_sol_v.at(step+Index(1)).local(), vec_sol_v.at(step+Index(1)).local(),
+            the_domain_level.space_velo, cubature, time_disc.coeff_rhs_v_v.at(step));
         }
 
         // Add psi gradient on rhs
@@ -1956,7 +1961,8 @@ struct NavierStokesScrewsApp
           auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
           typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
           loc_mat_a.format();
-          burgers_mat.assemble(extruded_dom_ctrl.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
+          //burgers_mat.assemble(extruded_dom_ctrl.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
+          burgers_mat.assemble_matrix(loc_mat_a, vec_cv, extruded_dom_ctrl.at(i)->space_velo, cubature);
         }
         watch_asm_mat.stop();
 

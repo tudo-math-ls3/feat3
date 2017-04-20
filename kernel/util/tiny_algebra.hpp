@@ -1097,6 +1097,19 @@ namespace FEAT
       }
 
       /**
+       * \brief Adds a value onto the matrix's main diagonal.
+       *
+       * \param[in] alpha
+       * The value that is to be added onto the main diagonal.
+       */
+      Matrix& add_scalar_main_diag(DataType alpha)
+      {
+        for(int i(0); (i < m_) && (i < n_); ++i)
+          v[i][i] += alpha;
+        return *this;
+      }
+
+      /**
        * \brief Adds the algebraic matrix-product of two other matrices onto this matrix.
        *
        * Let \e C denote \c this matrix, and let \e A denote the left m-by-l matrix and \e B the right l-by-n matrix,

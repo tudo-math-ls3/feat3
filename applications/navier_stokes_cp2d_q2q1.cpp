@@ -694,6 +694,7 @@ namespace NavierStokesCP2D
 
     /* ***************************************************************************************** */
 
+    comm.print("");
     comm.print("Assembling gates...");
 
     for (Index i(0); i < num_levels; ++i)
@@ -1031,7 +1032,8 @@ namespace NavierStokesCP2D
       watch_asm_rhs.start();
       vec_rhs_v.format();
       vec_rhs_p.format();
-      burgers_rhs.assemble(the_domain_level.space_velo, cubature, vec_sol_v.local(), nullptr, &vec_rhs_v.local());
+      burgers_rhs.assemble_vector(
+        vec_rhs_v.local(), vec_sol_v.local(), vec_sol_v.local(), the_domain_level.space_velo, cubature);
       vec_rhs_v.sync_0();
 
       // subtract pressure (?)
@@ -1068,15 +1070,15 @@ namespace NavierStokesCP2D
             auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
             typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
             loc_mat_a.format();
-            burgers_mat.assemble(domain.at(i)->space_velo, cubature, vec_cv, &loc_mat_a, nullptr);
+            burgers_mat.assemble_matrix(loc_mat_a, vec_cv, domain.at(i)->space_velo, cubature);
           }
         }
         else
         {
           // assemble burgers matrices on finest level
           the_system_level.matrix_a.local().format();
-          burgers_mat.assemble(the_domain_level.space_velo, cubature, vec_conv.local(),
-            &the_system_level.matrix_a.local(), nullptr);
+          burgers_mat.assemble_matrix(
+            the_system_level.matrix_a.local(), vec_conv.local(), the_domain_level.space_velo, cubature);
         }
         watch_asm_mat.stop();
 
