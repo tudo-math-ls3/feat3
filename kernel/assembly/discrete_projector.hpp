@@ -128,7 +128,7 @@ namespace FEAT
             // initialise domain point
             for(int i(0); i < shape_dim; ++i)
             {
-              dom_point[i] = Shape::ReferenceCell<ShapeType>::vertex<DataType>(k, i);
+              dom_point[i] = Shape::ReferenceCell<ShapeType>::template vertex<DataType>(k, i);
             }
 
             // compute trafo data

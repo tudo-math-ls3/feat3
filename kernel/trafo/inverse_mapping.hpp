@@ -432,7 +432,7 @@ namespace FEAT
 
         // initialise output domain point to cell centre
         for(int i(0); i < shape_dim; ++i)
-          dom_point[i] = Shape::ReferenceCell<ShapeType>::centre<DataType>(i);
+          dom_point[i] = Shape::ReferenceCell<ShapeType>::template centre<DataType>(i);
 
         // compute squared tolerance
         const DataType tol_sqr = Math::sqr(_newton_tol);

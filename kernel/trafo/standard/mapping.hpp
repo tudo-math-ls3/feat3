@@ -149,7 +149,7 @@ namespace FEAT
           for(int i(0); i < num_coeff_facet; ++i)
           {
             for(int d(0); d < ShapeType::dimension - 1 ; ++d)
-              xloc(i,d) = Shape::ReferenceCell<FacetType>::vertex<CoordType>(i,d);
+              xloc(i,d) = Shape::ReferenceCell<FacetType>::template vertex<CoordType>(i,d);
           }
 
           // The Jacobian matrix of the transformation
