@@ -1,9 +1,4 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:3:3">
-  <Info>
-    This is a mesh for the C3D0 benchmark aka
-    the 3D "flow around a cylinder" benchark
-    This mesh consists of 128 hexahedral cells.
-  </Info>
   <Chart name="circle">
     <Extrude>
       <Circle radius="0.05" midpoint="0.5 0.2" domain="0.5 -0.5" />
@@ -2367,6 +2362,112 @@
       427
       408
       399
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:l" parent="root" topology="none" size="15 22 8 0">
+    <Mapping dim="0">
+      12
+      13
+      14
+      57
+      58
+      59
+      102
+      103
+      104
+      147
+      148
+      149
+      192
+      193
+      194
+    </Mapping>
+    <Mapping dim="1">
+      23
+      24
+      100
+      101
+      177
+      178
+      254
+      255
+      331
+      332
+      397
+      398
+      399
+      442
+      443
+      444
+      487
+      488
+      489
+      532
+      533
+      534
+    </Mapping>
+    <Mapping dim="2">
+      183
+      184
+      260
+      261
+      337
+      338
+      414
+      415
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:u" parent="root" topology="none" size="15 22 8 0">
+    <Mapping dim="0">
+      15
+      16
+      17
+      60
+      61
+      62
+      105
+      106
+      107
+      150
+      151
+      152
+      195
+      196
+      197
+    </Mapping>
+    <Mapping dim="1">
+      25
+      26
+      102
+      103
+      179
+      180
+      256
+      257
+      333
+      334
+      400
+      401
+      402
+      445
+      446
+      447
+      490
+      491
+      492
+      535
+      536
+      537
+    </Mapping>
+    <Mapping dim="2">
+      185
+      186
+      262
+      263
+      339
+      340
+      416
+      417
     </Mapping>
   </MeshPart>
   <Partition name="auto" priority="1" level="0" size="2 128">

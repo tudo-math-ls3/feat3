@@ -502,7 +502,7 @@ namespace NavierStokesCP2D
     // Setup: flow around a cylinder
     void setup_bench1()
     {
-      mesh_file = "bench1-quad.xml";
+      mesh_file = "flowbench_c2d_00_quad_130.xml";
       part_name_in = "bnd:l";
       part_name_out = "bnd:r";
       level_min = level_min_in = Index(0);
@@ -520,7 +520,7 @@ namespace NavierStokesCP2D
     // Setup: flow around a cylinder
     void setup_c2d0()
     {
-      mesh_file = "c2d0-32-quad.xml";
+      mesh_file = "flowbench_c2d_01_quad_32.xml";
       part_name_in = "bnd:l";
       part_name_out = "bnd:r";
       level_min = level_min_in = Index(0);

@@ -1,11 +1,12 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Info>
-    This is a mesh for the C2D0 benchmark aka "bench1" aka
-    the 2D "flow around a cylinder" benchmark.
+    This mesh is the 2D plane of the 3D "flow around a cylinder" benchmark,
+    which can be used to generate a 3D hexa mesh using the mesh-extruder tool.
+    Note that the domain is slightly different from the 2D case.
     This mesh consists of 32 quadrilateral cells.
   </Info>
   <Chart name="circle">
-    <Circle radius="0.05" midpoint="0.2 0.2" domain="0.5 -0.5" />
+    <Circle radius="0.05" midpoint="0.5 0.2" domain="0.5 -0.5" />
   </Chart>
   <Mesh type="conformal:hypercube:2:2" size="45 77 32">
     <Vertices>
@@ -14,85 +15,85 @@
       0.00 0.20
       0.00 0.30
       0.00 0.41
-      0.08 0.20
-      0.15 0.20
-      0.20 0.00
-      0.20 0.08
-      0.20 0.15
-      0.20 0.25
-      0.20 0.32
-      0.20 0.41
+      0.25 0.00
+      0.25 0.10
       0.25 0.20
-      0.32 0.20
-      0.40 0.00
-      0.40 0.10
-      0.40 0.20
-      0.40 0.30
-      0.40 0.41
-      0.70 0.00
-      0.70 0.10
-      0.70 0.20
-      0.70 0.30
-      0.70 0.41
-      1.00 0.00
-      1.00 0.10
-      1.00 0.20
-      1.00 0.30
-      1.00 0.41
-      1.35 0.00
-      1.35 0.10
-      1.35 0.20
-      1.35 0.30
-      1.35 0.41
-      1.75 0.00
-      1.75 0.10
-      1.75 0.20
-      1.75 0.30
-      1.75 0.41
-      2.20 0.00
-      2.20 0.10
-      2.20 0.20
-      2.20 0.30
-      2.20 0.41
+      0.25 0.30
+      0.25 0.41
+      0.38 0.20
+      0.45 0.20
+      0.50 0.00
+      0.50 0.08
+      0.50 0.15
+      0.50 0.25
+      0.50 0.32
+      0.50 0.41
+      0.55 0.20
+      0.62 0.20
+      0.75 0.00
+      0.75 0.10
+      0.75 0.20
+      0.75 0.30
+      0.75 0.41
+      1.10 0.00
+      1.10 0.10
+      1.10 0.20
+      1.10 0.30
+      1.10 0.41
+      1.50 0.00
+      1.50 0.10
+      1.50 0.20
+      1.50 0.30
+      1.50 0.41
+      2.00 0.00
+      2.00 0.10
+      2.00 0.20
+      2.00 0.30
+      2.00 0.41
+      2.50 0.00
+      2.50 0.10
+      2.50 0.20
+      2.50 0.30
+      2.50 0.41
     </Vertices>
     <Topology dim="1">
       1 0
       2 1
       3 2
       4 3
-      0 7
-      1 8
-      2 5
-      3 11
-      12 4
-      5 8
-      9 6
+      0 5
+      1 6
+      2 7
+      3 8
+      9 4
       5 6
-      6 10
-      5 11
+      6 7
       7 8
       8 9
-      10 11
-      11 12
-      8 14
-      13 9
-      13 14
-      10 13
-      11 14
-      7 15
+      5 12
+      6 13
+      7 10
       8 16
-      14 17
-      11 18
-      19 12
+      17 9
+      10 13
+      14 11
+      10 11
+      11 15
+      10 16
+      12 13
+      13 14
       15 16
       16 17
-      17 18
+      13 19
+      18 14
       18 19
-      15 20
-      16 21
-      17 22
-      18 23
-      24 19
+      15 18
+      16 19
+      12 20
+      13 21
+      19 22
+      16 23
+      24 17
       20 21
       21 22
       22 23
@@ -135,22 +136,22 @@
       43 44
     </Topology>
     <Topology dim="2">
-      0 7 1 8
-      1 8 2 5
-      2 5 3 11
-      3 11 4 12
-      5 8 6 9
-      6 10 5 11
-      8 14 9 13
+      0 5 1 6
+      1 6 2 7
+      2 7 3 8
+      3 8 4 9
+      5 12 6 13
+      6 13 7 10
+      7 10 8 16
+      8 16 9 17
       10 13 11 14
-      7 15 8 16
-      8 16 14 17
-      14 17 11 18
-      11 18 12 19
-      15 20 16 21
-      16 21 17 22
-      17 22 18 23
-      18 23 19 24
+      11 15 10 16
+      13 19 14 18
+      15 18 16 19
+      12 20 13 21
+      13 21 19 22
+      19 22 16 23
+      16 23 17 24
       20 25 21 26
       21 26 22 27
       22 27 23 28
@@ -202,8 +203,8 @@
   <MeshPart name="bnd:b" parent="root" topology="none" size="8 7">
     <Mapping dim="0">
       0
-      7
-      15
+      5
+      12
       20
       25
       30
@@ -212,7 +213,7 @@
     </Mapping>
     <Mapping dim="1">
       4
-      23
+      13
       32
       41
       50
@@ -227,8 +228,8 @@
       34
       29
       24
-      19
-      12
+      17
+      9
       4
     </Mapping>
     <Mapping dim="1">
@@ -237,7 +238,7 @@
       54
       45
       36
-      27
+      17
       8
     </Mapping>
   </MeshPart>
@@ -249,17 +250,17 @@
       3 4
     </Topology>
     <Mapping dim="0">
-      6
-      10
-      13
-      9
-      6
+      11
+      15
+      18
+      14
+      11
     </Mapping>
     <Mapping dim="1">
-      12
       21
+      30
+      28
       19
-      10
     </Mapping>
     <Attribute name="param" dim="1">
       0
@@ -269,14 +270,37 @@
       1
     </Attribute>
   </MeshPart>
+  <MeshPart name="inner:u" parent="root" topology="none" size="3 2">
+    <Mapping dim="0">
+      15
+      16
+      17
+    </Mapping>
+    <Mapping dim="1">
+      25
+      26
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:l" parent="root" topology="none" size="3 2">
+    <Mapping dim="0">
+      12
+      13
+      14
+    </Mapping>
+    <Mapping dim="1">
+      23
+      24
+    </Mapping>
+  </MeshPart>
+
   <Partition name="auto" priority="1" level="0" size="2 32">
     <Patch rank="0" size="16">
       0
       1
       4
-      6
+      5
       8
-      9
+      10
       12
       13
       16
@@ -291,9 +315,9 @@
     <Patch rank="1" size="16">
       2
       3
-      5
+      6
       7
-      10
+      9
       11
       14
       15
@@ -312,18 +336,18 @@
       0
       1
       4
-      6
+      5
       8
-      9
+      10
       12
       13
     </Patch>
     <Patch rank="1" size="8">
       2
       3
-      5
+      6
       7
-      10
+      9
       11
       14
       15
@@ -345,106 +369,6 @@
       23
       26
       27
-      30
-      31
-    </Patch>
-  </Partition>
-  <Partition name="auto" priority="1" level="0" size="8 32">
-    <Patch rank="0" size="4">
-      0
-      1
-      4
-      6
-    </Patch>
-    <Patch rank="1" size="4">
-      2
-      3
-      5
-      7
-    </Patch>
-    <Patch rank="2" size="4">
-      8
-      9
-      12
-      13
-    </Patch>
-    <Patch rank="3" size="4">
-      10
-      11
-      14
-      15
-    </Patch>
-    <Patch rank="4" size="4">
-      16
-      17
-      20
-      21
-    </Patch>
-    <Patch rank="5" size="4">
-      18
-      19
-      22
-      23
-    </Patch>
-    <Patch rank="6" size="4">
-      24
-      25
-      28
-      29
-    </Patch>
-    <Patch rank="7" size="4">
-      26
-      27
-      30
-      31
-    </Patch>
-  </Partition>
-  <Partition name="other" priority="1" level="0" size="8 32">
-    <Patch rank="0" size="4">
-      0
-      1
-      2
-      3
-    </Patch>
-    <Patch rank="1" size="4">
-      4
-      5
-      6
-      7
-    </Patch>
-    <Patch rank="2" size="4">
-      8
-      9
-      10
-      11
-    </Patch>
-    <Patch rank="3" size="4">
-      12
-      13
-      14
-      15
-    </Patch>
-    <Patch rank="4" size="4">
-      16
-      17
-      18
-      19
-    </Patch>
-    <Patch rank="5" size="4">
-      20
-      21
-      22
-      23
-    </Patch>
-    <Patch rank="6" size="4">
-      24
-      25
-      26
-      27
-    </Patch>
-    <Patch rank="7" size="4">
-      28
-      29
       30
       31
     </Patch>

@@ -452,6 +452,32 @@
       143
     </Mapping>
   </MeshPart>
+  <MeshPart name="inner:u" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      2
+      10
+      18
+      32
+    </Mapping>
+    <Mapping dim="1">
+      5
+      27
+      53
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:l" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      31
+      22
+      14
+      6
+    </Mapping>
+    <Mapping dim="1">
+      52
+      35
+      17
+    </Mapping>
+  </MeshPart>
   <Partition name="auto" priority="1" level="0" size="2 64">
     <Patch rank="0" size="32">
       0

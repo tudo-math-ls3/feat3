@@ -1,7 +1,8 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Info>
-    This is the bench1 mesh-file, which defines the standard
-    mesh for the famous 2D "flow around a cylinder" benchmark.
+    This is a mesh for the 2D "flow around a cylinder" benchmark.
+    This mesh consists of 130 quadrilateral cells.
+    This is the mesh that was used in the old FEAT versions.
   </Info>
   <Chart name="outer">
     <Spline dim="2" size="5" type="closed">
@@ -871,5 +872,31 @@
       0.875
       1
     </Attribute>
+  </MeshPart>
+  <MeshPart name="inner:u" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      2
+      144
+      14
+      37
+    </Mapping>
+    <Mapping dim="1">
+      240
+      243
+      234
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:l" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      26
+      22
+      153
+      10
+    </Mapping>
+    <Mapping dim="1">
+      6
+      266
+      270
+    </Mapping>
   </MeshPart>
 </FeatMeshFile>
