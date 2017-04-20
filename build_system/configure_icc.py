@@ -81,6 +81,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
       cxxflags += " -xCORE-AVX-I"
     elif cpu == "broadwell":
       cxxflags += " -xCORE-AVX-I"
+    elif cpu == "knightslanding":
+      cxxflags += " -xMIC-AVX512"
     elif cpu == "skylake":
       cxxflags += " -xCORE-AVX-I"
     elif cpu == "itanium":

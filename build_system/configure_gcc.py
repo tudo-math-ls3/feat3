@@ -143,6 +143,12 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -march=nocona -m64"
     elif cpu == "itanium2":
       cxxflags += " -march=itanium2"
+    elif cpu == "knightslanding":
+      if (major == 5 and minor >= 2)  or (major > 5):
+        cxxflags += " -march=knl"
+      else:
+        print ("Warning: Your gcc compiler is too old for knightslanding support!")
+
 
     # AMD
     elif cpu == "amd486":
