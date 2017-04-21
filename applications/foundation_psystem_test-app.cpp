@@ -104,7 +104,7 @@ void check_psynch_meshstreamer()
   std::stringstream synchstream;
   std::string file_prefix(FEAT_SRC_DIR);
   std::string filename(file_prefix);
-  filename += "/data/meshes/bench1-quad.xml";
+  filename += "/data/meshes/flowbench_c2d_00_quad_130.xml";
 
   if(comm.rank() == 0)
   {
