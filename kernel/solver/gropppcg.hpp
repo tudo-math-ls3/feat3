@@ -307,33 +307,33 @@ namespace FEAT
      * The preconditioner. May be \c nullptr.
      *
      * \returns
-     * A shared pointer to a new PipePCG object.
+     * A shared pointer to a new GroppPCG object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PipePCG<Matrix_, Filter_>> new_gropppcg(
+    inline std::shared_ptr<GroppPCG<Matrix_, Filter_>> new_gropppcg(
       const String& section_name, PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
     {
-      return std::make_shared<PipePCG<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
+      return std::make_shared<GroppPCG<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
     }
 
     template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<PipePCG<Matrix_, Filter_>> new_gropppcg(
+    inline std::shared_ptr<GroppPCG<Matrix_, Filter_>> new_gropppcg(
       const String& section_name, PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
     {
-      return std::make_shared<PipePCG<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+      return std::make_shared<GroppPCG<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
 #else
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PipePCG<Matrix_, Filter_>> new_gropppcg(
+    inline std::shared_ptr<GroppPCG<Matrix_, Filter_>> new_gropppcg(
       const String& section_name, PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {
-      return std::make_shared<PipePCG<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
+      return std::make_shared<GroppPCG<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
 #endif
   } // namespace Solver
