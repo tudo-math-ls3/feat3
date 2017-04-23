@@ -165,19 +165,7 @@ namespace Tutorial03
     class Evaluator :
       public Assembly::BilinearOperator::Evaluator<AsmTraits_>
     {
-    protected:
-      // The first thing that we require is again a const reference to our data object:
-      const AndicoreData& _data;
-
     public:
-      // And now the constructor: An instance of this evaluator class is created by the assembler,
-      // which passes a const reference to the corresponding operator to the evaluator's constructor.
-      // By this approach, we can get the reference to our data object:
-      explicit Evaluator(const AndicoreOperator& operat) :
-        _data(operat._data)
-      {
-      }
-
       // The assembly traits class 'AsmTraits_' contains a handful of typedefs which we require.
       // The first type is the trafo data, which contains all required data from the transformation
       // in the current cubature point. This includes e.g. the coordinates of the current point,
@@ -198,6 +186,19 @@ namespace Tutorial03
 
       // Finally, we also need the DataType typedef.
       typedef typename AsmTraits_::DataType DataType;
+
+    protected:
+      // The first thing that we require is again a const reference to our data object:
+      const AndicoreData& _data;
+
+    public:
+      // And now the constructor: An instance of this evaluator class is created by the assembler,
+      // which passes a const reference to the corresponding operator to the evaluator's constructor.
+      // By this approach, we can get the reference to our data object:
+      explicit Evaluator(const AndicoreOperator& operat) :
+        _data(operat._data)
+      {
+      }
 
       // As all other evaluator classes (e.g. the one from the analytic function in
       // 'tutorial_02_laplace'), also the bilinear operator evaluator has a 'prepare-finish'
@@ -286,10 +287,7 @@ namespace Tutorial03
     class Evaluator :
       public Assembly::LinearFunctional::Evaluator<AsmTraits_>
     {
-    protected:
-      // As usual, a reference to our data object:
-      const AndicoreData& _data;
-
+    public:
       // The 'AsmTraits_' class template, which is passed to this evaluator template by the
       // assembler, is the same as the one passed on for bilinear operators, so we can again
       // query our required types from it. As functionals do not operate on trial basis functions,
@@ -317,13 +315,14 @@ namespace Tutorial03
 
       // Return value of the analytic function, can be scalar or vector-valued in general but is scalar here
       // Has to be public for the ForceFunctional
-    public:
       typedef typename AnalyticEvalTraits::ValueType ValueType;
-
-    protected:
 
       // With that type, we can now define the type of the solution function evaluator:
       typedef typename SolFunction_::template Evaluator<AnalyticEvalTraits> SolEvaluator;
+
+    protected:
+      // As usual, a reference to our data object:
+      const AndicoreData& _data;
 
       // Now, declare one of those solution function evaluators:
       SolEvaluator _sol_eval;
@@ -388,7 +387,7 @@ namespace Tutorial03
       // for bilinear operators, with the only difference being that there is no trial function.
       // It takes a const reference to the test-function data object as a parameter
       // and returns the evaluation of the functional in the current cubature point:
-      DataType operator()(const TestBasisData& psi) const
+      ValueType operator()(const TestBasisData& psi) const
       {
         // As we have already computed the value of our force functional in the "set_point" function
         // above, we just need to multiply by the function value of 'psi':
