@@ -172,8 +172,18 @@ namespace Tutorial05
     std::deque<std::shared_ptr<Level>> levels;
 
     // Now we need to create our level hierarchy. For this, we will use the
-    // RefinedUnitCubeFactory to generate the coarse mesh on the desired level, and then
-    // successively refine the mesh by using the StandardRefinery.
+    // RefinedUnitCubeFactory to generate the coarse mesh on the desired level,
+    // and then successively refine the mesh by using the StandardRefinery.
+
+    // At this point we have to choose in which order we want to store our level hierarchy:
+    // coarse-to-fine or fine-to-coarse?
+    // The answer is: fine-to-coarse, i.e. the first entry in our level deque stores the
+    // finest mesh level, whereas the last entry in our deque stores the coarsest mesh level.
+    // This may seem unintuitive at first, but there is indeed a good reason to do so when
+    // it comes to setting up a parallel multigrid on hierarchic partitions. This goes far
+    // beyond the scope of this tutorial, so we merely stick to this convention for consistency,
+    // as it is used by all the "real-world" parallel applications. So keep in mind:
+    // the finest level is at the front of the deque, the coarest level at its back.
 
     // First of all, let's create the coarse level
     {
@@ -183,7 +193,7 @@ namespace Tutorial05
       Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level_min);
 
       // Allocate a new level using the factory and append it to our level deque:
-      levels.push_back(std::make_shared<Level>(mesh_factory));
+      levels.push_front(std::make_shared<Level>(mesh_factory));
     }
 
     // Now, let's refine up to the maximum level
@@ -194,10 +204,12 @@ namespace Tutorial05
       // The StandardRefinery is another mesh factory class, which creates a new mesh by
       // applying the "standard-regular-refinement" algorithm onto a given input mesh.
       // Create a StandardRefinery object and pass the last mesh to its constructor.
-      Geometry::StandardRefinery<MeshType> mesh_factory(levels.back()->mesh);
+      Geometry::StandardRefinery<MeshType> mesh_factory(levels.front()->mesh);
 
-      // Allocate the next level using the mesh factory and append it to our deque:
-      levels.push_back(std::make_shared<Level>(mesh_factory));
+      // Allocate the next level using the mesh factory and append it to our deque.
+      // Remember that we have to push the new level to the front of the deque to achieve
+      // the desired "fine-to-coarse" ordering of the levels:
+      levels.push_front(std::make_shared<Level>(mesh_factory));
     }
 
     // At this point, the basic setup (mesh, trafo and space creation) of all levels is complete.
@@ -215,7 +227,7 @@ namespace Tutorial05
       std::cout << "Assembling Matrix and Filter for level " << ilevel << "..." << std::endl;
 
       // Get a reference to the corresponding level for easier member access
-      Level& lvl = *levels.at(std::size_t(ilevel - level_min));
+      Level& lvl = *levels.at(std::size_t(level_max - ilevel));
 
       // Assemble the Laplace matrix:
       Assembly::SymbolicAssembler::assemble_matrix_std1(lvl.matrix, lvl.space);
@@ -244,8 +256,8 @@ namespace Tutorial05
       std::cout << "Assembling Grid Transfer for level " << ilevel << "..." << std::endl;
 
       // Get references to the corresponding coarse and fine levels:
-      Level& lvl_coarse = *levels.at(std::size_t(ilevel - level_min));
-      Level& lvl_fine   = *levels.at(std::size_t(ilevel - level_min + 1));
+      Level& lvl_fine   = *levels.at(std::size_t(level_max - ilevel - 1));
+      Level& lvl_coarse = *levels.at(std::size_t(level_max - ilevel));
 
       // Now let's get the references to the internal prolongation and restriction matrices
       // of the transfer operator:
@@ -293,8 +305,8 @@ namespace Tutorial05
     // right-hand-side vector as well as an initial solution vector. Note that these vectors
     // are required only on the finest level, so there is no loop involved here.
 
-    // Get a reference to the finest level
-    Level& lvl_fine = *levels.back();
+    // Get a reference to the finest level at the front of the deque:
+    Level& lvl_fine = *levels.front();
 
     // Create solution and rhs vectors for the finest level
     VectorType vec_sol = lvl_fine.matrix.create_vector_r();
@@ -349,10 +361,10 @@ namespace Tutorial05
 
     // For each level above the coarse level, we have to create a smoother and attach it to the
     // hierarchy. So let' loop over all levels except for the coarse-most one in *descending* order:
-    for(Index ilevel(level_max); ilevel > level_min; --ilevel)
+    for(std::size_t i(0); (i+1) < levels.size(); ++i)
     {
       // Get a reference to the corresponding level
-      Level& lvl = *levels.at(std::size_t(ilevel - level_min));
+      Level& lvl = *levels.at(i);
 
       // Create a Jacobi preconditioner for the smoother
       auto jacobi = Solver::new_jacobi_precond(lvl.matrix, lvl.filter);
@@ -387,8 +399,8 @@ namespace Tutorial05
 
     // Finally, we have to set up the coarse level:
     {
-      // get a reference to the coarsest level
-      Level& lvl = *levels.front();
+      // Get a reference to the coarsest level at the back of the deque:
+      Level& lvl = *levels.back();
 
       // We use a simple (unpreconditioned) CG solver as a coarse-grid solver, so let's create one:
       auto coarse_solver = Solver::new_pcg(lvl.matrix, lvl.filter);
