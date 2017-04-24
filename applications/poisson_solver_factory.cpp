@@ -186,7 +186,7 @@ namespace PoissonDirichlet2D
 
     if (!Solver::status_success(result))
     {
-      comm.print("Solver execution FAILED, with status: ");
+      comm.print("Solver execution FAILED, with status: " + stringify(result));
     }
 
     double solver_toe(at.elapsed_now());
