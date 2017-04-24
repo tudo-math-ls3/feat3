@@ -8,6 +8,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/lagrange3/element.hpp>
+#include <kernel/space/p2bubble/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/space/hermite3/element.hpp>
 #include <kernel/space/argyris/element.hpp>
@@ -50,6 +51,8 @@ int main(int, char**)
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
     // Lagrange-2
     dump_basis< Space::Lagrange2::Element<TrafoType> >("2d_tria_lagrange-2.vtk");
+    // P2-Bubble
+    dump_basis< Space::P2Bubble::Element<TrafoType> >("2d_tria_p2-bubble.vtk");
     // Lagrange-3
     dump_basis< Space::Lagrange3::Element<TrafoType> >("2d_tria_lagrange-3.vtk");
     // Crouzeix-Raviart
