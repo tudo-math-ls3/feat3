@@ -222,7 +222,6 @@ namespace FEAT
             }
             else if(need_diff && deformation)
             {
-              /// \todo figure out the correct scaling factor (1/2 ?, 1/4 ?)
               // assemble deformation-tensor diffusion
 
               // test function loop
@@ -231,14 +230,14 @@ namespace FEAT
                 // trial function loop
                 for(int j(0); j < num_loc_dofs; ++j)
                 {
-                  // compute inner product of  grad(phi) and grad(psi)
-                  const DataType value = nu * weight * Tiny::dot(space_data.phi[i].grad, space_data.phi[j].grad);
+                  // compute inner product of grad(phi) and grad(psi)
+                  const DataType value = nu * weight * Tiny::dot(space_data.phi[j].grad, space_data.phi[i].grad);
 
                   // update local matrix
                   local_matrix[i][j].add_scalar_main_diag(value);
 
                   // add outer product of grad(phi) and grad(psi)
-                  local_matrix[i][j].add_outer_product(space_data.phi[i].grad, space_data.phi[j].grad, nu*weight);
+                  local_matrix[i][j].add_outer_product(space_data.phi[j].grad, space_data.phi[i].grad, nu * weight);
                 }
               }
             }
@@ -486,7 +485,6 @@ namespace FEAT
             }
             else if(need_diff && deformation)
             {
-              /// \todo figure out the correct scaling factor (1/2 ?, 1/4 ?)
               // assemble deformation-tensor diffusion
 
               // test function loop
@@ -498,12 +496,12 @@ namespace FEAT
                   // compute inner product of grad(phi) and grad(psi)
                   const DataType value1 = nu * weight * Tiny::dot(space_data.phi[i].grad, space_data.phi[j].grad);
 
-                  // compute outerproduct of grad(phi) and grad(psi)
-                  const DataType value2 = nu * weight * Tiny::dot(local_prim_dofs[j], space_data.phi[j].grad);
+                  // compute outer product of grad(phi) and grad(psi)
+                  const DataType value2 = nu * weight * Tiny::dot(local_prim_dofs[j], space_data.phi[i].grad);
 
                   // update local vector
                   local_vector[i].axpy(value1, local_prim_dofs[j]);
-                  local_vector[i].axpy(value2, space_data.phi[i].grad);
+                  local_vector[i].axpy(value2, space_data.phi[j].grad);
                 }
               }
             }
