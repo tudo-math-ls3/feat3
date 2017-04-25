@@ -477,15 +477,7 @@ if (not nomkl):
   addition = addition + "-mkl"
 
 quadmath_add = ""
-gcc_major = 0
-gcc_minor = 0
 if is_found("g++"):
-  gcc_version = get_output("/usr/bin/g++ -dM -E -")
-  gcc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in gcc_version]))
-  gcc_major = int(gcc_version["__GNUC__"])
-  gcc_minor = int(gcc_version["__GNUC_MINOR__"])
-  gcc_minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
-if gcc_major > 4 or (gcc_major == 4 and gcc_minor > 5):
   quadmath_add = "-quadmath --ovr_mpi_ops"
 parmetis_add = ""
 if (not nothirdparty):
