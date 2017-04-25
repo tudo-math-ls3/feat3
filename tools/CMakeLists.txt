@@ -75,3 +75,8 @@ TARGET_LINK_LIBRARIES (mtx2tga feat)
 
 ADD_EXECUTABLE(resort-matrix io/resort_matrix.cpp)
 TARGET_LINK_LIBRARIES (resort-matrix feat)
+
+if (FEAT_HAVE_CUDA)
+  CUDA_ADD_EXECUTABLE(cuda-device-info cuda_device_info/cuda_device_info.cu)
+  TARGET_LINK_LIBRARIES (cuda-device-info feat)
+endif(FEAT_HAVE_CUDA)
