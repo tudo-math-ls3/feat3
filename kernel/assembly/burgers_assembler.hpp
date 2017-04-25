@@ -534,7 +534,7 @@ namespace FEAT
                 for(int j(0); j < num_loc_dofs; ++j)
                 {
                   // compute scalar value
-                  const DataType value = weight *  space_data.phi[i].value * space_data.phi[j].value;
+                  const DataType value = theta * weight *  space_data.phi[i].value * space_data.phi[j].value;
 
                   // update local vector
                   local_vector[i].axpy(value, local_prim_dofs[j]);
