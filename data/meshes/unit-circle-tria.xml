@@ -58,4 +58,14 @@
       4
     </Attribute>
   </MeshPart>
+  <Partition name="auto" priority="1" level="0" size="2 4">
+    <Patch rank="0" size="2">
+      0
+      1
+    </Patch>
+    <Patch rank="1" size="2">
+      2
+      3
+    </Patch>
+  </Partition>
 </FeatMeshFile>

@@ -1,0 +1,743 @@
+/** \page mesh_file_format FEAT Mesh File Format
+This page describes the structure of the FEAT mesh file format.
+
+\tableofcontents
+
+\section meshfile_basic Basic Information
+\todo basic info
+\todo encoding
+\todo basic parser info
+\todo comments
+\todo partitioner info
+
+\subsection meshfile_terminology Terminology
+\todo terminology
+
+
+\section meshfile_shape_numbering Topology Ordering
+This section describes the topology ordering for the four supported shapes.
+
+\note The edge and face numberings presented below are irrelevant for the documentation of the mesh file format,
+as mesh files dot not supply any information that would require their definition.
+These orderings are only documented here for the sake of completeness.
+
+\subsection meshfile_shape_numbering_tria Triangle Topology Ordering
+The ordering of the triangle topology is as follows:
+\image html images/shape_topo_tria2d.svg
+
+- The vertices (black) of a triangle are ordered in counter-clockwise manner.
+- The edges (red) of a triangle are also ordered in counter-clockwise manner,
+where edge 0 is on the opposite side of vertex 0.
+
+\subsection meshfile_shape_numbering_quad Quadrilateral Topology Ordering
+The ordering of the quadrilateral topology is as follows:
+\image html images/shape_topo_quad2d.svg
+
+- The vertices (black) of a quadrilateral are ordered in an S-shape zick-zack pattern.
+- The edges (red) of a quadrilateral are ordered in an alternating pattern:
+  - First, all edges parallel to the X-axis, sorted by their Y-coords.
+  - Then, all edges parallel to the Y-axis, sorted by their X-coords.
+
+\note This zick-zack pattern of the vertices is derived from the following idea:
+Assume that the quad represents the square [0,1]x[0,1], then the coordinates of
+a vertex are given by the binary digits of its index:
+  - vertex 0: (0,0)
+  - vertex 1: (0,1)
+  - vertex 2: (1,0)
+  - vertex 3: (1,1)
+
+\subsection meshfile_shape_numbering_tetra Tetrahedral Topology Ordering
+The ordering of the tetrahedron topology is as follows:
+\image html images/shape_topo_tetra3d.svg
+
+- The vertices (black) of a tetrahedron are ordered by the right-hand-rule.
+- The edges (red) of a tetrahedron are not ordered to any particular pattern,
+  as it seems that there exists no real useful pattern for tetrahedra edges.
+  - edge 0: (0, 1)
+  - edge 1: (0, 2)
+  - edge 2: (0, 3)
+  - edge 3: (1, 2)
+  - edge 4: (1, 3)
+  - edge 5: (2, 3)
+- The faces (blue) are of a tetrahedron are ordered by the right-hand-rule,
+  where face 0 is on the opposite side of vertex 0.
+  - face 0: (1, 2, 3)
+  - face 1: (0, 2, 3)
+  - face 2: (0, 1, 3)
+  - face 3: (0, 1, 2)
+
+\subsection meshfile_shape_numbering_hexa Hexahedral Topology Ordering
+The ordering of the hexahedron topology is as follows:
+\image html images/shape_topo_hexa3d.svg
+
+- The vertices (black) of a quadrilateral are ordered in an S-shape zick-zack pattern.
+- The edges (red) of a quadrilateral are ordered in an alternating pattern:
+  - First, all edges parallel to the X-axis, sorted by their YZ-coords.
+  - Then, all edges parallel to the Y-axis, sorted by their XZ-coords.
+  - Then, all edges parallel to the Z-axis, sorted by their XY-coords.
+- The faces (blue) of a quadrilateral are ordered in an alternating pattern:
+  - First, all faces parallel to the XY-plane, sorted by their Z-coords.
+  - Then, all faces parallel to the XZ-plane, sorted by their Y-coords.
+  - Then, all faces parallel to the YZ-plane, sorted by their X-coords.
+
+\note Just as for quadrilaterals, the zick-zack pattern of the vertex numbering
+for hexahedra is derived from the fact, that the binary digits of the vertex
+indices represent the vertex coordinates of the unit-cube.
+
+\subsection meshfile_meshtype Mesh Type Specification
+The meshtype value is a string consisting of four tokens joined by colons:
+\verbatim
+<class>:<shape>:<shape-dim>:<world-dim>
+\endverbatim
+where:
+- <c><class></c> is the mesh class\n
+  Currently, the only valid option is \c conformal, which represents an unstructured conformal mesh.
+- <c><shape></c> is the shape-type of the mesh elements\n
+  This can be one of the following:
+  - \c simplex if the elements are simplices (triangles, tetrahedra)
+  - \c hypercube if the elements are hypercubes (quadrilateral, hexahedra)
+- <c><shape-dim></c> is the shape dimension of the mesh elements:
+  - \c 2 for 2-dimensional shapes (triangles, quadrilaterals)
+  - \c 3 for 3-dimensional shaped (tetrahedra, hexahedra)
+- <c><world-dim></c> is the world dimension of the mesh, i.e. the number of coordinates per vertex
+  - <c><world-dim></c> is always equal to <c><shape-dim></c>, unless you have a surface mesh
+
+<b>Examples:</b>
+- <c>conformal:simplex:2:2</c> represents a 2D unstructured conformal triangular mesh
+- <c>conformal:simplex:3:3</c> represents a 3D unstructured conformal tetrahedral mesh
+- <c>conformal:hypercube:2:2</c> represents a 2D unstructured conformal quadrilateral mesh
+- <c>conformal:hypercube:3:3</c> represents a 3D unstructured conformal hexahedral mesh
+
+\section meshfile_file_structure Overall File Structure
+
+\verbatim
+ FeatMeshFile
+ +- Info
+ +- Chart
+ |  +- Circle
+ |  +- Sphere
+ |  +- Spline
+ |  |  +- Points
+ |  |  +- Params
+ |  +- SurfaceMesh
+ |  |  +- Vertices
+ |  |  +- Triangles
+ |  +- Extrude
+ |     +- Circle
+ |     +- Spline
+ +- Mesh
+ |  +- Vertices
+ |  +- Topology
+ +- MeshPart
+ |  +- Mapping
+ |  +- Topology
+ |  +- Attribute
+ +- Partition
+    +- Patch
+\endverbatim
+
+\section meshfile_root The Root Node
+
+The root node of all valid FEAT mesh files is the <c>FeatMeshFile</c> node.
+
+The root node can contain the following attributes:
+- \b version (mandatory): specifies the file version, must be equal to <c>1</c>
+- \b meshtype (optional): specifies the mesh type
+
+The \b meshtype attribute is optional and, if given, specifies the type of the root mesh that is stored in the mesh
+file. See \ref meshfile_meshtype for possible values for this attribute.
+This attribute is optional, because not all mesh files actually contain a root mesh, as they may just store
+charts, mesh-parts or partitions.
+
+\note Even if the file contains a root mesh, the \b meshtype attribute is not mandatory, but it is highly recommended to
+be declared, as some applications or tools (e.g. the <c>mesh2vtk</c> tool) may require this attribute to choose the
+correct execution path.
+
+\note It is recommended to obey the following rule of thumb:\n
+The mesh file root marker specifies the \b meshtype attribute <em>if and only if</em> the mesh file also contains the root mesh.
+
+\subsection meshfile_root_examples Examples
+In the most simple case, the root node is merely
+\code{.xml}
+<FeatMeshFile version="1">
+  ...
+</FeatMeshFile>
+\endcode
+
+If the mesh file contains a 2D quadrilateral mesh, then the root node would be
+\code{.xml}
+<FeatMeshFile version="1" meshtype="conformal:hypercube:2:2">
+  ...
+</FeatMeshFile>
+\endcode
+
+\section meshfile_charts Chart Description
+Charts are descriptions of geometric object like circles, spheres or splines, which are often used for parameterisation
+of domain boundaries or ficticious boundaries within the domain.
+
+Each chart is embedded in a seperate <c>Chart</c> node, whose one and only attribute is the mandatory \b name attribute,
+which specifies the unique name of the chart. See the following subsections for examples of this node.
+
+\subsection meshfile_chart_circle 2D Circle Chart Description
+The most simple chart is the \c Circle chart, which represents a simple 2D circle object.
+
+The Circle chart supports the following attributes:
+- \b radius (mandatory): the radius of the circle
+- \b midpoint (mandatory): the X- and Y-coordinates of the circle midpoint, separated by whitespace(s)
+- \b domain (optional): the left and right borders of the interval that is mapped onto the circle.
+
+\subsection meshfile_chart_circle_param Circle Parameterisation
+
+Let \f$m_x, m_y\f$ denote the coordinates of the circle midpoint, \f$r\f$ the circle radius and \f$d_L, d_R\f$
+the left and right domain interval borders, then the parameterisation of the circle is defined as follows:
+
+\f[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\f]
+\f[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\f]
+
+\subsubsection meshfile_chart_circle_examples 2D Circle Chart Examples
+A (unparameterised) circle of radius 0.2 around the midpoint (0.5, 1.0) named "myCircle" would be defined by:
+\code{.xml}
+<Chart name="myCircle">
+  <Circle radius="0.2" midpoint="0.5 1.0" />
+</Chart>
+\endcode
+
+A circle of radius 1 around the midpoint (0.7, 0.2) parameterised by the interval [0, 2]:
+\code{.xml}
+<Chart name="myCircle">
+  <Circle radius="1" midpoint="0.7 0.2" domain="0 2" />
+</Chart>
+\endcode
+
+
+\subsection meshfile_chart_sphere 3D Sphere Chart Description
+The \c Sphere chart is the 3D analogon of the \c Circle chart, which represents a 3D sphere object.
+
+The Sphere chart supports the following attributes:
+- \b radius (mandatory): the radius of the sphere
+- \b midpoint (mandatory): the X-, Y- and Z-coordinates of the sphere midpoint, separated by whitespace(s)
+
+\subsubsection meshfile_chart_sphere_examples 3D Sphere Chart Examples
+A sphere of radius 0.2 around the midpoint (0.5, 1.0, 0.7) named "mySphere" would be defined by:
+\code{.xml}
+<Chart name="mySphere">
+  <Sphere radius="0.2" midpoint="0.5 1 0.7"/>
+</Chart>
+\endcode
+
+\subsection meshfile_chart_spline 2D Spline Chart Description
+The \c Spline chart represents a 2D Bezier-Spline (aka "Polybezier" aka "composite Bezier curve"), which can be used
+to describe quite complex objects by a continuous composition of Bezier curves of possibly varying degree.
+
+Terminology:
+- A <b>vertex point</b> is a point which denotes the start and/or end of one ore more Bezier curve segment(s).\n
+  This includes the start- and end-points of the whole Spline as well as each inner point connecting two consecutive
+  Bezier curves.
+- A <b>control point</b> is a point which controls the shape of the Bezier curve segment spanned between two consecutive
+  vertex points.
+
+The \c Spline chart contains the following attributes:
+- \b dim (mandatory): specifies the dimension of the spline, must be equal to 2
+- \b size (mandatory): specifies the total number of vertex points of the spline
+- \b type (optional): specifies whether the spline is \b open or \b closed.
+  If not given, the spline is assumed to be open.
+- \b orientiation (optional): specifies the orientation of the spline, which may be either +1 or -1.
+  If not given, the spline is assumed to have positive orientation.
+
+\note
+If a spline is declared as \b closed, then it is silently assumed that the start- and end-vertex points of the spline
+coincide.
+
+Each \c Spline chart must contain a child node named <c>Points</c> which encapsulates the coordinates of the
+vertex and control points, see \ref meshfile_chart_spline_points for details.
+
+Furthermore, a \c Spline chart may also be parameterised. In this case, the spline need an additional child node
+named \c Params, which encapsulates the 1D parameters for the vertex points of the Spline, see
+\ref meshfile_chart_spline_params for details.
+
+\subsubsection meshfile_chart_spline_points Spline Points
+The \c Points node itself has no attributes, and its contents specify both the vertex points and the control points
+of the Spline. Each line corresponds to a single Spline segment, which consists of the start vertex point as well
+as all control points following that vertex point, encoded in the following way:
+\f[ n~ v_x~ v_y~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y\f]
+
+where
+- \e n specifies the number of control points for the segment
+- \f$v_x\f$ and \f$v_y\f$ specify the x- and y-coordinates of the vertex point, resp.
+- \f$c^k_x\f$ and \f$c^k_y\f$ specify the x- and y-coordinates of the <em>k</em>-th inner control point following the
+  vertex point, resp.
+
+\remark
+A Bezier curve without any inner control points is a simple line segment.
+
+\note
+The last vertex point of a spline must not have any control points.
+
+\subsubsection meshfile_chart_spline_params Spline Parameters
+A \c Spline chart may also be explicitly parameterised. In this case, the \c Spline node contains a child node named
+\c Params, which contain the 1D parameter values of the vertex points.
+
+\subsubsection meshfile_chart_spline_examples 2D Spline Chart Examples
+A Spline representing a simple line segment from (0.1, 0.5) to (0.7, 0.2) would be:
+\code{.xml}
+<Chart name="line">
+  <Spline dim="2" size="2" type="open">
+    <Points>
+      0 0.1 0.5
+      0 0.7 0.2
+    </Points>
+  </Spline>
+</Chart>
+\endcode
+
+A (closed) Spline representing the polyline forming the boundary of the unit-square [0,1] x [0,1], equidistantly
+parameterised over the 1D domain [0,4]:
+\code{.xml}
+<Chart name="square">
+  <Spline dim="2" size="5" type="closed">
+    <Points>
+      0 0 0
+      0 1 0
+      0 1 1
+      0 0 1
+      0 0 0
+    </Points>
+    <Params>
+      0.0
+      1.0
+      2.0
+      3.0
+      4.0
+    </Params>
+  </Spline>
+</Chart>
+\endcode
+
+Consider the (open) cubic Bezier curve spanned by the four points (0.1, 0.2), (0.3, 0.1), (0.5, 0.1) and (0.7, 0.3).
+This curve has two vertex points (the first and the last one) as well as two (inner) control points between the
+two vertex points, so in our encoding the two control points "belong" to the first vertex point, whereas the seond (last)
+vertex point has no control points:
+\code{.xml}
+<Chart name="curve">
+  <Spline dim="2" size="2" type="open">
+    <Points>
+      2 0.1 0.2 0.3 0.1 0.5 0.1
+      0 0.7 0.3
+    </Points>
+  </Spline>
+</Chart>
+\endcode
+
+A cubic Bezier spline with three vertex points (0,-0.5), (1,-0.2), (2,-0.5) and two (inner) control points for each of
+the two segments, equidistantly parameterised over the 1D domain [0,1]:
+\code{.xml}
+<Chart name="nozzle:b">
+  <Spline dim="2" size="3" type="open">
+    <Points>
+      2 0 -0.5 0.50 -0.5 0.65 -0.2
+      2 1 -0.2 1.35 -0.2 1.60 -0.35
+      0 2 -0.5
+    </Points>
+    <Params>
+      0.0
+      0.5
+      1.0
+    </Params>
+  </Spline>
+</Chart>
+\endcode
+
+\subsection meshfile_chart_surfmesh 3D SurfaceMesh Chart Description
+The \c SurfaceMesh chart represents a surface triangulation of a 3D object.
+
+A \c SurfaceMesh has the following attributes:
+- \b verts (mandatory): specifies the number of vertices in the triangulation
+- \b trias (mandatory): specifies the number of triangles in the triangulation
+
+The definition of a \c SurfaceMesh is pretty straight forward: it only contains
+two child nodes named \c Vertices and \c Triangles, which contain the
+vertex coordinate triplets and the triangle vertex index triplets, respr.
+
+\subsubsection meshfile_chart_surfmesh_examples 3D SurfaceMesh Chart Examples
+A surface triangulation of the 3D unit cube [0,1] x [0,1] x [0,1] consisting of
+8 vertices and 12 triangles:
+\code{.xml}
+<Chart name="cube">
+  <SurfaceMesh verts="8" trias="12">
+    <Vertices>
+      0.0 0.0 1.0
+      1.0 0.0 1.0
+      1.0 1.0 1.0
+      0.0 1.0 1.0
+      0.0 0.0 0.0
+      1.0 0.0 0.0
+      1.0 1.0 0.0
+      0.0 1.0 0.0
+    </Vertices>
+    <Triangles>
+      0 1 2
+      2 3 0
+      1 5 6
+      6 2 1
+      7 6 5
+      5 4 7
+      4 0 3
+      3 7 4
+      4 5 1
+      1 0 4
+      3 2 6
+      6 7 3
+    </Triangles>
+  </SurfaceMesh>
+</Chart>
+\endcode
+
+\subsection meshfile_chart_extrude 3D Extrude Chart Description
+The \c Extrude chart is a wrapper chart, which "converts" a 2D chart into a 3D chart by extruding it infinitely in
+positive and negative Z-direction.
+
+The \c Extrude chart supports the following 2D child charts:
+- \c Circle, see \ref meshfile_chart_circle
+- \c Spline, see \ref meshfile_chart_spline
+
+\subsubsection meshfile_chart_extrude_transform Transformation
+The \c Extrude chart supports the three attributes \c origin, \c offset and \c angles to define a "proper rigid
+transformation" (a transformation that consists only of translations and rotations) for the extruded chart.
+The transformation consists of two translation vectors \e v and \e w as well as a 3D rotation matrix \e R, which define
+the following transformation mapping:
+
+\f[ x \mapsto w + R \cdot(x - v)\f]
+
+Each of the three components is optional and can be specified by the following attributes:
+- \c origin: specifies the X- and Y-coordinates of the origin vector \e v, separated by whitespaces
+- \c offset: specifies the X-, Y- and Z-coordinates of the offset vector \e w, separated by whitespaces
+- \c angles: specifies the yaw, pitch and roll angles of the rotation matrix \e R, separated by whitespaces
+
+\attention
+The angles are given in revolutions (aka rotations aka full turns) rather than radians or degrees to avoid angles with
+a large number of digits for commonly used rotations.\n
+Note: 1 revolution = 360 degrees = 2&pi; radians
+
+\note
+Although using two translation vectors for a rigid transformation is redundant, this approach has been chosen as it
+is significantly less brain-twisting to define simple transformations this way.
+
+\subsubsection meshfile_chart_extrude_examples 3D Extrude Chart Examples
+Extruding a 2D \c Circle chart effectively yields a 3D cylinder:
+\code{.xml}
+<Chart name="cylinder">
+  <Extrude origin="0.5 1.0" offset="0.2 1.0 0.3" angles="0.1 0.5 0.0">
+    <Circle radius="0.2" midpoint="0.5 1.0"/>
+  </Extrude>
+</Chart>
+\endcode
+
+\section meshfile_mesh Root Mesh Description
+The \c RootMesh node defines the actual root mesh, i.e. the mesh that is used for the domain discretisation.
+Note that each mesh file can contain at most one root mesh.
+
+The \c RootMesh node has the following attributes:
+- \b type (mandatory): specifies the mesh type, see \ref meshfile_meshtype
+- \b size (mandatory): specifies the number of mesh entities, separated by whitespaces
+
+The root mesh is defined by two mandatory sets of information:
+- The vertices, i.e. the set of all coordinate tuples for each vertex, see \ref meshfile_mesh_vertices
+- The topologies, i.e. the sets of all vertex indices for each face of each dimension, see \ref meshfile_mesh_topology
+
+\subsection meshfile_mesh_vertices Vertices Description
+The \c Vertices child node specifies the set of all vertices of the mesh.
+
+This node does not have any attributes because:
+- The number of coordinates per vertices is specified by the \b type attribute of the parent \c RootMesh node.
+- The number of vertices in the mesh is specified by the \b size attribute of the parent \c RootMesh node.
+
+Each content line of the \c Vertices node specifies the coordinate tuple for one vertex, separated by whitespaces.
+
+See \ref meshfile_mesh_examples for examples.
+
+\subsection meshfile_mesh_topology Topology Description
+Each \c Topology child node specifies the topology for one entity dimension, i.e. the index tuple of all vertices
+adjacent to one entity (edge, triangle, etc).
+
+Each \c Topology node has one mandatory attribute \b dim, which specifies the dimension of the entities that the
+\c Topology refers to.
+
+\attention
+In the FEAT mesh file format, you need to specify \b all topologies up to the dimension of the root mesh,
+i.e. it is \b not sufficient to specify only the topology for the highest-dimensional shape!\n
+Example: if you have a 3D hexahedral mesh, then you need to explicitly specify the topologies of
+- the edges (dim = 1)
+- the quadrilaterals (dim = 2)
+- the hexahedra (dim = 3)
+
+See \ref meshfile_mesh_examples for examples.
+
+\subsection meshfile_mesh_examples RootMesh Examples
+\subsubsection meshfile_mesh_examples_2d_unit_square_quad 2D Quadrilateral Unit-Square
+The following example shows the definition of the unit-square mesh consisting of 4 vertices, 4 edges and 1 quadrilateral:
+\code{.xml}
+<Mesh type="conformal:hypercube:2:2" size="4 4 1">
+  <Vertices>
+    0 0
+    1 0
+    0 1
+    1 1
+  </Vertices>
+  <Topology dim="1">
+    0 1
+    2 3
+    0 2
+    1 3
+  </Topology>
+  <Topology dim="2">
+    0 1 2 3
+  </Topology>
+</Mesh>
+\endcode
+- Lines 2-7: the coordinates for the four vertices of the mesh
+- Lines 8-13: the vertex indices for the four edges of the mesh
+- Lines 14-16: the vertex indices for the one and only quadrilateral of the mesh
+
+\subsubsection meshfile_mesh_examples_2d_unit_circle_tria 2D Triangle Unit-Circle
+The following example shows the definition of the unit-circle mesh consisting of 5 vertices, 8 edges and 4 triangles:
+
+\code{.xml}
+  <Mesh type="conformal:simplex:2:2" size="5 8 4">
+    <Vertices>
+       1  0
+       0  1
+      -1  0
+       0 -1
+       0  0
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 0
+      0 4
+      1 4
+      2 4
+      3 4
+    </Topology>
+    <Topology dim="2">
+      0 1 4
+      1 2 4
+      2 3 4
+      3 0 4
+    </Topology>
+  </Mesh>
+\endcode
+- Lines 2-8: the coordinates for the five vertices of the mesh
+- Lines 9-18: the vertex indices for the eight edges of the mesh
+- Lines 19-24: the vertex indices for the four triangles of the mesh
+
+\subsubsection meshfile_mesh_examples_3d_cube_hexa 3D Hexahedral Unit-Cube
+The following example shows the definition of the unit-cube mesh consisting of 8 vertices, 12 edges, 6 quadrilaterals
+and 1 hexahedron:
+\code{.xml}
+<Mesh type="conformal:hypercube:3:3" size="8 12 6 1">
+  <Vertices>
+    0 0 0
+    1 0 0
+    0 1 0
+    1 1 0
+    0 0 1
+    1 0 1
+    0 1 1
+    1 1 1
+  </Vertices>
+  <Topology dim="1">
+    0 1
+    2 3
+    4 5
+    6 7
+    0 2
+    1 3
+    4 6
+    5 7
+    0 4
+    1 5
+    2 6
+    3 7
+  </Topology>
+  <Topology dim="2">
+    0 1 2 3
+    4 5 6 7
+    0 1 4 5
+    2 3 6 7
+    0 2 4 6
+    1 3 5 7
+  </Topology>
+  <Topology dim="3">
+    0 1 2 3 4 5 6 7
+  </Topology>
+</Mesh>
+\endcode
+- Lines 2-11: the coordinates for the eight vertices of the mesh
+- Lines 12-25: the vertex indices for the twelve edges of the mesh
+- Lines 26-33: the vertex indices for the six quadrilaterals of the mesh
+- Lines 34-36: the vertex indices for the one and only hexahedron of the mesh
+
+\section meshfile_meshpart Mesh-Part Description
+Mesh-parts are used to represent certain regions of interest of the root mesh such as e.g. boundary regions.
+In the most simple case, a mesh-part consists only of a list of vertices, edges, etc. of the root mesh that are
+assigned to that mesh-part. In more complex cases, mesh parts may have their own topology as well as sets of attributes
+that are assigned to the mesh-part's vertices and can be used for e.g. boundary parameterisation.
+
+A \c MeshPart node has the following attributes:
+- \b name (mandatory): a unique name for the mesh-part
+- \b parent (mandatory): specifies the name of the parent mesh; this must be <c>root</c>.
+- \b size (mandatory): specifies the number of mesh entities in the mesh part, separated by whitespaces.
+- \b topology (mandatory): specifies the type of the topology for the mesh part; must be one of:
+  - \c none: the mesh part does not have a topology
+  - \c full: the full topology for the mesh-part is explicitly given
+  - \c parent: the full topology is deducted automatically from the parent mesh
+- \b chart (optional): specifies the name of the chart for the parameterisation of the mesh-part.
+
+
+\subsection meshfile_meshpart_mapping Mapping Description
+A \c Mapping node specifies the (root) mesh entities that belong to the particular mesh-part.
+
+A \c Mapping node has only one mandatory attribute \b dim, which specifies the dimension that this
+\c Mapping node refers to.
+
+Each content line of a \c Mapping node contains the index of a single root mesh entity of the given dimension
+that is contained in this mesh part. Note that the indices don't need to be in any particular order.
+The number of entities in a \c Mapping node is given in the \b size attribute of the \c MeshPart node.
+
+\subsection meshfile_meshpart_topology Topology Description
+In analogy to the root mesh, also mesh-parts may have a topology defined on its entities. If the \b topology attribute
+of the \c MeshPart node is set to \c full, then the toplogy is specifies just the same way as for the root mesh.
+
+\attention
+If the \b topology attribute of the \c MeshPart node is set to \c parent, then the topology must \b not be specified
+explicitly by using \c Topology nodes, but it is automatically derived from the root mesh instead.
+
+\subsection meshfile_meshpart_attribute Attribute Description
+An \c Attribute node specifies a set of values (called attributes) assigned to the vertices of a mesh-part.
+
+\attention
+If a \c MeshPart node has at least one \c Attribute node, then it \b must specify a topology for the mesh-part.
+The topology may be either given explicitly or it may be derived from the root-mesh.
+
+An \c Attribute node has two attributes:
+- \b name (mandatory): the name of the attribute set.
+- \b dim (mandatory): the dimension of an attribute, i.e. the number of values assigned to a vertex.
+
+One special case of an attribute is the parameterisation, which is represented by the name \c param,
+which is used to define the (root mesh) vertex coordinates via the chart that the mesh-part is assigned to.
+
+\subsection meshfile_meshpart_examples MeshPart Examples
+
+\subsubsection meshfile_meshpart_example_unit_square_simple 2D Unit-Square Top Edge Mesh-Part
+The following example shows a mesh-part named \c bnd:t that consists of the two root-mesh vertices 3 and 2 as well as
+the root-mesh edge 1. This mesh-part is not assigned to any chart and does not have a topology. This mesh-part could be
+used for the \ref meshfile_mesh_examples_2d_unit_square_quad root mesh to represent the top boundary edge of the mesh.
+
+\code{.xml}
+  <MeshPart name="bnd:t" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      2
+      3
+    </Mapping>
+    <Mapping dim="1">
+      1
+    </Mapping>
+  </MeshPart>
+\endcode
+
+\subsubsection meshfile_meshpart_example_unit_circle 2D Unit-Circle Boundary Mesh-Part
+The following example mesh-part represents the parameterised boundary mesh-part of the
+\ref meshfile_mesh_examples_2d_unit_circle_tria root mesh.
+This mesh-part contains four vertices, where the first one is stored duplicated for the parameterisation, thus the
+total number of vertex indices is 5. The mesh-part contains all four boundary edges of the mesh.
+
+\code{.xml}
+  <MeshPart name="bnd:o" parent="root" chart="outer" topology="full" size="5 4">
+    <Mapping dim="0">
+      0
+      1
+      2
+      3
+      0
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+      2
+      3
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      1
+      2
+      3
+      4
+    </Attribute>
+  </MeshPart>
+\endcode
+
+\section meshfile_partition Partition Description
+
+A \c Partition node specifies a partitioning of the root mesh into a number of patches (aka sub-domains aka partitions).
+
+\todo talk about auto-partitioner
+
+A \c Partition node has the following attributes:
+- \b size (mandatory): specifies the number of patches and the number of elements of this partitioning, separated by a whitespace.
+- \b name (optional): specifies the name of the partitioning. If not given, the partition will remain unnamed.
+- \b level (optional): specifies the refinement level of the root mesh that this partition belongs to. If not given, level 0 is assumed.
+- \b priority (optional): specifies the priority of this partitioning. If not given, priority 0 is assumed.
+
+\subsection meshfile_partition_patch Patch Description
+A \c Patch node specifies the elements that belong to a specific patch/partition/sub-domain/process.
+
+A \c Patch node has the following attributes:
+- \b rank (mandatory): specifies the rank (i.e. process number) that this patch belongs to.
+- \b size (mandatory): specifies the number of elements for this patch.
+
+Each line of the \c Patch node specifies the index of one element that belongs to this patch.
+
+\subsection meshfile_partition_examples Partition Examples
+
+\subsubsection meshfile_partition_examples_unit_circle_tria 2D Unit-Circle Partitions
+The following partition is defined on the \ref meshfile_mesh_examples_2d_unit_circle_tria and subdivides the domain
+into 2 patches with 2 elements each.
+\code{.xml}
+  <Partition name="auto" priority="1" level="0" size="2 4">
+    <Patch rank="0" size="2">
+      0
+      1
+    </Patch>
+    <Patch rank="1" size="2">
+      2
+      3
+    </Patch>
+  </Partition>
+\endcode
+
+\subsubsection meshfile_partition_examples_unit_square_quad 2D Unit-Square Partitions
+The following partition is defined on the once refined \ref meshfile_mesh_examples_2d_unit_square_quad and subdivides
+the domain into 2 patches with 2 elements each.
+\code{.xml}
+  <Partition name="auto" priority="1" level="1" size="2 4">
+    <Patch rank="0" size="2">
+      0
+      1
+    </Patch>
+    <Patch rank="1" size="2">
+      2
+      3
+    </Patch>
+  </Partition>
+\endcode
+
+\author Peter Zajac
+**/
