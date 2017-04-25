@@ -228,6 +228,8 @@ for option in extra_options:
       print ("Error: multiple system_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
     system_host_compiler = option.replace("--system_host_compiler=", "", 1)
+    if not os.path.exists(system_host_compiler):
+      print ("Error: system_host_compiler " + system_host_compiler + " does not exist!")
     cmake_flags += " -DFEAT_SYSTEM_HOST_COMPILER=" + system_host_compiler
 
   if option.startswith("--cuda_host_compiler="):
@@ -235,12 +237,16 @@ for option in extra_options:
       print ("Error: multiple cuda_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
     cuda_host_compiler = option.replace("--cuda_host_compiler=", "", 1)
+    if not os.path.exists(cuda_host_compiler):
+      print ("Error: cuda_host_compiler " + cuda_host_compiler + " does not exist!")
 
   if option.startswith("--compiler="):
     if compiler:
       print ("Error: multiple compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
     compiler = option.replace("--compiler=", "", 1)
+    if not os.path.exists(compiler):
+      print ("Error: compiler " + compiler + " does not exist!")
 
   if option.startswith("--cuda_arch="):
     if cuda_arch:
