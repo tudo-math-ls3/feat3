@@ -944,13 +944,10 @@ namespace FEAT
       /**
        * \brief Extracts a patch from a manual partition
        *
-       * This function also computes the communication ranks and tags.
+       * This function also computes the communication ranks.
        *
        * \param[out] comm_ranks
        * The communication ranks vector for this rank.
-       *
-       * \param[out] comm_tags
-       * The communication tags vector for this rank.
        *
        * \param[in] partition
        * The partition from which the patch is to be extracted.
