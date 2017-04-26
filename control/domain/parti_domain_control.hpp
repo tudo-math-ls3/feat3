@@ -16,6 +16,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/parti_2lvl.hpp>
+#include <kernel/geometry/parti_iterative.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -63,6 +64,8 @@ namespace FEAT
         bool _allow_parti_manual;
         /// allow 2-level partitioner?
         bool _allow_parti_2level;
+        /// allow iterative partitioner?
+        bool _allow_parti_iterative;
         /// allow parmetis partitioner?
         bool _allow_parti_parmetis;
         /// allow fallback partitioner?
@@ -77,6 +80,9 @@ namespace FEAT
         std::shared_ptr<MeshNodeType> _base_mesh_node;
         /// our patch-mesh node
         std::shared_ptr<MeshNodeType> _patch_mesh_node;
+        //iterative partitioner specific values
+        double _time_init;
+        double _time_mutate;
 
       public:
         /// default constructor
@@ -89,11 +95,14 @@ namespace FEAT
           _base_mesh_level(0),
           _allow_parti_manual(true),
           _allow_parti_2level(true),
+          _allow_parti_iterative(true),
           _allow_parti_parmetis(true),
           _allow_parti_fallback(true),
           _min_elems_per_rank(4),
           _base_mesh_node(),
-          _patch_mesh_node()
+          _patch_mesh_node(),
+          _time_init(3.),
+          _time_mutate(3.)
         {
         }
 
@@ -116,6 +125,8 @@ namespace FEAT
           args.support("parti-type");
           args.support("parti-name");
           args.support("parti-rank-elems");
+          args.support("time-init");
+          args.support("time-mutate");
         }
 
         /**
@@ -135,13 +146,15 @@ namespace FEAT
             auto it = args.query("parti-type");
             if(it != nullptr)
             {
-              _allow_parti_manual = _allow_parti_parmetis = _allow_parti_fallback = false;
+              _allow_parti_manual = _allow_parti_parmetis = _allow_parti_fallback = _allow_parti_2level = _allow_parti_iterative = false;
               for(const auto& t : it->second)
               {
                 if(t == "manual")
                   _allow_parti_manual = true;
                 else if(t == "2level")
                   _allow_parti_2level = true;
+                else if(t == "iterative")
+                  _allow_parti_iterative = true;
                 else if(t == "parmetis")
                   _allow_parti_parmetis = true;
                 else if(t == "fallback")
@@ -169,6 +182,9 @@ namespace FEAT
             _adapt_mode << adapt_mode_string;
           }
 
+          args.parse("time-init", _time_init);
+          args.parse("time-mutate", _time_mutate);
+
           // okay
           return true;
         }
@@ -190,7 +206,7 @@ namespace FEAT
           auto parti_type_p = property_map->query("parti-type");
           if(parti_type_p.second)
           {
-             _allow_parti_manual = _allow_parti_parmetis = _allow_parti_fallback = false;
+              _allow_parti_manual = _allow_parti_parmetis = _allow_parti_fallback = _allow_parti_2level = _allow_parti_iterative = false;
 
              std::deque<String> allowed_partitioners;
              parti_type_p.first.split_by_charset(allowed_partitioners, " ");
@@ -201,6 +217,8 @@ namespace FEAT
                  _allow_parti_manual = true;
                else if(t == "2level")
                  _allow_parti_2level = true;
+               else if(t == "iterative")
+                 _allow_parti_iterative = true;
                else if(t == "parmetis")
                  _allow_parti_parmetis = true;
                else if(t == "fallback")
@@ -229,6 +247,18 @@ namespace FEAT
           if(parti_adapt_mode_p.second)
           {
             _adapt_mode << parti_adapt_mode_p.first;
+          }
+
+          auto time_init_p = property_map->query("time-init");
+          if(time_init_p.second)
+          {
+            _time_init = double(std::stod(time_init_p.first));
+          }
+
+          auto time_mutate_p = property_map->query("time-mutate");
+          if(time_mutate_p.second)
+          {
+            _time_mutate = double(std::stod(time_mutate_p.first));
           }
 
           return true;
@@ -470,6 +500,12 @@ namespace FEAT
           }
           // let's see whether we can apply the 2-level partitioner
           if(_allow_parti_2level && _create_partition_2level())
+          {
+            _have_partition = true;
+            return;
+          }
+          // let's see whether we can apply the iterative partitioner
+          if(_allow_parti_iterative && _create_partition_iterative())
           {
             _have_partition = true;
             return;
@@ -736,6 +772,36 @@ namespace FEAT
 
           // refine base mesh
           _refine_base_mesh_to_level(int(ref_lvl));
+
+          // get the patch graph
+          Adjacency::Graph elems_at_rank(partitioner.build_elems_at_rank());
+
+          // comm ranks and tags
+          std::vector<int> ranks;
+
+          // extract our patch
+          _patch_mesh_node = std::shared_ptr<MeshNodeType>(_base_mesh_node->extract_patch(ranks, elems_at_rank, rank));
+
+          // set neighbour ranks
+          this->_layers.front()->set_neighbour_ranks(ranks);
+
+          // okay
+          return true;
+        }
+
+        bool _create_partition_iterative()
+        {
+          // get rank and nprocs
+          int rank = this->_comm.rank();
+          Index nprocs = Index(this->_comm.size());
+
+          // refine base mesh if necessary
+          this->_refine_base_mesh_to_min_elems(nprocs);
+
+          // create a iterative partitioner
+          Geometry::PartiIterative<MeshType> partitioner(*_base_mesh_node->get_mesh(), this->_comm, _time_init, _time_mutate);
+
+          this->_comm.print("Found iterative partitionining");
 
           // get the patch graph
           Adjacency::Graph elems_at_rank(partitioner.build_elems_at_rank());
