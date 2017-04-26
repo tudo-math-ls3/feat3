@@ -5,6 +5,8 @@
 // includes, FEAT
 #include <kernel/util/string.hpp>
 
+#include <typeindex>
+
 namespace FEAT
 {
   /**
@@ -67,6 +69,11 @@ namespace FEAT
       {
         return "float";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(float)).hash_code();
+      }
     };
 
     /**
@@ -94,6 +101,11 @@ namespace FEAT
       static String name()
       {
         return "double";
+      }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(double)).hash_code();
       }
     };
 
@@ -123,6 +135,11 @@ namespace FEAT
       {
         return "long double";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(long double)).hash_code();
+      }
     };
 
     /**
@@ -150,6 +167,11 @@ namespace FEAT
       static String name()
       {
         return "unsigned int";
+      }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(unsigned int)).hash_code();
       }
     };
 
@@ -179,6 +201,11 @@ namespace FEAT
       {
         return "signed int";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(signed int)).hash_code();
+      }
     };
 
     /**
@@ -206,6 +233,11 @@ namespace FEAT
       static String name()
       {
         return "unsigned char";
+      }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(unsigned char)).hash_code();
       }
     };
 
@@ -235,6 +267,11 @@ namespace FEAT
       {
         return "signed char";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(signed char)).hash_code();
+      }
     };
 
     /**
@@ -262,6 +299,11 @@ namespace FEAT
       static String name()
       {
         return "unsigned short";
+      }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(unsigned short)).hash_code();
       }
     };
 
@@ -291,6 +333,11 @@ namespace FEAT
       {
         return "signed short";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(signed short)).hash_code();
+      }
     };
 
     /**
@@ -318,6 +365,11 @@ namespace FEAT
       static String name()
       {
         return "unsigned long";
+      }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(unsigned long)).hash_code();
       }
     };
 
@@ -347,6 +399,11 @@ namespace FEAT
       {
         return "signed long";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(signed long)).hash_code();
+      }
     };
 
     /**
@@ -374,6 +431,11 @@ namespace FEAT
       static String name()
       {
         return "unsigned long long";
+      }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(unsigned long long)).hash_code();
       }
     };
 
@@ -403,6 +465,11 @@ namespace FEAT
       {
         return "signed long long";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(signed long long)).hash_code();
+      }
     };
 
     /**
@@ -431,6 +498,11 @@ namespace FEAT
       {
         return "bool";
       }
+
+      static uint64_t hash_code()
+      {
+        return (uint64_t)std::type_index(typeid(bool)).hash_code();
+      }
     };
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
@@ -458,6 +530,11 @@ namespace FEAT
       static String name()
       {
         return "__float128";
+      }
+
+      static uint64_t hash_code()
+      {
+        return uint64_t(12345);
       }
     };
 #endif // FEAT_HAVE_QUADMATH && !__CUDA__CC

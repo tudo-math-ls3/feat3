@@ -7,6 +7,7 @@
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/base.hpp>
+#include <kernel/util/type_traits.hpp>
 
 #include <vector>
 #include <limits>
@@ -16,7 +17,6 @@
 #include <type_traits>
 #include <cstdlib>
 #include <stdint.h>
-#include <typeindex>
 
 #define InsertWeakClone( TContainer )                             \
   /** \brief Clone operation                                      \
@@ -423,8 +423,8 @@ namespace FEAT
 #endif
         uiarray[0] = gsize;
         uiarray[1] = magic;
-        uiarray[2] = (uint64_t)std::type_index(typeid(DT_)).hash_code();
-        uiarray[3] = (uint64_t)std::type_index(typeid(IT_)).hash_code();
+        uiarray[2] = Type::Traits<DT_>::hash_code();
+        uiarray[3] = Type::Traits<IT_>::hash_code();
         uiarray[4] = tc._elements.size();
         uiarray[5] = tc._indices.size();
         uiarray[6] = tc._elements_size.size();
@@ -522,10 +522,10 @@ namespace FEAT
         if (magic != uiarray[1])
           throw InternalError(__func__, __FILE__, __LINE__, "_deserialise: given FileMode incompatible with given array!");
 
-        if(typeid(DT_) == typeid(double) && uiarray[2] == (uint64_t)std::type_index(typeid(float)).hash_code())
+        if(Type::Traits<DT_>::hash_code() == Type::Traits<double>::hash_code() && uiarray[2] == Type::Traits<float>::hash_code())
           std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!"<<std::endl;
 
-        if(typeid(IT_) == typeid(unsigned long) && uiarray[3] == (uint64_t)std::type_index(typeid(unsigned int)).hash_code())
+        if(Type::Traits<IT_>::hash_code() == Type::Traits<IT_>::hash_code() && uiarray[3] == Type::Traits<unsigned int>::hash_code())
           std::cerr<<"Warning: You are reading a container index array in higher precision then it was saved before!"<<std::endl;
 
 
