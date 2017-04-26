@@ -240,14 +240,19 @@ namespace FEAT
         return String("TupleVector<") + sub_name_list() + ">";
       }
 
-      /// Clears the vector
+      /**
+       * \brief Reset all elements of the container to a given value or zero if missing.
+       *
+       * \param[in] value
+       * The value to which the vector's entries are to be set to.
+       */
       void format(DataType value = DataType(0))
       {
         first().format(value);
         rest().format(value);
       }
 
-      /// Clears the vector
+      /// Free all allocated arrays
       void clear()
       {
         first().clear();

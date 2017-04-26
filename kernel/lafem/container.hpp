@@ -661,7 +661,6 @@ namespace FEAT
        * \brief Reset all elements of the container to a given value or zero if missing.
        *
        * \param[in] value The value to be set (defaults to 0)
-       *
        */
       void format(DT_ value = DT_(0))
       {
@@ -671,7 +670,6 @@ namespace FEAT
 
       /**
        * \brief Free all allocated arrays
-       *
        */
       virtual void clear()
       {

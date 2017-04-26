@@ -277,7 +277,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Clears this vector.
+       * \brief Reset all elements of the container to a given value or zero if missing.
        *
        * \param[in] value
        * The value to which the vector's entries are to be set to.
@@ -288,7 +288,7 @@ namespace FEAT
         rest().format(value);
       }
 
-      /// Clears the vector.
+      /// Free all allocated arrays
       void clear()
       {
         first().clear();

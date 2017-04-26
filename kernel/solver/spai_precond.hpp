@@ -9,6 +9,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/util/random.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/solver/legacy_preconditioners.hpp>
@@ -483,6 +484,81 @@ nextj:
 
       }; // class SPAIPrecond<...>
 #endif
+
+    /// SPAIPrecond specialisation for saddle point matrices
+    template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename Filter_>
+    class SPAIPrecond<LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>, Filter_> :
+      public SolverBase<LAFEM::TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL>>
+      {
+        public:
+        /// our matrix type
+        typedef LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_> MatrixType;
+        /// our filter type
+        typedef Filter_ FilterType;
+
+        /// our vector type
+        typedef typename MatrixType::VectorTypeR VectorType;
+        /// our data type
+        typedef typename MatrixType::DataType DataType;
+        /// our index type
+        typedef typename MatrixType::IndexType IndexType;
+        /// our index type
+        typedef typename MatrixType::MemType MemType;
+
+        protected:
+        const MatrixType& _matrix;
+        const FilterType& _filter;
+        MatrixType _M;
+
+        public:
+
+        SPAIPrecond(
+            const MatrixType& matrix, const FilterType& filter) :
+          _matrix(matrix),
+          _filter(filter)
+        {
+        }
+
+        /// Returns the name of the solver.
+        virtual String name() const override
+        {
+          return "SPAI_1";
+        }
+
+        virtual void init_symbolic() override
+        {
+        }
+
+        virtual void done_symbolic() override
+        {
+          _M.clear();
+        }
+
+        virtual void init_numeric() override
+        {
+          LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> csr;
+          csr.convert(_matrix);
+          auto csr_result = Intern::SPAIFactory<decltype(csr)>::construct_M(csr, 0);
+          _M = _matrix.clone(LAFEM::CloneMode::Layout);
+          csr_result.convert_reverse(_M);
+        }
+
+        virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+        {
+          // multiply with the SPAI
+          _M.apply(vec_cor, vec_def);
+          // apply filter
+          this->_filter.filter_cor(vec_cor);
+
+          return Status::success;
+        }
+
+        const MatrixType& get_spai() const
+        {
+          return _M;
+        }
+
+      }; // class SPAIPrecond<...>
 
     /// Dummy class for not implemented specialisations
     template<typename Matrix_, typename Filter_>

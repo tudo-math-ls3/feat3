@@ -396,7 +396,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Clears this matrix.
+       * \brief Reset all elements of the container to a given value or zero if missing.
        *
        * \param[in] value
        * The value to which the matrix' entries are to be set to.
@@ -406,6 +406,16 @@ namespace FEAT
         block_a().format(value);
         block_b().format(value);
         block_d().format(value);
+      }
+
+      /**
+       * \brief Free all allocated arrays
+       */
+      void clear()
+      {
+        block_a().clear();
+        block_b().clear();
+        block_d().clear();
       }
 
       /// extract main diagonal vector from matrix

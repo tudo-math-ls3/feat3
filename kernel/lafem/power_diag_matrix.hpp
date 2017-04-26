@@ -412,7 +412,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Clears this matrix.
+       * \brief Reset all elements of the container to a given value or zero if missing.
        *
        * \param[in] value
        * The value to which the matrix' entries are to be set to.
@@ -421,6 +421,15 @@ namespace FEAT
       {
         first().format(value);
         rest().format(value);
+      }
+
+      /**
+       * \brief Free all allocated arrays
+       */
+      void clear()
+      {
+        first().clear();
+        rest().clear();
       }
 
       /// extract main diagonal vector from matrix
@@ -867,6 +876,11 @@ namespace FEAT
       void format(DataType value = DataType(0))
       {
         first().format(value);
+      }
+
+      void clear()
+      {
+        first().clear();
       }
 
       void extract_diag(VectorTypeL& diag) const
