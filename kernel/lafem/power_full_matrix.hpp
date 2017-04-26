@@ -265,6 +265,11 @@ namespace FEAT
         _container.set_line(row, pval_set, pcol_set, col_start, stride);
       }
 
+      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
+      {
+        _container.set_line_reverse(row, pval_set, stride);
+      }
+
       ContClass& get_container()
       {
         return _container;
@@ -371,6 +376,12 @@ namespace FEAT
       void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
       {
         _container.convert(other._container);
+      }
+
+      template <typename SubType2_>
+      void convert_reverse(PowerFullMatrix<SubType2_, width_, height_> & other) const
+      {
+        _container.convert_reverse(other._container);
       }
 
       /**

@@ -70,9 +70,19 @@ public:
       SparseMatrixELL<Mem_, DT_, IT_> ell_m1(coo_m1);
       SparseMatrixCOO<Mem_, DT_, IT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
+      coo_m1.format();
+      ell_m1.format();
+      coo_m2.convert_reverse(ell_m1);
+      ell_m1.convert_reverse(coo_m1);
+      TEST_CHECK_EQUAL(coo_m1, coo_m2);
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(coo_m1);
       SparseMatrixCOO<Mem_, DT_, IT_> coo_m3(csr_m1);
       TEST_CHECK_EQUAL(coo_m3, coo_m1);
+      coo_m1.format();
+      csr_m1.format();
+      coo_m3.convert_reverse(csr_m1);
+      csr_m1.convert_reverse(coo_m1);
+      TEST_CHECK_EQUAL(coo_m1, coo_m3);
     }
 
     {
@@ -80,18 +90,38 @@ public:
       SparseMatrixCOO<Mem_, DT_, IT_> coo_m1(ell_m1);
       SparseMatrixELL<Mem_, DT_, IT_> ell_m2(coo_m1);
       TEST_CHECK_EQUAL(ell_m2, ell_m1);
+      ell_m1.format();
+      coo_m1.format();
+      ell_m2.convert_reverse(coo_m1);
+      coo_m1.convert_reverse(ell_m1);
+      TEST_CHECK_EQUAL(ell_m1, ell_m2);
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(ell_m1);
       SparseMatrixELL<Mem_, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
+      csr_m1.format();
+      ell_m1.format();
+      ell_m3.convert_reverse(csr_m1);
+      csr_m1.convert_reverse(ell_m1);
+      TEST_CHECK_EQUAL(ell_m1, ell_m3);
     }
     {
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(a);
       SparseMatrixCOO<Mem_, DT_, IT_> coo_m1(csr_m1);
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m2(coo_m1);
       TEST_CHECK_EQUAL(csr_m2, csr_m1);
+      csr_m1.format();
+      coo_m1.format();
+      csr_m2.convert_reverse(coo_m1);
+      coo_m1.convert_reverse(csr_m1);
+      TEST_CHECK_EQUAL(csr_m1, csr_m2);
       SparseMatrixELL<Mem_, DT_, IT_> ell_m1(csr_m1);
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m3(ell_m1);
       TEST_CHECK_EQUAL(csr_m3, csr_m1);
+      ell_m1.format();
+      csr_m1.format();
+      csr_m3.convert_reverse(ell_m1);
+      ell_m1.convert_reverse(csr_m1);
+      TEST_CHECK_EQUAL(csr_m1, csr_m3);
     }
 
   }
@@ -157,9 +187,19 @@ public:
       SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
+      coo_m1.format();
+      ell_m1.format();
+      coo_m2.convert_reverse(ell_m1);
+      ell_m1.convert_reverse(coo_m1);
+      TEST_CHECK_EQUAL(coo_m1, coo_m2);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m3(csr_m1);
       TEST_CHECK_EQUAL(coo_m3, coo_m1);
+      coo_m1.format();
+      csr_m1.format();
+      coo_m3.convert_reverse(csr_m1);
+      csr_m1.convert_reverse(coo_m1);
+      TEST_CHECK_EQUAL(coo_m1, coo_m3);
     }
 
     {
@@ -167,9 +207,19 @@ public:
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m1(ell_m1);
       SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m2(coo_m1);
       TEST_CHECK_EQUAL(ell_m2, ell_m1);
+      ell_m1.format();
+      coo_m1.format();
+      ell_m2.convert_reverse(coo_m1);
+      coo_m1.convert_reverse(ell_m1);
+      TEST_CHECK_EQUAL(ell_m1, ell_m2);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(ell_m1);
       SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
+      csr_m1.format();
+      ell_m1.format();
+      ell_m3.convert_reverse(csr_m1);
+      csr_m1.convert_reverse(ell_m1);
+      TEST_CHECK_EQUAL(ell_m1, ell_m3);
     }
 
     {
@@ -177,9 +227,19 @@ public:
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m1(csr_m1);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m2(coo_m1);
       TEST_CHECK_EQUAL(csr_m2, csr_m1);
+      csr_m1.format();
+      coo_m1.format();
+      csr_m2.convert_reverse(coo_m1);
+      coo_m1.convert_reverse(csr_m1);
+      TEST_CHECK_EQUAL(csr_m1, csr_m2);
       SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m1(csr_m1);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m3(ell_m1);
       TEST_CHECK_EQUAL(csr_m3, csr_m1);
+      ell_m1.format();
+      csr_m1.format();
+      csr_m3.convert_reverse(ell_m1);
+      ell_m1.convert_reverse(csr_m1);
+      TEST_CHECK_EQUAL(csr_m1, csr_m3);
     }
 
     {
@@ -188,9 +248,18 @@ public:
       SparseMatrixELL<Mem::Main, DT_, IT_> ell_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
+      coo_m1.format();
+      ell_m1.format();
+      coo_m2.convert_reverse(ell_m1);
+      ell_m1.convert_reverse(coo_m1);
       SparseMatrixCSR<Mem::Main, DT_, IT_> csr_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m3(csr_m1);
       TEST_CHECK_EQUAL(coo_m3, coo_m1);
+      coo_m1.format();
+      csr_m1.format();
+      coo_m3.convert_reverse(csr_m1);
+      csr_m1.convert_reverse(coo_m1);
+      TEST_CHECK_EQUAL(coo_m1, coo_m3);
     }
 
     {
@@ -198,9 +267,19 @@ public:
       SparseMatrixCOO<Mem::Main, DT_, IT_> coo_m1(ell_m1);
       SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m2(coo_m1);
       TEST_CHECK_EQUAL(ell_m2, ell_m1);
+      ell_m1.format();
+      coo_m1.format();
+      ell_m2.convert_reverse(coo_m1);
+      coo_m1.convert_reverse(ell_m1);
+      TEST_CHECK_EQUAL(ell_m1, ell_m2);
       SparseMatrixCSR<Mem::Main, DT_, IT_> csr_m1(ell_m1);
       SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
+      csr_m1.format();
+      ell_m1.format();
+      ell_m3.convert_reverse(csr_m1);
+      csr_m1.convert_reverse(ell_m1);
+      TEST_CHECK_EQUAL(ell_m1, ell_m3);
     }
 
     {
@@ -208,9 +287,19 @@ public:
       SparseMatrixCOO<Mem::Main, DT_, IT_> coo_m1(csr_m1);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m2(coo_m1);
       TEST_CHECK_EQUAL(csr_m2, csr_m1);
+      csr_m1.format();
+      coo_m1.format();
+      csr_m2.convert_reverse(coo_m1);
+      coo_m1.convert_reverse(csr_m1);
+      TEST_CHECK_EQUAL(csr_m1, csr_m2);
       SparseMatrixELL<Mem::Main, DT_, IT_> ell_m1(csr_m1);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m3(ell_m1);
       TEST_CHECK_EQUAL(csr_m3, csr_m1);
+      ell_m1.format();
+      csr_m1.format();
+      csr_m3.convert_reverse(ell_m1);
+      ell_m1.convert_reverse(csr_m1);
+      TEST_CHECK_EQUAL(csr_m1, csr_m3);
     }
 
   }

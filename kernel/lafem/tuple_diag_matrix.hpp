@@ -511,6 +511,20 @@ namespace FEAT
           this->rest().set_line(row - brows, pval_set, pcol_set, col_start + bcolumns, stride);
         }
       }
+
+      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
+      {
+        const Index brows(this->first().rows());
+
+        if (row < brows)
+        {
+          this->first().set_line_reverse(row, pval_set, stride);
+        }
+        else
+        {
+          this->rest().set_line_reverse(row - brows, pval_set, stride);
+        }
+      }
       /// \endcond
 
       /**
@@ -525,6 +539,13 @@ namespace FEAT
       {
         this->first().convert(other.first());
         this->rest().convert(other.rest());
+      }
+
+      template <typename First2_, typename... Rest2_>
+      void convert_reverse(TupleDiagMatrix<First2_, Rest2_...>& other) const
+      {
+        this->first().convert_reverse(other.first());
+        this->rest().convert_reverse(other.rest());
       }
 
       /**
@@ -808,6 +829,11 @@ namespace FEAT
         this->first().set_line(row, pval_set, pcol_set, col_start, stride);
       }
 
+      void set_line_revse(const Index row, DataType * const pval_set, const Index stride = 1) const
+      {
+        this->first().set_line_reverse(row, pval_set, stride);
+      }
+
       /**
        * \brief Conversion method
        *
@@ -819,6 +845,12 @@ namespace FEAT
       void convert(const TupleDiagMatrix<First2_>& other)
       {
         this->first().convert(other.first());
+      }
+
+      template <typename First2_>
+      void convert_reverse(TupleDiagMatrix<First2_>& other) const
+      {
+        this->first().convert_reverse(other.first());
       }
 
       /**

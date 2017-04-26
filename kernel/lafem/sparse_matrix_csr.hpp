@@ -981,6 +981,38 @@ namespace FEAT
       }
 
       /**
+       * \brief Reverse Conversion method
+       *
+       * \param[out] a The target matrix.
+       *
+       * Assigns own matrix values to target matrix
+       *
+       * \warning This method assumes, that ideally this csr matrix was created from the target
+       * matrix a earlier and thus, both (nonzero) layouts match perfectly.
+       */
+      template <typename MT_>
+      void convert_reverse(MT_ & a) const
+      {
+        typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+        ta.convert(a);
+
+        SparseMatrixCSR<Mem::Main, DT_, IT_> ta_csr;
+        ta_csr.convert(*this);
+
+        const Index arows(ta_csr.template rows<Perspective::pod>());
+
+        DT_ * pval(ta_csr.val());
+        IT_ * prow_ptr(ta_csr.row_ptr());
+
+        for (Index i(0); i < arows; ++i)
+        {
+          ta.set_line_reverse(i, pval + prow_ptr[i]);
+        }
+
+        a.convert(ta);
+      }
+
+      /**
        * \brief Assignment operator
        *
        * \param[in] layout_in A sparse matrix layout.
@@ -2519,6 +2551,20 @@ namespace FEAT
           pcol_set[i * stride] = pcol_ind[start + i] + IT_(col_start);
         }
       }
+
+      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride = 1)
+      {
+        const IT_ * prow_ptr(this->row_ptr());
+        DT_ * pval(this->val());
+
+        const Index start((Index(prow_ptr[row])));
+        const Index end((Index(prow_ptr[row + 1] - prow_ptr[row])));
+        for (Index i(0); i < end; ++i)
+        {
+          pval[start + i] = pval_set[i * stride];
+        }
+      }
+
       /// \endcond
 
       /* ******************************************************************* */

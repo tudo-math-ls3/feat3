@@ -431,6 +431,16 @@ namespace FEAT
           pcol_set[i * stride] = IT_(i) + IT_(col_start);
         }
       }
+
+      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride = 1)
+      {
+        const DT_ * pval(this->elements());
+
+        for (Index i(0); i < columns(); ++i)
+        {
+          pval_set[i * stride] = pval[columns() * row + i];
+        }
+      }
       /// \endcond
 
       /**

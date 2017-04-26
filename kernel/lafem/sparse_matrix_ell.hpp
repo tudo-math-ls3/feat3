@@ -1140,6 +1140,37 @@ namespace FEAT
       }
 
       /**
+       * \brief Conversion method
+       *
+       * \param[in] a The input matrix.
+       *
+       * Assigns input matrix values.
+       * For this purpose, both matrix must have the same layout
+       */
+      template <typename MT_>
+      void convert_reverse(MT_ & a) const
+      {
+        typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+        ta.convert(a);
+
+        SparseMatrixELL<Mem::Main, DT_, IT_> ta_ell;
+        ta_ell.convert(*this);
+
+        const Index arows(ta_ell.template rows<Perspective::pod>());
+
+        const Index aC(this->C());
+        DT_ * pval(ta_ell.val());
+        const IT_ * pcs(ta_ell.cs());
+
+        for (Index i(0); i < arows; ++i)
+        {
+          ta.set_line_reverse(i, pval + pcs[i/aC] + i%aC, aC);
+        }
+
+        a.convert(ta);
+      }
+
+      /**
        * \brief Assignment operator
        *
        * \param[in] layout_in A sparse matrix layout.
@@ -2158,6 +2189,18 @@ namespace FEAT
         {
           pval_set[i * stride_in] =     pval[i * tC];
           pcol_set[i * stride_in] = pcol_ind[i * tC] + IT_(col_start);
+        }
+      }
+
+      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride_in = 1)
+      {
+        const Index tC(this->C());
+        const Index length((Index(this->rl()[row])));
+        DT_ * pval    (this->val()     + this->cs()[row/tC] + row%tC);
+
+        for (Index i(0); i < length; ++i)
+        {
+          pval[i * tC] = pval_set[i * stride_in];
         }
       }
       /// \endcond

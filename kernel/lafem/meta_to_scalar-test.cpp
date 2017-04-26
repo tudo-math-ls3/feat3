@@ -91,6 +91,14 @@ public:
       vec_sol_scalar(i, DT_(0));
     }
 
+    auto mat_sys2 = mat_sys.clone();
+    mat_sys2.format();
+    mat_sys_scalar.convert_reverse(mat_sys2);
+    MT_ mat_sys_scalar2;
+    mat_sys_scalar2.convert(mat_sys2);
+
+    TEST_CHECK_EQUAL(mat_sys_scalar, mat_sys_scalar2);
+
     /**
      * check VecMetaToScalar and "VecScalarToMeta"
      */
@@ -265,6 +273,16 @@ public:
     c6.convert(c5);
 
     MT_ c7;
+    c7.convert(c4);
+
+    TEST_CHECK_EQUAL(c6, c7);
+
+    c4.format();
+    c5.convert_reverse(c4);
+
+    c6.format();
+    c7.format();
+    c6.convert(c5);
     c7.convert(c4);
 
     TEST_CHECK_EQUAL(c6, c7);

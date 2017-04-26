@@ -395,6 +395,19 @@ namespace FEAT
         return rows<perspective_>() * columns<perspective_>();
       }
 
+      /**
+       * \brief Clears this matrix.
+       *
+       * \param[in] value
+       * The value to which the matrix' entries are to be set to.
+       */
+      void format(DataType value = DataType(0))
+      {
+        block_a().format(value);
+        block_b().format(value);
+        block_d().format(value);
+      }
+
       /// extract main diagonal vector from matrix
       void extract_diag(VectorTypeL& diag) const
       {
@@ -533,6 +546,23 @@ namespace FEAT
           this->block_d().set_line(row - arows, pval_set, pcol_set, col_start, stride);
         }
       }
+
+      void set_line_reverse(const Index row, typename MatrixA_::DataType * const pval_set, const Index stride = 1)
+      {
+        const Index arows(this->block_a().template rows<Perspective::pod>());
+
+        if (row < arows)
+        {
+          const Index length_of_a(this->block_a().get_length_of_line(row));
+
+          this->block_a().set_line_reverse(row, pval_set, stride);
+          this->block_b().set_line_reverse(row, pval_set + stride * length_of_a, stride);
+        }
+        else
+        {
+          this->block_d().set_line_reverse(row - arows, pval_set, stride);
+        }
+      }
       /// \endcond
 
       /**
@@ -548,6 +578,14 @@ namespace FEAT
         this->block_a().convert(other.block_a());
         this->block_b().convert(other.block_b());
         this->block_d().convert(other.block_d());
+      }
+
+      template <typename MatrixA2_, typename MatrixB2_, typename MatrixD2_>
+      void convert_reverse(SaddlePointMatrix<MatrixA2_, MatrixB2_, MatrixD2_> & other) const
+      {
+        this->block_a().convert_reverse(other.block_a());
+        this->block_b().convert_reverse(other.block_b());
+        this->block_d().convert_reverse(other.block_d());
       }
 
       /**

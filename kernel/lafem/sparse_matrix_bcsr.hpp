@@ -1725,6 +1725,25 @@ namespace FEAT
           }
         }
       }
+
+      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride = 1)
+      {
+        const auto * prow_ptr(this->row_ptr());
+        auto * pval(this->val());
+
+        const auto trow = int(row) / BlockHeight_;
+        const auto lrow = int(row) - trow * BlockHeight_;
+
+        const Index start((Index(prow_ptr[trow])));
+        const Index end((Index(prow_ptr[trow + 1] - prow_ptr[trow])));
+        for (Index i(0); i < end; ++i)
+        {
+          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          {
+            pval[start + i](lrow, int(ti)) = pval_set[(i * Index(BlockWidth_) + ti) * stride];
+          }
+        }
+      }
       /// \endcond
 
       /* ******************************************************************* */

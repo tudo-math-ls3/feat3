@@ -993,6 +993,51 @@ namespace FEAT
       }
 
       /**
+       * \brief Conversion method
+       *
+       * \param[in] a The input matrix.
+       *
+       * Assigns input matrix values.
+       * For this purpose, both matrix must have the same layout
+       */
+      template <typename MT_>
+      void convert_reverse(MT_ & a) const
+      {
+        typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+        ta.convert(a);
+
+        SparseMatrixCOO<Mem::Main, DT_, IT_> ta_coo;
+        ta_coo.convert(*this);
+
+        const Index arows(ta_coo.template rows<Perspective::pod>());
+
+        DenseVector<Mem::Main, IT_, IT_> trow_ptr(arows + 1);
+        IT_ * prow_ptr(trow_ptr.elements());
+
+        for (Index i(0); i < arows; ++i)
+        {
+          prow_ptr[i + 1] = IT_(ta.get_length_of_line(i));
+        }
+
+        prow_ptr[0] = IT_(0);
+
+        for (Index i(1); i < arows + 1; ++i)
+        {
+          prow_ptr[i] += prow_ptr[i - 1];
+        }
+
+        DT_ * pval(ta_coo.val());
+
+        for (Index i(0); i < arows; ++i)
+        {
+          ta.set_line_reverse(i, pval + prow_ptr[i]);
+        }
+
+        a.convert(ta);
+      }
+
+
+      /**
        * \brief Deserialisation of complete container entity.
        *
        * \param[in] input A std::vector, containing the byte array.
@@ -1972,6 +2017,29 @@ namespace FEAT
           }
           pval_set[i * stride] = pval[start + i];
           pcol_set[i * stride] = pcol[start + i] + IT_(col_start);
+        }
+      }
+
+      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride = 1)
+      {
+        const IT_ * prow(this->row_indices());
+        DT_ * pval(this->val());
+
+        const Index tused_elements(this->used_elements());
+
+        Index start(0);
+        while (prow[start] < row)
+        {
+          ++start;
+        }
+
+        for (Index i(0); start + i < tused_elements; ++i)
+        {
+          if (prow[start + i] != row)
+          {
+            return;
+          }
+          pval[start + i] = pval_set[i * stride];
         }
       }
       /// \endcond
