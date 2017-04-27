@@ -478,7 +478,8 @@ if (not nomkl):
 
 quadmath_add = ""
 if is_found("g++"):
-  quadmath_add = "-quadmath --ovr_mpi_ops"
+  quadmath_add = "-quadmath"
+  extra_opts = " --ovr_mpi_ops"
 parmetis_add = ""
 if (not nothirdparty):
   parmetis_add = "-parmetis"
