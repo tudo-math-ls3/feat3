@@ -289,6 +289,9 @@ namespace FEAT
           const auto& layer_c = virt_lvl_coarse.layer_c();
           const DomainLevel_& level_c = virt_lvl_coarse.level_c();
 
+          // ensure that there is only one parent
+          XASSERTM(layer_c.parent_count() == Index(1), "currently only 1 layer parent is supported");
+
           SystemMirror parent_mirror_sys;
           VeloMirror& parent_mirror_v = parent_mirror_sys.template at<0>();
           PresMirror& parent_mirror_p = parent_mirror_sys.template at<1>();
@@ -326,10 +329,10 @@ namespace FEAT
           }
 
           // set muxer parent
-          int parent_rank = layer_c.parent_rank();
-          this->coarse_muxer_velo.set_parent(parent_rank, parent_mirror_v.clone(LAFEM::CloneMode::Shallow));
-          this->coarse_muxer_pres.set_parent(parent_rank, parent_mirror_p.clone(LAFEM::CloneMode::Shallow));
-          this->coarse_muxer_sys.set_parent(parent_rank, std::move(parent_mirror_sys));
+          int parent_rank = layer_c.parent_rank(Index(0));
+          this->coarse_muxer_velo.push_parent(parent_rank, parent_mirror_v.clone(LAFEM::CloneMode::Shallow));
+          this->coarse_muxer_pres.push_parent(parent_rank, parent_mirror_p.clone(LAFEM::CloneMode::Shallow));
+          this->coarse_muxer_sys.push_parent(parent_rank, std::move(parent_mirror_sys));
 
           // set muxer comm
           this->coarse_muxer_velo.set_comm(layer_c.comm_ptr());

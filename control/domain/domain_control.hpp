@@ -33,8 +33,10 @@ namespace FEAT
 
         /// the ranks of the neighbour processes in this layer
         std::vector<int> _neighbour_ranks;
+        /// the ranks of the child processes w.r.t. the previous layer
         std::vector<int> _child_ranks;
-        int _parent_rank;
+        /// the ranks of the parent processes w.r.t. the next layer
+        std::vector<int> _parent_ranks;
 
       public:
         explicit DomainLayer(Dist::Comm&& comm_, int lyr_idx) :
@@ -42,7 +44,7 @@ namespace FEAT
           _layer_index(lyr_idx),
           _neighbour_ranks(),
           _child_ranks(),
-          _parent_rank(-1)
+          _parent_ranks()
         {
         }
 
@@ -51,7 +53,7 @@ namespace FEAT
           _layer_index(other._layer_index),
           _neighbour_ranks(std::forward<std::vector<int>>(other._neighbour_ranks)),
           _child_ranks(std::forward<std::vector<int>>(other._child_ranks)),
-          _parent_rank(other._parent_rank)
+          _parent_ranks(std::forward<std::vector<int>>(other._parent_ranks))
         {
         }
 
@@ -61,7 +63,7 @@ namespace FEAT
 
         std::size_t bytes() const
         {
-          return (_neighbour_ranks.size() + _child_ranks.size()) * sizeof(int);
+          return (_neighbour_ranks.size() + _child_ranks.size() + _parent_ranks.size()) * sizeof(int);
         }
 
         const Dist::Comm& comm() const
@@ -76,7 +78,7 @@ namespace FEAT
 
         bool is_child() const
         {
-          return _parent_rank >= 0;
+          return !_parent_ranks.empty();
         }
 
         bool is_parent() const
@@ -92,13 +94,6 @@ namespace FEAT
         int get_layer_index() const
         {
           return _layer_index;
-        }
-
-        void set_parent_rank(int parent_rank_)
-        {
-          XASSERT(parent_rank_ >= -1);
-          XASSERT(parent_rank_ < _comm.size());
-          _parent_rank = parent_rank_;
         }
 
         Index neighbour_count() const
@@ -126,11 +121,6 @@ namespace FEAT
           return _neighbour_ranks;
         }
 
-        int parent_rank() const
-        {
-          return _parent_rank;
-        }
-
         Index child_count() const
         {
           return Index(_child_ranks.size());
@@ -154,6 +144,31 @@ namespace FEAT
         const std::vector<int>& get_child_ranks() const
         {
           return _child_ranks;
+        }
+
+        Index parent_count() const
+        {
+          return Index(_parent_ranks.size());
+        }
+
+        void push_parent(int parent_rank_)
+        {
+          _parent_ranks.push_back(parent_rank_);
+        }
+
+        int parent_rank(Index i) const
+        {
+          return _parent_ranks.at(std::size_t(i));
+        }
+
+        void set_parent_ranks(const std::vector<int>& parents)
+        {
+          _parent_ranks = parents;
+        }
+
+        const std::vector<int>& get_parent_ranks() const
+        {
+          return _parent_ranks;
         }
       }; // class DomainLayer
 
@@ -598,7 +613,12 @@ namespace FEAT
             for(const auto& cr : lyr.get_child_ranks())
               msg += " " + stringify(cr).pad_front(nc);
             if(lyr.is_child())
-              msg += " {" + stringify(lyr.parent_rank()).pad_front(np) + "}";
+            {
+              msg += " {";
+              for(const auto& pr : lyr.get_parent_ranks())
+                msg += " " + stringify(pr).pad_front(np);
+              msg += "}";
+            }
             nc = np;
           }
           _comm.allprint(msg);
@@ -629,7 +649,9 @@ namespace FEAT
             msg += "[" + stringify((*it).layer().comm().size()).pad_front(np) + "]";
             if((*it).is_child())
             {
-              msg += "{" + stringify((*it).layer_c().parent_rank()).pad_front(np);
+              msg += " {";
+              for(const auto& pr : (*it).layer_c().get_parent_ranks())
+                msg += " " + stringify(pr).pad_front(np);
               if((*it).is_parent())
                 msg += ":" + stringify((*it).layer_p().comm().rank()).pad_front(np) + "}";
               else

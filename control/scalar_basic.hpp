@@ -186,6 +186,9 @@ namespace FEAT
           const auto& layer_c = virt_lvl_coarse.layer_c();
           const DomainLevel_& level_c = virt_lvl_coarse.level_c();
 
+          // ensure that there is only one parent
+          XASSERTM(layer_c.parent_count() == Index(1), "currently only 1 layer parent is supported");
+
           // manually set up an identity gather/scatter matrix
           Index n = level_c.space.get_num_dofs();
           LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> scagath(n, n, n);
@@ -204,8 +207,8 @@ namespace FEAT
           SystemMirror parent_mirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
 
           // set muxer parent
-          int parent_rank = layer_c.parent_rank();
-          this->coarse_muxer_sys.set_parent(parent_rank, std::move(parent_mirror));
+          int parent_rank = layer_c.parent_rank(Index(0));
+          this->coarse_muxer_sys.push_parent(parent_rank, std::move(parent_mirror));
 
           // set muxer comm
           this->coarse_muxer_sys.set_comm(layer_c.comm_ptr());

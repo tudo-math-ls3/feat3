@@ -212,7 +212,7 @@ namespace FEAT
             int parent_rank = 2*(ix & ~1) + (iy & ~1)*crs_dim; // don't ask...
 
             // set the child's parent rank
-            child.set_parent_rank(parent_rank);
+            child.push_parent(parent_rank);
 
             // create parent comm
             Dist::Comm comm_p = comm_c.comm_create_range_incl(comm_c.size()/4, 0, 4);
