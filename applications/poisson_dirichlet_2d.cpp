@@ -150,7 +150,7 @@ namespace PoissonDirichlet2D
 
     comm.print("Setting up solver...");
 
-    //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
+    // PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
     auto multigrid_hierarchy = std::make_shared<
       Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalSystemMatrix,
@@ -159,23 +159,24 @@ namespace PoissonDirichlet2D
         > >();
 
     // push all levels except the coarse most one
-    auto it_end = --system_levels.end();
-    for (auto it = system_levels.begin(); it != it_end; ++it)
+    for (Index i(0); (i+1) < num_levels; ++i)
     {
-      auto jac_smoother = Solver::new_jacobi_precond((*it)->matrix_sys, (*it)->filter_sys, 0.7);
-      auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, 1.0, jac_smoother);
+      const SystemLevelType& lvl = *system_levels.at(i);
+      auto jac_smoother = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 0.7);
+      auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 1.0, jac_smoother);
       smoother->set_min_iter(4);
       smoother->set_max_iter(4);
-      multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*it)->transfer_sys, smoother, smoother, smoother);
+      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
     }
 
     // push the coarse level
     {
-      auto coarse_precond = Solver::new_jacobi_precond(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, 0.7);
-      auto coarse_solver = Solver::new_richardson(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, 1.0, coarse_precond);
+      const SystemLevelType& lvl = *system_levels.back();
+      auto coarse_precond = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 0.7);
+      auto coarse_solver = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 1.0, coarse_precond);
       coarse_solver->set_min_iter(4);
       coarse_solver->set_max_iter(4);
-      multigrid_hierarchy->push_level(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, coarse_solver);
+      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
     }
 
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);

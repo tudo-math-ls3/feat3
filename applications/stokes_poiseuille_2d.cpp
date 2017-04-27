@@ -224,17 +224,18 @@ namespace StokesPoiseuille2D
 
     {
       // push levels into MGV
-      auto it_end = --system_levels.end();
-      for (auto it = system_levels.begin(); it != it_end; ++it)
+      for (Index i(0); (i+1) < num_levels; ++i)
       {
-        auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
-        multigrid_hierarchy_a->push_level((*it)->matrix_a, (*it)->filter_velo, (*it)->transfer_velo, smoother, smoother, smoother);
+        const SystemLevelType& lvl = *system_levels.at(i);
+        auto smoother = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+        multigrid_hierarchy_a->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo, smoother, smoother, smoother);
       }
 
       // create coarse grid solver
       {
-        auto coarse_solver = Solver::new_jacobi_precond(system_levels.back()->matrix_a, system_levels.back()->filter_velo);
-        multigrid_hierarchy_a->push_level(system_levels.back()->matrix_a, system_levels.back()->filter_velo, coarse_solver);
+        const SystemLevelType& lvl = *system_levels.back();
+        auto coarse_solver = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+        multigrid_hierarchy_a->push_level(lvl.matrix_a, lvl.filter_velo, coarse_solver);
       }
 
       // set our A-solver
