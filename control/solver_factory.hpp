@@ -520,7 +520,7 @@ namespace FEAT
           {
             result = create_ssor_precon<SolverVectorType_>(matrix_stock, section_name, section, solver_level, nullptr);
           }
-          else if (solver_type == "mg" || solver_type == "scarcmg")
+          else if (solver_type == "mg")
           {
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
@@ -583,52 +583,25 @@ namespace FEAT
             auto lvl_min = std::stoi(lvl_min_s);
             auto lvl_max_s = section->query("lvl_max", "-1");
             auto lvl_max = std::stoi(lvl_max_s);
-            if (solver_type == "scarcmg" && lvl_max != -1)
-                throw InternalError(__func__, __FILE__, __LINE__, "You really should not manually set the max lvl for a scarc mg solver!");
             lvl_max = Math::max(lvl_max, (int)( matrix_stock.systems.size()-solver_level-1));
 
-            if (solver_type == "mg")
+            if (cycle_p.first == "v")
             {
-              if (cycle_p.first == "v")
-              {
-                auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::V, lvl_max, lvl_min);
-                result = mgv;
-              }
-              else if (cycle_p.first == "w")
-              {
-                auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::W, lvl_max, lvl_min);
-                result = mgv;
-              }
-              else if (cycle_p.first == "f")
-              {
-                auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::F, lvl_max, lvl_min);
-                result = mgv;
-              }
-              else
-                throw InternalError(__func__, __FILE__, __LINE__, "mg cycle " + cycle_p.first + " unknown!");
+              auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::V, lvl_max, lvl_min);
+              result = mgv;
             }
-            else if (solver_type == "scarcmg")
+            else if (cycle_p.first == "w")
             {
-              if (cycle_p.first == "v")
-              {
-                auto mgv = Solver::new_scarcmultigrid(hierarchy, Solver::MultiGridCycle::V, lvl_max, lvl_min);
-                result = mgv;
-              }
-              else if (cycle_p.first == "w")
-              {
-                auto mgv = Solver::new_scarcmultigrid(hierarchy, Solver::MultiGridCycle::W, lvl_max, lvl_min);
-                result = mgv;
-              }
-              else if (cycle_p.first == "f")
-              {
-                auto mgv = Solver::new_scarcmultigrid(hierarchy, Solver::MultiGridCycle::F, lvl_max, lvl_min);
-                result = mgv;
-              }
-              else
-                throw InternalError(__func__, __FILE__, __LINE__, "mg cycle " + cycle_p.first + " unknown!");
+              auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::W, lvl_max, lvl_min);
+              result = mgv;
+            }
+            else if (cycle_p.first == "f")
+            {
+              auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::F, lvl_max, lvl_min);
+              result = mgv;
             }
             else
-              throw InternalError(__func__, __FILE__, __LINE__, "mg type " + solver_type + " unknown!");
+              throw InternalError(__func__, __FILE__, __LINE__, "mg cycle " + cycle_p.first + " unknown!");
           }
           else if (solver_type == "schwarz")
           {
