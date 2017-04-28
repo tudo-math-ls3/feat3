@@ -21,7 +21,6 @@ SET (app_list
   poisson_dirichlet_2d
   poisson_neumann_2d
   poisson_solver_factory
-  scarckin_poisson
   stokes_dricav_2d
   stokes_poiseuille_2d
   stokes_vortex_2d
@@ -224,89 +223,6 @@ else (FEAT_HAVE_MPI)
     --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 19 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (FEAT_HAVE_MPI)
-
-######################### scarckin_poisson
-if (FEAT_HAVE_MPI)
-  ADD_TEST(sleep12 sleep 2)
-  SET_PROPERTY(TEST sleep12 PROPERTY LABELS "mpi,sleep")
-
-  ADD_TEST(scarckin_poisson_mpi_4 ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target scarckin_poisson
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/scarckin_poisson --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST scarckin_poisson_mpi_4 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST scarckin_poisson_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-  ADD_TEST(sleep14 sleep 2)
-  SET_PROPERTY(TEST sleep14 PROPERTY LABELS "mpi,sleep")
-
-  #    if (FEAT_HAVE_CUDA)
-  # ADD_TEST(scarckin_poisson_mpi_4_cuda ${CMAKE_CTEST_COMMAND}
-  #   --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-  #   --build-generator ${CMAKE_GENERATOR}
-  #   --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-  #   --build-target scarckin_poisson
-  #   --build-nocmake
-  #   --build-noclean
-  #   --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/scarckin_poisson --level 5 0 --mem cuda --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
-  #SET_PROPERTY(TEST scarckin_poisson_mpi_4_cuda PROPERTY LABELS "mpi")
-  # SET_PROPERTY(TEST scarckin_poisson_mpi_4_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  #endif(FEAT_HAVE_CUDA)
-
-  ADD_TEST(scarckin_poisson_mpi_3 ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target scarckin_poisson
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/scarckin_poisson --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST scarckin_poisson_mpi_3 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST scarckin_poisson_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-  ADD_TEST(sleep15 sleep 2)
-  SET_PROPERTY(TEST sleep15 PROPERTY LABELS "mpi,sleep")
-
-  ADD_TEST(scarckin_poisson_mpi_6 ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target scarckin_poisson
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/scarckin_poisson --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST scarckin_poisson_mpi_6 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST scarckin_poisson_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-else (FEAT_HAVE_MPI)
-  ADD_TEST(scarckin_poisson_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target scarckin_poisson
-    --build-nocmake
-    --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/scarckin_poisson --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
-  SET_PROPERTY(TEST scarckin_poisson_serial PROPERTY LABELS "serial")
-  SET_PROPERTY(TEST scarckin_poisson_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-  if (FEAT_HAVE_CUDA)
-    ADD_TEST(scarckin_poisson_serial_cuda ${CMAKE_CTEST_COMMAND}
-      --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-      --build-generator ${CMAKE_GENERATOR}
-      --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-      --build-target scarckin_poisson
-      --build-nocmake
-      --build-noclean
-      --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/scarckin_poisson --level 5 0 --mem cuda --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
-    SET_PROPERTY(TEST scarckin_poisson_serial_cuda PROPERTY LABELS "serial")
-    SET_PROPERTY(TEST scarckin_poisson_serial_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  endif (FEAT_HAVE_CUDA)
 endif (FEAT_HAVE_MPI)
 
 ######################### navier_stokes_cp2d_q2q1
