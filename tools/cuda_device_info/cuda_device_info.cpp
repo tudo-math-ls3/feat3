@@ -1,9 +1,10 @@
 #include <kernel/base_header.hpp>
 #include <iostream>
+#include <cuda_runtime.h>
 
 using namespace FEAT;
 
-int main (int argc, char** argv)
+int main (int /*argc*/, char** /*argv*/)
 {
   //
   // get number of devices in the system, and perform proper error checking:
