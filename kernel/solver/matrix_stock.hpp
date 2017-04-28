@@ -35,6 +35,9 @@ namespace FEAT
 
         using MuxerType = typename TransferType_::MuxerType;
 
+        /// virtual hierarchy sizes
+        std::size_t size_virtual;
+
         // input deques with original containers
         std::deque<MatrixType_> systems;
         std::deque<GateRowType_*> gates_row;
@@ -284,6 +287,11 @@ namespace FEAT
           typename MT_cuda_double_uint::LocalMatrix, typename FT_cuda_double_uint::LocalFilter, typename TT_cuda_double_uint::LocalTransfer>
           > > local_hierarchy_map_cuda_double_uint;
 #endif
+
+        explicit MatrixStock(std::size_t size_virt) :
+          size_virtual(size_virt)
+        {
+        }
 
         /// compile global systems
         template <typename SolverVectorType_>

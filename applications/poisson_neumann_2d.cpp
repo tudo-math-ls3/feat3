@@ -39,6 +39,21 @@ namespace PoissonNeumann2D
     typedef Real DataType;
     typedef Index IndexType;
 
+    // choose cycle
+    Solver::MultiGridCycle cycle = Solver::MultiGridCycle::V;
+    if(args.parse("cycle", cycle) < 0)
+    {
+      comm.print("ERROR: Invalid cycle");
+      Runtime::abort();
+    }
+    /*if(args.check("cycle") > 0)
+    {
+      String s;
+      args.parse("cycle", s);
+      cycle << s;
+    }*/
+    comm.print("Cycle: " + stringify(cycle));
+
     // choose our desired analytical solution
     Analytic::Common::CosineWaveFunction<2> sol_func;
 
@@ -77,7 +92,7 @@ namespace PoissonNeumann2D
 
     comm.print("Assembling transfers...");
 
-    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
+    for (Index i(0); (i < num_levels) && ((i+1) < domain.size_virtual()); ++i)
     {
       system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
       system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
@@ -150,31 +165,39 @@ namespace PoissonNeumann2D
       typename SystemLevelType::GlobalSystemMatrix,
       typename SystemLevelType::GlobalSystemFilter,
       typename SystemLevelType::GlobalSystemTransfer
-      > >();
+      > >(domain.size_virtual());
 
     // scaling factor
     DataType omega = DataType(0.2);
 
     // push levels into MGV
-    auto it_end = --system_levels.end();
-    for (auto it = system_levels.begin(); it != it_end; ++it)
+    for(std::size_t i(0); i < system_levels.size(); ++i)
     {
-      auto smoother = Solver::new_richardson((*it)->matrix_sys, (*it)->filter_sys, omega);
-      smoother->set_max_iter(4);
-      smoother->set_min_iter(4);
-      multigrid_hierarchy->push_level((*it)->matrix_sys, (*it)->filter_sys, (*it)->transfer_sys, smoother, smoother, smoother);
-    }
+      // get a reference to the system level
+      const SystemLevelType& lvl = *system_levels.at(i);
 
-    // create coarse grid solver
-    {
-      auto coarse_solver = Solver::new_richardson(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, omega);
-      coarse_solver->set_max_iter(4);
-      coarse_solver->set_min_iter(4);
-      multigrid_hierarchy->push_level(system_levels.back()->matrix_sys, system_levels.back()->filter_sys, coarse_solver);
+      // Is this the virtual coarse level?
+      if((i+1) < domain.size_virtual())
+      {
+        // No, so add a smoothing level
+        auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, omega);
+        smoother->set_max_iter(4);
+        smoother->set_min_iter(4);
+        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
+      }
+      else
+      {
+        // Yes, that's the virtual coarse level
+        auto coarse_solver = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, omega);
+        coarse_solver->set_max_iter(4);
+        coarse_solver->set_min_iter(4);
+        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
+      }
     }
 
     // create our solver
-    auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
+    auto mgv = Solver::new_multigrid(multigrid_hierarchy, cycle);
+
     auto solver = Solver::new_pcg(matrix, filter, mgv);
 
     // enable plotting
@@ -263,6 +286,8 @@ namespace PoissonNeumann2D
     args.support("level");
     args.support("no-err");
     args.support("vtk");
+    args.support("cycle");
+    args.support("debug-rank");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -274,6 +299,15 @@ namespace PoissonNeumann2D
       // abort
       FEAT::Runtime::abort();
     }
+
+#ifdef FEAT_COMPILER_MICROSOFT
+    {
+      int dbg_rank(-1);
+      args.parse("debug-rank", dbg_rank);
+      if(comm.rank() == dbg_rank)
+        __debugbreak();
+    }
+#endif
 
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
@@ -320,6 +354,11 @@ namespace PoissonNeumann2D
       // plot our levels
       comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvls.front()) + "]");
       comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvls.back()) + "]");
+
+      {
+        String s = String("Phys/Virt Sizes: ") + stringify(domain.size_physical()) + " / " + stringify(domain.size_virtual());
+        comm.allprint(s);
+      }
 
       domain.dump_layers();
       domain.dump_layer_levels();

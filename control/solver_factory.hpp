@@ -539,7 +539,7 @@ namespace FEAT
             }
             else
             {
-              hierarchy = std::make_shared<typename decltype(hierarchy)::element_type>();
+              hierarchy = std::make_shared<typename decltype(hierarchy)::element_type>(matrix_stock.size_virtual);
               hmap[hierarchy_p.first] = hierarchy;
 
               auto hierarchy_section_path = get_section_path(base, section, section_name, hierarchy_p.first);
@@ -560,6 +560,7 @@ namespace FEAT
                 throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without smoother key is not allowed!");
               auto smoother_section_path = get_section_path(base, section, section_name, smoother_p.first);
 
+              XASSERT(matrix_stock.systems.size() <= matrix_stock.size_virtual);
               for(Index level(0) ; level < matrix_stock.systems.size() ; ++level)
               {
                 auto coarse_solver = create_scalar_solver_by_section<MST_, SolverVectorType_>(matrix_stock, base, coarse_solver_section_path, level);
@@ -579,11 +580,12 @@ namespace FEAT
             auto cycle_p = section->query("cycle");
             if (!cycle_p.second)
               throw InternalError(__func__, __FILE__, __LINE__, "mg section without cycle key is not allowed!");
-            auto lvl_min_s = section->query("lvl_min", "0");
+            auto lvl_min_s = section->query("lvl_min", "-1");
             auto lvl_min = std::stoi(lvl_min_s);
-            auto lvl_max_s = section->query("lvl_max", "-1");
+            auto lvl_max_s = section->query("lvl_max", "0");
             auto lvl_max = std::stoi(lvl_max_s);
-            lvl_max = Math::max(lvl_max, (int)( matrix_stock.systems.size()-solver_level-1));
+            lvl_max = Math::max(lvl_max, int(solver_level));
+            lvl_min = Math::min(lvl_min, int(matrix_stock.size_virtual)-1);
 
             if (cycle_p.first == "v")
             {

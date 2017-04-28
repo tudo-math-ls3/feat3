@@ -882,7 +882,7 @@ struct NavierStokesScrewsApp
 
     comm.print("Assembling transfers...");
 
-    for (Index i(0); (i+1) < extruded_dom_ctrl.size_virtual(); ++i)
+    for (Index i(0); (i < num_levels) && ((i+1) < extruded_dom_ctrl.size_virtual()); ++i)
     {
       system_levels.at(i)->assemble_coarse_muxers(extruded_dom_ctrl.at(i+1));
       system_levels.at(i)->assemble_transfers(extruded_dom_ctrl.at(i), extruded_dom_ctrl.at(i+1), cubature);
@@ -1095,8 +1095,10 @@ struct NavierStokesScrewsApp
     comm.print("Setting up Velocity Multigrid...");
 
     watch_sol_init.start();
-    Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter,
-    typename SystemLevelType::GlobalVeloTransfer> matrix_stock_velo;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalMatrixBlockA,
+      typename SystemLevelType::GlobalVeloFilter,
+      typename SystemLevelType::GlobalVeloTransfer> matrix_stock_velo(extruded_dom_ctrl.size_virtual());
     for (auto & system_level: system_levels)
     {
       matrix_stock_velo.systems.push_back(system_level->matrix_a.clone(LAFEM::CloneMode::Shallow));
@@ -1118,8 +1120,10 @@ struct NavierStokesScrewsApp
 
     comm.print("Setting up Pressure Multigrid...");
 
-    Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, typename SystemLevelType::GlobalPresFilter,
-    typename SystemLevelType::GlobalPresTransfer> matrix_stock_pres;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalSchurMatrix,
+      typename SystemLevelType::GlobalPresFilter,
+      typename SystemLevelType::GlobalPresTransfer> matrix_stock_pres(extruded_dom_ctrl.size_virtual());
     for (auto & system_level: system_levels)
     {
       matrix_stock_pres.systems.push_back(system_level->matrix_s.clone(LAFEM::CloneMode::Shallow));
@@ -1137,8 +1141,10 @@ struct NavierStokesScrewsApp
     solver_s->init_symbolic();
     solver_s->set_plot_name(solver_s->name()+" (P-Lap)");
 
-    Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, MassPFilter,
-    typename SystemLevelType::GlobalPresTransfer> ms_mass_p;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalSchurMatrix,
+      MassPFilter,
+      typename SystemLevelType::GlobalPresTransfer> ms_mass_p(std::size_t(1));
     MassPFilter mass_p_filter;
     ms_mass_p.systems.push_back(matrix_m_p.clone(LAFEM::CloneMode::Shallow));
     ms_mass_p.gates_row.push_back(&the_system_level.gate_pres);
@@ -2490,8 +2496,8 @@ static void read_test_solver_config(std::stringstream& iss, const int DOXY(test_
   iss << "[mgv_a]" << std::endl;
   iss << "type = mg" << std::endl;
   iss << "hierarchy = h1_a" << std::endl;
-  iss << "lvl_min = 0" << std::endl;
-  iss << "lvl_max = -1" << std::endl;
+  iss << "lvl_min = -1" << std::endl;
+  iss << "lvl_max = 0" << std::endl;
   iss << "cycle = f" << std::endl;
 
   iss << "[h1_a]" << std::endl;
@@ -2574,8 +2580,8 @@ static void read_test_solver_config(std::stringstream& iss, const int DOXY(test_
   iss << "[Meshopt-MG]" << std::endl;
   iss << "type = mg" << std::endl;
   iss << "hierarchy = h_cg" << std::endl;
-  iss << "lvl_min = 0" << std::endl;
-  iss << "lvl_max = -1" << std::endl;
+  iss << "lvl_min = -1" << std::endl;
+  iss << "lvl_max = 0" << std::endl;
   iss << "cycle = v" << std::endl;
 
   iss << "[h_cg]" << std::endl;

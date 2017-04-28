@@ -820,8 +820,8 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[MG1]" << std::endl;
     iss << "type = mg" << std::endl;
     iss << "hierarchy = s:rich-c:pcg" << std::endl;
-    iss << "lvl_min = 0" << std::endl;
-    iss << "lvl_max = -1" << std::endl;
+    iss << "lvl_min = -1" << std::endl;
+    iss << "lvl_max = 0" << std::endl;
     iss << "cycle = w" << std::endl;
 
     iss << "[s:rich-c:pcg]" << std::endl;
@@ -882,8 +882,8 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[MG1]" << std::endl;
     iss << "type = mg" << std::endl;
     iss << "hierarchy = s:rich-c:pcg" << std::endl;
-    iss << "lvl_min = 0" << std::endl;
-    iss << "lvl_max = -1" << std::endl;
+    iss << "lvl_min = -1" << std::endl;
+    iss << "lvl_max = 0" << std::endl;
     iss << "cycle = v" << std::endl;
 
     iss << "[s:rich-c:pcg]" << std::endl;

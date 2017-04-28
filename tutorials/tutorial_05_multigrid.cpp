@@ -352,12 +352,14 @@ namespace Tutorial05
     // for managing the level hierarchy used by a multigrid solver. Note that this hierarchy
     // object is not a solver/preconditioner -- we will create that one later on.
 
-    // The MultiGridHierarchy class templates has four template parameters:
+    // The MultiGridHierarchy class templates has three template parameters and its only
+    // constructor parameter is the size of the level hierarchy, i.e. the total number of
+    // levels that we want to create:
     auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
       MatrixType,   // the system matrix type
       FilterType,   // the system filter type
       TransferType  // the transfer operator type
-      >>();
+      >>( levels.size() );
 
     // Now we need to fill this empty hierarchy object with life, i.e. we have to attach
     // all our matrices and filters to it. Moreover, we also need to create the corresponding

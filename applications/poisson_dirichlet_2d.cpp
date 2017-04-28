@@ -156,7 +156,7 @@ namespace PoissonDirichlet2D
       typename SystemLevelType::GlobalSystemMatrix,
       typename SystemLevelType::GlobalSystemFilter,
       typename SystemLevelType::GlobalSystemTransfer
-        > >();
+        > >(domain.size_virtual());
 
     // push all levels except the coarse most one
     for (Index i(0); (i+1) < num_levels; ++i)

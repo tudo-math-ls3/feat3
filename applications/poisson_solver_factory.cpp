@@ -153,7 +153,10 @@ namespace PoissonDirichlet2D
     comm.print("Creating solver tree");
 
     ////////// MATRIX STOCK
-    Solver::MatrixStock<typename SystemLevelType::GlobalSystemMatrix, typename SystemLevelType::GlobalSystemFilter, typename SystemLevelType::GlobalSystemTransfer> matrix_stock;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalSystemMatrix,
+      typename SystemLevelType::GlobalSystemFilter,
+      typename SystemLevelType::GlobalSystemTransfer> matrix_stock(domain.size_virtual());
     for (auto& system_level : system_levels)
     {
       matrix_stock.systems.push_back(system_level->matrix_sys.clone(LAFEM::CloneMode::Shallow));

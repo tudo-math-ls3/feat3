@@ -34,35 +34,48 @@ namespace FEAT
       switch(cycle)
       {
       case MultiGridCycle::V:
-        return os << "v";
+        return os << "V";
       case MultiGridCycle::F:
-        return os << "f";
+        return os << "F";
       case MultiGridCycle::W:
-        return os << "w";
+        return os << "W";
       default:
         return os << "?";
       }
     }
 
-    inline void operator<<(MultiGridCycle& cycle, const String& cycle_name)
+    inline std::istream& operator>>(std::istream& is, MultiGridCycle& cycle)
     {
-      if(cycle_name == "v")
+      // read character
+      char c(' ');
+      if((is >> c).fail())
+        return is;
+
+      switch(c)
       {
+      case 'v':
+      case 'V':
         cycle = MultiGridCycle::V;
-      }
-      else if(cycle_name == "w")
-      {
-        cycle = MultiGridCycle::W;
-      }
-      else if(cycle_name == "f")
-      {
+        break;
+
+      case 'f':
+      case 'F':
         cycle = MultiGridCycle::F;
+        break;
+
+      case 'w':
+      case 'W':
+        cycle = MultiGridCycle::W;
+        break;
+
+      default:
+        // invalid character
+        is.putback(c);
+        is.setstate(std::ios_base::failbit);
+        break;
       }
-      else
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "Unknown MultiGridCycle identifier string "
-            +cycle_name);
-      }
+
+      return is;
     }
     /// \endcond
 
@@ -310,7 +323,7 @@ namespace FEAT
       {
       }
 
-      /// virtal destructor
+      /// virtual destructor
       virtual ~MultiGridLevelStd()
       {
       }
@@ -531,13 +544,15 @@ namespace FEAT
        */
       LevelInfo& _get_level_info(Index lvl)
       {
-        XASSERTM(lvl < get_num_levels(), "invalid level index");
+        XASSERTM(lvl < size_physical(), "invalid level index");
         return _levels.at(std::size_t(lvl));
       }
 
     protected:
       /// the deque of all level info objects
       std::deque<LevelInfo> _levels;
+      /// the virtual multigrid hierarchy sizes
+      std::size_t _virt_size;
       /// specifies whether init_symbolic() has been called
       bool _have_init_symbolic;
       /// specifies whether init_numeric() has been called
@@ -546,9 +561,13 @@ namespace FEAT
     public:
       /**
        * \brief Constructor
+       *
+       * \param[in] size_virt
+       * The virtual multigrid hierarchy size on all processes.
        */
-      MultiGridHierarchy() :
+      explicit MultiGridHierarchy(std::size_t size_virt) :
         _levels(),
+        _virt_size(size_virt),
         _have_init_symbolic(false),
         _have_init_numeric(false)
       {
@@ -574,8 +593,8 @@ namespace FEAT
       {
         XASSERTM(!_have_init_symbolic, "cannot push new level, init_symbolic() was already called");
         XASSERTM(!_have_init_numeric,  "cannot push new level, init_numeric() was already called");
-        //_levels.push_back(LevelInfo(level));
-        _levels.push_front(LevelInfo(level));
+        XASSERTM(_levels.size() < _virt_size, "cannot push new level, already have maximum number of levels");
+        _levels.push_back(LevelInfo(level));
       }
 
       /**
@@ -650,11 +669,23 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the number of levels in the hierarchy.
+       * \brief Returns the physical hierarchy size.
+       *
+       * \returns The physical hierarchy size.
        */
-      Index get_num_levels() const
+      Index size_physical() const
       {
         return Index(_levels.size());
+      }
+
+      /**
+       * \brief Returns the virtual hierarchy size.
+       *
+       * \returns The virtual hierarchy size.
+       */
+      Index size_virtual() const
+      {
+        return Index(_virt_size);
       }
 
       /**
@@ -668,14 +699,14 @@ namespace FEAT
        */
       LevelType& get_level(Index lvl)
       {
-        XASSERTM(lvl < get_num_levels(), "invalid level index");
+        XASSERTM(lvl < size_physical(), "invalid level index");
         return *(_levels.at(std::size_t(lvl)).level);
       }
 
       /** \copydoc get_level() */
       const LevelType& get_level(Index lvl) const
       {
-        XASSERTM(lvl < get_num_levels(), "invalid level index");
+        XASSERTM(lvl < size_physical(), "invalid level index");
         return *(_levels.at(std::size_t(lvl)).level);
       }
 
@@ -949,7 +980,7 @@ namespace FEAT
       typedef typename LevelType::SystemFilterType FilterType;
       /// the system vector type
       typedef typename LevelType::SystemVectorType VectorType;
-      /// the trasnfer operator type
+      /// the transfer operator type
       typedef typename LevelType::TransferOperatorType TransferOperatorType;
       /// the sub-solver type
       typedef typename LevelType::SolverType SolverType;
@@ -991,24 +1022,24 @@ namespace FEAT
        *
        * \param[in] top_level
        * The desired top-level for this multigrid solver.\n
-       * Set to -1 to use the finest level in the multigrid hierarchy.
+       * Set to 0 to use the finest level in the multigrid hierarchy.
        *
        * \param[in] crs_level
        * The desired coarse-level for this multigrid solver.\n
-       * Set to 0 to use the coarsest level in the multigrid hierarchy.
+       * Set to -1 to use the coarsest level in the multigrid hierarchy.
        *
        * \note
        * The cycle may be changed anytime by using the set_cycle() function.
        */
-      explicit MultiGrid(std::shared_ptr<HierarchyType> hierarchy, MultiGridCycle cycle, int top_level = -1, int crs_level = 0) :
+      explicit MultiGrid(std::shared_ptr<HierarchyType> hierarchy, MultiGridCycle cycle, int top_level = 0, int crs_level = -1) :
         BaseClass(),
         _hierarchy(hierarchy),
         _cycle(cycle),
-        _top_level(top_level >= 0 ? Index(top_level) : Index(int(_hierarchy->get_num_levels()) + top_level)),
-        _crs_level(Index(crs_level))
+        _top_level(Index(top_level)),
+        _crs_level(crs_level >= 0 ? Index(crs_level) : Index(int(_hierarchy->size_virtual()) + crs_level))
       {
-        XASSERTM(crs_level >= 0, "invalid coarse level");
-        XASSERTM(_top_level >= _crs_level, "invalid top-/coarse-level combination");
+        XASSERTM(_crs_level < _hierarchy->size_virtual(), "invalid coarse level");
+        XASSERTM(_top_level <= _crs_level, "invalid top/coarse level combination");
       }
 
       /// virtual destructor
@@ -1042,18 +1073,19 @@ namespace FEAT
        *
        * \param[in] top_level
        * The desired top-level for this multigrid solver.\n
-       * Set to -1 to use the finest level in the multigrid hierarchy.
+       * Set to 0 to use the finest level in the multigrid hierarchy.
        *
        * \param[in] crs_level
        * The desired coarse-level for this multigrid solver.\n
-       * Set to 0 to use the coarsest level in the multigrid hierarchy.
+       * Set to -1 to use the coarsest level in the multigrid hierarchy.
        */
       void set_levels(int top_level, int crs_level)
       {
-        XASSERTM(crs_level >= 0, "invalid coarse level");
-        _top_level = (top_level >= 0 ? Index(top_level) : Index(int(_hierarchy->get_num_levels()) + top_level));
-        _crs_level = Index(crs_level);
-        XASSERTM(_top_level >= _crs_level, "invalid top-/coarse-level combination");
+        _top_level = Index(top_level);
+        _crs_level = (crs_level >= 0 ? Index(crs_level) : Index(int(_hierarchy->size_virtual()) + crs_level));
+
+        XASSERTM(_crs_level < _hierarchy->size_virtual(), "invalid coarse level");
+        XASSERTM(_top_level <= _crs_level, "invalid top/coarse level combination");
       }
 
       /**
@@ -1102,16 +1134,17 @@ namespace FEAT
         // ensure that the hierarchy was initialised
         XASSERTM(_hierarchy->have_symbolic(), "init_symbolic() of multigrid hierarchy was not called yet");
 
-        const std::size_t num_lvls = _hierarchy->get_num_levels();
+        // get the virtual hierarchy size
+        const std::size_t num_lvls = _hierarchy->size_virtual();
 
         // allocate counter vector
-        _counters.resize(std::size_t(num_lvls), 0);
+        _counters.resize(num_lvls, 0);
 
         // allocate statistics vectors
-        _toes.resize(std::size_t(num_lvls), 0.0);
-        _mpi_execs.resize(std::size_t(num_lvls), 0.0);
-        _mpi_waits_reduction.resize(std::size_t(num_lvls), 0.0);
-        _mpi_waits_spmv.resize(std::size_t(num_lvls), 0.0);
+        _toes.resize(num_lvls, 0.0);
+        _mpi_execs.resize(num_lvls, 0.0);
+        _mpi_waits_reduction.resize(num_lvls, 0.0);
+        _mpi_waits_spmv.resize(num_lvls, 0.0);
       }
 
       /**
@@ -1183,7 +1216,7 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
         // reset statistics counters
-        for(std::size_t i(0); i <= std::size_t(_top_level); ++i)
+        for(std::size_t i(0); i <  std::size_t(_hierarchy->size_virtual()); ++i)
         {
           _toes.at(i) = 0.0;
           _mpi_execs.at(i) = 0.0;
@@ -1224,7 +1257,7 @@ namespace FEAT
         vec_cor.copy(lvl_top.vec_sol);
 
         // propagate solver statistics
-        for(std::size_t i(0); i <= std::size_t(_top_level); ++i)
+        for(std::size_t i(0); i <  std::size_t(_hierarchy->size_virtual()); ++i)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), Index(i),
             _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i), _mpi_waits_spmv.at(i)));
@@ -1276,11 +1309,15 @@ namespace FEAT
         //
         // 4) Prolongate from the coarse level to the top level
 
-        // restrict (apply top-level pre-smoother if if it exists)
+        // restrict (apply top-level pre-smoother if it exists)
         this->_apply_rest(_top_level, true);
 
+        // get the coarsest level on this process; that's either the
+        // coarse level or the last level for this process:
+        const Index last_level = Math::min(_crs_level, _hierarchy->size_physical());
+
         // F-cycle intermediate peak-level loop
-        for(Index peak_lvl(_crs_level+1); peak_lvl < _top_level; ++peak_lvl)
+        for(Index peak_lvl(last_level-1); peak_lvl > _top_level; --peak_lvl)
         {
           // solve coarse level
           this->_apply_coarse();
@@ -1298,7 +1335,7 @@ namespace FEAT
         // solve coarse level
         this->_apply_coarse();
 
-        // prolongate (apply top-level post-smoother if if it exists)
+        // prolongate (apply top-level post-smoother if it exists)
         this->_apply_prol(_top_level, true);
 
         // okay
@@ -1331,32 +1368,36 @@ namespace FEAT
         // Oh yes, and finally we also need to prolongate from the
         // coarse level to the top level, of course.
 
-        // restrict (apply top-level pre-smoother if if it exists)
+        // restrict (apply top-level pre-smoother if it exists)
         this->_apply_rest(_top_level, true);
 
         // solve coarse level
         this->_apply_coarse();
 
+        // get the coarsest level on this process; that's either the
+        // coarse level or the last level for this process:
+        const Index last_level = Math::min(_crs_level, _hierarchy->size_physical());
+
         // reset all level counters to 0
-        for(std::size_t i(_crs_level); i <= std::size_t(_top_level); ++i)
+        for(std::size_t i(_top_level); i <= std::size_t(last_level); ++i)
         {
           _counters[i] = 0;
         }
 
         // compute the total number of coarse-grid solves to perform:
         // that's = 2^(top_level - crs_level)
-        const int num_cgs = 1 << (_top_level - _crs_level);
+        const int num_cgs = 1 << (last_level - _top_level);
 
         // W-cycle loop: count the number of coarse-grid solves
         for(int cgs(1); cgs < num_cgs; ++cgs)
         {
           // find the next peak level; that's the lowest level
           // above the coarse level whose counter is 0
-          std::size_t peak_lvl = std::size_t(_crs_level+1);
-          for(; peak_lvl <= std::size_t(_top_level); ++peak_lvl)
+          std::size_t peak_lvl = std::size_t(last_level);
+          while(peak_lvl > std::size_t(_top_level))
           {
             // if the counter is 0, we have our next peak level
-            if(_counters[peak_lvl] == 0)
+            if(_counters[--peak_lvl] == 0)
               break;
           }
 
@@ -1368,10 +1409,10 @@ namespace FEAT
           // <<<<< DEBUG <<<<<
 
           // sanity check: do not go beyond our top level
-          XASSERTM(peak_lvl <= _top_level, "W-cycle sanity check failed: invalid peak level");
+          XASSERTM(peak_lvl >= _top_level, "W-cycle sanity check failed: invalid peak level");
 
           // reset all counters below our peak level to 0
-          for(std::size_t i = std::size_t(_crs_level+1); i < peak_lvl; ++i)
+          for(std::size_t i = std::size_t(last_level-1); i > peak_lvl; --i)
             _counters[i] = 0;
 
           // increment the counter of our peak level by 1,
@@ -1400,12 +1441,13 @@ namespace FEAT
         }
 
         // sanity check: all level counters above the coarse level must be 1
-        for(std::size_t i(_crs_level+1); i <= std::size_t(_top_level); ++i)
+        for(std::size_t i(last_level); i > std::size_t(_top_level); )
         {
+          --i;
           XASSERTM(this->_counters[i] == 1, "W-cycle sanity check failed: invalid counters");
         }
 
-        // prolongate (apply top-level post-smoother if if it exists)
+        // prolongate (apply top-level post-smoother if it exists)
         this->_apply_prol(_top_level, true);
 
         // okay
@@ -1417,6 +1459,10 @@ namespace FEAT
        */
       Status _apply_coarse()
       {
+        // no coarse level on this process?
+        if(_crs_level >= _hierarchy->size_physical())
+          return Status::success;
+
         // process the coarse grid level
         TimeStamp at;
         double mpi_exec_start(Statistics::get_time_mpi_execute());
@@ -1450,8 +1496,7 @@ namespace FEAT
         }
         lvl_crs.time_coarse += stamp_coarse.elapsed_now();
 
-        TimeStamp bt;
-        _toes.at(std::size_t(_crs_level)) = bt.elapsed(at);
+        _toes.at(std::size_t(_crs_level)) = at.elapsed_now();
         double mpi_exec_stop(Statistics::get_time_mpi_execute());
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
@@ -1570,8 +1615,10 @@ namespace FEAT
        */
       Status _apply_rest(const Index cur_lvl, bool cur_smooth)
       {
-        // restriction loop: from current level to corse level
-        for(Index i(cur_lvl); i > _crs_level; --i)
+        const Index last_level = Math::min(_crs_level, _hierarchy->size_physical());
+
+        // restriction loop: from current level to last level
+        for(Index i(cur_lvl); i < last_level; ++i)
         {
           TimeStamp at;
           double mpi_exec_start(Statistics::get_time_mpi_execute());
@@ -1580,17 +1627,10 @@ namespace FEAT
 
           // get our fine and coarse levels
           LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
-          LevelInfo& lvl_c = _hierarchy->_get_level_info(i-1);
 
           // get system matrix and filters
           const MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
           const FilterType& system_filter_f = lvl_f.level->get_system_filter();
-          const FilterType& system_filter_c = lvl_c.level->get_system_filter();
-
-          // get our transfer operator
-          const TransferOperatorType* transfer_operator = lvl_f.level->get_transfer_operator();
-          XASSERTM(transfer_operator != nullptr, "transfer operator is missing");
-          XASSERT(!transfer_operator->is_ghost());
 
           // get our pre-smoother
           std::shared_ptr<SolverType> smoother = lvl_f.level->get_smoother_pre();
@@ -1600,7 +1640,7 @@ namespace FEAT
           // as otherwise the following statements would discard the solution vector
           // approximation that has already been computed by prior restriction and
           // peak-smoothing operations.
-          if(cur_smooth || (i < cur_lvl))
+          if(cur_smooth || (i > cur_lvl))
           {
             // apply pre-smoother if we have one
             if(smoother)
@@ -1630,23 +1670,47 @@ namespace FEAT
           // filter our defect
           system_filter_f.filter_def(lvl_f.vec_def);
 
-          // restrict onto coarse level
-          Statistics::add_solver_expression(std::make_shared<ExpressionRestriction>(this->name(), i));
-          TimeStamp stamp_rest;
-          transfer_operator->rest(lvl_f.vec_def, lvl_c.vec_rhs);
-          lvl_f.time_transfer += stamp_rest.elapsed_now();
+          // get our transfer operator
+          const TransferOperatorType* transfer_operator = lvl_f.level->get_transfer_operator();
+          XASSERTM(transfer_operator != nullptr, "transfer operator is missing");
 
-          // filter coarse fefect
-          system_filter_c.filter_def(lvl_c.vec_rhs);
+          // break loop?
+          bool break_loop = false;
 
-          TimeStamp bt;
-          _toes.at((size_t)i)= bt.elapsed(at);
+          // ghost transfer?
+          if(transfer_operator->is_ghost())
+          {
+            // send restriction to parent processes and return
+            transfer_operator->rest_send(lvl_f.vec_def);
+            break_loop = true;
+          }
+          else
+          {
+            // okay, get coarse level
+            LevelInfo& lvl_c = _hierarchy->_get_level_info(i+1);
+            const FilterType& system_filter_c = lvl_c.level->get_system_filter();
+
+            // restrict onto coarse level
+            //Statistics::add_solver_expression(std::make_shared<ExpressionRestriction>(this->name(), i));
+            TimeStamp stamp_rest;
+            transfer_operator->rest(lvl_f.vec_def, lvl_c.vec_rhs);
+            lvl_f.time_transfer += stamp_rest.elapsed_now();
+
+            // filter coarse defect
+            system_filter_c.filter_def(lvl_c.vec_rhs);
+          }
+
+          // collect timings
+          _toes.at((size_t)i)= at.elapsed_now();
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           _mpi_execs.at((size_t)i) = mpi_exec_stop - mpi_exec_start;
           _mpi_waits_reduction.at((size_t)i) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
           _mpi_waits_spmv.at((size_t)i) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
+
+          if(break_loop)
+            break;
 
           // descent to prior level
         }
@@ -1665,32 +1729,42 @@ namespace FEAT
        */
       virtual Status _apply_prol(const Index cur_lvl, bool cur_smooth)
       {
-        // prolongation loop: from coarse level to current level
-        for(Index i(_crs_level+1); i <= cur_lvl; ++i)
+        const Index last_level = Math::min(_crs_level, _hierarchy->size_physical());
+
+        // prolongation loop: from last level to current level
+        for(Index i(last_level); i > cur_lvl;)
         {
+          --i;
           TimeStamp at;
           double mpi_exec_start(Statistics::get_time_mpi_execute());
           double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
-          // get our level and the coarse level
+          // get our fine level
           LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
-          LevelInfo& lvl_c = _hierarchy->_get_level_info(i-1);
-
-          // get system matrix and filters
-          const MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
-          const FilterType& system_filter_f = lvl_f.level->get_system_filter();
 
           // get our transfer operator
           const TransferOperatorType* transfer_operator = lvl_f.level->get_transfer_operator();
           XASSERTM(transfer_operator != nullptr, "transfer operator is missing");
-          XASSERT(!transfer_operator->is_ghost());
 
-          // prolongate coarse grid solution
-          Statistics::add_solver_expression(std::make_shared<ExpressionProlongation>(this->name(), i));
-          TimeStamp stamp_prol;
-          transfer_operator->prol(lvl_f.vec_cor, lvl_c.vec_sol);
-          lvl_f.time_transfer += stamp_prol.elapsed_now();
+          // ghost transfer?
+          if(transfer_operator->is_ghost())
+          {
+            // receive prolongation
+            transfer_operator->prol_recv(lvl_f.vec_cor);
+          }
+          else
+          {
+            // get coarse level
+            LevelInfo& lvl_c = _hierarchy->_get_level_info(i+1);
+
+            // prolongate
+            transfer_operator->prol(lvl_f.vec_cor, lvl_c.vec_sol);
+          }
+
+          // get system matrix and filters
+          const MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
+          const FilterType& system_filter_f = lvl_f.level->get_system_filter();
 
           // apply correction filter
           system_filter_f.filter_cor(lvl_f.vec_cor);
@@ -1702,7 +1776,7 @@ namespace FEAT
           std::shared_ptr<SolverType> smoother = lvl_f.level->get_smoother_post();
 
           // apply post-smoother if we have one
-          if(smoother && (cur_smooth || (i < cur_lvl)))
+          if(smoother && (cur_smooth || (i > cur_lvl)))
           {
             // compute new defect
             TimeStamp stamp_defect;
@@ -1723,8 +1797,7 @@ namespace FEAT
             lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol);
           }
 
-          TimeStamp bt;
-          _toes.at((size_t)i) += bt.elapsed(at);
+          _toes.at((size_t)i) += at.elapsed_now();
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
@@ -1750,11 +1823,11 @@ namespace FEAT
      *
      * \param[in] top_level
      * The desired top-level for this multigrid solver.\n
-     * Set to -1 to use the finest level in the multigrid hierarchy.
+     * Set to 0 to use the finest level in the multigrid hierarchy.
      *
      * \param[in] crs_level
      * The desired coarse-level for this multigrid solver.\n
-     * Set to 0 to use the coarsest level in the multigrid hierarchy.
+     * Set to -1 to use the coarsest level in the multigrid hierarchy.
      *
      * \returns
      * A shared pointer to a new MultiGrid object.
@@ -1766,8 +1839,8 @@ namespace FEAT
     std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>> new_multigrid(
       std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, TransferOperator_>> hierarchy,
       MultiGridCycle cycle = MultiGridCycle::V,
-      int top_level = -1,
-      int crs_level = 0)
+      int top_level = 0,
+      int crs_level = -1)
     {
       return std::make_shared<MultiGrid<SystemMatrix_, SystemFilter_, TransferOperator_>>
         (hierarchy, cycle, top_level, crs_level);

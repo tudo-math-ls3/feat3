@@ -819,8 +819,10 @@ namespace NaverStokesCP2D
 
     comm.print("Setting up Velocity Multigrid...");
 
-    Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter,
-      typename SystemLevelType::GlobalVeloTransfer> matrix_stock_velo;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalMatrixBlockA,
+      typename SystemLevelType::GlobalVeloFilter,
+      typename SystemLevelType::GlobalVeloTransfer> matrix_stock_velo(domain.size_virtual());
     for (auto & system_level: system_levels)
     {
       matrix_stock_velo.systems.push_back(system_level->matrix_a.clone(LAFEM::CloneMode::Shallow));
@@ -846,8 +848,10 @@ namespace NaverStokesCP2D
 
     comm.print("Setting up Pressure Multigrid...");
 
-    Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, typename SystemLevelType::GlobalPresUnitFilter,
-      typename SystemLevelType::GlobalPresTransfer> matrix_stock_pres;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalSchurMatrix,
+      typename SystemLevelType::GlobalPresUnitFilter,
+      typename SystemLevelType::GlobalPresTransfer> matrix_stock_pres(domain.size_virtual());
     for (auto & system_level: system_levels)
     {
       matrix_stock_pres.systems.push_back(system_level->matrix_s.clone(LAFEM::CloneMode::Shallow));

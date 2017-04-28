@@ -208,7 +208,10 @@ namespace StokesPoiseuille2D
     comm.print("Creating solver tree");
 
     ////////// MATRIX STOCK
-    Solver::MatrixStock<typename SystemLevelType::GlobalMatrixBlockA, typename SystemLevelType::GlobalVeloFilter, typename SystemLevelType::GlobalVeloTransfer> matrix_stock_a;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalMatrixBlockA,
+      typename SystemLevelType::GlobalVeloFilter,
+      typename SystemLevelType::GlobalVeloTransfer> matrix_stock_a(domain.size_virtual());
     for (auto& system_level : system_levels)
     {
       matrix_stock_a.systems.push_back(system_level->matrix_a.clone(LAFEM::CloneMode::Shallow));
@@ -219,7 +222,10 @@ namespace StokesPoiseuille2D
       matrix_stock_a.transfers.push_back(system_level->transfer_velo.clone(LAFEM::CloneMode::Shallow));
     }
 
-    Solver::MatrixStock<typename SystemLevelType::GlobalSchurMatrix, typename SystemLevelType::GlobalPresFilter, typename SystemLevelType::GlobalPresTransfer> matrix_stock_s;
+    Solver::MatrixStock<
+      typename SystemLevelType::GlobalSchurMatrix,
+      typename SystemLevelType::GlobalPresFilter,
+      typename SystemLevelType::GlobalPresTransfer> matrix_stock_s(domain.size_virtual());
     for (auto& system_level : system_levels)
     {
       matrix_stock_s.systems.push_back(system_level->matrix_s.clone(LAFEM::CloneMode::Shallow));

@@ -147,7 +147,7 @@ namespace StokesVortex2D
 
     comm.print("Assembling transfers...");
 
-    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
+    for (Index i(0); (i < num_levels) && ((i+1) < domain.size_virtual()); ++i)
     {
       system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
       system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
@@ -288,21 +288,24 @@ namespace StokesVortex2D
       typename SystemLevelType::GlobalMatrixBlockA,
       typename SystemLevelType::GlobalVeloFilter,
       typename SystemLevelType::GlobalVeloTransfer
-        > >();
+        > >(domain.size_virtual());
     {
       // push levels into MGV
-      for (Index i(0); (i+1) < num_levels; ++i)
+      for (std::size_t i(0); i < system_levels.size(); ++i)
       {
         const SystemLevelType& lvl = *system_levels.at(i);
-        auto smoother = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
-        multigrid_hierarchy_a->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo, smoother, smoother, smoother);
-      }
 
-      // create coarse grid solver
-      {
-        const SystemLevelType& lvl = *system_levels.back();
-        auto coarse_solver = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
-        multigrid_hierarchy_a->push_level(lvl.matrix_a, lvl.filter_velo, coarse_solver);
+        // Is this the virtual coarse level?
+        if((i+1) < domain.size_virtual())
+        {
+          auto smoother = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+          multigrid_hierarchy_a->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo, smoother, smoother, smoother);
+        }
+        else
+        {
+          auto coarse_solver = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+          multigrid_hierarchy_a->push_level(lvl.matrix_a, lvl.filter_velo, coarse_solver);
+        }
       }
 
       auto mgv = Solver::new_multigrid(multigrid_hierarchy_a, Solver::MultiGridCycle::V);

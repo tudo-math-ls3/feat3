@@ -706,7 +706,7 @@ namespace NavierStokesCP2D
 
     comm.print("Assembling transfers...");
 
-    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
+    for (Index i(0); (i < num_levels) && ((i+1) < domain.size_virtual()); ++i)
     {
       system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
       system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
@@ -823,32 +823,35 @@ namespace NavierStokesCP2D
       typename SystemLevelType::GlobalMatrixBlockA,
       typename SystemLevelType::GlobalVeloFilter,
       typename SystemLevelType::GlobalVeloTransfer
-      >>();
+      >>(domain.size_virtual());
 
     // use multigrid for A-solver?
     if(cfg.multigrid_a)
     {
-      // loop over all finer levels
-      for(Index i(0); (i+1) < num_levels; ++i)
+      // loop over all levels
+      for (std::size_t i(0); i < system_levels.size(); ++i)
       {
-        auto& lvl = *system_levels.at(std::size_t(i));
-        auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
-        auto smoother = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
-        smoother->set_max_iter(cfg.smooth_steps_a);
-        smoother->set_min_iter(cfg.smooth_steps_a);
-        multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo,
-          smoother, smoother, smoother);
-      }
+        auto& lvl = *system_levels.at(i);
 
-      // set up velocity coarse grid solver
-      {
-        auto& lvl = *system_levels.back();
-        auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
-        auto cgs = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
-        cgs->set_max_iter(cfg.smooth_steps_a);
-        cgs->set_min_iter(cfg.smooth_steps_a);
-
-        multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, cgs);
+        if((i+1) < domain.size_virtual())
+        {
+          // smoother
+          auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+          auto smoother = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
+          smoother->set_max_iter(cfg.smooth_steps_a);
+          smoother->set_min_iter(cfg.smooth_steps_a);
+          multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo,
+            smoother, smoother, smoother);
+        }
+        else
+        {
+          // coarse grid solver
+          auto jac = Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+          auto cgs = Solver::new_richardson(lvl.matrix_a, lvl.filter_velo, cfg.smooth_damp_a, jac);
+          cgs->set_max_iter(cfg.smooth_steps_a);
+          cgs->set_min_iter(cfg.smooth_steps_a);
+          multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, cgs);
+        }
       }
     }
 
@@ -861,31 +864,34 @@ namespace NavierStokesCP2D
       typename SystemLevelType::GlobalSchurMatrix,
       typename SystemLevelType::GlobalPresUnitFilter,
       typename SystemLevelType::GlobalPresTransfer
-      >>();
+      >>(domain.size_virtual());
 
     if (cfg.multigrid_s)
     {
-      // loop over all finer levels
-      for(Index i(0); (i+1) < num_levels; ++i)
+      // loop over all levels
+      for (std::size_t i(0); i < system_levels.size(); ++i)
       {
-        auto& lvl = *system_levels.at(std::size_t(i));
-        auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-        auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
-        smoother->set_max_iter(cfg.smooth_steps_s);
-        smoother->set_min_iter(cfg.smooth_steps_s);
-        multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, lvl.transfer_pres,
-          smoother, smoother, smoother);
-      }
+        auto& lvl = *system_levels.at(i);
 
-      // set up pressure coarse grid solver
-      {
-        auto& lvl = *system_levels.back();
-        auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-        auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
-        cgs->set_max_iter(cfg.smooth_steps_s);
-        cgs->set_min_iter(cfg.smooth_steps_s);
-
-        multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, cgs);
+        if((i+1) < domain.size_virtual())
+        {
+          // smoother
+          auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
+          auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+          smoother->set_max_iter(cfg.smooth_steps_s);
+          smoother->set_min_iter(cfg.smooth_steps_s);
+          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, lvl.transfer_pres,
+            smoother, smoother, smoother);
+        }
+        else
+        {
+          // coarse grid solver
+          auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
+          auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+          cgs->set_max_iter(cfg.smooth_steps_s);
+          cgs->set_min_iter(cfg.smooth_steps_s);
+          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, cgs);
+        }
       }
     }
 

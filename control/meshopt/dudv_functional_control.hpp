@@ -160,7 +160,7 @@ namespace FEAT
             bool fixed_reference_domain_):
             BaseClass(dom_ctrl, dirichlet_list, slip_list),
             _system_levels(),
-            _mst(),
+            _mst(dom_ctrl.size_virtual()),
             solver_config(solver_config_),
             solver_name(solver_name_),
             solver(nullptr),

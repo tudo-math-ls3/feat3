@@ -96,15 +96,15 @@ omega = 0.5
 [MG1]
 type = mg
 hierarchy = s:rich-c:pcg
-lvl_min = 0
-lvl_max = -1
+lvl_min = -1
+lvl_max = 0
 cycle = v
 
 [MG2]
 type = mg
 hierarchy = s:cg-c:pcg
-lvl_min = 0
-lvl_max = -1
+lvl_min = -1
+lvl_max = 0
 cycle = f
 
 [s:rich-c:pcg]

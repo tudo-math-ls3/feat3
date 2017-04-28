@@ -352,10 +352,12 @@ namespace FEAT
         std::deque<std::shared_ptr<LayerType>> _layers;
         std::deque<std::deque<std::shared_ptr<LevelType>>> _layer_levels;
         std::deque<VirtLevelType> _virt_levels;
+        std::size_t _virt_size;
 
       public:
         explicit DomainControl(const Dist::Comm& comm_) :
-          _comm(comm_)
+          _comm(comm_),
+          _virt_size(0u)
         {
           _layers.push_back(std::make_shared<LayerType>(_comm.comm_dup(), 0));
           _layer_levels.resize(std::size_t(1));
@@ -429,15 +431,17 @@ namespace FEAT
 
         bool has_ghost() const
         {
-          if(_virt_levels.empty())
+          /// \todo does this really work?
+          return _virt_size < _virt_levels.size();
+          /*if(_virt_levels.empty())
             return false;
           else
-            return _virt_levels.back().is_ghost();
+            return _virt_levels.back().is_ghost();*/
         }
 
         std::size_t size_virtual() const
         {
-          return _virt_levels.size();
+          return _virt_size;
         }
 
         std::size_t size_physical() const
@@ -528,6 +532,12 @@ namespace FEAT
               _virt_levels.push_back(VirtLevelType(laylevs.back(), layer));
             }
           }
+
+          // get virtual size of this process
+          std::size_t my_virt_size = _virt_levels.size();
+
+          // get global maximum of all virtual sizes
+          _comm.allreduce(&my_virt_size, &_virt_size, std::size_t(1), Dist::op_max);
         }
 
         /**
