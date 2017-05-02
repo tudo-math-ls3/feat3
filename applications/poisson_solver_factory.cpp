@@ -250,7 +250,7 @@ namespace PoissonDirichlet2D
     if (args.check("test-iter") >= 0)
     {
       int num_iter = (int)((Solver::IterativeSolver<GlobalSystemVector>*)solver.get())->get_num_iter();
-      int iter_target;
+      int iter_target(0);
       args.parse("test-iter", iter_target);
       if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
       {
