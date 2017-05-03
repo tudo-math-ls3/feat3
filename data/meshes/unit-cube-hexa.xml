@@ -1,9 +1,4 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:3:3">
-  <Chart name="outer">
-    <Extrude origin="0 0" offset="0 0 0" transform="0 0 0">
-      <Circle radius="1" midpoint="0 0" />
-    </Extrude>
-  </Chart>
   <Mesh type="conformal:hypercube:3:3" size="8 12 6 1">
     <Vertices>
       0 0 0
