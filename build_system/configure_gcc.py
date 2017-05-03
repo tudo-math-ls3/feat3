@@ -28,6 +28,9 @@ def configure_gcc(cpu, buildid, compiler):
     cxxflags += " -Wshift-negative-value -Wduplicated-cond"
     #cxxflags += " -Wnull-dereference" #produces too much false positives
 
+  if major >= 7:
+    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull"
+
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
 
