@@ -62,11 +62,9 @@ namespace FEAT
           typedef DomainControl_ DomainControl;
           /// The type of levels of DomainControl
           typedef typename DomainControl_::LevelType DomainLevel;
-
+          /// The type of mesh the DomainControl uses
           typedef typename DomainControl_::MeshType MeshType;
 
-          /// The type of transformation we optimise the mesh for
-          //typedef typename DomainLevel::TrafoType TrafoType;
           /// The world dimension, i.e. number of coordinates
           static constexpr int world_dim = DomainControl_::MeshType::world_dim;
           /// Floating point type for coordinates
@@ -111,10 +109,13 @@ namespace FEAT
           {
           }
 
-          const MeshType& get_mesh(Index lvl)
-          {
-            return _dom_ctrl.at(lvl)->get_mesh();
-          }
+          ///**
+          // * \brief Gets a const reference to the mesh at a certain level
+          // */
+          //const MeshType& get_mesh(Index lvl)
+          //{
+          //  return _dom_ctrl.at(lvl)->get_mesh();
+          //}
 
           /**
            * \brief Computes a quality indicator concerning the cell sizes

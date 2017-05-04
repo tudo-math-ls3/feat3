@@ -137,8 +137,8 @@ namespace FEAT
      * \f[
      *   L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2
      *                          + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2
-     *                          + fac\_det (\det \nabla R_K)^{p_d}
-     *   + \frac{fac\_rec\_det}{A\det \nabla R_K + \sqrt{(\mathrm{fac\_reg}^2 + (\det \nabla R_K)^2)}}
+     *                          + fac\_det (\det(\nabla R_K))^{p_d}
+     *   + \frac{fac\_rec\_det}{\det(\nabla R_K) + \sqrt{(\mathrm{fac\_reg}^2 + \det(\nabla R_K)^2)}}
      * \f]
      *
      * For the computation of the gradient of \f$ L \f$, we need to calculate some directional derivatives wrt.
@@ -149,8 +149,8 @@ namespace FEAT
      * \f{align*}
      *    \frac{d}{dt} M(t)^{-1} &= - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
      *    \frac{d}{dt} \| M(t) \|_F^2 &=  M(t) : \frac{d M}{d t}(t)\\
-     *    \frac{d}{dt} \mathrm{cof}( M(t) ) &=  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{cof}(M(t))
-     *    - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{cof}(M(t)) \\
+     *    \frac{d}{dt} \mathrm{Cof}( M(t) ) &=  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{Cof}(M(t))
+     *    - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{Cof}(M(t)) \\
      *    \frac{d}{dt} \mathrm{det}( M(t) ) &=  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)
      * \f}
      * With this, we can compute directional derivatives of a function \f$ f: \mathbb{R}^{d \times d} \to V \f$ with
@@ -167,14 +167,14 @@ namespace FEAT
      * \f{align*}
      *   \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)' \eta &= 4(\| \nabla R_K \|_F^2 - d)
      *   \nabla R_K : \nabla \eta \\
-     *   \frac{d}{dt} \left( (\| \mathrm{cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta & =
-     *     4(\| \mathrm{cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{cof}(\nabla R_K) :
-     *      \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{cof}(\nabla R_K) \right) \\
+     *   \frac{d}{dt} \left( (\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta & =
+     *     4(\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{cCf}(\nabla R_K) :
+     *      \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{Cof}(\nabla R_K) \right) \\
      *   \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta & = p \mathrm{det}(\nabla R_K )^p
      *   \nabla R_K)^{-1} : \nabla \eta.
      * \f}
      *
-     * Note that the test functiona \f$ \eta \f$ might not be the standard FE basis functions as defined by the FE
+     * Note that the test function \f$ \eta \f$ might not be the standard FE basis functions as defined by the FE
      * space used (call those \f$ \hat{\eta} \f$). They might be with regard to a different reference cell, so a
      * transformation is involved, which is realised by passing the [c] material tensor [/c] \f$ M \f$ (which can be
      * identified with a matrix in this case) to corresponding functions and using the relation
@@ -330,7 +330,7 @@ namespace FEAT
        * Contribution of \f$ \| \nabla R_K \|_F^2 \f$.
        *
        * \param[out] fval_cof
-       * Contribution of \f$ \| \mathbb{cof}(\nabla R_K) \|_F^2 \f$.
+       * Contribution of \f$ \| \mathrm{Cof}(\nabla R_K) \|_F^2 \f$.
        *
        * \param[out] fval_det
        * Contribution of \f$ \mathbb{det}(\nabla R_K)\f$.
