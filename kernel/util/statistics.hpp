@@ -361,7 +361,7 @@ namespace FEAT
       static String get_formatted_times(double total_time);
 
       /// Retrieve formatted timings and iteration counts of internal solver structures for the provided solver target
-      static String get_formatted_solver_internals(String target);
+      static String get_formatted_solver_internals(String target = "default");
 
       /// Reset all global timer counters
       static void reset_times()
