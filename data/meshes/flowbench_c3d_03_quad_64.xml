@@ -3,7 +3,7 @@
     This mesh is the 2D plane of the 3D "flow around a cylinder" benchmark,
     which can be used to generate a 3D hexa mesh using the mesh-extruder tool.
     Note that the domain is slightly different from the 2D case.
-    This mesh consists of 48 quadrilateral cells.
+    This mesh consists of 64 quadrilateral cells.
   </Info>
   <Chart name="circle">
     <Circle radius="0.05" midpoint="0.5 0.2" domain="0.5 -0.5" />
