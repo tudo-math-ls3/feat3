@@ -84,7 +84,7 @@ namespace FEAT
         _child_ranks(std::forward<std::vector<int>>(other._child_ranks)),
         _child_mirrors(std::forward<std::vector<Mirror_>>(other._child_mirrors)),
         _child_buffers(std::forward<std::vector<BufferVectorType>>(other._child_buffers)),
-        _child_reqs(std::forward<Dist::RequestVector>>(other._child_reqs))
+        _child_reqs(std::forward<Dist::RequestVector>(other._child_reqs))
       {
       }
 
@@ -108,7 +108,7 @@ namespace FEAT
         _child_ranks = std::forward<std::vector<int>>(other._child_ranks);
         _child_mirrors = std::forward<std::vector<Mirror_>>(other._child_mirrors);
         _child_buffers = std::forward<std::vector<BufferVectorType>>(other._child_buffers);
-        _child_reqs = std::forward<Dist::RequestVector>>(other._child_reqs);
+        _child_reqs = std::forward<Dist::RequestVector>(other._child_reqs);
         return *this;
       }
 
