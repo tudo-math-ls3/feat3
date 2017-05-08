@@ -14,6 +14,7 @@
 #include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/xml_scanner.hpp>
+#include <kernel/util/dist_file_io.hpp>
 
 #include <deque>
 #include <vector>
@@ -1364,6 +1365,8 @@ namespace FEAT
       };
 
     protected:
+      /// Our internally managed streams
+      std::deque<std::shared_ptr<std::stringstream>> _streams;
       /// Our Xml scanner objects
       std::deque<std::shared_ptr<Xml::Scanner>> _scanners;
       /// Did we read the root markup yet?
@@ -1416,6 +1419,8 @@ namespace FEAT
       /// virtual destructor
       virtual ~MeshFileReader()
       {
+        _scanners.clear();
+        _streams.clear();
       }
 
       /**
@@ -1430,6 +1435,73 @@ namespace FEAT
 
         // create a new scanner object
         _scanners.push_back(std::make_shared<Xml::Scanner>(is));
+      }
+
+      /**
+       * \brief Adds a list of mesh files to the list of streams to be parsed.
+       *
+       * \param[in] comm
+       * The communicator to be used for parallel file I/O.
+       *
+       * \param[in] filenames
+       * A list of mesh filenames that are to be parsed.
+       *
+       * \param[in] dirpath
+       * The path in which the mesh files are located.
+       */
+      void add_mesh_files(const Dist::Comm& comm, const std::deque<String>& filenames, String dirpath = "")
+      {
+        XASSERTM(!_have_root_markup, "cannot add new stream after reading root");
+
+        if(filenames.empty())
+          return;
+
+        // ensure that the directory path ends with a path separator
+        if(!dirpath.empty())
+        {
+          /// \platformswitch windows uses backslash as path separator
+#ifdef _WIN32
+          if((dirpath.back() != '/') && (dirpath.back() != '\\'))
+            dirpath.push_back('\\');
+#else
+          if(dirpath.back() != '/')
+            dirpath.push_back('/');
+#endif
+        }
+
+        // read all files
+        for(std::size_t i(0); i < filenames.size(); ++i)
+        {
+          // build file path
+          String filepath = dirpath + filenames.at(i);
+
+          // create a new stream
+          auto stream = std::make_shared<std::stringstream>();
+
+          // read the stream
+          DistFileIO::read_common(*stream, filepath, comm);
+
+          // add stream to deque
+          _streams.push_back(stream);
+
+          // add to mesh reader
+          add_stream(*_streams.back());
+        }
+      }
+
+      /**
+       * \brief Adds a list of mesh files to the list of streams to be parsed.
+       *
+       * \param[in] filenames
+       * A list of mesh filenames that are to be parsed.
+       *
+       * \param[in] dirpath
+       * The path in which the mesh files are located.
+       */
+      void add_mesh_files(const std::deque<String>& filenames, String dirpath = "")
+      {
+        Dist::Comm comm = Dist::Comm::world();
+        add_mesh_files(comm, filenames, dirpath);
       }
 
       /**

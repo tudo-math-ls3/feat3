@@ -169,10 +169,9 @@ struct MeshoptRefinementApp
     // Create domain control
     DomCtrl dom_ctrl(comm);
     dom_ctrl.set_adapt_mode(refinement_adapt_mode);
-    dom_ctrl.read_mesh(mesh_file_reader);
-    dom_ctrl.parse_property_map(domain_control_settings_section);
-    dom_ctrl.create_partition();
-    dom_ctrl.create_hierarchy(lvl_max, lvl_min);
+    dom_ctrl.parse_property_map(*domain_control_settings_section);
+    dom_ctrl.set_desired_levels(lvl_max, lvl_min);
+    dom_ctrl.create(mesh_file_reader);
 
     // Mesh on the finest level, mainly for computing quality indicators
     const auto& finest_mesh = dom_ctrl.front()->get_mesh();
@@ -690,8 +689,8 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "solver_config_file = ./solver_config.ini" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    iss << "parti-type = fallback parmetis" << std::endl;
-    iss << "parti-rank-elems = 4" << std::endl;
+    //iss << "parti-type = fallback parmetis" << std::endl;
+    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "refinement_adapt_mode = none" << std::endl;
     iss << "finest_adapt_mode = chart" << std::endl;
     iss << "lvl_min = 1" << std::endl;
@@ -704,8 +703,8 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "solver_config_file = ./solver_config.ini" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    iss << "parti-type = fallback parmetis" << std::endl;
-    iss << "parti-rank-elems = 4" << std::endl;
+    //iss << "parti-type = fallback parmetis" << std::endl;
+    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "refinement_adapt_mode = none" << std::endl;
     iss << "finest_adapt_mode = chart" << std::endl;
     iss << "lvl_min = 1" << std::endl;

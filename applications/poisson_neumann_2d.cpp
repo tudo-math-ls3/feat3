@@ -46,12 +46,6 @@ namespace PoissonNeumann2D
       comm.print("ERROR: Invalid cycle");
       Runtime::abort();
     }
-    /*if(args.check("cycle") > 0)
-    {
-      String s;
-      args.parse("cycle", s);
-      cycle << s;
-    }*/
     comm.print("Cycle: " + stringify(cycle));
 
     // choose our desired analytical solution
@@ -81,21 +75,16 @@ namespace PoissonNeumann2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling gates...");
+    comm.print("Assembling gates, muxers and transfers...");
 
     for (Index i(0); i < num_levels; ++i)
     {
       system_levels.at(i)->assemble_gate(domain.at(i));
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfers...");
-
-    for (Index i(0); (i < num_levels) && ((i+1) < domain.size_virtual()); ++i)
-    {
-      system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
-      system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
+      if((i+1) < domain.size_virtual())
+      {
+        system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
+        system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
+      }
     }
 
     /* ***************************************************************************************** */
@@ -287,7 +276,6 @@ namespace PoissonNeumann2D
     args.support("no-err");
     args.support("vtk");
     args.support("cycle");
-    args.support("debug-rank");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -299,15 +287,6 @@ namespace PoissonNeumann2D
       // abort
       FEAT::Runtime::abort();
     }
-
-#ifdef FEAT_COMPILER_MICROSOFT
-    {
-      int dbg_rank(-1);
-      args.parse("debug-rank", dbg_rank);
-      if(comm.rank() == dbg_rank)
-        __debugbreak();
-    }
-#endif
 
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
@@ -341,63 +320,50 @@ namespace PoissonNeumann2D
         lvls.push_back(0);
     }
 
-#ifndef DEBUG
-    try
-#endif
+    // create a time-stamp
+    TimeStamp time_stamp;
+
+    // let's create our domain
+    typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
+    Control::Domain::HierarchUnitCubeDomainControl<DomainLevelType> domain(comm, lvls);
+
+    // plot our levels
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvls.front()) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvls.back()) + "]");
+
     {
-      TimeStamp stamp1;
-
-      // let's create our domain
-      typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-      Control::Domain::HierarchUnitCubeDomainControl<DomainLevelType> domain(comm, lvls);
-
-      // plot our levels
-      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvls.front()) + "]");
-      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvls.back()) + "]");
-
-      {
-        String s = String("Phys/Virt Sizes: ") + stringify(domain.size_physical()) + " / " + stringify(domain.size_virtual());
-        comm.allprint(s);
-      }
-
-      domain.dump_layers();
-      domain.dump_layer_levels();
-      domain.dump_virt_levels();
-
-      // run our application
-      run(args, domain);
-
-      TimeStamp stamp2;
-
-      // get times
-      long long time1 = stamp2.elapsed_micros(stamp1);
-
-      // accumulate times over all processes
-      long long time2 = time1 * (long long) comm.size();
-
-      // print time
-      comm.print("Run-Time: "
-        + TimeStamp::format_micros(time1, TimeFormat::m_s_m) + " ["
-        + TimeStamp::format_micros(time2, TimeFormat::m_s_m) + "]");
+      String s = String("Phys/Virt Sizes: ") + stringify(domain.size_physical()) + " / " + stringify(domain.size_virtual());
+      comm.allprint(s);
     }
-#ifndef DEBUG
-    catch (const std::exception& exc)
-    {
-      std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAT::Runtime::abort();
-    }
-    catch (...)
-    {
-      std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAT::Runtime::abort();
-    }
-#endif // DEBUG
+
+    domain.dump_layers();
+    domain.dump_layer_levels();
+    domain.dump_virt_levels();
+
+    // run our application
+    run(args, domain);
+
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 } // namespace PoissonNeumann2D
 
 int main(int argc, char* argv [])
 {
   FEAT::Runtime::initialise(argc, argv);
-  PoissonNeumann2D::main(argc, argv);
+  try
+  {
+    PoissonNeumann2D::main(argc, argv);
+  }
+  catch (const std::exception& exc)
+  {
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    FEAT::Runtime::abort();
+  }
+  catch (...)
+  {
+    std::cerr << "ERROR: unknown exception" << std::endl;
+    FEAT::Runtime::abort();
+  }
   return FEAT::Runtime::finalise();
 }

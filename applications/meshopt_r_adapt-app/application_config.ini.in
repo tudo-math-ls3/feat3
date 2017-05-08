@@ -9,6 +9,6 @@ t_end = 1e0
 [DomainControlSettings]
 lvl_min = 2
 lvl_max = 4
-parti-type = parmetis fallback
+#parti-type = metis naive
 #parti-name = default
-parti-rank-elems = 4
+#parti-rank-elems = 4

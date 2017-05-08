@@ -34,6 +34,9 @@ namespace FEAT
           int rank = comm_.rank();
           int nprocs = comm_.size();
 
+          this->_layers.push_back(std::make_shared<LayerType>(comm_.comm_dup(), 0));
+          this->_layer_levels.resize(std::size_t(1));
+
           // communication data structures
           std::vector<int> ranks;
 
@@ -133,7 +136,7 @@ namespace FEAT
 
         void _create(const std::deque<int>& lvls)
         {
-          const int log4n = _ilog4(this->_layers.front()->comm().size());
+          const int log4n = _ilog4(this->_comm.size());
           XASSERTM(log4n >= 0, "number of processes must be a power of 4");
 
           XASSERT(!lvls.empty());
@@ -196,6 +199,9 @@ namespace FEAT
 
         void _create_layers(int log4n, int nlayers)
         {
+          // create main layer
+          this->_layers.push_back(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
+
           // the world comm layer is already pushed
           for(int i(0); (i+1) < nlayers; ++i)
           {

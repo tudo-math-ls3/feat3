@@ -77,21 +77,16 @@ namespace StokesDriCav2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling gates...");
+    comm.print("Assembling gates, muxers and transfers...");
 
     for (Index i(0); i < num_levels; ++i)
     {
       system_levels.at(i)->assemble_gates(domain.at(i));
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfers...");
-
-    for (Index i(0); (i < num_levels) && ((i+1) < domain.size_virtual()); ++i)
-    {
-      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      if((i+1) < domain.size_virtual())
+      {
+        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      }
     }
 
     /* ***************************************************************************************** */
@@ -371,55 +366,41 @@ namespace StokesDriCav2D
     int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);
 
-#ifndef DEBUG
-    try
-#endif
-    {
-      TimeStamp stamp1;
+    // create a time-stamp
+    TimeStamp time_stamp;
 
-      // let's create our domain
-      typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
-      Control::Domain::UnitCubeDomainControl<DomainLevelType> domain(comm, lvl_max, lvl_min);
+    // let's create our domain
+    typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
+    Control::Domain::UnitCubeDomainControl<DomainLevelType> domain(comm, lvl_max, lvl_min);
 
-      // plot our levels
-      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
-      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
+    // plot our levels
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
 
-      // run our application
-      run(args, domain);
+    // run our application
+    run(args, domain);
 
-      TimeStamp stamp2;
-
-      // get times
-      long long time1 = stamp2.elapsed_micros(stamp1);
-
-      // accumulate times over all processes
-      long long time2 = time1 * (long long)comm.size();
-
-      // print time
-      comm.print("Run-Time: "
-        + TimeStamp::format_micros(time1, TimeFormat::m_s_m) + " ["
-        + TimeStamp::format_micros(time2, TimeFormat::m_s_m) + "]");
-    }
-#ifndef DEBUG
-    catch (const std::exception& exc)
-    {
-      std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAT::Runtime::abort();
-    }
-    catch (...)
-    {
-      std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAT::Runtime::abort();
-    }
-#endif // DEBUG
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
-
 } // namespace StokesDriCav2D
 
 int main(int argc, char* argv[])
 {
   FEAT::Runtime::initialise(argc, argv);
-  StokesDriCav2D::main(argc, argv);
+  try
+  {
+    StokesDriCav2D::main(argc, argv);
+  }
+  catch (const std::exception& exc)
+  {
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    FEAT::Runtime::abort();
+  }
+  catch (...)
+  {
+    std::cerr << "ERROR: unknown exception" << std::endl;
+    FEAT::Runtime::abort();
+  }
   return FEAT::Runtime::finalise();
 }

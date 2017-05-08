@@ -966,6 +966,20 @@ namespace FEAT
         return extract_patch(comm_ranks, partition.get_patches(), rank);
       }
 
+      void create_patch_meshpart(const Adjacency::Graph& elems_at_rank, const int rank)
+      {
+        // create a factory for our partition
+        PatchMeshPartFactory<MeshType> part_factory(Index(rank), elems_at_rank);
+
+        // create patch mesh part
+        MeshPartType* patch_mesh_part = new MeshPartType(part_factory);
+        patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
+          this->get_mesh()->get_index_set_holder());
+
+        // add patch meshpart to this node
+        this->add_mesh_part(String("_patch:") + stringify(rank), patch_mesh_part);
+      }
+
       /**
        * \brief Returns the name of the class.
        * \returns

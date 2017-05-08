@@ -187,6 +187,11 @@ namespace FEAT
       {
       }
 
+      void clear()
+      {
+        _parts.clear();
+      }
+
       std::deque<Partition>& get_partitions()
       {
         return _parts;
@@ -222,6 +227,14 @@ namespace FEAT
        */
       const Partition* find_partition(int size, const String& name = "", int prio = 0) const
       {
+        std::deque<String> names;
+        if(!name.empty())
+          names.push_back(name);
+        return find_partition(size, names, prio);
+      }
+
+      const Partition* find_partition(int size, const std::deque<String>& names, int prio = 0) const
+      {
         const Partition* part(nullptr);
 
         // loop over all partitions
@@ -232,8 +245,16 @@ namespace FEAT
             continue;
 
           // check name
-          if((!name.empty()) && (name != it->get_name()))
-            continue;
+          if(!names.empty())
+          {
+            bool match = false;
+            for(const auto& name : names)
+            {
+              match = match || (name == it->get_name());
+            }
+            if(!match)
+              continue;
+          }
 
           // check priority
           if((it->get_priority() <= 0) || (it->get_priority() < prio))

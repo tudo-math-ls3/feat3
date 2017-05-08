@@ -122,7 +122,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_4 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -136,7 +136,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_3 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -150,7 +150,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 6 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 6 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_6 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -162,7 +162,7 @@ else (FEAT_HAVE_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
@@ -179,7 +179,7 @@ if (FEAT_HAVE_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 21 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 21 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_4 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -193,7 +193,7 @@ if (FEAT_HAVE_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 31 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 31 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_3 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -207,7 +207,7 @@ if (FEAT_HAVE_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 66 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 31 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_6 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -219,7 +219,7 @@ else (FEAT_HAVE_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 19 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 19 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
@@ -265,7 +265,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_solver_factory
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_solver_factory_mpi_4 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_solver_factory_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -279,7 +279,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_solver_factory
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_solver_factory_mpi_3 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_solver_factory_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -293,7 +293,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_solver_factory
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_solver_factory_mpi_6 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_solver_factory_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -305,7 +305,7 @@ else (FEAT_HAVE_MPI)
     --build-target poisson_solver_factory
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini)
   SET_PROPERTY(TEST poisson_solver_factory_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_solver_factory_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

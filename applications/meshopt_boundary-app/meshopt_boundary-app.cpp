@@ -185,10 +185,9 @@ struct MeshoptBoundaryApp
 
     // Create domain control
     DomCtrl dom_ctrl(comm);
-    dom_ctrl.read_mesh(mesh_file_reader);
-    dom_ctrl.parse_property_map(domain_control_settings_section);
-    dom_ctrl.create_partition();
-    dom_ctrl.create_hierarchy(lvl_max, lvl_min);
+    dom_ctrl.parse_property_map(*domain_control_settings_section);
+    dom_ctrl.set_desired_levels(lvl_max, lvl_min);
+    dom_ctrl.create(mesh_file_reader);
     // After the initial creation of the hierarchy, we need to set the adapt mode to none because we will be modifying
     // the vertex coordinates directly and do not want adapt() to interfere with that
     dom_ctrl.set_adapt_mode(Geometry::AdaptMode::none);
@@ -901,8 +900,8 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "midpoint = 0.0 0.0" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    iss << "parti-type = fallback parmetis" << std::endl;
-    iss << "parti-rank-elems = 4" << std::endl;
+    //iss << "parti-type = fallback parmetis" << std::endl;
+    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "lvl_min = 1" << std::endl;
     iss << "lvl_max = 5" << std::endl;
   }
@@ -916,8 +915,8 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "midpoint = 0.0 0.0" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    iss << "parti-type = fallback parmetis" << std::endl;
-    iss << "parti-rank-elems = 4" << std::endl;
+    //iss << "parti-type = fallback parmetis" << std::endl;
+    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "lvl_min = 1" << std::endl;
     iss << "lvl_max = 3" << std::endl;
   }

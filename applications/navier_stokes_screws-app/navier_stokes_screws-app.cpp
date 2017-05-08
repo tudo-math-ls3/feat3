@@ -132,11 +132,11 @@ class NavierStokesBlockedSystemLevel :
 
 template<typename DomainLevel_, typename DomCtrl2d_, bool extrude>
 class ExtrudedPartiDomainControl :
-  public Control::Domain::PartiDomainControl<DomainLevel_>
+  public Control::Domain::DomainControl<DomainLevel_>
 {
   public:
     /// Our base class
-    typedef Control::Domain::PartiDomainControl<DomainLevel_> BaseClass;
+    typedef Control::Domain::DomainControl<DomainLevel_> BaseClass;
     typedef DomCtrl2d_ DomCtrl2d;
     typedef typename DomCtrl2d_::MeshType Mesh2d;
     /// our domain level type
@@ -165,7 +165,10 @@ class ExtrudedPartiDomainControl :
       _vtx_map(),
       _dom_ctrl_2d(dom_ctrl_2d)
       {
-        XASSERTM(!this->_have_hierarchy, "domain control already has a hierarchy!");
+        //XASSERTM(!this->_have_hierarchy, "domain control already has a hierarchy!");
+
+        this->_layers.push_back(std::make_shared<LayerType>(comm_.comm_dup(), 0));
+        this->_layer_levels.resize(std::size_t(1));
 
         auto coarse_mesh_node_2d = _dom_ctrl_2d.back()->get_mesh_node_ptr();
         int lvl_min(_dom_ctrl_2d.min_level_index());
@@ -174,8 +177,6 @@ class ExtrudedPartiDomainControl :
         // Create coarse mesh node for this domain control
         std::shared_ptr<MeshNodeType> mesh_node(nullptr);
         MeshExtruder::create(mesh_node, coarse_mesh_node_2d, slices, z_min, z_max, z_min_part_name, z_max_part_name);
-        // Set the patch mesh node to the new coarse mesh node
-        this->_patch_mesh_node = mesh_node;
         // Copy the neighbours information from the lower dimensional domain control
         this->_layers.front()->set_neighbour_ranks(_dom_ctrl_2d.front().layer().get_neighbour_ranks());
 
@@ -187,14 +188,10 @@ class ExtrudedPartiDomainControl :
         for(int lvl(lvl_min); lvl < lvl_max; ++lvl)
         {
           std::shared_ptr<MeshNodeType> coarse_node = mesh_node;
-          mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(this->_adapt_mode));
+          mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(/*this->_adapt_mode*/));
 
           laylevs.push_front(std::make_shared<LevelType>(lvl+1, mesh_node));
         }
-
-        // Okay, we're done here
-        this->_have_hierarchy = true;
-        this->_have_partition = true;
 
         // Finally, compile the virtual levels
         this->compile_virtual_levels();
@@ -549,10 +546,9 @@ struct NavierStokesScrewsApp
 
     // Create domain control
     DomCtrl dom_ctrl(comm);
-    dom_ctrl.read_mesh(mesh_file_reader);
-    dom_ctrl.parse_property_map(domain_control_settings_section);
-    dom_ctrl.create_partition();
-    dom_ctrl.create_hierarchy(lvl_max, lvl_min);
+    dom_ctrl.parse_property_map(*domain_control_settings_section);
+    dom_ctrl.set_desired_levels(lvl_max, lvl_min);
+    dom_ctrl.create(mesh_file_reader);
 
     ExtrudedDomCtrl extruded_dom_ctrl(comm, dom_ctrl, slices, z_min, z_max, "bnd:b", "bnd:t");
 
@@ -2413,8 +2409,8 @@ static void read_test_application_config(std::stringstream& iss)
   iss << "use_deformation = 0" << std::endl;
 
   iss << "[DomainControlSettings]" << std::endl;
-  iss << "parti-type = fallback parmetis" << std::endl;
-  iss << "parti-rank-elems = 4" << std::endl;
+  //iss << "parti-type = fallback parmetis" << std::endl;
+  //iss << "parti-rank-elems = 4" << std::endl;
   iss << "lvl_min = 0" << std::endl;
   iss << "lvl_max = 1" << std::endl;
   iss << "z_min = 0.0" << std::endl;

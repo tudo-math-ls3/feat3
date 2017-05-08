@@ -242,10 +242,10 @@ namespace NavierStokesCP2D
   class Config
   {
   public:
-    /// filename of the mesh file
-    String mesh_file;
     /// path to the mesh directory
     String mesh_path;
+    /// names of the mesh files
+    std::deque<String> mesh_files;
 
     /// minimum and maximum levels (as configured)
     Index level_min_in, level_max_in;
@@ -404,12 +404,14 @@ namespace NavierStokesCP2D
       test_mode = (args.check("test-mode") >= 0);
 
       args.parse("mesh-path", mesh_path);
-      args.parse("mesh-file", mesh_file);
+      if(args.check("mesh-file") > 0)
+        mesh_files = args.query("mesh-file")->second;
+      //args.parse("mesh-file", mesh_file);
       if(args.parse("vtk", vtk_name, vtk_step) == 1)
         vtk_step = 1; // vtk-name given, but not vtk-step, so set to 1
-      args.parse("level", level_max_in, level_min_in);
-      level_max = level_max_in;
-      level_min = level_min_in;
+      //args.parse("level", level_max_in, level_min_in);
+      //level_max = level_max_in;
+      //level_min = level_min_in;
       args.parse("nu", nu);
       if(args.check("part-in") > 0)
         part_names_in = args.query("part-in")->second;
@@ -444,9 +446,9 @@ namespace NavierStokesCP2D
 
     void dump(const Dist::Comm& comm)
     {
-      comm.print("Configuration Summary:");
-      dump_line(comm, "Mesh File", mesh_file);
+      comm.print("\nConfiguration Summary:");
       dump_line(comm, "Mesh Path", mesh_path);
+      dump_line(comm, "Mesh Files", mesh_files);
       dump_line(comm, "Level-Min", stringify(level_min) + " [" + stringify(level_min_in) + "]");
       dump_line(comm, "Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
       dump_line(comm, "VTK-Name", vtk_name);
@@ -481,7 +483,7 @@ namespace NavierStokesCP2D
     // Setup: Poiseuille-Flow on unit-square
     void setup_square()
     {
-      mesh_file = "unit-square-quad.xml";
+      mesh_files.push_back("unit-square-quad.xml");
       part_names_in.push_back("bnd:l");  // left
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
@@ -501,7 +503,7 @@ namespace NavierStokesCP2D
     // Setup: nozzle-jet simulation
     void setup_nozzle()
     {
-      mesh_file = "nozzle-2-quad.xml";
+      mesh_files.push_back("nozzle-2-quad.xml");
       part_names_in.push_back("bnd:l");  // left
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
@@ -521,7 +523,7 @@ namespace NavierStokesCP2D
     // Setup: flow around a cylinder
     void setup_bench1()
     {
-      mesh_file = "flowbench_c2d_00_quad_130.xml";
+      mesh_files.push_back("flowbench_c2d_00_quad_130.xml");
       part_names_in.push_back("bnd:l");  // left
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
@@ -542,7 +544,7 @@ namespace NavierStokesCP2D
     // Setup: flow around a cylinder
     void setup_c2d0()
     {
-      mesh_file = "flowbench_c2d_01_quad_32.xml";
+      mesh_files.push_back("flowbench_c2d_01_quad_32.xml");
       part_names_in.push_back("bnd:l");  // left
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
@@ -720,21 +722,16 @@ namespace NavierStokesCP2D
     /* ***************************************************************************************** */
 
     comm.print("");
-    comm.print("Assembling gates...");
+    comm.print("Assembling gates, muxers and transfers...");
 
     for (Index i(0); i < num_levels; ++i)
     {
       system_levels.at(i)->assemble_gates(domain.at(i));
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfers...");
-
-    for (Index i(0); (i < num_levels) && ((i+1) < domain.size_virtual()); ++i)
-    {
-      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      if((i+1) < domain.size_virtual())
+      {
+        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      }
     }
 
     /* ***************************************************************************************** */
@@ -1349,17 +1346,15 @@ namespace NavierStokesCP2D
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
 
-    int rank = comm.rank();
-    int nprocs = comm.size();
-
 #ifdef FEAT_HAVE_MPI
-    comm.print("NUM-PROCS: " + stringify(nprocs) + "\n");
+    comm.print("NUM-PROCS: " + stringify(comm.size()));
 #endif
 
     // create arg parser
     SimpleArgParser args(argc, argv);
 
     // check command line arguments
+    Control::Domain::add_supported_pdc_args(args);
     args.support("help", "\nDisplays this help message.\n");
     args.support("setup", "<config>\nLoads a pre-defined configuration:\n"
       "square    Poiseuille-Flow on Unit-Square\n"
@@ -1395,9 +1390,6 @@ namespace NavierStokesCP2D
     args.support("damp-s", "<omega>\nSets the smoother damping parameter for the S-Solver.\nDefault: 0.5\n");
     args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete statistics dump");
     args.support("test-mode", "Runs the application in regression test mode.");
-    args.support("parti-type");
-    args.support("parti-name");
-    args.support("parti-rank-elems");
 
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))
@@ -1430,14 +1422,12 @@ namespace NavierStokesCP2D
     if (!unsupported.empty())
     {
       // print all unsupported options to cerr
-      if(rank == 0)
-      {
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
 
-        std::cerr << "Supported options are:" << std::endl;
-        std::cerr << args.get_supported_help() << std::endl;
-      }
+      comm.print(std::cerr, "Supported Options are:");
+      comm.print(std::cerr, args.get_supported_help());
+
       // abort
       FEAT::Runtime::abort();
     }
@@ -1449,81 +1439,47 @@ namespace NavierStokesCP2D
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
     typedef Space::Lagrange1::Element<TrafoType> SpacePresType;
 
-
     // parse our configuration
     Config cfg;
     if(!cfg.parse_args(args))
       FEAT::Runtime::abort();
 
-#ifndef DEBUG
-    try
-#endif
-    {
-      TimeStamp stamp1;
+    // create a time-stamp
+    TimeStamp time_stamp;
 
-      // let's create our domain
-      comm.print("\nPreparing domain...");
+    // let's create our domain
+    comm.print("\nPreparing domain...");
 
-      // create our domain control
-      typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
-      Control::Domain::PartiDomainControl<DomainLevelType> domain(comm);
+    // create our domain control
+    typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, false);
 
-      // let the controller parse its arguments
-      if(!domain.parse_args(args))
-      {
-        FEAT::Runtime::abort();
-      }
+    // parse arguments and set levels
+    domain.parse_args(args);
+    if(args.check("level") > 0)
+      domain.set_desired_levels(args.query("level")->second);
+    else
+      domain.set_desired_levels(int(cfg.level_max_in), int(cfg.level_min_in));
 
-      // read the base-mesh
-      domain.read_mesh(cfg.mesh_path + "/" + cfg.mesh_file);
-      TimeStamp stamp_partition;
+    domain.create(cfg.mesh_files, cfg.mesh_path);
 
-      // try to create the partition
-      domain.create_partition();
+    // print partitioning info
+    comm.print(domain.get_chosen_parti_info());
 
-      Statistics::toe_partition = stamp_partition.elapsed_now();
+    // store levels after partitioning
+    cfg.level_max_in = Index(domain.get_desired_level_max());
+    cfg.level_min_in = Index(domain.get_desired_level_min());
+    cfg.level_max = Index(domain.max_level_index());
+    cfg.level_min = Index(domain.min_level_index());
 
-      comm.print("Creating mesh hierarchy...");
+    // dump our configuration
+    cfg.dump(comm);
 
-      // create the level hierarchy
-      domain.create_hierarchy(int(cfg.level_max_in), int(cfg.level_min_in));
+    // run our application
+    run(cfg, domain);
 
-      // store levels after partitioning
-      cfg.level_max = Index(domain.max_level_index());
-      cfg.level_min = Index(domain.min_level_index());
-
-      // dump our configuration
-      cfg.dump(comm);
-
-      // run our application
-      run(cfg, domain);
-
-      TimeStamp stamp2;
-
-      // get times
-      long long time1 = stamp2.elapsed_micros(stamp1);
-
-      // accumulate times over all processes
-      long long time2 = time1 * (long long) nprocs;
-
-      // print time
-      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
-        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
-    }
-#ifndef DEBUG
-    catch (const std::exception& exc)
-    {
-      std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAT::Runtime::abort();
-    }
-    catch (...)
-    {
-      std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAT::Runtime::abort();
-    }
-#endif // DEBUG
-
-    // okay
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 } // namespace NavierStokesCP2D
 
@@ -1531,6 +1487,19 @@ namespace NavierStokesCP2D
 int main(int argc, char* argv [])
 {
   FEAT::Runtime::initialise(argc, argv);
-  NavierStokesCP2D::main(argc, argv);
+  try
+  {
+    NavierStokesCP2D::main(argc, argv);
+  }
+  catch (const std::exception& exc)
+  {
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    FEAT::Runtime::abort();
+  }
+  catch (...)
+  {
+    std::cerr << "ERROR: unknown exception" << std::endl;
+    FEAT::Runtime::abort();
+  }
   return FEAT::Runtime::finalise();
 }

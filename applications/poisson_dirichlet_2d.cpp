@@ -75,21 +75,16 @@ namespace PoissonDirichlet2D
 
     TimeStamp stamp_ass;
 
-    comm.print("Assembling gates...");
+    comm.print("Assembling gates, muxers and transfers...");
 
     for (Index i(0); i < num_levels; ++i)
     {
       system_levels.at(i)->assemble_gate(domain.at(i));
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfers...");
-
-    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
-    {
-      system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
-      system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
+      if((i+1) < domain.size_virtual())
+      {
+        system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
+        system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
+      }
     }
 
     /* ***************************************************************************************** */
@@ -159,24 +154,23 @@ namespace PoissonDirichlet2D
         > >(domain.size_virtual());
 
     // push all levels except the coarse most one
-    for (Index i(0); (i+1) < num_levels; ++i)
+    for (Index i(0); i < num_levels; ++i)
     {
       const SystemLevelType& lvl = *system_levels.at(i);
-      auto jac_smoother = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 0.7);
-      auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 1.0, jac_smoother);
+
+      auto jacobi = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 0.7);
+      auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 1.0, jacobi);
       smoother->set_min_iter(4);
       smoother->set_max_iter(4);
-      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
-    }
 
-    // push the coarse level
-    {
-      const SystemLevelType& lvl = *system_levels.back();
-      auto coarse_precond = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 0.7);
-      auto coarse_solver = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 1.0, coarse_precond);
-      coarse_solver->set_min_iter(4);
-      coarse_solver->set_max_iter(4);
-      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
+      if((i+1) < domain.size_virtual())
+      {
+        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
+      }
+      else
+      {
+        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, smoother);
+      }
     }
 
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
@@ -227,7 +221,7 @@ namespace PoissonDirichlet2D
       Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
         (vec_sol.local(), sol_func, the_domain_level.space, cubature);
 
-      // synhronise all local errors
+      // synchronise all local errors
       errors.synchronise(comm);
 
       // print errors
@@ -292,16 +286,14 @@ namespace PoissonDirichlet2D
     SimpleArgParser args(argc, argv);
 
     // check command line arguments
+    Control::Domain::add_supported_pdc_args(args);
+    args.support("mesh");
     args.support("level");
     args.support("no-err");
     args.support("vtk");
     args.support("statistics");
-    args.support("min-rank-elems");
-    args.support("mesh");
     args.support("test-iter");
-    args.support("parti-type");
-    args.support("parti-name");
-    args.support("parti-rank-elems");
+    args.support("dump");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -323,6 +315,11 @@ namespace PoissonDirichlet2D
       comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
       FEAT::Runtime::abort();
     }
+    if(args.check("level") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--level <levels>' is missing!");
+      FEAT::Runtime::abort();
+    }
 
     // define our mesh type
     typedef Shape::Hypercube<2> ShapeType;
@@ -330,87 +327,60 @@ namespace PoissonDirichlet2D
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-    int lvl_max = 3;
-    int lvl_min = 0;
-    args.parse("level", lvl_max, lvl_min);
+    // create a time-stamp
+    TimeStamp time_stamp;
 
-#ifndef DEBUG
-    try
-#endif
+    // let's create our domain
+    comm.print("Preparing domain...");
+
+    // create our domain control
+    typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
+
+    domain.parse_args(args);
+    domain.set_desired_levels(args.query("level")->second);
+    domain.create(args.query("mesh")->second);
+
+    // print partitioning info
+    comm.print(domain.get_chosen_parti_info());
+
+    // plot our levels
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
+    comm.print("LVL-MED: " + stringify(domain.med_level_index()) + " [" + stringify(domain.get_desired_level_med()) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
+
+    // dump domain info if desired
+    if(args.check("dump") >= 0)
     {
-      TimeStamp stamp1;
-
-      // let's create our domain
-      comm.print("Preparing domain...");
-
-      // query mesh filename list
-      const std::deque<String>& mesh_filenames = args.query("mesh")->second;
-
-      // create our domain control
-      typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-      Control::Domain::PartiDomainControl<DomainLevelType> domain(comm);
-
-      // let the controller parse its arguments
-      if(!domain.parse_args(args))
-      {
-        FEAT::Runtime::abort();
-      }
-
-      // read the base-mesh
-      domain.read_mesh(mesh_filenames);
-
-      TimeStamp stamp_partition;
-
-      // try to create the partition
-      domain.create_partition();
-
-      Statistics::toe_partition = stamp_partition.elapsed_now();
-
-      comm.print("Creating mesh hierarchy...");
-
-      // create the level hierarchy
-      domain.create_hierarchy(lvl_max, lvl_min);
-
-      // plot our levels
-      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
-      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
-
-      // run our application
-      run(args, domain);
-
-      TimeStamp stamp2;
-
-      // get times
-      long long time1 = stamp2.elapsed_micros(stamp1);
-
-      // accumulate times over all processes
-      long long time2 = time1 * (long long) comm.size();
-
-      // print time
-      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
-        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
+      domain.dump_layers();
+      domain.dump_layer_levels();
+      domain.dump_virt_levels();
     }
-#ifndef DEBUG
-    catch (const std::exception& exc)
-    {
-      std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAT::Runtime::abort();
-    }
-    catch (...)
-    {
-      std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAT::Runtime::abort();
-    }
-#endif // DEBUG
+
+    // run our application
+    run(args, domain);
+
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 } // namespace PoissonDirichlet2D
 
 int main(int argc, char* argv [])
 {
-  // initialise
   FEAT::Runtime::initialise(argc, argv);
-
-  PoissonDirichlet2D::main(argc, argv);
-  // okay
+  try
+  {
+    PoissonDirichlet2D::main(argc, argv);
+  }
+  catch (const std::exception& exc)
+  {
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    FEAT::Runtime::abort();
+  }
+  catch (...)
+  {
+    std::cerr << "ERROR: unknown exception" << std::endl;
+    FEAT::Runtime::abort();
+  }
   return FEAT::Runtime::finalise();
 }

@@ -343,6 +343,7 @@ namespace FEAT
         typedef VirtualLevel<LevelType> VirtLevelType;
 
         typedef typename LevelType::MeshType MeshType;
+        typedef typename LevelType::MeshNodeType MeshNodeType;
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
         typedef typename MeshType::CoordType CoordType;
 
@@ -359,8 +360,6 @@ namespace FEAT
           _comm(comm_),
           _virt_size(0u)
         {
-          _layers.push_back(std::make_shared<LayerType>(_comm.comm_dup(), 0));
-          _layer_levels.resize(std::size_t(1));
         }
 
         virtual ~DomainControl()
@@ -409,6 +408,17 @@ namespace FEAT
           return Index(_layers.size());
         }
 
+        void push_layer(std::shared_ptr<LayerType> layer)
+        {
+          // make sure that the layer index is valid
+          if(!_layers.empty())
+          {
+            XASSERT((_layers.back()->get_layer_index()+1) == layer->get_layer_index());
+          }
+          _layers.push_back(layer);
+          _layer_levels.push_back(std::deque<std::shared_ptr<LevelType>>());
+        }
+
         int min_level_index() const
         {
           return _virt_levels.back()->get_level_index();
@@ -417,6 +427,11 @@ namespace FEAT
         int max_level_index() const
         {
           return _virt_levels.front()->get_level_index();
+        }
+
+        int med_level_index() const
+        {
+          return (_layer_levels.size() < std::size_t(2) ? -1 : _layer_levels.front().back()->get_level_index());
         }
 
         void push_level_front(int layer_index, std::shared_ptr<LevelType> level)

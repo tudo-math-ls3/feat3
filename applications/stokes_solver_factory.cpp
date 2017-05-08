@@ -90,21 +90,16 @@ namespace StokesPoiseuille2D
 
     TimeStamp stamp_ass;
 
-    comm.print("Assembling gates...");
+    comm.print("Assembling gates, muxers and transfers...");
 
     for (Index i(0); i < num_levels; ++i)
     {
       system_levels.at(i)->assemble_gates(domain.at(i));
-    }
-
-    /* ***************************************************************************************** */
-
-    comm.print("Assembling transfers...");
-
-    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
-    {
-      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      if((i+1) < domain.size_virtual())
+      {
+        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      }
     }
 
     /* ***************************************************************************************** */
@@ -399,14 +394,12 @@ namespace StokesPoiseuille2D
     SimpleArgParser args(argc, argv);
 
     // check command line arguments
+    Control::Domain::add_supported_pdc_args(args);
+    args.support("mesh");
     args.support("level");
     args.support("no-err");
     args.support("vtk");
     args.support("statistics");
-    args.support("mesh");
-    args.support("parti-type");
-    args.support("parti-name");
-    args.support("parti-rank-elems");
     args.support("solver-ini");
     args.support("test-iter");
 
@@ -427,6 +420,11 @@ namespace StokesPoiseuille2D
       comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
       FEAT::Runtime::abort();
     }
+    if(args.check("level") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--level <levels>' is missing!");
+      FEAT::Runtime::abort();
+    }
     if(args.check("solver-ini") < 1)
     {
       comm.print(std::cerr, "ERROR: Mandatory option '--solver-ini <ini-file>' is missing!");
@@ -440,80 +438,52 @@ namespace StokesPoiseuille2D
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
     typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
-    int lvl_max = 3;
-    int lvl_min = 0;
-    args.parse("level", lvl_max, lvl_min);
+    // create a time-stamp
+    TimeStamp time_stamp;
 
-#ifndef DEBUG
-    try
-#endif
-    {
-      TimeStamp stamp1;
+    // let's create our domain
+    comm.print("Preparing domain...");
 
-      // query mesh filename list
-      const std::deque<String>& mesh_filenames = args.query("mesh")->second;
+    // create our domain control
+    typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, false);
 
-      // create our domain control
-      typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
-      Control::Domain::PartiDomainControl<DomainLevelType> domain(comm);
+    domain.parse_args(args);
+    domain.set_desired_levels(args.query("level")->second);
+    domain.create(args.query("mesh")->second);
 
-      // let the controller parse its arguments
-      if(!domain.parse_args(args))
-      {
-        FEAT::Runtime::abort();
-      }
+    // print partitioning info
+    comm.print(domain.get_chosen_parti_info());
 
-      // read the base-mesh
-      domain.read_mesh(mesh_filenames);
+    // plot our levels
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
+    //comm.print("LVL-MED: " + stringify(domain.med_level_index()) + " [" + stringify(domain.get_desired_level_med()) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
 
-      TimeStamp stamp_partition;
+    // run our application
+    run(args, domain);
 
-      // try to create the partition
-      domain.create_partition();
-
-      Statistics::toe_partition = stamp_partition.elapsed_now();
-
-      comm.print("Creating mesh hierarchy...");
-
-      // create the level hierarchy
-      domain.create_hierarchy(lvl_max, lvl_min);
-
-      // plot our levels
-      comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
-      comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
-
-      run(args, domain);
-
-      TimeStamp stamp2;
-
-      // get times
-      long long time1 = stamp2.elapsed_micros(stamp1);
-
-      // accumulate times over all processes
-      long long time2 = time1 * (long long)comm.size();
-
-      // print time
-      comm.print("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
-        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]");
-    }
-#ifndef DEBUG
-    catch (const std::exception& exc)
-    {
-      std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAT::Runtime::abort();
-    }
-    catch (...)
-    {
-      std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAT::Runtime::abort();
-    }
-#endif // DEBUG
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 } // namespace StokesPoiseuille2D
 
 int main(int argc, char* argv[])
 {
   FEAT::Runtime::initialise(argc, argv);
-  StokesPoiseuille2D::main(argc, argv);
+  try
+  {
+    StokesPoiseuille2D::main(argc, argv);
+  }
+  catch (const std::exception& exc)
+  {
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    FEAT::Runtime::abort();
+  }
+  catch (...)
+  {
+    std::cerr << "ERROR: unknown exception" << std::endl;
+    FEAT::Runtime::abort();
+  }
   return FEAT::Runtime::finalise();
 }
