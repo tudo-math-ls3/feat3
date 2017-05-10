@@ -93,8 +93,6 @@ class BDFTimeDiscretisation
     std::vector<DataType> coeff_rhs_v_psi;
     std::vector<DataType> coeff_extrapolation_p;
 
-    DataType coeff_lhs_ale;
-    DataType coeff_rhs_ale;
     DataType coeff_rhs_f;
     DataType coeff_rhs_proj_D_v;
     DataType coeff_rhs_psi;
@@ -120,8 +118,6 @@ class BDFTimeDiscretisation
       coeff_rhs_v_1(3),
       coeff_rhs_v_psi(0),
       coeff_extrapolation_p(0),
-      coeff_lhs_ale(0),
-      coeff_rhs_ale(0),
       coeff_rhs_f(0),
       coeff_rhs_proj_D_v(0),
       coeff_rhs_psi(0),
@@ -247,18 +243,12 @@ class BDFTimeDiscretisation
         // Stiffness matrix
         coeff_lhs_v.at(2) = (visc_handling == TermHandling::impl) ? _delta_t/_reynolds : DataType(0);
 
-        // ALE term
-        coeff_lhs_ale = (ale_handling == TermHandling::impl) ? -DataType(1) : DataType(0);
-
         // Mass matrix
         coeff_rhs_v_1.at(0) = DataType(1);
         // Convection matrix
         coeff_rhs_v_1.at(1) = (conv_handling == TermHandling::expl) ? -_delta_t : DataType(0);
         // Stiffness matrix
         coeff_rhs_v_1.at(2) = (visc_handling == TermHandling::expl) ? -_delta_t/_reynolds : DataType(0);
-
-        // ALE term rhs
-        coeff_rhs_ale = (ale_handling == TermHandling::impl) ? DataType(1) : DataType(0);
 
         // Mass matrix coefficient for previous time step vector
         coeff_rhs_v_2 = DataType(0);
@@ -283,9 +273,6 @@ class BDFTimeDiscretisation
         coeff_lhs_v.at(2) =
           (visc_handling == TermHandling::impl) ? DataType(2)/DataType(3)*_delta_t/_reynolds : DataType(0);
 
-        // ALE term lhs
-        coeff_lhs_ale = (ale_handling == TermHandling::impl) ? -DataType(1) : DataType(0);
-
         // Mass matrix
         coeff_rhs_v_1.at(0) = DataType(4)/DataType(3);
         // Convection matrix
@@ -293,9 +280,6 @@ class BDFTimeDiscretisation
         // Stiffness matrix
         coeff_rhs_v_1.at(2) =
           (visc_handling == TermHandling::expl) ? -DataType(2)/DataType(3)*_delta_t/_reynolds : DataType(0);
-
-        // ALE term rhs
-        coeff_rhs_ale = (ale_handling == TermHandling::impl) ? DataType(1) : DataType(0);
 
         coeff_rhs_f = DataType(2)/DataType(3)*_delta_t;
 
@@ -1240,25 +1224,26 @@ struct NavierStokesScrewsApp
 
     comm.print("Assembling basic matrices...");
 
-    // Create assembler for the Robin BCs for the pressure Poisson problem
-    std::vector<std::shared_ptr<Assembly::TraceAssembler<ExtrudedTrafoType>>> robin_asm_p(num_levels);
-    for(Index i(0); i < num_levels; ++i)
-    {
-      robin_asm_p.at(i) =
-        std::make_shared<Assembly::TraceAssembler<ExtrudedTrafoType>>(extruded_dom_ctrl.at(i)->trafo);
+    //// Create assembler for the Robin BCs for the pressure Poisson problem - only needed in the presence of
+    //// do-nothing boundaries
+    //std::vector<std::shared_ptr<Assembly::TraceAssembler<ExtrudedTrafoType>>> robin_asm_p(num_levels);
+    //for(Index i(0); i < num_levels; ++i)
+    //{
+    //  robin_asm_p.at(i) =
+    //    std::make_shared<Assembly::TraceAssembler<ExtrudedTrafoType>>(extruded_dom_ctrl.at(i)->trafo);
 
-      auto* mpp = extruded_dom_ctrl.at(i)->get_mesh_node()->find_mesh_part("bnd:b");
-      if(mpp != nullptr)
-      {
-        robin_asm_p.at(i)->add_mesh_part(*mpp);
-      }
+    //  auto* mpp = extruded_dom_ctrl.at(i)->get_mesh_node()->find_mesh_part("bnd:b");
+    //  if(mpp != nullptr)
+    //  {
+    //    robin_asm_p.at(i)->add_mesh_part(*mpp);
+    //  }
 
-      mpp = extruded_dom_ctrl.at(i)->get_mesh_node()->find_mesh_part("bnd:t");
-      if(mpp != nullptr)
-      {
-        robin_asm_p.at(i)->add_mesh_part(*mpp);
-      }
-    }
+    //  mpp = extruded_dom_ctrl.at(i)->get_mesh_node()->find_mesh_part("bnd:t");
+    //  if(mpp != nullptr)
+    //  {
+    //    robin_asm_p.at(i)->add_mesh_part(*mpp);
+    //  }
+    //}
 
     for(Index i(0); i < num_levels; ++i)
     {
@@ -1272,10 +1257,10 @@ struct NavierStokesScrewsApp
       Assembly::BilinearOperatorAssembler::assemble_matrix1(system_levels.at(i)->matrix_s.local(),
       laplace_op, extruded_dom_ctrl.at(i)->space_pres, cubature);
 
-      // Add Robin boundary terms to the lhs
-      Assembly::Common::IdentityOperator mass_op;
-      robin_asm_p.at(i)->assemble_operator_matrix1(
-        system_levels.at(i)->matrix_s.local(), mass_op, extruded_dom_ctrl.at(i)->space_pres, cubature, DT_(0e3));
+      //// Add Robin boundary terms to the lhs
+      //Assembly::Common::IdentityOperator mass_op;
+      //robin_asm_p.at(i)->assemble_operator_matrix1(
+      //  system_levels.at(i)->matrix_s.local(), mass_op, extruded_dom_ctrl.at(i)->space_pres, cubature, DT_(0e3));
     }
 
     // assemble B/D matrices on finest level
@@ -1661,7 +1646,7 @@ struct NavierStokesScrewsApp
           // Create a VTK exporter for our mesh
           Geometry::ExportVTK<ExtrudedMeshType> exporter(dom_lvl->get_mesh());
 
-          exporter.add_vertex_scalar("extrude_idx", extruded_dom_ctrl._vtx_map.data());
+          //exporter.add_vertex_scalar("extrude_idx", extruded_dom_ctrl._vtx_map.data());
           exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
           exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
           //exporter.add_vertex_vector("nu", system_levels.at(l)->filter_velo.local().template at<0>().get_filter_vector());
@@ -1810,28 +1795,31 @@ struct NavierStokesScrewsApp
           comm.print("");
           new_coords.copy(meshopt_preproc->get_coords());
 
-          if(write_vtk && ( (time_step%vtk_freq == 0) || failure))
-          {
-            watch_vtk.start();
+          //if(write_vtk && ( (time_step%vtk_freq == 0) || failure))
+          //{
+          //  watch_vtk.start();
 
-            // Compute mesh quality on the finest
-            dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+          //  // Compute mesh quality on the finest
+          //  dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
-            String vtk_name = String("mesh_pre_n"+stringify(comm.size())+"_"+stringify(time_step));
-            // Create a VTK exporter for our mesh
-            Geometry::ExportVTK<MeshType> exporter(dom_ctrl.front()->get_mesh());
+          //  String vtk_name = String("mesh_pre_n"+stringify(comm.size())+"_"+stringify(time_step));
+          //  // Create a VTK exporter for our mesh
+          //  Geometry::ExportVTK<MeshType> exporter(dom_ctrl.front()->get_mesh());
 
-            exporter.add_cell_scalar("Worst angle", edge_angle_cellwise.data());
-            exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise.data());
+          //  exporter.add_cell_scalar("Worst angle", edge_angle_cellwise.data());
+          //  exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise.data());
 
-            meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.front()->get_level_index());
+          //  meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.front()->get_level_index());
 
-            exporter.add_vertex_vector("mesh velocity", mesh_velocity.local());
+          //  mesh_velocity.axpy(old_coords, new_coords, DataType(-1));
+          //  mesh_velocity.scale(mesh_velocity, DataType(1)/time_disc.delta_t());
 
-            exporter.write(vtk_name, comm);
+          //  exporter.add_vertex_vector("mesh velocity", mesh_velocity.local());
 
-            watch_vtk.stop();
-          }
+          //  exporter.write(vtk_name, comm);
+
+          //  watch_vtk.stop();
+          //}
         }
         watch_meshopt.start();
 
@@ -1839,20 +1827,27 @@ struct NavierStokesScrewsApp
         // Now prepare the functional
         meshopt_ctrl->prepare(new_coords);
         meshopt_ctrl->optimise();
+        new_coords.copy(meshopt_ctrl->get_coords());
         extruded_dom_ctrl.extrude_vertex_sets();
         comm.print("");
         watch_meshopt.stop();
 
         // Compute mesh velocity
         {
-          mesh_velocity.axpy(old_coords, meshopt_ctrl->get_coords(), DataType(-1));
+          mesh_velocity.axpy(old_coords, new_coords, DataType(-1));
           mesh_velocity.scale(mesh_velocity, DataType(1)/time_disc.delta_t());
 
           // Compute maximum of the mesh velocity
           DataType max_mesh_velocity(0);
+
           for(IT_ i(0); i < (*mesh_velocity).size(); ++i)
           {
             max_mesh_velocity = Math::max(max_mesh_velocity, (*mesh_velocity)(i).norm_euclid());
+          }
+
+          if(mesh_velocity.get_gate() != nullptr)
+          {
+            max_mesh_velocity = mesh_velocity.get_gate()->max(max_mesh_velocity);
           }
 
           String msg = String("max. mesh velocity").pad_back(pad_width, ' ') + ": " + stringify_fp_sci(max_mesh_velocity)+"\n";
@@ -1866,9 +1861,11 @@ struct NavierStokesScrewsApp
       if(solve_flow)
       {
         comm.print("Solving flow problem:");
-        //velo_sol.set_time(time+start_time);
-        //pres_sol.set_time(time+start_time);
-        //velo_rhs.set_time(time+start_time);
+#ifdef ANALYTIC_SOLUTION
+        velo_sol.set_time(time+start_time);
+        pres_sol.set_time(time+start_time);
+        velo_rhs.set_time(time+start_time);
+#endif
 
         if((time_step == time_disc.get_max_num_steps())
             && (time_disc.get_num_steps() != time_disc.get_max_num_steps()))
@@ -2015,7 +2012,7 @@ struct NavierStokesScrewsApp
         // Use ALE velocity if necessary
         if(time_disc.ale_handling == TermHandling::expl)
         {
-          vec_conv.axpy(mesh_velocity_q2, vec_conv, time_disc.coeff_rhs_ale);
+          vec_conv.axpy(mesh_velocity_q2, vec_conv, -DataType(1));
         }
 
         // Assemble rhs for NVS
@@ -2045,23 +2042,23 @@ struct NavierStokesScrewsApp
           vec_rhs_v.local(), velo_rhs_func, extruded_dom_ctrl.front()->space_velo, cubature, time_disc.coeff_rhs_f);
 #endif
 
-        //// Add psi gradient on rhs
-        //for(Index step(0); step < time_disc.get_num_steps(); ++step)
-        //{
-        //  Assembly::GradOperatorAssembler::assemble(
-        //    vec_rhs_v.local(), vec_sol_psi.at(step+Index(1)).local(),
-        //    the_domain_level.space_velo, the_domain_level.space_pres,
-        //    cubature, time_disc.coeff_rhs_v_psi.at(step));
-        //}
+        // Add psi gradient on rhs
+        for(Index step(0); step < time_disc.get_num_steps(); ++step)
+        {
+          Assembly::GradOperatorAssembler::assemble(
+            vec_rhs_v.local(), vec_sol_psi.at(step+Index(1)).local(),
+            the_domain_level.space_velo, the_domain_level.space_pres,
+            cubature, time_disc.coeff_rhs_v_psi.at(step));
+        }
 
         // Synchronise the rhs vector after the local assemblers are finished
         vec_rhs_v.sync_0();
 
-        // Add psi gradient on rhs
-        for(Index step(0); step < time_disc.get_num_steps(); ++step)
-        {
-          matrix_b.apply(vec_rhs_v, vec_sol_psi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_psi.at(step));
-        }
+        //// Add psi gradient on rhs - superseeded by the GradOperatorAssembler above
+        //for(Index step(0); step < time_disc.get_num_steps(); ++step)
+        //{
+        //  matrix_b.apply(vec_rhs_v, vec_sol_psi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_psi.at(step));
+        //}
 
         // Add pressure gradient on rhs if it got extrapolated at all. This does not have to be synchronised because
         // it is a multiplication with a Global::Matrix
@@ -2097,7 +2094,7 @@ struct NavierStokesScrewsApp
         // Use ALE velocity if necessary
         if(time_disc.ale_handling == TermHandling::impl)
         {
-          vec_conv.axpy(mesh_velocity_q2, vec_conv, time_disc.coeff_lhs_ale);
+          vec_conv.axpy(mesh_velocity_q2, vec_conv, -DataType(1));
         }
 
         // Phase 2: loop over all levels and assemble the burgers matrices
@@ -2240,27 +2237,27 @@ struct NavierStokesScrewsApp
 
         watch_vtk.start();
         // 2d export
-        if(solve_mesh_optimisation)
-        {
-          String vtk_name = String("mesh_post_n"+stringify(comm.size())+"_"+stringify(time_step));
-          comm.print("Writing "+vtk_name+".vtk");
-          auto& dom_lvl = dom_ctrl.front();
+        //if(solve_mesh_optimisation)
+        //{
+        //  String vtk_name = String("mesh_post_n"+stringify(comm.size())+"_"+stringify(time_step));
+        //  comm.print("Writing "+vtk_name+".vtk");
+        //  auto& dom_lvl = dom_ctrl.front();
 
-          // Compute mesh quality on the finest
-          dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+        //  // Compute mesh quality on the finest
+        //  dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
+        //  // Create a VTK exporter for our mesh
+        //  Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
 
-          exporter.add_cell_scalar("Worst angle", edge_angle_cellwise.data());
-          exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise.data());
+        //  exporter.add_cell_scalar("Worst angle", edge_angle_cellwise.data());
+        //  exporter.add_cell_scalar("Shape quality heuristic", qi_cellwise.data());
 
-          meshopt_ctrl->add_to_vtk_exporter(exporter, (*dom_lvl).get_level_index());
+        //  meshopt_ctrl->add_to_vtk_exporter(exporter, (*dom_lvl).get_level_index());
 
-          exporter.add_vertex_vector("mesh velocity", mesh_velocity.local());
+        //  exporter.add_vertex_vector("mesh velocity", mesh_velocity.local());
 
-          exporter.write(vtk_name, comm.rank(), comm.size());
-        }
+        //  exporter.write(vtk_name, comm.rank(), comm.size());
+        //}
 
         // 3d export
         if(solve_flow)
@@ -2273,31 +2270,31 @@ struct NavierStokesScrewsApp
           // Create a VTK exporter for our mesh
           Geometry::ExportVTK<ExtrudedMeshType> exporter(dom_lvl->get_mesh());
 
-          exporter.add_vertex_vector("mesh velocity", extruded_mesh_velocity.local());
+          exporter.add_vertex_vector("mesh_velocity_q2", mesh_velocity_q2.local());
 
           exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-          for(Index step(0); step < time_disc.get_num_steps(); ++step)
-          {
-            exporter.add_vertex_vector("v_"+stringify(step+1), vec_sol_v.at(step+1).local());
-          }
+          //for(Index step(0); step < time_disc.get_num_steps(); ++step)
+          //{
+          //  exporter.add_vertex_vector("v_"+stringify(step+1), vec_sol_v.at(step+1).local());
+          //}
 
-          exporter.add_vertex_vector("vec_conv", vec_conv.local());
-          exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
+          //exporter.add_vertex_vector("vec_conv", vec_conv.local());
+          //exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
 
           exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-          exporter.add_vertex_scalar("psi", vec_sol_psi.at(0).local().elements());
+          //exporter.add_vertex_scalar("psi", vec_sol_psi.at(0).local().elements());
 
-          // compute and write time-derivatives
-          vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
-          vec_der_p.axpy(vec_sol_p.at(1), vec_sol_p.at(0), -DataType(1));
+          //// compute and write time-derivatives
+          //vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
+          //vec_der_p.axpy(vec_sol_p.at(1), vec_sol_p.at(0), -DataType(1));
 
-          vec_der_v.scale(vec_der_v, DataType(1) / time_disc.delta_t());
-          vec_der_p.scale(vec_der_p, DataType(1) / time_disc.delta_t());
+          //vec_der_v.scale(vec_der_v, DataType(1) / time_disc.delta_t());
+          //vec_der_p.scale(vec_der_p, DataType(1) / time_disc.delta_t());
 
-          exporter.add_vertex_vector("v_dt", vec_der_v.local());
-          exporter.add_vertex_scalar("p_dt", vec_der_p.local().elements());
+          //exporter.add_vertex_vector("v_dt", vec_der_v.local());
+          //exporter.add_vertex_scalar("p_dt", vec_der_p.local().elements());
 
-          exporter.add_vertex_vector("v_rhs", vec_rhs_v.local());
+          //exporter.add_vertex_vector("v_rhs", vec_rhs_v.local());
 
 #ifdef ANALYTIC_SOLUTION
           Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_rhs, the_domain_level.trafo);
@@ -2310,19 +2307,19 @@ struct NavierStokesScrewsApp
           exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
 #endif
 
-          vec_rhs_v.format();
-          Assembly::GradOperatorAssembler::assemble(
-            vec_rhs_v.local(), vec_sol_p.at(0).local(),
-            the_domain_level.space_velo, the_domain_level.space_pres,
-            cubature, time_disc.coeff_rhs_v_psi.at(0));
-          vec_rhs_v.sync_0();
-          filter_v.filter_cor(vec_rhs_v);
-          exporter.add_vertex_vector("grad_p_phi", vec_rhs_v.local());
+          //vec_rhs_v.format();
+          //Assembly::GradOperatorAssembler::assemble(
+          //  vec_rhs_v.local(), vec_sol_p.at(0).local(),
+          //  the_domain_level.space_velo, the_domain_level.space_pres,
+          //  cubature, time_disc.coeff_rhs_v_psi.at(0));
+          //vec_rhs_v.sync_0();
+          //filter_v.filter_cor(vec_rhs_v);
+          //exporter.add_vertex_vector("grad_p_phi", vec_rhs_v.local());
 
-          vec_rhs_v.format();
-          matrix_b.apply(vec_rhs_v, vec_sol_p.at(0), vec_rhs_v, -time_disc.coeff_rhs_v_psi.at(0));
-          filter_v.filter_cor(vec_rhs_v);
-          exporter.add_vertex_vector("p_div_phi", vec_rhs_v.local());
+          //vec_rhs_v.format();
+          //matrix_b.apply(vec_rhs_v, vec_sol_p.at(0), vec_rhs_v, -time_disc.coeff_rhs_v_psi.at(0));
+          //filter_v.filter_cor(vec_rhs_v);
+          //exporter.add_vertex_vector("p_div_phi", vec_rhs_v.local());
 
           exporter.write(vtk_name, comm.rank(), comm.size());
         }
@@ -2377,10 +2374,10 @@ struct NavierStokesScrewsApp
         cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
         // If we did not compute this for the vtk output, we have to do it here
-        if(! (write_vtk && ( (time_step%vtk_freq == 0) || failure) ) )
-        {
+        //if(! (write_vtk && ( (time_step%vtk_freq == 0) || failure) ) )
+        //{
           dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
-        }
+        //}
 
         String msg;
         msg = String("Post total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
