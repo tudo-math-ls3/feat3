@@ -175,6 +175,9 @@ namespace FEAT
             *
             * \param[in] use_deformation
             * Use the deformation tensor based bilinear form for the viscous term?
+            *
+            * \param[in] startup
+            * Set up as BDF(1) until finish_startup() is called?
             */
            NvsBdfQ(PropertyMap* config_section, const DataType reynolds, const bool use_deformation,
            const bool startup):
