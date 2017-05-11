@@ -1,14 +1,16 @@
+# This configuration is for when all terms in the momentum equation are handled explicitly and the only thing left is
+# the mass matrix
 #[linsolver_a]
 #type = pcg
 #max_iter = 1000
 #tol_rel = 1e2
 #tol_abs = 1e-8
-#precon = mgv_a
-#plot = all
+#precon = jac
+#plot = summary
 
 [linsolver_a]
 type = fgmres
-max_iter = 1000
+max_iter = 100
 tol_rel = 1e-8
 precon = mgv_a
 precon_variant = left
@@ -20,7 +22,7 @@ type = mg
 hierarchy = h1_a
 lvl_min = 0
 lvl_max = -1
-cycle = v
+cycle = f
 
 [h1_a]
 type = hierarchy
@@ -33,9 +35,9 @@ omega = 0.7
 
 [smoother_a]
 type = fgmres
-min_iter = 8
-max_iter = 8
-krylov_dim = 8
+min_iter = 32
+max_iter = 32
+krylov_dim = 32
 precon = jac
 
 [linsolver_s]

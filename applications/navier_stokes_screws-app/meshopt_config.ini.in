@@ -2,7 +2,7 @@
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
 slip_boundaries = bnd:i bnd:o
-meshopt_lvl = 1
+meshopt_lvl = 0
 preprocessor_config= DuDvPreproc
 
 [DuDvDefault]
