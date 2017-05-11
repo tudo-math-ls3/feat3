@@ -371,6 +371,8 @@ namespace FEAT
        * \code
        * raw array size in bytes (uint64_t)
        * magic number (uint64_t)
+       * DT_ 'hash' value (sizeof(DT_) and floating/integral distinction (packed uint64_t)
+       * IT_ 'hash' value (sizeof(IT_) and floating/integral distinction (packed uint64_t)
        * _elements.size() (uint64_t)
        * _indices.size() (uint64_t)
        * _elements_size.size() (uint64_t)
@@ -423,8 +425,8 @@ namespace FEAT
 #endif
         uiarray[0] = gsize;
         uiarray[1] = magic;
-        uiarray[2] = Type::Traits<DT_>::hash_code();
-        uiarray[3] = Type::Traits<IT_>::hash_code();
+        uiarray[2] = Type::Traits<DT_>::feature_hash();
+        uiarray[3] = Type::Traits<IT_>::feature_hash();
         uiarray[4] = tc._elements.size();
         uiarray[5] = tc._indices.size();
         uiarray[6] = tc._elements_size.size();
@@ -522,12 +524,19 @@ namespace FEAT
         if (magic != uiarray[1])
           throw InternalError(__func__, __FILE__, __LINE__, "_deserialise: given FileMode incompatible with given array!");
 
-        if(Type::Traits<DT_>::hash_code() == Type::Traits<double>::hash_code() && uiarray[2] == Type::Traits<float>::hash_code())
+        //ensure that we have the same integral/floating type configuration, that was used when storing the serialised data
+        XASSERT(Type::Traits<DT_>::is_int == Type::Helper::extract_intness(uiarray[2]));
+        XASSERT(Type::Traits<DT_>::is_float == Type::Helper::extract_floatness(uiarray[2]));
+        XASSERT(Type::Traits<DT_>::is_signed == Type::Helper::extract_signedness(uiarray[2]));
+        XASSERT(Type::Traits<IT_>::is_int == Type::Helper::extract_intness(uiarray[3]));
+        XASSERT(Type::Traits<IT_>::is_float == Type::Helper::extract_floatness(uiarray[3]));
+        XASSERT(Type::Traits<IT_>::is_signed == Type::Helper::extract_signedness(uiarray[3]));
+
+        if (sizeof(DT_) > Type::Helper::extract_type_size(uiarray[2]))
           std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!"<<std::endl;
 
-        if(Type::Traits<IT_>::hash_code() == Type::Traits<IT_>::hash_code() && uiarray[3] == Type::Traits<unsigned int>::hash_code())
-          std::cerr<<"Warning: You are reading a container index array in higher precision then it was saved before!"<<std::endl;
-
+        if (sizeof(IT_) > Type::Helper::extract_type_size(uiarray[3]))
+          std::cerr<<"Warning: You are reading a container integral type in higher precision then it was saved before!"<<std::endl;
 
         Index global_i(10);
         for (uint64_t i(0) ; i < uiarray[6] ; ++i)
