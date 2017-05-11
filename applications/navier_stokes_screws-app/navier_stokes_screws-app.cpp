@@ -1263,7 +1263,7 @@ struct NavierStokesScrewsApp
     velo_rhs.set_time(start_time);
 
     Assembly::Interpolator::project(vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo);
-    // For starting with an exact pressure or psi
+    // For starting with an exact pressure or phi
     //Assembly::Interpolator::project(vec_sol_p.at(0).local(), pres_sol, the_domain_level.space_pres);
     //Assembly::Interpolator::project(vec_sol_phi.at(0).local(), pres_sol, the_domain_level.space_pres);
 
@@ -1562,7 +1562,7 @@ struct NavierStokesScrewsApp
           vec_sol_v.at(step).copy(vec_sol_v.at(step-Index(1)));
         }
 
-        // Save previous psi solutions
+        // Save previous phi solutions
         for(Index step(time_disc.get_num_steps()); step > Index(0); --step)
         {
           vec_sol_phi.at(step).copy(vec_sol_phi.at(step-Index(1)));
@@ -1710,7 +1710,7 @@ struct NavierStokesScrewsApp
           vec_rhs_v.local(), velo_rhs_func, extruded_dom_ctrl.front()->space_velo, cubature, time_disc.coeff_rhs_f);
 #endif
 
-        // Add psi gradient on rhs
+        // Add phi gradient on rhs
         for(Index step(0); step < time_disc.get_num_steps(); ++step)
         {
           Assembly::GradOperatorAssembler::assemble(
@@ -1722,7 +1722,7 @@ struct NavierStokesScrewsApp
         // Synchronise the rhs vector after the local assemblers are finished
         vec_rhs_v.sync_0();
 
-        //// Add psi gradient on rhs - superseeded by the GradOperatorAssembler above
+        //// Add phi gradient on rhs - superseeded by the GradOperatorAssembler above
         //for(Index step(0); step < time_disc.get_num_steps(); ++step)
         //{
         //  matrix_b.apply(vec_rhs_v, vec_sol_phi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_phi.at(step));
@@ -1825,7 +1825,7 @@ struct NavierStokesScrewsApp
         // Assemble rhs for projection step - no filtering here
         watch_asm_rhs.start();
         vec_rhs_p.format();
-        // rhs_p = M (p + psi) + 1/reynolds D v
+        // rhs_p = M (p + phi) + 1/reynolds D v
         matrix_m_p.apply(vec_rhs_p, vec_sol_phi.at(0), vec_rhs_p, DataType(1));
         // Add pressure on rhs if it got extrapolated at all
         if(time_disc.get_p_extrapolation_steps() > Index(0))
@@ -1839,7 +1839,7 @@ struct NavierStokesScrewsApp
         }
         watch_asm_rhs.stop();
 
-        // Solve pressure projection problem: M_p p[k+1] = M_p p[k] + M_p psi[k+1] + 1/Re D u[k+1]
+        // Solve pressure projection problem: M_p p[k+1] = M_p p[k] + M_p phi[k+1] + 1/Re D u[k+1]
         FEAT::Statistics::expression_target = "solver_m_p";
         watch_solver_m_p.start();
         Solver::Status status_m_p = solver_m_p->correct(vec_sol_p.at(0), vec_rhs_p);
@@ -1950,7 +1950,7 @@ struct NavierStokesScrewsApp
           //exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
 
           exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-          //exporter.add_vertex_scalar("psi", vec_sol_phi.at(0).local().elements());
+          //exporter.add_vertex_scalar("phi", vec_sol_phi.at(0).local().elements());
 
           //// compute and write time-derivatives
           //vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
@@ -1975,20 +1975,6 @@ struct NavierStokesScrewsApp
           exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
 #endif
 
-          //vec_rhs_v.format();
-          //Assembly::GradOperatorAssembler::assemble(
-          //  vec_rhs_v.local(), vec_sol_p.at(0).local(),
-          //  the_domain_level.space_velo, the_domain_level.space_pres,
-          //  cubature, time_disc.coeff_rhs_v_phi.at(0));
-          //vec_rhs_v.sync_0();
-          //filter_v.filter_cor(vec_rhs_v);
-          //exporter.add_vertex_vector("grad_p_phi", vec_rhs_v.local());
-
-          //vec_rhs_v.format();
-          //matrix_b.apply(vec_rhs_v, vec_sol_p.at(0), vec_rhs_v, -time_disc.coeff_rhs_v_phi.at(0));
-          //filter_v.filter_cor(vec_rhs_v);
-          //exporter.add_vertex_vector("p_div_phi", vec_rhs_v.local());
-
           exporter.write(vtk_name, comm.rank(), comm.size());
         }
         watch_vtk.stop();
@@ -2003,7 +1989,6 @@ struct NavierStokesScrewsApp
         {
           throw InternalError(__func__,__FILE__,__LINE__,"Writing the mesh to xml is only possible with 1 process!");
         }
-
 
         for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
         {
@@ -2041,11 +2026,7 @@ struct NavierStokesScrewsApp
 
         cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-        // If we did not compute this for the vtk output, we have to do it here
-        //if(! (write_vtk && ( (time_step%vtk_freq == 0) || failure) ) )
-        //{
-          dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
-        //}
+        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
         String msg;
         msg = String("Post total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
@@ -2473,6 +2454,7 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     //iss << "solver_config_file = ./solver_config.ini" << std::endl;
     iss << "t_end = 1e-4" << std::endl;
     iss << "solve_flow = 0" << std::endl;
+    iss << "solve_mesh_optimisation = 1" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
     iss << "parti-type = fallback parmetis" << std::endl;
@@ -2488,6 +2470,9 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "num_steps = 2" << std::endl;
     iss << "p_extrapolation_steps = 1" << std::endl;
     iss << "use_rotational_form = 1" << std::endl;
+    iss << "ALE = impl" << std::endl;
+    iss << "convection = impl" << std::endl;
+    iss << "viscous = impl" << std::endl;
   }
   else
   {
@@ -2663,10 +2648,6 @@ static void read_test_solver_config(std::stringstream& iss, const int DOXY(test_
   iss << "max_iter = 1000" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
-
-  iss << "[jac]" << std::endl;
-  iss << "type = jacobi" << std::endl;
-  iss << "omega = 0.5" << std::endl;
 
 }
 
