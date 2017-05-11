@@ -24,7 +24,9 @@
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_control_factory.hpp>
 #include <control/stokes_blocked.hpp>
+#include <control/time/nvs_bdf_q.hpp>
 
+// For validating the time discretisation with analytic solutions
 //#define ANALYTIC_SOLUTION
 using namespace FEAT;
 
@@ -33,297 +35,6 @@ static void read_test_application_config(std::stringstream&, const int);
 static void read_test_meshopt_config(std::stringstream&, const int);
 static void read_test_solver_config(std::stringstream&, const int);
 static void read_test_mesh_file_names(std::deque<String>&, const int);
-
-enum class TermHandling
-{
-  off = 0,
-  expl,
-  impl
-};
-
-inline std::ostream& operator<<(std::ostream& os, TermHandling convection_handling)
-{
-  switch(convection_handling)
-  {
-    case TermHandling::off:
-      return os << "off";
-    case TermHandling::expl:
-      return os << "expl";
-    case TermHandling::impl:
-      return os << "impl";
-    default:
-      return os << "-unknown-";
-  }
-}
-
-inline void operator<<(TermHandling& convection_handling, const String& convection_handling_name)
-{
-  if(convection_handling_name == "off")
-    convection_handling = TermHandling::off;
-  else if(convection_handling_name == "expl")
-    convection_handling = TermHandling::expl;
-  else if(convection_handling_name == "impl")
-    convection_handling = TermHandling::impl;
-  else
-    throw InternalError(__func__, __FILE__, __LINE__, "Unknown TermHandling identifier string "
-        +convection_handling_name);
-}
-
-
-template<typename DT_>
-class BDFTimeDiscretisation
-{
-  public:
-    typedef DT_ DataType;
-
-  private:
-    Index _num_steps;
-    Index _num_steps_startup;
-    Index _p_extrapolation_steps;
-    Index _p_extrapolation_steps_startup;
-    const DataType _reynolds;
-    DataType _delta_t;
-    bool _use_deformation;
-    bool _use_rotational_form;
-    bool _startup;
-
-  public:
-    std::vector<DataType> coeff_lhs_v;
-    std::vector<DataType> coeff_rhs_v_1;
-    std::vector<DataType> coeff_rhs_v_psi;
-    std::vector<DataType> coeff_extrapolation_p;
-
-    DataType coeff_rhs_f;
-    DataType coeff_rhs_proj_D_v;
-    DataType coeff_rhs_psi;
-    DataType coeff_rhs_v_2;
-    DataType coeff_rhs_v_p;
-
-    TermHandling ale_handling;
-    TermHandling conv_handling;
-    TermHandling visc_handling;
-
-    explicit BDFTimeDiscretisation(PropertyMap* config_section, const DataType reynolds, const bool use_deformation,
-    const bool startup):
-      _num_steps(~Index(0)),
-      _num_steps_startup(1),
-      _p_extrapolation_steps(~Index(0)),
-      _p_extrapolation_steps_startup(~Index(0)),
-      _reynolds(reynolds),
-      _delta_t(0),
-      _use_deformation(use_deformation),
-      _use_rotational_form(false),
-      _startup(startup),
-      coeff_lhs_v(3),
-      coeff_rhs_v_1(3),
-      coeff_rhs_v_psi(0),
-      coeff_extrapolation_p(0),
-      coeff_rhs_f(0),
-      coeff_rhs_proj_D_v(0),
-      coeff_rhs_psi(0),
-      coeff_rhs_v_2(0),
-      coeff_rhs_v_p(0),
-      ale_handling(TermHandling::off),
-      conv_handling(TermHandling::off),
-      visc_handling(TermHandling::off)
-      {
-        XASSERT(config_section != nullptr);
-        // Get time discretisation order
-        auto num_steps_p = config_section->query("num_steps");
-        XASSERTM(num_steps_p.second, "TimeDiscretisation section is missing the mandatory num_steps entry!");
-        _num_steps = Index(std::stoul(num_steps_p.first));
-        XASSERTM(_num_steps == Index(1) || _num_steps == Index(2),"Only BDF1 and BDF2 are implemented!");
-
-        // Get the order for extrapolation of the pressure in time
-        auto p_extrapolation_p = config_section->query("p_extrapolation_steps");
-        XASSERTM(p_extrapolation_p.second,
-        "TimeDiscretisation section is missing the mandatory p_extrapolation_steps entry!");
-        _p_extrapolation_steps = Index(std::stoul(p_extrapolation_p.first));
-        XASSERTM(_p_extrapolation_steps < Index(3),"p extrapolation is only implemented for order 0, 1, 2!");
-        _p_extrapolation_steps_startup = Math::min(_p_extrapolation_steps, Index(1));
-
-        // Use the rotational form?
-        auto use_rotational_form_p = config_section->query("use_rotational_form");
-        XASSERTM(use_rotational_form_p.second,
-        "TimeDiscretisation section is missing the mandatory use_rotational_form entry!");
-        XASSERTM(std::stoi(use_rotational_form_p.first) == 0 || std::stoi(use_rotational_form_p.first) == 1,
-        "use_rotational has to be set to 0 or 1");
-        _use_rotational_form = std::stoi(use_rotational_form_p.first) == 1;
-
-        // Get timestep size
-        auto delta_t_p = config_section->query("delta_t");
-        XASSERTM(delta_t_p.second, "TimeDiscretisation section is missing the mandatory delta_t entry!");
-        _delta_t = DataType(std::stod(delta_t_p.first));
-        XASSERT(_delta_t > DataType(0));
-
-        // Use ale (meaning solve Navier-Stokes instead of plain Stokes)?
-        auto ale_p = config_section->query("ALE");
-        XASSERTM(ale_p.second,
-        "TimeDiscretisation section is missing the mandatory ALE entry!");
-        ale_handling << ale_p.first;
-
-        // Use convection (meaning solve Navier-Stokes instead of plain Stokes)?
-        auto convection_p = config_section->query("convection");
-        XASSERTM(convection_p.second,
-        "TimeDiscretisation section is missing the mandatory convection entry!");
-        conv_handling << convection_p.first;
-
-        // Use viscous (meaning solve Navier-Stokes instead of plain Stokes)?
-        auto viscous_p = config_section->query("viscous");
-        XASSERTM(viscous_p.second,
-        "TimeDiscretisation section is missing the mandatory viscous entry!");
-        visc_handling << viscous_p.first;
-
-        coeff_rhs_v_psi.clear();
-        coeff_rhs_v_psi = std::vector<DataType>(_num_steps, DataType(0));
-
-        coeff_extrapolation_p.clear();
-        coeff_extrapolation_p = std::vector<DataType>(_p_extrapolation_steps, DataType(0));
-
-        if(startup)
-        {
-          set_coeffs(_num_steps_startup, _p_extrapolation_steps_startup);
-        }
-        else
-        {
-          set_coeffs(_num_steps, _p_extrapolation_steps);
-        }
-      }
-
-    ~BDFTimeDiscretisation()
-    {
-    };
-
-    DataType delta_t()
-    {
-      return _delta_t;
-    }
-
-    bool is_rotational()
-    {
-      return _use_rotational_form;
-    }
-
-    Index get_num_steps()
-    {
-      return _startup ? _num_steps_startup : _num_steps;
-    }
-
-    Index get_max_num_steps()
-    {
-      return Math::max(_num_steps, _num_steps_startup);
-    }
-
-    Index get_max_p_extrapolation_steps()
-    {
-      return Math::max(_p_extrapolation_steps, _p_extrapolation_steps_startup);
-    }
-
-    Index get_p_extrapolation_steps()
-    {
-      return _startup ? _p_extrapolation_steps_startup : _p_extrapolation_steps;
-    }
-
-    void finish_startup()
-    {
-      _startup = false;
-
-      set_coeffs(_num_steps, _p_extrapolation_steps);
-    }
-
-    void set_coeffs(const Index num_steps, const Index p_extrapolation_steps)
-    {
-
-      if(num_steps == Index(1))
-      {
-        // Mass matrix
-        coeff_lhs_v.at(0) = DataType(1);
-        // Convection matrix
-        coeff_lhs_v.at(1) = (conv_handling == TermHandling::impl) ? _delta_t : DataType(0);
-        // Stiffness matrix
-        coeff_lhs_v.at(2) = (visc_handling == TermHandling::impl) ? _delta_t/_reynolds : DataType(0);
-
-        // Mass matrix
-        coeff_rhs_v_1.at(0) = DataType(1);
-        // Convection matrix
-        coeff_rhs_v_1.at(1) = (conv_handling == TermHandling::expl) ? -_delta_t : DataType(0);
-        // Stiffness matrix
-        coeff_rhs_v_1.at(2) = (visc_handling == TermHandling::expl) ? -_delta_t/_reynolds : DataType(0);
-
-        // Mass matrix coefficient for previous time step vector
-        coeff_rhs_v_2 = DataType(0);
-
-        coeff_rhs_f = _delta_t;
-
-        // coefficient for -(p*[k], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_p = -_delta_t;
-        // coefficient for -(psi[k], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_psi.at(0) = -_delta_t;
-
-        coeff_rhs_psi = DataType(1)/_delta_t;
-
-      }
-      else if(num_steps == Index(2))
-      {
-        // Mass matrix
-        coeff_lhs_v.at(0) = DataType(1);
-        // Convection matrix
-        coeff_lhs_v.at(1) = (conv_handling == TermHandling::impl) ? DataType(2)/DataType(3)*_delta_t : DataType(0);
-        // Stiffness matrix
-        coeff_lhs_v.at(2) =
-          (visc_handling == TermHandling::impl) ? DataType(2)/DataType(3)*_delta_t/_reynolds : DataType(0);
-
-        // Mass matrix
-        coeff_rhs_v_1.at(0) = DataType(4)/DataType(3);
-        // Convection matrix
-        coeff_rhs_v_1.at(1) = (conv_handling == TermHandling::expl) ? -DataType(2)/DataType(3)*_delta_t : DataType(0);
-        // Stiffness matrix
-        coeff_rhs_v_1.at(2) =
-          (visc_handling == TermHandling::expl) ? -DataType(2)/DataType(3)*_delta_t/_reynolds : DataType(0);
-
-        coeff_rhs_f = DataType(2)/DataType(3)*_delta_t;
-
-        // Mass matrix coefficient for previous time step vector
-        coeff_rhs_v_2 = -DataType(1)/DataType(3);
-
-        // coefficient for -(p*[k], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_p = -DataType(2)/DataType(3)*_delta_t;
-
-        // coefficient for -(psi[k], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_psi.at(0) =  -DataType(8)/DataType(9)*_delta_t;
-        // coefficient for -(psi[k-1], div phi) on the rhs for the velocity eq.
-        coeff_rhs_v_psi.at(1) = DataType(2)/DataType(9)*_delta_t;
-
-        coeff_rhs_psi = DataType(3)/(DataType(2)*_delta_t);
-
-      }
-      else
-      {
-        throw InternalError(__func__,__FILE__,__LINE__,
-        "Invalid number of BDF steps: "+stringify(num_steps));
-      }
-
-      // Coefficient for the div v term for the projection step
-      coeff_rhs_proj_D_v = _use_rotational_form ? DataType(1)/_reynolds : DataType(0);
-
-      if(_use_deformation)
-      {
-        coeff_rhs_proj_D_v *= DataType(2);
-      }
-
-      // Coefficients for the extrapolation of the pressure
-      if(p_extrapolation_steps == Index(1))
-      {
-        coeff_extrapolation_p.at(0) = DataType(1);
-      }
-      else if(p_extrapolation_steps == Index(2))
-      {
-        coeff_extrapolation_p.at(0) = DataType(2);
-        coeff_extrapolation_p.at(1) = -DataType(1);
-      }
-
-    }
-};
 
 template<typename Mesh_, bool extrude>
 struct MeshExtrudeHelper
@@ -419,43 +130,6 @@ class NavierStokesBlockedSystemLevel :
 //
 //}; // class NavierStokesBlockedSystemLevel
 
-//template<typename Mesh_, typename Trafo_, typename SpaceVelo_, typename SpacePres_>
-//class ExtrudedStokesDomainLevel :
-//  public Control::Domain::DomainLevel<Mesh_>
-//{
-//  public:
-//    typedef Mesh_ MeshType;
-//    typedef Control::Domain::DomainLevel<Mesh_> BaseClass;
-//    /// Type of the extruded mesh, which is Simplex<2> for Simplex<2> meshes (no extrusion) and Hypercube<3> for
-//    /// Hypercube<2> meshes
-//    typedef MeshExtrudeHelper<Mesh2d> MeshExtruder;
-//    typedef typename MeshExtrudeHelper<Mesh2d>::ExtrudedMeshType ExtrudedMeshType;
-//
-//    typedef Trafo_ TrafoType;
-//    typedef SpaceVelo_ SpaceVeloType;
-//    typedef SpacePres_ SpacePresType;
-//
-//    std::shared_ptr<Geometry::RootMeshNode<Mesh2d>> mesh_node;
-//    std::shared_ptr<Geometry::RootMeshNode<ExtrudedMeshType>> extruded_mesh_node;
-//
-//    TrafoType trafo;
-//    SpaceVeloType space_velo;
-//    SpacePresType space_pres;
-//
-//  public:
-//    explicit ExtrudedStokesDomainLevel(int lvl_idx,
-//    std::shared_ptr<Geometry::RootMeshNode<Mesh2d>> mesh_node_2d,
-//    std::shared_ptr<Geometry::RootMeshNode<ExtrudedMeshType>> mesh_node_3d) :
-//      BaseClass(lvl_idx, mesh_node_2d),
-//      mesh_node(mesh_node_2d),
-//      extruded_mesh_node(mesh_node_3d),
-//      trafo(*(extruded_mesh_node->get_mesh())),
-//      space_velo(trafo),
-//      space_pres(trafo)
-//      {
-//      }
-//}; // class StokesDomainLevel<...>
-
 template<typename DomainLevel_, typename DomCtrl2d_, bool extrude>
 class ExtrudedPartiDomainControl :
   public Control::Domain::PartiDomainControl<DomainLevel_>
@@ -492,23 +166,6 @@ class ExtrudedPartiDomainControl :
       _dom_ctrl_2d(dom_ctrl_2d)
       {
         XASSERTM(!this->_have_hierarchy, "domain control already has a hierarchy!");
-        //XASSERTM(dom_ctrl_2d._have_hierarchy, "2d domain control has no hierarchy!");
-
-        //#ifdef FEAT_HAVE_MPI
-        //      XASSERTM(dom_ctrl_2d._have_partition, "domain needs to be partitioned before creating a hierarchy");
-        //#endif
-
-        //#ifdef FEAT_HAVE_MPI
-        //      // create hierarchy from our patch mesh
-        //      XASSERTM(this->_patch_mesh_node != nullptr, "domain control does not have a patch mesh");
-        //      mesh_node = this->_patch_mesh_node;
-        //      this->_patch_mesh_node = nullptr;
-        //#else
-        //      // create hierarchy from our base mesh
-        //      XASSERTM(this->_base_mesh_node != nullptr, "domain control does not have a base mesh");
-        //      mesh_node = _base_mesh_node;
-        //      this->_base_mesh_node = nullptr;
-        //#endif // FEAT_HAVE_MPI
 
         auto coarse_mesh_node_2d = _dom_ctrl_2d.back()->get_mesh_node_ptr();
         int lvl_min(_dom_ctrl_2d.min_level_index());
@@ -534,7 +191,6 @@ class ExtrudedPartiDomainControl :
 
           laylevs.push_front(std::make_shared<LevelType>(lvl+1, mesh_node));
         }
-
 
         // Okay, we're done here
         this->_have_hierarchy = true;
@@ -587,7 +243,6 @@ class ExtrudedPartiDomainControl :
           }
         }
 
-
       }
 
     /// virtual destructor
@@ -596,6 +251,9 @@ class ExtrudedPartiDomainControl :
       MeshExtruder::clear(this->front()->get_mesh_node());
     }
 
+    /**
+     * \brief Extrudes the 2d vertex set to the 3d mesh
+     */
     void extrude_vertex_sets()
     {
 
@@ -615,8 +273,12 @@ class ExtrudedPartiDomainControl :
       }
     }
 
+    /**
+     * \brief Extrudes a 2d vertex vector to 3d
+     */
     template<typename DT_, typename IT_>
-    void extrude_vertex_vector(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, MeshType::world_dim>& v, const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, Mesh2d::world_dim>& v_in)
+    void extrude_vertex_vector(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, MeshType::world_dim>& v,
+    const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, Mesh2d::world_dim>& v_in)
     {
       Tiny::Vector<DT_, MeshType::world_dim> tmp(DT_(0));
 
@@ -635,7 +297,7 @@ class ExtrudedPartiDomainControl :
 template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
 struct NavierStokesScrewsApp
 {
-  static constexpr bool extrude = false;
+  static constexpr bool extrude = true;
 
   /// The memory architecture. Although this looks freely chosable, it has to be Mem::Main for now because all the
   /// Hyperelasticity functionals are implemented for Mem::Main only
@@ -889,7 +551,7 @@ struct NavierStokesScrewsApp
     "Application config is missing the mandatory TimeDiscretisation section!");
 
     // Create BDF time discretisation coefficients in startup mode
-    BDFTimeDiscretisation<DataType> time_disc(time_disc_settings, reynolds, use_deformation, true);
+    Control::Time::NvsBdfQ<DataType> time_disc(time_disc_settings, reynolds, use_deformation, true);
 
     // Create domain control
     DomCtrl dom_ctrl(comm);
@@ -921,12 +583,18 @@ struct NavierStokesScrewsApp
       msg = String("t_end").pad_back(pad_width, '.') + String(": "+ stringify_fp_fix(t_end));
       comm.print(msg);
 
-      msg = String("ALE term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.ale_handling));
-      comm.print(msg);
-      msg = String("Convection term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.conv_handling));
-      comm.print(msg);
-      msg = String("Viscous term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.visc_handling));
-      comm.print(msg);
+      if(solve_flow)
+      {
+        msg = String("Reynolds").pad_back(pad_width, '.') + String(": "+ stringify_fp_fix(reynolds));
+        comm.print(msg);
+
+        msg = String("ALE term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.ale_handling));
+        comm.print(msg);
+        msg = String("Convection term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.conv_handling));
+        comm.print(msg);
+        msg = String("Viscous term").pad_back(pad_width, '.') + String(": "+stringify(time_disc.visc_handling));
+        comm.print(msg);
+      }
 
       dom_ctrl.print();
     }
@@ -1533,20 +1201,20 @@ struct NavierStokesScrewsApp
     vec_extrapolated_p.format();
 
     // We need several solution vectors for the auxillary Poisson problem
-    std::vector<GlobalPresVector> vec_sol_psi(time_disc.get_max_num_steps()+Index(1));
-    for(size_t i(0); i < vec_sol_psi.size(); ++i)
+    std::vector<GlobalPresVector> vec_sol_phi(time_disc.get_max_num_steps()+Index(1));
+    for(size_t i(0); i < vec_sol_phi.size(); ++i)
     {
-      vec_sol_psi.at(i) = std::move(matrix_s.create_vector_r());
-      vec_sol_psi.at(i).format();
+      vec_sol_phi.at(i) = std::move(matrix_s.create_vector_r());
+      vec_sol_phi.at(i).format();
     }
 
     // RHS vectors
     GlobalVeloVector vec_rhs_v = matrix_a.create_vector_l();
     GlobalPresVector vec_rhs_p = matrix_s.create_vector_l();
-    GlobalPresVector vec_rhs_psi = matrix_s.create_vector_l();
+    GlobalPresVector vec_rhs_phi = matrix_s.create_vector_l();
     vec_rhs_v.format();
     vec_rhs_p.format();
-    vec_rhs_psi.format();
+    vec_rhs_phi.format();
 
     // Vectors for the analytical solution
     GlobalVeloVector vec_sol_v_analytic = matrix_a.create_vector_l();
@@ -1597,7 +1265,7 @@ struct NavierStokesScrewsApp
     Assembly::Interpolator::project(vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo);
     // For starting with an exact pressure or psi
     //Assembly::Interpolator::project(vec_sol_p.at(0).local(), pres_sol, the_domain_level.space_pres);
-    //Assembly::Interpolator::project(vec_sol_psi.at(0).local(), pres_sol, the_domain_level.space_pres);
+    //Assembly::Interpolator::project(vec_sol_phi.at(0).local(), pres_sol, the_domain_level.space_pres);
 
     DataType err_v_L2_max(0);
     DataType err_v_H1_max(0);
@@ -1897,7 +1565,7 @@ struct NavierStokesScrewsApp
         // Save previous psi solutions
         for(Index step(time_disc.get_num_steps()); step > Index(0); --step)
         {
-          vec_sol_psi.at(step).copy(vec_sol_psi.at(step-Index(1)));
+          vec_sol_phi.at(step).copy(vec_sol_phi.at(step-Index(1)));
         }
 
         // Save previous pressure solutions
@@ -1986,7 +1654,7 @@ struct NavierStokesScrewsApp
         // Compute convection vector for rhs assembly
 
         // Interpolate the mesh velocity to Q2
-        if(time_disc.ale_handling != TermHandling::off)
+        if(time_disc.ale_handling != Control::Time::TermHandling::off)
         {
           Assembly::FEInterpolator<SpaceVeloType, ExtrudedTrafoFESpace>::interpolate(
             mesh_velocity_q2.local(), extruded_mesh_velocity.local(),
@@ -1994,7 +1662,7 @@ struct NavierStokesScrewsApp
         }
 
         vec_conv.format();
-        if(time_disc.conv_handling == TermHandling::expl)
+        if(time_disc.conv_handling == Control::Time::TermHandling::expl)
         {
           if((time_step > Index(2)))
           {
@@ -2010,7 +1678,7 @@ struct NavierStokesScrewsApp
         }
 
         // Use ALE velocity if necessary
-        if(time_disc.ale_handling == TermHandling::expl)
+        if(time_disc.ale_handling == Control::Time::TermHandling::expl)
         {
           vec_conv.axpy(mesh_velocity_q2, vec_conv, -DataType(1));
         }
@@ -2046,9 +1714,9 @@ struct NavierStokesScrewsApp
         for(Index step(0); step < time_disc.get_num_steps(); ++step)
         {
           Assembly::GradOperatorAssembler::assemble(
-            vec_rhs_v.local(), vec_sol_psi.at(step+Index(1)).local(),
+            vec_rhs_v.local(), vec_sol_phi.at(step+Index(1)).local(),
             the_domain_level.space_velo, the_domain_level.space_pres,
-            cubature, time_disc.coeff_rhs_v_psi.at(step));
+            cubature, time_disc.coeff_rhs_v_phi.at(step));
         }
 
         // Synchronise the rhs vector after the local assemblers are finished
@@ -2057,7 +1725,7 @@ struct NavierStokesScrewsApp
         //// Add psi gradient on rhs - superseeded by the GradOperatorAssembler above
         //for(Index step(0); step < time_disc.get_num_steps(); ++step)
         //{
-        //  matrix_b.apply(vec_rhs_v, vec_sol_psi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_psi.at(step));
+        //  matrix_b.apply(vec_rhs_v, vec_sol_phi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_phi.at(step));
         //}
 
         // Add pressure gradient on rhs if it got extrapolated at all. This does not have to be synchronised because
@@ -2076,7 +1744,7 @@ struct NavierStokesScrewsApp
         watch_asm_mat.start();
         vec_conv.format();
         // Compute convection vector for matrix assemly
-        if(time_disc.conv_handling == TermHandling::impl)
+        if(time_disc.conv_handling == Control::Time::TermHandling::impl)
         {
           if((time_step > Index(2)))
           {
@@ -2092,7 +1760,7 @@ struct NavierStokesScrewsApp
         }
 
         // Use ALE velocity if necessary
-        if(time_disc.ale_handling == TermHandling::impl)
+        if(time_disc.ale_handling == Control::Time::TermHandling::impl)
         {
           vec_conv.axpy(mesh_velocity_q2, vec_conv, -DataType(1));
         }
@@ -2135,15 +1803,15 @@ struct NavierStokesScrewsApp
         matrix_d.apply(vec_D_v, vec_sol_v.at(0));
 
         // Assemble rhs for the auxillary pressure poisson problem
-        vec_rhs_psi.format();
-        vec_rhs_psi.axpy(vec_D_v, vec_rhs_psi, time_disc.coeff_rhs_psi);
-        filter_p.filter_rhs(vec_rhs_psi);
+        vec_rhs_phi.format();
+        vec_rhs_phi.axpy(vec_D_v, vec_rhs_phi, time_disc.coeff_rhs_phi);
+        filter_p.filter_rhs(vec_rhs_phi);
         watch_asm_rhs.stop();
 
         // Solve auxillary pressure Poisson
         FEAT::Statistics::expression_target = "solver_s";
         watch_solver_s.start();
-        Solver::Status status_s = solver_s->correct(vec_sol_psi.at(0), vec_rhs_psi);
+        Solver::Status status_s = solver_s->correct(vec_sol_phi.at(0), vec_rhs_phi);
         watch_solver_s.stop();
         if(!Solver::status_success(status_s))
         {
@@ -2158,7 +1826,7 @@ struct NavierStokesScrewsApp
         watch_asm_rhs.start();
         vec_rhs_p.format();
         // rhs_p = M (p + psi) + 1/reynolds D v
-        matrix_m_p.apply(vec_rhs_p, vec_sol_psi.at(0), vec_rhs_p, DataType(1));
+        matrix_m_p.apply(vec_rhs_p, vec_sol_phi.at(0), vec_rhs_p, DataType(1));
         // Add pressure on rhs if it got extrapolated at all
         if(time_disc.get_p_extrapolation_steps() > Index(0))
         {
@@ -2282,7 +1950,7 @@ struct NavierStokesScrewsApp
           //exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
 
           exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-          //exporter.add_vertex_scalar("psi", vec_sol_psi.at(0).local().elements());
+          //exporter.add_vertex_scalar("psi", vec_sol_phi.at(0).local().elements());
 
           //// compute and write time-derivatives
           //vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
@@ -2311,13 +1979,13 @@ struct NavierStokesScrewsApp
           //Assembly::GradOperatorAssembler::assemble(
           //  vec_rhs_v.local(), vec_sol_p.at(0).local(),
           //  the_domain_level.space_velo, the_domain_level.space_pres,
-          //  cubature, time_disc.coeff_rhs_v_psi.at(0));
+          //  cubature, time_disc.coeff_rhs_v_phi.at(0));
           //vec_rhs_v.sync_0();
           //filter_v.filter_cor(vec_rhs_v);
           //exporter.add_vertex_vector("grad_p_phi", vec_rhs_v.local());
 
           //vec_rhs_v.format();
-          //matrix_b.apply(vec_rhs_v, vec_sol_p.at(0), vec_rhs_v, -time_disc.coeff_rhs_v_psi.at(0));
+          //matrix_b.apply(vec_rhs_v, vec_sol_p.at(0), vec_rhs_v, -time_disc.coeff_rhs_v_phi.at(0));
           //filter_v.filter_cor(vec_rhs_v);
           //exporter.add_vertex_vector("p_div_phi", vec_rhs_v.local());
 
