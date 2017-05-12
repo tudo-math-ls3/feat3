@@ -32,7 +32,7 @@ for i in range(1, 5):
     #f.write("export SCOREP_ENABLE_PROFILING=true" + os.linesep)
     f.write("export SCOREP_ENABLE_TRACING=true" + os.linesep)
     f.write("export SCOREP_FILTERING_FILE=" + os.getcwd() + "/scorep.filt" + os.linesep)
-    f.write("srun --cpu_bind=verbose,cores --distribution=block:cyclic ~/feat/applications/poisson_dirichlet_2d  --level " +  str(11+i) + " 4 --part_min_elems 1000" + os.linesep)
+    f.write("srun --hint=nomultithread --cpu_bind=map_cpu:0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19 ~/feat/applications/poisson_dirichlet_2d  --level " +  str(11+i) + " 4 --part_min_elems 1000" + os.linesep)
 
   #sbatch
   subprocess.call(["sbatch", "temp"])
