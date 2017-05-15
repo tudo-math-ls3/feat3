@@ -214,7 +214,7 @@ namespace FEAT
 
           update_boundary_size();
 
-          //TODO anzahl nachbar ranks fuer fitness nötig ???
+          //TODO anzahl nachbar ranks fuer fitness noetig ???
         }
 
         /// mutate individuum - let cells switch to smaller patches
@@ -233,7 +233,7 @@ namespace FEAT
             ++tries;
 
             Index rank(rng(Index(0), _num_ranks - 1));
-            Index rng_cell_idx = rng(Index(0), _boundary_cells.at(rank).size() - 1);
+            Index rng_cell_idx = rng(Index(0), Index(_boundary_cells.at(rank).size() - 1));
             Index counter(0);
             Index cell(*(_boundary_cells.at(rank).begin()));
             //choose cell randomly from current boundary set
@@ -404,8 +404,8 @@ namespace FEAT
           Index max(0);
           for (Index rank(0) ; rank < _num_ranks ; ++rank)
           {
-            min = Math::min(_cells_per_rank.at(rank).size(), min);
-            max = Math::max(_cells_per_rank.at(rank).size(), max);
+            min = Math::min(Index(_cells_per_rank.at(rank).size()), min);
+            max = Math::max(Index(_cells_per_rank.at(rank).size()), max);
           }
           return max - min;
         }
