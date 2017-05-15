@@ -43,7 +43,7 @@ public:
   }
 };
 #if !defined(__linux) && defined(__unix)
-// the memory usage on bsd systems is reported as zero in non interactive mode, but positive in interactive mode; thus it is usefull but
+// the memory usage on bsd systems is reported as zero in non interactive mode, but positive in interactive mode; thus it is useful but
 // the test is disabled until somebody really uses a bsd system in his day to day work.
 /// \todo fix memory usage report in non interactive mode on bsd systems
 #else

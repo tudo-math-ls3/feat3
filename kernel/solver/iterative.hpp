@@ -678,7 +678,7 @@ namespace FEAT
        * \returns
        * A Status code.
        *
-       * \note This function is prefered over _set_new_defect when using asynchronous mpi operations.
+       * \note This function is preferred over _set_new_defect when using asynchronous mpi operations.
        */
       virtual Status _update_defect(const DataType def_cur_norm)
       {

@@ -172,7 +172,7 @@ namespace FEAT
        * The current solution vector, gets overwritten
        *
        * \param[in] vec_rhs
-       * The right hand side vector. This is unused in this function, as the intial defect was alredy computed and
+       * The right hand side vector. This is unused in this function, as the initial defect was alredy computed and
        * stored in _vec_r.
        *
        * \returns A status code.

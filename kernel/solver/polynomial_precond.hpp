@@ -45,7 +45,7 @@ namespace FEAT
       DataType _omega;
       /// The component-wise inverted diagonal of _matrix
       VectorType _inv_diag;
-      /// auxilary vectors
+      /// auxiliary vectors
       VectorType _aux1, _aux2, _aux3;
 
     public:

@@ -30,7 +30,7 @@ namespace FEAT
             inline void cuda_spai_check_for_api_errors(cudaError_t err, const char* func, const char* file, const long line)
             {
                 if (err != cudaSuccess)
-                    throw InternalError(func, file, line, "CUDA error occured in API call: " + stringify(cudaGetErrorString(err)));
+                    throw InternalError(func, file, line, "CUDA error occurred in API call: " + stringify(cudaGetErrorString(err)));
             }
 
 #define SPAI_CHECK_KERNEL_ERROR() cuda_spai_check_for_kernel_errors(__func__,__FILE__,__LINE__)
@@ -39,11 +39,11 @@ namespace FEAT
                 // catch launch errors
                 cudaError_t last_error(cudaGetLastError());
                 if (last_error != cudaSuccess)
-                    throw InternalError(func, file, line, "CUDA error occured in kernel launch: " + stringify(cudaGetErrorString(last_error)));
+                    throw InternalError(func, file, line, "CUDA error occurred in kernel launch: " + stringify(cudaGetErrorString(last_error)));
 #ifdef FEAT_DEBUG_MODE
                 // catch execution errors -> may affect performance!
                 if (cudaDeviceSynchronize() != cudaSuccess)
-                    throw InternalError(func, file, line, "CUDA error occured in kernel execution: " + stringify(cudaGetErrorString(last_error)));
+                    throw InternalError(func, file, line, "CUDA error occurred in kernel execution: " + stringify(cudaGetErrorString(last_error)));
 #endif
             }
 
@@ -51,7 +51,7 @@ namespace FEAT
             inline void cuda_spai_check_for_cublas_errors(cublasStatus_t err, const char* func, const char* file, const long line)
             {
                 if (err != CUBLAS_STATUS_SUCCESS)
-                    throw InternalError(func, file, line, "CUDA error occured in cublas call.");
+                    throw InternalError(func, file, line, "CUDA error occurred in cublas call.");
             }
 
 

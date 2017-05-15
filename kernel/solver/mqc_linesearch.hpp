@@ -388,7 +388,7 @@ namespace FEAT
           this->_alpha_min = alpha;//*this->_norm_dir;
           this->_fval_min = fval;
 
-          // If we are successfull, we save the last step length as the new initial step length
+          // If we are successful, we save the last step length as the new initial step length
           if(status == Status::success)
           {
             this->_alpha_0 = alpha*this->_norm_dir;

@@ -44,7 +44,7 @@ namespace FEAT
         // the list that shall contain our computed distance results
         std::vector<Index> distances(num_elems, std::numeric_limits<Index>::max());
         // the 'queue' of nodes that have not yet been visited
-        // the priorities are sorted from max to min, thus we need to use the inverse distance as the key, resulting in the lowest distance beeing at the front of the queue
+        // the priorities are sorted from max to min, thus we need to use the inverse distance as the key, resulting in the lowest distance being at the front of the queue
         FEAT::mutable_priority_queue<Index, Index> pending_nodes;
         for (Index i(0) ; i < num_elems ; ++i)
         {

@@ -267,7 +267,7 @@ namespace FEAT
             vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
           }
 
-          // If we are successfull, we could save the last step length as the new initial step length. This is
+          // If we are successful, we could save the last step length as the new initial step length. This is
           // disabled by default, as it can lead to stagnation e.g. for minimising the Rosenbrock function.
           //if(status == Status::success)
           //{

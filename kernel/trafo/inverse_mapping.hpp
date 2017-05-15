@@ -491,7 +491,7 @@ namespace FEAT
       template<int dim_>
       struct InverseMappingHelper<Shape::Simplex<dim_>>
       {
-        // checks whether p is on the referece cell
+        // checks whether p is on the reference cell
         template<typename PT_, typename DT_>
         static bool is_on_ref(const PT_& p, const DT_ tol)
         {
@@ -513,7 +513,7 @@ namespace FEAT
       template<int dim_>
       struct InverseMappingHelper<Shape::Hypercube<dim_>>
       {
-        // checks whether p is on the referece cell
+        // checks whether p is on the reference cell
         template<typename PT_, typename DT_>
         static bool is_on_ref(const PT_& p, const DT_ tol)
         {

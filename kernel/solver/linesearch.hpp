@@ -447,7 +447,7 @@ namespace FEAT
          * The routine sets the initial data from "iteration 0" (needed for checking the strong Wolfe conditions
          * later) and does some error checking.
          *
-         * \returns Status::progress if no error occured.
+         * \returns Status::progress if no error occurred.
          */
         virtual Status _startup(const DataType fval, const DataType df, const VectorType& vec_sol,
         const VectorType& vec_dir)

@@ -20,7 +20,7 @@ namespace FEAT
 {
   namespace Solver
   {
-    /// Stock of matrices, based on global inpupt containes
+    /// Stock of matrices, based on global inpupt contains
     template <typename MatrixType_, typename FilterType_, typename TransferType_>
     class MatrixStock
     {
