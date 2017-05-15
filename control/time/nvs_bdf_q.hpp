@@ -94,12 +94,12 @@ namespace FEAT
        * If the deformation tensor based bilinear form is used for the viscous term (meaning \f$ D(u) \f$ instead
        * of \f$ \nabla u \f$), the rotational coefficient gains an additional factor 2.
        *
-       * If do-nothing boundaries for the momentum equation exist, the auxillary variable \$f \phi \f$ needs Robin
+       * If do-nothing boundaries for the momentum equation exist, the auxillary variable \f$ \phi \f$ needs Robin
        * boundary conditions.
        *
        * If the domain moves with the ALE velocity \f$ w \f$, the convection term should read
        * \f[
-       *   ((u^{*,k) - w) \cdot \nabla) \tilde{u}^k
+       *   ((u^{*,k} - w) \cdot \nabla) \tilde{u}^k
        * \f]
        *
        * For details (for the Stokes problem) see \cite GMS06.
