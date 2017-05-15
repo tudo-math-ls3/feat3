@@ -12,7 +12,7 @@
 //
 //         u(x,y) = (x - 1/2)^2 - (y - 1/2)^2
 //
-// The purpose of this tutorial is to demonstate the implementation of a custom
+// The purpose of this tutorial is to demonstrate the implementation of a custom
 // AnalyticalFunction class for the solution function 'u' and the boundary condition
 // function 'g'.
 //
@@ -92,7 +92,7 @@ namespace Tutorial02
     public Analytic::Function
   {
   public:
-    // For analytic functions, we first need to provide information abou the domain and the image
+    // For analytic functions, we first need to provide information about the domain and the image
     // sets. The domain of any analytic function in our context is the R^n, so the only thing we
     // have to specify is the domain dimension, which equals 2 as we are solving a 2D PDE:
     static constexpr int domain_dim = 2;

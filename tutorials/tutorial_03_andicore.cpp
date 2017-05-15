@@ -57,7 +57,7 @@
 // FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAT-Analytic includs
+// FEAT-Analytic includes
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
 // FEAT-Assembly includes
@@ -308,7 +308,7 @@ namespace Tutorial03
       // see the 'PringlesFunction' from the 'tutorial_02_laplace' example.
       // However, its template parameter is *not* our assembly traits type 'AsmTraits_', but another
       // type called 'analytic evaluation traits', which we need to provide here.
-      // Luckily, there is another template class in te 'Analytic' namespace which takes care
+      // Luckily, there is another template class in the 'Analytic' namespace which takes care
       // of all the necessary typedefing. The only two template parameters are the data type which
       // we want to use internally and the function class itself:
       typedef Analytic::EvalTraits<DataType, SolFunction_> AnalyticEvalTraits;
@@ -358,7 +358,7 @@ namespace Tutorial03
         // 3. the reaction   :      c *    u   * psi
 
         // For this task, we need to call the 'value', 'gradient' and 'hessian' functions of the
-        // solution function evalutuar (see the PringlesFunction in Tutorial 02), so we first need
+        // solution function evaluator (see the PringlesFunction in Tutorial 02), so we first need
         // to create the objects where the functions can write their values to.
         // We do this by using the types defined in the AnalyticEvalTraits class which we have
         // defined above:
@@ -373,7 +373,7 @@ namespace Tutorial03
         _sol_eval.hessian (hess , tau.img_point);
 
         // Finally, we can combine these terms to pre-compute the value of our force
-        // functional, so that we just need to multiply by 'psi' lateron:
+        // functional, so that we just need to multiply by 'psi' later on:
         _force_value =
           // First, the diffusion. This is the matrix-dot product of 'A' and the hessian of 'u':
           - dot(_data.a, hess)
@@ -404,7 +404,7 @@ namespace Tutorial03
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Initial data setup
 
-    // First of all, we create and initialiase the data object for our PDE:
+    // First of all, we create and initialise the data object for our PDE:
     AndicoreData andicore_data;
 
     // Choose a (non-symmetric) positive definite matrix A for the diffusion
@@ -528,7 +528,7 @@ namespace Tutorial03
 
     std::cout << "Assembling boundary conditions..." << std::endl;
 
-    // In this example, we assemble homogene Dirichlet boundary conditions:
+    // In this example, we assemble homogeneous Dirichlet boundary conditions:
     Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
     // Add our only boundary component:

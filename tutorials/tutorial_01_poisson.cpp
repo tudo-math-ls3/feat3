@@ -17,7 +17,7 @@
 //         f(x,y) = 2 * pi^2 * u(x,y)
 //
 //
-// The purpose of this tutorial is to demonstate the basic program flow of a simple
+// The purpose of this tutorial is to demonstrate the basic program flow of a simple
 // scalar stationary linear PDE solver without going to far into the details of what
 // magic happens under-the-hood.
 //
@@ -66,7 +66,7 @@
 // FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAT-Analytic includs
+// FEAT-Analytic includes
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
 // FEAT-Assembly includes
@@ -227,7 +227,7 @@ namespace Tutorial01
     // Symbolic linear system assembly
     std::cout << "Allocating matrix and vectors..." << std::endl;
 
-    // Now we need to perform the symbolic matrix assembly, i.e., the computation of the nonzero
+    // Now we need to perform the symbolic matrix assembly, i.e., the computation of the non-zero
     // pattern and the allocation of storage for the three CSR arrays.
     // The class which performs this task is the SymbolicAssembler class:
     MatrixType matrix;
@@ -242,7 +242,7 @@ namespace Tutorial01
     // Now that the matrix structure is assembled, we can easily create two vector objects
     // for the solution and the right-hand-side vector by the create_vector_l/r member function
     // of the matrix object. This member function creates a vector of the corresponding
-    // type and dimension, so that the vector can acts as a left or right multiplicant
+    // type and dimension, so that the vector can acts as a left or right multiplicand
     // in a matrix-vector multiply operation. Our matrix is square, so it does not matter
     // whether we call 'create_vector_l' or 'create_vector_r' here:
     VectorType vec_sol = matrix.create_vector_r();

@@ -74,7 +74,7 @@
 // FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAT-Analytic includs
+// FEAT-Analytic includes
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
 // FEAT-Assembly includes
@@ -214,7 +214,7 @@ namespace Tutorial06
     // The '#' represent the four boundary edges of our unit-square domain named 'bnd:0' to
     // 'bnd:3' and the 'X' represent the corner vertices of our domain, each of which is
     // part of the two adjacent boundary mesh-parts.
-    // We will require these names for the assembly of boundary conditions lateron.
+    // We will require these names for the assembly of boundary conditions later on.
     // Note: in 3D there would be six boundary faces named from 'bnd:0' to 'bnd:5'.
 
     // Define the mesh type, just as in any previous tutorials
@@ -237,7 +237,7 @@ namespace Tutorial06
     // As we do this on foot in this tutorial, we will use a std::shared_ptr for convenience:
     std::shared_ptr<RootMeshNodeType> root_mesh_node;
 
-    // The generator class will not only give us a mesh-node prepresenting our patch of the domain,
+    // The generator class will not only give us a mesh-node representing our patch of the domain,
     // but it will also tell us the ranks of all processes that manage our neighbour patches.
     // We will require these ranks to set up the communication "mirrors" that are required for
     // the global simulation. For this, we need to create a std::vector of ints, which will be
@@ -366,7 +366,7 @@ namespace Tutorial06
     // functionality, which is used by the global linear algebra containers that we will
     // define in a moment. We will not use any of the gate's functionality directly after
     // its initial creation, as we will simply work with global matrices and vectors, which
-    // internally use the gate's functionality. Note that each gate object is associtated
+    // internally use the gate's functionality. Note that each gate object is associated
     // with a single finite element space object - so in a more complex application with
     // several different finite element spaces defined on possibly more than just a
     // single mesh (level), there would be one gate per FE space per mesh.
@@ -660,7 +660,7 @@ namespace Tutorial06
 
     // In this tutorial, we want to set up an additive overlapping Schwarz preconditioner and for
     // this, we need the so-called "local type-1 matrix". If you don't know what that means, you
-    // should consider some literatute on Schwarz/ScaRC preconditioners in the FEM context.
+    // should consider some literature on Schwarz/ScaRC preconditioners in the FEM context.
 
     // The easiest way to obtain a local type-1 matrix is to call the "convert_to_1" function of
     // the *unfiltered* global matrix, which will return a new local matrix object, which we will
@@ -679,7 +679,7 @@ namespace Tutorial06
     // So, we have been setting up the global linear system for quite a while now and the good news
     // is that setting up a global (i.e. parallel) linear solver is quite trivial now!
     // We just need to decide what type of mixed local/global solver we want and then we can link
-    // the individial nodes of the solver tree just as in the simple sequential tutorials.
+    // the individual nodes of the solver tree just as in the simple sequential tutorials.
 
     // The solver we want to set up in this tutorial is a
     // 1. global PCG preconditioned by

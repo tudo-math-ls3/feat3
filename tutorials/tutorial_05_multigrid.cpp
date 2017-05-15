@@ -1,9 +1,9 @@
 //
-// \brief FEAT Tutorial 05: Geometric Multgrid Solver (TM)
+// \brief FEAT Tutorial 05: Geometric Multigrid Solver (TM)
 //
 // This file contains a simple prototypical multigrid Poisson solver for the unit square domain.
 //
-// The purpose of this tutorial is to demonstate how to set up a simple geometrical multigrid
+// The purpose of this tutorial is to demonstrate how to set up a simple geometrical multigrid
 // solver for a linear PDE. In this example, the PDE to be solved is exactly the same as
 // in Tutorial 01.
 //
@@ -56,7 +56,7 @@
 // FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAT-Analytic includs
+// FEAT-Analytic includes
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
 // FEAT-Assembly includes
@@ -183,7 +183,7 @@ namespace Tutorial05
     // it comes to setting up a parallel multigrid on hierarchic partitions. This goes far
     // beyond the scope of this tutorial, so we merely stick to this convention for consistency,
     // as it is used by all the "real-world" parallel applications. So keep in mind:
-    // the finest level is at the front of the deque, the coarest level at its back.
+    // the finest level is at the front of the deque, the coarsest level at its back.
 
     // First of all, let's create the coarse level
     {
@@ -239,7 +239,7 @@ namespace Tutorial05
       Geometry::BoundaryFactory<MeshType> boundary_factory(lvl.mesh);
       BoundaryType boundary(boundary_factory);
 
-      // Assemble the unit filter for homogenous Dirichlet boundary conditions
+      // Assemble the unit filter for homogeneous Dirichlet boundary conditions
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
       unit_asm.add_mesh_part(boundary);
       unit_asm.assemble(lvl.filter, lvl.space);
@@ -329,6 +329,10 @@ namespace Tutorial05
     // And assemble the rhs vector:
     Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, force_functional, lvl_fine.space, cubature_factory);
 
+    // As always, we have to apply the boundary condition filter onto our vectors:
+    lvl_fine.filter.filter_sol(vec_sol);
+    lvl_fine.filter.filter_rhs(vec_rhs);
+
     // Our system is fully assembled now.
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -346,7 +350,7 @@ namespace Tutorial05
 
     // The first object that we require is a "MultiGridHierarchy" object, which is responsible
     // for managing the level hierarchy used by a multigrid solver. Note that this hierarchy
-    // object is not a solver/preconditioner -- we will create that one lateron.
+    // object is not a solver/preconditioner -- we will create that one later on.
 
     // The MultiGridHierarchy class templates has four template parameters:
     auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
@@ -432,13 +436,13 @@ namespace Tutorial05
     // Alright, now we have a multigrid preconditioner object.
 
     // However, the 'multigrid' object we have set up so far is just a *single cycle*, i.e.
-    // it is merely a preconditiner, so we still need to create a "real solver" around that.
-    // As we want to have a "classical multigrid", we just need to use this multgrid object
+    // it is merely a preconditioner, so we still need to create a "real solver" around that.
+    // As we want to have a "classical multigrid", we just need to use this multigrid object
     // as a preconditioner for a Richardson solver:
     auto solver = Solver::new_richardson(lvl_fine.matrix, lvl_fine.filter, DataType(1), multigrid);
 
     // Change the solver's plot name (that's what is written to the console) to "Multigrid".
-    // This is just for the sake os aesthetics: Without this step, our solver would present
+    // This is just for the sake of aesthetics: Without this step, our solver would present
     // itself as "Richardson" ;)
     solver->set_plot_name("Multigrid");
 
@@ -555,7 +559,7 @@ int main(int argc, char* argv[])
   if(level_max < level_min)
   {
     // minimum level greater than maximum level
-    std::cerr << "ERROR: Minimum level " << level_min << " is greather than the maximum level " << level_max << std::endl;
+    std::cerr << "ERROR: Minimum level " << level_min << " is greater than the maximum level " << level_max << std::endl;
     Runtime::abort();
   }
   if(level_max == level_min)

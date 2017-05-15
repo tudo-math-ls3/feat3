@@ -1,5 +1,5 @@
 //
-// \brief FEAT Tutorial 04: Parser demonstation
+// \brief FEAT Tutorial 04: Parser demonstration
 //
 // This file contains a simple Poisson/Laplace solver for the unit square domain.
 //
@@ -9,7 +9,7 @@
 //             u  = g          on the boundary
 //
 // with runtime user-specified functions 'u', 'f' and 'g'.
-// See the section 'The Problem Defintion' at the end of this comment block for details.
+// See the section 'The Problem Definition' at the end of this comment block for details.
 //
 // The purpose of this tutorial is to demonstrate the usage of two parser classes,
 // which can be used to define the behaviour and underlying problem of this application
@@ -48,7 +48,7 @@
 // The Problem Definition
 // ======================
 // As already mentioned above, this tutorial application solves a Poisson PDE with
-// a caller-defined right-hand-side function 'f', a Dirchlet boundary condition
+// a caller-defined right-hand-side function 'f', a Dirichlet boundary condition
 // function 'g' as well as a (optional) reference solution function 'u'.
 // The actual problem depends on which of those options were actually supplied by
 // the caller via the command line, so there are various cases:
@@ -194,10 +194,10 @@ namespace Tutorial04
     // We will now tell the argument parser which options this application supports,
     // along with a short description of what the corresponding option is meant to do.
     // Although this is step is not mandatory, it is highly recommended for two reasons:
-    // 1. By telling the parser all our supported options, we may lateron instruct the
+    // 1. By telling the parser all our supported options, we may later on instruct the
     //    parser to check if the caller has supplied any unsupported options, so that
     //    we may print an appropriate error message. Without this, any mistyped option
-    //    (e.g. '--levle' instead of '--level') will simply be ignored by the parser
+    //    (e.g. '--level' instead of '--level') will simply be ignored by the parser
     //    without emitting any warning or error message.
     // 2. Moreover, we can instruct the parser to give us a string containing all
     //    the supported options and their descriptions which we may then print out
@@ -214,7 +214,7 @@ namespace Tutorial04
       "If this option is not specified, no VTK file will be written\n");
 
     // Beside the support for the 'SimpleArgParser' class, which is a build-in feature
-    // of FEAT, this tutorial also demonstrates the usage of the 'ParsedFunction' lateron.
+    // of FEAT, this tutorial also demonstrates the usage of the 'ParsedFunction' later on.
     // However, this functionality is only available if the 'fparser' library was included,
     // so we need to use an #ifdef here to include the corresponding options.
 #ifdef FEAT_HAVE_FPARSER
@@ -243,7 +243,7 @@ namespace Tutorial04
     if(!unsupported.empty())
     {
       // Okay, we have at least one unsupported option.
-      // Each entry of the container contains a pair of an int specifing the index of the
+      // Each entry of the container contains a pair of an int specifying the index of the
       // faulty command line argument as well as the faulty argument itself as a string.
       // We loop over all unsupported arguments and print them out:
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
@@ -299,7 +299,7 @@ namespace Tutorial04
     }
 
     // Okay, if we come out here, then all supplied options (if any) are supported and
-    // the caller did not explicitly ask for help by specifing '--help', so we can now
+    // the caller did not explicitly ask for help by specifying '--help', so we can now
     // start the actual parsing.
 
     // First of all, we will check for 'basic' options, which do not require any parameters.
@@ -308,7 +308,7 @@ namespace Tutorial04
 
     // For this, we can use the 'check' function of the parser. The only argument of this
     // function is the name of the option that we want to check for (without the leading
-    // double-hypen), and the function returns an int, which is:
+    // double-hyphen), and the function returns an int, which is:
     //  * = -1, if the option was not supplied by the caller
     //  * =  0, if the option was given without any parameters
     //  * = n > 0, if the option was given with n parameters
@@ -367,7 +367,7 @@ namespace Tutorial04
     // Now we will parse the formulas for our PDE functions if the fparser library in enabled.
 
 #ifdef FEAT_HAVE_FPARSER
-    // Let's initialise our reference solution, the rhs and the dbc function fomulae
+    // Let's initialise our reference solution, the rhs and the dbc function formulae
     // to empty strings
     String formula_u("");
     String formula_f("");
@@ -387,7 +387,7 @@ namespace Tutorial04
 
     // At this point, we have at least one function formula. Now, we need to create
     // three instances of the ParsedFunction class template, which we will pass on
-    // to our assembly functions lateron. The only template parameter is the dimension
+    // to our assembly functions later on. The only template parameter is the dimension
     // of the function to be parsed, which is 2 in our case:
     Analytic::ParsedFunction<2> rhs_function; // right-hand-side
     Analytic::ParsedFunction<2> dbc_function; // boundary conditions
@@ -417,7 +417,7 @@ namespace Tutorial04
       catch(...)
       {
         // Oops...
-        std::cerr << "ERROR: Cannot parse expession '" << formula_u << "' as function 'u(x,y)'" << std::endl;
+        std::cerr << "ERROR: Cannot parse expression '" << formula_u << "' as function 'u(x,y)'" << std::endl;
         Runtime::abort();
       }
     }
@@ -430,7 +430,7 @@ namespace Tutorial04
       }
       catch(...)
       {
-        std::cerr << "ERROR: Cannot parse expession '" << formula_f << "' as function 'f(x,y)'" << std::endl;
+        std::cerr << "ERROR: Cannot parse expression '" << formula_f << "' as function 'f(x,y)'" << std::endl;
         Runtime::abort();
       }
     }
@@ -442,7 +442,7 @@ namespace Tutorial04
       }
       catch(...)
       {
-        std::cerr << "ERROR: Cannot parse expession '" << formula_g << "' as function 'g(x,y)'" << std::endl;
+        std::cerr << "ERROR: Cannot parse expression '" << formula_g << "' as function 'g(x,y)'" << std::endl;
         Runtime::abort();
       }
     }
@@ -603,7 +603,7 @@ namespace Tutorial04
     else
     {
       // We have neither a boundary condition function nor a solution function, so we
-      // initialise homogene Dirichlet boundary conditions.
+      // initialise homogeneous Dirichlet boundary conditions.
       unit_asm.assemble(filter, space);
     }
 

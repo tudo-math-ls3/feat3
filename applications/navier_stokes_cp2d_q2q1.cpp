@@ -8,7 +8,7 @@
 // !!! WARNING !!!
 // ---------------
 // This application is a "toy code" solver, i.e. it is meant as a playground for the
-// HPC guys to tweak their parallel poisson solvers for more interesting scenarious than
+// HPC guys to tweak their parallel poisson solvers for more interesting scenarios than
 // poisson on the unit-square. You can furthermore generate fancy videos of vortex
 // streets to impress your girlfriend or to show your parents what you are being paid for.
 // But: Do not expect this application to be accurate in time and/or space,
@@ -16,7 +16,7 @@
 // </Warning>
 //
 // This application is a "flow-through-a-domain" solver, i.e. it handles Navier-Stokes
-// equations with an inflow and and outflow region without any external forces, moving
+// equations with an inflow and outflow region without any external forces, moving
 // boundaries or any other fancy stuff.
 //
 // This application has four pre-configured benchmark problems, which can be launched
@@ -25,7 +25,7 @@
 //
 // --setup square
 // Loads the "Poiseuille-Flow-On-Unit-Square" problem.
-// This is the most simple of the three pre-confgured problems, where the time-dependent
+// This is the most simple of the three pre-configured problems, where the time-dependent
 // solution converges to a steady-state Poiseuille-Flow.
 //
 // --setup nozzle
@@ -133,7 +133,7 @@
 // treatment of the non-linear convection.
 //
 // The '--dpm-steps <N>' option specifies the number of DPM iterations to perform per
-// non-linear itation. By default, only 1 step is perfomed.
+// non-linear iteration. By default, only 1 step is performed.
 //
 //
 // Linear Solver/Preconditioner Options
@@ -1344,15 +1344,15 @@ namespace NavierStokesCP2D
     args.support("dpm-steps", "<N>\nSets the number of Discrete-Projection-Method steps per non-linear step.\nDefault: 1\n");
     args.support("no-multigrid-a", "\nUse BiCGStab-Jacobi instead of Multigrid as A-Solver.\n");
     args.support("max-iter-a", "<N>\nSets the maximum number of allowed iterations for the A-Solver.\nDefault: 25\n");
-    args.support("tol-rel-a", "<eps>\nSets the relative tolerative for the A-Solver.\nDefault: 1E-5\n");
+    args.support("tol-rel-a", "<eps>\nSets the relative tolerance for the A-Solver.\nDefault: 1E-5\n");
     args.support("smooth-a", "<N>\nSets the number of smoothing steps for the A-Solver.\nDefault: 4\n");
-    args.support("damp-a", "<omega>\nSets the smoother daming parameter for the A-Solver.\nDefault: 0.5\n");
+    args.support("damp-a", "<omega>\nSets the smoother damping parameter for the A-Solver.\nDefault: 0.5\n");
     args.support("no-multigrid-s", "\nUse PCG-Jacobi instead of Multigrid as S-Solver.\n");
     args.support("max-iter-s", "<N>\nSets the maximum number of allowed iterations for the S-Solver.\nDefault: 50\n");
-    args.support("tol-rel-s", "<eps>\nSets the relative tolerative for the S-Solver.\nDefault: 1E-5\n");
+    args.support("tol-rel-s", "<eps>\nSets the relative tolerance for the S-Solver.\nDefault: 1E-5\n");
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
-    args.support("damp-s", "<omega>\nSets the smoother daming parameter for the S-Solver.\nDefault: 0.5\n");
-    args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete stastistics dump");
+    args.support("damp-s", "<omega>\nSets the smoother damping parameter for the S-Solver.\nDefault: 0.5\n");
+    args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete statistics dump");
     args.support("test-mode", "Runs the application in regression test mode.");
     args.support("parti-type");
     args.support("parti-name");
@@ -1369,7 +1369,7 @@ namespace NavierStokesCP2D
       comm.print("  nozzle    Jet-Flow through Nozzle domain");
       comm.print("  bench1    Nonsteady Flow Around A Cylinder\n");
       comm.print("This will pre-configure this application to solve one of the");
-      comm.print("above problems. Note that you can further adjust the configration");
+      comm.print("above problems. Note that you can further adjust the configuration");
       comm.print("by specifying additional options to override the default problem");
       comm.print("configuration.");
       if(args.check("help") >= 0)
