@@ -145,7 +145,7 @@ struct MeshoptBoundaryApp
       midpoint_p.first.split_by_charset(midpoint_deque," ");
     }
 
-    Tiny::Vector<DataType,2> midpoint(DataType(0));
+    WorldPoint midpoint(DataType(0));
     if(midpoint_deque.size() > size_t(0))
     {
       XASSERTM(midpoint_deque.size() == size_t(MeshType::world_dim),"midpoint has invalid number of components!");
