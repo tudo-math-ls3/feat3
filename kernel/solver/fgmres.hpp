@@ -85,9 +85,9 @@ namespace FEAT
         BaseClass("FGMRES(" + stringify(krylov_dim) + ")", precond),
         _system_matrix(matrix),
         _system_filter(filter),
-        _krylov_dim(krylov_dim),
-        _inner_res_scale(inner_res_scale)
+        _krylov_dim(krylov_dim)
       {
+        set_inner_res_scale(inner_res_scale);
       }
 
       explicit FGMRES(const String& section_name, PropertyMap* section,
