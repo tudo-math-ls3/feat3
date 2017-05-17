@@ -27,19 +27,19 @@ namespace FEAT
       /// extracts integral feature from a given types feature hash
       static inline bool extract_intness(uint64_t feature_hash)
       {
-        return feature_hash&uint64_t(1)<<32;
+        return (bool)(feature_hash&uint64_t(1)<<32);
       }
 
       /// extracts floating point feature from a given types feature hash
       static inline bool extract_floatness(uint64_t feature_hash)
       {
-        return feature_hash&uint64_t(1)<<33;
+        return (bool)(feature_hash&uint64_t(1)<<33);
       }
 
       /// extracts sign feature from a given types feature hash
       static inline bool extract_signedness(uint64_t feature_hash)
       {
-        return feature_hash&uint64_t(1)<<34;
+        return (bool)(feature_hash&uint64_t(1)<<34);
       }
     };
 
