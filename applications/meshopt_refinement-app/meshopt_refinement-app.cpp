@@ -63,8 +63,8 @@ struct MeshoptRefinementApp
   /**
    * \brief The routine that does the actual work
    */
-  static int run(const SimpleArgParser& args, Dist::Comm& comm, PropertyMap* application_config,
-    PropertyMap* meshopt_config, PropertyMap* solver_config, Geometry::MeshFileReader& mesh_file_reader)
+  static int run(const SimpleArgParser& args, Dist::Comm& comm, PropertyMap& application_config,
+    PropertyMap& meshopt_config, PropertyMap& solver_config, Geometry::MeshFileReader& mesh_file_reader)
   {
 
     static constexpr int pad_width = 30;
@@ -113,7 +113,7 @@ struct MeshoptRefinementApp
     }
 
     // Get the application settings section
-    auto app_settings_section = application_config->query_section("ApplicationSettings");
+    auto app_settings_section = application_config.query_section("ApplicationSettings");
     XASSERTM(app_settings_section != nullptr,
     "Application config is missing the mandatory ApplicationSettings section!");
 
@@ -123,7 +123,7 @@ struct MeshoptRefinementApp
     "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
 
     // Get the application settings section
-    auto domain_control_settings_section = application_config->query_section("DomainControlSettings");
+    auto domain_control_settings_section = application_config.query_section("DomainControlSettings");
     XASSERTM(domain_control_settings_section != nullptr,
     "DomainControl config is missing the mandatory DomainControlSettings section!");
 
@@ -162,7 +162,6 @@ struct MeshoptRefinementApp
     if(adapt_mode_p.second)
     {
       finest_adapt_mode << adapt_mode_p.first;
-      std::cout << finest_adapt_mode;
     }
 
     TimeStamp at;
@@ -188,7 +187,7 @@ struct MeshoptRefinementApp
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
-      dom_ctrl, meshoptimiser_key_p.first, meshopt_config, solver_config);
+      dom_ctrl, meshoptimiser_key_p.first, &meshopt_config, &solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
 
@@ -552,125 +551,90 @@ int run_app(int argc, char* argv[])
     }
   }
 
-  // Application settings, has to be created here because it gets filled differently according to test
-  PropertyMap* application_config = new PropertyMap;
-
   // create a mesh file reader
   Geometry::MeshFileReader mesh_file_reader;
+
+  // Application settings, has to be created here because it gets filled differently according to test
+  PropertyMap application_config;
+  PropertyMap meshopt_config;
+  PropertyMap solver_config;
 
   // If we are not in test mode, parse command line arguments, read files, synchronise streams
   if(test_number == 0)
   {
-    // Read the application config file on rank 0
-    if(comm.rank() == 0)
+    // Read the application config file, required
+    String application_config_filename("");
+    // Check and parse --application_config
+    if(args.check("application_config") != 1 )
     {
-      // Input application configuration file name, required
-      String application_config_filename("");
-      // Check and parse --application_config
-      if(args.check("application_config") != 1 )
-      {
-        std::cout << "You need to specify a application configuration file with --application_config.";
-        throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --application_config");
-      }
-      else
-      {
-        args.parse("application_config", application_config_filename);
-        std::cout << "Reading application configuration from file " << application_config_filename << std::endl;
-        std::ifstream ifs(application_config_filename);
-        if(!ifs.good())
-        {
-          throw FileNotFound(application_config_filename);
-        }
+      comm.print("You need to specify a application configuration file with --application_config.");
+      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --application_config");
+    }
+    else
+    {
+      args.parse("application_config", application_config_filename);
+      comm.print("Reading application configuration from file "+application_config_filename);
 
-        synchstream_app_config << ifs.rdbuf();
-      }
+      DistFileIO::read_common(synchstream_app_config, application_config_filename);
     }
 
-    // If we are in parallel mode, we need to synchronise the stream
-    comm.bcast_stringstream(synchstream_app_config);
-
     // Parse the application config from the (synchronised) stream
-    application_config->parse(synchstream_app_config, true);
+    application_config.parse(synchstream_app_config, true);
 
     // Get the application settings section
-    auto app_settings_section = application_config->query_section("ApplicationSettings");
+    auto app_settings_section = application_config.query_section("ApplicationSettings");
     XASSERTM(app_settings_section != nullptr,
     "Application config is missing the mandatory ApplicationSettings section!");
 
     auto mesh_files_p = app_settings_section->query("mesh_files");
     mesh_files_p.first.split_by_charset(mesh_files, " ");
 
-    // We read the files only on rank 0. After reading, we synchronise the streams like above.
-    if(comm.rank() == 0)
-    {
-      // Read configuration for mesh optimisation to stream
-      auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
-      XASSERTM(meshopt_config_filename_p.second,
-      "ApplicationConfig section is missing the mandatory meshopt_config_file entry!");
-      {
-        std::ifstream ifs(meshopt_config_filename_p.first);
-        if(!ifs.good())
-        {
-          throw FileNotFound(meshopt_config_filename_p.first);
-        }
+    // Read configuration for mesh optimisation to stream
+    auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
 
-        std::cout << "Reading mesh optimisation config from file " <<meshopt_config_filename_p.first << std::endl;
-        synchstream_meshopt_config << ifs.rdbuf();
-      }
+    XASSERTM(meshopt_config_filename_p.second,
+    "ApplicationConfig section is missing the mandatory meshopt_config_file entry!");
 
-      // Read solver configuration to stream
-      auto solver_config_filename_p = app_settings_section->query("solver_config_file");
-      XASSERTM(solver_config_filename_p.second,
-      "ApplicationConfig section is missing the mandatory solver_config_file entry!");
-      {
-        std::ifstream ifs(solver_config_filename_p.first);
-        if(ifs.good())
-        {
-          std::cout << "Reading solver config from file " << solver_config_filename_p.first << std::endl;
-          synchstream_solver_config << ifs.rdbuf();
-        }
-        else
-        {
-          throw FileNotFound(solver_config_filename_p.first);
-        }
-      }
-    } // comm.rank() == 0
+    comm.print("Reading mesh optimisation config from file "+meshopt_config_filename_p.first);
+    DistFileIO::read_common(synchstream_meshopt_config, meshopt_config_filename_p.first);
+    meshopt_config.parse(synchstream_meshopt_config, true);
 
-    // Synchronise all those streams in parallel mode
-    comm.bcast_stringstream(synchstream_meshopt_config);
-    comm.bcast_stringstream(synchstream_solver_config);
+    // Read solver configuration to stream
+    auto solver_config_filename_p = app_settings_section->query("solver_config_file");
+
+    XASSERTM(solver_config_filename_p.second,
+    "ApplicationConfig section is missing the mandatory solver_config_file entry!");
+
+    comm.print("Reading solver config from file "+solver_config_filename_p.first);
+    DistFileIO::read_common(synchstream_solver_config, solver_config_filename_p.first);
+    solver_config.parse(synchstream_solver_config, true);
   }
   // If we are in test mode, all streams are filled by the hard coded stuff below
   else
   {
     read_test_application_config(synchstream_app_config, test_number);
-    // Parse the application config from the (synchronised) stream
-    application_config->parse(synchstream_app_config, true);
+    application_config.parse(synchstream_app_config, true);
 
     read_test_meshopt_config(synchstream_meshopt_config, test_number);
+    meshopt_config.parse(synchstream_meshopt_config, true);
+
     read_test_solver_config(synchstream_solver_config, test_number);
+    solver_config.parse(synchstream_solver_config, true);
 
     read_test_mesh_file_names(mesh_files, test_number);
   }
+
   // Now we have all configurations in the corresponding streams and know the mesh file names
 
-  // Create PropertyMaps and parse the configuration streams
-  PropertyMap* meshopt_config = new PropertyMap;
-  meshopt_config->parse(synchstream_meshopt_config, true);
-
-  PropertyMap* solver_config = new PropertyMap;
-  solver_config->parse(synchstream_solver_config, true);
-
+  // Read all mesh files
   std::deque<std::stringstream> mesh_streams(mesh_files.size());
-
-  // read all files
   for(std::size_t i(0); i < mesh_files.size(); ++i)
   {
-    // read the stream
+    // Read the stream
     comm.print("Reading mesh file "+mesh_files.at(i));
     DistFileIO::read_common(mesh_streams.at(i), mesh_files.at(i));
 
-    // add to mesh reader
+    // Add to mesh reader
     mesh_file_reader.add_stream(mesh_streams.at(i));
   }
 
@@ -705,10 +669,6 @@ int run_app(int argc, char* argv[])
   {
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
   }
-
-  delete application_config;
-  delete meshopt_config;
-  delete solver_config;
 
   return ret;
 }
