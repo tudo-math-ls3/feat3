@@ -96,12 +96,9 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
-        // Check if we have set _inner_res_scale
-        auto inner_res_scale_p = section->query("inner_res_scale");
-        if(inner_res_scale_p.second)
-        {
-          set_inner_res_scale(DataType(std::stod(inner_res_scale_p.first)));
-        }
+        // Set _inner_res_scale by parameter or use default value
+        auto inner_res_scale_s = section->query("inner_res_scale", "0.0");
+        set_inner_res_scale(DataType(std::stod(inner_res_scale_s)));
 
         // Check if we have set _krylov_vim
         auto krylov_dim_p = section->query("krylov_dim");
