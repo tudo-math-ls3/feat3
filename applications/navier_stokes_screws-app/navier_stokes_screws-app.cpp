@@ -31,10 +31,10 @@
 using namespace FEAT;
 
 static void display_help(const Dist::Comm&);
-static void read_test_application_config(std::stringstream&, const int);
-static void read_test_meshopt_config(std::stringstream&, const int);
-static void read_test_solver_config(std::stringstream&, const int);
-static void read_test_mesh_file_names(std::deque<String>&, const int);
+static void read_test_application_config(std::stringstream&);
+static void read_test_meshopt_config(std::stringstream&);
+static void read_test_solver_config(std::stringstream&);
+static void read_test_mesh_file_names(std::deque<String>&);
 
 template<typename Mesh_, bool extrude>
 struct MeshExtrudeHelper
@@ -403,12 +403,16 @@ struct NavierStokesScrewsApp
     // If write_xml is set, we write out every xml_freq time steps
     Index xml_freq(1);
     // Is the application running as a test? Read from the command line arguments
-    int test_number(0);
+    bool test(false);
 
+    // Solve the flow problem?
     bool solve_flow(false);
+    // Optimise the mesh in every time step?
     bool solve_mesh_optimisation(false);
 
+    // The Reynolds number for the flow problem
     DataType reynolds(1);
+    // Use the deformation tensor-based bilinear form for the viscous term in the Navier-Stokes equations?
     bool use_deformation(false);
 
     // Need some pi for all the angles
@@ -442,20 +446,10 @@ struct NavierStokesScrewsApp
       XASSERT(xml_freq > Index(0));
     }
 
-    // Check if we are to perform test 1 or test 2, if any
-    if( args.check("test") >=0 )
+    // Check if we are running in test mode
+    if( args.check("test") >= 0 )
     {
-      if(args.check("test") > 1)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
-      }
-
-      args.parse("test",test_number);
-      if(test_number != 1 && test_number != 2)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__,
-        "Encountered unhandled test number "+stringify(test_number));
-      }
+      test = true;
     }
 
     // Get the application settings section
@@ -757,7 +751,7 @@ struct NavierStokesScrewsApp
     }
 
     // Check for the hard coded settings for test mode
-    if(test_number == 1)
+    if(test)
     {
       if( edge_angle < DT_(28))
       {
@@ -827,7 +821,7 @@ struct NavierStokesScrewsApp
 
 
       // Check for the hard coded settings for test mode
-      if(test_number == 1)
+      if(test)
       {
         if( edge_angle < DT_(28))
         {
@@ -1804,6 +1798,15 @@ struct NavierStokesScrewsApp
           break;
         }
 
+        if(test)
+        {
+          if(status_a != Solver::Status::success)
+          {
+            comm.print("FAILED: V-Bur solver status was "+stringify(status_a));
+            ++failed_checks;
+          }
+        }
+
         watch_asm_rhs.start();
         // Compute the weak divergence of the new velocity
         matrix_d.apply(vec_D_v, vec_sol_v.at(0));
@@ -1828,6 +1831,7 @@ struct NavierStokesScrewsApp
           matrix_stock_pres.hierarchy_done_numeric();
           break;
         }
+
         // Assemble rhs for projection step - no filtering here
         watch_asm_rhs.start();
         vec_rhs_p.format();
@@ -2078,7 +2082,7 @@ struct NavierStokesScrewsApp
     } // time loop
 
     // Check for the hard coded settings for test mode
-    if(test_number == 1)
+    if(test)
     {
       if( edge_angle < DT_(27.8))
       {
@@ -2244,7 +2248,7 @@ int run_app(int argc, char* argv[])
   // String containing the mesh type, read from the header of the mesh file
   String mesh_type("");
   // Is the application running as a test? Read from the command line arguments
-  int test_number(0);
+  bool test(false);
 
   // Streams for synchronising information read from files
   std::stringstream synchstream_app_config;
@@ -2273,18 +2277,9 @@ int run_app(int argc, char* argv[])
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
   }
 
-  if( args.check("test") >=0 )
+  if( args.check("test") >= 0 )
   {
-    if(args.check("test") > 1)
-    {
-      throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
-    }
-
-    args.parse("test",test_number);
-    if(test_number != 1 && test_number != 2)
-    {
-      throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
-    }
+    test = true;
   }
 
   // create a mesh file reader
@@ -2296,7 +2291,7 @@ int run_app(int argc, char* argv[])
   PropertyMap solver_config;
 
   // If we are not in test mode, parse command line arguments, read files, synchronise streams
-  if(test_number == 0)
+  if(!test)
   {
     // Read the application config file, required
     String application_config_filename("");
@@ -2348,16 +2343,16 @@ int run_app(int argc, char* argv[])
   // If we are in test mode, all streams are filled by the hard coded stuff below
   else
   {
-    read_test_application_config(synchstream_app_config, test_number);
+    read_test_application_config(synchstream_app_config);
     application_config.parse(synchstream_app_config, true);
 
-    read_test_meshopt_config(synchstream_meshopt_config, test_number);
+    read_test_meshopt_config(synchstream_meshopt_config);
     meshopt_config.parse(synchstream_meshopt_config, true);
 
-    read_test_solver_config(synchstream_solver_config, test_number);
+    read_test_solver_config(synchstream_solver_config);
     solver_config.parse(synchstream_solver_config, true);
 
-    read_test_mesh_file_names(mesh_files, test_number);
+    read_test_mesh_file_names(mesh_files);
   }
 
   // Now we have all configurations in the corresponding streams and know the mesh file names
@@ -2407,82 +2402,69 @@ int main(int argc, char* argv[])
   return ret;
 }
 
-static void read_test_application_config(std::stringstream& iss, const int test_number)
+static void read_test_application_config(std::stringstream& iss)
 {
-  if(test_number == 1)
-  {
-    iss << "[ApplicationSettings]" << std::endl;
-    iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
-    //iss << "solver_config_file = ./solver_config.ini" << std::endl;
-    iss << "t_end = 1e-4" << std::endl;
-    iss << "solve_flow = 0" << std::endl;
-    iss << "solve_mesh_optimisation = 1" << std::endl;
+  iss << "[ApplicationSettings]" << std::endl;
+  iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
+  iss << "t_end = 1e-4" << std::endl;
+  iss << "solve_flow = 1" << std::endl;
+  iss << "solve_mesh_optimisation = 1" << std::endl;
+  iss << "reynolds = 1e1" << std::endl;
+  iss << "use_deformation = 0" << std::endl;
 
-    iss << "[DomainControlSettings]" << std::endl;
-    iss << "parti-type = fallback parmetis" << std::endl;
-    iss << "parti-rank-elems = 4" << std::endl;
-    iss << "lvl_min = 0" << std::endl;
-    iss << "lvl_max = 1" << std::endl;
-    iss << "z_min = 0.0" << std::endl;
-    iss << "z_max = 1.0" << std::endl;
-    iss << "slices = 1" << std::endl;
+  iss << "[DomainControlSettings]" << std::endl;
+  iss << "parti-type = fallback parmetis" << std::endl;
+  iss << "parti-rank-elems = 4" << std::endl;
+  iss << "lvl_min = 0" << std::endl;
+  iss << "lvl_max = 1" << std::endl;
+  iss << "z_min = 0.0" << std::endl;
+  iss << "z_max = 1.0" << std::endl;
+  iss << "slices = 1" << std::endl;
 
-    iss << "[TimeDiscretisation]" << std::endl;
-    iss << "delta_t = 1e-4" << std::endl;
-    iss << "num_steps = 2" << std::endl;
-    iss << "p_extrapolation_steps = 1" << std::endl;
-    iss << "use_rotational_form = 1" << std::endl;
-    iss << "ALE = impl" << std::endl;
-    iss << "convection = impl" << std::endl;
-    iss << "viscous = impl" << std::endl;
-  }
-  else
-  {
-    throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number: "+stringify(test_number));
-  }
+  iss << "[TimeDiscretisation]" << std::endl;
+  iss << "delta_t = 1e-4" << std::endl;
+  iss << "num_steps = 2" << std::endl;
+  iss << "p_extrapolation_steps = 1" << std::endl;
+  iss << "use_rotational_form = 1" << std::endl;
+  iss << "ALE = impl" << std::endl;
+  iss << "convection = impl" << std::endl;
+  iss << "viscous = impl" << std::endl;
 }
 
-static void read_test_meshopt_config(std::stringstream& iss, const int test_number)
+static void read_test_meshopt_config(std::stringstream& iss)
 {
-  if(test_number == 1)
-  {
-    iss << "[HyperElasticityDefault]" << std::endl;
-    iss << "type = Hyperelasticity" << std::endl;
-    iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "slip_boundaries = bnd:i bnd:o" << std::endl;
-    iss << "meshopt_lvl = 0" << std::endl;
+  iss << "[HyperElasticityDefault]" << std::endl;
+  iss << "type = Hyperelasticity" << std::endl;
+  iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
+  iss << "slip_boundaries = bnd:i bnd:o" << std::endl;
+  iss << "meshopt_lvl = 0" << std::endl;
 
-    iss << "[DuDvPreproc]" << std::endl;
-    iss << "type = DuDv" << std::endl;
-    iss << "config_section = DuDvDefaultParameters" << std::endl;
-    iss << "dirichlet_boundaries = bnd:i bnd:o" << std::endl;
-    iss << "meshopt_lvl = -1" << std::endl;
+  iss << "[DuDvPreproc]" << std::endl;
+  iss << "type = DuDv" << std::endl;
+  iss << "config_section = DuDvDefaultParameters" << std::endl;
+  iss << "dirichlet_boundaries = bnd:i bnd:o" << std::endl;
+  iss << "meshopt_lvl = -1" << std::endl;
 
-    iss << "[HyperelasticityDefaultParameters]" << std::endl;
-    iss << "global_functional = HyperelasticityFunctional" << std::endl;
-    iss << "local_functional = RumpfFunctional" << std::endl;
-    iss << "solver_config = NLCG" << std::endl;
-    iss << "fac_norm = 1e0" << std::endl;
-    iss << "fac_det = 1.0" << std::endl;
-    iss << "fac_cof = 0.0" << std::endl;
-    iss << "fac_reg = 1e-8" << std::endl;
-    iss << "exponent_det = 2" << std::endl;
-    iss << "scale_computation = iter_concentration" << std::endl;
-    iss << "conc_function = GapWidth" << std::endl;
+  iss << "[HyperelasticityDefaultParameters]" << std::endl;
+  iss << "global_functional = HyperelasticityFunctional" << std::endl;
+  iss << "local_functional = RumpfFunctional" << std::endl;
+  iss << "solver_config = NLCG" << std::endl;
+  iss << "fac_norm = 1e0" << std::endl;
+  iss << "fac_det = 1.0" << std::endl;
+  iss << "fac_cof = 0.0" << std::endl;
+  iss << "fac_reg = 1e-8" << std::endl;
+  iss << "exponent_det = 2" << std::endl;
+  iss << "scale_computation = iter_concentration" << std::endl;
+  iss << "conc_function = GapWidth" << std::endl;
 
-    iss << "[GapWidth]" << std::endl;
-    iss << "type = ChartDistance" << std::endl;
-    iss << "operation = add" << std::endl;
-    iss << "chart_list = screw:i screw:o" << std::endl;
-    iss << "function_type = default" << std::endl;
-  }
-  else
-  {
-    throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number "+stringify(test_number));
-  }
+  iss << "[GapWidth]" << std::endl;
+  iss << "type = ChartDistance" << std::endl;
+  iss << "operation = add" << std::endl;
+  iss << "chart_list = screw:i screw:o" << std::endl;
+  iss << "function_type = default" << std::endl;
 }
 
-static void read_test_solver_config(std::stringstream& iss, const int DOXY(test_number))
+static void read_test_solver_config(std::stringstream& iss)
 {
   iss << "[linsolver_a]" << std::endl;
   iss << "type = fgmres" << std::endl;
@@ -2613,22 +2595,10 @@ static void read_test_solver_config(std::stringstream& iss, const int DOXY(test_
 
 }
 
-static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int test_number)
+static void read_test_mesh_file_names(std::deque<String>& mesh_files)
 {
-  String mesh_filename(FEAT_SRC_DIR);
-  String chart_filename(mesh_filename+"/data/meshes/screws_2d_chart_bezier_24_28.xml");
-  mesh_files.push_back(chart_filename);
-
-  if(test_number == 1)
-  {
-    mesh_filename +="/data/meshes/screws_2d_mesh_quad_opt_ss_360_1.xml";
-  }
-  else
-  {
-    throw InternalError(__func__,__FILE__,__LINE__,"Encountered unhandled test "+stringify(test_number));
-  }
-
-  mesh_files.push_back(mesh_filename);
+  mesh_files.push_back(String(FEAT_SRC_DIR)+"/data/meshes/screws_2d_chart_bezier_24_28.xml");
+  mesh_files.push_back(String(FEAT_SRC_DIR)+"/data/meshes/screws_2d_mesh_quad_opt_ss_360_1.xml");
 }
 
 static void display_help(const Dist::Comm& comm)
