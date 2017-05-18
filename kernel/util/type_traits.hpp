@@ -27,19 +27,19 @@ namespace FEAT
       /// extracts integral feature from a given types feature hash
       static inline bool extract_intness(uint64_t feature_hash)
       {
-        return (bool)(feature_hash&uint64_t(1)<<32);
+        return (feature_hash&(uint64_t(1)<<32)) != uint64_t(0);
       }
 
       /// extracts floating point feature from a given types feature hash
       static inline bool extract_floatness(uint64_t feature_hash)
       {
-        return (bool)(feature_hash&uint64_t(1)<<33);
+        return (feature_hash&(uint64_t(1)<<33)) != uint64_t(0);
       }
 
       /// extracts sign feature from a given types feature hash
       static inline bool extract_signedness(uint64_t feature_hash)
       {
-        return (bool)(feature_hash&uint64_t(1)<<34);
+        return (feature_hash&(uint64_t(1)<<34)) != uint64_t(0);
       }
     };
 
@@ -100,7 +100,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(float) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(float)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -134,7 +134,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(double) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(double)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -168,7 +168,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(long double) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(long double)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -202,7 +202,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(unsigned int) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(unsigned int)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -236,7 +236,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(signed int) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(signed int)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -270,7 +270,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(unsigned char) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(unsigned char)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -304,7 +304,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(signed char) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(signed char)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -338,7 +338,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(unsigned short) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(unsigned short)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -372,7 +372,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(signed short) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(signed short)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -406,7 +406,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(unsigned long) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(unsigned long)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -440,7 +440,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(signed long) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(signed long)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -474,7 +474,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(unsigned long long) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(unsigned long long)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -508,7 +508,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(signed long long) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(signed long long)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -542,7 +542,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(bool) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(bool)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 
@@ -576,7 +576,7 @@ namespace FEAT
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(__float128) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33) | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(__float128)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 #endif // FEAT_HAVE_QUADMATH && !__CUDA__CC
