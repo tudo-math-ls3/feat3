@@ -1,6 +1,8 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Info>
-    Coarse mesh exported by RocheMesher
+    Coarse mesh exported by RocheMesher. This is a version that was optimised
+    with unilateral boundary conditions of place on both boundaries, useful
+    for simulations using the same.
   </Info>
   <Mesh type="conformal:hypercube:2:2" size="  1080  1800   720">
     <Vertices>

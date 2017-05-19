@@ -1,6 +1,9 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Info>
-    Coarse mesh exported by RocheMesher
+    Coarse mesh exported by RocheMesher. This is a version with a smaller
+    inner screw, resulting in a larger gap and was optimised with unilateral
+    boundary conditions of place on both boundaries. Useful for simulations
+    using the same BCs for mesh optimisation.
   </Info>
   <Mesh type="conformal:hypercube:2:2" size="  1080  1800   720">
   <Vertices>
