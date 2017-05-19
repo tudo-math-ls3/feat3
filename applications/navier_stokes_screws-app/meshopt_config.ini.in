@@ -1,7 +1,8 @@
 [HyperelasticityDefault]
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
-slip_boundaries = bnd:i bnd:o
+slip_boundaries = bnd:o
+dirichlet_boundaries = bnd:i
 meshopt_lvl = 0
 preprocessor_config= DuDvPreproc
 
@@ -30,7 +31,6 @@ fac_det = 1.0
 fac_cof = 0.0
 fac_reg = 2e-7
 exponent_det = 2
-#scale_computation = once_uniform
 scale_computation = iter_concentration
 conc_function = GapWidth
 
@@ -38,4 +38,7 @@ conc_function = GapWidth
 type = ChartDistance
 operation = add
 chart_list = screw:i screw:o
-function_type = default
+function_type = PowOfDist
+minval = 1e-2
+exponent = 1
+use_derivative = 1
