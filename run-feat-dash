@@ -435,7 +435,7 @@ get_output("git fetch -v -p")
 raw_branches = get_output("git branch -a")
 raw_branches[:] = [s.strip("* ") for s in raw_branches]
 
-extra_opts = " --eickt"
+extra_opts = " --eickt --in-source "
 if cuda_host_compiler:
   extra_opts += " --cuda_host_compiler=" + cuda_host_compiler + " "
 if is_found ("nvcc"):
@@ -479,7 +479,7 @@ if (not nomkl):
 quadmath_add = ""
 if is_found("g++"):
   quadmath_add = "-quadmath"
-  extra_opts = " --ovr_mpi_ops"
+  extra_opts += " --ovr_mpi_ops"
 parmetis_add = ""
 if (not nothirdparty):
   parmetis_add = "-parmetis"
