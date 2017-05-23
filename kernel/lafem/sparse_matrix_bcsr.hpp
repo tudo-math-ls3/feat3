@@ -1518,6 +1518,32 @@ namespace FEAT
       }
       ///@}
 
+      /// \copydoc lump_rows()
+      void lump_rows(VectorTypeL& lump) const
+      {
+        XASSERTM(lump.size() == rows(), "lump vector size does not match matrix row count!");
+
+        Arch::Lumping<Mem_>::bcsr(
+          lump.template elements<Perspective::pod>(),
+          this->template val<Perspective::pod>(),
+          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+      }
+
+      /**
+       * \brief Returns the lumped rows vector
+       *
+       * Each entry in the returned lumped rows vector contains the
+       * the sum of all matrix elements in the corresponding row.
+       *
+       * \returns
+       * The lumped vector.
+       */
+      VectorTypeL lump_rows() const
+      {
+        VectorTypeL lump = create_vector_l();
+        lump_rows(lump);
+        return lump;
+      }
 
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const

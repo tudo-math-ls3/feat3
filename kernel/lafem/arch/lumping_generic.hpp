@@ -28,6 +28,35 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
+      void Lumping<Mem::Main>::bcsr_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
+        const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+      {
+        Index block_height = Index(BlockHeight);
+        Index block_width = Index(BlockWidth);
+
+        for (Index row(0); row < rows; row++)
+        {
+          Index end = row_ptr[row + 1];
+
+          for(Index i(0); i < block_height; ++i)
+          {
+             lump[block_height*row + i] = DT_(0);
+          }
+
+          for (Index col = row_ptr[row]; col < end; col++)
+          {
+            for(Index i(0); i < block_height; ++i)
+            {
+              for(Index j(0); j < block_width; ++j)
+              {
+                lump[block_height*row + i] += val[block_height*block_width*col + i*block_width + j];
+              }
+            }
+          }
+        }
+      }
+
+      template <typename DT_, typename IT_>
       void Lumping<Mem::Main>::ell_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
         const IT_ * const cs, const IT_ * const /*cl*/, const Index C, const Index rows)
       {

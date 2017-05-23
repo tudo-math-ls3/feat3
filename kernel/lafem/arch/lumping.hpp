@@ -28,6 +28,15 @@ namespace FEAT
         template <typename DT_, typename IT_>
         static void csr_generic(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
+        template <typename DT_, typename IT_>
+        static void bcsr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockWidth, const int BlockHeight)
+        {
+          bcsr_generic(lump, val, col_ind, row_ptr, rows, BlockWidth, BlockHeight);
+        }
+
+        template <typename DT_, typename IT_>
+        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockWidth, const int BlockHeight);
+
         template <typename DT_ , typename IT_>
         static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
           const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
@@ -43,6 +52,9 @@ namespace FEAT
 #ifdef FEAT_EICKT
       extern template void Lumping<Mem::Main>::csr_generic(float *, const float * const, const Index * const, const Index * const, const Index);
       extern template void Lumping<Mem::Main>::csr_generic(double *, const double * const, const Index * const, const Index * const, const Index);
+
+      extern template void Lumping<Mem::Main>::bcsr_generic(float *, const float * const, const Index * const, const Index * const, const Index, const int, const int);
+      extern template void Lumping<Mem::Main>::bcsr_generic(double *, const double * const, const Index * const, const Index * const, const Index, const int, const int);
 
       extern template void Lumping<Mem::Main>::ell_generic(float *, const float * const, const Index * const,
         const Index * const, const Index * const, Index, const Index);
