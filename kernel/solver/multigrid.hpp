@@ -1519,8 +1519,9 @@ namespace FEAT
         // apply peak-smoother
         TimeStamp stamp_smooth;
         Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother.name()));
-        if(!status_success(smoother.apply(lvl.vec_cor, lvl.vec_def)))
-          return false;
+        smoother.apply(lvl.vec_cor, lvl.vec_def);
+        //if(!status_success(smoother.apply(lvl.vec_cor, lvl.vec_def)))
+          //return false;
         lvl.time_smooth += stamp_smooth.elapsed_now();
 
         // apply correction filter
@@ -1648,8 +1649,9 @@ namespace FEAT
               // apply pre-smoother
               TimeStamp stamp_smooth;
               Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
-              if(!status_success(smoother->apply(lvl_f.vec_sol, lvl_f.vec_rhs)))
-                return Status::aborted;
+              smoother->apply(lvl_f.vec_sol, lvl_f.vec_rhs);
+              //if(!status_success(smoother->apply(lvl_f.vec_sol, lvl_f.vec_rhs)))
+                //return Status::aborted;
               lvl_f.time_smooth += stamp_smooth.elapsed_now();
 
               // compute defect
@@ -1789,8 +1791,9 @@ namespace FEAT
             // apply post-smoother
             Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));
             TimeStamp stamp_smooth;
-            if(!status_success(smoother->apply(lvl_f.vec_cor, lvl_f.vec_def)))
-              return Status::aborted;
+            smoother->apply(lvl_f.vec_cor, lvl_f.vec_def);
+            //if(!status_success(smoother->apply(lvl_f.vec_cor, lvl_f.vec_def)))
+              //return Status::aborted;
             lvl_f.time_smooth += stamp_smooth.elapsed_now();
 
             // update solution vector
