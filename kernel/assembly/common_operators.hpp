@@ -166,6 +166,91 @@ namespace FEAT
       }; // class IdentityOperator
 
       /**
+       * \brief Vector-valued identity operator implementation
+       *
+       * This functor can be used with the BilinearOperator assembly class template to assemble one
+       * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the
+       * number of space dimensions.
+       *
+       * \author Jordi Paul
+       */
+      template<int dimension_>
+      class IdentityOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        /// Every block is a dimension x dimension matrix
+        static constexpr int BlockHeight = dimension_;
+        /// Every block is a dimension x dimension matrix
+        static constexpr int BlockWidth = dimension_;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::value;
+
+        /**
+         * \brief Vector-valued identity operator evaluator class template
+         *
+         * \tparam AsmTraits_
+         * The assembly traits class.
+         *
+         * \author Jordi Paul
+         */
+        template<typename AsmTraits_>
+        class Evaluator :
+            public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] operat
+           * A reference to the Du : Dv operator object.
+           */
+          explicit Evaluator(const IdentityOperatorBlocked& DOXY(operat))
+          {
+          }
+
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
+          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            OperatorValueType r(DataType(0));
+            for(int i(0); i < OperatorValueType::m; ++i)
+            {
+              r(i,i) = phi.value * psi.value;
+            }
+            return r;
+          }
+        }; // class IdentityOperatorBlocked::Evaluator<...>
+      }; // class DuDVOperatorBlocked
+
+      /**
        * \brief Trial-Derivative operator implementation
        *
        * This functor implements the weak formulation of the bilinear trial-function derivative operator, i.e.
