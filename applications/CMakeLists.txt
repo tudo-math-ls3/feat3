@@ -18,6 +18,7 @@ SET (app_list
   navier_stokes_cp2d_q2q1
   navier_stokes_solver_factory
   poisson_dirichlet_2d
+  poisson_mixed
   poisson_neumann_2d
   poisson_solver_factory
   stokes_dricav_2d
@@ -163,6 +164,35 @@ else (FEAT_HAVE_MPI)
     --build-nocmake
     --build-noclean
     --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet_2d --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
+  SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
+  SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+endif (FEAT_HAVE_MPI)
+
+######################### poisson_mixed
+if (FEAT_HAVE_MPI)
+  ADD_TEST(sleep1 sleep 2)
+  SET_PROPERTY(TEST sleep1 PROPERTY LABELS "mpi,sleep")
+
+  ADD_TEST(poisson_mixed_mpi_3 ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target poisson_mixed
+    --build-nocmake
+    --build-noclean
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_mixed --test-iter 8 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+  SET_PROPERTY(TEST poisson_mixed_mpi_3 PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST poisson_mixed_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+
+else (FEAT_HAVE_MPI)
+  ADD_TEST(poisson_mixed_serial ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target poisson_mixed
+    --build-nocmake
+    --build-noclean
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_mixed --test-iter 8 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

@@ -14,6 +14,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/apply.hpp>
+#include <kernel/lafem/arch/lumping.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/row_norm.hpp>
 #include <kernel/adjacency/graph.hpp>
