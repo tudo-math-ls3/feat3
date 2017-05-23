@@ -138,6 +138,14 @@ namespace FEAT
       /// our supported vector type
       typedef DenseVectorBlocked<MemType, DataType, IndexType, BlockSize> VectorType;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DataType_, typename IT2_ = IndexType_, int BS_ = BlockSize_>
+      using FilterType = class NoneFilter<Mem2_, DT2_, IT2_>;
+
+      /// this typedef lets you create a filter with new Memory, Datatape and Index types
+      template <typename Mem2_, typename DataType2_, typename IndexType2_, int BlockSize2_>
+      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+
       /// \brief Creates a (empty) clone of itself
       NoneFilterBlocked clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
       {
@@ -153,6 +161,12 @@ namespace FEAT
       template<typename MT2_, typename DT2_, typename IT2_>
       void convert(const NoneFilterBlocked<MT2_, DT2_, IT2_, BlockSize>&)
       {
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return 0;
       }
 
       /**
