@@ -6,6 +6,7 @@
 // includes, system
 #include <vector>
 #include <utility>
+#include <unordered_set>
 
 namespace FEAT
 {
@@ -37,15 +38,19 @@ namespace FEAT
       Index* colouring)
     {
       _num_nodes = num_nodes;
+
+      std::unordered_set<Index> colors;
+      for (Index i(0) ; i < _num_nodes ; ++i)
+      {
+        colors.insert(colouring[i]);
+      }
+      _num_colours = colors.size();
+      colors.clear();
+
       _colouring = new Index[_num_nodes];
-      _num_colours = 0;
       for(Index i(0); i< _num_nodes; i++)
       {
         _colouring[i] = colouring[i];
-        if(colouring[i] >= _num_colours)
-        {
-          ++_num_colours;
-        }
       }
     }
 
