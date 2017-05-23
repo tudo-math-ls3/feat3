@@ -171,6 +171,7 @@ namespace FEAT
         transfer_sys.get_mat_rest().template at<0,0>().clone(transfer_velo.get_mat_rest(), LAFEM::CloneMode::Shallow);
         transfer_sys.get_mat_prol().template at<1,1>().clone(transfer_pres.get_mat_prol(), LAFEM::CloneMode::Shallow);
         transfer_sys.get_mat_rest().template at<1,1>().clone(transfer_pres.get_mat_rest(), LAFEM::CloneMode::Shallow);
+        transfer_sys.compile();
       }
 
       void compile_system_matrix()
@@ -417,6 +418,9 @@ namespace FEAT
             loc_rest_v.get(i,i) = loc_rest_vx.clone(LAFEM::CloneMode::Shallow);
           }
         }
+
+        // compile velocity transfer
+        this->transfer_velo.compile();
       }
 
       template<typename DomainLevel_, typename Cubature_>
@@ -467,6 +471,9 @@ namespace FEAT
           // copy and transpose
           loc_rest_p = loc_prol_p.transpose();
         }
+
+        // compile pressure transfer
+        this->transfer_pres.compile();
       }
 
       template<typename DomainLevel_, typename Cubature_>
