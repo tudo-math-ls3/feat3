@@ -23,6 +23,7 @@ if (FEAT_EICKT)
     max_element_generic-eickt.cpp
     norm_generic-eickt.cpp
     product_matmat_generic-eickt.cpp
+    row_norm_generic-eickt.cpp
     scale_generic-eickt.cpp
     scale_row_col_generic-eickt.cpp
     scatter_axpy_prim_generic-eickt.cpp

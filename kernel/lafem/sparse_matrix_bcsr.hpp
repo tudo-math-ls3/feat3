@@ -15,6 +15,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/row_norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/statistics.hpp>
@@ -1172,6 +1173,83 @@ namespace FEAT
       }
 
       /**
+       * \brief Computes the 2-norm for every row
+       *
+       * \param[in] row_norms
+       * For every row, this left-vector will contain its 2-norm
+       */
+      void row_norm2(VectorTypeL& row_norms) const
+      {
+        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
+
+        TimeStamp ts_start;
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+
+        Arch::RowNorm<Mem_>::bcsr_norm2(row_norms.template elements<Perspective::pod>(),
+          this->template val<Perspective::pod>(),
+          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Computes the square of the 2-norm for every row
+       *
+       * \param[out] row_norms
+       * For every row, this left-vector will contain the square of its 2-norm
+       */
+      void row_norm2sqr(VectorTypeL& row_norms) const
+      {
+        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
+
+        TimeStamp ts_start;
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+
+        Arch::RowNorm<Mem_>::bcsr_norm2sqr(row_norms.template elements<Perspective::pod>(),
+          this->template val<Perspective::pod>(),
+          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Computes the square of the 2-norm for every row, where every row is scaled by a vector
+       *
+       * \param[out] row_norms
+       * For every (scaled) row, this left-vector will contain the square of its 2-norm
+       *
+       * \param[in] scal
+       * The scaling vector
+       *
+       * This computes
+       * \f[
+       *    row\_norms_i = \sum_{j=0}^{n-1} scal_j (this_{ij})^2
+       * \f]
+       * and is used to compute
+       * \f[
+       *   \mathrm{tr}(B^T \mathrm{diag}(A) B)
+       * \f]
+       *
+       */
+      void row_norm2sqr(VectorTypeL& row_norms, const VectorTypeR& scal) const
+      {
+        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
+        XASSERTM(scal.size() == this->columns(), "Matrix/scalings dimension mismatch");
+
+        TimeStamp ts_start;
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+
+        Arch::RowNorm<Mem_>::bcsr_scaled_norm2sqr(row_norms.template elements<Perspective::pod>(),
+           scal.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -1544,6 +1622,7 @@ namespace FEAT
         lump_rows(lump);
         return lump;
       }
+
 
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
