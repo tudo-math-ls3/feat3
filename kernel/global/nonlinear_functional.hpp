@@ -64,7 +64,19 @@ namespace FEAT
         LocalNonlinearFunctional_& _nonlinear_functional;
 
       public:
-
+        /**
+         * \brief Constructor
+         *
+         * \param[in] row_gate
+         * Gate for rows
+         *
+         * \param[in] col_gate
+         * Gate for columns
+         *
+         * \param[in] nonlinear_functional
+         * The (patch-)local nonlinear functional
+         *
+         */
         explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate,
         LocalNonlinearFunctional_& nonlinear_functional) :
           _row_gate(row_gate),
@@ -72,26 +84,6 @@ namespace FEAT
           _nonlinear_functional(nonlinear_functional)
           {
           }
-
-        ///**
-        // * \brief Variadic template constructor
-        // *
-        // * \param[in] row_gate
-        // * Gate for communicating row-wise
-        // *
-        // * \param[in] column_gate
-        // * Gate for communicating column-wise
-        // *
-        // * \note The gates might not be compiled yet, so they cannot be used for synchronisation in the constructor.
-        // *
-        // */
-        //template<typename... Args_>
-        //explicit NonlinearFunctional(GateRowType* row_gate, GateColType* col_gate, Args_&&... args) :
-        //  _row_gate(row_gate),
-        //  _col_gate(col_gate),
-        //  _nonlinear_functional(std::forward<Args_>(args)...)
-        //  {
-        //  }
 
         /// Explicitly delete default constructor
         NonlinearFunctional() = delete;
@@ -202,6 +194,9 @@ namespace FEAT
           return VectorTypeR(_col_gate, _nonlinear_functional.create_vector_r());
         }
 
+        /**
+         * \brief Functionality that cannot be done in the constructor
+         */
         void init()
         {
           _nonlinear_functional.init_pre_sync();
@@ -358,9 +353,9 @@ namespace FEAT
           const bool add_penalty_fval(false);
           _nonlinear_functional.eval_fval_grad(fval, *grad, add_penalty_fval);
 
-#ifdef FEAT_HAVE_MPI
+          // Sum up over all patches
           Util::Comm::allreduce(&fval, &fval, 1, Util::CommOperationSum());
-#endif
+
           // Add the penalty term
           if(get_penalty_param() > DataType(0))
           {
@@ -409,49 +404,6 @@ namespace FEAT
         {
           return _nonlinear_functional.compute_constraint();
         }
-
-        //void extract_diag(VectorTypeL& diag, bool sync = true) const
-        //{
-        //  _nonlinear_functional.extract_diag(*diag);
-        //  if(sync)
-        //  {
-        //    diag.sync_0();
-        //  }
-        //}
-
-        //void apply(VectorTypeL& r, const VectorTypeR& x) const
-        //{
-        //  _nonlinear_functional.compute_grad(*r, *x);
-        //  r.sync_0();
-        //}
-
-        //void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
-        //{
-        //  // copy y to r
-        //  r.copy(y);
-
-        //  // convert from type-1 to type-0
-        //  r.from_1_to_0();
-
-        //  // r <- r + alpha*A*x
-        //  _nonlinear_functional.apply(*r, *x, *r, alpha);
-
-        //  // synchronise r
-        //  r.sync_0();
-        //}
-
-        //template<typename OtherLocalNonlinearFunctional_>
-        //void convert(GateRowType* row_gate, GateColType* col_gate, const Global::NonlinearFunctional<OtherLocalNonlinearFunctional_>& other)
-        //{
-        //  this->_row_gate = row_gate;
-        //  this->_col_gate = col_gate;
-        //  this->_nonlinear_functional.convert(*other);
-        //}
-
-        //NonlinearFunctional clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
-        //{
-        //  return NonlinearFunctional(_row_gate, _col_gate, _nonlinear_functional.clone(mode));
-        //}
 
     };
   } // namespace Global
