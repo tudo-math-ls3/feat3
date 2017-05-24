@@ -38,6 +38,17 @@ namespace FEAT
     } // namespace Intern
     /// \endcond
 
+    /**
+     * \brief Assembles Facet information for assembling operators
+     *
+     * This functionality similar to the OuterNormalComputer (which assembles only boundary facets, but can compute
+     * weighted outer normals, too).
+     *
+     * \tparam Trafo_
+     * The transformation
+     *
+     * \note After all MeshParts are added, compile_facets() needs to be called
+     */
     template<typename Trafo_>
     class TraceAssembler
     {

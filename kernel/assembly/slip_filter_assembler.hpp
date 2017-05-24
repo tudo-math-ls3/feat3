@@ -45,7 +45,7 @@ namespace FEAT
      *
      * This weighted mean outer unit normal is used in the SlipFilter.
      *
-     * \see LAFEM::SlipFilter, SlipFilterAssembler
+     * \see LAFEM::SlipFilter, SlipFilterAssembler, TraceAssembler
      *
      * \author Jordi Paul
      *
