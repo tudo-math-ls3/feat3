@@ -34,13 +34,13 @@ namespace FEAT
       template
       <
         template<typename, typename, typename, typename, typename, typename> class Functional_,
-        typename LocalFunctional_
+        typename CellFunctional_
       >
-      class SetFunctional
+      class SetCellFunctional
       {
         public:
           template<typename A, typename B, typename C, typename D>
-          using Functional = Functional_<A, B, C, D, LocalFunctional_, FEAT::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
+          using Functional = Functional_<A, B, C, D, CellFunctional_, FEAT::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
       };
       /// \endcond
 
@@ -173,7 +173,7 @@ namespace FEAT
          * \returns
          * A BaseClass std::shared_ptr to the new object
          *
-         * This is the first stage, where the (cell-) local functional is determined, configured, created and then
+         * This is the first stage, where the (cell-)local functional is determined, configured, created and then
          * passed to the next stage.
          */
         template<typename DomCtrl_>
@@ -269,11 +269,11 @@ namespace FEAT
           fac_reg = DT_(std::stod(fac_reg_p.first));
 
           // Get the local functional
-          auto local_functional_p = hyperelasticity_config_section->query("local_functional");
-          if(!local_functional_p.second)
+          auto cell_functional_p = hyperelasticity_config_section->query("cell_functional");
+          if(!cell_functional_p.second)
           {
             throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing local_functional entry!");
+            "config_section "+config_section_p.first+" is missing cell_functional entry!");
           }
 
           // Get the handling of the 1/det term
@@ -287,28 +287,29 @@ namespace FEAT
           exponent_det = std::stoi(exponent_det_p.first);
 
           // Get the local functional
-          if(local_functional_p.first == "RumpfFunctional")
+          if(cell_functional_p.first == "RumpfFunctional")
           {
-            typedef FEAT::Meshopt::RumpfFunctional<DT_, TrafoType> FunctionalType;
-            std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+            typedef FEAT::Meshopt::RumpfFunctional<DT_, TrafoType> CellFunctionalType;
+            std::shared_ptr<CellFunctionalType> my_functional = std::make_shared<CellFunctionalType>
               (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
 
-            result = create_hyperelasticity_control_with_functional
-              (dom_ctrl, meshopt_lvl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
+            result = create_hyperelasticity_control_with_cell_functional
+              (dom_ctrl, meshopt_lvl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional,
+              dirichlet_list, slip_list);
           }
           // This is disabled because the ***Unrolled classes produce huge object files, slow code and are a pain to compile.
           // If you need them for debugging purposes, use the code below
-          //else if(local_functional_p.first == "RumpfFunctionalUnrolled")
+          //else if(cell_functional_p.first == "RumpfFunctionalUnrolled")
           //{
-          //  typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, TrafoType> FunctionalType;
-          //  std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
+          //  typedef FEAT::Meshopt::RumpfFunctionalUnrolled<DT_, TrafoType> CellFunctionalType;
+          //  std::shared_ptr<CellFunctionalType> my_functional = std::make_shared<CellFunctionalType>
           //    (fac_norm, fac_det, fac_cof, fac_reg, exponent_det);
-          //  result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
+          //  result = create_hyperelasticity_control_with_cell_functional(dom_ctrl, hyperelasticity_config_section,
           //  meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
           //}
           else
           {
-            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled local_functional "+local_functional_p.first);
+            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled cell_functional "+cell_functional_p.first);
           }
 
           return result;
@@ -356,10 +357,13 @@ namespace FEAT
          */
         template<typename DomCtrl_, typename CellFunctional_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_>>
-        create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl, const int meshopt_lvl,
-        PropertyMap* hyperelasticity_config_section, PropertyMap* meshopt_config, PropertyMap* solver_config,
-        std::shared_ptr<CellFunctional_> my_functional,
-        const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list)
+        create_hyperelasticity_control_with_cell_functional( DomCtrl_& dom_ctrl,
+          const int meshopt_lvl,
+          PropertyMap* hyperelasticity_config_section,
+          PropertyMap* meshopt_config,
+          PropertyMap* solver_config,
+          std::shared_ptr<CellFunctional_> my_functional,
+          const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list)
         {
           typedef typename DomCtrl_::LevelType::TrafoType TrafoType;
 
@@ -417,7 +421,7 @@ namespace FEAT
 
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_,
-            SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, CellFunctional_>::template Functional>>
+            SetCellFunctional<FEAT::Meshopt::HyperelasticityFunctional, CellFunctional_>::template Functional>>
               (dom_ctrl, meshopt_lvl, dirichlet_list, slip_list, solver_p.first,
               *solver_config, my_functional, scale_computation, mesh_conc_func, DT_(align_mesh));
           }

@@ -15,7 +15,7 @@ solver_config = PCG-MG
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional
-local_functional = RumpfFunctional
+cell_functional = RumpfFunctional
 solver_config = NLCG
 fac_norm = 1e-2
 fac_det = 1.0

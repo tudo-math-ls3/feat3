@@ -925,7 +925,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
-    iss << "local_functional = RumpfFunctional" << std::endl;
+    iss << "cell_functional = RumpfFunctional" << std::endl;
     iss << "solver_config = NLCG" << std::endl;
     iss << "fac_norm = 1e-2" << std::endl;
     iss << "fac_det = 1.0" << std::endl;
@@ -953,7 +953,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
 
     iss << "[HyperelasticityDefaultParameters]" << std::endl;
     iss << "global_functional = HyperelasticityFunctional" << std::endl;
-    iss << "local_functional = RumpfFunctional" << std::endl;
+    iss << "cell_functional = RumpfFunctional" << std::endl;
     iss << "solver_config = QPenalty" << std::endl;
     iss << "fac_norm = 1.0" << std::endl;
     iss << "fac_det = 1.0" << std::endl;

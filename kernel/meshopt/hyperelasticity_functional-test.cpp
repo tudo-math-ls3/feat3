@@ -44,7 +44,7 @@ template
 <
   typename DT_,
   typename ShapeType_,
-  template<typename, typename> class FunctionalType_,
+  template<typename, typename> class CellFunctionalType_,
   template<typename ... > class MeshQualityFunctional_
   >
   class HyperelasticityFunctionalTest
@@ -62,9 +62,9 @@ template
     /// The FE space for the transformation
     typedef typename FEAT::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
     /// Our functional type
-    typedef FunctionalType_<DataType, TrafoType> FunctionalType;
+    typedef CellFunctionalType_<DataType, TrafoType> CellFunctionalType;
     /// The Rumpf smoother
-    typedef MeshQualityFunctional_<MemType, DataType, IndexType, TrafoType, FunctionalType> MeshQualityFunctional;
+    typedef MeshQualityFunctional_<MemType, DataType, IndexType, TrafoType, CellFunctionalType> MeshQualityFunctional;
     /// Filter for Dirichlet boundary conditions
     typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> DirichletFilterType;
     /// Filter for slip boundary conditions
@@ -77,7 +77,7 @@ template
 
   public:
     explicit HyperelasticityFunctionalTest(int exponent_det) : TestSystem::FullTaggedTest<MemType, DataType, IndexType>
-    ("hyperelasticity_functional_test-"+FunctionalType::name()), _exponent_det(exponent_det)
+    ("hyperelasticity_functional_test-"+CellFunctionalType::name()), _exponent_det(exponent_det)
       {
       }
 
@@ -99,13 +99,13 @@ template
       // Create the root mesh node
       Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
-      // Parameters for the Rumpf functional
+      // Parameters for the cell functional
       DataType fac_norm(1e-1);
       DataType fac_det(2.5);
       DataType fac_cof(MeshType::world_dim == 3);
       DataType fac_reg(DataType(1e-8));
-      // Create the functional with these parameters
-      auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg, _exponent_det);
+      // Create the cell functional with these parameters
+      auto cell_functional = std::make_shared<CellFunctionalType>(fac_norm, fac_det, fac_cof, fac_reg, _exponent_det);
 
       // Set optimal scale
       DataType target_scaling(DataType(2.5));
@@ -117,7 +117,7 @@ template
 
       // Create the mesh quality functional
       MeshQualityFunctional rumpflpumpfl(
-        rmn, trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
+        rmn, trafo, dirichlet_list, slip_list, cell_functional, Meshopt::ScaleComputation::current_uniform);
 
       // init() sets the coordinates in the mesh and computes h
       rumpflpumpfl.init();
@@ -176,7 +176,7 @@ template
 
       // Now do the negative test: Change the functional in a nonsensical manner. Calling the optimiser should NOT
       // give the correctly scaled element
-      my_functional->_fac_rec_det = DataType(0.6676);
+      cell_functional->_fac_rec_det = DataType(0.6676);
 
       // Compute initial functional value
       rumpflpumpfl.eval_fval_cellwise(fval_pre, &func_norm, &func_cof, &func_det);
@@ -198,7 +198,7 @@ template
       TEST_CHECK(fval_pre > fval_post);
       // These differences should all be greater than eps
       TEST_CHECK(Math::abs(func_norm - DataType(0)) > eps);
-      TEST_CHECK(Math::abs(func_det - my_functional->_fac_det*DataType(1)) > eps);
+      TEST_CHECK(Math::abs(func_det - cell_functional->_fac_det*DataType(1)) > eps);
 
       delete rmn;
 

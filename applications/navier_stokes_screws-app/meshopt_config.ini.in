@@ -24,7 +24,7 @@ fixed_reference_domain = 0
 
 [HyperelasticityDefaultParameters]
 global_functional = HyperelasticityFunctional
-local_functional = RumpfFunctional
+cell_functional = RumpfFunctional
 solver_config = NLCG
 fac_norm = 1e0
 fac_det = 1.0

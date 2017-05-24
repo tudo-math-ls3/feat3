@@ -50,8 +50,8 @@ namespace FEAT
       current_uniform,
       current_cellsize,
       current_concentration,
-      iter_concentration,
-      };
+      iter_concentration
+    };
 
     /// \cond internal
     /**
@@ -121,8 +121,8 @@ namespace FEAT
      * \tparam Trafo_
      * Type of the underlying transformation.
      *
-     * \tparam FunctionalType_
-     * Functional used for defining mesh quality. \see RumpfFunctional
+     * \tparam CellFunctionalType_
+     * (Cell-)local functional used for defining mesh quality. \see RumpfFunctional
      *
      * \tparam RefCellTrafo_
      * Basically choses the reference cell according to which to optimise the mesh quality for.
@@ -142,7 +142,7 @@ namespace FEAT
       typename DT_,
       typename IT_,
       typename Trafo_,
-      typename FunctionalType_,
+      typename CellFunctionalType_,
       typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
     >
     class HyperelasticityFunctional;
@@ -158,8 +158,8 @@ namespace FEAT
      * \tparam Trafo_
      * Type of the underlying transformation.
      *
-     * \tparam FunctionalType_
-     * Functional used for defining mesh quality. \see RumpfFunctional
+     * \tparam CellFunctionalType_
+     * (Cell-)local functional used for defining mesh quality. \see RumpfFunctional
      *
      * \tparam RefCellTrafo_
      * Basically choses the reference cell according to which to optimise the mesh quality for.
@@ -190,7 +190,7 @@ namespace FEAT
      *   \forall K \in \mathcal{T}: \exists L_K \in SO_d \times K: \mathcal{L}_K: \mathcal{L}(\Phi,\cdot) =
      *   L_K(\nabla \Phi, \cdot) = L_K(\nabla R_K, \cdot)
      * \f]
-     * and that the local functional is of the form
+     * and that the local cell functional is of the form
      * \f[
      *    F(\nabla R_K(\Phi))  := \int_K L(\nabla R_K (\Phi)(x)) dx = \mu_K L( \| \nabla R_T(\Phi) \|_F^2,
      *    \| \mathrm{cof} \nabla R_T(\Phi) \|_F^2, \det \nabla R_T(\Phi) )
@@ -206,10 +206,10 @@ namespace FEAT
       typename DT_,
       typename IT_,
       typename Trafo_,
-      typename FunctionalType_,
+      typename CellFunctionalType_,
       typename RefCellTrafo_
     >
-    class HyperelasticityFunctional<Mem::Main, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>:
+    class HyperelasticityFunctional<Mem::Main, DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_>:
     public MeshQualityFunctional<typename Trafo_::MeshType>
     {
       public :
@@ -219,8 +219,8 @@ namespace FEAT
         typedef typename TrafoType::MeshType MeshType;
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
-        /// Type for the functional
-        typedef FunctionalType_ FunctionalType;
+        /// Type for the cell functional
+        typedef CellFunctionalType_ CellFunctionalType;
 
         /// Type of the reference cell trafo for the mesh quality
         typedef RefCellTrafo_ RefCellTrafo;
@@ -270,13 +270,13 @@ namespace FEAT
         /// Type for exchanging information between state variable and mesh
         typedef typename BaseClass::CoordsBufferType CoordsBufferType;
 
-        /// Since the functional contains a ShapeType, these have to be the same
-        static_assert(std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
-        "ShapeTypes of the transformation / functional have to agree" );
+        /// Since the cell functional contains a ShapeType, these have to be the same
+        static_assert(std::is_same<ShapeType, typename CellFunctionalType::ShapeType>::value,
+        "ShapeTypes of the transformation / cell functional have to agree" );
 
       protected:
-        /// The functional for determining mesh quality
-        std::shared_ptr<FunctionalType> _functional;
+        /// The cell functional for determining mesh quality
+        std::shared_ptr<CellFunctionalType> _cell_functional;
         /// The transformation defining the physical mesh
         TrafoType& _trafo;
         /// Weights for the local contributions to the global functional value.
@@ -338,8 +338,8 @@ namespace FEAT
          * \param[in] slip_list
          * The list of slip boundaries.
          *
-         * \param[in] functional_
-         * The (cell-local) functional used
+         * \param[in] cell_functional_
+         * The (cell-)local functional used
          *
          * This is the simple constructor that always sets the scale computation to once_uniform and the mesh
          * concentration function to nullptr.
@@ -350,9 +350,9 @@ namespace FEAT
           TrafoType& trafo,
           const std::deque<String>& dirichlet_list,
           const std::deque<String>& slip_list,
-          std::shared_ptr<FunctionalType_> functional_)
+          std::shared_ptr<CellFunctionalType_> cell_functional_)
           : BaseClass(rmn_),
-          _functional(functional_),
+          _cell_functional(cell_functional_),
           _trafo(trafo),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension), DataType(1)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -373,7 +373,7 @@ namespace FEAT
           _sum_mu(0)
           {
 
-            XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
+            XASSERTM(cell_functional_ != nullptr, "cell functional must not be nullptr");
 
             // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
             // insert it into the std::map
@@ -441,8 +441,8 @@ namespace FEAT
          * \param[in] slip_list
          * The list of slip boundaries.
          *
-         * \param[in] functional_
-         * The (cell-local) functional used
+         * \param[in] cell_functional_
+         * The (cell-)local functional used
          *
          * \param[in] scale_computation_
          * The type of scale computation to use
@@ -460,12 +460,12 @@ namespace FEAT
           TrafoType& trafo,
           const std::deque<String>& dirichlet_list,
           const std::deque<String>& slip_list,
-          std::shared_ptr<FunctionalType_> functional_,
+          std::shared_ptr<CellFunctionalType_> cell_functional_,
           ScaleComputation scale_computation_,
           std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr,
           DataType penalty_param_ = DataType(0))
           : BaseClass(rmn_),
-          _functional(functional_),
+          _cell_functional(cell_functional_),
           _trafo(trafo),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension), DataType(1)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -486,7 +486,7 @@ namespace FEAT
           _sum_mu(0)
           {
 
-            XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr!\n");
+            XASSERTM(cell_functional_ != nullptr, "cell functional must not be nullptr!\n");
             XASSERTM(_penalty_param >= DataType(0), "penalty_param must be >= 0!\n");
 
             // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
@@ -626,7 +626,7 @@ namespace FEAT
           msg = String("Scale computation").pad_back(pad_width, '.') + String(": ") + stringify(_scale_computation);
           comm_world.print(msg);
 
-          _functional->print();
+          _cell_functional->print();
           if(_mesh_conc != nullptr)
           {
             _mesh_conc->print();
@@ -1115,14 +1115,14 @@ namespace FEAT
 
             auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
 
-            this->_functional->eval_fval_grad(
+            this->_cell_functional->eval_fval_grad(
               fval_loc, grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell));
 
             // Add the contribution from the dependence of h on the vertex coordinates
             if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
             {
               const auto& grad_h = this->_mesh_conc->get_grad_h();
-              this->_functional->add_grad_h_part(
+              this->_cell_functional->add_grad_h_part(
                 grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell), grad_h(cell));
             }
 
@@ -1211,7 +1211,7 @@ namespace FEAT
 
             auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
 
-            this->_functional->eval_fval_cellwise(fval_loc, mat_tensor, trafo_eval, space_eval, x, h,
+            this->_cell_functional->eval_fval_cellwise(fval_loc, mat_tensor, trafo_eval, space_eval, x, h,
             fval_norm[cell], fval_cof[cell], fval_det[cell]);
 
             fval += this->_mu(cell)*fval_loc;
