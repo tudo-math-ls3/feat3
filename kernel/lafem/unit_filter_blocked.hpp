@@ -277,15 +277,15 @@ namespace FEAT
         if(_sv.size() != matrix.rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
-        const Index* row_ptr(matrix.row_ptr());
-        const Index* col_idx(matrix.col_ind());
+        const IT_* row_ptr(matrix.row_ptr());
+        const IT_* col_idx(matrix.col_ind());
         typename SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_sv.indices()[i]);
+          IT_ ix(_sv.indices()[i]);
           // replace by unit row
-          for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
             v[j].format(DT_(0));
             if(col_idx[j] == ix)
@@ -303,14 +303,14 @@ namespace FEAT
         if(_sv.size() != matrix.rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
-        const Index* row_ptr(matrix.row_ptr());
+        const IT_* row_ptr(matrix.row_ptr());
         auto* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_sv.indices()[i]);
+          IT_ ix(_sv.indices()[i]);
           // replace by null row
-          for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
             v[j].format(DT_(0));
           }
