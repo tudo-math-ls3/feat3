@@ -113,7 +113,8 @@ namespace FEAT
             const int exponent_det_) :
             BaseClass( fac_frobenius_,
             fac_det_,
-            fac_det_*(Math::sqrt( Math::sqr(fac_reg_) + DataType(1) )*Math::pow( DataType(1) + Math::sqrt(Math::sqr(fac_reg_) + DataType(1)), DataType(exponent_det_))),
+            fac_det_*(Math::sqrt( Math::sqr(fac_reg_) + DataType(1) )*Math::pow( DataType(1)
+                + Math::sqrt(Math::sqr(fac_reg_) + DataType(1)), DataType(exponent_det_))),
             fac_cof_,
             fac_reg_),
             grad_R(0),
@@ -131,7 +132,8 @@ namespace FEAT
             _compute_inverse( _compute_det || _compute_cof)
             {
               XASSERTM(exponent_det_ == 1 || exponent_det_ == 2,"exponent_det must be 1 or 2!");
-              XASSERTM(world_dim == 3 || fac_cof_ == DataType(0),"In 2d, the cofactor and frobenius norm term are redundant, so set fac_cof = 0.");
+              XASSERTM(world_dim == 3 || fac_cof_ == DataType(0),
+              "In 2d, the cofactor and frobenius norm term are redundant, so set fac_cof = 0.");
 
               // vol(Simplex<d>) = d!
               for(int d(1); d < world_dim; ++d)
@@ -265,7 +267,9 @@ namespace FEAT
           /**
            * \brief Computes the functional gradient for one cell
            */
-          void eval_fval_grad(DataType& fval, Tx& grad, const TgradR& mat_tensor, const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval, const Tx& DOXY(x), const DataType& DOXY(h))
+          void eval_fval_grad(DataType& fval, Tx& grad, const TgradR& mat_tensor,
+            const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval,
+            const Tx& DOXY(x), const DataType& DOXY(h))
           {
             TrafoEvalData trafo_data;
             SpaceEvalData space_data;
@@ -320,7 +324,10 @@ namespace FEAT
           /**
            * \brief Computes the functional gradient for one cell
            */
-          void eval_fval_cellwise(DataType& fval, const TgradR& mat_tensor, const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval, const Tx& DOXY(x), const DataType& DOXY(h), DataType& fval_frobenius, DataType& fval_cof, DataType& fval_det)
+          void eval_fval_cellwise(DataType& fval, const TgradR& mat_tensor,
+            const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval,
+            const Tx& DOXY(x), const DataType& DOXY(h),
+            DataType& fval_frobenius, DataType& fval_cof, DataType& fval_det)
           {
 
             TrafoEvalData trafo_data;
@@ -388,21 +395,11 @@ namespace FEAT
            */
           void add_grad_cof(Tx& grad, const SpaceEvalData& space_data, const TgradR& mat_tensor, const DataType fac)
           {
-            add_grad_cof1(grad, space_data, mat_tensor, fac);
-            add_grad_cof2(grad, space_data, mat_tensor, fac);
-          }
-
-          /**
-           * \brief Computes the gradient of the cofactor matrix frobenius norm term
-           */
-          void add_grad_cof1(Tx& grad, const SpaceEvalData& space_data, const TgradR& mat_tensor, const DataType fac)
-          {
             DataType my_fac(fac*DataType(4)*(Math::sqr(_frobenius_cof_grad_R) - DataType(TgradR::n)));
             my_fac /= _normalised_ref_cell_vol;
 
             TgradR cof_grad_R_transpose(0);
             cof_grad_R_transpose.set_transpose(cof_grad_R);
-
 
             for(int i(0); i < SpaceEvalData::max_local_dofs; ++i)
             {
@@ -411,32 +408,7 @@ namespace FEAT
               for(int d(0); d < world_dim; ++d)
               {
                 grad[i][d] += my_fac*(
-                  Tiny::dot( inv_grad_R[d], transformed_phi_ref_grad)*Math::sqr(_frobenius_cof_grad_R) );
-                //  - Tiny::dot(cof_grad_R[d], cof_grad_R_transpose*(inv_grad_R*transformed_phi_ref_grad)));
-              }
-            }
-          }
-
-          /**
-           * \brief Computes the gradient of the cofactor matrix frobenius norm term
-           */
-          void add_grad_cof2(Tx& grad, const SpaceEvalData& space_data, const TgradR& mat_tensor, const DataType fac)
-          {
-            DataType my_fac(fac*DataType(4)*(Math::sqr(_frobenius_cof_grad_R) - DataType(TgradR::n)));
-            my_fac /= _normalised_ref_cell_vol;
-
-            TgradR cof_grad_R_transpose(0);
-            cof_grad_R_transpose.set_transpose(cof_grad_R);
-
-
-            for(int i(0); i < SpaceEvalData::max_local_dofs; ++i)
-            {
-              auto transformed_phi_ref_grad = space_data.phi[i].ref_grad*mat_tensor;
-
-              for(int d(0); d < world_dim; ++d)
-              {
-                grad[i][d] += my_fac*(
-                  //Tiny::dot( inv_grad_R[d], transformed_phi_ref_grad)*Math::sqr(_frobenius_cof_grad_R) );
+                  Tiny::dot( inv_grad_R[d], transformed_phi_ref_grad)*Math::sqr(_frobenius_cof_grad_R)
                   - Tiny::dot(cof_grad_R[d], cof_grad_R_transpose*(inv_grad_R*transformed_phi_ref_grad)));
               }
             }
@@ -509,7 +481,9 @@ namespace FEAT
           /**
            * \brief Adds the part coming from the chain rule involving h to the local gradient
            */
-          void add_grad_h_part(Tx& grad, const TgradR& mat_tensor, const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval, const Tx& DOXY(x), const DataType& h, const Tgradh& grad_h)
+          void add_grad_h_part(Tx& grad, const TgradR& mat_tensor,
+            const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval,
+            const Tx& DOXY(x), const DataType& h, const Tgradh& grad_h)
           {
 
             TrafoEvalData trafo_data;
