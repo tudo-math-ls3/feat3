@@ -522,7 +522,7 @@ namespace FEAT
       template<typename VT_>
       void copy(const VT_ & a)
       {
-        if (this->size() != a.size())
+        if (this->template size<Perspective::pod>() != a.template size<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
 
         this->template _copy<VT_>(a);
@@ -536,7 +536,7 @@ namespace FEAT
       template<typename VT_>
       void copy_inv(VT_ & a) const
       {
-        if (this->size() != a.size())
+        if (this->template size<Perspective::pod>() != a.template size<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
 
         this->template _copy_inv<VT_>(a);
