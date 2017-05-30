@@ -218,6 +218,13 @@ namespace NaverStokesCP2D
     comm.print(s.pad_back(30, '.') + ": " + t);
   }
 
+  static inline void dump_line(const Dist::Comm& comm, String s, const std::deque<String>& t)
+  {
+    String tt;
+    tt.join(t, " ");
+    comm.print(s.pad_back(30, '.') + ": " + tt);
+  }
+
   template<typename T_>
   static inline void dump_line(const Dist::Comm& comm, String s, T_ t)
   {
@@ -255,11 +262,14 @@ namespace NaverStokesCP2D
     /// stepping of VTK output
     Index vtk_step;
 
-    // name of inflow mesh-part
-    String part_name_in;
+    // names of inflow mesh-parts
+    std::deque<String> part_names_in;
 
-    // name of outflow mesh-part
-    String part_name_out;
+    // names of outflow mesh-part
+    std::deque<String> part_names_out;
+
+    // names of noflow mesh-parts
+    std::deque<String> part_names_no;
 
     // -------------------------------
 
@@ -401,8 +411,12 @@ namespace NaverStokesCP2D
       level_max = level_max_in;
       level_min = level_min_in;
       args.parse("nu", nu);
-      args.parse("part-in", part_name_in);
-      args.parse("part-out", part_name_out);
+      if(args.check("part-in") > 0)
+        part_names_in = args.query("part-in")->second;
+      if(args.check("part-out") > 0)
+        part_names_out = args.query("part-out")->second;
+      if(args.check("part-no") > 0)
+        part_names_no = args.query("part-no")->second;
       args.parse("profile", ix0, iy0, ix1, iy1, vmax);
       args.parse("time-max", time_max);
       args.parse("time-steps", time_steps);
@@ -439,8 +453,9 @@ namespace NaverStokesCP2D
       dump_line(comm, "Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
       dump_line(comm, "VTK-Name", vtk_name);
       dump_line(comm, "VTK-Step", vtk_step);
-      dump_line(comm, "Inflow-Part", part_name_in);
-      dump_line(comm, "Outflow-Part", part_name_out);
+      dump_line(comm, "Inflow-Parts", part_names_in);
+      dump_line(comm, "Outflow-Parts", part_names_out);
+      dump_line(comm, "Noflow-Parts", part_names_no);
       dump_line(comm, "Inflow-Profile", "( " + stringify(ix0) + " , " + stringify(iy0) + " ) - ( "
         + stringify(ix1) + " , " + stringify(iy1) + " )");
       dump_line(comm, "V-Max", vmax);
@@ -469,8 +484,10 @@ namespace NaverStokesCP2D
     void setup_square()
     {
       mesh_file = "unit-square-quad.xml";
-      part_name_in = "bnd:l";
-      part_name_out = "bnd:r";
+      part_names_in.push_back("bnd:l");  // left
+      part_names_out.push_back("bnd:r"); // right
+      part_names_no.push_back("bnd:t");  // top
+      part_names_no.push_back("bnd:b");  // bottom
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(7);
       nu = 1E-3;
@@ -487,8 +504,10 @@ namespace NaverStokesCP2D
     void setup_nozzle()
     {
       mesh_file = "nozzle-2-quad.xml";
-      part_name_in = "bnd:l";
-      part_name_out = "bnd:r";
+      part_names_in.push_back("bnd:l");  // left
+      part_names_out.push_back("bnd:r"); // right
+      part_names_no.push_back("bnd:t");  // top
+      part_names_no.push_back("bnd:b");  // bottom
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(6);
       nu = 1E-3;
@@ -505,8 +524,11 @@ namespace NaverStokesCP2D
     void setup_bench1()
     {
       mesh_file = "flowbench_c2d_00_quad_130.xml";
-      part_name_in = "bnd:l";
-      part_name_out = "bnd:r";
+      part_names_in.push_back("bnd:l");  // left
+      part_names_out.push_back("bnd:r"); // right
+      part_names_no.push_back("bnd:t");  // top
+      part_names_no.push_back("bnd:b");  // bottom
+      part_names_no.push_back("bnd:c");  // circle
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(4);
       nu = 1E-3;
@@ -523,8 +545,11 @@ namespace NaverStokesCP2D
     void setup_c2d0()
     {
       mesh_file = "flowbench_c2d_01_quad_32.xml";
-      part_name_in = "bnd:l";
-      part_name_out = "bnd:r";
+      part_names_in.push_back("bnd:l");  // left
+      part_names_out.push_back("bnd:r"); // right
+      part_names_no.push_back("bnd:t");  // top
+      part_names_no.push_back("bnd:b");  // bottom
+      part_names_no.push_back("bnd:c");  // circle
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(5);
       nu = 1E-3;
@@ -747,11 +772,10 @@ namespace NaverStokesCP2D
       typename SystemLevelType::LocalPresUnitFilter& fil_loc_p = system_levels.at(i)->filter_pres_unit.local();
 
       // create unit-filter assemblers
-      Assembly::UnitFilterAssembler<MeshType> unit_asm_velo, unit_asm_inflow, unit_asm_pres;
+      Assembly::UnitFilterAssembler<MeshType> unit_asm_noflow, unit_asm_inflow, unit_asm_outflow;
 
-      // loop over all boundary parts
-      std::deque<String> part_names = domain.at(i)->get_mesh_node()->get_mesh_part_names(true);
-      for(const auto& name : part_names)
+      // loop over all inflow boundary parts
+      for(const auto& name : cfg.part_names_in)
       {
         // try to fetch the corresponding mesh part node
         auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
@@ -766,31 +790,41 @@ namespace NaverStokesCP2D
           continue;
 
         // add to corresponding boundary assembler
-        if(name == cfg.part_name_in)
-        {
-          // inflow BC for velocity
-          unit_asm_inflow.add_mesh_part(*mesh_part);
-        }
-        else if(name == cfg.part_name_out)
-        {
-          // Dirichlet-0 for pressure
-          unit_asm_pres.add_mesh_part(*mesh_part);
-        }
-        else
-        {
-          // Dirichlet-0 for velocity
-          unit_asm_velo.add_mesh_part(*mesh_part);
-        }
+        unit_asm_inflow.add_mesh_part(*mesh_part);
+      }
+
+      // loop over all inflow boundary parts
+      for(const auto& name : cfg.part_names_out)
+      {
+        // try to fetch the corresponding mesh part node
+        auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
+        XASSERT(mesh_part_node != nullptr);
+        auto* mesh_part = mesh_part_node->get_mesh();
+        if(mesh_part == nullptr)
+          continue;
+        unit_asm_outflow.add_mesh_part(*mesh_part);
+      }
+
+      // loop over all noflow boundary parts
+      for(const auto& name : cfg.part_names_no)
+      {
+        // try to fetch the corresponding mesh part node
+        auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
+        XASSERT(mesh_part_node != nullptr);
+        auto* mesh_part = mesh_part_node->get_mesh();
+        if(mesh_part == nullptr)
+          continue;
+        unit_asm_noflow.add_mesh_part(*mesh_part);
       }
 
       // assemble the velocity filter
-      unit_asm_velo.assemble(fil_loc_v, domain.at(i)->space_velo);
+      unit_asm_noflow.assemble(fil_loc_v, domain.at(i)->space_velo);
 
       // assemble inflow BC
       unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow);
 
       // assemble the pressure filter
-      unit_asm_pres.assemble(fil_loc_p, domain.at(i)->space_pres);
+      unit_asm_outflow.assemble(fil_loc_p, domain.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
@@ -1258,8 +1292,9 @@ namespace NaverStokesCP2D
     args.support("time-max", "<T_max>\nSets the maximum simulation time T_max.\n");
     args.support("time-steps", "<N>\nSets the number of time-steps for the time interval.\n");
     args.support("max-time-steps", "<N>\nSets the maximum number of time-steps to perform.\n");
-    args.support("part-in", "<name>\nSpecifies the name of the inflow mesh-part.\n");
-    args.support("part-out", "<name>\nSpecifies the name of the outflow mesh-part.\n");
+    args.support("part-in", "<names...>\nSpecifies the name of the inflow mesh-parts.\n");
+    args.support("part-out", "<names...>\nSpecifies the name of the outflow mesh-parts.\n");
+    args.support("part-no", "<names...>\nSpecifies the name of the noflow mesh-parts.\n");
     args.support("profile", "<x0> <y0> <x1> <y1>\nSpecifies the line segment coordinates for the inflow profile.\n");
     args.support("level", "<max> [<min>]\nSets the maximum and minimum mesh refinement levels.\n");
     args.support("vtk", "<name> [<step>]\nSets the name for VTK output and the time-stepping for the output (optional).\n");
