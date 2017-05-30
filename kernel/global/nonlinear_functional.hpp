@@ -354,7 +354,8 @@ namespace FEAT
           _nonlinear_functional.eval_fval_grad(fval, *grad, add_penalty_fval);
 
           // Sum up over all patches
-          Util::Comm::allreduce(&fval, &fval, 1, Util::CommOperationSum());
+          if(_row_gate != nullptr)
+            fval = _row_gate->sum(fval);
 
           // Add the penalty term
           if(get_penalty_param() > DataType(0))

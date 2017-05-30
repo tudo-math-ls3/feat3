@@ -3,7 +3,6 @@
 #define CONTROL_BLOCKED_BASIC_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/comm_base.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
