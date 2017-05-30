@@ -219,9 +219,21 @@ namespace FEAT
        */
       DataType dot(const LocalVector_& x, const LocalVector_& y) const
       {
-        if(_ranks.empty())
+        // This is if there is only one process
+        if(_comm == nullptr || _comm->size() == 1)
+        {
           return x.dot(y);
-        return sum(_freqs.triple_dot(x, y));
+        }
+        // Even if there are no neighbours, we still need to sum up globally
+        else if(_ranks.empty())
+        {
+          return sum(x.dot(y));
+        }
+        // If there are neighbours, we have to use the frequencies and sum up globally
+        else
+        {
+          return sum(_freqs.triple_dot(x, y));
+        }
       }
 
       ScalarTicketType dot_async(const LocalVector_& x, const LocalVector_& y, bool sqrt = false) const
