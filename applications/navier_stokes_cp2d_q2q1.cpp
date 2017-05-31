@@ -33,15 +33,18 @@
 // Similar to the previous problem, but on a slightly more complex domain.
 // The solution also converges to a steady-state flow.
 //
-// --setup bench1
+// --setup fb_c2d_00
+// --setup fb_c2d_01
+// --setup fb_c2d_02
+// --setup fb_c2d_03
 // Loads the famous "Flow-Around-A-Cylinder" problem (non-steady version).
 // This is the problem which generates the fancy "Von-Karman vortex shedding".
 // In contrast to the previous problems, this solution is periodic.
-//
-// --setup c2d0
-// Same as 'bench1', but uses the 'c2d0-32-quad' mesh (32 quads) instead of the
-// 'bench1' mesh (130) quads. Also uses level 5 instead of level 4 by default due
-// to the coarser base mesh.
+// The three versions differ in the mesh that they use:
+// * fb_c2d_00: 130 quads mesh (the old FEAT bench1 mesh)
+// * fb_c2d_01: 32 quads mesh
+// * fb_c2d_02: 48 quads mesh
+// * fb_c2d_03: 64 quads mesh
 //
 // Moreover, this application can be configured by specifying further options, which can
 // be used to define new (non-preconfigured) problems or override the pre-defined settings.
@@ -186,11 +189,14 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/burgers_assembler.hpp>
+#include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/discrete_evaluator.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/bicgstab.hpp>
@@ -387,10 +393,14 @@ namespace NavierStokesCP2D
           setup_square();
         else if(s.compare_no_case("nozzle") == 0)
           setup_nozzle();
-        else if(s.compare_no_case("bench1") == 0)
-          setup_bench1();
-        else if(s.compare_no_case("c2d0") == 0)
-          setup_c2d0();
+        else if(s.compare_no_case("fb_c2d_00") == 0)
+          setup_fb_c2d_00();
+        else if(s.compare_no_case("fb_c2d_01") == 0)
+          setup_fb_c2d_01();
+        else if(s.compare_no_case("fb_c2d_02") == 0)
+          setup_fb_c2d_02();
+        else if(s.compare_no_case("fb_c2d_03") == 0)
+          setup_fb_c2d_03();
         else
         {
           Dist::Comm comm = Dist::Comm::world();
@@ -406,12 +416,8 @@ namespace NavierStokesCP2D
       args.parse("mesh-path", mesh_path);
       if(args.check("mesh-file") > 0)
         mesh_files = args.query("mesh-file")->second;
-      //args.parse("mesh-file", mesh_file);
       if(args.parse("vtk", vtk_name, vtk_step) == 1)
         vtk_step = 1; // vtk-name given, but not vtk-step, so set to 1
-      //args.parse("level", level_max_in, level_min_in);
-      //level_max = level_max_in;
-      //level_min = level_min_in;
       args.parse("nu", nu);
       if(args.check("part-in") > 0)
         part_names_in = args.query("part-in")->second;
@@ -520,17 +526,14 @@ namespace NavierStokesCP2D
       time_steps = max_time_steps = 3500;
     }
 
-    // Setup: flow around a cylinder
-    void setup_bench1()
+    // auxiliary function: basic flow benchmark setup
+    void setup_fb_c2d_aux()
     {
-      mesh_files.push_back("flowbench_c2d_00_quad_130.xml");
       part_names_in.push_back("bnd:l");  // left
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
       part_names_no.push_back("bnd:b");  // bottom
       part_names_no.push_back("bnd:c");  // circle
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(4);
       nu = 1E-3;
       ix0 = 0.0;
       iy0 = 0.0;
@@ -538,30 +541,155 @@ namespace NavierStokesCP2D
       iy1 = 0.41;
       vmax = 1.5;
       time_max = 3.0;
-      time_steps = max_time_steps = 4500;
     }
 
-    // Setup: flow around a cylinder
-    void setup_c2d0()
+    // Setup: flow around a cylinder (130 quads)
+    void setup_fb_c2d_00()
     {
+      setup_fb_c2d_aux();
+      mesh_files.push_back("flowbench_c2d_00_quad_130.xml");
+      level_min = level_min_in = Index(0);
+      level_max = level_max_in = Index(4);
+      time_steps = max_time_steps = 1500;
+    }
+
+    // Setup: flow around a cylinder (32 quads)
+    void setup_fb_c2d_01()
+    {
+      setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_01_quad_32.xml");
-      part_names_in.push_back("bnd:l");  // left
-      part_names_out.push_back("bnd:r"); // right
-      part_names_no.push_back("bnd:t");  // top
-      part_names_no.push_back("bnd:b");  // bottom
-      part_names_no.push_back("bnd:c");  // circle
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(5);
-      nu = 1E-3;
-      ix0 = 0.0;
-      iy0 = 0.0;
-      ix1 = 0.0;
-      iy1 = 0.41;
-      vmax = 1.5;
-      time_max = 3.0;
-      time_steps = max_time_steps = 4500;
+      time_steps = max_time_steps = 1500;
+    }
+
+    // Setup: flow around a cylinder (48 quads)
+    void setup_fb_c2d_02()
+    {
+      setup_fb_c2d_aux();
+      mesh_files.push_back("flowbench_c2d_02_quad_48.xml");
+      level_min = level_min_in = Index(0);
+      level_max = level_max_in = Index(4);
+      time_steps = max_time_steps = 1500;
+    }
+
+    // Setup: flow around a cylinder (64 quads)
+    void setup_fb_c2d_03()
+    {
+      setup_fb_c2d_aux();
+      mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
+      level_min = level_min_in = Index(0);
+      level_max = level_max_in = Index(4);
+      time_steps = max_time_steps = 1500;
     }
   }; // class Config
+
+  template<typename DataType_>
+  class BenchBodyForceAccumulator
+  {
+  public:
+    const bool _defo;
+    const DataType_ _nu;
+    const DataType_ _v_max;
+    Tiny::Vector<DataType_, 2, 2> body_forces;
+
+    explicit BenchBodyForceAccumulator(bool defo, DataType_ nu, DataType_ v_max) :
+      _defo(defo), _nu(nu), _v_max(v_max)
+    {
+      body_forces.format();
+    }
+
+    /// 2D variant
+    template<typename T_>
+    void operator()(
+      const T_ omega,
+      const Tiny::Vector<T_, 2, 2>& /*pt*/,
+      const Tiny::Matrix<T_, 2, 1, 2, 1>& jac,
+      const Tiny::Vector<T_, 2, 2>& /*val_v*/,
+      const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
+      const T_ val_p)
+    {
+      // compute normal and tangential
+      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
+      const T_ tx = jac(0,0) * n2;
+      const T_ ty = jac(1,0) * n2;
+      const T_ nx = -ty;
+      const T_ ny =  tx;
+
+      /// \todo adjust this to support the deformation tensor!!!
+
+      Tiny::Matrix<T_, 2, 2, 2, 2> nt;
+      nt(0,0) = tx * nx;
+      nt(0,1) = tx * ny;
+      nt(1,0) = ty * nx;
+      nt(1,1) = ty * ny;
+
+      const T_ dut = Tiny::dot(nt, grad_v);
+      const T_ dpf1 = _nu;
+      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(2.0/3.0)))); // = 2 / (rho * U^2 * D)
+
+      body_forces[0] += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
+      body_forces[1] += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
+    }
+
+    /// 3D variant
+    template<typename T_>
+    void operator()(
+      const T_ omega,
+      const Tiny::Vector<T_, 3, 3>& /*pt*/,
+      const Tiny::Matrix<T_, 3, 2, 3, 2>& jac,
+      const Tiny::Vector<T_, 3, 3>& /*val_v*/,
+      const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
+      const T_ val_p)
+    {
+      // compute normal and tangential
+      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
+      const T_ tx = jac(0,0) * n2;
+      const T_ ty = jac(1,0) * n2;
+      const T_ nx = -ty;
+      const T_ ny =  tx;
+
+      /// \todo adjust this to support the deformation tensor!!!
+
+      Tiny::Matrix<T_, 3, 3, 3, 3> nt;
+      nt.format();
+      nt(0,0) = tx * nx;
+      nt(0,1) = tx * ny;
+      nt(1,0) = ty * nx;
+      nt(1,1) = ty * ny;
+
+      const T_ dut = Tiny::dot(nt, grad_v);
+      const T_ dpf1 = _nu;
+      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
+
+      body_forces[0] += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
+      body_forces[1] += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
+    }
+  }; // class BenchBodyForceAccumulator<...,2>
+
+  template<typename DataType_>
+  class XFluxAccumulator
+  {
+  public:
+    DataType_ _flux_value;
+
+    XFluxAccumulator() :
+      _flux_value(0.0)
+    {
+    }
+
+    template<typename T_, int d_, int d2_>
+    void operator()(
+      const T_ omega,
+      const Tiny::Vector<T_, d_, d_>& /*pt*/,
+      const Tiny::Matrix<T_, d_, d2_, d_, d2_>& /*jac*/,
+      const Tiny::Vector<T_, d_, d_>& val_v,
+      const Tiny::Matrix<T_, d_, d_, d_, d_>& /*grad_v*/,
+      const T_ /*val_p*/)
+    {
+      _flux_value += DataType_(omega * val_v[0]);
+    }
+  };
 
   /**
    * \brief Navier-Stokes System Level class
@@ -694,6 +822,7 @@ namespace NavierStokesCP2D
     // define our domain type
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
+    typedef typename DomainLevelType::TrafoType TrafoType;
 
     // fetch our mesh type
     typedef typename DomainControlType::MeshType MeshType;
@@ -842,6 +971,70 @@ namespace NavierStokesCP2D
     // get out fine-level filters
     typename SystemLevelType::GlobalVeloFilter& filter_v = the_system_level.filter_velo;
     typename SystemLevelType::GlobalPresUnitFilter& filter_p = the_system_level.filter_pres_unit;
+
+    /* ***************************************************************************************** */
+
+    // set up body forces assembler
+    Assembly::TraceAssembler<TrafoType> body_force_asm(the_domain_level.trafo);
+
+    {
+      auto* mesh_part = the_domain_level.get_mesh_node()->find_mesh_part("bnd:c");
+      if(mesh_part != nullptr)
+      {
+        body_force_asm.add_mesh_part(*mesh_part);
+      }
+    }
+
+    body_force_asm.compile_facets();
+
+    // set up flux assemblers
+    Assembly::TraceAssembler<TrafoType> flux_u_asm(the_domain_level.trafo);
+    Assembly::TraceAssembler<TrafoType> flux_l_asm(the_domain_level.trafo);
+
+    {
+      auto* mesh_part = the_domain_level.get_mesh_node()->find_mesh_part("inner:u");
+      if(mesh_part != nullptr)
+      {
+        flux_u_asm.add_mesh_part(*mesh_part);
+      }
+    }
+    {
+      auto* mesh_part = the_domain_level.get_mesh_node()->find_mesh_part("inner:l");
+      if(mesh_part != nullptr)
+      {
+        flux_l_asm.add_mesh_part(*mesh_part);
+      }
+    }
+
+    flux_u_asm.compile_facets(false);
+    flux_l_asm.compile_facets(false);
+
+    // set up inverse trafo mapping
+    Trafo::InverseMappingData<DataType, dim> point_pa, point_pe;
+    {
+      typedef Trafo::InverseMapping<TrafoType, DataType> InvMappingType;
+      InvMappingType inv_mapping(the_domain_level.trafo);
+
+      // reference pressure points
+      typename InvMappingType::ImagePointType v_a, v_e;
+      if(dim == 2)
+      {
+        v_a[0] = 0.15;
+        v_e[0] = 0.25;
+        v_a[1] = v_e[1] = 0.2;
+      }
+      else
+      {
+        v_a[0] = 0.45;
+        v_e[0] = 0.55;
+        v_a[1] = v_e[1] = 0.2;
+        v_a[2] = v_e[2] = 0.205;
+      }
+
+      // unmap points
+      point_pa = inv_mapping.unmap_point(v_a, true);
+      point_pe = inv_mapping.unmap_point(v_e, true);
+    }
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -1030,7 +1223,12 @@ namespace NavierStokesCP2D
       head += String("Def-P").pad_back(nf) + "   ";
       head += String("IT-A").pad_front(4) + " ";
       head += String("IT-S").pad_front(4) + "   ";
-      head += String("Runtime    ");
+      head += String("Runtime     | ");
+      head += String("Drag       ");
+      head += String("Lift       ");
+      head += String("P-Diff     ");
+      head += String("U-Flux     ");
+      head += String("L-Flux     ");
       comm.print(head);
       comm.print(String(head.size(), '-'));
     }
@@ -1048,14 +1246,14 @@ namespace NavierStokesCP2D
     burgers_rhs.deformation = cfg.deformation;
     burgers_rhs.nu = -cfg.nu;
     burgers_rhs.beta = -DataType(1);
-    burgers_rhs.theta = DataType(1) / delta_t;
+    burgers_rhs.theta = DataType(2) / delta_t;
 
     // set up a burgers assembler for the velocity matrix
     Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_mat;
     burgers_mat.deformation = cfg.deformation;
     burgers_mat.nu = cfg.nu;
     burgers_mat.beta = DataType(1);
-    burgers_mat.theta = DataType(1) / delta_t;
+    burgers_mat.theta = DataType(2) / delta_t;
 
     Statistics::reset();
 
@@ -1071,10 +1269,8 @@ namespace NavierStokesCP2D
       vec_rhs_p.format();
       burgers_rhs.assemble_vector(
         vec_rhs_v.local(), vec_sol_v.local(), vec_sol_v.local(), the_domain_level.space_velo, cubature);
+      matrix_b.local().apply(vec_rhs_v.local(), vec_sol_p.local(), vec_rhs_v.local(), -DataType(1));
       vec_rhs_v.sync_0();
-
-      // subtract pressure (?)
-      //matrix_b.apply(vec_rhs_v, vec_sol_p, vec_rhs_v, -DataType(1));
       watch_asm_rhs.stop();
 
       // apply RHS filter
@@ -1083,6 +1279,9 @@ namespace NavierStokesCP2D
       // non-linear loop
       for(Index nonlin_step(0); nonlin_step < cfg.nonlin_steps; ++nonlin_step)
       {
+        if(comm.rank() == 0 && nonlin_step > 0u)
+          std::cout << "\n";
+
         // Phase 1: compute convection vector
         // extrapolate previous time-step solution in first NL step
         if((time_step > Index(2)) && (nonlin_step == Index(0)))
@@ -1240,13 +1439,94 @@ namespace NavierStokesCP2D
           line += stringify(iter_v).pad_front(4) + " ";
           line += stringify(iter_p).pad_front(4) + " | ";
           line += stamp_start.elapsed_string_now();
-          std::cout << line << std::endl;
+          std::cout << line;// << std::endl;
         }
       } // non-linear loop
 
       // epic fail?
       if(failure)
         break;
+
+      // body forces, pressure difference and flux values
+      DataType c_drag = DataType(0);
+      DataType c_lift = DataType(0);
+      DataType p_diff = DataType(0);
+      DataType u_flux = DataType(0);
+      DataType l_flux = DataType(0);
+
+      // assemble drag and lift forces
+      {
+        BenchBodyForceAccumulator<DataType> body_force_accum(false, cfg.nu, cfg.vmax);
+        body_force_asm.assemble_flow_accum(
+          body_force_accum,
+          vec_sol_v.local(),
+          vec_sol_p.local(),
+          the_domain_level.space_velo,
+          the_domain_level.space_pres,
+          cubature);
+
+        comm.allreduce(&body_force_accum.body_forces.v[0], &c_drag, 1, Dist::op_sum);
+        comm.allreduce(&body_force_accum.body_forces.v[1], &c_lift, 1, Dist::op_sum);
+      }
+
+      // compute pressure values and difference
+      {
+        // evaluate pressure
+        auto pval_a = Assembly::DiscreteEvaluator::eval_fe_function(
+          point_pa, vec_sol_p.local(), the_domain_level.space_pres);
+        auto pval_e = Assembly::DiscreteEvaluator::eval_fe_function(
+          point_pe, vec_sol_p.local(), the_domain_level.space_pres);
+
+        // compute pressure mean
+        const auto p_a = pval_a.mean_value_dist(comm);
+        const auto p_e = pval_e.mean_value_dist(comm);
+        p_diff = p_a - p_e;
+      }
+
+      // assemble upper flux
+      {
+        XFluxAccumulator<DataType> flux_accum;
+        flux_u_asm.assemble_flow_accum(
+          flux_accum,
+          vec_sol_v.local(),
+          vec_sol_p.local(),
+          the_domain_level.space_velo,
+          the_domain_level.space_pres,
+          cubature);
+
+        comm.allreduce(&flux_accum._flux_value, &u_flux, 1, Dist::op_sum);
+        u_flux /= DataType(2);
+      }
+
+      // assemble lower flux
+      {
+        XFluxAccumulator<DataType> flux_accum;
+        flux_l_asm.assemble_flow_accum(
+          flux_accum,
+          vec_sol_v.local(),
+          vec_sol_p.local(),
+          the_domain_level.space_velo,
+          the_domain_level.space_pres,
+          cubature);
+
+        comm.allreduce(&flux_accum._flux_value, &l_flux, 1, Dist::op_sum);
+        l_flux /= DataType(2);
+      }
+
+
+      // console output, part 3
+      if(rank == 0)
+      {
+        String line;
+        line += " | ";
+        line += stringify_fp_fix(c_drag, 7).trunc_back(10u).pad_front(10u) + " ";
+        line += stringify_fp_fix(c_lift, 7).trunc_back(10u).pad_front(10u) + " ";
+        line += stringify_fp_fix(p_diff, 7).trunc_back(10u).pad_front(10u) + " ";
+        line += stringify_fp_fix(u_flux, 7).trunc_back(10u).pad_front(10u) + " ";
+        line += stringify_fp_fix(l_flux, 7).trunc_back(10u).pad_front(10u);
+        std::cout << line << std::endl;
+      }
+
 
       // VTK-Export
       if(!cfg.vtk_name.empty() && (cfg.vtk_step > 0) && (time_step % cfg.vtk_step == 0))
@@ -1357,11 +1637,13 @@ namespace NavierStokesCP2D
     Control::Domain::add_supported_pdc_args(args);
     args.support("help", "\nDisplays this help message.\n");
     args.support("setup", "<config>\nLoads a pre-defined configuration:\n"
-      "square    Poiseuille-Flow on Unit-Square\n"
-      "nozzle    Jet-Flow through Nozzle domain\n"
-      "bench1    Nonsteady Flow Around A Cylinder (bench1 mesh)\n"
-      "c2d0      Nonsteady Flow Around A Cylinder (c2d0 mesh)\n"
-      );
+      "square      Poiseuille-Flow on Unit-Square\n"
+      "nozzle      Jet-Flow through Nozzle domain\n"
+      "fb_c2d_00   Nonsteady Flow Around A Cylinder (bench1 mesh)\n"
+      "fb_c2d_01   Nonsteady Flow Around A Cylinder (32 quad mesh)\n"
+      "fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)\n"
+      "fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)\n"
+    );
     args.support("deformation", "\nUse deformation tensor instead of gradient tensor.\n");
     args.support("nu <nu>", "\nSets the viscosity parameter.\n");
     args.support("time-max", "<T_max>\nSets the maximum simulation time T_max.\n");
@@ -1398,9 +1680,12 @@ namespace NavierStokesCP2D
       comm.print("The easiest way to make this application do something useful is");
       comm.print("to load a pre-defined problem configuration by supplying the");
       comm.print("option '--setup <config>', where <config> may be one of:\n");
-      comm.print("  square    Poiseuille-Flow on Unit-Square");
-      comm.print("  nozzle    Jet-Flow through Nozzle domain");
-      comm.print("  bench1    Nonsteady Flow Around A Cylinder\n");
+      comm.print("  square      Poiseuille-Flow on Unit-Square");
+      comm.print("  nozzle      Jet-Flow through Nozzle domain");
+      comm.print("  fb_c2d_00   Nonsteady Flow Around A Cylinder (bench1 mesh)\n");
+      comm.print("  fb_c2d_01   Nonsteady Flow Around A Cylinder (32 quad mesh)\n");
+      comm.print("  fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)\n");
+      comm.print("  fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)\n");
       comm.print("This will pre-configure this application to solve one of the");
       comm.print("above problems. Note that you can further adjust the configuration");
       comm.print("by specifying additional options to override the default problem");
