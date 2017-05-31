@@ -1025,7 +1025,7 @@ namespace FEAT
         {
           if (MemoryPool<Mem_>::get_element(offsets(), i) == rows() - 1)
           {
-            MemoryPool<Mem_>::copy(diag.elements(), val(), rows());
+            MemoryPool<Mem_>::copy(diag.elements(), val() + i * rows(), rows());
             break;
           }
         }
