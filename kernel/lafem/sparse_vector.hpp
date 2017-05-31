@@ -724,16 +724,14 @@ namespace FEAT
         local.convert(*this);
         SparseVector<Mem::Main, DT_, IT_> target(this->size());
 
-        Index perm_size(perm.size());
-        const Index * const perm_pos(perm.get_perm_pos());
-        for (Index i(0) ; i < perm_size ; ++i)
+        auto inv = perm.inverse();
+        const Index * const inv_pos(inv.get_perm_pos());
+        for (Index i(0) ; i < local.used_elements() ; ++i)
         {
-          Index source_i(perm_pos[i]);
-          if (local(source_i) != zero_element())
-          {
-            target(i, local(source_i));
-          }
+          const Index col = local.indices()[i];
+          target(inv_pos[col], local(col));
         }
+
         this->assign(target);
       }
 
