@@ -43,6 +43,7 @@ namespace FEAT
 
         // the list that shall contain our computed distance results
         std::vector<Index> distances(num_elems, std::numeric_limits<Index>::max());
+        distances.at(start) = Index(0);
         // the 'queue' of nodes that have not yet been visited
         // the priorities are sorted from max to min, thus we need to use the inverse distance as the key, resulting in the lowest distance being at the front of the queue
         FEAT::mutable_priority_queue<Index, Index> pending_nodes;
@@ -55,6 +56,7 @@ namespace FEAT
         Index exploration_threshold = Math::max(
             Index(Math::pow(double(num_elems), double(1) / double(MeshType::shape_dim)) + 1),
             num_elems / num_ranks);
+        exploration_threshold = Math::max(exploration_threshold, Index(2));
 
 
         while (pending_nodes.size() > 0)
@@ -234,6 +236,8 @@ namespace FEAT
 
             Index rank(rng(Index(0), _num_ranks - 1));
             if (_boundary_cells.at(rank).size() == 0)
+              continue;
+            if (_cells_per_rank.at(rank).size() == 1)
               continue;
 
             Index rng_cell_idx = rng(Index(0), Index(_boundary_cells.at(rank).size() - 1));
