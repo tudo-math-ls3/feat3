@@ -1574,6 +1574,120 @@ namespace FEAT
       }
 
       /**
+       * \brief Adds the trace of a double matrix multiplikation to a vector
+       *
+       * This function performs the following computation:
+       * \f[ v \leftarrow v + \alpha \mathrm{tr}( D \textnormal{diag}(A) \cdot B\f,]
+       *
+       * where \f$ B = \mathrm{this} \f$
+       *
+       * where
+       * - \e v denotes a m vector
+       * - \e D denotes a m-by-l matrix
+       * - \e A denotes a vector representing a l-by-l diagonal matrix
+       * - \e B denotes a l-by-n matrix
+       *
+       * and the block sizes have to match accordingly:
+       *  - \e v has a bm blocks
+       *  - \e D has bm-by-bl blocks
+       *  - \e A has bl blocks
+       *  - \e B has bl-by-bn blocks
+       *
+       * \note
+       * This function currently only supports data in main memory.
+       *
+       * \tparam[BHD_]
+       * The block height of D, which is also the block size for v
+       *
+       * \param[in] a
+       * The vector representing the diagonal matrix A.
+       *
+       * \param[in] d, b
+       * The left and right multiplicant matrices
+       *
+       * \param[in] alpha
+       * The scaling factor for the product.
+       *
+       * \author Jordi Paul
+       *
+       */
+      template<int BHD_>
+      void add_trace_double_mat_mult(
+        typename LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BHD_, BlockHeight>::VectorTypeL& v,
+        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BHD_, BlockHeight>& d,
+        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, BlockHeight>& a,
+        const DT_ alpha = DT_(1)) const
+      {
+        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BHD_, BlockHeight> MatrixD;
+
+        static constexpr IT_ bhd = IT_(BHD_);
+        static constexpr IT_ bwd = IT_(BlockHeight);
+
+        static constexpr IT_ bh = IT_(BlockHeight);
+        static constexpr IT_ bw = IT_(BlockWidth);
+
+        const auto& b(*this);
+
+        // Check matrix dimensions
+        XASSERT(v.size() == d.rows());
+        XASSERT(d.columns() == a.size());
+        XASSERT(a.size() == b.rows());
+        XASSERT(b.columns() == this->columns());
+
+        // Fetch matrix arrays
+        // Use POD here to avoid hassle with 1x1 matrices and stuff
+        DT_* data_v = v.template elements<LAFEM::Perspective::pod>();
+        const DT_* data_d = d.template val<LAFEM::Perspective::pod>();
+        const DT_* data_a = a.template elements<LAFEM::Perspective::pod>();
+        const DT_* data_b = b.template val<LAFEM::Perspective::pod>();
+        const IT_* row_ptr_d = d.row_ptr();
+        const IT_* col_idx_d = d.col_ind();
+        const IT_* row_ptr_b = b.row_ptr();
+        const IT_* col_idx_b = b.col_ind();
+
+        // Loop over all rows i of v
+        for(IT_ row(0); row < IT_(v.size()); ++row)
+        {
+          // For all non-zeros D_ik in row i of D
+          for(IT_ pos_d(row_ptr_d[row]); pos_d  < row_ptr_d[row+1]; ++pos_d)
+          {
+            // Get column index k
+            const IT_ col_d(col_idx_d[pos_d]);
+
+            // Pre-compute block factor (alpha * D_ik * A_kk)
+            typename MatrixD::ValueType omega(0);
+            for(IT_ i(0); i < bhd; ++i)
+            {
+              for(IT_ j(0); j < bwd; ++j)
+              {
+                omega[int(i)][int(j)] = alpha * data_d[bhd*bwd*pos_d + bwd*i + j] * data_a[bwd*col_d + j];
+              }
+            }
+
+            // Loop over all non-zero blocks B_kj in row j of B and perform a "sparse axpy" of B_l onto v_i, i.e.:
+            // v_i += alpha * (D_ik * A_kk) * B_k.
+            IT_ pos_b(row_ptr_b[col_d]);
+            while(pos_b < row_ptr_b[col_d+1])
+            {
+              if(col_idx_b[pos_b] == row)
+              {
+                // B_kj contributes to v_i here
+                for(IT_ i(0); i < bhd; ++i)
+                {
+                  for(IT_ j(0); j < bh; ++j)
+                  {
+                    data_v[bhd*row + i] += omega[int(i)][int(j)]*data_b[bh*bw*pos_b + bw*j + i];
+                  }
+                }
+                break;
+              }
+              ++pos_b;
+            }
+          }
+        }
+      }
+
+      /**
        * \brief SparseMatrixBCSR comparison operator
        *
        * \param[in] a A matrix to compare with.
