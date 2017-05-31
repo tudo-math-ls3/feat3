@@ -233,6 +233,9 @@ namespace FEAT
             ++tries;
 
             Index rank(rng(Index(0), _num_ranks - 1));
+            if (_boundary_cells.at(rank).size() == 0)
+              continue;
+
             Index rng_cell_idx = rng(Index(0), Index(_boundary_cells.at(rank).size() - 1));
             Index counter(0);
             Index cell(*(_boundary_cells.at(rank).begin()));
