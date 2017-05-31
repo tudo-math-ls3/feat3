@@ -39,6 +39,33 @@ namespace PoissonMixed2D
 {
   using namespace FEAT;
 
+  /**
+   * \brief Symmetric Schur complement matrix
+   *
+   * \tparam LumpedMatrixA_
+   * Type for the vector representing the diagonal middle matrix
+   *
+   * \tparam MatrixB_
+   * Type for the right matrix
+   *
+   * \tparam MatrixD_
+   * Type for the left matrix
+   *
+   * \tparam FilterA_
+   * Filter for the diagonal middle matrix
+   *
+   * For given matrices \f$ B, A = diag(a), D = B^T \f$, this emulates the matrix
+   * \f[ S = B^T A^{-1} B. \f]
+   * This is called Lumped because the diagonal structure of A usually comes from lumping.
+   *
+   * \warning For efficiency reasons, \f$ B^T \f$ needs to be explicitly computed and passed as \f$ D \f$, but this
+   * property is only checked very superficially (and only in debug mode).
+   *
+   * \note In the current implementation, all container template parameters must be Global:: as the synchronisation
+   * is done manually by using local() objects and calling sync_0()
+   *
+   * \author Jordi Paul
+   */
   template
   <
     typename LumpedMatrixA_,
@@ -46,33 +73,63 @@ namespace PoissonMixed2D
     typename MatrixD_,
     typename FilterA_
   >
-  class VirtualLumpedSchurMatrix
+  class SymmetricLumpedSchurMatrix
   {
     public:
+      /// The type of A = diag(a)
       typedef LumpedMatrixA_ LumpedMatrixA;
+      /// The type of B
       typedef MatrixB_ MatrixB;
+      /// The type of D = B^T
       typedef MatrixD_ MatrixD;
+      /// The filter for A
       typedef FilterA_ FilterA;
 
+      /// The floating point precision
       typedef typename LumpedMatrixA_::DataType DataType;
-
+      /// The vector for left-multiplication with S
       typedef typename MatrixD::VectorTypeL VectorTypeL;
+      /// The vector for right-multiplication with S
       typedef typename MatrixB::VectorTypeR VectorTypeR;
 
+      /// The left-vector type for A
       typedef LumpedMatrixA VectorTypeML;
+      /// The right-vector type for A
       typedef LumpedMatrixA VectorTypeMR;
 
+      /// A = diag(a)
       LumpedMatrixA lumped_matrix_a;
+      /// B
       const MatrixB& matrix_b;
+      /// D = B^T
       const MatrixD& matrix_d;
+      /// The filter for a
       const FilterA& filter_a;
 
     private:
+      // These two need to be modified even when apply() (which is const) is called
+      /// Buffer vector for receiving v <- x^T A
       mutable VectorTypeML _vec_ml;
+      /// Buffer vector for receiving v <- A x
       mutable VectorTypeMR _vec_mr;
 
     public:
-      VirtualLumpedSchurMatrix(const LumpedMatrixA& lumped_matrix_a_,
+      /**
+       * \brief Constructor
+       *
+       * \param[in] lumped_matrix_a_
+       * A = diag(a)
+       *
+       * \param[in] matrix_b_
+       * B
+       *
+       * \param[in] matrix_d_
+       * D = B^T
+       *
+       * \param[in] filter_a_
+       * Filter for A
+       */
+      SymmetricLumpedSchurMatrix(const LumpedMatrixA& lumped_matrix_a_,
       const MatrixB& matrix_b_,
       const MatrixD& matrix_d_,
       const FilterA& filter_a_) :
@@ -83,25 +140,48 @@ namespace PoissonMixed2D
         _vec_ml(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
         _vec_mr(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout))
         {
+          ASSERT(matrix_d.columns() == matrix_b.rows());
+          ASSERT(matrix_d.used_elements() == matrix_b.used_elements());
+
           lumped_matrix_a.component_invert(lumped_matrix_a_);
-          //lumped_matrix_a.format(2);
         }
 
-      virtual ~VirtualLumpedSchurMatrix()
+      /**
+       * \brief Virtual destructor
+       */
+      virtual ~SymmetricLumpedSchurMatrix()
       {
       }
 
-      VirtualLumpedSchurMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
+      /**
+       * \brief Clone operation
+       *
+       * \param[in] mode
+       * The mode for cloning
+       *
+       * \returns A clone of \c this
+       */
+      SymmetricLumpedSchurMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return VirtualSchurMatrix(lumped_matrix_a.clone(mode), matrix_b.clone(mode), matrix_d.clone(mode),
+        return SymmetricSchurMatrix(lumped_matrix_a.clone(mode), matrix_b.clone(mode), matrix_d.clone(mode),
         filter_a.clone(mode));
       }
 
+      /**
+       * \brief Returns a left-vector
+       *
+       * \returns A new left-vector
+       */
       VectorTypeL create_vector_l() const
       {
         return matrix_d.create_vector_l();
       }
 
+      /**
+       * \brief Returns a right-vector
+       *
+       * \returns A new right-vector
+       */
       VectorTypeR create_vector_r() const
       {
         return matrix_b.create_vector_r();
@@ -151,6 +231,20 @@ namespace PoissonMixed2D
         return _vec_ml.bytes() + _vec_mr.bytes();
       }
 
+      /**
+       * \brief Extracts the diagonal
+       *
+       * \param[out] diag
+       * The diagonal of \f$ S \f$
+       *
+       * \param[in] sync
+       * Return diag as type 0 or type 1 (if true)
+       *
+       * \note This operation is only possible because A = diag(a)
+       *
+       * \warning If the matrix \f$ B \f$ is a distributed matrix, this requires synchronisation which is expensive.
+       *
+       */
       void extract_diag(VectorTypeL& diag, bool sync=true) const
       {
         if(diag.get_gate() != nullptr && !diag.get_gate()->_ranks.empty() )
@@ -172,6 +266,15 @@ namespace PoissonMixed2D
         }
       }
 
+      /**
+       * \brief Calculate \f$ r \leftarrow this\cdot x \f$
+       *
+       * \param[out] r
+       * The vector that receives the result.
+       *
+       * \param[in] x
+       * The vector to be multiplied by this matrix.
+       */
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
         matrix_b.apply(_vec_mr, x);
@@ -187,6 +290,21 @@ namespace PoissonMixed2D
       //{
       //}
 
+      /**
+       * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
+       *
+       * \param[out] r
+       * The vector that receives the result.
+       *
+       * \param[in] x
+       * The vector to be multiplied by this matrix.
+       *
+       * \param[in] y
+       * The summand vector.
+       *
+       * \param[in] alpha
+       * A scalar to scale the product with.
+       */
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
       {
         // r <- y + alpha*(D A^(-1) B)*x
@@ -231,7 +349,7 @@ namespace PoissonMixed2D
     typename MatrixD_,
     typename FilterA_
   >
-  class VirtualSchurMatrix
+  class SymmetricSchurMatrix
   {
     public:
       typedef MatrixA_ MatrixA;
@@ -258,7 +376,7 @@ namespace PoissonMixed2D
       std::shared_ptr<Solver::SolverBase<VectorTypeMR>> _solver_a;
 
     public:
-      VirtualSchurMatrix(const MatrixA& matrix_a_,
+      SymmetricSchurMatrix(const MatrixA& matrix_a_,
       const MatrixB& matrix_b_,
       const MatrixD& matrix_d_,
       const FilterA& filter_a_,
@@ -273,10 +391,14 @@ namespace PoissonMixed2D
         {
         }
 
-      VirtualSchurMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
+      virtual ~SymmetricSchurMatrix()
+      {
+      }
+
+      SymmetricSchurMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return
-          VirtualSchurMatrix(matrix_a.clone(mode), matrix_b.clone(mode),  matrix_d.clone(mode), filter_a.clone(mode));
+          SymmetricSchurMatrix(matrix_a.clone(mode), matrix_b.clone(mode),  matrix_d.clone(mode), filter_a.clone(mode));
       }
 
       VectorTypeL create_vector_l() const
@@ -413,9 +535,6 @@ namespace PoissonMixed2D
       //  return locmat;
       //}
 
-      virtual ~VirtualSchurMatrix()
-      {
-      }
   };
 
   template<typename DomainLevel_>
@@ -567,7 +686,7 @@ namespace PoissonMixed2D
     the_system_level.filter_pres.filter_sol(vec_sol);
     the_system_level.filter_pres.filter_rhs(vec_rhs);
 
-    typedef VirtualLumpedSchurMatrix
+    typedef SymmetricLumpedSchurMatrix
     <
       typename SystemLevelType::GlobalVeloVector,
       typename SystemLevelType::GlobalMatrixBlockB,
@@ -575,13 +694,13 @@ namespace PoissonMixed2D
       typename SystemLevelType::GlobalVeloFilter
     > GlobalLumpedSystemMatrix;
 
-    typedef VirtualSchurMatrix
-    <
-      typename SystemLevelType::GlobalMatrixBlockA,
-      typename SystemLevelType::GlobalMatrixBlockB,
-      typename SystemLevelType::GlobalMatrixBlockD,
-      typename SystemLevelType::GlobalVeloFilter
-    > GlobalFullSystemMatrix;
+    //typedef SymmetricSchurMatrix
+    //<
+    //  typename SystemLevelType::GlobalMatrixBlockA,
+    //  typename SystemLevelType::GlobalMatrixBlockB,
+    //  typename SystemLevelType::GlobalMatrixBlockD,
+    //  typename SystemLevelType::GlobalVeloFilter
+    //> GlobalFullSystemMatrix;
 
     typedef GlobalLumpedSystemMatrix GlobalSystemMatrix;
 
@@ -608,7 +727,7 @@ namespace PoissonMixed2D
     {
       const SystemLevelType& lvl = *system_levels.at(i);
 
-      // VirtualLumpedSchurMatrix version
+      // SymmetricLumpedSchurMatrix version
       {
         typename SystemLevelType::GlobalVeloVector lumped_matrix_a(lvl.matrix_a.create_vector_l());
         lvl.matrix_a.local().lump_rows(lumped_matrix_a.local());
@@ -617,7 +736,7 @@ namespace PoissonMixed2D
         matrix_sys.emplace_back(lumped_matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo);
       }
 
-      //// VirtualSchurMatrix version
+      //// SymmetricSchurMatrix version
       //{
       //  auto precon_a = Solver::new_jacobi_precond( lvl.matrix_a, lvl.filter_velo, 0.5);
 
@@ -642,7 +761,7 @@ namespace PoissonMixed2D
     {
       const SystemLevelType& lvl = *system_levels.back();
 
-      // VirtualLumpedSchurMatrix version
+      // SymmetricLumpedSchurMatrix version
       {
         typename SystemLevelType::GlobalVeloVector lumped_matrix_a(lvl.matrix_a.create_vector_l());
         lvl.matrix_a.local().lump_rows(lumped_matrix_a.local());
@@ -651,7 +770,7 @@ namespace PoissonMixed2D
         matrix_sys.emplace_back(lumped_matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo);
       }
 
-      //// VirtualSchurMatrix version
+      //// SymmetricSchurMatrix version
       //{
       //  auto precon_a = Solver::new_jacobi_precond( lvl.matrix_a, lvl.filter_velo, 0.7);
 
@@ -697,8 +816,8 @@ namespace PoissonMixed2D
 
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
     //auto jac_precond = Solver::new_jacobi_precond(matrix_sys.front(), the_system_level.filter_pres, 0.5);
-    //auto solver = Solver::new_pcg(matrix_sys.front(), the_system_level.filter_pres, jac_precond);
-    auto solver = Solver::new_richardson(matrix_sys.front(), the_system_level.filter_pres, 1.0, mgv);
+    auto solver = Solver::new_pcg(matrix_sys.front(), the_system_level.filter_pres, mgv);
+    //auto solver = Solver::new_richardson(matrix_sys.front(), the_system_level.filter_pres, 1.0, mgv);
 
     // enable plotting
     if(comm.rank() == 0)
