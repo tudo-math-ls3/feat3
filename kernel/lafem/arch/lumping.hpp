@@ -29,13 +29,13 @@ namespace FEAT
         static void csr_generic(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
         template <typename DT_, typename IT_>
-        static void bcsr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockWidth, const int BlockHeight)
+        static void bcsr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
-          bcsr_generic(lump, val, col_ind, row_ptr, rows, BlockWidth, BlockHeight);
+          bcsr_generic(lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
         }
 
         template <typename DT_, typename IT_>
-        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockWidth, const int BlockHeight);
+        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeigh, const int BlockWidth);
 
         template <typename DT_ , typename IT_>
         static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
@@ -72,6 +72,9 @@ namespace FEAT
         template <typename DT_, typename IT_>
         static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
           const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
+
+        template <typename DT_, typename IT_>
+        static void bcsr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth);
       };
 
     } // namespace Arch

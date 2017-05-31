@@ -65,6 +65,7 @@ if (FEAT_HAVE_CUDA)
     max_element.cu
     norm.cu
     product_matmat.cu
+    row_norm.cu
     scale.cu
     scale_row_col.cu
     scatter_axpy_prim.cu

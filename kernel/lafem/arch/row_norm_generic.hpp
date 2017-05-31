@@ -19,16 +19,16 @@ namespace FEAT
         for (Index row(0); row < rows; row++)
         {
           Index end = row_ptr[row + 1];
-          row_norms[row] = DT_(0);
+          DT_ norm(0);
 
           // Manually compute norm2 of row
           for (Index col = row_ptr[row]; col < end; col++)
           {
-            row_norms[row] += Math::sqr(val[col]);
+            norm += Math::sqr(val[col]);
           }
 
           // Take the square root
-          row_norms[row] = Math::sqrt(row_norms[row]);
+          row_norms[row] = Math::sqrt(norm);
         }
       }
 
@@ -39,14 +39,15 @@ namespace FEAT
         for (Index row(0); row < rows; row++)
         {
           Index end = row_ptr[row + 1];
-          row_norms[row] = DT_(0);
+          DT_ norm(0);
 
           // Manually compute norm2 of row
           for (Index col = row_ptr[row]; col < end; col++)
           {
-            row_norms[row] += Math::sqr(val[col]);
+            norm += Math::sqr(val[col]);
           }
           // Do not take the square root
+          row_norms[row] = norm;
         }
       }
 
@@ -57,14 +58,15 @@ namespace FEAT
         for (Index row(0); row < rows; row++)
         {
           Index end = row_ptr[row + 1];
-          row_norms[row] = DT_(0);
+          DT_ norm(0);
 
           // Manually compute norm2 of row
           for (Index col = row_ptr[row]; col < end; col++)
           {
-            row_norms[row] += scal[row]*Math::sqr(val[col]);
+            norm += scal[row]*Math::sqr(val[col]);
           }
           // Do not take the square root
+          row_norms[row] = norm;
         }
       }
 
@@ -174,14 +176,14 @@ namespace FEAT
           const Index local_row(row % C);
           const Index chunk_end(cs[chunk+1]);
 
-          row_norms[row] = DT_(0);
+          DT_ norm(0);
           // Manually compute norm2 of row
           for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
           {
-            row_norms[row] += Math::sqr(val[pcol]);
+            norm += Math::sqr(val[pcol]);
           }
           // Take the square root
-          row_norms[row] = Math::sqrt(row_norms[row]);
+          row_norms[row] = Math::sqrt(norm);
         }
       }
 
@@ -195,13 +197,14 @@ namespace FEAT
           const Index local_row(row % C);
           const Index chunk_end(cs[chunk+1]);
 
-          row_norms[row] = DT_(0);
+          DT_ norm(0);
           // Manually compute norm2 of row
           for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
           {
-            row_norms[row] += Math::sqr(val[pcol]);
+            norm += Math::sqr(val[pcol]);
           }
           // Do not take the square root
+          row_norms[row] = norm;
         }
       }
       template <typename DT_, typename IT_>
@@ -215,12 +218,13 @@ namespace FEAT
           const Index local_row(row % C);
           const Index chunk_end(cs[chunk+1]);
 
-          row_norms[row] = DT_(0);
+          DT_ norm(0);
           // Manually compute norm2 of row
           for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
           {
-            row_norms[row] += scal[row]*Math::sqr(val[pcol]);
+            norm += scal[row]*Math::sqr(val[pcol]);
           }
+          row_norms[row] = norm;
         }
       }
     } // namespace Arch

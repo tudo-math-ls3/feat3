@@ -19,11 +19,12 @@ namespace FEAT
         for (Index row(0); row < rows; row++)
         {
           Index end = row_ptr[row + 1];
-          lump[row] = DT_(0);
+          DT_ sum(0);
           for (Index col = row_ptr[row]; col < end; col++)
           {
-            lump[row] += val[col];
+            sum += val[col];
           }
+          lump[row] = sum;
         }
       }
 
@@ -66,11 +67,12 @@ namespace FEAT
           const Index local_row(row % C);
           const Index chunk_end(cs[chunk+1]);
 
-          lump[row] = DT_(0);
+          DT_ sum(0);
           for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
           {
-            lump[row] += val[pcol];
+            sum += val[pcol];
           }
+          lump[row] = sum;
         }
       }
     } // namespace Arch
