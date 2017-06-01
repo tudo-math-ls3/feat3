@@ -143,6 +143,20 @@ namespace FEAT
         }
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        std::size_t my_bytes(0);
+
+        for(size_t i(0); i < this->size(); ++i)
+        {
+          my_bytes += this->at(i).second.bytes();
+        }
+
+        return my_bytes;
+      }
+
+
       /** \copydoc UnitFilter::filter_rhs() */
       template<typename Vector_>
       void filter_rhs(Vector_& vector) const
