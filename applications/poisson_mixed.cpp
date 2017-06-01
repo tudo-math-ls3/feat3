@@ -252,33 +252,41 @@ namespace PoissonMixed2D
     static constexpr int dim = 2;
 
     // choose our desired analytical solution
-    Analytic::Common::ExpBubbleFunction<dim> sol_func;
-    //Analytic::Common::CosineWaveFunction<dim> sol_func;
+    // This has homogeneous Dirichlet BCs
+    //Analytic::Common::ExpBubbleFunction<dim> sol_func;
+    // This has homogeneous Neumann BCs
+    Analytic::Common::CosineWaveFunction<dim> sol_func;
 
     // define our domain type
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
 
-    //typedef typename DomainLevelType::TrafoType TrafoType;
     // fetch our mesh type
     typedef typename DomainControlType::MeshType MeshType;
 
     // define our system level
     typedef Control::PoissonMixedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
-    typedef LAFEM::SlipFilter<MemType, DataType, IndexType, dim> SlipFilterType;
-    typedef LAFEM::FilterSequence<SlipFilterType> NeumannFilter;
-
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
-
-    std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> neumann_asm;
 
     const Index num_levels = domain.size_physical();
 
-    // create system levels
-    for (Index i(0); i < num_levels; ++i)
+    if(args.check("neumann") >= 0)
     {
-      system_levels.push_back(std::make_shared<SystemLevelType>());
+      // create system levels
+      for (Index i(0); i < num_levels; ++i)
+      {
+        std::deque<String> neumann_list = domain.at(i)->get_mesh_node()->get_mesh_part_names(true);
+        system_levels.push_back(std::make_shared<SystemLevelType>(neumann_list));
+      }
+    }
+    else
+    {
+      // create system levels
+      for (Index i(0); i < num_levels; ++i)
+      {
+        system_levels.push_back(std::make_shared<SystemLevelType>());
+      }
     }
 
     Cubature::DynamicFactory cubature("auto-degree:7");
@@ -313,7 +321,6 @@ namespace PoissonMixed2D
     {
       // Assemble matrix structure
       system_levels.at(i)->assemble_velo_struct(domain.at(i)->space_velo);
-      //system_levels.at(i)->assemble_pres_struct(domain.at(i)->space_pres);
 
       system_levels.at(i)->matrix_a.local().format();
       Assembly::Common::IdentityOperatorBlocked<dim> identity_op;
@@ -325,60 +332,41 @@ namespace PoissonMixed2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling system filters...");
-
-    for(Index i(0); i < num_levels; ++i)
+    if (args.check("neumann") >= 0)
     {
-      // get our local system filters
-      //typename SystemLevelType::LocalVeloFilter& fil_loc_v = system_levels.at(i)->filter_velo.local();
-      typename SystemLevelType::LocalPresFilter& fil_loc_p = system_levels.at(i)->filter_pres.local();
+      comm.print("Assembling system filters...");
 
-      // create unit-filter assemblers
-      Assembly::UnitFilterAssembler<MeshType> unit_asm_pres;
+      for(Index i(0); i < num_levels; ++i)
+      {
+        // get our local system filters
+        typename SystemLevelType::LocalVeloFilter& fil_loc_v = system_levels.at(i)->filter_velo.local();
 
-    //  // loop over all boundary parts
-    //  std::deque<String> part_names = domain.at(i)->get_mesh_node()->get_mesh_part_names(true);
-    //  for(const auto& name : part_names)
-    //  {
-    //    // Create empty assembler
-    //    auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(domain.at(i)->get_mesh());
+        for(auto& it: fil_loc_v)
+        {
+          // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+          // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+          auto* mpp = domain.at(i)->get_mesh_node()->find_mesh_part(it.first);
 
-    //    // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
-    //    // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
-    //    auto* mpp = rmn_->find_mesh_part(it);
-    //    if(mpp != nullptr)
-    //    {
-    //      new_asm->add_mesh_part(*mpp);
-    //    }
+          // Create empty assembler
+          Assembly::SlipFilterAssembler<MeshType> neumann_asm(domain.at(i)->get_mesh());
+          if(mpp != nullptr)
+          {
+            neumann_asm.add_mesh_part(*mpp);
+          }
+          // Even if the assembler is empty, this call is necessary for the filter to have the right size
+          neumann_asm.assemble(it.second, domain.at(i)->space_velo);
+        }
 
-    //    // Insert into the map
-    //    String identifier(it);
-    //    slip_asm.emplace(identifier, new_asm);
+        // This shallow-copies the filters to filter_sys
+        system_levels.at(i)->compile_system_filter();
+        // After assembling to local filters, we need to call this to synchronise e.g. the slip filters
+        system_levels.at(i)->assemble_global_filters();
 
-    //  }
-
-      // loop over all boundary parts
-      //std::deque<String> part_names = domain.at(i)->get_mesh_node()->get_mesh_part_names(true);
-      //for(const auto& name : part_names)
-      //{
-      //  // try to fetch the corresponding mesh part node
-      //  auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
-
-      //  // found it?
-      //  XASSERT(mesh_part_node != nullptr);
-
-      //  // let's see if we have that mesh part
-      //  // if it is nullptr, then our patch is not adjacent to that boundary part
-      //  auto* mesh_part = mesh_part_node->get_mesh();
-      //  if(mesh_part == nullptr)
-      //    continue;
-
-      //  // add to corresponding boundary assembler
-      //  unit_asm_pres.add_mesh_part(*mesh_part);
-      //}
-
-      //// assemble the pressure filter
-      //unit_asm_pres.assemble(fil_loc_p, domain.at(i)->space_pres, sol_func);
+      }
+    }
+    else
+    {
+      comm.print("Not Assembling system filters because there are no Neumann boundaries");
     }
 
     Statistics::toe_assembly = stamp_ass.elapsed_now();
@@ -479,7 +467,7 @@ namespace PoissonMixed2D
       //  matrix_sys.emplace_back(lvl.matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo, solver_a);
       //}
 
-      auto jac_smoother = Solver::new_jacobi_precond(matrix_sys.at(i), lvl.filter_pres, 0.5);
+      auto jac_smoother = Solver::new_jacobi_precond(matrix_sys.at(i), lvl.filter_pres, 0.7);
       auto smoother = Solver::new_richardson(matrix_sys.at(i), lvl.filter_pres, 1.0, jac_smoother);
       smoother->set_min_iter(4);
       smoother->set_max_iter(4);
@@ -513,7 +501,7 @@ namespace PoissonMixed2D
       //  matrix_sys.emplace_back(lvl.matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo, solver_a);
       //}
 
-      auto coarse_precond = Solver::new_jacobi_precond(matrix_sys.back(), lvl.filter_pres, 0.5);
+      auto coarse_precond = Solver::new_jacobi_precond(matrix_sys.back(), lvl.filter_pres, 0.7);
       auto coarse_solver = Solver::new_richardson(matrix_sys.back(), lvl.filter_pres, 1.0, coarse_precond);
       coarse_solver->set_min_iter(4);
       coarse_solver->set_max_iter(4);
@@ -662,6 +650,7 @@ namespace PoissonMixed2D
     Control::Domain::add_supported_pdc_args(args);
     // check command line arguments
     args.support("level");
+    args.support("neumann");
     args.support("no-err");
     args.support("vtk");
     args.support("statistics");
@@ -674,7 +663,9 @@ namespace PoissonMixed2D
     {
       // print all unsupported options to cerr
       for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+      {
         comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
+      }
 
       comm.print(std::cerr, "Supported Options are:");
       comm.print(std::cerr, args.get_supported_help());
@@ -700,8 +691,8 @@ namespace PoissonMixed2D
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> AuxSpace;
     //typedef Space::CroRavRanTur::Element<TrafoType> AuxSpace;
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
-    //typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1> > SpaceType;
+    //typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1> > SpaceType;
 
     // create a time-stamp
     TimeStamp time_stamp;
