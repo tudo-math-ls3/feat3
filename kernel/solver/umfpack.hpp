@@ -19,6 +19,10 @@ namespace FEAT
      * This class provides an implementation of the SolverBase interface using the
      * direct solver UMFPACK for doing the actual dirty work.
      *
+     * \note
+     * This solver can only be applied onto SparseMatrixCSR<Mem::Main,double,Index> matrices.
+     * If you want to apply UMFPACK on other matrix types, use the GenericUmfpack solver instead.
+     *
      * \attention
      * This class is only declared if FEAT was configured to build and link against
      * the \c UMFPACK third-party library.
@@ -186,6 +190,140 @@ namespace FEAT
        */
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override;
     }; // class UmfpackMean
+
+    /**
+     * \brief Generic UMFPACK solver class
+     *
+     * This class effectively wraps around an Umfpack solver object
+     *
+     * \attention
+     * This class is only declared if FEAT was configured to build and link against
+     * the \c UMFPACK third-party library.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Matrix_>
+    class GenericUmfpack :
+      public SolverBase<typename Matrix_::VectorTypeL>
+    {
+    public:
+      /// our base class
+      typedef SolverBase<typename Matrix_::VectorTypeL> BaseClass;
+      /// our matrix type
+      typedef Matrix_ MatrixType;
+      /// our vector type
+      typedef typename MatrixType::VectorTypeL VectorType;
+
+    protected:
+      /// our matrix
+      const MatrixType& _matrix;
+      /// the matrix for our Umfpack solver (SparseMatrixCSR<Mem::Main, double, Index>)
+      typename Umfpack::MatrixType _umf_matrix;
+      /// the vectors for our Umfpack solver (DenseVector<Mem::Main, double, Index>)
+      typename Umfpack::VectorType _umf_vsol, _umf_vrhs;
+      /// the actual Umpfack solver object
+      Umfpack _umfpack;
+
+    public:
+      explicit GenericUmfpack(const MatrixType& matrix) :
+        _matrix(matrix),
+        _umfpack(_umf_matrix)
+      {
+      }
+
+      /// virtual destructor
+      virtual ~GenericUmfpack()
+      {
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "GenericUmfpack";
+      }
+
+      virtual void init_symbolic() override
+      {
+        BaseClass::init_symbolic();
+
+        // convert matrix to obtain the structure
+        _umf_matrix.convert(_matrix);
+
+        // create vectors
+        _umf_vsol = _umf_matrix.create_vector_l();
+        _umf_vrhs = _umf_matrix.create_vector_l();
+
+        // factorise symbolic
+        _umfpack.init_symbolic();
+      }
+
+      virtual void done_symbolic() override
+      {
+        _umfpack.done_symbolic();
+
+        _umf_vrhs.clear();
+        _umf_vsol.clear();
+        _umf_matrix.clear();
+
+        BaseClass::done_symbolic();
+      }
+
+      virtual void init_numeric() override
+      {
+        BaseClass::init_numeric();
+
+        // convert our system matrix to <Mem::Main, double, Index> (if necessary)
+        typename MatrixType::template ContainerType<Mem::Main, double, Index> mat_main;
+        mat_main.convert(_matrix);
+
+        // get the array of our CSR matrix
+        const Index* row_ptr = _umf_matrix.row_ptr();
+        /*const*/ Index* col_idx = _umf_matrix.col_ind();
+        double* val = _umf_matrix.val();
+
+        // copy entries into our CSR matrix
+        for(Index i(0); i < _umf_matrix.rows(); ++i)
+          mat_main.set_line(i, val + row_ptr[i], col_idx + row_ptr[i], 0);
+
+        // factorise
+        _umfpack.init_numeric();
+      }
+
+      virtual void done_numeric() override
+      {
+        _umfpack.done_numeric();
+      }
+
+      virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // convert RHS vector
+        _umf_vrhs.copy(vec_rhs);
+
+        // solve
+        Status status = _umfpack.apply(_umf_vsol, _umf_vrhs);
+
+        // convert sol vector
+        _umf_vsol.copy_inv(vec_sol);
+
+        return status;
+      }
+    }; // class GenericUmfpack<...>
+
+    /**
+     * \brief Creates a new GenericUmfpack solver object
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \returns
+     * A shared pointer to a new GenericUmfpack object.
+     */
+    template<typename Matrix_>
+    inline std::shared_ptr<GenericUmfpack<Matrix_>> new_generic_umfpack(const Matrix_& matrix)
+    {
+      return std::make_shared<GenericUmfpack<Matrix_>> (matrix);
+    }
+
 #endif // defined(FEAT_HAVE_UMFPACK) || defined(DOXYGEN)
   } // namespace Solver
 } // namespace FEAT
