@@ -35,7 +35,7 @@ namespace FEAT
         }
 
         template <typename DT_, typename IT_>
-        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeigh, const int BlockWidth);
+        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth);
 
         template <typename DT_ , typename IT_>
         static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
