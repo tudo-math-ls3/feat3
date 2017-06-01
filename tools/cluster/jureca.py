@@ -24,6 +24,7 @@ for i in range(1, 5):
     #f.write("#SBATCH --gres=gpu:1" + os.linesep)
     f.write("#SBATCH --job-name=feat" + os.linesep)
 
+    f.write("export PSP_ONDEMAND=1" + os.linesep)
     f.write("export OMP_NUM_THREADS=1" + os.linesep)
     #f.write("export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}" + os.linesep)
     f.write("source ~/.bashrc &>/dev/null" + os.linesep)
