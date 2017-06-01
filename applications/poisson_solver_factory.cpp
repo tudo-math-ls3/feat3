@@ -277,6 +277,7 @@ namespace PoissonDirichlet2D
     args.support("statistics");
     args.support("test-iter");
     args.support("solver-ini");
+    args.support("vtk");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
