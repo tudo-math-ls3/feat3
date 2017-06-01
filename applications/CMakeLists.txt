@@ -180,7 +180,7 @@ if (FEAT_HAVE_MPI)
     --build-target poisson_mixed
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_mixed --test-iter 8 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_mixed --test-iter 9 --level 5 2 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_mixed_mpi_3 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_mixed_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -192,7 +192,7 @@ else (FEAT_HAVE_MPI)
     --build-target poisson_mixed
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_mixed --test-iter 8 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --parti-type manual 2level parmetis fallback)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_mixed --test-iter 8 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
