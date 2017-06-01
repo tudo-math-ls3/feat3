@@ -21,17 +21,17 @@
 
 namespace FEAT
 {
-    /**
-     * Supported time string formating.
-     */
-    enum class TimeFormat
-    {
-      h_m_s_m, /**< <c>h:mm:ss.mmm</c> */
-      h_m_s, /**< <c>h:mm:ss</c> */
-      m_s_m, /**< <c>mm:ss.mmm</c> */
-      m_s, /**< <c>mm:ss</c> */
-      s_m, /**< <c>ss.mmm</c> */
-    };
+  /**
+   * Supported time string formatting.
+   */
+  enum class TimeFormat
+  {
+    h_m_s_m, /**< <c>h:mm:ss.mmm</c> */
+    h_m_s, /**< <c>h:mm:ss</c> */
+    m_s_m, /**< <c>m:ss.mmm</c> */
+    m_s, /**< <c>m:ss</c> */
+    s_m, /**< <c>s.mmm</c> */
+  };
 
   /**
    * \brief Time stamp class
@@ -166,63 +166,62 @@ namespace FEAT
      * - For TimeFormat::h_m_s the string is
      *   of the format <c>h:mm:ss</c>.
      * - For TimeFormat::m_s_m the string is
-     *   of the format <c>mm:ss.mmm</c>.
+     *   of the format <c>m:ss.mmm</c>.
      * - For TimeFormat::m_s the string is
-     *   of the format <c>mm:ss</c>.
+     *   of the format <c>m:ss</c>.
      * - For TimeFormat::s_m the string is
-     *   of the format <c>ss.mmm</c>.
+     *   of the format <c>s.mmm</c>.
      *
      * \param[in] micros
      * The elapsed time to be formatted.
      *
      * \param[in] format
-     * Specifies string formating to be used.
+     * Specifies string formatting to be used.
      *
      * \returns
      * The time elapsed as a formatted string, for example <code>h:m:ss.mmm</code>.
      */
     static String format_micros(long long micros, TimeFormat format = TimeFormat::h_m_s_m)
     {
-      // check whether the time is negative
-      bool neg(false);
-      if(micros < 0)
-      {
-        neg = true;
-        micros = -micros;
-      }
-
       std::ostringstream oss;
       oss << std::setfill('0');
+
+      // check whether the time is negative
+      if(micros < 0)
+      {
+        oss << '-';
+        micros = -micros;
+      }
 
       switch (format)
       {
         case TimeFormat::h_m_s_m:
           oss << (micros / 3600000000ll);
           oss << ":" << std::setw(2) << ((micros / 60000000ll) % 60ll);
-          oss << ":" << std::setw(2) << (((micros + 500) / 1000000ll) % 60ll);
-          oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
+          oss << ":" << std::setw(2) << ((micros / 1000000ll) % 60ll);
+          oss << "." << std::setw(3) << ((micros / 1000ll) % 1000ll);
           break;
 
         case TimeFormat::h_m_s:
           oss << (micros / 3600000000ll);
           oss << ":" << std::setw(2) << ((micros / 60000000ll) % 60ll);
-          oss << ":" << std::setw(2) << (((micros + 500000) / 1000000ll) % 60ll);
+          oss << ":" << std::setw(2) << ((micros / 1000000ll) % 60ll);
           break;
 
         case TimeFormat::m_s_m:
           oss << (micros / 60000000ll);
-          oss << ":" << std::setw(2) << (((micros + 500) / 1000000ll) % 60ll);
-          oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
+          oss << ":" << std::setw(2) << ((micros / 1000000ll) % 60ll);
+          oss << "." << std::setw(3) << ((micros / 1000ll) % 1000ll);
           break;
 
         case TimeFormat::m_s:
           oss << (micros / 60000000ll);
-          oss << ":" << std::setw(2) << (((micros + 500000) / 1000000ll) % 60ll);
+          oss << ":" << std::setw(2) << ((micros / 1000000ll) % 60ll);
           break;
 
         case TimeFormat::s_m:
-          oss << std::setw(2) << (((micros + 500) / 1000000ll));
-          oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
+          oss << (micros / 1000000ll);
+          oss << "." << std::setw(3) << ((micros / 1000ll) % 1000ll);
           break;
 
         default:
@@ -230,10 +229,7 @@ namespace FEAT
       }
 
       // return formatted string
-      String str(oss.str());
-      if(neg)
-        str.push_front('-');
-      return str;
+      return oss.str();
     }
 
     /**
@@ -245,7 +241,7 @@ namespace FEAT
      * A time stamp that represents a previous moment.
      *
      * \param[in] format
-     * Specifies string formating to be used.
+     * Specifies string formatting to be used.
      *
      * \returns
      * The time elapsed between the time stamps \p before and \c this as a formatted string,
@@ -265,7 +261,7 @@ namespace FEAT
      * See TimeStamp::format_micros() for more information about the formatting options.
      *
      * \param[in] format
-     * Specifies string formating to be used.
+     * Specifies string formatting to be used.
      *
      * \returns
      * The time elapsed between this time stamp and now as a formatted string,
