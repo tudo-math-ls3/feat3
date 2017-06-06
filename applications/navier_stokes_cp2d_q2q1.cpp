@@ -657,7 +657,7 @@ namespace NavierStokesCP2D
     comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&nzes_fine_local, &nzes_fine_min, std::size_t(1), Dist::op_min);
 
-    String flops = FEAT::Statistics::get_formatted_flops(solver_toe, (Index)nprocs);
+    String flops = FEAT::Statistics::get_formatted_flops(solver_toe, nprocs);
     comm.print(flops + "\n");
     comm.print(op_timings);
     comm.print(FEAT::Statistics::get_formatted_solver_internals("solver_a"));

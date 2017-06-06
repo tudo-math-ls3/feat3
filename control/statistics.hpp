@@ -32,8 +32,8 @@ namespace FEAT
           DomainType_ & domain)
         {
           Dist::Comm comm(Dist::Comm::world());
-          Index rank = Index(comm.rank());
-          Index nranks = Index(comm.size());
+          int rank(comm.rank());
+          int nranks(comm.size());
 
           FEAT::Statistics::toe_solve = solver_toe;
 

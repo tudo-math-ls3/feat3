@@ -660,7 +660,7 @@ namespace NavierStokesCP2D
 
 
     comm.print("\n");
-    comm.print(FEAT::Statistics::get_formatted_flops(solver_toe, (Index)nprocs));
+    comm.print(FEAT::Statistics::get_formatted_flops(solver_toe, nprocs));
     comm.print(FEAT::Statistics::get_formatted_times(solver_toe));
     comm.print(FEAT::Statistics::get_formatted_solver_internals("solver_a"));
     comm.print("");
