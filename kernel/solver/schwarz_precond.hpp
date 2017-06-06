@@ -124,17 +124,35 @@ namespace FEAT
         // apply local solver
         Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_local_solver->name()));
         Status status = _local_solver->apply(*vec_cor, *vec_def);
-        if(!status_success(status))
+
+        // synchronise local status over communicator to obtain
+        // a consistent status code on all processes
+        const Dist::Comm* comm = vec_cor.get_comm();
+        if(comm != nullptr)
         {
-          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
-          return status;
+          // local status: 0: success, 1: failure
+          int lstat = (status_success(status) ? 0 : 1);
+          int gstat = -1;
+
+          // sum up over all processes:
+          comm->allreduce(&lstat, &gstat, std::size_t(1), Dist::op_sum);
+          XASSERT(gstat >= 0);
+
+          // if all processes succeeded, the sum will also be 0
+          // if the sum is > 0, then at least one process failed,
+          // so the global status will also be failure
+          status = (gstat == 0 ? Status::success : Status::aborted);
         }
 
-        // synchronise
-        vec_cor.sync_1();
+        // did all processes succeed?
+        if(status == Status::success)
+        {
+          // synchronise correction vector
+          vec_cor.sync_1();
 
-        // apply filter
-        _filter.filter_cor(vec_cor);
+          // apply filter
+          _filter.filter_cor(vec_cor);
+        }
 
         // okay
         Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, 0));
@@ -207,10 +225,10 @@ namespace FEAT
     new_schwarz_precond(
       const String& section_name, PropertyMap* section,
       std::shared_ptr<LocalSolver_> local_solver, Global::Filter<LocalFilter_, Mirror_>& filter)
-      {
-        return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
-          (section_name, section, local_solver, filter);
-      }
+    {
+      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
+        (section_name, section, local_solver, filter);
+    }
 #else
     template<typename LocalFilter_, typename Mirror_>
     inline std::shared_ptr
@@ -225,10 +243,10 @@ namespace FEAT
       const String& section_name, PropertyMap* section,
       std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
       Global::Filter<LocalFilter_, Mirror_>& filter)
-      {
-        return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
-          (section_name, section, local_solver, filter);
-      }
+    {
+      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
+        (section_name, section, local_solver, filter);
+    }
 #endif
   } // namespace Solver
 } // namespace FEAT

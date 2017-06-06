@@ -79,9 +79,14 @@ namespace FEAT
         this->_vector.convert(*other);
       }
 
-      const GateType* get_gate()
+      const GateType* get_gate() const
       {
         return _gate;
+      }
+
+      const Dist::Comm* get_comm() const
+      {
+        return (_gate != nullptr ? _gate->get_comm() : nullptr);
       }
 
       void from_1_to_0()
