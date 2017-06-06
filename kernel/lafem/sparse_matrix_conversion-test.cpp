@@ -52,7 +52,7 @@ public:
   virtual void run() const override
   {
 
-    SparseMatrixCOO<Mem_, DT_, IT_> a(121, 121);
+    SparseMatrixCOO<Mem_, DT_, IT_> a(120, 121);
     for (Index row(0) ; row < a.rows() ; ++row)
     {
       for (Index col(0) ; col < a.columns() ; ++col)
@@ -122,6 +122,12 @@ public:
       csr_m3.convert_reverse(ell_m1);
       ell_m1.convert_reverse(csr_m1);
       TEST_CHECK_EQUAL(csr_m1, csr_m3);
+    }
+    {
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(a);
+      SparseMatrixBanded<Mem_, DT_, IT_> banded_m1(csr_m1);
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m2(banded_m1);
+      TEST_CHECK_EQUAL(csr_m2, csr_m1);
     }
 
   }

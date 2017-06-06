@@ -36,7 +36,7 @@ namespace FEAT
      * _elements[0]: raw non zero number values \n
      * _indices[0]: vector of offsets (bottom-left diagonal has offset 0,
      *                                 main diagonal has offset rows - 1 and
-     *                                 top-right diagonal has offset row + columns - 1)\n
+     *                                 top-right diagonal has offset row + columns - 2)\n
      *
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: row count \n
@@ -63,9 +63,9 @@ namespace FEAT
      \endverbatim
      * To get the position of the diagonals in the matrix, the matching offsets are
      * saved from left to right in the offsets-array.
-     * - The first diagonal is the one at the bottom-left and gets the offset = 1,
+     * - The first diagonal is the one at the bottom-left and gets the offset = 0,
      * - the main diaognal has the offset = rows - 1
-     * - and the last offset at the top-right has the offset = rows + columns - 1.
+     * - and the last offset at the top-right has the offset = rows + columns - 2.
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -491,6 +491,20 @@ namespace FEAT
       /**
        * \brief Constructor
        *
+       * \param[in] other The source matrix.
+       *
+       * Creates a Banded matrix based on the source matrix.
+       */
+      template <typename MT_>
+      explicit SparseMatrixBanded(const MT_ & other) :
+        Container<Mem_, DT_, IT_>(other.size())
+      {
+        convert(other);
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] graph The graph to create the matrix from
        *
        * Creates a matrix based on a given adjacency graph, representing the sparsity pattern.
@@ -604,19 +618,6 @@ namespace FEAT
 /// \endcond
 
       /**
-       * \brief Conversion method
-       *
-       * \param[in] other The source Matrix.
-       *
-       * Use source matrix content as content of current matrix
-       */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
-      {
-        this->assign(other);
-      }
-
-      /**
        * \brief Assignment operator
        *
        * \param[in] layout_in A sparse matrix layout.
@@ -649,6 +650,62 @@ namespace FEAT
         this->_elements_size.push_back(rows() * num_of_offsets());
 
         return *this;
+      }
+
+      /**
+       * \brief Conversion method
+       *
+       * \param[in] other The source Matrix.
+       *
+       * Use source matrix content as content of current matrix
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
+      {
+        this->assign(other);
+      }
+
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & csr_in)
+      {
+        SparseMatrixCSR<Mem::Main, DT_, IT_> csr;
+        csr.convert(csr_in);
+
+        std::set<IT_> offset_set;
+        Index nrows(csr.rows());
+        Index ncolumns(csr.columns());
+        for (Index row(0) ; row < nrows ; ++row)
+        {
+          for (Index i(csr.row_ptr()[row]) ; i < csr.row_ptr()[row+1] ; ++i)
+          {
+            //compute band offset for each non zero entry
+            IT_ off = IT_(csr.col_ind()[i] - row + nrows - 1);
+            offset_set.insert(off);
+          }
+        }
+
+        DenseVector<Mem::Main, DT_, IT_> val(Index(offset_set.size()) * nrows, DT_(0));
+        for (Index row(0) ; row < nrows ; ++row)
+        {
+          for (Index i(csr.row_ptr()[row]) ; i < csr.row_ptr()[row+1] ; ++i)
+          {
+            Index col = csr.col_ind()[i];
+            Index offset = (col - row + nrows - 1);
+            Index band = Index(std::distance(offset_set.begin(), offset_set.find(IT_(offset))));
+            val.elements()[band * nrows + row] = csr.val()[i];
+          }
+        }
+
+        DenseVector<Mem::Main, IT_, IT_> offsets(Index(offset_set.size()));
+        auto it_offset = offset_set.begin();
+        for (Index i(0) ; i < offset_set.size() ; ++i, ++it_offset)
+        {
+          offsets(i, *it_offset);
+        }
+        offset_set.clear();
+
+        SparseMatrixBanded<Mem::Main, DT_, IT_> temp(nrows, ncolumns, val, offsets);
+        this->assign(temp);
       }
 
 
