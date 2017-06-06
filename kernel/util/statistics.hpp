@@ -172,7 +172,7 @@ namespace FEAT
       }
 
       /// Retrieve formatted flops per second string
-      static String get_formatted_flops(double seconds, Index ranks = 1)
+      static String get_formatted_flops(double seconds, int ranks = 1)
       {
         double flops((double)_flops);
         flops /= seconds;

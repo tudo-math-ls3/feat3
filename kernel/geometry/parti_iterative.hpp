@@ -264,12 +264,12 @@ namespace FEAT
 
             //check if any neighbour has a smaller patch
             Index smallest_rank(rank);
-            Index smallest_size(_cells_per_rank.at(rank).size());
+            Index smallest_size = Index(_cells_per_rank.at(rank).size());
             for (auto neighbour : trans_rank_neighbours)
             {
               if (_cells_per_rank.at(_rank_per_cell.at(neighbour)).size() < smallest_size)
               {
-                smallest_size = _cells_per_rank.at(_rank_per_cell.at(neighbour)).size();
+                smallest_size = Index(_cells_per_rank.at(_rank_per_cell.at(neighbour)).size());
                 smallest_rank = _rank_per_cell.at(neighbour);
               }
             }
@@ -605,7 +605,7 @@ namespace FEAT
           ptr[0] = 0;
           for(Index i(0); i < _num_ranks; ++i)
           {
-            ptr[i+1] = indi._cells_per_rank.at(i).size() + ptr[i];
+            ptr[i+1] = Index(indi._cells_per_rank.at(i).size()) + ptr[i];
           }
 
           // build index array
