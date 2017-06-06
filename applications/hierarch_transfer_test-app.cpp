@@ -261,6 +261,19 @@ namespace HierarchTransferTestApp
 int main(int argc, char** argv)
 {
   Runtime::initialise(argc, argv);
-  HierarchTransferTestApp::run();
+  try
+  {
+    HierarchTransferTestApp::run();
+  }
+  catch (const std::exception& exc)
+  {
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    FEAT::Runtime::abort();
+  }
+  catch (...)
+  {
+    std::cerr << "ERROR: unknown exception" << std::endl;
+    FEAT::Runtime::abort();
+  }
   return Runtime::finalise();
 }
