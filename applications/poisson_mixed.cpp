@@ -37,6 +37,15 @@ namespace PoissonMixed
 {
   using namespace FEAT;
 
+  static void display_help(const Dist::Comm& comm)
+  {
+    comm.print("poisson-mixed: Solve the Poisson problem in mixed formulation e.g. with Q1~/P0 or Q2/P1disc or Q2/Q1.");
+    comm.print("Boundary conditions are either homogeneous Dirichlet or homogeneous Neumann on all outer boundaries.\n");
+    comm.print("Usage: poisson-mixed --mesh [PATH_TO_MESH] --level [LVL_MAX LVL_MED LVL_MIN] --bc [BC].\n");
+    comm.print("Only LVL_MAX is mandatory.");
+    comm.print("--bc needs either 'dirichlet' or 'neumann'");
+  }
+
   template
   <
     typename MatrixA_,
@@ -265,8 +274,13 @@ namespace PoissonMixed
 
     const Index num_levels = domain.size_physical();
 
-    if(args.check("neumann") >= 0)
+    String bc_name;
+    args.parse("bc", bc_name);
+
+    bool essential_bcs(false);
+    if(bc_name == "neumann")
     {
+      essential_bcs = true;
       // create system levels
       for (Index i(0); i < num_levels; ++i)
       {
@@ -274,13 +288,17 @@ namespace PoissonMixed
         system_levels.push_back(std::make_shared<SystemLevelType>(neumann_list));
       }
     }
-    else
+    else if(bc_name == "dirichlet")
     {
       // create system levels
       for (Index i(0); i < num_levels; ++i)
       {
         system_levels.push_back(std::make_shared<SystemLevelType>());
       }
+    }
+    else
+    {
+        throw InternalError(__func__, __FILE__, __LINE__, "--bc supports only 'dirichlet' or 'neumann', but got "+bc_name);
     }
 
     Cubature::DynamicFactory cubature("auto-degree:7");
@@ -326,7 +344,7 @@ namespace PoissonMixed
 
     /* ***************************************************************************************** */
 
-    if (args.check("neumann") >= 0)
+    if (essential_bcs)
     {
       comm.print("Assembling system filters...");
 
@@ -611,6 +629,7 @@ namespace PoissonMixed
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
+      comm.print("Writing "+vtk_name);
       exporter.write(vtk_name, comm);
     }
 
@@ -646,26 +665,37 @@ namespace PoissonMixed
     // Add the DomainControl's supported arguments
     Control::Domain::add_supported_pdc_args(args);
     // check command line arguments
-    args.support("level");
-    args.support("neumann");
-    args.support("no-err");
-    args.support("vtk");
-    args.support("statistics");
-    args.support("mesh");
-    args.support("test-iter");
+    args.support("help", "Displays the help text");
+    args.support("bc", " [BC] specifies the homogeneous boundary conditions, either 'dirichlet' or 'neumann'.");
+    args.support("level", " [LVL_MAX LVL_MED LVL_MIN] specifies the maximum, intermediate and minimum levels.");
+    args.support("mesh", " [PATH_TO_MESH] specifies the mesh to use.");
+    args.support("no-err", "Skip the computation of L2/H1 errors vs. the analytical solution.");
+    args.support("statistics", "Display execution time and memory statistics.");
+    args.support("test-iter", "  [ITER]: Run as a test and FAIL |solver_iterations - ITER| > 2.");
+    args.support("vtk", "Write solution and rhs to vtk.");
+
+    if(args.check("help") >= 0)
+    {
+      PoissonMixed::display_help(comm);
+      comm.print(std::cerr, "Supported Options are:");
+      comm.print(std::cerr, args.get_supported_help());
+      // abort
+      FEAT::Runtime::abort();
+    }
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
     if (!unsupported.empty())
     {
-      // print all unsupported options to cerr
-      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      {
-        comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
-      }
+      PoissonMixed::display_help(comm);
 
       comm.print(std::cerr, "Supported Options are:");
       comm.print(std::cerr, args.get_supported_help());
+      // print all unsupported options to cerr
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+      {
+        comm.print(std::cerr, "\nERROR: unknown option '--" + (*it).second + "'");
+      }
 
       // abort
       FEAT::Runtime::abort();
@@ -673,12 +703,20 @@ namespace PoissonMixed
 
     if(args.check("mesh") < 1)
     {
-      comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
+      comm.print(std::cerr, "ERROR: Mandatory option '--mesh [PATH_TO_MESH]' is missing!");
+      display_help(comm);
       FEAT::Runtime::abort();
     }
     if(args.check("level") < 1)
     {
-      comm.print(std::cerr, "ERROR: Mandatory option '--level <levels>' is missing!");
+      comm.print(std::cerr, "ERROR: Mandatory option '--level [LVL_MAX LVL_MED LVL_MIN]' is missing!");
+      display_help(comm);
+      FEAT::Runtime::abort();
+    }
+    if(args.check("bc") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--bc [BC]' is missing!");
+      display_help(comm);
       FEAT::Runtime::abort();
     }
 
@@ -721,6 +759,7 @@ namespace PoissonMixed
     // print elapsed runtime
     comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
+
 
 } // namespace PoissonMixed
 
