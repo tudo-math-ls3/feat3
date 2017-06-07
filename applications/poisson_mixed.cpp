@@ -7,19 +7,14 @@
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
-//#include <kernel/assembly/trace_assembler.hpp>
-//#include <kernel/solver/bicgstab.hpp>
-//#include <kernel/solver/fgmres.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/global/symmetric_lumped_schur_matrix.hpp>
 #include <kernel/lafem/filter_sequence.hpp>
-//#include <kernel/solver/legacy_preconditioners.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/pcg.hpp>
-//#include <kernel/solver/precon_wrapper.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/space/cro_rav_ran_tur/element.hpp>
@@ -38,7 +33,7 @@
 #include <control/poisson_mixed.hpp>
 #include <control/statistics.hpp>
 
-namespace PoissonMixed2D
+namespace PoissonMixed
 {
   using namespace FEAT;
 
@@ -248,20 +243,20 @@ namespace PoissonMixed2D
     typedef double DataType;
     typedef Index IndexType;
 
-    static constexpr int dim = 2;
-
-    // choose our desired analytical solution
-    // This has homogeneous Dirichlet BCs
-    //Analytic::Common::ExpBubbleFunction<dim> sol_func;
-    // This has homogeneous Neumann BCs
-    Analytic::Common::CosineWaveFunction<dim> sol_func;
-
     // define our domain type
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
 
     // fetch our mesh type
     typedef typename DomainControlType::MeshType MeshType;
+
+    static constexpr int dim = MeshType::world_dim;
+
+    // choose our desired analytical solution
+    // This has homogeneous Dirichlet BCs
+    //Analytic::Common::ExpBubbleFunction<dim> sol_func;
+    // This has homogeneous Neumann BCs
+    Analytic::Common::CosineWaveFunction<dim> sol_func;
 
     // define our system level
     typedef Control::PoissonMixedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
@@ -360,6 +355,8 @@ namespace PoissonMixed2D
         system_levels.at(i)->compile_system_filter();
         // After assembling to local filters, we need to call this to synchronise e.g. the slip filters
         system_levels.at(i)->assemble_global_filters();
+        // Compile the system matrix
+        system_levels.at(i)->compile_system_matrix();
 
       }
     }
@@ -596,7 +593,8 @@ namespace PoissonMixed2D
     if (args.check("vtk") >= 0)
     {
       // build VTK name
-      String vtk_name = String("./poisson-dirichlet-2d");
+      String vtk_name = String("./poisson-mixed");
+      vtk_name += "-"+stringify(dim)+"d";
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(comm.size());
 
@@ -685,7 +683,8 @@ namespace PoissonMixed2D
     }
 
     // define our mesh type
-    typedef Shape::Hypercube<2> ShapeType;
+    static constexpr int dim = 2;
+    typedef Shape::Hypercube<dim> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> AuxSpace;
@@ -723,14 +722,14 @@ namespace PoissonMixed2D
     comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 
-} // namespace PoissonMixed2D
+} // namespace PoissonMixed
 
 int main(int argc, char* argv [])
 {
   // initialise
   FEAT::Runtime::initialise(argc, argv);
 
-  PoissonMixed2D::main(argc, argv);
+  PoissonMixed::main(argc, argv);
   // okay
   return FEAT::Runtime::finalise();
 }
