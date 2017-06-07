@@ -1,8 +1,8 @@
 //
-// The 2D Nonsteady Navier-Stokes CP-Q2/Q1 Toy-Code Solver (TM)
+// The 2D Nonsteady Navier-Stokes CP-Q2/P1dc Toy-Code Solver (TM)
 // ------------------------------------------------------------
 // This application implements a "simple" parallel non-steady Navier-Stokes solver using
-// the "CP" approach with Q2/Q1 space and Crank-Nicolson time discretisation.
+// the "CP" approach with Q2/P1dc space and Crank-Nicolson time discretisation.
 //
 // ---------------
 // !!! WARNING !!!
@@ -190,13 +190,15 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
-#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/burgers_assembler.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
 #include <kernel/assembly/discrete_evaluator.hpp>
+#include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/global/symmetric_lumped_schur_matrix.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/bicgstab.hpp>
@@ -272,6 +274,9 @@ namespace NavierStokesCP2D
 
     // names of noflow mesh-parts
     std::deque<String> part_names_no;
+
+    /// compute "flow-around-a-cylinder" benchmark quantities?
+    bool flowbench_c2d;
 
     // -------------------------------
 
@@ -354,6 +359,7 @@ namespace NavierStokesCP2D
       level_min(0),
       level_max(0),
       vtk_step(0),
+      flowbench_c2d(false),
       deformation(false),
       nu(1.0),
       ix0(0.0),
@@ -368,11 +374,11 @@ namespace NavierStokesCP2D
       dpm_steps(1),
       multigrid_a(false),
       multigrid_s(false),
-      max_iter_a(25),
+      max_iter_a(50),
       tol_rel_a(1E-5),
       smooth_steps_a(4),
       smooth_damp_a(0.5),
-      max_iter_s(50),
+      max_iter_s(100),
       tol_rel_s(1E-5),
       smooth_steps_s(4),
       smooth_damp_s(0.5),
@@ -403,12 +409,12 @@ namespace NavierStokesCP2D
           setup_fb_c2d_03();
         else
         {
-          Dist::Comm comm = Dist::Comm::world();
-          comm.print(std::cerr, "ERROR: unknown setup '" + s + "'");
+          std::cerr << "ERROR: unknown setup '" << s << "'" << std::endl;
           return false;
         }
       }
 
+      flowbench_c2d |= (args.check("flowbench") >= 0); // this may already be enabled by a setup above
       deformation = (args.check("deformation") >= 0);
       statistics = (args.check("statistics") >= 0);
       test_mode = (args.check("test-mode") >= 0);
@@ -459,6 +465,7 @@ namespace NavierStokesCP2D
       dump_line(comm, "Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
       dump_line(comm, "VTK-Name", vtk_name);
       dump_line(comm, "VTK-Step", vtk_step);
+      dump_line(comm, "Flow Benchmark", (flowbench_c2d ? "yes" : "no"));
       dump_line(comm, "Inflow-Parts", part_names_in);
       dump_line(comm, "Outflow-Parts", part_names_out);
       dump_line(comm, "Noflow-Parts", part_names_no);
@@ -476,14 +483,14 @@ namespace NavierStokesCP2D
       dump_line(comm, "A: Max-Iter", max_iter_a);
       dump_line(comm, "A: Tol-Rel", tol_rel_a);
       dump_line(comm, "A: Smooth Steps", smooth_steps_a);
-      dump_line(comm, "S: Solver", (multigrid_s ? "PCG-Multigrid" : "PCG-Jacobi"));
       dump_line(comm, "A: Smooth Damp", smooth_damp_a);
+      dump_line(comm, "S: Solver", (multigrid_s ? "PCG-Multigrid" : "PCG-Jacobi"));
       dump_line(comm, "S: Max-Iter", max_iter_s);
       dump_line(comm, "S: Tol-Rel", tol_rel_s);
       dump_line(comm, "S: Smooth Steps", smooth_steps_s);
       dump_line(comm, "S: Smooth Damp", smooth_damp_s);
       dump_line(comm, "Test Mode", (test_mode ? "yes" : "no"));
-      dump_line(comm, "Statistics", statistics);
+      dump_line(comm, "Statistics", (statistics ? "yes" : "no"));
     }
 
     // Setup: Poiseuille-Flow on unit-square
@@ -541,6 +548,7 @@ namespace NavierStokesCP2D
       iy1 = 0.41;
       vmax = 1.5;
       time_max = 3.0;
+      flowbench_c2d = true;
     }
 
     // Setup: flow around a cylinder (130 quads)
@@ -587,16 +595,19 @@ namespace NavierStokesCP2D
   template<typename DataType_>
   class BenchBodyForceAccumulator
   {
-  public:
+  private:
     const bool _defo;
     const DataType_ _nu;
     const DataType_ _v_max;
-    Tiny::Vector<DataType_, 2, 2> body_forces;
+
+  public:
+    DataType_ drag;
+    DataType_ lift;
 
     explicit BenchBodyForceAccumulator(bool defo, DataType_ nu, DataType_ v_max) :
-      _defo(defo), _nu(nu), _v_max(v_max)
+      _defo(defo), _nu(nu), _v_max(v_max),
+      drag(DataType_(0)), lift(DataType_(0))
     {
-      body_forces.format();
     }
 
     /// 2D variant
@@ -616,7 +627,7 @@ namespace NavierStokesCP2D
       const T_ nx = -ty;
       const T_ ny =  tx;
 
-      /// \todo adjust this to support the deformation tensor!!!
+      /// \todo adjust this to support the deformation tensor (?)
 
       Tiny::Matrix<T_, 2, 2, 2, 2> nt;
       nt(0,0) = tx * nx;
@@ -628,8 +639,8 @@ namespace NavierStokesCP2D
       const T_ dpf1 = _nu;
       const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(2.0/3.0)))); // = 2 / (rho * U^2 * D)
 
-      body_forces[0] += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      body_forces[1] += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
+      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
+      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
     }
 
     /// 3D variant
@@ -649,7 +660,7 @@ namespace NavierStokesCP2D
       const T_ nx = -ty;
       const T_ ny =  tx;
 
-      /// \todo adjust this to support the deformation tensor!!!
+      /// \todo adjust this to support the deformation tensor (?)
 
       Tiny::Matrix<T_, 3, 3, 3, 3> nt;
       nt.format();
@@ -662,19 +673,25 @@ namespace NavierStokesCP2D
       const T_ dpf1 = _nu;
       const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
 
-      body_forces[0] += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      body_forces[1] += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
+      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
+      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
     }
-  }; // class BenchBodyForceAccumulator<...,2>
+
+    void sync(const Dist::Comm& comm)
+    {
+      comm.allreduce(&drag, &drag, std::size_t(1), Dist::op_sum);
+      comm.allreduce(&lift, &lift, std::size_t(1), Dist::op_sum);
+    }
+  }; // class BenchBodyForceAccumulator<...>
 
   template<typename DataType_>
   class XFluxAccumulator
   {
   public:
-    DataType_ _flux_value;
+    DataType_ flux;
 
     XFluxAccumulator() :
-      _flux_value(0.0)
+      flux(DataType_(0))
     {
     }
 
@@ -687,7 +704,12 @@ namespace NavierStokesCP2D
       const Tiny::Matrix<T_, d_, d_, d_, d_>& /*grad_v*/,
       const T_ /*val_p*/)
     {
-      _flux_value += DataType_(omega * val_v[0]);
+      flux += DataType_(omega * val_v[0]);
+    }
+
+    void sync(const Dist::Comm& comm)
+    {
+      comm.allreduce(&flux, &flux, std::size_t(1), Dist::op_sum);
     }
   };
 
@@ -712,19 +734,28 @@ namespace NavierStokesCP2D
   public:
     typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
-    // define local filter types
-    typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> LocalPresUnitFilter;
+    typedef typename BaseClass::GlobalVeloVector GlobalVeloVector;
+    typedef typename BaseClass::GlobalMatrixBlockB GlobalMatrixBlockB;
+    typedef typename BaseClass::GlobalMatrixBlockD GlobalMatrixBlockD;
 
-    // define global filter types
-    typedef Global::Filter<LocalPresUnitFilter, typename BaseClass::PresMirror> GlobalPresUnitFilter;
+    // lumped velocity mass matrix
+    GlobalVeloVector lumped_mass_velo;
 
-    // (global) filters
-    GlobalPresUnitFilter filter_pres_unit;
+    typedef Global::SymmetricLumpedSchurMatrix
+    <
+      GlobalVeloVector,
+      typename BaseClass::GlobalMatrixBlockB,
+      typename BaseClass::GlobalMatrixBlockD,
+      typename BaseClass::GlobalVeloFilter
+    > GlobalSchurMatrix;
 
-    /// \brief Returns the total amount of bytes allocated.
-    std::size_t bytes() const
+    // schur matrix
+    GlobalSchurMatrix matrix_s;
+
+    NavierStokesBlockedSystemLevel() :
+      lumped_mass_velo(&this->gate_velo),
+      matrix_s(this->lumped_mass_velo, this->matrix_b, this->matrix_d, this->filter_velo)
     {
-      return this->filter_pres_unit.bytes() + BaseClass::bytes();
     }
   }; // class NavierStokesBlockedSystemLevel
 
@@ -763,23 +794,23 @@ namespace NavierStokesCP2D
     comm.allreduce(&cells_fine_local, &cells_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&cells_fine_local, &cells_fine_min, std::size_t(1), Dist::op_min);
 
-    Index dofs_coarse_local = (*system_levels.back()->matrix_a).columns() + (*system_levels.back()->matrix_s).columns();
+    Index dofs_coarse_local = system_levels.back()->matrix_a.local().columns() + system_levels.back()->matrix_b.local().columns();
     Index dofs_coarse_max;
     Index dofs_coarse_min;
     comm.allreduce(&dofs_coarse_local, &dofs_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&dofs_coarse_local, &dofs_coarse_min, std::size_t(1), Dist::op_min);
-    Index dofs_fine_local = (*system_levels.front()->matrix_a).columns() + (*system_levels.front()->matrix_s).columns();
+    Index dofs_fine_local = system_levels.front()->matrix_a.local().columns() + system_levels.front()->matrix_b.local().columns();
     Index dofs_fine_max;
     Index dofs_fine_min;
     comm.allreduce(&dofs_fine_local, &dofs_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&dofs_fine_local, &dofs_fine_min, std::size_t(1), Dist::op_min);
 
-    Index nzes_coarse_local = (*system_levels.back()->matrix_a).used_elements() + (*system_levels.back()->matrix_s).used_elements();
+    Index nzes_coarse_local = system_levels.back()->matrix_a.local().used_elements() + system_levels.back()->lumped_mass_velo.local().size();
     Index nzes_coarse_max;
     Index nzes_coarse_min;
     comm.allreduce(&nzes_coarse_local, &nzes_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&nzes_coarse_local, &nzes_coarse_min, std::size_t(1), Dist::op_min);
-    Index nzes_fine_local = (*system_levels.front()->matrix_a).used_elements() + (*system_levels.front()->matrix_s).used_elements();
+    Index nzes_fine_local = system_levels.front()->matrix_a.local().used_elements() + system_levels.back()->lumped_mass_velo.local().size();
     Index nzes_fine_max;
     Index nzes_fine_min;
     comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
@@ -848,6 +879,9 @@ namespace NavierStokesCP2D
 
     Cubature::DynamicFactory cubature("auto-degree:7");
 
+    // compute time-step size
+    const DataType delta_t = cfg.time_max / DataType(cfg.time_steps);
+
     /* ***************************************************************************************** */
 
     comm.print("");
@@ -871,17 +905,25 @@ namespace NavierStokesCP2D
     {
       // assemble velocity matrix structure
       system_levels.at(i)->assemble_velo_struct(domain.at(i)->space_velo);
-      // assemble pressure matrix structure
-      system_levels.at(i)->assemble_pres_struct(domain.at(i)->space_pres);
-      // assemble pressure laplace matrix
-      system_levels.at(i)->matrix_s.local().format();
-      Assembly::Common::LaplaceOperator laplace_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(system_levels.at(i)->matrix_s.local(),
-        laplace_op, domain.at(i)->space_pres, cubature);
-    }
+      // assemble B/D matrices
+      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
 
-    // assemble B/D matrices on finest level
-    system_levels.front()->assemble_grad_div_matrices(domain.front()->space_velo, domain.front()->space_pres, cubature);
+      // assemble lumped velocity mass matrix
+      {
+        Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_mat;
+        burgers_mat.theta = DataType(1);
+
+        auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
+        auto loc_vec_v = loc_mat_a.create_vector_l();
+        loc_vec_v.format();
+        loc_mat_a.format();
+        burgers_mat.assemble_matrix(loc_mat_a, loc_vec_v, domain.at(i)->space_velo, cubature);
+
+        system_levels.at(i)->lumped_mass_velo = system_levels.at(i)->matrix_a.lump_rows();
+
+        system_levels.at(i)->matrix_s.update_lumped_a(system_levels.at(i)->lumped_mass_velo);
+      }
+    }
 
     /* ***************************************************************************************** */
 
@@ -894,10 +936,9 @@ namespace NavierStokesCP2D
     {
       // get our local system filters
       typename SystemLevelType::LocalVeloFilter& fil_loc_v = system_levels.at(i)->filter_velo.local();
-      typename SystemLevelType::LocalPresUnitFilter& fil_loc_p = system_levels.at(i)->filter_pres_unit.local();
 
       // create unit-filter assemblers
-      Assembly::UnitFilterAssembler<MeshType> unit_asm_noflow, unit_asm_inflow, unit_asm_outflow;
+      Assembly::UnitFilterAssembler<MeshType> unit_asm_noflow, unit_asm_inflow;
 
       // loop over all inflow boundary parts
       for(const auto& name : cfg.part_names_in)
@@ -918,18 +959,6 @@ namespace NavierStokesCP2D
         unit_asm_inflow.add_mesh_part(*mesh_part);
       }
 
-      // loop over all inflow boundary parts
-      for(const auto& name : cfg.part_names_out)
-      {
-        // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
-        XASSERT(mesh_part_node != nullptr);
-        auto* mesh_part = mesh_part_node->get_mesh();
-        if(mesh_part == nullptr)
-          continue;
-        unit_asm_outflow.add_mesh_part(*mesh_part);
-      }
-
       // loop over all noflow boundary parts
       for(const auto& name : cfg.part_names_no)
       {
@@ -947,9 +976,6 @@ namespace NavierStokesCP2D
 
       // assemble inflow BC
       unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow);
-
-      // assemble the pressure filter
-      unit_asm_outflow.assemble(fil_loc_p, domain.at(i)->space_pres);
     }
 
     /* ***************************************************************************************** */
@@ -970,48 +996,34 @@ namespace NavierStokesCP2D
 
     // get out fine-level filters
     typename SystemLevelType::GlobalVeloFilter& filter_v = the_system_level.filter_velo;
-    typename SystemLevelType::GlobalPresUnitFilter& filter_p = the_system_level.filter_pres_unit;
+    typename SystemLevelType::GlobalPresFilter& filter_p = the_system_level.filter_pres;
 
     /* ***************************************************************************************** */
 
-    // set up body forces assembler
+    // set up body forces and flux assemblers
     Assembly::TraceAssembler<TrafoType> body_force_asm(the_domain_level.trafo);
-
-    {
-      auto* mesh_part = the_domain_level.get_mesh_node()->find_mesh_part("bnd:c");
-      if(mesh_part != nullptr)
-      {
-        body_force_asm.add_mesh_part(*mesh_part);
-      }
-    }
-
-    body_force_asm.compile_facets();
-
-    // set up flux assemblers
     Assembly::TraceAssembler<TrafoType> flux_u_asm(the_domain_level.trafo);
     Assembly::TraceAssembler<TrafoType> flux_l_asm(the_domain_level.trafo);
-
-    {
-      auto* mesh_part = the_domain_level.get_mesh_node()->find_mesh_part("inner:u");
-      if(mesh_part != nullptr)
-      {
-        flux_u_asm.add_mesh_part(*mesh_part);
-      }
-    }
-    {
-      auto* mesh_part = the_domain_level.get_mesh_node()->find_mesh_part("inner:l");
-      if(mesh_part != nullptr)
-      {
-        flux_l_asm.add_mesh_part(*mesh_part);
-      }
-    }
-
-    flux_u_asm.compile_facets(false);
-    flux_l_asm.compile_facets(false);
-
-    // set up inverse trafo mapping
     Trafo::InverseMappingData<DataType, dim> point_pa, point_pe;
+
+    // set up post-processing for flow benchmark?
+    if(cfg.flowbench_c2d)
     {
+      auto* mesh_part_c = the_domain_level.get_mesh_node()->find_mesh_part("bnd:c");
+      auto* mesh_part_u = the_domain_level.get_mesh_node()->find_mesh_part("inner:u");
+      auto* mesh_part_l = the_domain_level.get_mesh_node()->find_mesh_part("inner:l");
+      if(mesh_part_c != nullptr)
+        body_force_asm.add_mesh_part(*mesh_part_c);
+      if(mesh_part_u != nullptr)
+        flux_u_asm.add_mesh_part(*mesh_part_u);
+      if(mesh_part_l != nullptr)
+        flux_l_asm.add_mesh_part(*mesh_part_l);
+
+      body_force_asm.compile_facets(true);
+      flux_u_asm.compile_facets(false);
+      flux_l_asm.compile_facets(false);
+
+      // set up inverse trafo mapping
       typedef Trafo::InverseMapping<TrafoType, DataType> InvMappingType;
       InvMappingType inv_mapping(the_domain_level.trafo);
 
@@ -1040,7 +1052,7 @@ namespace NavierStokesCP2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    comm.print("Setting up Velocity Multigrid...");
+    comm.print("Setting up Velocity Burgers Solver...");
 
     // create a multigrid solver for the velocity
     auto multigrid_hierarchy_velo = std::make_shared<Solver::MultiGridHierarchy<
@@ -1081,12 +1093,12 @@ namespace NavierStokesCP2D
 
     /* ***************************************************************************************** */
 
-    comm.print("Setting up Pressure Multigrid...");
+    comm.print("Setting up Pressure Laplace Solver...");
 
     // create another multigrid solver for the pressure
     auto multigrid_hierarchy_pres = std::make_shared<Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalSchurMatrix,
-      typename SystemLevelType::GlobalPresUnitFilter,
+      typename SystemLevelType::GlobalPresFilter,
       typename SystemLevelType::GlobalPresTransfer
       >>(domain.size_virtual());
 
@@ -1100,21 +1112,21 @@ namespace NavierStokesCP2D
         if((i+1) < domain.size_virtual())
         {
           // smoother
-          auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-          auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+          auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres);
+          auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres, cfg.smooth_damp_s, jac);
           smoother->set_max_iter(cfg.smooth_steps_s);
           smoother->set_min_iter(cfg.smooth_steps_s);
-          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, lvl.transfer_pres,
+          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, lvl.transfer_pres,
             smoother, smoother, smoother);
         }
         else
         {
           // coarse grid solver
-          auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres_unit);
-          auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres_unit, cfg.smooth_damp_s, jac);
+          auto jac = Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres);
+          auto cgs = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres, cfg.smooth_damp_s, jac);
           cgs->set_max_iter(cfg.smooth_steps_s);
           cgs->set_min_iter(cfg.smooth_steps_s);
-          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres_unit, cgs);
+          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, cgs);
         }
       }
     }
@@ -1223,20 +1235,20 @@ namespace NavierStokesCP2D
       head += String("Def-P").pad_back(nf) + "   ";
       head += String("IT-A").pad_front(4) + " ";
       head += String("IT-S").pad_front(4) + "   ";
-      head += String("Runtime     | ");
-      head += String("Drag       ");
-      head += String("Lift       ");
-      head += String("P-Diff     ");
-      head += String("U-Flux     ");
-      head += String("L-Flux     ");
+      if(cfg.flowbench_c2d)
+      {
+        head += String("Drag       ");
+        head += String("Lift       ");
+        head += String("P-Diff     ");
+        head += String("U-Flux     ");
+        head += String("L-Flux       ");
+      }
+      head += String("Runtime    ");
       comm.print(head);
       comm.print(String(head.size(), '-'));
     }
 
     watch_total.start();
-
-    // compute time-step size
-    const DataType delta_t = cfg.time_max / DataType(cfg.time_steps);
 
     // keep track whether something failed miserably...
     bool failure = false;
@@ -1437,8 +1449,7 @@ namespace NavierStokesCP2D
           line += stringify_fp_sci(def_nl2_p, 3);
           line += " | ";
           line += stringify(iter_v).pad_front(4) + " ";
-          line += stringify(iter_p).pad_front(4) + " | ";
-          line += stamp_start.elapsed_string_now();
+          line += stringify(iter_p).pad_front(4);
           std::cout << line;// << std::endl;
         }
       } // non-linear loop
@@ -1447,86 +1458,94 @@ namespace NavierStokesCP2D
       if(failure)
         break;
 
-      // body forces, pressure difference and flux values
-      DataType c_drag = DataType(0);
-      DataType c_lift = DataType(0);
-      DataType p_diff = DataType(0);
-      DataType u_flux = DataType(0);
-      DataType l_flux = DataType(0);
-
-      // assemble drag and lift forces
+      if(cfg.flowbench_c2d)
       {
-        BenchBodyForceAccumulator<DataType> body_force_accum(false, cfg.nu, cfg.vmax);
-        body_force_asm.assemble_flow_accum(
-          body_force_accum,
-          vec_sol_v.local(),
-          vec_sol_p.local(),
-          the_domain_level.space_velo,
-          the_domain_level.space_pres,
-          cubature);
+        // body forces, pressure difference and flux values
+        DataType c_drag = DataType(0);
+        DataType c_lift = DataType(0);
+        DataType p_diff = DataType(0);
+        DataType u_flux = DataType(0);
+        DataType l_flux = DataType(0);
 
-        comm.allreduce(&body_force_accum.body_forces.v[0], &c_drag, 1, Dist::op_sum);
-        comm.allreduce(&body_force_accum.body_forces.v[1], &c_lift, 1, Dist::op_sum);
+        // assemble drag and lift forces
+        {
+          BenchBodyForceAccumulator<DataType> body_force_accum(false, cfg.nu, cfg.vmax);
+          body_force_asm.assemble_flow_accum(
+            body_force_accum,
+            vec_sol_v.local(),
+            vec_sol_p.local(),
+            the_domain_level.space_velo,
+            the_domain_level.space_pres,
+            cubature);
+          body_force_accum.sync(comm);
+          c_drag = body_force_accum.drag;
+          c_lift = body_force_accum.lift;
+        }
+
+        // compute pressure values and difference
+        {
+          // evaluate pressure
+          auto pval_a = Assembly::DiscreteEvaluator::eval_fe_function(
+            point_pa, vec_sol_p.local(), the_domain_level.space_pres);
+          auto pval_e = Assembly::DiscreteEvaluator::eval_fe_function(
+            point_pe, vec_sol_p.local(), the_domain_level.space_pres);
+
+          // compute pressure mean
+          const auto p_a = pval_a.mean_value_dist(comm);
+          const auto p_e = pval_e.mean_value_dist(comm);
+          p_diff = p_a - p_e;
+        }
+
+        // assemble upper flux
+        {
+          XFluxAccumulator<DataType> flux_accum;
+          flux_u_asm.assemble_flow_accum(
+            flux_accum,
+            vec_sol_v.local(),
+            vec_sol_p.local(),
+            the_domain_level.space_velo,
+            the_domain_level.space_pres,
+            cubature);
+
+          flux_accum.sync(comm);
+          u_flux = flux_accum.flux / DataType(2);
+        }
+
+        // assemble lower flux
+        {
+          XFluxAccumulator<DataType> flux_accum;
+          flux_l_asm.assemble_flow_accum(
+            flux_accum,
+            vec_sol_v.local(),
+            vec_sol_p.local(),
+            the_domain_level.space_velo,
+            the_domain_level.space_pres,
+            cubature);
+
+          flux_accum.sync(comm);
+          l_flux = flux_accum.flux / DataType(2);
+        }
+
+        // console output, part 3
+        if(rank == 0)
+        {
+          String line;
+          line += " | ";
+          line += stringify_fp_fix(c_drag, 7).trunc_back(10u).pad_front(10u) + " ";
+          line += stringify_fp_fix(c_lift, 7).trunc_back(10u).pad_front(10u) + " ";
+          line += stringify_fp_fix(p_diff, 7).trunc_back(10u).pad_front(10u) + " ";
+          line += stringify_fp_fix(u_flux, 7).trunc_back(10u).pad_front(10u) + " ";
+          line += stringify_fp_fix(l_flux, 7).trunc_back(10u).pad_front(10u);
+          std::cout << line;
+        }
       }
 
-      // compute pressure values and difference
-      {
-        // evaluate pressure
-        auto pval_a = Assembly::DiscreteEvaluator::eval_fe_function(
-          point_pa, vec_sol_p.local(), the_domain_level.space_pres);
-        auto pval_e = Assembly::DiscreteEvaluator::eval_fe_function(
-          point_pe, vec_sol_p.local(), the_domain_level.space_pres);
-
-        // compute pressure mean
-        const auto p_a = pval_a.mean_value_dist(comm);
-        const auto p_e = pval_e.mean_value_dist(comm);
-        p_diff = p_a - p_e;
-      }
-
-      // assemble upper flux
-      {
-        XFluxAccumulator<DataType> flux_accum;
-        flux_u_asm.assemble_flow_accum(
-          flux_accum,
-          vec_sol_v.local(),
-          vec_sol_p.local(),
-          the_domain_level.space_velo,
-          the_domain_level.space_pres,
-          cubature);
-
-        comm.allreduce(&flux_accum._flux_value, &u_flux, 1, Dist::op_sum);
-        u_flux /= DataType(2);
-      }
-
-      // assemble lower flux
-      {
-        XFluxAccumulator<DataType> flux_accum;
-        flux_l_asm.assemble_flow_accum(
-          flux_accum,
-          vec_sol_v.local(),
-          vec_sol_p.local(),
-          the_domain_level.space_velo,
-          the_domain_level.space_pres,
-          cubature);
-
-        comm.allreduce(&flux_accum._flux_value, &l_flux, 1, Dist::op_sum);
-        l_flux /= DataType(2);
-      }
-
-
-      // console output, part 3
       if(rank == 0)
       {
-        String line;
-        line += " | ";
-        line += stringify_fp_fix(c_drag, 7).trunc_back(10u).pad_front(10u) + " ";
-        line += stringify_fp_fix(c_lift, 7).trunc_back(10u).pad_front(10u) + " ";
-        line += stringify_fp_fix(p_diff, 7).trunc_back(10u).pad_front(10u) + " ";
-        line += stringify_fp_fix(u_flux, 7).trunc_back(10u).pad_front(10u) + " ";
-        line += stringify_fp_fix(l_flux, 7).trunc_back(10u).pad_front(10u);
+        String line(" | ");
+        line += stamp_start.elapsed_string_now();
         std::cout << line << std::endl;
       }
-
 
       // VTK-Export
       if(!cfg.vtk_name.empty() && (cfg.vtk_step > 0) && (time_step % cfg.vtk_step == 0))
@@ -1538,7 +1557,14 @@ namespace NavierStokesCP2D
 
         // write solution
         vtk.add_vertex_vector("v", (*vec_sol_v));
-        vtk.add_vertex_scalar("p", (*vec_sol_p).elements());
+
+        // project pressure
+        Cubature::DynamicFactory cub("gauss-legendre:2");
+        LAFEM::DenseVector<Mem::Main, double, Index> vtx_p, vtx_der_p;
+        Assembly::DiscreteCellProjector::project(vtx_p, *vec_sol_p, the_domain_level.space_pres, cub);
+
+        // write pressure
+        vtk.add_cell_scalar("p", vtx_p.elements());
 
         // compute and write time-derivatives
         GlobalVeloVector vec_der_v = vec_sol_v.clone();
@@ -1547,9 +1573,10 @@ namespace NavierStokesCP2D
         vec_der_p.axpy(vec_sol_p_1, vec_der_p, -DataType(1));
         vec_der_v.scale(vec_der_v, DataType(1) / delta_t);
         vec_der_p.scale(vec_der_p, DataType(1) / delta_t);
+        Assembly::DiscreteCellProjector::project(vtx_der_p, *vec_der_p, the_domain_level.space_pres, cub);
 
         vtk.add_vertex_vector("v_dt", (*vec_der_v));
-        vtk.add_vertex_scalar("p_dt", (*vec_der_p).elements());
+        vtk.add_cell_scalar("p_dt", vtx_der_p.elements());
 
         // export
         vtk.write(vtk_path, comm);
@@ -1644,48 +1671,48 @@ namespace NavierStokesCP2D
       "fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)\n"
       "fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)\n"
     );
+    args.support("flowbench","\nEnables the computation of 'flow around a cylinder' post-processing\nquantities such as drag, lift, etc.\n");
     args.support("deformation", "\nUse deformation tensor instead of gradient tensor.\n");
     args.support("nu <nu>", "\nSets the viscosity parameter.\n");
     args.support("time-max", "<T_max>\nSets the maximum simulation time T_max.\n");
     args.support("time-steps", "<N>\nSets the number of time-steps for the time interval.\n");
     args.support("max-time-steps", "<N>\nSets the maximum number of time-steps to perform.\n");
-    args.support("part-in", "<names...>\nSpecifies the name of the inflow mesh-parts.\n");
-    args.support("part-out", "<names...>\nSpecifies the name of the outflow mesh-parts.\n");
-    args.support("part-no", "<names...>\nSpecifies the name of the noflow mesh-parts.\n");
+    args.support("part-in", "<names...>\nSpecifies the names of the inflow mesh-parts.\n");
+    args.support("part-out", "<names...>\nSpecifies the names of the outflow mesh-parts.\n");
+    args.support("part-no", "<names...>\nSpecifies the names of the noflow mesh-parts.\n");
     args.support("profile", "<x0> <y0> <x1> <y1>\nSpecifies the line segment coordinates for the inflow profile.\n");
     args.support("level", "<max> [<min>]\nSets the maximum and minimum mesh refinement levels.\n");
     args.support("vtk", "<name> [<step>]\nSets the name for VTK output and the time-stepping for the output (optional).\n");
-    args.support("rank-elems", "<n>\nSpecifies the minimum number of elements per rank.\nDefault: 4\n");
     args.support("mesh-file", "<name>\nSpecifies the filename of the input mesh file.\n");
     args.support("mesh-path", "<path>\nSpecifies the path of the directory containing the mesh file.\n");
     args.support("nl-steps", "<N>\nSets the number of non-linear iterations per time-step.\nDefault: 1\n");
     args.support("dpm-steps", "<N>\nSets the number of Discrete-Projection-Method steps per non-linear step.\nDefault: 1\n");
     args.support("no-multigrid-a", "\nUse BiCGStab-Jacobi instead of Multigrid as A-Solver.\n");
-    args.support("max-iter-a", "<N>\nSets the maximum number of allowed iterations for the A-Solver.\nDefault: 25\n");
+    args.support("max-iter-a", "<N>\nSets the maximum number of allowed iterations for the A-Solver.\nDefault: 50\n");
     args.support("tol-rel-a", "<eps>\nSets the relative tolerance for the A-Solver.\nDefault: 1E-5\n");
     args.support("smooth-a", "<N>\nSets the number of smoothing steps for the A-Solver.\nDefault: 4\n");
     args.support("damp-a", "<omega>\nSets the smoother damping parameter for the A-Solver.\nDefault: 0.5\n");
     args.support("no-multigrid-s", "\nUse PCG-Jacobi instead of Multigrid as S-Solver.\n");
-    args.support("max-iter-s", "<N>\nSets the maximum number of allowed iterations for the S-Solver.\nDefault: 50\n");
+    args.support("max-iter-s", "<N>\nSets the maximum number of allowed iterations for the S-Solver.\nDefault: 100\n");
     args.support("tol-rel-s", "<eps>\nSets the relative tolerance for the S-Solver.\nDefault: 1E-5\n");
     args.support("smooth-s", "<N>\nSets the number of smoothing steps for the S-Solver.\nDefault: 4\n");
     args.support("damp-s", "<omega>\nSets the smoother damping parameter for the S-Solver.\nDefault: 0.5\n");
-    args.support("statistics", "Enables general statistics output.\nAdditional parameter 'dump' enables complete statistics dump");
-    args.support("test-mode", "Runs the application in regression test mode.");
+    args.support("statistics", "[dump]\nEnables general statistics output.\nAdditional parameter 'dump' enables complete statistics dump.\n");
+    args.support("test-mode", "\nRuns the application in regression test mode.\n");
 
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))
     {
-      comm.print("\n2D Nonsteady Navier-Stokes CP-Q2/Q1 Toycode Solver (TM)\n");
+      comm.print("\n2D Nonsteady Navier-Stokes CP-Q2/P1dc Toycode Solver (TM)\n");
       comm.print("The easiest way to make this application do something useful is");
       comm.print("to load a pre-defined problem configuration by supplying the");
       comm.print("option '--setup <config>', where <config> may be one of:\n");
       comm.print("  square      Poiseuille-Flow on Unit-Square");
       comm.print("  nozzle      Jet-Flow through Nozzle domain");
-      comm.print("  fb_c2d_00   Nonsteady Flow Around A Cylinder (bench1 mesh)\n");
-      comm.print("  fb_c2d_01   Nonsteady Flow Around A Cylinder (32 quad mesh)\n");
-      comm.print("  fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)\n");
-      comm.print("  fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)\n");
+      comm.print("  fb_c2d_00   Nonsteady Flow Around A Cylinder (bench1 mesh)");
+      comm.print("  fb_c2d_01   Nonsteady Flow Around A Cylinder (32 quad mesh)");
+      comm.print("  fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)");
+      comm.print("  fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)");
       comm.print("This will pre-configure this application to solve one of the");
       comm.print("above problems. Note that you can further adjust the configuration");
       comm.print("by specifying additional options to override the default problem");
@@ -1722,7 +1749,7 @@ namespace NavierStokesCP2D
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
-    typedef Space::Lagrange1::Element<TrafoType> SpacePresType;
+    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
     // parse our configuration
     Config cfg;
