@@ -127,15 +127,15 @@ namespace FEAT
       void update_lumped_a(const LumpedMatrixA& lumped_matrix_a_)
       {
         // If these were initialised empty (as it frequently happens with Global containers), adjust the sizes
-        if(_vec_ml.local.size() == Index(0))
+        if(_vec_ml.local().size() == Index(0))
         {
           _vec_ml.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
         }
-        if(_vec_mr.local.size() == Index(0))
+        if(_vec_mr.local().size() == Index(0))
         {
           _vec_mr.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
         }
-        if(inv_lumped_matrix_a.local.size() == Index(0))
+        if(inv_lumped_matrix_a.local().size() == Index(0))
         {
           inv_lumped_matrix_a.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
         }
