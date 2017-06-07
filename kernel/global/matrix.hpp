@@ -221,6 +221,49 @@ namespace FEAT
         r.sync_0_async();
       }
 
+      /**
+       * \brief Computes the lumped rows vector
+       *
+       * \param[out] lump
+       * The vector receiving the lumped rows
+       *
+       * \param[in] sync
+       * Synchronise the lumped rows vector?
+       *
+       * Each entry in the returned lumped rows vector contains the the sum of all matrix elements in the
+       * corresponding row.
+       *
+       */
+      void lump_rows(VectorTypeL& lump, bool sync = true) const
+      {
+        XASSERTM(lump.local().size() == _matrix.rows(), "lump vector size does not match matrix row count!");
+
+        _matrix.lump_rows(lump.local());
+
+        if(sync)
+        {
+          lump.sync_0();
+        }
+      }
+
+      /**
+       * \brief Returns the lumped rows vector
+       *
+       * Each entry in the returned lumped rows vector contains the the sum of all matrix elements in the
+       * corresponding row.
+       *
+       * \returns
+       * The lumped vector.
+       */
+      VectorTypeL lump_rows(bool sync = true) const
+      {
+        VectorTypeL lump = create_vector_l();
+
+        lump_rows(lump, sync);
+
+        return lump;
+      }
+
       LocalMatrix convert_to_1() const
       {
         LocalMatrix locmat = _matrix.clone(LAFEM::CloneMode::Weak);
