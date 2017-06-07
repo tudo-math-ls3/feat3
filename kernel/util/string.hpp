@@ -374,7 +374,7 @@ namespace FEAT
      * This function returns a string that is front-padded with a specific character up to a desired minimum length.
      * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
      *
-     * \note This function is virtually the counter-part of #trim_front().
+     * \note This function is virtually the counter-part of #trim_front() and #trunc_front().
      *
      * \param[in] len
      * The desired (minimum) length of the string.
@@ -397,7 +397,7 @@ namespace FEAT
      * This function returns a string that is back-padded with a specific character up to a desired minimum length.
      * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
      *
-     * \note This function is virtually the counter-part of #trim_back().
+     * \note This function is virtually the counter-part of #trim_back() and #trunc_back().
      *
      * \param[in] len
      * The desired (minimum) length of the string.
@@ -412,6 +412,34 @@ namespace FEAT
     {
       size_type l(length());
       return (l < len) ? String(*this).append(len - l, c) : *this;
+    }
+
+    /**
+     * \brief Truncates the front of the string to a given maximum length.
+     *
+     * \param[in] len
+     * The desired maximum length of the string.
+     *
+     * \returns
+     * The truncated string.
+     */
+    String trunc_front(size_type len) const
+    {
+      return length() <= len ? *this : substr(length() - len);
+    }
+
+    /**
+     * \brief Truncates the back of the string to a given maximum length.
+     *
+     * \param[in] len
+     * The desired maximum length of the string.
+     *
+     * \returns
+     * The truncated string.
+     */
+    String trunc_back(size_type len) const
+    {
+      return length() <= len ? *this : substr(size_type(0), len);
     }
 
     /**

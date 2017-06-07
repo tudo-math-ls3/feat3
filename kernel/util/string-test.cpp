@@ -74,6 +74,12 @@ public:
     TEST_CHECK_EQUAL(String("abcde").ends_with('x'), false);
     TEST_CHECK_EQUAL(String("").ends_with('x'), false);
 
+    // test trunc
+    TEST_CHECK_EQUAL(String("abcde").trunc_front(7u), "abcde");
+    TEST_CHECK_EQUAL(String("abcde").trunc_front(3u), "cde");
+    TEST_CHECK_EQUAL(String("abcde").trunc_back(7u), "abcde");
+    TEST_CHECK_EQUAL(String("abcde").trunc_back(3u), "abc");
+
     // test bool stringify/parse
     TEST_CHECK(stringify(b = true).parse(b));
     TEST_CHECK(b == true);
