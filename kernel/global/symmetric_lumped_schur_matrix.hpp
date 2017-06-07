@@ -1,13 +1,13 @@
 #pragma once
-#ifndef KERNEL_LAFEM_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP
-#define KERNEL_LAFEM_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP 1
+#ifndef KERNEL_Global_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP
+#define KERNEL_Global_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 
 namespace FEAT
 {
-  namespace LAFEM
+  namespace Global
   {
 
   /**
@@ -69,7 +69,7 @@ namespace FEAT
       typedef LumpedMatrixA VectorTypeMR;
 
       /// A = diag(a)
-      LumpedMatrixA lumped_matrix_a;
+      LumpedMatrixA inv_lumped_matrix_a;
       /// B
       const MatrixB& matrix_b;
       /// D = B^T
@@ -104,7 +104,7 @@ namespace FEAT
       const MatrixB& matrix_b_,
       const MatrixD& matrix_d_,
       const FilterA& filter_a_) :
-        lumped_matrix_a(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
+        inv_lumped_matrix_a(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
         matrix_b(matrix_b_),
         matrix_d(matrix_d_),
         filter_a(filter_a_),
@@ -114,7 +114,7 @@ namespace FEAT
           ASSERT(matrix_d.columns() == matrix_b.rows());
           ASSERT(matrix_d.used_elements() == matrix_b.used_elements());
 
-          lumped_matrix_a.component_invert(lumped_matrix_a_);
+          inv_lumped_matrix_a.component_invert(lumped_matrix_a_);
         }
 
       /**
@@ -122,6 +122,26 @@ namespace FEAT
        */
       virtual ~SymmetricLumpedSchurMatrix()
       {
+      }
+
+      void update_lumped_a(const LumpedMatrixA& lumped_matrix_a_)
+      {
+        // If these were initialised empty (as it frequently happens with Global containers), adjust the sizes
+        if(_vec_ml.local.size() == Index(0))
+        {
+          _vec_ml.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
+        }
+        if(_vec_mr.local.size() == Index(0))
+        {
+          _vec_mr.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
+        }
+        if(inv_lumped_matrix_a.local.size() == Index(0))
+        {
+          inv_lumped_matrix_a.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
+        }
+
+        inv_lumped_matrix_a.component_invert(lumped_matrix_a_);
+
       }
 
       /**
@@ -134,7 +154,7 @@ namespace FEAT
        */
       SymmetricLumpedSchurMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return SymmetricSchurMatrix(lumped_matrix_a.clone(mode), matrix_b.clone(mode), matrix_d.clone(mode),
+        return SymmetricSchurMatrix(inv_lumped_matrix_a.clone(mode), matrix_b.clone(mode), matrix_d.clone(mode),
         filter_a.clone(mode));
       }
 
@@ -193,7 +213,7 @@ namespace FEAT
        */
       Index used_elements() const
       {
-        return lumped_matrix_a.used_elements() + matrix_b.used_elements() + matrix_d.used_elements();
+        return inv_lumped_matrix_a.used_elements() + matrix_b.used_elements() + matrix_d.used_elements();
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -218,17 +238,18 @@ namespace FEAT
        */
       void extract_diag(VectorTypeL& diag, bool sync=true) const
       {
+        // If we have a gate and it contains neighbours, we have to do it the complicated way
         if(diag.get_gate() != nullptr && !diag.get_gate()->_ranks.empty() )
         {
           diag.format();
 
           typename MatrixB::LocalMatrix matrix_b1(matrix_b.convert_to_1());
 
-          matrix_b1.add_trace_double_mat_mult(diag.local(), matrix_d.local(), lumped_matrix_a.local(), DataType(1));
+          matrix_b1.add_trace_double_mat_mult(diag.local(), matrix_d.local(), inv_lumped_matrix_a.local(), DataType(1));
         }
         else
         {
-          matrix_d.local().row_norm2sqr(diag.local(), lumped_matrix_a.local());
+          matrix_d.local().row_norm2sqr(diag.local(), inv_lumped_matrix_a.local());
         }
 
         if(sync)
@@ -252,7 +273,7 @@ namespace FEAT
         matrix_b.apply(_vec_mr, x);
 
         filter_a.filter_def(_vec_mr);
-        _vec_ml.component_product(_vec_mr, lumped_matrix_a);
+        _vec_ml.component_product(_vec_mr, inv_lumped_matrix_a);
         filter_a.filter_cor(_vec_ml);
 
         matrix_d.apply(r, _vec_ml);
@@ -271,7 +292,7 @@ namespace FEAT
       {
         _vec_mr.copy(x);
         filter_a.filter_def(_vec_mr);
-        _vec_ml.component_product(_vec_mr, lumped_matrix_a);
+        _vec_ml.component_product(_vec_mr, inv_lumped_matrix_a);
         filter_a.filter_cor(_vec_ml);
 
         matrix_d.apply(r, _vec_ml);
@@ -298,7 +319,7 @@ namespace FEAT
         matrix_b.apply(_vec_mr, x);
 
         filter_a.filter_def(_vec_mr);
-        _vec_ml.component_product(_vec_mr, lumped_matrix_a);
+        _vec_ml.component_product(_vec_mr, inv_lumped_matrix_a);
         filter_a.filter_cor(_vec_ml);
 
         matrix_d.apply(r, _vec_ml, y, alpha);
@@ -313,7 +334,7 @@ namespace FEAT
       //}
 
   };
-  } // namespace LAFEM
+  } // namespace Global
 } // namespace FEAT
 
-#endif // KERNEL_LAFEM_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP
+#endif // KERNEL_Global_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP

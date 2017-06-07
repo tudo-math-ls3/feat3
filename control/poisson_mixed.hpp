@@ -14,7 +14,6 @@
 #include <kernel/lafem/filter_sequence.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/slip_filter.hpp>
-#include <kernel/lafem/symmetric_lumped_schur_matrix.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
 #include <kernel/lafem/tuple_mirror.hpp>
 #include <kernel/lafem/tuple_diag_matrix.hpp>
@@ -33,6 +32,7 @@
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
+#include <kernel/global/symmetric_lumped_schur_matrix.hpp>
 #include <kernel/global/transfer.hpp>
 
 namespace FEAT
@@ -122,13 +122,6 @@ namespace FEAT
         typedef Global::Matrix<LocalMatrixBlockA, VeloMirror, VeloMirror> GlobalMatrixBlockA;
         typedef Global::Matrix<LocalMatrixBlockB, VeloMirror, PresMirror> GlobalMatrixBlockB;
         typedef Global::Matrix<LocalMatrixBlockD, PresMirror, VeloMirror> GlobalMatrixBlockD;
-        typedef LAFEM::SymmetricLumpedSchurMatrix
-        <
-          GlobalVeloVector,
-          GlobalMatrixBlockB,
-          GlobalMatrixBlockD,
-          GlobalVeloFilter
-        > GlobalSchurMatrix;
         typedef Global::Matrix<LocalSystemMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
 
         // define global transfer types
@@ -149,12 +142,11 @@ namespace FEAT
         SystemMuxer coarse_muxer_sys;
 
         /// our global system matrix
-        GlobalSystemMatrix matrix_sys;
         GlobalMatrixBlockA matrix_a;
         GlobalVeloVector lumped_matrix_a;
         GlobalMatrixBlockB matrix_b;
         GlobalMatrixBlockD matrix_d;
-        GlobalSchurMatrix matrix_s;
+        GlobalSystemMatrix matrix_sys;
 
         /// our global transfer operator
         GlobalVeloTransfer transfer_velo;
@@ -166,28 +158,33 @@ namespace FEAT
         GlobalVeloFilter filter_velo;
         GlobalPresFilter filter_pres;
 
-        /// CTOR
+        /**
+         * \brief Empty standard constructor
+         */
         PoissonMixedSystemLevel() :
-          matrix_sys(&gate_sys, &gate_sys),
           matrix_a(&gate_velo, &gate_velo),
           lumped_matrix_a(&gate_velo),
           matrix_b(&gate_velo, &gate_pres),
           matrix_d(&gate_pres, &gate_velo),
-          matrix_s(lumped_matrix_a, matrix_b, matrix_d, filter_velo),
+          matrix_sys(&gate_sys, &gate_sys),
           transfer_velo(&coarse_muxer_velo),
           transfer_pres(&coarse_muxer_pres),
           transfer_sys(&coarse_muxer_sys)
           {
           }
 
-        /// CTOR
+        /**
+         * \brief Constructor for using essential boundary conditions
+         *
+         * \param[in] neumann_list
+         * List of MeshPart names where essential boundary conditions (in this case: Neumann) are to be enforced.
+         *
+         */
         explicit PoissonMixedSystemLevel(const std::deque<String>& neumann_list) :
-          matrix_sys(&gate_sys, &gate_sys),
           matrix_a(&gate_velo, &gate_velo),
           lumped_matrix_a(&gate_velo),
           matrix_b(&gate_velo, &gate_pres),
           matrix_d(&gate_pres, &gate_velo),
-          matrix_s(lumped_matrix_a, matrix_b, matrix_d, filter_velo),
           transfer_velo(&coarse_muxer_velo),
           transfer_pres(&coarse_muxer_pres),
           transfer_sys(&coarse_muxer_sys),
@@ -208,6 +205,13 @@ namespace FEAT
 
         void compile_system_matrix()
         {
+          if(lumped_matrix_a.local().size() == Index(0))
+          {
+            lumped_matrix_a.local() = matrix_a.local().create_vector_l();
+          }
+
+          matrix_a.lump_rows(lumped_matrix_a);
+
           (*matrix_sys).block_a() = (*matrix_a).clone(LAFEM::CloneMode::Shallow);
           (*matrix_sys).block_b() = (*matrix_b).clone(LAFEM::CloneMode::Shallow);
           (*matrix_sys).block_d() = (*matrix_d).clone(LAFEM::CloneMode::Shallow);
@@ -239,7 +243,6 @@ namespace FEAT
           matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
           matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
           matrix_d.convert(&gate_pres, &gate_velo, other.matrix_d);
-          matrix_s.convert(&gate_pres, &gate_pres, other.matrix_s);
 
           transfer_velo.convert(&coarse_muxer_velo, other.transfer_velo);
           transfer_pres.convert(&coarse_muxer_pres, other.transfer_pres);

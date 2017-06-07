@@ -1,39 +1,38 @@
+#include <kernel/analytic/common.hpp>
+#include <kernel/assembly/common_functionals.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/assembly/error_computer.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/slip_filter_assembler.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
+//#include <kernel/assembly/trace_assembler.hpp>
+//#include <kernel/solver/bicgstab.hpp>
+//#include <kernel/solver/fgmres.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/global/symmetric_lumped_schur_matrix.hpp>
+#include <kernel/lafem/filter_sequence.hpp>
+//#include <kernel/solver/legacy_preconditioners.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/solver/multigrid.hpp>
+#include <kernel/solver/pcg.hpp>
+//#include <kernel/solver/precon_wrapper.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/scale_precond.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
+#include <kernel/space/discontinuous/element.hpp>
+#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/lagrange3/element.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>
-#include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/mesh_node.hpp>
-#include <kernel/geometry/export_vtk.hpp>
-#include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/solver/legacy_preconditioners.hpp>
-#include <kernel/assembly/unit_filter_assembler.hpp>
-#include <kernel/assembly/error_computer.hpp>
-#include <kernel/assembly/discrete_projector.hpp>
-#include <kernel/analytic/common.hpp>
-#include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/symbolic_assembler.hpp>
-#include <kernel/assembly/bilinear_operator_assembler.hpp>
-#include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/slip_filter_assembler.hpp>
-//#include <kernel/assembly/trace_assembler.hpp>
-//#include <kernel/solver/bicgstab.hpp>
-//#include <kernel/solver/fgmres.hpp>
-#include <kernel/lafem/filter_sequence.hpp>
-#include <kernel/lafem/symmetric_lumped_schur_matrix.hpp>
-#include <kernel/solver/pcg.hpp>
-#include <kernel/solver/precon_wrapper.hpp>
-#include <kernel/solver/richardson.hpp>
-#include <kernel/solver/scale_precond.hpp>
-#include <kernel/solver/jacobi_precond.hpp>
-#include <kernel/solver/multigrid.hpp>
-#include <kernel/space/discontinuous/element.hpp>
-#include <kernel/space/cro_rav_ran_tur/element.hpp>
-#include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/lagrange2/element.hpp>
-#include <kernel/space/lagrange3/element.hpp>
-#include <kernel/util/dist.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/poisson_mixed.hpp>
@@ -403,7 +402,7 @@ namespace PoissonMixed2D
     the_system_level.filter_pres.filter_sol(vec_sol);
     the_system_level.filter_pres.filter_rhs(vec_rhs);
 
-    typedef LAFEM::SymmetricLumpedSchurMatrix
+    typedef Global::SymmetricLumpedSchurMatrix
     <
       typename SystemLevelType::GlobalVeloVector,
       typename SystemLevelType::GlobalMatrixBlockB,
