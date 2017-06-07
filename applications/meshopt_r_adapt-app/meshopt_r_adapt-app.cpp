@@ -993,7 +993,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "max_iter = 10" << std::endl;
   iss << "tol_rel = 1e5" << std::endl;
   iss << "tol_abs = 1e-8" << std::endl;
-  iss << "initial_penalty_param = 1e4" << std::endl;
+  iss << "initial_penalty_param = 2e4" << std::endl;
   iss << "plot = iter" << std::endl;
   iss << "inner_solver = NLCG" << std::endl;
 

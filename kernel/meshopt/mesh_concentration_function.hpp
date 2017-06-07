@@ -186,8 +186,7 @@ namespace FEAT
             eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
         }
 
-        // DEBUG
-        return DataType(2)*constraint;
+        return constraint;
       }
 
       template<typename Mesh_, typename Dist_>
@@ -239,12 +238,10 @@ namespace FEAT
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i) + DataType(2)*edge_freqs(edge)*grad_loc);
+          grad(i, grad(i) + edge_freqs(edge)*grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j) + DataType(2)*edge_freqs(edge)*grad_loc);
+          grad(j, grad(j) + edge_freqs(edge)*grad_loc);
         }
       }
 
@@ -277,8 +274,7 @@ namespace FEAT
             eval( - dist(cell_idx(cell,1)) * dist(cell_idx(cell,2)));
         }
 
-        // DEBUG
-        return DataType(2)*constraint;
+        return constraint;
       }
 
       template<typename Mesh_, typename Dist_>
@@ -340,12 +336,10 @@ namespace FEAT
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i) + edge_freqs(edge)*DataType(2)*grad_loc);
+          grad(i, grad(i) + edge_freqs(edge)*grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j) + edge_freqs(edge)*DataType(2)*grad_loc);
+          grad(j, grad(j) + edge_freqs(edge)*grad_loc);
         }
 
         const auto cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
@@ -359,12 +353,10 @@ namespace FEAT
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i)+DataType(2)*grad_loc);
+          grad(i, grad(i)+grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j)+DataType(2)*grad_loc);
+          grad(j, grad(j)+grad_loc);
 
           i = cell_idx(cell,Index(1));
           j = cell_idx(cell,Index(2));
@@ -374,12 +366,10 @@ namespace FEAT
           heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i)+DataType(2)*grad_loc);
+          grad(i, grad(i)+grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j)+DataType(2)*grad_loc);
+          grad(j, grad(j)+grad_loc);
         }
       }
     };
@@ -424,8 +414,7 @@ namespace FEAT
             eval( - dist(cell_idx(cell,3)) * dist(cell_idx(cell,4)));
         }
 
-        // DEBUG
-        return DataType(2)*constraint;
+        return constraint;
       }
 
       template<typename Mesh_, typename Dist_>
@@ -513,12 +502,10 @@ namespace FEAT
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i) + edge_freqs(edge)*DataType(2)*grad_loc);
+          grad(i, grad(i) + edge_freqs(edge)*grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j) + edge_freqs(edge)*DataType(2)*grad_loc);
+          grad(j, grad(j) + edge_freqs(edge)*grad_loc);
         }
 
         const auto face_idx = mesh.template get_index_set<2,0>();
@@ -532,12 +519,10 @@ namespace FEAT
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i)+DataType(2)*grad_loc);
+          grad(i, grad(i)+grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j)+DataType(2)*grad_loc);
+          grad(j, grad(j)+grad_loc);
 
           i = face_idx(face,Index(1));
           j = face_idx(face,Index(2));
@@ -547,12 +532,10 @@ namespace FEAT
           heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          // DEBUG
-          grad(i, grad(i)+DataType(2)*grad_loc);
+          grad(i, grad(i)+grad_loc);
 
           grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          // DEBUG
-          grad(j, grad(j)+DataType(2)*grad_loc);
+          grad(j, grad(j)+grad_loc);
         }
 
         const auto cell_idx = mesh.template get_index_set<3,0>();
@@ -569,12 +552,10 @@ namespace FEAT
             auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
             grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j[k])) * grad_dist(i[k]);
-            // DEBUG
-            grad(i[k], grad(i[k]) + DataType(2)*grad_loc);
+            grad(i[k], grad(i[k]) +grad_loc);
 
             grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i[k])) * grad_dist(j[k]);
-            // DEBUG
-            grad(j[k], grad(j[k]) + DataType(2)*grad_loc);
+            grad(j[k], grad(j[k]) + grad_loc);
           }
 
         }

@@ -52,7 +52,7 @@ type = QPenalty
 max_iter = 10
 tol_rel = 1e5
 tol_abs = 1e-8
-initial_penalty_param = 1e4
+initial_penalty_param = 2e4
 plot = iter
 inner_solver = NLCG
 
