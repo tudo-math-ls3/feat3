@@ -168,10 +168,10 @@ namespace FEAT
      *   \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)' \eta &= 4(\| \nabla R_K \|_F^2 - d)
      *   \nabla R_K : \nabla \eta \\
      *   \frac{d}{dt} \left( (\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta & =
-     *     4(\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{cCf}(\nabla R_K) :
+     *     4(\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{Cof}(\nabla R_K) :
      *      \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{Cof}(\nabla R_K) \right) \\
-     *   \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta & = p \mathrm{det}(\nabla R_K )^p
-     *   \nabla R_K)^{-1} : \nabla \eta.
+     *   \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta & = p~\mathrm{det}(\nabla R_K )^p
+     *   (\nabla R_K)^{-1} : \nabla \eta.
      * \f}
      *
      * Note that the test function \f$ \eta \f$ might not be the standard FE basis functions as defined by the FE
@@ -333,7 +333,7 @@ namespace FEAT
        * Contribution of \f$ \| \mathrm{Cof}(\nabla R_K) \|_F^2 \f$.
        *
        * \param[out] fval_det
-       * Contribution of \f$ \mathbb{det}(\nabla R_K)\f$.
+       * Contribution of \f$ \mathrm{det}(\nabla R_K)\f$.
        *
        * \note: This is for debugging and visualisation purposes and does not compute the local gradient.
        *
@@ -360,7 +360,7 @@ namespace FEAT
        * \f[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \f]
        * so that we have to take this dependency into account for the full gradient. Define
        * \f[
-       *   s_d := \sum_{l=1}^N \mathrm{det} \nabla R_{T,l}(\Phi), s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
+       *   s_d := \sum_{l=1}^N \det(\nabla R_{T,l}(\Phi)), \quad s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
        * \f]
        * So for each \f$ x_j \f$ we arrive at
        * \f{align*}
@@ -393,7 +393,9 @@ namespace FEAT
        * The gradient of h wrt. the local vertex coordinates
        *
        */
-        void add_grad_h_part(Tx& grad, const TgradR& mat_tensor, const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval, const Tx& DOXY(x), const DataType& h, const Tgradh& grad_h)
+       void add_grad_h_part(Tx& grad, const TgradR& mat_tensor,
+       const TrafoEvaluator& trafo_eval, const SpaceEvaluator& space_eval,
+       const Tx& DOXY(x), const DataType& h, const Tgradh& grad_h);
 
     };
 #endif
