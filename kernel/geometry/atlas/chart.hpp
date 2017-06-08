@@ -116,48 +116,6 @@ namespace FEAT
         virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) = 0;
 
         /**
-         * \brief Moves the whole chart
-         *
-         * \deprecated Use transform() instead and set
-         * - origin = angles = 0
-         * - offset = translation
-         *
-         * \param[in] translation
-         * The translation vector.
-         */
-        virtual void move_by(const WorldPoint& translation)
-        {
-          WorldPoint origin, angles;
-          origin.format();
-          angles.format();
-          transform(origin, angles, translation);
-        }
-
-        /**
-         * \brief Performs a rigid body rotation of the whole chart
-         *
-         * \deprecated Use transform() instead and set
-         * - origin = offset = centre
-         * - angles = angles
-         *
-         * \param[in] centre
-         * Point around which to rotate.
-         *
-         * \param[in] angles
-         * Angles by which to rotate (in radian).
-         *
-         * Note that in 2d, two angles can be specified but only one is used. This if for interface compatibility for
-         * 3d.
-         *
-         * For 2d, angles(0) defines the rotation around the y-axis. For 3d, angles(0) defines the rotation around
-         * the x-axis, angles(1) the rotation arount the y-axis and angles(2) the rotation around the z-axis.
-         */
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
-        {
-          transform(centre, angles, centre);
-        }
-
-        /**
          * \brief Maps a parameter to a world point
          *
          * \param[in] param

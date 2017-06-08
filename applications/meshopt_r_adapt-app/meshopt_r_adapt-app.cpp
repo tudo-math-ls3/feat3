@@ -426,6 +426,8 @@ struct MeshoptRAdaptApp
     WorldPoint rotation_angles(DataType(0));
     rotation_angles(0) = rotation_speed*delta_t;
 
+    WorldPoint zero(0);
+
     WorldPoint dir(delta_t/DataType(2));
 
     while(time < t_end)
@@ -451,25 +453,25 @@ struct MeshoptRAdaptApp
         if(it.first.find("moving_") != String::npos)
         {
           comm.print(it.first+" by "+stringify(midpoint-old_midpoint));
-          it.second->move_by(midpoint-old_midpoint);
+          it.second->transform(zero, zero, midpoint-old_midpoint);
         }
 
         if(it.first.find("pos_merging_") != String::npos)
         {
           comm.print(it.first+" by "+stringify(dir));
-          it.second->move_by(dir);
+          it.second->transform(zero, zero, dir);
         }
 
         if(it.first.find("neg_merging_") != String::npos)
         {
           comm.print(it.first+" by "+stringify(DataType(-1)*dir));
-          it.second->move_by(DataType(-1)*dir);
+          it.second->transform(zero, zero, DataType(-1)*dir);
         }
 
         if(it.first.find("rotating_") != String::npos)
         {
           comm.print(it.first+" around "+stringify(rotation_centre)+" by "+stringify_fp_fix(rotation_angles(0)));
-          it.second->rotate(rotation_centre, rotation_angles);
+          it.second->transform(rotation_centre, rotation_angles, rotation_centre);
         }
       }
 
