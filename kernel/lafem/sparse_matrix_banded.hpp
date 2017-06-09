@@ -684,7 +684,7 @@ namespace FEAT
           }
         }
 
-        DenseVector<Mem::Main, DT_, IT_> val(Index(offset_set.size()) * nrows, DT_(0));
+        DenseVector<Mem::Main, DT_, IT_> val_new(Index(offset_set.size()) * nrows, DT_(0));
         for (Index row(0) ; row < nrows ; ++row)
         {
           for (Index i(csr.row_ptr()[row]) ; i < csr.row_ptr()[row+1] ; ++i)
@@ -692,19 +692,19 @@ namespace FEAT
             Index col = csr.col_ind()[i];
             Index offset = (col - row + nrows - 1);
             Index band = Index(std::distance(offset_set.begin(), offset_set.find(IT_(offset))));
-            val.elements()[band * nrows + row] = csr.val()[i];
+            val_new.elements()[band * nrows + row] = csr.val()[i];
           }
         }
 
-        DenseVector<Mem::Main, IT_, IT_> offsets(Index(offset_set.size()));
+        DenseVector<Mem::Main, IT_, IT_> offsets_new(Index(offset_set.size()));
         auto it_offset = offset_set.begin();
         for (Index i(0) ; i < offset_set.size() ; ++i, ++it_offset)
         {
-          offsets(i, *it_offset);
+          offsets_new(i, *it_offset);
         }
         offset_set.clear();
 
-        SparseMatrixBanded<Mem::Main, DT_, IT_> temp(nrows, ncolumns, val, offsets);
+        SparseMatrixBanded<Mem::Main, DT_, IT_> temp(nrows, ncolumns, val_new, offsets_new);
         this->assign(temp);
       }
 

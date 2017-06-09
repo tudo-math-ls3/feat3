@@ -44,7 +44,7 @@ namespace FEAT
       {
         colors.insert(colouring[i]);
       }
-      _num_colours = colors.size();
+      _num_colours = Index(colors.size());
       colors.clear();
 
       _colouring = new Index[_num_nodes];
