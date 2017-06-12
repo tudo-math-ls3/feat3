@@ -1436,11 +1436,23 @@ namespace FEAT
       static Comm world();
 
       /**
+       * \brief Returns a copy of the self communicator.
+       */
+      static Comm self();
+
+      /**
        * \brief Checks whether this communicator is the world communicator.
        *
        * \returns \c true, if this communicator represents \c MPI_COMM_WORLD, otherwise \c false.
        */
       bool is_world() const;
+
+      /**
+       * \brief Checks whether this communicator is the self communicator.
+       *
+       * \returns \c true, if this communicator represents \c MPI_COMM_SELF, otherwise \c false.
+       */
+      bool is_self() const;
 
       /**
        * \brief Checks whether this communicator is a null communicator.

@@ -353,8 +353,8 @@ namespace FEAT
       _rank(other._rank),
       _size(other._size)
     {
-      // do not free the world comm
-      if(other.comm != MPI_COMM_WORLD)
+      // do not free the world and self comms
+      if((other.comm != MPI_COMM_WORLD) && (other.comm != MPI_COMM_SELF))
       {
         other.comm = MPI_COMM_NULL;
         other._rank = other._size = 0;
@@ -369,8 +369,8 @@ namespace FEAT
         comm = other.comm;
         _rank = other._rank;
         _size = other._size;
-        // do not free the world comm
-        if(other.comm != MPI_COMM_WORLD)
+        // do not free the world and self comms
+        if((other.comm != MPI_COMM_WORLD) && (other.comm != MPI_COMM_SELF))
         {
           other.comm = MPI_COMM_NULL;
           other._rank = other._size = 0;
@@ -381,8 +381,8 @@ namespace FEAT
 
     Comm::~Comm()
     {
-      // do not free the world comm
-      if((comm != MPI_COMM_WORLD) && (comm != MPI_COMM_NULL))
+      // do not free the world, self and null comms
+      if((comm != MPI_COMM_WORLD) && (comm != MPI_COMM_SELF) && (comm != MPI_COMM_NULL))
         MPI_Comm_free(&comm);
     }
 
@@ -391,9 +391,19 @@ namespace FEAT
       return Comm(MPI_COMM_WORLD);
     }
 
+    Comm Comm::self()
+    {
+      return Comm(MPI_COMM_SELF);
+    }
+
     bool Comm::is_world() const
     {
       return (comm == MPI_COMM_WORLD);
+    }
+
+    bool Comm::is_self() const
+    {
+      return (comm == MPI_COMM_SELF);
     }
 
     bool Comm::is_null() const
@@ -403,8 +413,8 @@ namespace FEAT
 
     Comm Comm::comm_dup() const
     {
-      // do not duplicate world and null comms
-      if((comm == MPI_COMM_WORLD) || (comm == MPI_COMM_NULL))
+      // do not duplicate world, self and null comms
+      if((comm == MPI_COMM_WORLD) || (comm == MPI_COMM_SELF) || (comm == MPI_COMM_NULL))
         return Comm(comm);
 
       // create a real duplicate
@@ -976,12 +986,22 @@ namespace FEAT
       return Comm(1);
     }
 
+    Comm Comm::self()
+    {
+      return Comm(1);
+    }
+
     bool Comm::is_null() const
     {
       return _size == 0;
     }
 
     bool Comm::is_world() const
+    {
+      return _size == 1;
+    }
+
+    bool Comm::is_self() const
     {
       return _size == 1;
     }
