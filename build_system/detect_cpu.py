@@ -48,13 +48,15 @@ def detect_cpu():
     lines = input.split("\n")
 
     for line in lines:
-      values = line.split("\t: ")
-      if len(values) == 2:
-        d[values[0].strip()] = values[1].strip()
-
-    vendor_id = d["vendor_id"]
-    cpu_family = int(d["cpu family"])
-    model = int(d["model"])
+      items = line.split()
+      if items[0] == "vendor_id":
+        vendor_id = items[2]
+      if items[0] == "cpu" and items[1] == "family":
+        cpu_family = int(items[3])
+      if items[0] == "model":
+        model = int(items[2])
+        #assume that all three fields have been found in this order and abort, cause we now all we need
+        break
 
   elif platform.system() == "Darwin":
     # vendor_id
