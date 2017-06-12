@@ -497,37 +497,37 @@ namespace FEAT
 
     void Comm::gather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
-      MPI_Gather(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
+      MPI_Gather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
     }
 
     Request Comm::igather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Igather(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
+      MPI_Igather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       return Request(req);
     }
 
     void Comm::scatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
-      MPI_Scatter(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
+      MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
     }
 
     Request Comm::iscatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Iscatter(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
+      MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       return Request(req);
     }
 
     void Comm::allgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
-      MPI_Allgather(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
+      MPI_Allgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
     }
 
     Request Comm::iallgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Iallgather(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
+      MPI_Iallgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
       return Request(req);
     }
 

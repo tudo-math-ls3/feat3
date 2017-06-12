@@ -1955,10 +1955,6 @@ namespace FEAT
       /**
        * \brief Blocking gather
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -1989,10 +1985,6 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -2018,10 +2010,6 @@ namespace FEAT
 
       /**
        * \brief Nonblocking gather
-       *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * The send buffer for the operation.
@@ -2055,10 +2043,6 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -2086,10 +2070,6 @@ namespace FEAT
 
       /**
        * \brief Blocking scatter
-       *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * The send buffer for the operation.
@@ -2121,10 +2101,6 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -2150,10 +2126,6 @@ namespace FEAT
 
       /**
        * \brief Nonblocking scatter
-       *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * The send buffer for the operation.
@@ -2187,10 +2159,6 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -2219,10 +2187,6 @@ namespace FEAT
       /**
        * \brief Blocking gather-to-all
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -2250,10 +2214,6 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
-       *
        * \param[in] sendbuf
        * The send buffer for the operation.
        *
@@ -2276,10 +2236,6 @@ namespace FEAT
 
       /**
        * \brief Nonblocking gather-to-all
-       *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * The send buffer for the operation.
@@ -2309,10 +2265,6 @@ namespace FEAT
        * \brief Nonblocking gather-to-all
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
-       *
-       * \note
-       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
-       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * The send buffer for the operation.
