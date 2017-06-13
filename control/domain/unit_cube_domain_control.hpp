@@ -122,7 +122,7 @@ namespace FEAT
         }
 
       protected:
-        int _ilog4(int x)
+        static int _ilog4(int x)
         {
           int r = 0;
           for(; x > 1; ++r)
@@ -132,6 +132,38 @@ namespace FEAT
             x /= 4;
           }
           return r;
+        }
+
+        // converts a rank from 2-level to lexi ordering
+        static int _2lvl2lexi(int rank, int size)
+        {
+          const int ls = _ilog4(size);
+          int ix(0), iy(0);
+          for(int i(0); i < ls; ++i)
+          {
+            ix |= (rank >> (i+0)) & (1 << i);
+            iy |= (rank >> (i+1)) & (1 << i);
+          }
+          return iy*(1 << ls) + ix;
+        }
+
+        // converts a vector of ranks from lexi to 2-level ordering
+        static void _lexi22lvl(std::vector<int>& ranks, std::map<int,int>& reranks, int size)
+        {
+          const int ls = _ilog4(size);
+          for(auto& rank : ranks)
+          {
+            const int ix = rank % (1 << ls);
+            const int iy = rank / (1 << ls);
+            int rr = 0;
+            for(int i(0); i < ls; ++i)
+            {
+              rr |= (ix & (1 << i)) << (i+0);
+              rr |= (iy & (1 << i)) << (i+1);
+            }
+            reranks.insert(std::make_pair(rank, rr));
+            rank = rr;
+          }
         }
 
         void _create(const std::deque<int>& lvls)
@@ -152,14 +184,21 @@ namespace FEAT
             auto& layer = *this->_layers.at(i);
             auto& laylevs = this->_layer_levels.at(i);
 
-            int crank = layer.comm().rank();
-            int csize = layer.comm().size();
+            const int csize = layer.comm().size();
+            const int crank = _2lvl2lexi(layer.comm().rank(), csize);
 
             std::vector<int> ranks;
+            std::map<int,int> reranks; // neighbour rank map: lexi -> 2lvl
 
             // create root mesh node
             std::shared_ptr<MeshNodeType> mesh_node;
             const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(crank, csize, mesh_node, ranks);
+
+            // translate neighbour ranks from lexi to 2lvl
+            _lexi22lvl(ranks, reranks, csize);
+
+            // rename halos
+            mesh_node->rename_halos(reranks);
 
             // set layer neighbours
             layer.set_neighbour_ranks(ranks);
@@ -197,7 +236,7 @@ namespace FEAT
           this->compile_virtual_levels();
         }
 
-        void _create_layers(int log4n, int nlayers)
+        void _create_layers(int /*log4n*/, int nlayers)
         {
           // create main layer
           this->_layers.push_back(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
@@ -211,33 +250,24 @@ namespace FEAT
             // get the child comm
             const Dist::Comm& comm_c = child.comm();
 
-            // compute the parent rank for this child process
-            int crs_dim = 1 << (log4n-i);
-            int ix = comm_c.rank() % crs_dim;
-            int iy = comm_c.rank() / crs_dim;
-            int parent_rank = 2*(ix & ~1) + (iy & ~1)*crs_dim; // don't ask...
-
             // set the child's parent rank
-            child.push_parent(parent_rank);
+            child.push_parent(comm_c.rank() & ~3); // = (r/4)*4
 
             // create parent comm
             Dist::Comm comm_p = comm_c.comm_create_range_incl(comm_c.size()/4, 0, 4);
             if(comm_p.is_null())
               break;
 
-            // compute the child ranks for this parent process
-            int prt_dim = crs_dim/2;
-            int ipx = comm_p.rank() % prt_dim;
-            int ipy = comm_p.rank() / prt_dim;
+            // get our rank in the parent comm
+            int prank = comm_p.rank();
 
-            // create new layer
+            // create new layer for parent
             auto parent = std::make_shared<DomainLayer>(std::move(comm_p), i+1);
 
             // set the parent's child ranks
             for(int c(0); c < 4; ++c)
             {
-              int child_rank = (2*ipx + (c%2)) + (2*ipy + (c/2))*2*prt_dim; // don't ask...
-              parent->push_child(child_rank);
+              parent->push_child(4*prank + c);
             }
 
             // finally, add to our layer deque

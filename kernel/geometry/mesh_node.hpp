@@ -430,6 +430,35 @@ namespace FEAT
       }
 
       /**
+       * \brief Renames a set of mesh-parts.
+       *
+       * \param[in] renames
+       * A map of oldname-newname pairs.
+       */
+      void rename_mesh_parts(const std::map<String,String>& renames)
+      {
+        if(renames.empty())
+          return;
+
+        MeshPartNodeContainer new_map;
+        for(auto& v : _mesh_part_nodes)
+        {
+          auto it = renames.find(v.first);
+          if(it == renames.end())
+          {
+            // no rename, use old name
+            new_map.emplace(v.first, v.second);
+          }
+          else
+          {
+            // insert with new name
+            new_map.emplace(it->second, v.second);
+          }
+        }
+        _mesh_part_nodes = std::move(new_map);
+      }
+
+      /**
        * \brief Adapts this mesh node.
        *
        * This function loops over all MeshPart nodes and uses their associated charts (if given)
@@ -794,6 +823,25 @@ namespace FEAT
       const MeshPartType* find_halo_mesh_part(int rank) const
       {
         return this->find_mesh_part(String("_halo:") + stringify(rank));
+      }
+
+      /**
+       * \brief Renames the halo meshparts.
+       *
+       * This function can be used to rename the halo meshparts when the rank ordering in the
+       * communicator has changed.
+       *
+       * \param[in] ranks
+       * An map of oldrank-newrank pairs.
+       */
+      void rename_halos(const std::map<int,int>& ranks)
+      {
+        std::map<String,String> names;
+        for(auto& v : ranks)
+        {
+          names.emplace(String("_halo:") + stringify(v.first), String("_halo:") + stringify(v.second));
+        }
+        this->rename_mesh_parts(names);
       }
 
       /**
