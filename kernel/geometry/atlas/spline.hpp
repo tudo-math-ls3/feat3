@@ -741,8 +741,6 @@ namespace FEAT
             return _param.size()-std::size_t(2);
 
           // apply binary search
-          DataType xl = _param.front()[0];
-          DataType xr = _param.back()[0];
           std::size_t il(0), ir(_param.size()-1);
           while(il+1 < ir)
           {
@@ -751,12 +749,10 @@ namespace FEAT
             DataType xm = _param.at(im)[0];
             if(x < xm)
             {
-              xr = xm;
               ir = im;
             }
             else
             {
-              xl = xm;
               il = im;
             }
           }

@@ -867,7 +867,7 @@ namespace FEAT
        */
       DataType trace() const
       {
-        int k = (m_ < n_ ? m_ : n_);
+        int k = Math::min(m_, n_);
         DataType r(0);
         for(int i(0); i < k; ++i)
         {
