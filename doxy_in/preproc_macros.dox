@@ -3,10 +3,239 @@ This page summarises the preprocessor macros defined by the build-system, the co
 
 \tableofcontents
 
+<hr><hr>
+\section preproc_sec_comp_detect Compiler-Detection Macros
+This section enlists the macros defined by the compiler detection headers to provide information about the compiler
+and its version being in use.
+
+<hr>
+\subsection ppm_feat_compiler FEAT_COMPILER
+This macro is defined by the compiler detection system and its value is a string literal specifying the name and
+possibly the version of the compiler in use, e.g. <code>"Microsoft Visual C++ 2015"</code> or <code>"GNU C++ compiler"</code>.
+
+\note This macro may also be defined the user through the build system, which will effectively disable the internal
+compiler detection system.
+
+<hr>
+\subsection ppm_feat_compiler_gnu FEAT_COMPILER_GNU
+This macro is defined if the GNU C++ compiler is detected. Its value is defined as
+\verbatim
+(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+\endverbatim
+which is a constant integral expression identifying the compiler version, e.g. the value <c>40702</c> identifies the
+G++ 4.7.2 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feat_compiler_intel FEAT_COMPILER_INTEL
+This macro is defined if the Intel C++ compiler is detected. Its value coindices with the compiler's internal macro
+<c>__INTEL_COMPILER</c>, which is a constant integral expression identifying the compiler version, e.g. the value
+<c>1210</c> identifies the Intel C++ 12.1 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feat_compiler_microsoft FEAT_COMPILER_MICROSOFT
+This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal
+macro <c>_MSC_VER</c>, which is an constant integral expression identifying the compiler version, e.g. the value
+<code>1900</code> identifies the Visual C++ 2015 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feat_compiler_open64 FEAT_COMPILER_OPEN64
+This macro is defined if the Open64 C++ compiler is detected. Its value is defined as
+\verbatim
+(__OPENCC__ * 10000 + __OPENCC_MINOR__ * 100 + __OPENCC_PATCHLEVEL__)
+\endverbatim
+which is a constant integral expression identifying the compiler version, e.g. the value <c>40204</c> identifies the
+Open64 C++ 4.2.4 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feat_compiler_oracle FEAT_COMPILER_ORACLE
+This macro is defined if the OracleStudio/SunStudio C++ compiler is detected. Its value coincides with the compiler's
+internal macro <c>__SUNPRO_CC</c>, which is an constant integral expression identifying the compiler version, e.g. the
+value <code>0x5110</code> identifies the OracleStudio C++ 12.2 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feat_compiler_pgi FEAT_COMPILER_PGI
+This macro is defined if the PGI C++ compiler is detected. Its value is defined as
+\verbatim
+(__PGIC__ * 10000 + __PGIC_MINOR__ * 100 + __PGIC_PATCHLEVEL__)
+\endverbatim
+which is a constant integral expression identifying the compiler version. See the compiler's documentation for details.
+
+<hr><hr>
+\section preproc_sec_backends Backend / Library Macros
+This section enlists macros defined by the build system, which specify what types of third-party libraries and backends
+are available to FEAT.
+
+<hr>
+\subsection ppm_feat_have_alglib FEAT_HAVE_ALGLIB
+This macro is defined by the build system if the FEAT kernel is linked against the ALGLIB library.
+
+<hr>
+\subsection ppm_feat_have_cuda FEAT_HAVE_CUDA
+This macro is defined by the build system if the FEAT kernel is linked against the CUDA library.
+
+If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the containters and
+operations using CUDA as a work-horse.
+
+<hr>
+\subsection ppm_feat_have_cusolver FEAT_HAVE_CUSOLVER
+This macro is defined by the build system detects a cuda sdk version equal or greater 7, which includes the cusolver library.
+
+<hr>
+\subsection ppm_feat_have_fparser FEAT_HAVE_FPARSER
+This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
+
+<hr>
+\subsection ppm_feat_have_metis FEAT_HAVE_METIS
+This macro is defined by the build system if the FEAT kernel is linked against the METIS library.
+
+<hr>
+\subsection ppm_feat_have_mkl FEAT_HAVE_MKL
+This macro is defined by the build system if the FEAT kernel is linked against the Intel MKL library.
+
+If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the operations using
+the MKL as a work-horse.
+
+<hr>
+\subsection ppm_feat_have_mpi FEAT_HAVE_MPI
+This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
+
+<hr>
+\subsection ppm_feat_have_parmetis FEAT_HAVE_PARMETIS
+This macro is defined by the build system if the FEAT kernel is linked against the ParMETIS library.
+\note If this macro is defined, then \c FEAT_HAVE_METIS is also defined.
+
+<hr>
+\subsection ppm_feat_have_quadmath FEAT_HAVE_QUADMATH
+This macro is defined by the build system if the FEAT kernel is linked against the quadmath library,
+which is included in the GCC compiler since version 4.6.0. If defined, corresponding specialisations and overloads
+for the datatype <code>__float128</code> are supplied.
+
+<hr>
+\subsection ppm_feat_have_umfpack FEAT_HAVE_UMFPACK
+This macro is defined by the build system if the FEAT kernel is linked agains the UMFPACK library, which is part of
+the SuiteSparse library package.
+
+<hr>
+\subsection ppm_feat_have_zlib FEAT_HAVE_ZLIB
+This macro is defined by the build system if the FEAT kernel is linked against the zlib library.
+
+<hr><hr>
+\section preproc_sec_user_def User-Defineable Macros
+This section enlists miscellaneous macros that can be defined by the user via the build-system to affect various parts
+of the FEAT kernel.
+
+<hr>
+\subsection ppm_feat_eickt FEAT_EICKT
+This macro can be defined to enable explicit instantiation of all common kernel templates.
+
+\note
+This macro is defined if the command line option <code>\--eickt</code> is passed to the configure script.
+
+<hr>
+\subsection ppm_feat_index_ull FEAT_INDEX_ULL
+This macro can be defined to affect the definition of the <c>FEAT::Index</c> data type in the kernel base-header.
+
+<b>Effects:</b><br>
+If undefined, <c>FEAT::Index</c> is a typedef for <c>unsigned long</c>.<br>
+If defined, <c>FEAT::Index</c> is a typedef for <c>unsigned long long</c>.
+
+<hr>
+\subsection ppm_feat_no_config FEAT_NO_CONFIG
+This macro can be defined to avoid config-header inclusion in the kernel base-header.
+
+<b>Effects:</b><br>
+If undefined, the kernel base-header will include the header <code>feat_config.hpp</code> from the FEAT root directory
+at the beginning of the file.
+
+\note This macro is automatically defined by the Visual Studio build system.
+
+<hr>
+\subsection ppm_feat_ovr_mpi_ops FEAT_OVERRIDE_MPI_OPS
+
+This macro can be defined to override the default MPI operation implmentations by custom implementations.
+
+<b>Effects:</b><br>
+If defined, the MPI wrapper classes and functions implemented in the FEAT::Dist namespace will use custom
+implementations of the Dist::op_sum, Dist::op_max and Dist::op_min operations, which provide support for additional
+custom datatypes such as the 128-bit float supplied by the quadmath library.
+
+\remark
+Overriding the default implementations supplied by the MPI library seems to have a negative impact on performance for
+the default data types in some cases. Therefore, it is advised to define this macro only if support for additional
+datatypes is required.
+
+\note
+This macro is defined if the command line option <code>\--ovr_mpi_ops</code> is passed to the configure script.
+
+<hr>
+\subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
+This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
+
+\note
+This macro is defined if the command line option <code>\--unroll_banded</code> is passed to the configure script.
+
+<hr><hr>
+
+\section preproc_sec_codegen Code-Generation Control Macros
+This section enlist various macros which control the compiler's code generation.
+
+<hr>
+\subsection ppm_feat_ivdep FEAT_IVDEP
+This macro can be used to instruct the compiler to ignore assumed vector dependencies. To use this loop pragma, place it
+immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
+
+See also:
+- https://gcc.gnu.org/onlinedocs/gcc-4.9.2/gcc/Loop-Specific-Pragmas.html
+- https://software.intel.com/en-us/node/524501
+- https://msdn.microsoft.com/en-us/library/hh923901.aspx
+
+<hr>
+\subsection ppm_feat_force_inline FORCE_INLINE
+This macro can be used to force the compiler to compile a function inline. The semantics of FORCE_INLINE are exactly the
+same as those for the C++ inline keyword.
+
+<hr>
+\subsection ppm_feat_noinline NOINLINE
+This macro can be used to force the compiler to compile a function without inlining.
+
+
+<hr><hr>
+\section preproc_sec_misc Miscellaneous Macros
+This section enlists various macros which do not fit into any other section.
+
+\subsection ppm_feat_warnings FEAT_DISABLE_WARNINGS / FEAT_RESTORE_WARNINGS
+This macro pair can be used to modify the compiler's diagnostics settings to suppress warnings for the inclusion of
+third-party header includes.
+
+\attention This macro pair is meant only for third-party includes and shall \b not be used to suppress warning arising
+from FEAT code!
+
+\note This macro pair may not be supported by all compilers. Furthermore, some warnings cannot be disabled, so there is
+no guarantee that the compiler will remain quiet even if this macro pair is in use.
+
+<b>Example:</b><br>
+\code{.cpp}
+#include <kernel/base_header.hpp>
+
+// suppress warnings for third-party header
+FEAT_DISABLE_WARNINGS
+
+// include third-party header producing compiler warnings
+#include <thirdparty/some_library/wicked_header.h>
+
+// restore previous diagnostics settings
+FEAT_RESTORE_WARNINGS
+
+// ...
+\endcode
+
+<hr><hr>
 \section preproc_sec_build_system Build-System Macros
 This section enlists the macros defined directly by the buildsystem, specifying the current build mode.
 
-For macros specifying the available third-party libraries and backends, see \ref preproc_sec_backends
+\attention
+The macros in this section are highly platform dependent by definition, i.e. there is no guarantee that a specific macro
+is defined on all platforms. Your code should not rely on any of these macros being defined!
 
 <hr>
 \subsection ppm_feat_debug_mode FEAT_DEBUG_MODE
@@ -120,193 +349,4 @@ Full path of the cmake binary.
 \subsection ppm_cmake_generator CMAKE_GENERATOR
 The 'makefile' generator used by cmake.
 
-<hr><hr>
-\section preproc_sec_comp_detect Compiler-Detection Macros
-This section enlists the macros defined by the compiler detection headers to provide information about the compiler
-and its version being in use.
-
-<hr>
-\subsection ppm_feat_compiler FEAT_COMPILER
-This macro is defined by the compiler detection system and its value is a string literal specifying the name and
-possibly the version of the compiler in use, e.g. <code>"Microsoft Visual C++ 2012"</code>.
-
-\note This macro may also be defined the user through the build system, which will effectively disable the internal
-compiler detection system.
-
-<hr>
-\subsection ppm_feat_compiler_gnu FEAT_COMPILER_GNU
-This macro is defined if the GNU C++ compiler is detected. Its value is defined as
-\verbatim
-(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-\endverbatim
-which is a constant integral expression identifying the compiler version, e.g. the value <c>40702</c> identifies the
-G++ 4.7.2 compiler. See the compiler's documentation for details.
-
-<hr>
-\subsection ppm_feat_compiler_intel FEAT_COMPILER_INTEL
-This macro is defined if the Intel C++ compiler is detected. Its value coindices with the compiler's internal macro
-<c>__INTEL_COMPILER</c>, which is a constant integral expression identifying the compiler version, e.g. the value
-<c>1210</c> identifies the Intel C++ 12.1 compiler. See the compiler's documentation for details on this macro.
-
-<hr>
-\subsection ppm_feat_compiler_microsoft FEAT_COMPILER_MICROSOFT
-This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal
-macro <c>_MSC_VER</c>, which is an constant integral expression identifying the compiler version, e.g. the value
-<code>1700</code> identifies the Visual C++ 2012 compiler. See the compiler's documentation for details on this macro.
-
-<hr>
-\subsection ppm_feat_compiler_open64 FEAT_COMPILER_OPEN64
-This macro is defined if the Open64 C++ compiler is detected. Its value is defined as
-\verbatim
-(__OPENCC__ * 10000 + __OPENCC_MINOR__ * 100 + __OPENCC_PATCHLEVEL__)
-\endverbatim
-which is a constant integral expression identifying the compiler version, e.g. the value <c>40204</c> identifies the
-Open64 C++ 4.2.4 compiler. See the compiler's documentation for details.
-
-<hr>
-\subsection ppm_feat_compiler_oracle FEAT_COMPILER_ORACLE
-This macro is defined if the OracleStudio/SunStudio C++ compiler is detected. Its value coincides with the compiler's
-internal macro <c>__SUNPRO_CC</c>, which is an constant integral expression identifying the compiler version, e.g. the
-value <code>0x5110</code> identifies the OracleStudio C++ 12.2 compiler. See the compiler's documentation for details
-on this macro.
-
-<hr>
-\subsection ppm_feat_compiler_pgi FEAT_COMPILER_PGI
-This macro is defined if the PGI C++ compiler is detected. Unfortunately, it is not known if the compiler's version can
-be deduced at compile-time, therefore this macro is simply defined as 1.
-
-<hr>
-\subsection ppm_feat_ivdep FEAT_IVDEP
-This macro can be used to instruct the compiler to ignore assumed vector dependencies. To use this loop pragma, place it
-immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
-
-<hr>
-\subsection ppm_feat_force_inline FORCE_INLINE
-This macro can be used to force the compiler to compile a function inline. The semantics of FORCE_INLINE are exactly the
-same as those for the C++ inline keyword.
-
-<hr>
-\subsection ppm_feat_noinline NOINLINE
-This macro can be used to force the compiler to compile a function without inlining.
-
-<hr><hr>
-\section preproc_sec_backends Backend / Library Macros
-This section enlists macros defined by the build system, which specify what types of third-party libraries and backends
-are available to FEAT.
-
-<hr>
-\subsection ppm_feat_have_alglib FEAT_HAVE_ALGLIB
-This macro is defined by the build system if the FEAT kernel is linked against the ALGLIB library.
-
-<hr>
-\subsection ppm_feat_have_cuda FEAT_HAVE_CUDA
-This macro is defined by the build system if the FEAT kernel is linked against the CUDA library.
-
-If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the containters and
-operations using CUDA as a work-horse.
-
-<hr>
-\subsection ppm_feat_have_cusolver FEAT_HAVE_CUSOLVER
-This macro is defined by the build system detects a cuda sdk version equal or greater 7, which includes the cusolver library.
-
-<hr>
-\subsection ppm_feat_have_fparser FEAT_HAVE_FPARSER
-This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
-
-<hr>
-\subsection ppm_feat_have_metis FEAT_HAVE_METIS
-This macro is defined by the build system if the FEAT kernel is linked against the METIS library.
-
-<hr>
-\subsection ppm_feat_have_mkl FEAT_HAVE_MKL
-This macro is defined by the build system if the FEAT kernel is linked against the Intel MKL library.
-
-If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the operations using
-the MKL as a work-horse.
-
-<hr>
-\subsection ppm_feat_have_mpi FEAT_HAVE_MPI
-This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
-
-<hr>
-\subsection ppm_feat_have_parmetis FEAT_HAVE_PARMETIS
-This macro is defined by the build system if the FEAT kernel is linked against the ParMETIS library.
-\note If this macro is defined, then \c FEAT_HAVE_METIS is also defined.
-
-<hr>
-\subsection ppm_feat_have_quadmath FEAT_HAVE_QUADMATH
-This macro is defined by the build system if the FEAT kernel has support for quadmath datatypes.
-The datatypes name is __float128.
-
-<hr>
-\subsection ppm_feat_have_umfpack FEAT_HAVE_UMFPACK
-This macro is defined by the build system if the FEAT kernel is linked agains the UMFPACK library, which is part of
-the SuiteSparse library package.
-
-If defined, the LAFEM subsystem of the FEAT kernel will implement the "LAFEM::Umfpack" solver class.
-
-<hr>
-\subsection ppm_feat_have_zlib FEAT_HAVE_ZLIB
-This macro is defined by the build system if the FEAT kernel is linked against the zlib library.
-
-<hr><hr>
-\section preproc_sec_user_def User-Defineable Macros
-This section enlists miscellaneous macros that can be defined by the user via the build-system to affect various parts
-of the FEAT kernel.
-
-<hr>
-\subsection ppm_feat_index_ull FEAT_INDEX_ULL
-This macro can be defined to affect the definition of the <c>FEAT::Index</c> data type in the kernel base-header.
-
-<b>Effects:</b><br>
-If undefined, <c>FEAT::Index</c> is a typedef for <c>unsigned long</c>.<br>
-If defined, <c>FEAT::Index</c> is a typedef for <c>unsigned long long</c>.
-
-<hr>
-\subsection ppm_feat_no_config FEAT_NO_CONFIG
-This macro can be defined to avoid config-header inclusion in the kernel base-header.
-
-\note This macro is automatically defined by the Visual Studio build system.
-
-<b>Effects:</b><br>
-If undefined, the kernel base-header will include the header <code>feat_config.hpp</code> from the FEAT root directory
-at the beginning of the file.
-
-<hr>
-\subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
-This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
-
-<hr>
-\subsection ppm_feat_eickt FEAT_EICKT
-This macro can be defined to enable explicit instantiation of all common kernel templates.
-
-<hr><hr>
-\section preproc_sec_misc Miscellaneous Macros
-This section enlists various macros which do not fit into any other section.
-
-\subsection ppm_feat_warnings FEAT_DISABLE_WARNINGS / FEAT_RESTORE_WARNINGS
-This macro pair can be used to modify the compiler's diagnostics settings to suppress warnings for the inclusion of
-third-party header includes.
-
-\attention This macro pair is meant only for third-party includes and shall \b not be used to suppress warning arising
-from FEAT code!
-
-\note This macro pair may not be supported by all compilers. Furthermore, some warnings cannot be disabled, so there is
-no guarantee that the compiler will remain quiet even if this macro pair is in use.
-
-<b>Example:</b><br>
-\code{.cpp}
-#include <kernel/base_header.hpp>
-
-// suppress warnings for third-party header
-FEAT_DISABLE_WARNINGS
-
-// include third-party header producing compiler warnings
-#include <thirdparty/some_library/wicked_header.h>
-
-// restore previous diagnostics settings
-FEAT_RESTORE_WARNINGS
-
-// ...
-\endcode
 **/

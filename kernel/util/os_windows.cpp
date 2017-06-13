@@ -1,6 +1,6 @@
 
 #ifndef _WIN32
-#error This file can only be compiler under Windows.
+#error This file can only be compiled under Windows.
 #endif
 
 // Warning:
