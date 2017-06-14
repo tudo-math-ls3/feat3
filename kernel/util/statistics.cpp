@@ -473,54 +473,42 @@ String Statistics::get_formatted_times(double total_time)
 
   Dist::Comm comm(Dist::Comm::world());
 
-  double t_local = get_time_reduction();
-  double t_max;
-  double t_min;
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("Reductions:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  double t_max[8];
+  double t_min[8];
+  double t_local[8];
+  t_local[0] = total_time - measured_time.sum;
+  t_local[1] = get_time_reduction();
+  t_local[2] = get_time_axpy();
+  t_local[3] = get_time_spmv();
+  t_local[4] = get_time_precon();
+  t_local[5] = get_time_mpi_execute();
+  t_local[6] = get_time_mpi_wait_reduction();
+  t_local[7] = get_time_mpi_wait_spmv();
 
-  t_local = get_time_axpy();
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("Blas-1:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  comm.allreduce(t_local, t_max, std::size_t(8), Dist::op_max);
+  comm.allreduce(t_local, t_min, std::size_t(8), Dist::op_min);
 
-  t_local = get_time_spmv();
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("Blas-2:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Reductions:").pad_back(22) + "max: " + stringify(t_max[1]) + ", min: " + stringify(t_min[1]) + ", local: " + stringify(t_local[1]) + "\n";
 
-  t_local = get_time_precon();
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("Precon Kernels:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Blas-1:").pad_back(22) + "max: " + stringify(t_max[2]) + ", min: " + stringify(t_min[2]) + ", local: " + stringify(t_local[2]) + "\n";
 
-  t_local = get_time_mpi_execute();
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("MPI Execution:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Blas-2:").pad_back(22) + "max: " + stringify(t_max[3]) + ", min: " + stringify(t_min[3]) + ", local: " + stringify(t_local[3]) + "\n";
 
-  t_local = get_time_mpi_wait_reduction();
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("MPI Wait Reduction:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Precon Kernels:").pad_back(22) + "max: " + stringify(t_max[4]) + ", min: " + stringify(t_min[4]) + ", local: " + stringify(t_local[4]) + "\n";
 
-  t_local = get_time_mpi_wait_spmv();
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("MPI Wait Blas-2:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("MPI Execution:").pad_back(22) + "max: " + stringify(t_max[5]) + ", min: " + stringify(t_min[5]) + ", local: " + stringify(t_local[5]) + "\n";
 
-  t_local = total_time - measured_time.sum;
-  comm.allreduce(&t_local, &t_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&t_local, &t_min, std::size_t(1), Dist::op_min);
-  result += String("Not covered:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("MPI Wait Reduction:").pad_back(22) + "max: " + stringify(t_max[6]) + ", min: " + stringify(t_min[6]) + ", local: " + stringify(t_local[6]) + "\n";
 
-  if (t_min < 0.0)
+  result += String("MPI Wait Blas-2:").pad_back(22) + "max: " + stringify(t_max[7]) + ", min: " + stringify(t_min[7]) + ", local: " + stringify(t_local[7]) + "\n";
+
+  result += String("Not covered:").pad_back(22) + "max: " + stringify(t_max[0]) + ", min: " + stringify(t_min[0]) + ", local: " + stringify(t_local[0]) + "\n";
+
+  if (t_min[0] < 0.0)
   {
     // total_time < measured_time.sum for at least one process
     result += "WARNING: Accumulated op time is greater than the provided total execution time !";
   }
-
   return result;
 }
 
@@ -528,156 +516,159 @@ String Statistics::get_formatted_solver_internals(String target)
 {
   Dist::Comm comm(Dist::Comm::world());
 
-  double solver_toe(std::accumulate(FEAT::Statistics::get_time_toe(target).begin(),
-        FEAT::Statistics::get_time_toe(target).end(), 0.));
-  double solver_toe_max;
-  double solver_toe_min;
-  comm.allreduce(&solver_toe, &solver_toe_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_toe, &solver_toe_min, std::size_t(1), Dist::op_min);
-  Index solver_iters(std::accumulate(FEAT::Statistics::get_iters(target).begin(),
-        FEAT::Statistics::get_iters(target).end(), Index(0)));
-  Index solver_iters_max;
-  Index solver_iters_min;
-  comm.allreduce(&solver_iters, &solver_iters_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_iters, &solver_iters_min, std::size_t(1), Dist::op_min);
-  double solver_mpi_execute(std::accumulate(FEAT::Statistics::get_time_mpi_execute(target).begin(),
-        FEAT::Statistics::get_time_mpi_execute(target).end(), 0.));
-  double solver_mpi_execute_max;
-  double solver_mpi_execute_min;
-  comm.allreduce(&solver_mpi_execute, &solver_mpi_execute_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_mpi_execute, &solver_mpi_execute_min, std::size_t(1), Dist::op_min);
-  double solver_mpi_wait_reduction(std::accumulate(FEAT::Statistics::get_time_mpi_wait_reduction(target).begin(),
-        FEAT::Statistics::get_time_mpi_wait_reduction(target).end(), 0.));
-  double solver_mpi_wait_reduction_max;
-  double solver_mpi_wait_reduction_min;
-  comm.allreduce(&solver_mpi_wait_reduction, &solver_mpi_wait_reduction_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_mpi_wait_reduction, &solver_mpi_wait_reduction_min, std::size_t(1), Dist::op_min);
-  double solver_mpi_wait_spmv(std::accumulate(FEAT::Statistics::get_time_mpi_wait_spmv(target).begin(),
-        FEAT::Statistics::get_time_mpi_wait_spmv(target).end(), 0.));
-  double solver_mpi_wait_spmv_max;
-  double solver_mpi_wait_spmv_min;
-  comm.allreduce(&solver_mpi_wait_spmv, &solver_mpi_wait_spmv_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_mpi_wait_spmv, &solver_mpi_wait_spmv_min, std::size_t(1), Dist::op_min);
-
   auto solver_time_mg = FEAT::Statistics::get_time_mg(target);
-  std::vector<double> solver_mg_toe(solver_time_mg.front().size(), double(0.));
+  auto solver_time_mg_mpi_execute = FEAT::Statistics::get_time_mg_mpi_execute(target);
+  auto solver_time_mg_mpi_wait_reduction = FEAT::Statistics::get_time_mg_mpi_wait_reduction(target);
+  auto solver_time_mg_mpi_wait_spmv = FEAT::Statistics::get_time_mg_mpi_wait_spmv(target);
+
+  Index item_count(5 + solver_time_mg.front().size() + solver_time_mg_mpi_execute.front().size() + solver_time_mg_mpi_wait_reduction.front().size() +
+      solver_time_mg_mpi_wait_spmv.front().size() + 2);
+
+  double * t_local = new double[item_count];
+  double * t_max = new double[item_count];
+  double * t_min = new double[item_count];
+
+  /*
+   * array to value mapping:
+   * 0 solver_toe
+   * 1 solver_iters
+   * 2 solver_mpi_execute
+   * 3 solver_mpi_wait_reduction
+   * 4 solver_mpi_wait_spmv
+   * 5 solver_schwarz_toe
+   * 6 solver_schwarz_iters
+   * n solver_mg_toe
+   * n solver_mg_mpi_execute
+   * n solver_mg_mpi_wait_reduction
+   * n solver_mg_mpi_wait_spmv
+   */
+
+  t_local[0] = std::accumulate(FEAT::Statistics::get_time_toe(target).begin(),
+        FEAT::Statistics::get_time_toe(target).end(), 0.);
+  t_local[1] = double(std::accumulate(FEAT::Statistics::get_iters(target).begin(),
+        FEAT::Statistics::get_iters(target).end(), Index(0)));
+  t_local[2] = std::accumulate(FEAT::Statistics::get_time_mpi_execute(target).begin(),
+        FEAT::Statistics::get_time_mpi_execute(target).end(), 0.);
+  t_local[3] = std::accumulate(FEAT::Statistics::get_time_mpi_wait_reduction(target).begin(),
+        FEAT::Statistics::get_time_mpi_wait_reduction(target).end(), 0.);
+  t_local[4] = std::accumulate(FEAT::Statistics::get_time_mpi_wait_spmv(target).begin(),
+        FEAT::Statistics::get_time_mpi_wait_spmv(target).end(), 0.);
+  t_local[5] = std::accumulate(FEAT::Statistics::get_time_schwarz(target).begin(),
+        FEAT::Statistics::get_time_schwarz(target).end(), 0.);
+  t_local[6] = Index(std::accumulate(FEAT::Statistics::get_iters_schwarz(target).begin(),
+        FEAT::Statistics::get_iters_schwarz(target).end(), Index(0)));
+  t_local[6] /= (Index)FEAT::Statistics::get_iters_schwarz(target).size();
+
+  Index offset(6);
+  Index levels(solver_time_mg.front().size());
+
   for (auto& step : solver_time_mg)
   {
+    XASSERT(step.size() == levels);
     for (Index i(0) ; i < step.size() ; ++i)
     {
-      solver_mg_toe.at(i) += step.at(i);
+      t_local[offset + i] = double(0);
+    }
+    for (Index i(0) ; i < step.size() ; ++i)
+    {
+      t_local[offset + i] += step.at(i);
     }
   }
-  std::vector<double> solver_mg_toe_max(solver_mg_toe.size(), double(0.));
-  std::vector<double> solver_mg_toe_min(solver_mg_toe.size(), double(0.));
-  for (Index i(0) ; i < solver_mg_toe.size() ; ++i)
-  {
-    comm.allreduce(&solver_mg_toe.at(i), &solver_mg_toe_max.at(i), std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_mg_toe.at(i), &solver_mg_toe_min.at(i), std::size_t(1), Dist::op_min);
-  }
 
-  auto solver_time_mg_mpi_execute = FEAT::Statistics::get_time_mg_mpi_execute(target);
-  std::vector<double> solver_mg_mpi_execute(solver_time_mg_mpi_execute.front().size(), double(0.));
+  offset += levels;
+
   for (auto& step : solver_time_mg_mpi_execute)
   {
+    XASSERT(step.size() == levels);
     for (Index i(0) ; i < step.size() ; ++i)
     {
-      solver_mg_mpi_execute.at(i) += step.at(i);
+      t_local[offset + i] = double(0);
+    }
+    for (Index i(0) ; i < step.size() ; ++i)
+    {
+      t_local[offset + i] += step.at(i);
     }
   }
-  std::vector<double> solver_mg_mpi_execute_max(solver_mg_mpi_execute.size(), double(0.));
-  std::vector<double> solver_mg_mpi_execute_min(solver_mg_mpi_execute.size(), double(0.));
-  for (Index i(0) ; i < solver_mg_mpi_execute.size() ; ++i)
-  {
-    comm.allreduce(&solver_mg_mpi_execute.at(i), &solver_mg_mpi_execute_max.at(i), std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_mg_mpi_execute.at(i), &solver_mg_mpi_execute_min.at(i), std::size_t(1), Dist::op_min);
-  }
 
-  auto solver_time_mg_mpi_wait_reduction = FEAT::Statistics::get_time_mg_mpi_wait_reduction(target);
-  std::vector<double> solver_mg_mpi_wait_reduction(solver_time_mg_mpi_wait_reduction.front().size(), double(0.));
+  offset += levels;
+
   for (auto& step : solver_time_mg_mpi_wait_reduction)
   {
+    XASSERT(step.size() == levels);
     for (Index i(0) ; i < step.size() ; ++i)
     {
-      solver_mg_mpi_wait_reduction.at(i) += step.at(i);
+      t_local[offset + i] = double(0);
+    }
+    for (Index i(0) ; i < step.size() ; ++i)
+    {
+      t_local[offset + i] += step.at(i);
     }
   }
-  std::vector<double> solver_mg_mpi_wait_reduction_max(solver_mg_mpi_wait_reduction.size(), double(0.));
-  std::vector<double> solver_mg_mpi_wait_reduction_min(solver_mg_mpi_wait_reduction.size(), double(0.));
-  for (Index i(0) ; i < solver_mg_mpi_wait_reduction.size() ; ++i)
-  {
-    comm.allreduce(&solver_mg_mpi_wait_reduction.at(i), &solver_mg_mpi_wait_reduction_max.at(i), std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_mg_mpi_wait_reduction.at(i), &solver_mg_mpi_wait_reduction_min.at(i), std::size_t(1), Dist::op_min);
-  }
 
-  auto solver_time_mg_mpi_wait_spmv = FEAT::Statistics::get_time_mg_mpi_wait_spmv(target);
-  std::vector<double> solver_mg_mpi_wait_spmv(solver_time_mg_mpi_wait_spmv.front().size(), double(0.));
+  offset += levels;
+
   for (auto& step : solver_time_mg_mpi_wait_spmv)
   {
+    XASSERT(step.size() == levels);
     for (Index i(0) ; i < step.size() ; ++i)
     {
-      solver_mg_mpi_wait_spmv.at(i) += step.at(i);
+      t_local[offset + i] = double(0);
+    }
+    for (Index i(0) ; i < step.size() ; ++i)
+    {
+      t_local[offset + i] += step.at(i);
     }
   }
-  std::vector<double> solver_mg_mpi_wait_spmv_max(solver_mg_mpi_wait_spmv.size(), double(0.));
-  std::vector<double> solver_mg_mpi_wait_spmv_min(solver_mg_mpi_wait_spmv.size(), double(0.));
-  for (Index i(0) ; i < solver_mg_mpi_wait_spmv.size() ; ++i)
-  {
-    comm.allreduce(&solver_mg_mpi_wait_spmv.at(i), &solver_mg_mpi_wait_spmv_max.at(i), std::size_t(1), Dist::op_max);
-    comm.allreduce(&solver_mg_mpi_wait_spmv.at(i), &solver_mg_mpi_wait_spmv_min.at(i), std::size_t(1), Dist::op_min);
-  }
 
-  double solver_schwarz_toe(std::accumulate(FEAT::Statistics::get_time_schwarz(target).begin(),
-        FEAT::Statistics::get_time_schwarz(target).end(), 0.));
-  double solver_schwarz_toe_max;
-  double solver_schwarz_toe_min;
-  comm.allreduce(&solver_schwarz_toe, &solver_schwarz_toe_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_schwarz_toe, &solver_schwarz_toe_min, std::size_t(1), Dist::op_min);
-
-  Index solver_schwarz_iters(std::accumulate(FEAT::Statistics::get_iters_schwarz(target).begin(),
-        FEAT::Statistics::get_iters_schwarz(target).end(), Index(0)));
-  solver_schwarz_iters = solver_schwarz_iters / (Index)FEAT::Statistics::get_iters_schwarz(target).size();
-  Index solver_schwarz_iters_max;
-  Index solver_schwarz_iters_min;
-  comm.allreduce(&solver_schwarz_iters, &solver_schwarz_iters_max, std::size_t(1), Dist::op_max);
-  comm.allreduce(&solver_schwarz_iters, &solver_schwarz_iters_min, std::size_t(1), Dist::op_min);
-
+  comm.allreduce(t_local, t_max, std::size_t(item_count), Dist::op_max);
+  comm.allreduce(t_local, t_min, std::size_t(item_count), Dist::op_min);
 
   String result = target + "\n";
-  result += String("toe:").pad_back(20) + "max: " + stringify(solver_toe_max) + ", min: " + stringify(solver_toe_min) + ", local: " +
-      stringify(solver_toe) + "\n";
-  result += String("iters:").pad_back(20) + "max: " + stringify(solver_iters_max) + ", min: " + stringify(solver_iters_min) + ", local: " +
-      stringify(solver_iters) + "\n";
-  result += String("mpi execute:").pad_back(20) + "max: " + stringify(solver_mpi_execute_max) + ", min: " + stringify(solver_mpi_execute_min) + ", local: " +
-      stringify(solver_mpi_execute) + "\n";
-  result += String("mpi wait reduction:").pad_back(20) + "max: " + stringify(solver_mpi_wait_reduction_max) + ", min: " + stringify(solver_mpi_wait_reduction_min) + ", local: " +
-      stringify(solver_mpi_wait_reduction) + "\n";
-  result += String("mpi wait spmv:").pad_back(20) + "max: " + stringify(solver_mpi_wait_spmv_max) + ", min: " + stringify(solver_mpi_wait_spmv_min) + ", local: " +
-      stringify(solver_mpi_wait_spmv) + "\n";
-  for (Index i(0) ; i < solver_mg_toe.size() ; ++i)
+  result += String("toe:").pad_back(22) + "max: " + stringify(t_max[0]) + ", min: " + stringify(t_min[0]) + ", local: " +
+      stringify(t_local[0]) + "\n";
+  result += String("iters:").pad_back(22) + "max: " + stringify(Index(t_max[1])) + ", min: " + stringify(Index(t_min[1])) + ", local: " +
+      stringify(Index(t_local[1])) + "\n";
+  result += String("mpi execute:").pad_back(22) + "max: " + stringify(t_max[2]) + ", min: " + stringify(t_min[2]) + ", local: " +
+      stringify(t_local[2]) + "\n";
+  result += String("mpi wait reduction:").pad_back(22) + "max: " + stringify(t_max[3]) + ", min: " + stringify(t_min[3]) + ", local: " +
+      stringify(t_local[3]) + "\n";
+  result += String("mpi wait spmv:").pad_back(22) + "max: " + stringify(t_max[4]) + ", min: " + stringify(t_min[4]) + ", local: " +
+      stringify(t_local[4]) + "\n";
+  result += String("schwarz toe:").pad_back(22) + "max: " + stringify(t_max[5]) + ", min: " + stringify(t_min[5]) + ", local: " +
+      stringify(t_local[5]) + "\n";
+  result += String("schwarz iters:").pad_back(22) + "max: " + stringify(Index(t_max[6])) + ", min: " + stringify(Index(t_min[6])) + ", local: " +
+      stringify(Index(t_local[6])) + "\n";
+
+  offset = 6;
+  for (Index i(0) ; i < levels ; ++i)
   {
-    result += String("toe lvl ") + stringify(i).pad_back(12) + "max: " + stringify(solver_mg_toe_max.at(i)) + ", min: " + stringify(solver_mg_toe_min.at(i)) + ", local: " +
-        stringify(solver_mg_toe.at(i)) + "\n";
+    result += String("toe lvl ") + stringify(i).pad_back(14) + "max: " + stringify(t_max[offset + i]) + ", min: " + stringify(t_min[offset + i]) + ", local: " +
+        stringify(t_local[offset + i]) + "\n";
   }
-  for (Index i(0) ; i < solver_mg_toe.size() ; ++i)
+  offset += levels;
+  for (Index i(0) ; i < levels ; ++i)
   {
-    result += String("mpi execute lvl ") + stringify(i).pad_back(4) + "max: " + stringify(solver_mg_mpi_execute_max.at(i)) + ", min: " + stringify(solver_mg_mpi_execute_min.at(i)) +
-        ", local: " + stringify(solver_mg_mpi_execute.at(i)) + "\n";
+    result += String("mpi execute lvl ") + stringify(i).pad_back(6) + "max: " + stringify(t_max[offset + i]) + ", min: " + stringify(t_min[offset + i]) +
+        ", local: " + stringify(t_local[offset + i]) + "\n";
   }
-  for (Index i(0) ; i < solver_mg_toe.size() ; ++i)
+  offset += levels;
+  for (Index i(0) ; i < levels ; ++i)
   {
-    result += String("mpi wait red lvl ") + stringify(i).pad_back(3) + "max: " + stringify(solver_mg_mpi_wait_reduction_max.at(i)) + ", min: " + stringify(solver_mg_mpi_wait_reduction_min.at(i)) +
-        ", local: " + stringify(solver_mg_mpi_wait_reduction.at(i)) + "\n";
+    result += String("mpi wait red lvl ") + stringify(i).pad_back(5) + "max: " + stringify(t_max[offset + i]) + ", min: " + stringify(t_min[offset + i]) +
+        ", local: " + stringify(t_local[offset + i]) + "\n";
   }
-  for (Index i(0) ; i < solver_mg_toe.size() ; ++i)
+  offset += levels;
+  for (Index i(0) ; i < levels ; ++i)
   {
-    result += String("mpi wait spmv lvl ") + stringify(i).pad_back(2) + "max: " + stringify(solver_mg_mpi_wait_spmv_max.at(i)) + ", min: " + stringify(solver_mg_mpi_wait_spmv_min.at(i)) +
-        ", local: " + stringify(solver_mg_mpi_wait_spmv.at(i)) + "\n";
+    result += String("mpi wait spmv lvl ") + stringify(i).pad_back(4) + "max: " + stringify(t_max[offset + i]) + ", min: " + stringify(t_min[offset + i]) +
+        ", local: " + stringify(t_local[offset + i]);
+    if (i != levels - 1)
+      result += "\n";
   }
-  result += String("schwarz toe:").pad_back(20) + "max: " + stringify(solver_schwarz_toe_max) + ", min: " + stringify(solver_schwarz_toe_min) + ", local: " +
-      stringify(solver_schwarz_toe) + "\n";
-  result += String("schwarz iters:").pad_back(20) + "max: " + stringify(solver_schwarz_iters_max) + ", min: " + stringify(solver_schwarz_iters_min) + ", local: " +
-      stringify(solver_schwarz_iters);
+
+  delete[] t_local;
+  delete[] t_max;
+  delete[] t_min;
 
   return result;
 }
