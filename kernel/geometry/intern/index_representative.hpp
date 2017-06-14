@@ -68,7 +68,7 @@ namespace FEAT
         {
           ivo[0] = std::min(std::min(ivi[0], ivi[1]), std::min(ivi[2], ivi[3]));
 
-          Index i = 0;
+          int i = 0;
 
           while(ivi[i] != ivo[0])
           {

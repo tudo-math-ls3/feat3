@@ -74,14 +74,14 @@ namespace FEAT
         Index count = 0;
         Index current_value;
         Index vector_size = 19;
-        Index num_indices = tree.get_num_indices();
+        int num_indices = tree.get_num_indices();
 
         for(Index i(0); i < vector_size; ++i)
         {
           Index current_set_size = tree.get_set_size(i);
           for(Index j(0); j < current_set_size; ++j)
           {
-            for(Index k(0); k < num_indices; ++k)
+            for(int k(0); k < num_indices; ++k)
             {
               current_value = tree.get_index(i, j, k);
 
@@ -152,14 +152,14 @@ namespace FEAT
         Index count = 0;
         Index current_value;
         Index vector_size = 19;
-        Index num_indices = tree.get_num_indices();
+        int num_indices = tree.get_num_indices();
 
         for(Index i(0); i < vector_size; ++i)
         {
           Index current_set_size = tree.get_set_size(i);
           for(Index j(0); j < current_set_size; ++j)
           {
-            for(Index k(0); k < num_indices; ++k)
+            for(int k(0); k < num_indices; ++k)
             {
               current_value = tree.get_index(i, j, k);
 
@@ -205,14 +205,14 @@ namespace FEAT
         Index count = 0;
         Index current_value;
         Index vector_size = 4;
-        Index num_indices = tree.get_num_indices();
+        int num_indices = tree.get_num_indices();
 
         for(Index i(0); i < vector_size; ++i)
         {
           Index current_set_size = tree.get_set_size(i);
           for(Index j(0); j < current_set_size; ++j)
           {
-            for(Index k(0); k < num_indices; ++k)
+            for(int k(0); k < num_indices; ++k)
             {
               current_value = tree.get_index(i, j, k);
 
@@ -256,14 +256,14 @@ namespace FEAT
         Index count = 0;
         Index current_value;
         Index vector_size = 4;
-        Index num_indices = tree.get_num_indices();
+        int num_indices = tree.get_num_indices();
 
         for(Index i(0); i < vector_size; ++i)
         {
           Index current_set_size = tree.get_set_size(i);
           for(Index j(0); j < current_set_size; ++j)
           {
-            for(Index k(0); k < num_indices; ++k)
+            for(int k(0); k < num_indices; ++k)
             {
               current_value = tree.get_index(i, j, k);
 

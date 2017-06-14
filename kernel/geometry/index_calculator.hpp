@@ -44,16 +44,16 @@ namespace FEAT
 
         IndexVector(const IndexVector& iv)
         {
-          for(Index i(0); i < Index(num_indices); ++i)
+          for(int i(0); i < num_indices; ++i)
             idx[i] = iv[i];
         }
 
-        Index& operator[](Index i)
+        Index& operator[](int i)
         {
           return idx[i];
         }
 
-        const Index& operator[](Index i) const
+        const Index& operator[](int i) const
         {
           return idx[i];
         }
@@ -61,7 +61,7 @@ namespace FEAT
         bool operator<(const IndexVector& other) const
         {
           // Lexicographical comparison ignoring the first entry
-          for(Index i(1); i < Index(num_indices); ++i)
+          for(int i(1); i < num_indices; ++i)
           {
             if (idx[i] < other[i])
             {
@@ -93,8 +93,8 @@ namespace FEAT
        * \param[in] num_vertices
        * The total number of vertices in the mesh.
        */
-      explicit IndexTree(Index num_vertices)
-        : _rep_set_vec(num_vertices)
+      explicit IndexTree(Index num_vertices) :
+        _rep_set_vec(num_vertices)
       {
       }
 
@@ -104,7 +104,7 @@ namespace FEAT
       }
 
       /// returns number of indices of an index-representative
-      Index get_num_indices() const
+      int get_num_indices() const
       {
         return Shape::FaceTraits<Shape_, 0>::count;
       }
@@ -117,7 +117,7 @@ namespace FEAT
       }
 
       /// returns the value of the k-th component of the j-th index-representative in the i-th set
-      Index get_index(Index i, Index j, Index k) const
+      Index get_index(Index i, Index j, int k) const
       {
         typename RepSet::const_iterator iter = _rep_set_vec[i].begin();
         std::advance(iter, (typename std::iterator_traits<decltype(iter)>::difference_type)j);
@@ -318,7 +318,7 @@ namespace FEAT
             // loop over all indices of the cell-vertex-vector
             for(int k(0); k < IndexTreeType::num_indices; ++k)
             {
-              current_face_indices[Index(k)]  = current_cell_in[FimType::map(j, k)];
+              current_face_indices[k]  = current_cell_in[FimType::map(j, k)];
             }
 
             // try to find the index of the vector within the tree
@@ -346,9 +346,9 @@ namespace FEAT
         // Number of verticex
         const Index num_verts(index_set_in.get_index_bound());
         // Number of vertices per subshape
-        const Index num_verts_subshape(Shape::FaceTraits<FaceType,0>::count);
+        const int num_verts_subshape(Shape::FaceTraits<FaceType,0>::count);
         // Number of subshapes per shape, i.e. a Simplex<3> has four Simplex<2> as subshapes
-        const Index num_subshapes_shape(Shape::FaceTraits<Shape_,face_dim_>::count);
+        const int num_subshapes_shape(Shape::FaceTraits<Shape_,face_dim_>::count);
 
         // For every vertex, the IndexTree saves which subshapes it is contained in
         IndexTreeType my_index_tree(num_verts);
@@ -358,11 +358,11 @@ namespace FEAT
         // Generate the IndexTree of subshapes
         for(Index k(0); k < num_shapes; ++k)
         {
-          for(Index l(0); l < num_subshapes_shape; ++l)
+          for(int l(0); l < num_subshapes_shape; ++l)
           {
             // Get the ith index in the current subshape from the subshape to index mapping for shape k
-            for(Index i(0); i < num_verts_subshape; ++i)
-              current_face_indices[i] = index_set_in[k][FimType::map(int(l),int(i))];
+            for(int i(0); i < num_verts_subshape; ++i)
+              current_face_indices[i] = index_set_in[k][FimType::map(l,i)];
 
             // Insert the current subshape into the IndexTree. We need to give an id as 2nd argument, this does not
             // get used in any way
@@ -393,7 +393,7 @@ namespace FEAT
 
             // Iterate over the IndexVector that the set element j represents
             // Skip index 0 as this is contains the index of the subshape in the subshape numbering
-            for(Index k(1); k < Index(IndexTreeType::num_indices); ++k)
+            for(int k(1); k < IndexTreeType::num_indices; ++k)
               index_set_out[my_index][k] = my_index_tree.get_index(i, j, k);
           }
 

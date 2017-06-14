@@ -333,7 +333,7 @@ class IndexCalculatorVertexTest
       // Check if every subshape in the new IndexSet was present in the original
       for(Index i(0); i < my_vert_at_subshape_index_set.get_num_entities(); ++i)
       {
-        for(Index j(0); j < Index(IndexTreeType::num_indices); ++j)
+        for(int j(0); j < IndexTreeType::num_indices; ++j)
           indices_at_edge[j] = my_vert_at_subshape_index_set[i][j];
 
         std::pair<bool, Index> bi = original_tree.find(indices_at_edge);
@@ -349,7 +349,7 @@ class IndexCalculatorVertexTest
       // Check if every subshape in the original IndexSet ist present in the new IndexSet
       for(Index i(0); i < original_vert_at_subshape_index_set.get_num_entities(); ++i)
       {
-        for(Index j(0); j < Index(IndexTreeType::num_indices); ++j)
+        for(int j(0); j < IndexTreeType::num_indices; ++j)
           indices_at_edge[j] = original_vert_at_subshape_index_set[i][j];
 
         std::pair<bool, Index> bi = new_tree.find(indices_at_edge);
