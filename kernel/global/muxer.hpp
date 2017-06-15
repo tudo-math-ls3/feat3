@@ -46,45 +46,39 @@ namespace FEAT
       using MuxerTypeByMDI = class Muxer<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
     public:
-      /// the child communicator
-      const Dist::Comm* _comm;
+      /// the sibling communicator
+      const Dist::Comm* _sibling_comm;
 
-      /// parent ranks (on all children)
-      std::vector<int> _parent_ranks;
-      /// parent mirrors (on all children)
-      std::vector<Mirror_> _parent_mirrors;
-      /// parent buffers (on all children)
-      mutable std::vector<BufferVectorType> _parent_buffers;
-      /// parent requests (on all children)
-      mutable Dist::RequestVector _parent_reqs;
+      /// the rank of the parent
+      int _parent_rank;
 
-      /// child ranks (only on parent)
-      std::vector<int> _child_ranks;
+      /// buffer size
+      Index _buffer_size;
+
+      /// parent mirror (on all children)
+      Mirror_ _parent_mirror;
+
       /// child mirrors (only on parent)
       std::vector<Mirror_> _child_mirrors;
-      /// child buffers (only on parent)
-      mutable std::vector<BufferVectorType> _child_buffers;
-      /// child requests (only on parent)
-      mutable Dist::RequestVector _child_reqs;
 
     public:
       /// standard constructor
       explicit Muxer() :
-        _comm(nullptr)
+        _sibling_comm(nullptr),
+        _parent_rank(-1),
+        _buffer_size(0),
+        _parent_mirror(),
+        _child_mirrors()
       {
       }
 
       /// move-constructor
       Muxer(Muxer&& other) :
-        _comm(other._comm),
-        _parent_ranks(std::forward<std::vector<int>>(other._parent_ranks)),
-        _parent_mirrors(std::forward<std::vector<Mirror_>>(other._parent_mirrors)),
-        _parent_buffers(std::forward<std::vector<BufferVectorType>>(other._parent_buffers)),
-        _parent_reqs(std::forward<Dist::RequestVector>(other._parent_reqs)),
-        _child_ranks(std::forward<std::vector<int>>(other._child_ranks)),
-        _child_mirrors(std::forward<std::vector<Mirror_>>(other._child_mirrors)),
-        _child_buffers(std::forward<std::vector<BufferVectorType>>(other._child_buffers)),
-        _child_reqs(std::forward<Dist::RequestVector>(other._child_reqs))
+        _sibling_comm(other._sibling_comm),
+        _parent_rank(other._parent_rank),
+        _buffer_size(other._buffer_size),
+        _parent_mirror(std::forward<Mirror_>(other._parent_mirror)),
+        _child_mirrors(std::forward<std::vector<Mirror_>>(other._child_mirrors))
       {
       }
 
@@ -100,15 +94,12 @@ namespace FEAT
         if(this == &other)
           return *this;
 
-        _comm = other._comm;
-        _parent_ranks = std::forward<std::vector<int>>(other._parent_ranks);
-        _parent_mirrors = std::forward<std::vector<Mirror_>>(other._parent_mirrors);
-        _parent_buffers = std::forward<std::vector<BufferVectorType>>(other._parent_buffers);
-        _parent_reqs = std::forward<Dist::RequestVector>(other._parent_reqs);
-        _child_ranks = std::forward<std::vector<int>>(other._child_ranks);
+        _sibling_comm = other._sibling_comm;
+        _parent_rank = other._parent_rank;
+        _buffer_size = other._buffer_size;
+        _parent_mirror = std::forward<Mirror_>(other._parent_mirror);
         _child_mirrors = std::forward<std::vector<Mirror_>>(other._child_mirrors);
-        _child_buffers = std::forward<std::vector<BufferVectorType>>(other._child_buffers);
-        _child_reqs = std::forward<Dist::RequestVector>(other._child_reqs);
+
         return *this;
       }
 
@@ -119,42 +110,23 @@ namespace FEAT
         if((void*)this == (void*)&other)
           return;
 
-        this->_comm = other._comm;
+        this->_sibling_comm = other._sibling_comm;
+        this->_parent_rank = other._parent_rank;
+        this->_buffer_size = other._buffer_size;
+        this->_parent_mirror.convert(other._parent_mirror);
 
-        this->_parent_ranks = other._parent_ranks;
-        this->_parent_mirrors.resize(other._parent_mirrors.size());
-        this->_parent_buffers.resize(other._parent_buffers.size());
-
-        for(std::size_t i(0); i < other._parent_ranks.size(); ++i)
-        {
-          this->_parent_mirrors.at(i).convert(other._parent_mirrors.at(i));
-          this->_parent_buffers.at(i).convert(other._parent_buffers.at(i));
-        }
-
-        this->_child_ranks = other._child_ranks;
-        this->_child_mirrors.resize(other._child_mirrors.size());
-        this->_child_buffers.resize(other._child_buffers.size());
-        this->_child_reqs.resize(other._child_reqs.size());
-
-        for(std::size_t i(0); i < other._child_ranks.size(); ++i)
+        for(std::size_t i(0); i < other._child_mirrors.size(); ++i)
         {
           this->_child_mirrors.at(i).convert(other._child_mirrors.at(i));
-          this->_child_buffers.at(i).convert(other._child_buffers.at(i));
         }
       }
 
       /// Returns the internal data size in bytes.
       std::size_t bytes() const
       {
-        std::size_t b = (_parent_ranks.size() + _child_ranks.size()) * sizeof(int);
-        for(const auto& pm : _parent_mirrors)
-          b += pm.bytes();
-        for(const auto& pb : _parent_buffers)
-          b += pb.bytes();
+        std::size_t b = _parent_mirror.bytes();
         for(const auto& cm : _child_mirrors)
           b += cm.bytes();
-        for(const auto& cb : _child_buffers)
-          b += cb.bytes();
         return b;
       }
 
@@ -166,7 +138,7 @@ namespace FEAT
        */
       bool is_child() const
       {
-        return !_parent_ranks.empty();
+        return (_sibling_comm != nullptr) && (_sibling_comm->size() > 0);
       }
 
       /**
@@ -177,7 +149,7 @@ namespace FEAT
        */
       bool is_parent() const
       {
-        return !_child_ranks.empty();
+        return (_sibling_comm != nullptr) && (_sibling_comm->rank() == _parent_rank);
       }
 
       /**
@@ -195,39 +167,35 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the child communicator.
+       * \brief Returns the sibling communicator.
        *
-       * \returns The child communicator.
+       * \returns The sibling communicator.
        */
-      const Dist::Comm* get_comm() const
+      const Dist::Comm* get_sibling_comm() const
       {
-        return _comm;
+        return _sibling_comm;
       }
 
       /**
-       * \brief Sets the child communicator.
+       * \brief Sets the sibling communicator.
        *
-       * \param[in] comm_
-       * The child communicator.
-       */
-      void set_comm(const Dist::Comm* comm_)
-      {
-        _comm = comm_;
-      }
-
-      /**
-       * \brief Adds a parent rank and mirror for a child process.
+       * \param[in] sibling_comm_
+       * The sibling communicator.
        *
        * \param[in] parent_rank
-       * The rank of the parent of this child process.
+       * The rank of the parent process in the sibling comm.
        *
        * \param[in] parent_mirror
-       * The mirror of the parent patch of this child process.
+       * The parent mirror.
        */
-      void push_parent(int parent_rank, Mirror_&& parent_mirror)
+      void set_parent(const Dist::Comm* sibling_comm_, int parent_rank, Mirror_&& parent_mirror)
       {
-        _parent_ranks.push_back(parent_rank);
-        _parent_mirrors.push_back(std::forward<Mirror_>(parent_mirror));
+        _sibling_comm = sibling_comm_;
+        XASSERT(_sibling_comm != nullptr);
+        XASSERT(parent_rank >= 0);
+        XASSERT(parent_rank < _sibling_comm->size());
+        _parent_rank = parent_rank;
+        _parent_mirror = std::forward<Mirror_>(parent_mirror);
       }
 
       /**
@@ -239,9 +207,8 @@ namespace FEAT
        * \param[in] child_mirror
        * The mirror of the child patch of this parent process.
        */
-      void push_child(int child_rank, Mirror_&& child_mirror)
+      void push_child(Mirror_&& child_mirror)
       {
-        _child_ranks.push_back(child_rank);
         _child_mirrors.push_back(std::forward<Mirror_>(child_mirror));
       }
 
@@ -253,25 +220,33 @@ namespace FEAT
        */
       void compile(const LocalVector_& vec_tmp_)
       {
-        if(is_child())
-        {
-          // create parent buffers
-          _parent_reqs.resize(_parent_ranks.size());
-          _parent_buffers.resize(_parent_ranks.size());
+        if(!is_child())
+          return; // nothing to
 
-          for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-            _parent_buffers.at(i) = _parent_mirrors.at(i).create_buffer(vec_tmp_);
+        XASSERT(_sibling_comm != nullptr);
+        XASSERT(_parent_rank >= 0);
+        XASSERT(_parent_rank < _sibling_comm->size());
+
+        Index bufsize(0);
+
+        // Is this the parent?
+        if(_sibling_comm->rank() == _parent_rank)
+        {
+          // loop over all child buffers and compute the largest buffer size
+          for(const auto& cm : _child_mirrors)
+          {
+            bufsize = Math::max(bufsize, cm.buffer_size(vec_tmp_));
+          }
         }
 
-        if(is_parent())
-        {
-          // create child buffers
-          _child_reqs.resize(_child_ranks.size());
-          _child_buffers.resize(_child_ranks.size());
+        // broadcast buffer size to all siblings
+        _sibling_comm->bcast(&bufsize, std::size_t(1), _parent_rank);
 
-          for(std::size_t i(0); i < _child_ranks.size(); ++i)
-            _child_buffers.at(i) = _child_mirrors.at(i).create_buffer(vec_tmp_);
-        }
+        // verify against length of parent buffer
+        XASSERT(bufsize >= _parent_mirror.buffer_size(vec_tmp_));
+
+        // store buffer size
+        this->_buffer_size = bufsize;
       }
 
       /**
@@ -280,30 +255,19 @@ namespace FEAT
        * \param[in] vec_src
        * The type-0 child vector that is to be joined on the parent process.
        */
-      bool join_send(const LocalVector_& vec_src) const
+      void join_send(const LocalVector_& vec_src) const
       {
-        XASSERT(is_child());
-        XASSERT(!is_parent());
-        XASSERT(_comm != nullptr);
+        XASSERT(_sibling_comm != nullptr);
+        XASSERT(_sibling_comm->size() > 1);
+        XASSERT(_sibling_comm->rank() != _parent_rank); // parent must call join() instead
 
-        // post sends to all parents
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-        {
-          // gather vector into buffer
-          _parent_mirrors.at(i).gather(_parent_buffers.at(i), vec_src, Index(0));
+        // gather source to parent buffer
+        BufferVectorType parent_buffer(_buffer_size);
+        _parent_mirror.gather(parent_buffer, vec_src);
 
-          // post send
-          _parent_reqs[i] = _comm->isend(
-            _parent_buffers.at(i).elements(),
-            _parent_buffers.at(i).used_elements(),
-            _parent_ranks.at(i));
-        }
-
-        // wait for all sends to finish
-        _parent_reqs.wait_all();
-
-        // okay
-        return true;
+        // gather to parent sibling
+        DataType* dummy = nullptr;
+        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
       }
 
       /**
@@ -315,56 +279,40 @@ namespace FEAT
        * \param[in] vec_trg
        * The joined type-0 parent vector.
        */
-      bool join(const LocalVector_& vec_src, LocalVector_& vec_trg) const
+      void join(const LocalVector_& vec_src, LocalVector_& vec_trg) const
       {
         // if this muxer is not a child, then this operation is a simple copy
-        if(!is_child() || (_comm == nullptr))
+        if((_sibling_comm == nullptr) || (_sibling_comm->size() <= 1))
         {
           vec_trg.copy(vec_src);
-          return true;
+          return;
         }
 
-        XASSERT(is_parent());
-        XASSERT(_comm != nullptr);
+        XASSERT(_sibling_comm != nullptr);
+        XASSERT(_sibling_comm->size() > 0);
+        XASSERT(_sibling_comm->rank() == _parent_rank);
 
-        // post the receives for our children
-        for(std::size_t i(0); i < _child_ranks.size(); ++i)
-        {
-          // post receive request from child
-          _child_reqs[i] = _comm->irecv(
-            _child_buffers.at(i).elements(),
-            _child_buffers.at(i).used_elements(),
-            _child_ranks.at(i));
-        }
+        const Index num_children = Index(_child_mirrors.size());
 
-        // post sends to all parents
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-        {
-          // gather vector into buffer
-          _parent_mirrors.at(i).gather(_parent_buffers.at(i), vec_src, Index(0));
+        // gather source to parent buffer
+        BufferVectorType parent_buffer(_buffer_size);
+        _parent_mirror.gather(parent_buffer, vec_src);
 
-          // post send
-          _parent_reqs[i] = _comm->isend(
-            _parent_buffers.at(i).elements(),
-            _parent_buffers.at(i).used_elements(),
-            _parent_ranks.at(i));
-        }
+        // allocate child buffers
+        BufferVectorType child_buffers(_buffer_size * num_children);
+
+        // gather from siblings
+        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, child_buffers.elements(), _buffer_size, _parent_rank);
 
         // format target vector
         vec_trg.format();
 
-        // process all receive requests
-        for(std::size_t idx; _child_reqs.wait_any(idx); )
+        // scatter child buffers into target vector
+        for(Index i(0); i < num_children; ++i)
         {
           // scatter buffers
-          _child_mirrors.at(idx).scatter_axpy(vec_trg, _child_buffers.at(idx));
+          _child_mirrors.at(i).scatter_axpy(vec_trg, child_buffers, DataType(1), i*_buffer_size);
         }
-
-        // wait for all sends to finish
-        _parent_reqs.wait_all();
-
-        // okay
-        return true;
       }
 
       /**
@@ -372,110 +320,23 @@ namespace FEAT
        *
        * \param[out] vec_trg
        * The split type-1 child vector.
-       *
-       * \returns
-       * \c true, if the split operation was performed or \c false,
-       * if the split operation was cancelled by the parent.
        */
-      bool split_recv(LocalVector_& vec_trg) const
+      void split_recv(LocalVector_& vec_trg) const
       {
-        XASSERT(is_child());
-        XASSERT(!is_parent());
-        XASSERT(_comm != nullptr);
+        XASSERT(_sibling_comm != nullptr);
+        XASSERT(_sibling_comm->size() > 1);
+        XASSERT(_sibling_comm->rank() != _parent_rank); // parent must call split() instead
 
-        // receive the statuses from all parents
-        std::vector<int> parent_split_status(_parent_ranks.size(), 1);
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-        {
-          _parent_reqs[i] = _comm->irecv(&parent_split_status.at(i), std::size_t(1), _parent_ranks.at(i));
-        }
+        // allocate parent buffer
+        BufferVectorType parent_buffer(_buffer_size);
 
-        // wait for all status receives to finish
-        _parent_reqs.wait_all();
+        // receive scatter from parent sibling
+        DataType* dummy = nullptr;
+        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer.elements(), _buffer_size, _parent_rank);
 
-        // did any of our parents cancel?
-        bool parent_split_cancelled = false;
-
-        // receive all statuses, one by one
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-        {
-          // check received status
-          if(parent_split_status.at(i) == 0)
-          {
-            // okay, parent successful, so post another receive for the data
-            _parent_reqs[i] = _comm->irecv(
-              _parent_buffers.at(i).elements(),
-              _parent_buffers.at(i).used_elements(),
-              _parent_ranks.at(i));
-          }
-          else
-          {
-            // parent cancelled
-            parent_split_cancelled = true;
-          }
-        }
-
-        // If at least one of our parents cancelled, then we also cancel,
-        // but we still need to wait for the receives from the successful
-        // parents to finish:
-        if(parent_split_cancelled)
-        {
-          // wait for successful parents
-          _parent_reqs.wait_all();
-
-          // cancelled by at least one parent
-          return false;
-        }
-
-        // If we come out here, then all parents were successful, so
-        // receive their data and scatter it into the target vector
-
-        // format target vector
+        // scatter into target vector
         vec_trg.format();
-
-        // process all receive requests
-        for(std::size_t idx; _parent_reqs.wait_any(idx); )
-        {
-          // scatter buffers
-          _parent_mirrors.at(idx).scatter_axpy(vec_trg, _parent_buffers.at(idx));
-        }
-
-        // okay
-        return true;
-      }
-
-      /**
-       * \brief Cancels a split operation.
-       *
-       * This function may be called by a parent process to notify the child processes
-       * that the split operation is not going to be completed. In this case, the
-       * return value of the #split_recv call on the child processes will return \c false.
-       */
-      void split_cancel() const
-      {
-        XASSERT(is_child());
-        XASSERT(is_parent());
-        XASSERT(_comm != nullptr);
-
-        // receive statuses from our parents
-        std::vector<int> parent_split_status(_parent_ranks.size(), 1);
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-        {
-          _parent_reqs[i] = _comm->irecv(&parent_split_status.at(i), std::size_t(1), _parent_ranks.at(i));
-        }
-
-        // post negative status to all our children
-        int child_split_status(1);
-        for(std::size_t i(0); i < _child_ranks.size(); ++i)
-        {
-          _child_reqs[i] = _comm->isend(&child_split_status, std::size_t(1), _child_ranks.at(i));
-        }
-
-        // wait for all status receives to finish
-        _parent_reqs.wait_all();
-
-        // wait until all sends are finished
-        _child_reqs.wait_all();
+        _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
       }
 
       /**
@@ -486,111 +347,40 @@ namespace FEAT
        *
        * \param[in] vec_src
        * The type-1 parent vector that is to be split
-       *
-       * \returns
-       * \c true, if the split operation was performed or \c false,
-       * if the split operation was cancelled by the parent.
        */
-      bool split(LocalVector_& vec_trg, const LocalVector_& vec_src) const
+      void split(LocalVector_& vec_trg, const LocalVector_& vec_src) const
       {
         // if this muxer is not a child, then this operation is a simple copy
-        if(!is_child() || (_comm == nullptr))
+        if((_sibling_comm == nullptr) || (_sibling_comm->size() <= 1))
         {
           vec_trg.copy(vec_src);
-          return true;
+          return;
         }
 
-        XASSERT(is_parent());
-        XASSERT(_comm != nullptr);
+        XASSERT(_sibling_comm != nullptr);
+        XASSERT(_sibling_comm->size() > 0);
+        XASSERT(_sibling_comm->rank() == _parent_rank);
 
-        // receive statuses from our parents
-        std::vector<int> parent_split_status(_parent_ranks.size(), 1);
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
+        const Index num_children = Index(_child_mirrors.size());
+
+        // allocate child buffers
+        BufferVectorType child_buffers(_buffer_size * num_children);
+
+        // gather child buffers from target vector
+        for(Index i(0); i < num_children; ++i)
         {
-          _parent_reqs[i] = _comm->irecv(&parent_split_status.at(i), std::size_t(1), _parent_ranks.at(i));
+          _child_mirrors.at(i).gather(child_buffers, vec_src, i*_buffer_size);
         }
 
-        // post positive status to all children
-        int child_split_status(0);
-        for(std::size_t i(0); i < _child_ranks.size(); ++i)
-        {
-          _child_reqs[i] = _comm->isend(&child_split_status, std::size_t(1), _child_ranks.at(i));
-        }
+        // create parent buffer
+        BufferVectorType parent_buffer(_buffer_size);
 
-        // wait for all status receives to finish
-        _parent_reqs.wait_all();
+        // scatter to siblings
+        _sibling_comm->scatter(child_buffers.elements(), _buffer_size, parent_buffer.elements(), _buffer_size, _parent_rank);
 
-        // did any of our parents cancel?
-        bool parent_split_cancelled = false;
-
-        // receive all statuses, one by one
-        for(std::size_t i(0); i < _parent_ranks.size(); ++i)
-        {
-          // check received status
-          if(parent_split_status.at(i) == 0)
-          {
-            // okay, parent successful, so post another receive for the data
-            _parent_reqs[i] = _comm->irecv(
-              _parent_buffers.at(i).elements(),
-              _parent_buffers.at(i).used_elements(),
-              _parent_ranks.at(i));
-          }
-          else
-          {
-            // parent cancelled
-            parent_split_cancelled = true;
-          }
-        }
-
-        // wait until all sends are finished
-        _child_reqs.wait_all();
-
-        // post the sends for our children
-        for(std::size_t i(0); i < _child_ranks.size(); ++i)
-        {
-          auto& child_buf = _child_buffers.at(i);
-
-          // gather vector into child buffer
-          _child_mirrors.at(i).gather(child_buf, vec_src, Index(0));
-
-          // post send request
-          _child_reqs[i] = _comm->isend(child_buf.elements(), child_buf.used_elements(), _child_ranks.at(i));
-        }
-
-
-        // If at least one of our parents cancelled, then we also cancel,
-        // but we still need to wait for the receives from the successful
-        // parents to finish:
-        if(parent_split_cancelled)
-        {
-          // wait for successful parents
-          _parent_reqs.wait_all();
-
-          // wait until all sends are finished
-          _child_reqs.wait_all();
-
-          // cancelled by at least one parent
-          return false;
-        }
-
-        // If we come out here, then all parents were successful, so
-        // receive their data and scatter it into the target vector
-
-        // format target vector
+        // scatter into target vector
         vec_trg.format();
-
-        // process all receive requests
-        for(std::size_t idx; _parent_reqs.wait_any(idx); )
-        {
-          // scatter buffers
-          _parent_mirrors.at(idx).scatter_axpy(vec_trg, _parent_buffers.at(idx));
-        }
-
-        // wait until all sends are finished
-        _child_reqs.wait_all();
-
-        // okay
-        return true;
+        _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
       }
     }; // class Muxer<...>
   } // namespace Global

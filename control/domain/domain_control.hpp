@@ -25,35 +25,34 @@ namespace FEAT
       class DomainLayer
       {
       protected:
-        /// the communicator for this level
-        Dist::Comm _comm;
-
         /// the layer index
         int _layer_index;
-
+        /// the communicator for this level
+        Dist::Comm _comm;
         /// the ranks of the neighbour processes in this layer
         std::vector<int> _neighbour_ranks;
-        /// the ranks of the child processes w.r.t. the previous layer
-        std::vector<int> _child_ranks;
-        /// the ranks of the parent processes w.r.t. the next layer
-        std::vector<int> _parent_ranks;
+
+        /// the sibling communicator
+        Dist::Comm _sibling_comm;
+        /// the rank of the parent in the sibling comm
+        int _parent_rank;
 
       public:
         explicit DomainLayer(Dist::Comm&& comm_, int lyr_idx) :
-          _comm(std::forward<Dist::Comm>(comm_)),
           _layer_index(lyr_idx),
+          _comm(std::forward<Dist::Comm>(comm_)),
           _neighbour_ranks(),
-          _child_ranks(),
-          _parent_ranks()
+          _sibling_comm(),
+          _parent_rank(-1)
         {
         }
 
         DomainLayer(DomainLayer&& other) :
-          _comm(std::forward<Dist::Comm>(other._comm)),
           _layer_index(other._layer_index),
+          _comm(std::forward<Dist::Comm>(other._comm)),
           _neighbour_ranks(std::forward<std::vector<int>>(other._neighbour_ranks)),
-          _child_ranks(std::forward<std::vector<int>>(other._child_ranks)),
-          _parent_ranks(std::forward<std::vector<int>>(other._parent_ranks))
+          _sibling_comm(std::forward<Dist::Comm>(other._sibling_comm)),
+          _parent_rank(other._parent_rank)
         {
         }
 
@@ -61,9 +60,15 @@ namespace FEAT
         {
         }
 
+        void set_parent(Dist::Comm&& sibling_comm_, int parent_rank)
+        {
+          _sibling_comm = std::forward<Dist::Comm>(sibling_comm_);
+          _parent_rank = parent_rank;
+        }
+
         std::size_t bytes() const
         {
-          return (_neighbour_ranks.size() + _child_ranks.size() + _parent_ranks.size()) * sizeof(int);
+          return _neighbour_ranks.size() * sizeof(int);
         }
 
         const Dist::Comm& comm() const
@@ -76,14 +81,19 @@ namespace FEAT
           return &_comm;
         }
 
+        const Dist::Comm* sibling_comm_ptr() const
+        {
+          return &_sibling_comm;
+        }
+
         bool is_child() const
         {
-          return !_parent_ranks.empty();
+          return (_sibling_comm.size() > 0);
         }
 
         bool is_parent() const
         {
-          return !_child_ranks.empty();
+          return (_sibling_comm.rank() == _parent_rank);
         }
 
         bool is_ghost() const
@@ -94,6 +104,16 @@ namespace FEAT
         int get_layer_index() const
         {
           return _layer_index;
+        }
+
+        int get_parent_rank() const
+        {
+          return _parent_rank;
+        }
+
+        Index child_count() const
+        {
+          return Index(_sibling_comm.size());
         }
 
         Index neighbour_count() const
@@ -119,56 +139,6 @@ namespace FEAT
         const std::vector<int>& get_neighbour_ranks() const
         {
           return _neighbour_ranks;
-        }
-
-        Index child_count() const
-        {
-          return Index(_child_ranks.size());
-        }
-
-        void push_child(int child_rank_)
-        {
-          _child_ranks.push_back(child_rank_);
-        }
-
-        int child_rank(Index i) const
-        {
-          return _child_ranks.at(std::size_t(i));
-        }
-
-        void set_child_ranks(const std::vector<int>& children)
-        {
-          _child_ranks = children;
-        }
-
-        const std::vector<int>& get_child_ranks() const
-        {
-          return _child_ranks;
-        }
-
-        Index parent_count() const
-        {
-          return Index(_parent_ranks.size());
-        }
-
-        void push_parent(int parent_rank_)
-        {
-          _parent_ranks.push_back(parent_rank_);
-        }
-
-        int parent_rank(Index i) const
-        {
-          return _parent_ranks.at(std::size_t(i));
-        }
-
-        void set_parent_ranks(const std::vector<int>& parents)
-        {
-          _parent_ranks = parents;
-        }
-
-        const std::vector<int>& get_parent_ranks() const
-        {
-          return _parent_ranks;
         }
       }; // class DomainLayer
 
@@ -217,7 +187,7 @@ namespace FEAT
           if(_level_parent)
           {
             XASSERT(bool(_layer_parent));
-            XASSERT(_layer_parent->is_parent());
+            XASSERT(_layer_child->is_parent());
             XASSERT(_level_child->get_level_index() == _level_parent->get_level_index());
           }
           else
@@ -627,7 +597,6 @@ namespace FEAT
         {
           String msg;
           msg += "(" + stringify(_layers.size()) + "):";
-          std::size_t nc = std::size_t(1);
           for(std::size_t i(0); i < _layers.size(); ++i)
           {
             const auto& lyr = *_layers.at(i);
@@ -635,16 +604,13 @@ namespace FEAT
             if(i > std::size_t(0))
               msg += " |";
             msg += " [" + stringify(lyr.comm().rank()).pad_front(np) + "]";
-            for(const auto& cr : lyr.get_child_ranks())
-              msg += " " + stringify(cr).pad_front(nc);
             if(lyr.is_child())
             {
-              msg += " {";
-              for(const auto& pr : lyr.get_parent_ranks())
-                msg += " " + stringify(pr).pad_front(np);
-              msg += "}";
+              std::size_t ns = std::size_t(Math::ilog10(lyr.comm().size()));
+              msg += " " + stringify(lyr.sibling_comm_ptr()->rank()).pad_front(ns);
+              msg += " {" + stringify(lyr.get_parent_rank()).pad_front(np);
+              msg += lyr.is_parent() ? "*}" : " }";
             }
-            nc = np;
           }
           _comm.allprint(msg);
         }
@@ -674,9 +640,7 @@ namespace FEAT
             msg += "[" + stringify((*it).layer().comm().size()).pad_front(np) + "]";
             if((*it).is_child())
             {
-              msg += " {";
-              for(const auto& pr : (*it).layer_c().get_parent_ranks())
-                msg += " " + stringify(pr).pad_front(np);
+              msg += " { " + stringify((*it).layer_c().get_parent_rank());
               if((*it).is_parent())
                 msg += ":" + stringify((*it).layer_p().comm().rank()).pad_front(np) + "}";
               else

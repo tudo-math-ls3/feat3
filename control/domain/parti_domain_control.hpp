@@ -686,8 +686,8 @@ namespace FEAT
           // create first layer (child)
           std::shared_ptr<LayerType> layer_c = std::make_shared<LayerType>(this->_comm.comm_dup(), 0);
 
-          // add parent rank to our child layer
-          layer_c->push_parent(0);
+          // set parent and sibling comm - that's the same as the child comm here
+          layer_c->set_parent(this->_comm.comm_dup(), 0);
 
           // push the first layer
           this->push_layer(layer_c);
@@ -695,15 +695,8 @@ namespace FEAT
           // is this the parent process?
           if(is_parent)
           {
-            // create second layer (parent)
-            std::shared_ptr<LayerType> layer_p = std::make_shared<LayerType>(Dist::Comm::self(), 1);
-
-            // push all child process ranks to parent layer
-            for(int i(0); i < nprocs; ++i)
-              layer_p->push_child(i);
-
-            // push the second layer (parent)
-            this->push_layer(layer_p);
+            // create and push second layer (parent)
+            this->push_layer(std::make_shared<LayerType>(Dist::Comm::self(), 1));
           }
 
           // choose a partitioning strategy

@@ -165,18 +165,17 @@ namespace FEAT
         {
           XASSERT(virt_lvl_coarse.is_child());
 
-          const auto& layer_p = virt_lvl_coarse.layer_p();
+          const auto& layer_c = virt_lvl_coarse.layer_c();
           const DomainLevel_& level_p = virt_lvl_coarse.level_p();
 
           // loop over all children
-          for(Index i(0); i < layer_p.child_count(); ++i)
+          for(Index i(0); i < layer_c.child_count(); ++i)
           {
-            int child_rank = layer_p.child_rank(i);
-            const auto* child = level_p.find_patch_part(child_rank);
+            const auto* child = level_p.find_patch_part(int(i));
             XASSERT(child != nullptr);
             SystemMirror child_mirror;
             Assembly::MirrorAssembler::assemble_mirror(child_mirror, level_p.space, *child);
-            this->coarse_muxer_sys.push_child(child_rank, std::move(child_mirror));
+            this->coarse_muxer_sys.push_child(std::move(child_mirror));
           }
         }
 
@@ -185,9 +184,6 @@ namespace FEAT
         {
           const auto& layer_c = virt_lvl_coarse.layer_c();
           const DomainLevel_& level_c = virt_lvl_coarse.level_c();
-
-          // ensure that there is only one parent
-          XASSERTM(layer_c.parent_count() == Index(1), "currently only 1 layer parent is supported");
 
           // manually set up an identity gather/scatter matrix
           Index n = level_c.space.get_num_dofs();
@@ -203,15 +199,12 @@ namespace FEAT
           }
           ptr[n] = n;
 
-          // build parent mirror
-          SystemMirror parent_mirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
-
-          // set muxer parent
-          int parent_rank = layer_c.parent_rank(Index(0));
-          this->coarse_muxer_sys.push_parent(parent_rank, std::move(parent_mirror));
-
-          // set muxer comm
-          this->coarse_muxer_sys.set_comm(layer_c.comm_ptr());
+          // set parent and sibling comms
+          this->coarse_muxer_sys.set_parent(
+            layer_c.sibling_comm_ptr(),
+            layer_c.get_parent_rank(),
+            SystemMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow))
+          );
 
           // compile muxer
           LocalSystemVector vec_tmp(level_c.space.get_num_dofs());

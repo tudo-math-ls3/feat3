@@ -202,8 +202,7 @@ namespace FEAT
         {
           XASSERT(_coarse_muxer->is_parent());
           _transfer.rest(vec_fine.local(), _vec_tmp);
-          if(!_coarse_muxer->join(_vec_tmp, vec_coarse.local()))
-            return false;
+          _coarse_muxer->join(_vec_tmp, vec_coarse.local());
         }
         vec_coarse.sync_0();
         return true;
@@ -220,7 +219,8 @@ namespace FEAT
         XASSERT(_coarse_muxer != nullptr);
         XASSERT(_coarse_muxer->is_ghost());
         _transfer.rest(vec_fine.local(), _vec_tmp);
-        return _coarse_muxer->join_send(_vec_tmp);
+        _coarse_muxer->join_send(_vec_tmp);
+        return true;
       }
 
       /**
@@ -244,8 +244,7 @@ namespace FEAT
         {
           XASSERT(_coarse_muxer->is_child());
           XASSERT(_coarse_muxer->is_parent());
-          if(!_coarse_muxer->split(_vec_tmp, vec_coarse.local()))
-            return false;
+          _coarse_muxer->split(_vec_tmp, vec_coarse.local());
           _transfer.prol(vec_fine.local(), _vec_tmp);
         }
         vec_fine.sync_0();
@@ -257,11 +256,7 @@ namespace FEAT
        */
       void prol_cancel() const
       {
-        if(_coarse_muxer != nullptr)
-        {
-          XASSERT(_coarse_muxer->is_parent());
-          _coarse_muxer->split_cancel();
-        }
+        XASSERTM(false, "this function must not be called");
       }
 
       /**
@@ -274,8 +269,7 @@ namespace FEAT
       {
         XASSERT(_coarse_muxer != nullptr);
         XASSERT(_coarse_muxer->is_ghost());
-        if(!_coarse_muxer->split_recv(_vec_tmp))
-          return false;
+        _coarse_muxer->split_recv(_vec_tmp);
         _transfer.prol(vec_fine.local(), _vec_tmp);
         vec_fine.sync_0();
         return true;

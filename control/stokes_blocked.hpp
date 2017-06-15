@@ -265,23 +265,22 @@ namespace FEAT
         {
           XASSERT(virt_lvl_coarse.is_child());
 
-          const auto& layer_p = virt_lvl_coarse.layer_p();
+          const auto& layer_c = virt_lvl_coarse.layer_c();
           const DomainLevel_& level_p = virt_lvl_coarse.level_p();
 
           // loop over all children
-          for(Index i(0); i < layer_p.child_count(); ++i)
+          for(Index i(0); i < layer_c.child_count(); ++i)
           {
-            int child_rank = layer_p.child_rank(i);
-            const auto* child = level_p.find_patch_part(child_rank);
+            const auto* child = level_p.find_patch_part(int(i));
             XASSERT(child != nullptr);
             SystemMirror child_mirror_sys;
             VeloMirror& child_mirror_v = child_mirror_sys.template at<0>();
             PresMirror& child_mirror_p = child_mirror_sys.template at<1>();
             Assembly::MirrorAssembler::assemble_mirror(child_mirror_v, level_p.space_velo, *child);
             Assembly::MirrorAssembler::assemble_mirror(child_mirror_p, level_p.space_pres, *child);
-            this->coarse_muxer_velo.push_child(child_rank, child_mirror_v.clone(LAFEM::CloneMode::Shallow));
-            this->coarse_muxer_pres.push_child(child_rank, child_mirror_p.clone(LAFEM::CloneMode::Shallow));
-            this->coarse_muxer_sys.push_child(child_rank, std::move(child_mirror_sys));
+            this->coarse_muxer_velo.push_child(child_mirror_v.clone(LAFEM::CloneMode::Shallow));
+            this->coarse_muxer_pres.push_child(child_mirror_p.clone(LAFEM::CloneMode::Shallow));
+            this->coarse_muxer_sys.push_child(std::move(child_mirror_sys));
           }
         }
 
@@ -290,9 +289,6 @@ namespace FEAT
         {
           const auto& layer_c = virt_lvl_coarse.layer_c();
           const DomainLevel_& level_c = virt_lvl_coarse.level_c();
-
-          // ensure that there is only one parent
-          XASSERTM(layer_c.parent_count() == Index(1), "currently only 1 layer parent is supported");
 
           SystemMirror parent_mirror_sys;
           VeloMirror& parent_mirror_v = parent_mirror_sys.template at<0>();
@@ -330,16 +326,22 @@ namespace FEAT
             parent_mirror_p = ScalarMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
           }
 
-          // set muxer parent
-          int parent_rank = layer_c.parent_rank(Index(0));
-          this->coarse_muxer_velo.push_parent(parent_rank, parent_mirror_v.clone(LAFEM::CloneMode::Shallow));
-          this->coarse_muxer_pres.push_parent(parent_rank, parent_mirror_p.clone(LAFEM::CloneMode::Shallow));
-          this->coarse_muxer_sys.push_parent(parent_rank, std::move(parent_mirror_sys));
-
-          // set muxer comm
-          this->coarse_muxer_velo.set_comm(layer_c.comm_ptr());
-          this->coarse_muxer_pres.set_comm(layer_c.comm_ptr());
-          this->coarse_muxer_sys.set_comm(layer_c.comm_ptr());
+          // set parent and sibling comms
+          this->coarse_muxer_velo.set_parent(
+            layer_c.sibling_comm_ptr(),
+            layer_c.get_parent_rank(),
+            parent_mirror_v.clone(LAFEM::CloneMode::Shallow)
+          );
+          this->coarse_muxer_pres.set_parent(
+            layer_c.sibling_comm_ptr(),
+            layer_c.get_parent_rank(),
+            parent_mirror_p.clone(LAFEM::CloneMode::Shallow)
+          );
+          this->coarse_muxer_sys.set_parent(
+            layer_c.sibling_comm_ptr(),
+            layer_c.get_parent_rank(),
+            std::move(parent_mirror_sys)
+          );
 
           // compile muxer
           LocalVeloVector tmpl_v(level_c.space_velo.get_num_dofs());

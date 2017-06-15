@@ -250,32 +250,27 @@ namespace FEAT
             // get the child comm
             const Dist::Comm& comm_c = child.comm();
 
-            // set the child's parent rank
-            child.push_parent(comm_c.rank() & ~3); // = (r/4)*4
+            // my rank in child comm
+            const int rank = comm_c.rank();
+
+            // create sibling comm
+            Dist::Comm comm_s = comm_c.comm_create_range_incl(4, rank & ~3);
+            XASSERT(comm_s.size() == 4);
+
+            // set sibling comm in child layer
+            child.set_parent(std::move(comm_s), 0); // rank 0 is parent
 
             // create parent comm
             Dist::Comm comm_p = comm_c.comm_create_range_incl(comm_c.size()/4, 0, 4);
             if(comm_p.is_null())
               break;
 
-            // get our rank in the parent comm
-            int prank = comm_p.rank();
-
-            // create new layer for parent
-            auto parent = std::make_shared<DomainLayer>(std::move(comm_p), i+1);
-
-            // set the parent's child ranks
-            for(int c(0); c < 4; ++c)
-            {
-              parent->push_child(4*prank + c);
-            }
-
             // finally, add to our layer deque
-            this->_layers.push_back(parent);
+            this->_layers.push_back(std::make_shared<DomainLayer>(std::move(comm_p), i+1));
           }
         }
 
-        void _create_child_meshparts(const DomainLayer& layer, std::shared_ptr<MeshNodeType> mesh_node)
+        void _create_child_meshparts(const DomainLayer& /*layer*/, std::shared_ptr<MeshNodeType> mesh_node)
         {
           Index num_elems = mesh_node->get_mesh()->get_num_elements();
           XASSERT(num_elems == 4);
@@ -311,7 +306,7 @@ namespace FEAT
           for(int i(0); i < 4; ++i)
           {
             // fetch child rank
-            int child_rank = layer.child_rank(Index(i));
+            //int child_rank = layer.child_rank(Index(i));
 
             MeshPartType* part = new MeshPartType(num_entities, false);
 
@@ -326,7 +321,8 @@ namespace FEAT
             }
             iq[0] = Index(i);
 
-            mesh_node->add_mesh_part("_patch:" + stringify(child_rank), part);
+            //mesh_node->add_mesh_part("_patch:" + stringify(child_rank), part);
+            mesh_node->add_mesh_part("_patch:" + stringify(i), part);
           }
         }
       }; // class HierarchUnitCubeDomainControl<...>
