@@ -43,14 +43,14 @@ namespace FEAT
       std::vector<int> _ranks;
       /// vector mirrors
       std::vector<Mirror_> _mirrors;
-      /// frequency fector
+      /// frequency vector
       LocalVector_ _freqs;
 
       /// Our 'base' class type
       template <typename LocalVector2_, typename Mirror2_>
       using GateType = class Gate<LocalVector2_, Mirror2_>;
 
-      /// this typedef lets you create a gate container with new Memory, Datatape and Index types
+      /// this typedef lets you create a gate container with new Memory, Data and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using GateTypeByMDI = class Gate<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 

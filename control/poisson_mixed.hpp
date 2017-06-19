@@ -291,7 +291,7 @@ namespace FEAT
 
             // push mirror into gates
             gate_velo.push(rank, std::move(mirror_velo));
-            if(!mirror_pres.get_gather().empty())
+            if(!mirror_pres.empty())
               gate_pres.push(rank, std::move(mirror_pres));
             gate_sys.push(rank, std::move(mirror_sys));
           }
@@ -347,33 +347,17 @@ namespace FEAT
             // manually set up an identity gather/scatter matrix
             {
               Index n = level_c.space_velo.get_num_dofs();
-              LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> scagath(n, n, n);
-              auto* ptr = scagath.row_ptr();
-              auto* idx = scagath.col_ind();
-              auto* val = scagath.val();
-
+              parent_mirror_v = ScalarMirror(n, n);
+              auto* idx = parent_mirror_v.indices();
               for(Index i(0); i < n; ++i)
-              {
-                ptr[i] = idx[i] = i;
-                val[i] = DataType(1);
-              }
-              ptr[n] = n;
-              parent_mirror_v = ScalarMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
+                idx[i] = i;
             }
             {
               Index n = level_c.space_pres.get_num_dofs();
-              LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> scagath(n, n, n);
-              auto* ptr = scagath.row_ptr();
-              auto* idx = scagath.col_ind();
-              auto* val = scagath.val();
-
+              parent_mirror_p = ScalarMirror(n, n);
+              auto* idx = parent_mirror_p.indices();
               for(Index i(0); i < n; ++i)
-              {
-                ptr[i] = idx[i] = i;
-                val[i] = DataType(1);
-              }
-              ptr[n] = n;
-              parent_mirror_p = ScalarMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow));
+                idx[i] = i;
             }
 
             // set parent and sibling comms

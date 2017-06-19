@@ -34,7 +34,7 @@ class VectorMirrorTest
   typedef SparseVectorBlocked<MemType_, DT_, IT_, block_size> BlockedSparseVectorType;
 
 
-  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
+  //typedef DenseVector<MemType_, IT_, IT_> IVectorType;
   typedef SparseMatrixCSR<MemType_, DT_, IT_> MatrixType;
   typedef VectorMirror<MemType_, DT_, IT_> MirrorType;
 
@@ -52,25 +52,13 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-    // create mirror vectors
-    IVectorType col_idx0(Index(1), IT_(0));
-    IVectorType col_idx1(Index(1), IT_(1));
-    IVectorType col_idx2(Index(1), IT_(2));
-    VectorType mir_val(Index(1), DT_(1));
-    IVectorType row_ptr(Index(2));
-    row_ptr(Index(0), IT_(0));
-    row_ptr(Index(1), IT_(1));
-    MatrixType mat_gather0(Index(1), Index(3), col_idx0, mir_val, row_ptr);
-    MatrixType mat_gather1(Index(1), Index(3), col_idx1, mir_val, row_ptr);
-    MatrixType mat_gather2(Index(1), Index(3), col_idx2, mir_val, row_ptr);
-    MatrixType mat_scatter0(mat_gather0.transpose());
-    MatrixType mat_scatter1(mat_gather1.transpose());
-    MatrixType mat_scatter2(mat_gather2.transpose());
-
     // create mirrors
-    MirrorType mirror0(std::move(mat_gather0), std::move(mat_scatter0));
-    MirrorType mirror1(std::move(mat_gather1), std::move(mat_scatter1));
-    MirrorType mirror2(std::move(mat_gather2), std::move(mat_scatter2));
+    MirrorType mirror0(Index(3), Index(1));
+    MirrorType mirror1(Index(3), Index(1));
+    MirrorType mirror2(Index(3), Index(1));
+    mirror0.indices()[0] = Index(0);
+    mirror1.indices()[0] = Index(1);
+    mirror2.indices()[0] = Index(2);
 
     // Test for DenseVector
     {

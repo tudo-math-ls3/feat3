@@ -13,6 +13,7 @@
 
 // includes, system
 #include <vector>
+#include <map>
 
 namespace FEAT
 {
@@ -20,6 +21,8 @@ namespace FEAT
   {
     /**
      * \brief Matrix-Mirror class template.
+     *
+     * \todo reimplement operations for SparseMatrixELL and SparseMatrixBanded
      *
      * \author Peter Zajac
      */
@@ -36,18 +39,11 @@ namespace FEAT
       /// vector mirror type
       typedef LAFEM::VectorMirror<Mem_, DT_, IT_> VectorMirrorType;
 
-      template<typename DT2_, typename IT2_>
-      using BufferType = LAFEM::MatrixMirrorBuffer<Mem::Main, DT2_, IT2_>;
-
     protected:
       /// row-mirror reference
       const VectorMirrorType& _row_mirror;
       /// col-mirror reference
       const VectorMirrorType& _col_mirror;
-      /// \cond internal
-      // mutable work array
-      mutable std::vector<DataType> _vec_work;
-      /// \endcond
 
     public:
       /**
@@ -61,8 +57,14 @@ namespace FEAT
        */
       explicit MatrixMirror(const VectorMirrorType& row_mirror, const VectorMirrorType& col_mirror) :
         _row_mirror(row_mirror),
-        _col_mirror(col_mirror),
-        _vec_work(std::max(col_mirror.get_gather().columns(), col_mirror.get_scatter().columns()), DataType(0))
+        _col_mirror(col_mirror)
+      {
+      }
+
+      /// move constructor
+      MatrixMirror(MatrixMirror&& other) :
+        _row_mirror(other._row_mirror),
+        _col_mirror(other._col_mirror)
       {
       }
 
@@ -93,12 +95,11 @@ namespace FEAT
        * \returns
        * A matrix buffer of the same data- and index-type as the template matrix.
        */
-      template<typename DT2_, typename IT2_, int bw_, int bh_>
-      LAFEM::MatrixMirrorBuffer<Mem::Main, DT2_, IT2_> create_buffer(
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT2_, IT2_, bw_, bh_>& matrix) const
+      template<int bw_, int bh_>
+      LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_> create_buffer(
+        const LAFEM::SparseMatrixBCSR<MemType, DT_, IT_, bw_, bh_>& matrix) const
       {
-        Adjacency::Graph graph = _create_buffer_graph(matrix);
-        return LAFEM::MatrixMirrorBuffer<Mem::Main, DT_, IT_>(graph, Index(bw_*bh_));
+        return LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>(_create_buffer_graph(matrix), Index(bw_*bh_));
       }
 
       /**
@@ -111,16 +112,14 @@ namespace FEAT
        * \returns
        * A matrix buffer of the same data- and index-type as the template matrix.
        */
-      template<typename DT2_, typename IT2_>
-      LAFEM::MatrixMirrorBuffer<Mem::Main, DT2_, IT2_> create_buffer(
-        const LAFEM::SparseMatrixCSR<Mem::Main, DT2_, IT2_>& matrix) const
+      LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_> create_buffer(
+        const LAFEM::SparseMatrixCSR<MemType, DT_, IT_>& matrix) const
       {
-        Adjacency::Graph graph = _create_buffer_graph(matrix);
-        return LAFEM::MatrixMirrorBuffer<Mem::Main, DT_, IT_>(graph, Index(1));
+        return LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>(_create_buffer_graph(matrix), Index(1));
       }
 
       /**
-       * \brief Creates a buffer matrix based on a ELL template matrix.
+       * \brief Creates a buffer matrix based on an ELL template matrix.
        *
        * \param[in] matrix
        * A reference to the template matrix. Its structure must be initialised,
@@ -129,13 +128,12 @@ namespace FEAT
        * \returns
        * A matrix buffer of the same data- and index-type as the template matrix.
        */
-      template<typename DT2_, typename IT2_>
-      LAFEM::MatrixMirrorBuffer<Mem::Main, DT2_, IT2_> create_buffer(
-        const LAFEM::SparseMatrixELL<Mem::Main, DT2_, IT2_>& matrix) const
+      LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_> create_buffer(
+        const LAFEM::SparseMatrixELL<MemType, DT_, IT_>& matrix) const
       {
-        Adjacency::Graph graph = _create_buffer_graph(matrix);
-        return LAFEM::MatrixMirrorBuffer<Mem::Main, DT_, IT_>(graph, Index(1));
+        return LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>(_create_buffer_graph(matrix), Index(1));
       }
+
       /**
        * \brief Creates a buffer matrix based on a banded template matrix.
        *
@@ -146,12 +144,10 @@ namespace FEAT
        * \returns
        * A matrix buffer of the same data- and index-type as the template matrix.
        */
-      template<typename DT2_, typename IT2_>
-      LAFEM::MatrixMirrorBuffer<Mem::Main, DT2_, IT2_> create_buffer(
-        const LAFEM::SparseMatrixBanded<Mem::Main, DT2_, IT2_>& matrix) const
+      LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_> create_buffer(
+        const LAFEM::SparseMatrixBanded<MemType, DT_, IT_>& matrix) const
       {
-        Adjacency::Graph graph = _create_buffer_graph(matrix);
-        return LAFEM::MatrixMirrorBuffer<Mem::Main, DT_, IT_>(graph, Index(1));
+        return LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>(_create_buffer_graph(matrix), Index(1));
       }
 
       /**
@@ -163,93 +159,53 @@ namespace FEAT
        * \param[in] matrix
        * A reference to the operator matrix whose entries are to be gathered.
        */
-      template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
       void gather(
-        LAFEM::MatrixMirrorBuffer<Mem::Main, Tx_, Ix_>& buffer,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix) const
+        LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>& buffer,
+        const LAFEM::SparseMatrixCSR<MemType, DT_, IT_>& matrix) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
-
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
-        DataType* _work = _vec_work.data();
-
-        // fetch row mirror arrays
-        const IndexType* row_ptr_a(row_mir_mat.row_ptr());
-        const IndexType* col_idx_a(row_mir_mat.col_ind());
-        const DataType* av(row_mir_mat.val());
-
-        // fetch col mirror arrays
-        const IndexType* row_ptr_b(col_mir_mat.row_ptr());
-        const IndexType* col_idx_b(col_mir_mat.col_ind());
-        const DataType* bv(col_mir_mat.val());
+        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
+        XASSERT(matrix.rows() == this->_row_mirror.size());
+        XASSERT(matrix.columns() == this->_col_mirror.size());
 
         // fetch system matrix arrays
-        const Iy_* row_ptr_y(matrix.row_ptr());
-        const Iy_* col_idx_y(matrix.col_ind());
-        const Ty_* yv(matrix.val());
+        const IT_* row_ptr_a(matrix.row_ptr());
+        const IT_* col_idx_a(matrix.col_ind());
+        const DT_* val_a(matrix.val());
 
         // fetch buffer arrays
-        const Ix_* row_ptr_x(buffer.row_ptr());
-        const Ix_* col_idx_x(buffer.col_ind());
-        Tx_* xv(buffer.val());
+        const IT_* row_ptr_b(buffer.row_ptr());
+        const IT_* col_idx_b(buffer.col_ind());
+        DT_* val_b(buffer.val());
 
-        // In the following, we have to compute:
-        //    X := A * Z := A * Y * B^T,
-        // where:
-        // X is the buffer matrix
-        // Y is the system matrix
-        // A is the row-mirror gather matrix
-        // B is the col-mirror gather matrix
+        // fetch row/column mirror indices
+        const IT_* mir_idx_r(this->_row_mirror.indices());
+        const IT_* mir_idx_c(this->_col_mirror.indices());
 
-        // loop over all buffer rows (X)
-        Index nrows_buf(buffer.rows());
-        for(Index irow_x(0); irow_x < nrows_buf; ++irow_x)
+        // loop over all buffer matrix rows
+        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
         {
-          Index irow_a(irow_x); // row of a := row of x
+          // get the row-index
+          const IT_ ridx = mir_idx_r[i];
 
-          // loop over all non-zeroes in the buffer row (X_i.)
-          for(Ix_ ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
+          // loop over all non-zeros in current row
+          for(IT_ j(row_ptr_b[i]); j < row_ptr_b[i+1]; ++j)
           {
-            // init result
-            Tx_ x_ij(Tx_(0));
+            // format buffer entry
+            val_b[j] = DT_(0);
 
-            // fetch the column index
-            Ix_ irow_b(col_idx_x[ix]); // row of b := col of x
+            // get the column index
+            const IT_ cidx = mir_idx_c[col_idx_b[j]];
 
-            // loop over all non-zeroes of the col-mirror (B_j.)
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            // try to find this entry in the input matrix
+            for(IT_ k(row_ptr_a[ridx]); k < row_ptr_a[ridx+1]; ++k)
             {
-              // and densify the sparse row B_j.
-              _work[col_idx_b[ib]] = bv[ib];
-            }
-
-            // loop over all non-zeroes of the row-mirror (A_i.)
-            for(IndexType ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
-            {
-              // fetch the column index
-              Iy_ irow_y(col_idx_a[ia]); // row of y := col of a
-
-              // temporary entry: Z_kj := Y_k. * B_j.
-              Tx_ z_kj(Tx_(0));
-
-              // loop over all non-zeroes of the system matrix (Y_k.)
-              for(Iy_ iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
+              if(col_idx_a[k] == cidx)
               {
-                z_kj += Tx_(yv[iy]) * Tx_(_work[col_idx_y[iy]]);
+                val_b[j] = val_a[k];
+                break;
               }
-
-              // update x_ij += a_ik * z_kj
-              x_ij += Tx_(av[ia]) * z_kj;
-            }
-
-            // store X_ij
-            xv[ix] = x_ij;
-
-            // reset temporary data
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
-            {
-              _work[col_idx_b[ib]] = DataType(0);
             }
           }
         }
@@ -267,102 +223,51 @@ namespace FEAT
        * \param[in] alpha
        * The scaling factor for the operation.
        */
-      template<typename Ty_, typename Iy_, typename Tx_, typename Ix_>
       void scatter_axpy(
-        LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
-        const LAFEM::MatrixMirrorBuffer<Mem::Main, Tx_, Ix_>& buffer,
-        const Ty_ alpha = Ty_(1)) const
+        LAFEM::SparseMatrixCSR<MemType, DT_, IT_>& matrix,
+        const LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>& buffer,
+        const DT_ alpha = DT_(1)) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
-
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
-        DataType* _work = _vec_work.data();
-
-        // fetch row-mirror arrays
-        const IndexType* row_ptr_a(row_mir_mat.row_ptr());
-        const IndexType* col_idx_a(row_mir_mat.col_ind());
-        const DataType* av(row_mir_mat.val());
-
-        // fetch col-mirror arrays
-        const IndexType* row_ptr_b(col_mir_mat.row_ptr());
-        const IndexType* col_idx_b(col_mir_mat.col_ind());
-        const DataType* bv(col_mir_mat.val());
+        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
+        XASSERT(matrix.rows() == this->_row_mirror.size());
+        XASSERT(matrix.columns() == this->_col_mirror.size());
 
         // fetch system matrix arrays
-        const Iy_* row_ptr_y(matrix.row_ptr());
-        const Iy_* col_idx_y(matrix.col_ind());
-        Ty_* yv(matrix.val());
+        const IT_* row_ptr_a(matrix.row_ptr());
+        const IT_* col_idx_a(matrix.col_ind());
+        DT_* val_a(matrix.val());
 
         // fetch buffer arrays
-        const Ix_* row_ptr_x(buffer.row_ptr());
-        const Ix_* col_idx_x(buffer.col_ind());
-        const Tx_* xv(buffer.val());
+        const IT_* row_ptr_b(buffer.row_ptr());
+        const IT_* col_idx_b(buffer.col_ind());
+        const DT_* val_b(buffer.val());
 
-        // In the following, we have to compute:
-        //    Y := B * Z := B * X * A^T,
-        // where:
-        // Y is the system matrix
-        // X is the buffer matrix
-        // A is the row-mirror scatter matrix
-        // B is the col-mirror scatter matrix
+        // fetch row/column mirror indices
+        const IT_* mir_idx_r(this->_row_mirror.indices());
+        const IT_* mir_idx_c(this->_col_mirror.indices());
 
-        // loop over all system matrix rows (Y)
-        Index nrows_sys(matrix.rows());
-        for(Index irow_y(0); irow_y < nrows_sys; ++irow_y)
+        // loop over all buffer matrix rows
+        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
         {
-          Index irow_a(irow_y); // row of a := row of y
+          // get the row-index
+          const IT_ ridx = mir_idx_r[i];
 
-          // skip if the row of a is empty
-          if(row_ptr_a[irow_a] >= row_ptr_a[irow_a + 1])
-            continue;
-
-          // loop over all non-zeroes in the system row (Y_i.)
-          for(Iy_ iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
+          // loop over all non-zeros in current row
+          for(IT_ j(row_ptr_b[i]); j < row_ptr_b[i+1]; ++j)
           {
-            // init result
-            Ty_ y_ij(Ty_(0));
+            // get the column index
+            const IT_ cidx = mir_idx_c[col_idx_b[j]];
 
-            // fetch the column index
-            IndexType irow_b(col_idx_y[iy]); // row of b := col of y
-
-            // skip if the row of b is empty
-            if(row_ptr_b[irow_b] >= row_ptr_b[irow_b + 1])
-              continue;
-
-            // loop over all non-zeroes of the col-mirror (B_j.)
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            // try to find this entry in the input matrix
+            for(IT_ k(row_ptr_a[ridx]); k < row_ptr_a[ridx+1]; ++k)
             {
-              // and densify the sparse row B_j.
-              _work[col_idx_b[ib]] = bv[ib];
-            }
-
-            // loop over all non-zeroes of the row-mirror (A_i.)
-            for(IndexType ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
-            {
-              // fetch the column index
-              IndexType irow_x(col_idx_a[ia]); // row of x := col of a
-
-              // temporary entry: Z_kj := X_k. * B_j.
-              Ty_ z_kj(Ty_(0));
-
-              // loop over all non-zeroes of the buffer matrix (X_k.)
-              for(Ix_ ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
+              if(col_idx_a[k] == cidx)
               {
-                z_kj += Ty_(xv[ix]) * Ty_(_work[col_idx_x[ix]]);
+                val_a[k] += alpha*val_b[j];
+                break;
               }
-
-              // update Y_ij += A_ik * Z_kj
-              y_ij += Ty_(av[ia]) * z_kj;
-            }
-
-            // update Y_ij
-            yv[iy] += alpha*y_ij;
-
-            // reset temporary data
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
-            {
-              _work[col_idx_b[ib]] = DataType(0);
             }
           }
         }
@@ -377,93 +282,56 @@ namespace FEAT
        * \param[in] matrix
        * A reference to the operator matrix whose entries are to be gathered.
        */
-      template</*typename DT_, typename IT_,*/ int bw_, int bh_>
+      template<int bw_, int bh_>
       void gather(
-        LAFEM::MatrixMirrorBuffer<Mem::Main, DT_, IT_>& buffer,
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bw_, bh_>& matrix) const
+        LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>& buffer,
+        const LAFEM::SparseMatrixBCSR<MemType, DT_, IT_, bw_, bh_>& matrix) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(bw_*bh_));
-
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
-        DataType* _work = _vec_work.data();
+        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
+        XASSERT(matrix.rows() == this->_row_mirror.size());
+        XASSERT(matrix.columns() == this->_col_mirror.size());
 
         typedef Tiny::Matrix<DT_, bw_, bh_> ValueType;
 
-        // fetch row mirror arrays
-        const IndexType* row_ptr_a(row_mir_mat.row_ptr());
-        const IndexType* col_idx_a(row_mir_mat.col_ind());
-        const DataType* av(row_mir_mat.val());
-
-        // fetch col mirror arrays
-        const IndexType* row_ptr_b(col_mir_mat.row_ptr());
-        const IndexType* col_idx_b(col_mir_mat.col_ind());
-        const DataType* bv(col_mir_mat.val());
-
         // fetch system matrix arrays
-        const IT_* row_ptr_y(matrix.row_ptr());
-        const IT_* col_idx_y(matrix.col_ind());
-        const ValueType* yv(matrix.val());
+        const IT_* row_ptr_a(matrix.row_ptr());
+        const IT_* col_idx_a(matrix.col_ind());
+        const ValueType* val_a(matrix.val());
 
         // fetch buffer arrays
-        const IT_* row_ptr_x(buffer.row_ptr());
-        const IT_* col_idx_x(buffer.col_ind());
-        ValueType* xv = reinterpret_cast<ValueType*>(buffer.val());
+        const IT_* row_ptr_b(buffer.row_ptr());
+        const IT_* col_idx_b(buffer.col_ind());
+        ValueType* val_b = reinterpret_cast<ValueType*>(buffer.val());
 
-        // In the following, we have to compute:
-        //    X := A * Z := A * Y * B^T,
-        // where:
-        // X is the buffer matrix
-        // Y is the system matrix
-        // A is the row-mirror gather matrix
-        // B is the col-mirror gather matrix
+        // fetch row/column mirror indices
+        const IT_* mir_idx_r(this->_row_mirror.indices());
+        const IT_* mir_idx_c(this->_col_mirror.indices());
 
-        // loop over all buffer rows (X)
-        Index nrows_buf(buffer.rows());
-        for(Index irow_x(0); irow_x < nrows_buf; ++irow_x)
+        // loop over all buffer matrix rows
+        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
         {
-          Index irow_a(irow_x); // row of a := row of x
+          // get the row-index
+          const IT_ ridx = mir_idx_r[i];
 
-          // loop over all non-zeroes in the buffer row (X_i.)
-          for(IT_ ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
+          // loop over all non-zeros in current row
+          for(IT_ j(row_ptr_b[i]); j < row_ptr_b[i+1]; ++j)
           {
-            // init result
-            ValueType& x_ij = xv[ix];
-            x_ij.format();
+            // format buffer entry
+            val_b[j].format();
 
-            // fetch the column index
-            IT_ irow_b(col_idx_x[ix]); // row of b := col of x
+            // get the column index
+            const IT_ cidx = mir_idx_c[col_idx_b[j]];
 
-            // loop over all non-zeroes of the col-mirror (B_j.)
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            // try to find this entry in the input matrix
+            for(IT_ k(row_ptr_a[ridx]); k < row_ptr_a[ridx+1]; ++k)
             {
-              // and densify the sparse row B_j.
-              _work[col_idx_b[ib]] = bv[ib];
-            }
-
-            // loop over all non-zeroes of the row-mirror (A_i.)
-            for(IndexType ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
-            {
-              // fetch the column index
-              IT_ irow_y(col_idx_a[ia]); // row of y := col of a
-
-              // temporary entry: Z_kj := Y_k. * B_j.
-              ValueType z_kj(DT_(0));
-
-              // loop over all non-zeroes of the system matrix (Y_k.)
-              for(IT_ iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
+              if(col_idx_a[k] == cidx)
               {
-                z_kj.axpy(_work[col_idx_y[iy]], yv[iy]);
+                val_b[j] = val_a[k];
+                break;
               }
-
-              // update x_ij += a_ik * z_kj
-              x_ij.axpy(av[ia], z_kj);
-            }
-
-            // reset temporary data
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
-            {
-              _work[col_idx_b[ib]] = DataType(0);
             }
           }
         }
@@ -481,102 +349,54 @@ namespace FEAT
        * \param[in] alpha
        * The scaling factor for the operation.
        */
-      template</*typename DT_, typename IT_,*/ int bw_, int bh_>
+      template<int bw_, int bh_>
       void scatter_axpy(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bw_, bh_>& matrix,
-        const LAFEM::MatrixMirrorBuffer<Mem::Main, DT_, IT_>& buffer,
+        LAFEM::SparseMatrixBCSR<MemType, DT_, IT_, bw_, bh_>& matrix,
+        const LAFEM::MatrixMirrorBuffer<MemType, DT_, IT_>& buffer,
         const DT_ alpha = DT_(1)) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(bw_*bh_));
-
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
-        DataType* _work = _vec_work.data();
+        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
+        XASSERT(matrix.rows() == this->_row_mirror.size());
+        XASSERT(matrix.columns() == this->_col_mirror.size());
 
         typedef Tiny::Matrix<DT_, bw_, bh_> ValueType;
 
-        // fetch row-mirror arrays
-        const IndexType* row_ptr_a(row_mir_mat.row_ptr());
-        const IndexType* col_idx_a(row_mir_mat.col_ind());
-        const DataType* av(row_mir_mat.val());
-
-        // fetch col-mirror arrays
-        const IndexType* row_ptr_b(col_mir_mat.row_ptr());
-        const IndexType* col_idx_b(col_mir_mat.col_ind());
-        const DataType* bv(col_mir_mat.val());
-
         // fetch system matrix arrays
-        const IT_* row_ptr_y(matrix.row_ptr());
-        const IT_* col_idx_y(matrix.col_ind());
-        ValueType* yv(matrix.val());
+        const IT_* row_ptr_a(matrix.row_ptr());
+        const IT_* col_idx_a(matrix.col_ind());
+        ValueType* val_a(matrix.val());
 
         // fetch buffer arrays
-        const IT_* row_ptr_x(buffer.row_ptr());
-        const IT_* col_idx_x(buffer.col_ind());
-        const ValueType* xv = reinterpret_cast<const ValueType*>(buffer.val());
+        const IT_* row_ptr_b(buffer.row_ptr());
+        const IT_* col_idx_b(buffer.col_ind());
+        const ValueType* val_b = reinterpret_cast<const ValueType*>(buffer.val());
 
-        // In the following, we have to compute:
-        //    Y := B * Z := B * X * A^T,
-        // where:
-        // Y is the system matrix
-        // X is the buffer matrix
-        // A is the row-mirror scatter matrix
-        // B is the col-mirror scatter matrix
+        // fetch row/column mirror indices
+        const IT_* mir_idx_r(this->_row_mirror.indices());
+        const IT_* mir_idx_c(this->_col_mirror.indices());
 
-        // loop over all system matrix rows (Y)
-        Index nrows_sys(matrix.rows());
-        for(Index irow_y(0); irow_y < nrows_sys; ++irow_y)
+        // loop over all buffer matrix rows
+        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
         {
-          Index irow_a(irow_y); // row of a := row of y
+          // get the row-index
+          const IT_ ridx = mir_idx_r[i];
 
-          // skip if the row of a is empty
-          if(row_ptr_a[irow_a] >= row_ptr_a[irow_a + 1])
-            continue;
-
-          // loop over all non-zeroes in the system row (Y_i.)
-          for(IT_ iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
+          // loop over all non-zeros in current row
+          for(IT_ j(row_ptr_b[i]); j < row_ptr_b[i+1]; ++j)
           {
-            // init result
-            ValueType& y_ij = yv[iy];
+            // get the column index
+            const IT_ cidx = mir_idx_c[col_idx_b[j]];
 
-            // fetch the column index
-            IndexType irow_b(col_idx_y[iy]); // row of b := col of y
-
-            // skip if the row of b is empty
-            if(row_ptr_b[irow_b] >= row_ptr_b[irow_b + 1])
-              continue;
-
-            // loop over all non-zeroes of the col-mirror (B_j.)
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            // try to find this entry in the input matrix
+            for(IT_ k(row_ptr_a[ridx]); k < row_ptr_a[ridx+1]; ++k)
             {
-              // and densify the sparse row B_j.
-              _work[col_idx_b[ib]] = bv[ib];
-            }
-
-            // loop over all non-zeroes of the row-mirror (A_i.)
-            for(IndexType ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
-            {
-              // fetch the column index
-              IndexType irow_x(col_idx_a[ia]); // row of x := col of a
-
-              // temporary entry: Z_kj := X_k. * B_j.
-              ValueType z_kj(DT_(0));
-              z_kj.format();
-
-              // loop over all non-zeroes of the buffer matrix (X_k.)
-              for(IT_ ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
+              if(col_idx_a[k] == cidx)
               {
-                z_kj.axpy(_work[col_idx_x[ix]], xv[ix]);
+                val_a[k].axpy(alpha, val_b[j]);
+                break;
               }
-
-              // update Y_ij += A_ik * Z_kj
-              y_ij.axpy(alpha*av[ia], z_kj);
-            }
-
-            // reset temporary data
-            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
-            {
-              _work[col_idx_b[ib]] = DataType(0);
             }
           }
         }
@@ -591,15 +411,17 @@ namespace FEAT
        * \param[in] matrix
        * A reference to the operator matrix whose entries are to be gathered.
        */
-      template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
+      /*template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
       void gather(
         LAFEM::MatrixMirrorBuffer<Mem::Main, Tx_, Ix_>& buffer,
         const LAFEM::SparseMatrixELL<Mem::Main, Ty_, Iy_>& matrix) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
+        //const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
+        //const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
+        const auto& row_mir_mat = _row_gather;
+        const auto& col_mir_mat = _col_gather;
         DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
@@ -683,7 +505,7 @@ namespace FEAT
             }
           }
         }
-      }
+      }*/
 
       /**
        * \brief Performs a scatter-axpy-operation on an operator matrix.
@@ -697,7 +519,7 @@ namespace FEAT
        * \param[in] alpha
        * The scaling factor for the operation.
        */
-      template<typename Ty_, typename Iy_, typename Tx_, typename Ix_>
+      /*template<typename Ty_, typename Iy_, typename Tx_, typename Ix_>
       void scatter_axpy(
         LAFEM::SparseMatrixELL<Mem::Main, Ty_, Iy_>& matrix,
         const LAFEM::MatrixMirrorBuffer<Mem::Main, Tx_, Ix_>& buffer,
@@ -705,8 +527,10 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
+        //const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
+        //const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
+        const auto& row_mir_mat = _row_scatter;
+        const auto& col_mir_mat = _col_scatter;
         DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
@@ -798,7 +622,7 @@ namespace FEAT
             }
           }
         }
-      }
+      }*/
 
       /**
        * \brief Performs a gather-operation on an operator matrix.
@@ -809,15 +633,17 @@ namespace FEAT
        * \param[in] matrix
        * A reference to the operator matrix whose entries are to be gathered.
        */
-      template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
+      /*template<typename Tx_, typename Ix_, typename Ty_, typename Iy_>
       void gather(
         LAFEM::MatrixMirrorBuffer<Mem::Main, Tx_, Ix_>& buffer,
         const LAFEM::SparseMatrixBanded<Mem::Main, Ty_, Iy_>& matrix) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
+        //const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather());
+        //const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather());
+        const auto& row_mir_mat = _row_gather;
+        const auto& col_mir_mat = _col_gather;
         DataType* _work = _vec_work.data();
 
         // fetch row mirror arrays
@@ -903,7 +729,7 @@ namespace FEAT
             }
           }
         }
-      }
+      }*/
 
       /**
        * \brief Performs a scatter-axpy-operation on an operator matrix.
@@ -917,7 +743,7 @@ namespace FEAT
        * \param[in] alpha
        * The scaling factor for the operation.
        */
-      template<typename Ty_, typename Iy_, typename Tx_, typename Ix_>
+      /*template<typename Ty_, typename Iy_, typename Tx_, typename Ix_>
       void scatter_axpy(
         LAFEM::SparseMatrixBanded<Mem::Main, Ty_, Iy_>& matrix,
         const LAFEM::MatrixMirrorBuffer<Mem::Main, Tx_, Ix_>& buffer,
@@ -925,8 +751,10 @@ namespace FEAT
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
 
-        const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
-        const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
+        //const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter());
+        //const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter());
+        const auto& row_mir_mat = _row_scatter;
+        const auto& col_mir_mat = _col_scatter;
         DataType* _work = _vec_work.data();
 
         // fetch row-mirror arrays
@@ -1021,7 +849,7 @@ namespace FEAT
             }
           }
         }
-      }
+      }*/
 
     protected:
       template<typename MT_>
@@ -1034,10 +862,64 @@ namespace FEAT
         // Y is the system matrix
         // A is the row-mirror gather matrix
         // B is the col-mirror gather matrix
-        Adjacency::Graph tmp1(Adjacency::rt_injectify, _row_mirror.get_gather(), tmpl_mat);
-        Adjacency::Graph tmp2(Adjacency::rt_injectify, tmp1, _col_mirror.get_scatter());
-        tmp2.sort_indices();
-        return tmp2;
+
+        // render the matrix structure to a graph to obtain
+        // the celebrated ptr/idx array pair
+        Adjacency::Graph mat_graph(Adjacency::rt_injectify, tmpl_mat);
+        const Index* dom_ptr = mat_graph.get_domain_ptr();
+        const Index* img_idx = mat_graph.get_image_idx();
+
+        // get row/column mirror indices
+        const Index nrows = _row_mirror.num_indices();
+        const Index ncols = _col_mirror.num_indices();
+        const auto* cidx = _col_mirror.indices();
+        const auto* ridx = _row_mirror.indices();
+
+        // build map of column mirror indices
+        std::map<Index,Index> col_map;
+        for(Index i(0); i < ncols; ++i)
+          col_map.emplace(cidx[i], i);
+
+        // count number of non-zeros in matrix buffer
+        Index count(0);
+        for(Index i(0); i < nrows; ++i)
+        {
+          const Index irow = ridx[i];
+          for(Index j(dom_ptr[irow]); j < dom_ptr[irow+1]; ++j)
+          {
+            if(col_map.find(img_idx[j]) != col_map.end())
+              ++count;
+          }
+        }
+
+        // allocate output graph
+        Adjacency::Graph graph(nrows, ncols, count);
+        Index* row_ptr = graph.get_domain_ptr();
+        Index* col_idx = graph.get_image_idx();
+
+        // compute output graph
+        row_ptr[0] = Index(0);
+        for(Index i(0); i < nrows; ++i)
+        {
+          const Index irow = ridx[i];
+          Index k = row_ptr[i];
+          for(Index j(dom_ptr[irow]); j < dom_ptr[irow+1]; ++j)
+          {
+            auto it = col_map.find(img_idx[j]);
+            if(it != col_map.end())
+            {
+              col_idx[k] = it->second;
+              ++k;
+            }
+          }
+          row_ptr[i+1] = k;
+        }
+        XASSERT(row_ptr[nrows] == count);
+
+        // sort column indices
+        graph.sort_indices();
+
+        return graph;
       }
     }; // class MatrixMirror<...>
   } // namespace LAFEM

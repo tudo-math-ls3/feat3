@@ -27,7 +27,7 @@ namespace FEAT
         int shape_dim_>
       struct DofMirrorHelper
       {
-        static Index count(Index& contribs, const Space_& space, const MeshPart_& mesh_part)
+        static Index count(const Space_& space, const MeshPart_& mesh_part)
         {
           // fetch the target set for this dimension
           const typename MeshPart_::template TargetSet<shape_dim_>::Type&
@@ -46,19 +46,14 @@ namespace FEAT
           for(Index i(0); i < num_entities; ++i)
           {
             dof_assign.prepare(target_set[i]);
-            int num_assign(dof_assign.get_num_assigned_dofs());
-            for(int j(0); j < num_assign; ++j)
-            {
-              contribs += Index(dof_assign.get_num_contribs(j));
-            }
-            count += Index(num_assign);
+            count += Index(dof_assign.get_num_assigned_dofs());
             dof_assign.finish();
           }
 
           return count;
         }
 
-        static Index fill(Index*& ptr, Index idx[], Index offset, const Space_& space, const MeshPart_& mesh_part)
+        static Index fill(Index idx[], Index offset, const Space_& space, const MeshPart_& mesh_part)
         {
           // fetch the target set for this dimension
           const typename MeshPart_::template TargetSet<shape_dim_>::Type&
@@ -77,16 +72,10 @@ namespace FEAT
           {
             dof_assign.prepare(target_set[i]);
             int num_assign(dof_assign.get_num_assigned_dofs());
-            for(int j(0); j < num_assign; ++j, ++ptr)
+            for(int j(0); j < num_assign; ++j, ++offset)
             {
-              *ptr = offset;
-              int num_contribs(dof_assign.get_num_contribs(j));
-              for(int k(0); k < num_contribs; ++k, ++offset)
-              {
-                idx[offset] = dof_assign.get_index(j, k);
-              }
+              idx[offset] = dof_assign.get_index(j);
             }
-            *ptr = offset;
             dof_assign.finish();
           }
 
@@ -100,17 +89,17 @@ namespace FEAT
         int shape_dim_ = Space_::shape_dim>
       struct DofMirrorHelpWrapper
       {
-        static Index count(Index& contribs, const Space_& space, const MeshPart_& mesh_part)
+        static Index count(const Space_& space, const MeshPart_& mesh_part)
         {
           // recursive call
-          return DofMirrorHelpWrapper<Space_, MeshPart_, shape_dim_ - 1>::count(contribs, space, mesh_part) +
-            DofMirrorHelper<Space_, MeshPart_, shape_dim_>::count(contribs, space, mesh_part);
+          return DofMirrorHelpWrapper<Space_, MeshPart_, shape_dim_ - 1>::count(space, mesh_part) +
+            DofMirrorHelper<Space_, MeshPart_, shape_dim_>::count(space, mesh_part);
         }
 
-        static Index fill(Index*& ptr, Index idx[], const Space_& space, const MeshPart_& mesh_part)
+        static Index fill(Index idx[], const Space_& space, const MeshPart_& mesh_part)
         {
-          Index offset =  DofMirrorHelpWrapper<Space_, MeshPart_, shape_dim_ - 1>::fill(ptr, idx, space, mesh_part);
-          return DofMirrorHelper<Space_, MeshPart_, shape_dim_>::fill(ptr, idx, offset, space, mesh_part);
+          Index offset =  DofMirrorHelpWrapper<Space_, MeshPart_, shape_dim_ - 1>::fill(idx, space, mesh_part);
+          return DofMirrorHelper<Space_, MeshPart_, shape_dim_>::fill(idx, offset, space, mesh_part);
         }
       };
 
@@ -119,14 +108,14 @@ namespace FEAT
         typename MeshPart_>
       struct DofMirrorHelpWrapper<Space_, MeshPart_, 0>
       {
-        static Index count(Index& contribs, const Space_& space, const MeshPart_& mesh_part)
+        static Index count(const Space_& space, const MeshPart_& mesh_part)
         {
-          return DofMirrorHelper<Space_, MeshPart_, 0>::count(contribs, space, mesh_part);
+          return DofMirrorHelper<Space_, MeshPart_, 0>::count(space, mesh_part);
         }
 
-        static Index fill(Index*& ptr, Index idx[], const Space_& space, const MeshPart_& mesh_part)
+        static Index fill(Index idx[], const Space_& space, const MeshPart_& mesh_part)
         {
-          return DofMirrorHelper<Space_, MeshPart_, 0>::fill(ptr, idx, 0, space, mesh_part);
+          return DofMirrorHelper<Space_, MeshPart_, 0>::fill(idx, 0, space, mesh_part);
         }
       };
 
@@ -164,50 +153,7 @@ namespace FEAT
     {
     public:
       /**
-       * \brief Assembles the Dof-Mirror adjacency graph.
-       */
-      template<
-        typename Space_,
-        typename MeshPart_>
-      static Adjacency::Graph assemble_mirror_graph(
-        const Space_& space,
-        const MeshPart_& mesh_part)
-      {
-        // ensure that the space has not more than 1 Dof contribution...
-        if(Intern::MaxDofContrib<Space_>::value(space) != 1)
-          throw InternalError("Cannot compute Dof-Mirror graph: multiple DOF contributions!");
-
-        Index contribs(0);
-        Index count = Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::count(contribs, space, mesh_part);
-        Adjacency::Graph graph(count, space.get_num_dofs(), contribs);
-        Index* ptr = graph.get_domain_ptr();
-        Index* idx = graph.get_image_idx();
-        Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::fill(ptr, idx, space, mesh_part);
-        return graph;
-      }
-
-      /**
-       * \brief Assembles a Vector-Mirror from graph.
-       *
-       * \param[out] vec_mirror
-       * The vector mirror that is to be assembled.
-       *
-       * \param[in] graph
-       * The mirror adjacency graph.
-       */
-      template<typename MemType_, typename DataType_, typename IndexType_>
-      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror, const Adjacency::Graph& graph)
-      {
-        typedef typename LAFEM::VectorMirror<MemType_, DataType_, IndexType_>::MirrorMatrixType MirrorMatrixType;
-        vec_mirror.get_gather() = MirrorMatrixType(graph);
-        vec_mirror.get_scatter() = vec_mirror.get_gather().transpose();
-
-        vec_mirror.get_gather().format(DataType_(1));
-        vec_mirror.get_scatter().format(DataType_(1));
-      }
-
-      /**
-       * \brief Assembles a Vector-Mirror from a space and a mesh-part.
+       * \brief Assembles a VectorMirror from a space and a mesh-part.
        *
        * \param[out] vec_mirror
        * The vector mirror that is to be assembled.
@@ -228,23 +174,36 @@ namespace FEAT
         LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror,
         const Space_& space, const MeshPart_& mesh_part)
       {
-        assemble_mirror(vec_mirror, assemble_mirror_graph(space, mesh_part));
+        XASSERT(Intern::MaxDofContrib<Space_>::value(space) == 1); // deprecated
+
+        // count number of dofs in mirror
+        const Index count = Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::count(space, mesh_part);
+
+        // allocate mirror in main memory
+        LAFEM::VectorMirror<Mem::Main, DataType_, IndexType_> vmir(space.get_num_dofs(), count);
+
+        // fill mirror indices
+        if(count > Index(0))
+        {
+          Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::fill(vmir.indices(), space, mesh_part);
+        }
+
+        // convert mirror
+        vec_mirror.convert(vmir);
       }
 
       template<
         typename MemType_,
         typename DataType_,
         typename IndexType_,
-        Index count_,
+        Index blocks_,
         typename Space_,
         typename MeshPart_>
       static void assemble_mirror(
-        LAFEM::PowerMirror<LAFEM::VectorMirror<MemType_, DataType_, IndexType_>, count_>& vec_mirror,
+        LAFEM::PowerMirror<LAFEM::VectorMirror<MemType_, DataType_, IndexType_>, blocks_>& vec_mirror,
         const Space_& space, const MeshPart_& mesh_part)
       {
-        LAFEM::VectorMirror<MemType_, DataType_, IndexType_> submirror;
-        assemble_mirror(submirror, assemble_mirror_graph(space, mesh_part));
-        vec_mirror = LAFEM::PowerMirror<LAFEM::VectorMirror<MemType_, DataType_, IndexType_>, count_>(std::move(submirror));
+        assemble_mirror(vec_mirror._sub_mirror, space, mesh_part);
       }
     }; // class MirrorAssembler
   } // namespace Assembly

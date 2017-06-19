@@ -74,14 +74,11 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<
-      typename SubMirror_,
-      int count_>
+    template<typename SubMirror_, int count_>
     class PowerMirror
     {
     public:
-      // Note: the case = 1 is specialised below
-      static_assert(count_ > 1, "invalid block size");
+      static_assert(count_ > 0, "invalid block size");
 
       /// sub-mirror type
       typedef SubMirror_ SubMirrorType;
@@ -99,7 +96,7 @@ namespace FEAT
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using MirrorType = class PowerMirror<typename SubMirrorType::template MirrorType<Mem2_, DT2_, IT2_>, count_>;
 
-      /// this typedef lets you create a mirror with new Memory, Datatape and Index types
+      /// this typedef lets you create a mirror with new Memory, Data and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
 
@@ -180,11 +177,20 @@ namespace FEAT
        * The vector for which the buffer is to be created.
        */
       template<typename SubVector_>
-      DenseVector<Mem::Main, DataType, IndexType> create_buffer(const PowerVector<SubVector_, count_>& vector) const
+      DenseVector<MemType, DataType, IndexType> create_buffer(const PowerVector<SubVector_, count_>& vector) const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
       }
 
+      /**
+       * \brief Returns a sub-mirror block.
+       *
+       * \tparam i_
+       * The index of the sub-mirror block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-mirror at position \p i_.
+       */
       template<int i_>
       SubMirrorType& at()
       {
@@ -192,6 +198,7 @@ namespace FEAT
         return _sub_mirror;
       }
 
+      /** \copydoc at() */
       template<int i_>
       const SubMirrorType& at() const
       {
@@ -222,22 +229,22 @@ namespace FEAT
       }
 
       /** \copydoc VectorMirror::gather() */
-      template<typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tv_>
       void gather(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::PowerVector<Tv_, count_>& vector,
-                       const Index buffer_offset = Index(0)) const
+        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const LAFEM::PowerVector<Tv_, count_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::gather(_sub_mirror, buffer, vector, buffer_offset);
       }
 
       /** \copydoc VectorMirror::scatter_axpy() */
-      template<typename Tv_, typename Tx_, typename Ix_>
+      template<typename Tv_>
       void scatter_axpy(
-                             LAFEM::PowerVector<Tv_, count_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                             const Tx_ alpha = Tx_(1),
-                             const Index buffer_offset = Index(0)) const
+        LAFEM::PowerVector<Tv_, count_>& vector,
+        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const DataType alpha = DataType(1),
+        const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::scatter_axpy(_sub_mirror, vector, buffer, alpha, buffer_offset);
       }

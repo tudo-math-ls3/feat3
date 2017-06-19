@@ -187,23 +187,16 @@ namespace FEAT
 
           // manually set up an identity gather/scatter matrix
           Index n = level_c.space.get_num_dofs();
-          LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> scagath(n, n, n);
-          auto* ptr = scagath.row_ptr();
-          auto* idx = scagath.col_ind();
-          auto* val = scagath.val();
-
+          SystemMirror parent_mirror(n, n);
+          auto* idx = parent_mirror.indices();
           for(Index i(0); i < n; ++i)
-          {
-            ptr[i] = idx[i] = i;
-            val[i] = DataType(1);
-          }
-          ptr[n] = n;
+            idx[i] = i;
 
           // set parent and sibling comms
           this->coarse_muxer_sys.set_parent(
             layer_c.sibling_comm_ptr(),
             layer_c.get_parent_rank(),
-            SystemMirror(scagath.clone(LAFEM::CloneMode::Shallow), scagath.clone(LAFEM::CloneMode::Shallow))
+            std::move(parent_mirror)
           );
 
           // compile muxer

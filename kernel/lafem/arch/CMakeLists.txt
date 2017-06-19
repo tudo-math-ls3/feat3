@@ -26,7 +26,6 @@ if (FEAT_EICKT)
     row_norm_generic-eickt.cpp
     scale_generic-eickt.cpp
     scale_row_col_generic-eickt.cpp
-    scatter_axpy_prim_generic-eickt.cpp
     slip_filter_generic-eickt.cpp
     unit_filter_generic-eickt.cpp
     unit_filter_blocked_generic-eickt.cpp
@@ -63,12 +62,12 @@ if (FEAT_HAVE_CUDA)
     dot_product.cu
     lumping.cu
     max_element.cu
+    mirror.cu
     norm.cu
     product_matmat.cu
     row_norm.cu
     scale.cu
     scale_row_col.cu
-    scatter_axpy_prim.cu
     slip_filter.cu
     unit_filter.cu
     unit_filter_blocked.cu

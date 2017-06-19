@@ -53,7 +53,7 @@ namespace FEAT
         typename First_::template MirrorType<Mem2_, DT2_, IT2_>,
         typename Rest_::template MirrorType<Mem2_, DT2_, IT2_>...>;
 
-      /// this typedef lets you create a mirror with new Memory, Datatape and Index types
+      /// this typedef lets you create a mirror with new Memory, Data and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
 
@@ -158,8 +158,8 @@ namespace FEAT
        * \tparam[in] vector
        * The vector whose buffer size is to be computed.
        */
-      template<typename Tx_, typename... Tv_>
-      Index buffer_size(const TupleVector<Tx_, Tv_...>& vector) const
+      template<typename Tv_, typename... Tw_>
+      Index buffer_size(const TupleVector<Tv_, Tw_...>& vector) const
       {
         return _first.buffer_size(vector.first()) + _rest.buffer_size(vector.rest());
       }
@@ -170,18 +170,28 @@ namespace FEAT
        * \tparam[in] vector
        * The vector for which the buffer is to be created.
        */
-      template<typename Tx_, typename... Tv_>
-      DenseVector<Mem::Main, DataType, IndexType> create_buffer(const TupleVector<Tx_, Tv_...>& vector) const
+      template<typename Tv_, typename... Tw_>
+      DenseVector<MemType, DataType, IndexType> create_buffer(const TupleVector<Tv_, Tw_...>& vector) const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
       }
 
+      /**
+       * \brief Returns a sub-mirror block.
+       *
+       * \tparam i_
+       * The index of the sub-mirror block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-mirror at position \p i_.
+       */
       template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
+      /** \copydoc at() */
       template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type const& at() const
       {
@@ -189,23 +199,23 @@ namespace FEAT
       }
 
       /** \copydoc VectorMirror::gather() */
-      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tv_, typename... Tw_>
       void gather(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::TupleVector<Ty_,Tv_...>& vector,
-                       const Index buffer_offset = Index(0)) const
+        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const LAFEM::TupleVector<Tv_, Tw_...>& vector,
+        const Index buffer_offset = Index(0)) const
       {
         _first.gather(buffer, vector.first(), buffer_offset);
         _rest.gather(buffer, vector.rest(), buffer_offset + _first.buffer_size(vector.first()));
       }
 
       /** \copydoc VectorMirror::scatter_axpy() */
-      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tv_, typename... Tw_>
       void scatter_axpy(
-                             LAFEM::TupleVector<Ty_, Tv_...>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                             const Tx_ alpha = Tx_(1),
-                             const Index buffer_offset = Index(0)) const
+        LAFEM::TupleVector<Tv_, Tw_...>& vector,
+        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const DataType alpha = DataType(1),
+        const Index buffer_offset = Index(0)) const
       {
         _first.scatter_axpy(vector.first(), buffer, alpha, buffer_offset);
         _rest.scatter_axpy(vector.rest(), buffer, alpha, buffer_offset + _first.buffer_size(vector.first()));
@@ -288,16 +298,16 @@ namespace FEAT
         return _first;
       }
 
-      template<typename Tx_>
-      Index buffer_size(const TupleVector<Tx_>& vector) const
+      template<typename Tv_>
+      Index buffer_size(const TupleVector<Tv_>& vector) const
       {
         return _first.buffer_size(vector.first());
       }
 
-      template<typename Tx_>
-      DenseVector<Mem::Main, DataType, IndexType> create_buffer(const TupleVector<Tx_>& vector) const
+      template<typename Tv_>
+      DenseVector<MemType, DataType, IndexType> create_buffer(const TupleVector<Tv_>& vector) const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
       }
 
       template<int i_>
@@ -314,20 +324,20 @@ namespace FEAT
         return _first;
       }
 
-      template<typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tv_>
       void gather(
-        LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
         const LAFEM::TupleVector<Tv_>& vector,
         const Index buffer_offset = Index(0)) const
       {
         _first.gather(buffer, vector.first(), buffer_offset);
       }
 
-      template<typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tv_>
       void scatter_axpy(
         LAFEM::TupleVector<Tv_>& vector,
-        const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-        const Tx_ alpha = Tx_(1),
+        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {
         _first.scatter_axpy(vector.first(), buffer, alpha, buffer_offset);

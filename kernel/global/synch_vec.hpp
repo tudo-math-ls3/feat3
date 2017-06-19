@@ -23,8 +23,11 @@ namespace FEAT
     class SynchVectorTicket
     {
     public:
-      /// the buffer vector type
-      using BufferVectorType = LAFEM::DenseVector<Mem::Main, typename VT_::DataType, typename VT_::IndexType>;
+      /// the buffer vector type (possibly in device memory)
+      using BufferType = LAFEM::DenseVector<typename VT_::MemType, typename VT_::DataType, typename VT_::IndexType>;
+
+      /// the buffer vector type in main memory
+      using BufferMain = LAFEM::DenseVector<Mem::Main, typename VT_::DataType, typename VT_::IndexType>;
 
     protected:
       /// signals, whether wait was already called
@@ -40,7 +43,7 @@ namespace FEAT
       /// send and receive request vectors
       Dist::RequestVector _send_reqs, _recv_reqs;
       /// send and receive buffers
-      std::vector<BufferVectorType> _send_bufs, _recv_bufs;
+      std::vector<BufferMain> _send_bufs, _recv_bufs;
 #endif // FEAT_HAVE_MPI || DOXYGEN
 
     public:
@@ -71,34 +74,34 @@ namespace FEAT
 
         XASSERTM(mirrors.size() == n, "invalid vector mirror count");
 
-        _recv_reqs.reserve(n);
-        _send_reqs.reserve(n);
-        _recv_bufs.reserve(n);
-        _send_bufs.reserve(n);
-
         // post receives
+        _recv_reqs.reserve(n);
+        _recv_bufs.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
-          // create receive buffer vector
-          _recv_bufs.emplace_back(_mirrors.at(i).create_buffer(target));
-          BufferVectorType& buf = _recv_bufs.back();
+          // create buffer vector in main memory
+          _recv_bufs.at(i) = BufferMain(_mirrors.at(i).buffer_size(target), LAFEM::Pinning::disabled);
 
           // post receive
-          _recv_reqs.push_back(_comm.irecv(buf.elements(), buf.size(), ranks.at(i)));
+          _recv_reqs.push_back(_comm.irecv(_recv_bufs.at(i).elements(), _recv_bufs.at(i).size(), ranks.at(i)));
         }
 
         // post sends
+        _send_reqs.reserve(n);
+        _send_bufs.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
-          // create receive buffer vector
-          _send_bufs.emplace_back(_mirrors.at(i).create_buffer(target));
-          BufferVectorType& buf = _send_bufs.back();
+          // create buffer in device memory
+          BufferType buffer(_mirrors.at(i).buffer_size(target), LAFEM::Pinning::disabled);
 
           // gather from mirror
-          _mirrors.at(i).gather(buf, _target);
+          _mirrors.at(i).gather(buffer, _target);
+
+          // convert buffer to main memory
+          _send_bufs.at(i).convert(buffer);
 
           // post send
-          _send_reqs.push_back(_comm.isend(buf.elements(), buf.size(), ranks.at(i)));
+          _send_reqs.push_back(_comm.isend(_send_bufs.at(i).elements(), _send_bufs.at(i).size(), ranks.at(i)));
         }
 
         Statistics::add_time_mpi_execute(ts_start.elapsed_now());
@@ -131,8 +134,12 @@ namespace FEAT
         // process all pending receives
         for(std::size_t idx; _recv_reqs.wait_any(idx); )
         {
+          // convert buffer to device memory
+          BufferType buffer;
+          buffer.convert(_recv_bufs.at(idx));
+
           // scatter the receive buffer
-          _mirrors.at(idx).scatter_axpy(_target, _recv_bufs.at(idx));
+          _mirrors.at(idx).scatter_axpy(_target, buffer);
         }
 
         // wait for all sends to finish

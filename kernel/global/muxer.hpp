@@ -34,14 +34,16 @@ namespace FEAT
       typedef typename LocalVector_::DataType DataType;
       /// the index type
       typedef typename LocalVector_::IndexType IndexType;
-      /// the internal buffer vector type
-      typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> BufferVectorType;
+      /// the internal buffer vector type (possibly in device memory)
+      typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferType;
+      /// the internal buffer vector type in main memory
+      typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> BufferMain;
 
       /// Our 'base' class type
       template <typename LocalVector2_, typename Mirror2_>
       using MuxerType = class Muxer<LocalVector2_, Mirror2_>;
 
-      /// this typedef lets you create a gate container with new Memory, Datatape and Index types
+      /// this typedef lets you create a gate container with new Memory, Data and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using MuxerTypeByMDI = class Muxer<typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
@@ -263,16 +265,22 @@ namespace FEAT
 
         TimeStamp ts_execute;
 
+        // create parent buffer in device memory
+        BufferType parent_buffer(_buffer_size);
+
         // gather source to parent buffer
-        BufferVectorType parent_buffer(_buffer_size);
         _parent_mirror.gather(parent_buffer, vec_src);
+
+        // convert buffer to main memory
+        BufferMain parent_buffer_main;
+        parent_buffer_main.convert(parent_buffer);
 
         Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
 
         // gather to parent sibling
         TimeStamp ts_collective;
         DataType* dummy = nullptr;
-        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
+        _sibling_comm->gather(parent_buffer_main.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
         Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
       }
 
@@ -302,21 +310,32 @@ namespace FEAT
 
         const Index num_children = Index(_child_mirrors.size());
 
+        // create parent buffer in device memory
+        BufferType parent_buffer(_buffer_size);
+
         // gather source to parent buffer
-        BufferVectorType parent_buffer(_buffer_size);
         _parent_mirror.gather(parent_buffer, vec_src);
 
+        // convert buffer to main memory
+        BufferMain parent_buffer_main;
+        parent_buffer_main.convert(parent_buffer);
+
         // allocate child buffers
-        BufferVectorType child_buffers(_buffer_size * num_children);
+        BufferMain child_buffers_main(_buffer_size * num_children);
 
         Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
 
         // gather from siblings
         TimeStamp ts_collective;
-        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, child_buffers.elements(), _buffer_size, _parent_rank);
+        _sibling_comm->gather(parent_buffer_main.elements(), _buffer_size, child_buffers_main.elements(), _buffer_size, _parent_rank);
         Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
 
         ts_execute.stamp();
+
+        // download child buffers to device memory
+        BufferType child_buffers;
+        child_buffers.convert(child_buffers_main);
+
         // format target vector
         vec_trg.format();
 
@@ -342,15 +361,19 @@ namespace FEAT
         XASSERT(_sibling_comm->rank() != _parent_rank); // parent must call split() instead
 
         // allocate parent buffer
-        BufferVectorType parent_buffer(_buffer_size);
+        BufferMain parent_buffer_main(_buffer_size);
 
         // receive scatter from parent sibling
         TimeStamp ts_collective;
         DataType* dummy = nullptr;
-        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer.elements(), _buffer_size, _parent_rank);
+        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer_main.elements(), _buffer_size, _parent_rank);
         Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
 
         TimeStamp ts_execute;
+
+        // convert to device memory
+        BufferType parent_buffer;
+        parent_buffer.convert(parent_buffer_main);
 
         // scatter into target vector
         vec_trg.format();
@@ -385,7 +408,7 @@ namespace FEAT
         const Index num_children = Index(_child_mirrors.size());
 
         // allocate child buffers
-        BufferVectorType child_buffers(_buffer_size * num_children);
+        BufferType child_buffers(_buffer_size * num_children);
 
         // gather child buffers from target vector
         for(Index i(0); i < num_children; ++i)
@@ -393,17 +416,25 @@ namespace FEAT
           _child_mirrors.at(i).gather(child_buffers, vec_src, i*_buffer_size);
         }
 
+        // convert child buffers to main memory
+        BufferMain child_buffers_main;
+        child_buffers_main.convert(child_buffers);
+
         // create parent buffer
-        BufferVectorType parent_buffer(_buffer_size);
+        BufferMain parent_buffer_main(_buffer_size);
 
         Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
 
         // scatter to siblings
         TimeStamp ts_collective;
-        _sibling_comm->scatter(child_buffers.elements(), _buffer_size, parent_buffer.elements(), _buffer_size, _parent_rank);
+        _sibling_comm->scatter(child_buffers_main.elements(), _buffer_size, parent_buffer_main.elements(), _buffer_size, _parent_rank);
         Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
 
         ts_execute.stamp();
+
+        // convert to device memory
+        BufferType parent_buffer;
+        parent_buffer.convert(parent_buffer_main);
 
         // scatter into target vector
         vec_trg.format();
