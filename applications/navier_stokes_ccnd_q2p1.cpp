@@ -871,6 +871,7 @@ namespace NvSCCNDQ2P1dc
         auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
         smoother->set_min_iter(smooth_steps);
         smoother->set_max_iter(smooth_steps);
+        smoother->skip_defect_calc(true); // skip defect calculation
         multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
       }
 #ifdef FEAT_HAVE_UMFPACK
@@ -1379,7 +1380,13 @@ namespace NvSCCNDQ2P1dc
     // print multigrid timings
     if(comm.rank() == 0)
     {
-      comm.print("Multigrid Timings: (Defect / Smoother / Transfer / Coarse)");
+      comm.print("Multigrid Timings:");
+      comm.print("              Defect /   Smoother /   Transfer /     Coarse");
+      comm.print("Overall : " +
+          stringify_fp_fix(multigrid_hierarchy->get_time_defect(), 3, 10) + " / " +
+          stringify_fp_fix(multigrid_hierarchy->get_time_smooth(), 3, 10) + " / " +
+          stringify_fp_fix(multigrid_hierarchy->get_time_transfer(), 3, 10) + " / " +
+          stringify_fp_fix(multigrid_hierarchy->get_time_coarse(), 3, 10));
       for(int i(0); i < int(multigrid_hierarchy->size_physical()); ++i)
       {
         comm.print("Level " + stringify(i).pad_front(2) + ": " +
