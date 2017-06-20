@@ -1380,7 +1380,7 @@ namespace NvSCCNDQ2P1dc
     if(comm.rank() == 0)
     {
       comm.print("Multigrid Timings: (Defect / Smoother / Transfer / Coarse)");
-      for(Index i(0); i < multigrid_hierarchy->size_physical(); ++i)
+      for(int i(0); i < int(multigrid_hierarchy->size_physical()); ++i)
       {
         comm.print("Level " + stringify(i).pad_front(2) + ": " +
           stringify_fp_fix(multigrid_hierarchy->get_time_defect(i), 3, 10) + " / " +
