@@ -45,11 +45,14 @@ namespace FEAT
       /// global time of execution for mpi related operations, e.g. send/recv or gather/scatter
       static KahanAccumulation _time_mpi_execute;
 
-      /// global time of execution for mpi related idle/wait tasks of reduction operations
+      /// global time of execution for mpi related idle/wait tasks of (scalar) reduction operations
       static KahanAccumulation _time_mpi_wait_reduction;
 
       /// global time of execution for mpi related idle/wait tasks of spmv operations
       static KahanAccumulation _time_mpi_wait_spmv;
+
+      /// global time of execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
+      static KahanAccumulation _time_mpi_wait_collective;
 
       /// a consecutive list of all solver actions
       static std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> _solver_expressions;
@@ -63,11 +66,13 @@ namespace FEAT
       static std::map<String, std::list<double>> _overall_mpi_execute;
       static std::map<String, std::list<double>> _overall_mpi_wait_reduction;
       static std::map<String, std::list<double>> _overall_mpi_wait_spmv;
+      static std::map<String, std::list<double>> _overall_mpi_wait_collective;
       /// mapping of solver name to list of outer multigrid level timings. each std::vector holds a complete level hierarchy of timings.
       static std::map<String, std::list<std::vector<double>>> _outer_mg_toe;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_reduction;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_spmv;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_collective;
       /// overall time of outer schwarz preconditioners internal solver
       static std::map<String, std::list<double>> _outer_schwarz_toe;
       /// overall iterations of outer schwarz preconditioners internal solver
@@ -151,10 +156,12 @@ namespace FEAT
         _overall_mpi_execute.clear();
         _overall_mpi_wait_reduction.clear();
         _overall_mpi_wait_spmv.clear();
+        _overall_mpi_wait_collective.clear();
         _outer_mg_toe.clear();
         _outer_mg_mpi_execute.clear();
         _outer_mg_mpi_wait_reduction.clear();
         _outer_mg_mpi_wait_spmv.clear();
+        _outer_mg_mpi_wait_collective.clear();
         _outer_schwarz_toe.clear();
         _outer_schwarz_iters.clear();
       }
@@ -216,6 +223,10 @@ namespace FEAT
       {
         _time_mpi_wait_spmv = KahanSum(_time_mpi_wait_spmv, seconds);
       }
+      inline static void add_time_mpi_wait_collective(double seconds)
+      {
+        _time_mpi_wait_collective = KahanSum(_time_mpi_wait_collective, seconds);
+      }
 
       inline static double get_time_reduction()
       {
@@ -244,6 +255,10 @@ namespace FEAT
       inline static double get_time_mpi_wait_spmv()
       {
         return _time_mpi_wait_spmv.sum;
+      }
+      inline static double get_time_mpi_wait_collective()
+      {
+        return _time_mpi_wait_collective.sum;
       }
 
       inline static void add_solver_expression(std::shared_ptr<Solver::ExpressionBase> expression)
@@ -309,6 +324,12 @@ namespace FEAT
         return _overall_mpi_wait_spmv.at(target);
       }
 
+      /// retrieve list of all overall solver mpi collective wait toe entries
+      static inline std::list<double> & get_time_mpi_wait_collective(String target)
+      {
+        return _overall_mpi_wait_collective.at(target);
+      }
+
       /// retrieve list of all overall solver toe entries per mg level
       static inline std::list<std::vector<double>> & get_time_mg(String target)
       {
@@ -331,6 +352,12 @@ namespace FEAT
       static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_spmv(String target)
       {
         return _outer_mg_mpi_wait_spmv.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi collective wait toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_collective(String target)
+      {
+        return _outer_mg_mpi_wait_collective.at(target);
       }
 
       /// retrieve list of all outer schwarz solver call toe entries
@@ -380,6 +407,8 @@ namespace FEAT
         _time_mpi_wait_reduction.correction = 0.;
         _time_mpi_wait_spmv.sum = 0.;
         _time_mpi_wait_spmv.correction = 0.;
+        _time_mpi_wait_collective.sum = 0.;
+        _time_mpi_wait_collective.correction = 0.;
       }
 
       /*

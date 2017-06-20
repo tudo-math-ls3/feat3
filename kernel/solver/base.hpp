@@ -438,8 +438,10 @@ namespace FEAT
       double _mpi_execute_stop;
       double _mpi_wait_start_reduction;
       double _mpi_wait_start_spmv;
+      double _mpi_wait_start_collective;
       double _mpi_wait_stop_reduction;
       double _mpi_wait_stop_spmv;
+      double _mpi_wait_stop_collective;
       bool _destroyed;
 
     public:
@@ -460,9 +462,11 @@ namespace FEAT
         _mpi_execute_start = Statistics::get_time_mpi_execute();
         _mpi_wait_start_reduction    = Statistics::get_time_mpi_wait_reduction();
         _mpi_wait_start_spmv    = Statistics::get_time_mpi_wait_spmv();
+        _mpi_wait_start_collective    = Statistics::get_time_mpi_wait_collective();
         _mpi_execute_stop = _mpi_execute_start;
         _mpi_wait_stop_reduction    = _mpi_wait_start_reduction;
         _mpi_wait_stop_spmv    = _mpi_wait_start_spmv;
+        _mpi_wait_stop_collective    = _mpi_wait_start_collective;
       }
 
       // delete copy-ctor and assign operator
@@ -490,8 +494,9 @@ namespace FEAT
         _mpi_execute_stop = Statistics::get_time_mpi_execute();
         _mpi_wait_stop_reduction    = Statistics::get_time_mpi_wait_reduction();
         _mpi_wait_stop_spmv    = Statistics::get_time_mpi_wait_spmv();
+        _mpi_wait_stop_collective    = Statistics::get_time_mpi_wait_collective();
         Statistics::add_solver_expression(std::make_shared<ExpressionTimings>(_solver_name, _at.elapsed_now(), _mpi_execute_stop - _mpi_execute_start,
-          _mpi_wait_stop_reduction - _mpi_wait_start_reduction, _mpi_wait_stop_spmv - _mpi_wait_start_spmv));
+          _mpi_wait_stop_reduction - _mpi_wait_start_reduction, _mpi_wait_stop_spmv - _mpi_wait_start_spmv, _mpi_wait_stop_collective - _mpi_wait_start_collective));
 
         _destroyed = true;
       }

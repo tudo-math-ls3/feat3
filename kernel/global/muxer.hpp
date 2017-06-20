@@ -261,13 +261,19 @@ namespace FEAT
         XASSERT(_sibling_comm->size() > 1);
         XASSERT(_sibling_comm->rank() != _parent_rank); // parent must call join() instead
 
+        TimeStamp ts_execute;
+
         // gather source to parent buffer
         BufferVectorType parent_buffer(_buffer_size);
         _parent_mirror.gather(parent_buffer, vec_src);
 
+        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+
         // gather to parent sibling
+        TimeStamp ts_collective;
         DataType* dummy = nullptr;
         _sibling_comm->gather(parent_buffer.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
+        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
       }
 
       /**
@@ -292,6 +298,8 @@ namespace FEAT
         XASSERT(_sibling_comm->size() > 0);
         XASSERT(_sibling_comm->rank() == _parent_rank);
 
+        TimeStamp ts_execute;
+
         const Index num_children = Index(_child_mirrors.size());
 
         // gather source to parent buffer
@@ -301,9 +309,14 @@ namespace FEAT
         // allocate child buffers
         BufferVectorType child_buffers(_buffer_size * num_children);
 
-        // gather from siblings
-        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, child_buffers.elements(), _buffer_size, _parent_rank);
+        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
 
+        // gather from siblings
+        TimeStamp ts_collective;
+        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, child_buffers.elements(), _buffer_size, _parent_rank);
+        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
+
+        ts_execute.stamp();
         // format target vector
         vec_trg.format();
 
@@ -313,6 +326,7 @@ namespace FEAT
           // scatter buffers
           _child_mirrors.at(i).scatter_axpy(vec_trg, child_buffers, DataType(1), i*_buffer_size);
         }
+        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
       }
 
       /**
@@ -331,12 +345,17 @@ namespace FEAT
         BufferVectorType parent_buffer(_buffer_size);
 
         // receive scatter from parent sibling
+        TimeStamp ts_collective;
         DataType* dummy = nullptr;
         _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer.elements(), _buffer_size, _parent_rank);
+        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
+
+        TimeStamp ts_execute;
 
         // scatter into target vector
         vec_trg.format();
         _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
+        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
       }
 
       /**
@@ -361,6 +380,8 @@ namespace FEAT
         XASSERT(_sibling_comm->size() > 0);
         XASSERT(_sibling_comm->rank() == _parent_rank);
 
+        TimeStamp ts_execute;
+
         const Index num_children = Index(_child_mirrors.size());
 
         // allocate child buffers
@@ -375,12 +396,20 @@ namespace FEAT
         // create parent buffer
         BufferVectorType parent_buffer(_buffer_size);
 
+        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+
         // scatter to siblings
+        TimeStamp ts_collective;
         _sibling_comm->scatter(child_buffers.elements(), _buffer_size, parent_buffer.elements(), _buffer_size, _parent_rank);
+        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
+
+        ts_execute.stamp();
 
         // scatter into target vector
         vec_trg.format();
         _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
+
+        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
       }
     }; // class Muxer<...>
   } // namespace Global

@@ -1009,6 +1009,8 @@ namespace FEAT
       std::vector<double> _mpi_waits_reduction;
       /// array containing toe of mpi wait spmv for each processed level
       std::vector<double> _mpi_waits_spmv;
+      /// array containing toe of mpi wait collective for each processed level
+      std::vector<double> _mpi_waits_collective;
 
     public:
       /**
@@ -1145,6 +1147,7 @@ namespace FEAT
         _mpi_execs.resize(num_lvls, 0.0);
         _mpi_waits_reduction.resize(num_lvls, 0.0);
         _mpi_waits_spmv.resize(num_lvls, 0.0);
+        _mpi_waits_collective.resize(num_lvls, 0.0);
       }
 
       /**
@@ -1158,10 +1161,11 @@ namespace FEAT
        */
       virtual void done_symbolic() override
       {
+        _toes.clear();
+        _mpi_execs.clear();
         _mpi_waits_reduction.clear();
         _mpi_waits_spmv.clear();
-        _mpi_execs.clear();
-        _toes.clear();
+        _mpi_waits_collective.clear();
         _counters.clear();
 
         BaseClass::done_symbolic();
@@ -1222,6 +1226,7 @@ namespace FEAT
           _mpi_execs.at(i) = 0.0;
           _mpi_waits_reduction.at(i) = 0.0;
           _mpi_waits_spmv.at(i) = 0.0;
+          _mpi_waits_collective.at(i) = 0.0;
         }
 
         // get a reference to the finest level
@@ -1260,7 +1265,7 @@ namespace FEAT
         for(std::size_t i(0); i <  std::size_t(_hierarchy->size_virtual()); ++i)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), Index(i),
-            _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i), _mpi_waits_spmv.at(i)));
+            _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i), _mpi_waits_spmv.at(i), _mpi_waits_collective.at(i)));
         }
 
         // okay
@@ -1468,6 +1473,7 @@ namespace FEAT
         double mpi_exec_start(Statistics::get_time_mpi_execute());
         double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
+        double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
 
         // get the coarse level info
         LevelInfo& lvl_crs = _hierarchy->_get_level_info(_crs_level);
@@ -1500,9 +1506,11 @@ namespace FEAT
         double mpi_exec_stop(Statistics::get_time_mpi_execute());
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+        double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
         _mpi_execs.at(std::size_t(_crs_level)) = mpi_exec_stop - mpi_exec_start;
         _mpi_waits_reduction.at(std::size_t(_crs_level)) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
         _mpi_waits_spmv.at(std::size_t(_crs_level)) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
+        _mpi_waits_collective.at(std::size_t(_crs_level)) = mpi_wait_stop_collective - mpi_wait_start_collective;
 
         return Status::success;
       }
@@ -1554,6 +1562,7 @@ namespace FEAT
         double mpi_exec_start(Statistics::get_time_mpi_execute());
         double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
+        double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
 
         // get the level info
         LevelInfo& lvl = _hierarchy->_get_level_info(cur_lvl);
@@ -1598,9 +1607,11 @@ namespace FEAT
         double mpi_exec_stop(Statistics::get_time_mpi_execute());
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+        double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
         _mpi_execs.at(std::size_t(cur_lvl)) = mpi_exec_stop - mpi_exec_start;
         _mpi_waits_reduction.at(std::size_t(cur_lvl)) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
         _mpi_waits_spmv.at(std::size_t(cur_lvl)) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
+        _mpi_waits_collective.at(std::size_t(cur_lvl)) = mpi_wait_stop_collective - mpi_wait_start_collective;
 
         return Status::success;
       }
@@ -1625,6 +1636,7 @@ namespace FEAT
           double mpi_exec_start(Statistics::get_time_mpi_execute());
           double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
+          double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
 
           // get our fine and coarse levels
           LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
@@ -1709,9 +1721,11 @@ namespace FEAT
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+          double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
           _mpi_execs.at((size_t)i) = mpi_exec_stop - mpi_exec_start;
           _mpi_waits_reduction.at((size_t)i) = mpi_wait_stop_reduction - mpi_wait_start_reduction;
           _mpi_waits_spmv.at((size_t)i) = mpi_wait_stop_spmv - mpi_wait_start_spmv;
+          _mpi_waits_collective.at((size_t)i) = mpi_wait_stop_collective - mpi_wait_start_collective;
 
           if(break_loop)
             break;
@@ -1743,6 +1757,7 @@ namespace FEAT
           double mpi_exec_start(Statistics::get_time_mpi_execute());
           double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
+          double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
 
           // get our fine level
           LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
@@ -1810,9 +1825,11 @@ namespace FEAT
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+          double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
           _mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
           _mpi_waits_reduction.at((size_t)i) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
           _mpi_waits_spmv.at((size_t)i) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
+          _mpi_waits_collective.at((size_t)i) += mpi_wait_stop_collective - mpi_wait_start_collective;
 
           // ascend to next level
         }
