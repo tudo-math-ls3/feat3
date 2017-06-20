@@ -1683,7 +1683,9 @@ namespace FEAT
           if(transfer_operator->is_ghost())
           {
             // send restriction to parent processes and return
+            TimeStamp stamp_rest;
             transfer_operator->rest_send(lvl_f.vec_def);
+            lvl_f.time_transfer += stamp_rest.elapsed_now();
             break_loop = true;
           }
           else
@@ -1753,7 +1755,9 @@ namespace FEAT
           if(transfer_operator->is_ghost())
           {
             // receive prolongation
+            TimeStamp stamp_prol;
             transfer_operator->prol_recv(lvl_f.vec_cor);
+            lvl_f.time_transfer += stamp_prol.elapsed_now();
           }
           else
           {
@@ -1761,7 +1765,9 @@ namespace FEAT
             LevelInfo& lvl_c = _hierarchy->_get_level_info(i+1);
 
             // prolongate
+            TimeStamp stamp_prol;
             transfer_operator->prol(lvl_f.vec_cor, lvl_c.vec_sol);
+            lvl_f.time_transfer += stamp_prol.elapsed_now();
           }
 
           // get system matrix and filters
