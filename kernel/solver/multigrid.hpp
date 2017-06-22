@@ -1321,20 +1321,24 @@ namespace FEAT
         // coarse level or the last level for this process:
         const Index last_level = Math::min(_crs_level, _hierarchy->size_physical());
 
-        // F-cycle intermediate peak-level loop
-        for(Index peak_lvl(last_level-1); peak_lvl > _top_level; --peak_lvl)
+        // ensure that we do not apply this if there is just one level
+        if(last_level > Index(0))
         {
-          // solve coarse level
-          this->_apply_coarse();
+          // F-cycle intermediate peak-level loop
+          for(Index peak_lvl(last_level-1); peak_lvl > _top_level; --peak_lvl)
+          {
+            // solve coarse level
+            this->_apply_coarse();
 
-          // prolongate to current peak-level without post-smoothing
-          this->_apply_prol(peak_lvl, false);
+            // prolongate to current peak-level without post-smoothing
+            this->_apply_prol(peak_lvl, false);
 
-          // apply peak-smoother
-          this->_apply_smooth_peak(peak_lvl);
+            // apply peak-smoother
+            this->_apply_smooth_peak(peak_lvl);
 
-          // restrict from current peak-level without pre-smoothing
-          this->_apply_rest(peak_lvl, false);
+            // restrict from current peak-level without pre-smoothing
+            this->_apply_rest(peak_lvl, false);
+          }
         }
 
         // solve coarse level
