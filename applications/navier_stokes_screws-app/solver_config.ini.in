@@ -20,8 +20,8 @@ plot = all
 [mgv_a]
 type = mg
 hierarchy = h1_a
-lvl_min = 0
-lvl_max = -1
+lvl_min = -1
+lvl_max = 0
 cycle = f
 
 [h1_a]
@@ -52,8 +52,8 @@ plot = summary
 [mgv_s]
 type = mg
 hierarchy = h1_s
-lvl_min = 0
-lvl_max = -1
+lvl_min = -1
+lvl_max = 0
 cycle = v
 
 [h1_s]
@@ -131,8 +131,8 @@ precon = Meshopt-MG
 [Meshopt-MG]
 type = mg
 hierarchy = h_cg
-lvl_min = 0
-lvl_max = -1
+lvl_min = -1
+lvl_max = 0
 cycle = v
 
 [h_cg]
