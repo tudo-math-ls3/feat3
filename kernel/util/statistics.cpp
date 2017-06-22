@@ -529,8 +529,8 @@ String Statistics::get_formatted_solver_internals(String target)
   auto solver_time_mg_mpi_wait_spmv = FEAT::Statistics::get_time_mg_mpi_wait_spmv(target);
   auto solver_time_mg_mpi_wait_collective = FEAT::Statistics::get_time_mg_mpi_wait_collective(target);
 
-  Index item_count(Index(8) + solver_time_mg.front().size() + solver_time_mg_mpi_execute.front().size() + solver_time_mg_mpi_wait_reduction.front().size() +
-      solver_time_mg_mpi_wait_spmv.front().size() + solver_time_mg_mpi_wait_collective.front().size());
+  Index item_count(Index(8) + Index(solver_time_mg.front().size() + solver_time_mg_mpi_execute.front().size() + solver_time_mg_mpi_wait_reduction.front().size() +
+      solver_time_mg_mpi_wait_spmv.front().size() + solver_time_mg_mpi_wait_collective.front().size()));
 
   double * t_local = new double[item_count];
   double * t_max = new double[item_count];
