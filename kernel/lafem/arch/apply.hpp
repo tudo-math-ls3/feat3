@@ -192,8 +192,10 @@ namespace FEAT
       extern template void Apply<Mem::Main>::coo_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
       extern template void Apply<Mem::Main>::coo_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
-      extern template void Apply<Mem::Main>::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const Index * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const Index * const, const Index, const Index, const Index);
+      extern template void Apply<Mem::Main>::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Apply<Mem::Main>::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
+      extern template void Apply<Mem::Main>::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Apply<Mem::Main>::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
 
       extern template void Apply<Mem::Main>::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
       extern template void Apply<Mem::Main>::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);
