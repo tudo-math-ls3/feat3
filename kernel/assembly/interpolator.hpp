@@ -19,22 +19,8 @@ namespace FEAT
         typename Function_,
         typename Space_,
         int shape_dim_,
-        bool enable_ =
-          (Space_::template NodeFunctional<shape_dim_, typename Vector_::DataType>::Type::max_assigned_dofs > 0)>
+        int max_dofs_ = Space_::template NodeFunctional<shape_dim_, typename Vector_::DataType>::Type::max_assigned_dofs>
       struct InterpolatorCore
-      {
-        static void project(Vector_&, const Function_&, const Space_&)
-        {
-          // do nothing
-        };
-      };
-
-      template<
-        typename Vector_,
-        typename Function_,
-        typename Space_,
-        int shape_dim_>
-      struct InterpolatorCore<Vector_, Function_, Space_, shape_dim_, true>
       {
       public:
         static void project(Vector_& vector, const Function_& function, const Space_& space)
@@ -44,16 +30,13 @@ namespace FEAT
           // create a node-functional object
           typedef typename Space_::template NodeFunctional<shape_dim_, DataType>::Type NodeFunc;
 
-          // check for empty node functional set
-          static constexpr int max_dofs = NodeFunc::max_assigned_dofs;
-
           typedef typename NodeFunc::template Value<Function_>::Type ValueType;
 
           // create node functional
           NodeFunc node_func(space);
 
           // create node data; avoid zero-length vectors
-          Tiny::Vector<ValueType, max_dofs> node_data;
+          Tiny::Vector<ValueType, max_dofs_> node_data;
 
           // define dof assignment
           typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
@@ -88,6 +71,15 @@ namespace FEAT
             dof_assign.finish();
           }
         }
+      };
+
+      template<typename Vector_, typename Function_, typename Space_, int shape_dim_>
+      struct InterpolatorCore<Vector_, Function_, Space_, shape_dim_, 0>
+      {
+        static void project(Vector_&, const Function_&, const Space_&)
+        {
+          // do nothing
+        };
       };
 
       template<typename Space_, int shape_dim_ = Space_::shape_dim>
