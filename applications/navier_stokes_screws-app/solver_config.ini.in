@@ -118,7 +118,7 @@ keep_iterates = 0
 
 [DuDvPrecon]
 type = DuDvPrecon
-dirichlet_boundaries = screw:i screw:o
+dirichlet_boundaries = bnd:i bnd:o
 linear_solver = Meshopt-PCG
 
 [Meshopt-PCG]
