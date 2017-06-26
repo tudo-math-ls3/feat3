@@ -501,24 +501,8 @@ namespace FEAT
        * functionals (which are point evaluations) to Q1~ functions (which are not continuous). In the case of
        * conforming Lagrange elements, it is well-defined however, and implemented below.
        */
-      template
-      <
-        typename Vector_,
-        typename Space_,
-        int shape_dim_,
-        bool enable_ = (Space_::template NodeFunctional<shape_dim_, typename Vector_::DataType>::Type::max_assigned_dofs > 0)
-      >
+      template<typename Vector_, typename Space_, int shape_dim_>
       struct Lagrange2InterpolatorCore
-      {
-        template<typename TSH_>
-        static void project(Vector_&, const Vector_&, const Space_&, const TSH_*)
-        {
-          // do nothing
-        }
-      };
-
-      template< typename Vector_, typename Space_, int shape_dim_>
-      struct Lagrange2InterpolatorCore<Vector_, Space_, shape_dim_, true>
       {
         public:
           template< typename TSH_>
@@ -530,6 +514,10 @@ namespace FEAT
             // define dof assignment
             typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
             DofAssignType dof_assign(space);
+
+            // skip empty dof assignments
+            if(dof_assign.get_max_assigned_dofs() < 1)
+              return;
 
             // Vertex at shape index set
             auto& idx(space.get_trafo().get_mesh().template get_index_set<shape_dim_, 0>());
@@ -593,7 +581,7 @@ namespace FEAT
       };
 
       template<typename Vector_, typename Space_>
-      struct Lagrange2InterpolatorCore<Vector_, Space_, 0, true>
+      struct Lagrange2InterpolatorCore<Vector_, Space_, 0>
       {
         public:
           template<typename TSH_>

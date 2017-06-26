@@ -118,7 +118,7 @@ namespace FEAT
           {
             for (IT_ l(playoutrow[i]); l < playoutrow[i + 1]; ++l)
             {
-              _m_columns[playoutcol[l]].emplace_back(DT_(0.0), i);
+              _m_columns[playoutcol[l]].emplace_back(DT_(0.0), IT_(i));
             }
           }
         } // function create_initial_m_columns
@@ -134,7 +134,7 @@ namespace FEAT
           {
             for (IT_ l(prow_ptr[i]); l < prow_ptr[i + 1]; ++l)
             {
-              _a_columnwise[pcol_ind[l]].emplace_back(pval[l], i);
+              _a_columnwise[pcol_ind[l]].emplace_back(pval[l], IT_(i));
             }
           }
         } // function create_a_columnwise
