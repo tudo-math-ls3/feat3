@@ -389,6 +389,26 @@ namespace FEAT
           _layer_levels.push_back(std::deque<std::shared_ptr<LevelType>>());
         }
 
+        LayerType& front_layer()
+        {
+          return *_layers.front();
+        }
+
+        const LayerType& front_layer() const
+        {
+          return *_layers.front();
+        }
+
+        LayerType& back_layer()
+        {
+          return *_layers.back();
+        }
+
+        const LayerType& back_layer() const
+        {
+          return *_layers.back();
+        }
+
         int min_level_index() const
         {
           return _virt_levels.back()->get_level_index();

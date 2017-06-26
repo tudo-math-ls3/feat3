@@ -615,7 +615,7 @@ namespace NvSCCNDQ2P1dc
     const bool testmode = (args.check("test-mode") >= 0);
 
 #ifdef FEAT_HAVE_UMFPACK
-    const bool umf_cgs = (domain.num_layers() == Index(2));
+    const bool umf_cgs = (domain.back_layer().comm().size() == 1);
 #else
     const bool umf_cgs = false;
 #endif
