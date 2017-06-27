@@ -42,6 +42,8 @@ The supported solver/precon types are (with a list of supported keys, in additio
 - sor (omega)
 - ssor (omega)
 - scale (omega)
+- polynomial (omega, m)
+- chebyshev (chebyshev, max_inter, min_iter, tol-rel, plot)
 - schwarz (solver)
 
 The supported keys semantics:
@@ -59,6 +61,9 @@ The supported keys semantics:
 - coarse: Reference to another section, which shall be used as a coarse grid solver.
 - omega: Damping/Scaling multiplicator.
 - solver: Local solver section for the schwarz preconditioner.
+- memorytype: cuda / main memory
+- indextype: unsigned long / unsigned int
+- datatype: float / double
 
 Advanced example:
 
@@ -104,14 +109,17 @@ precon = schwarz-ilu
 [schwarz-ilu]
 type = schwarz
 solver = ilu0
+memorytype = cuda
 
 [ilu0]
 type = ilu
+memorytype = cuda
+fill_in_param = 0
 \endverbatim
 
 This creates a fgmres, preconditioned with one mg-v cycle.
 Each cycle uses 4 jac pre/post smoother steps and a coarse grid pcg
-solver with schwarz-ilu preconditioner.
+solver with schwarz-ilu preconditioner on a cuda gpu.
 
 \note The referenced precon/solver sections may lie in the parent solver's section or in global scope.
 
