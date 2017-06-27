@@ -10,14 +10,12 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/statistics.hpp>
-#include <kernel/foundation/pexecutor.hpp>
-#include <kernel/foundation/pgraph.hpp>
-#include <kernel/foundation/psynch.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/parti_2lvl.hpp>
 #include <kernel/geometry/parti_iterative.hpp>
+#include <kernel/geometry/parti_metis.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -144,7 +142,7 @@ namespace FEAT
           _adapt_mode(Geometry::AdaptMode::chart),
           _allow_parti_extern(true),
           _allow_parti_2level(true),
-          _allow_parti_metis(false),   // this one sucks
+          _allow_parti_metis(false),
           _allow_parti_genetic(false), // this one is exotic
           _allow_parti_naive(true),
           _support_double_layered(support_double_layered),
@@ -928,29 +926,22 @@ namespace FEAT
         bool _apply_parti_metis(const MeshNodeType& base_mesh_node)
         {
 #ifdef FEAT_HAVE_PARMETIS
-          // define partition executor
-          typedef Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway> PExeType;
+          Index nprocs = Index(this->_comm.size());
 
-          // get our base mesh
-          const auto& base_root_mesh = *base_mesh_node.get_mesh();
+          // build element adjacency graph
+          // connectivity by facets
+          /// \todo use centralised method for adj graph retrieval
+          /// \todo does any partitioner need self-adjacencies? -> remove it in creation
+          const auto dimension = MeshNodeType::MeshType::ShapeType::dimension;
+          Adjacency::Graph facets_at_elem(Adjacency::rt_as_is, base_mesh_node.get_mesh()->template get_index_set<dimension, dimension-1>());
+          Adjacency::Graph elems_at_facet(Adjacency::rt_transpose, facets_at_elem);
+          Adjacency::Graph adj_graph = Adjacency::Graph(Adjacency::rt_injectify, facets_at_elem, elems_at_facet);
 
-          // get number of elements
-          const Index num_global_elements(base_root_mesh.get_num_elements());
+          // create a metis partitioner
+          Geometry::PartiMetis<MeshType> partitioner(adj_graph, nprocs);
 
-          // allocate graph
-          typename PExeType::PGraphT global_dual(base_root_mesh, num_global_elements, this->_comm);
-
-          // local input for k-way partitioning
-          auto local_dual(global_dual.create_local());
-
-          auto part(PExeType::part(*((typename PExeType::PGraphT*)local_dual.get())));
-
-          auto synched_part(Foundation::PSynch<PExeType>::exec(part, typename PExeType::IndexType(num_global_elements)));
-
-          PExeType::fill_comm_structs_global(synched_part, global_dual);
-
-          // render elements-at-rank graph
-          this->_chosen_parti_graph = Adjacency::Graph(Adjacency::rt_transpose, synched_part.rank_at_element());
+          // create elems-at-rank graph
+          this->_chosen_parti_graph = partitioner.build_elems_at_rank();
 
           // verify that each process has at least one element
           {

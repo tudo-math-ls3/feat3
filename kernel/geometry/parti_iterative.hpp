@@ -2,6 +2,7 @@
 #ifndef KERNEL_GEOMETRY_PARTI_ITERATIVE_HPP
 #define KERNEL_GEOMETRY_PARTI_ITERATIVE_HPP 1
 
+#include <kernel/base_header.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/util/assertion.hpp>
