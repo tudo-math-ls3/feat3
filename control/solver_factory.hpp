@@ -283,25 +283,29 @@ namespace FEAT
         {
           std::shared_ptr<Solver::SolverBase<SolverVectorType_> > precon = nullptr;
           auto precon_section = base->query_section(precon_section_path);
-          auto precon_memory = precon_section->query("memory", "main");
+          auto precon_memorytype = precon_section->query("memorytype", "main");
           auto precon_datatype = precon_section->query("datatype", "double");
-          auto precon_indextype = precon_section->query("indextype", "unsigned long");
+          String precon_indextype;
+          if (precon_memorytype == "cuda")
+              precon_indextype = precon_section->query("indextype", "unsigned int");
+          else
+              precon_indextype = precon_section->query("indextype", "unsigned long");
 
-          if (precon_memory == SolverVectorType_::MemType::name() &&
+          if (precon_memorytype == SolverVectorType_::MemType::name() &&
               precon_datatype == Type::Traits<typename SolverVectorType_::DataType>::name() &&
               precon_indextype == Type::Traits<typename SolverVectorType_::IndexType>::name())
           {
             precon = create_scalar_solver<MST_, SolverVectorType_>(matrix_stock, base, precon_section_path, solver_level);
           }
 #ifdef FEAT_SF_ESOTERIC
-          else if (precon_memory == "main" && precon_datatype == "float" && precon_indextype == "unsigned long")
+          else if (precon_memorytype == "main" && precon_datatype == "float" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, float, unsigned long>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
-          else if (precon_memory == "main" && precon_datatype == "double" && precon_indextype == "unsigned long")
+          else if (precon_memorytype == "main" && precon_datatype == "double" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, double, unsigned long>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
@@ -309,13 +313,13 @@ namespace FEAT
           }
 #ifdef FEAT_SF_ESOTERIC
 #ifdef FEAT_HAVE_CUDA
-          else if (precon_memory == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned long")
+          else if (precon_memorytype == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned long>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
-          else if (precon_memory == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned long")
+          else if (precon_memorytype == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned long")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned long>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
@@ -324,13 +328,13 @@ namespace FEAT
 #endif
 #endif
 #ifdef FEAT_SF_ESOTERIC
-          else if (precon_memory == "main" && precon_datatype == "float" && precon_indextype == "unsigned int")
+          else if (precon_memorytype == "main" && precon_datatype == "float" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, float, unsigned int>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
-          else if (precon_memory == "main" && precon_datatype == "double" && precon_indextype == "unsigned int")
+          else if (precon_memorytype == "main" && precon_datatype == "double" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::Main, double, unsigned int>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
@@ -339,14 +343,14 @@ namespace FEAT
 #endif
 #ifdef FEAT_HAVE_CUDA
 #ifdef FEAT_SF_ESOTERIC
-          else if (precon_memory == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned int")
+          else if (precon_memorytype == "cuda" && precon_datatype == "float" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, float, unsigned int>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
             precon = std::make_shared<Solver::ConvertPrecond<SolverVectorType_, NextVectorType_>>(precon_next);
           }
 #endif
-          else if (precon_memory == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned int")
+          else if (precon_memorytype == "cuda" && precon_datatype == "double" && precon_indextype == "unsigned int")
           {
             using NextVectorType_ = typename SolverVectorType_::template ContainerTypeByMDI<Mem::CUDA, double, unsigned int>;
             auto precon_next = create_scalar_solver<MST_, NextVectorType_>(matrix_stock, base, precon_section_path, solver_level);
@@ -355,7 +359,7 @@ namespace FEAT
 #endif
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "memory/datatype/indextype combination unknown!");
+            throw InternalError(__func__, __FILE__, __LINE__, "memorytype/datatype/indextype combination unknown!");
           }
 
           return precon;
@@ -392,10 +396,15 @@ namespace FEAT
             throw InternalError(__func__, __FILE__, __LINE__, "no type key found in property map section: " + section_name + "!");
           String solver_type = solver_p.first;
 
-          auto section_memory = section->query("memory", "main");
+          auto section_memorytype = section->query("memorytype", "main");
           auto section_datatype = section->query("datatype", "double");
-          auto section_indextype = section->query("indextype", "unsigned long");
-          XASSERT(section_memory == MemType::name());
+          String section_indextype;
+          if (section_memorytype == "cuda")
+            section_indextype = section->query("indextype", "unsigned int");
+          else
+            section_indextype = section->query("indextype", "unsigned long");
+
+          XASSERT(section_memorytype == MemType::name());
           XASSERT(section_datatype == Type::Traits<DataType>::name());
           XASSERT(section_indextype == Type::Traits<IndexType>::name());
 
