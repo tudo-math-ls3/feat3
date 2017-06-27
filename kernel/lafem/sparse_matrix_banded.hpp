@@ -112,7 +112,7 @@ namespace FEAT
           _data(matrix.val())
         {
           // allocate column-pointer array
-          _col_ptr = new IT_[matrix.columns()];
+          _col_ptr = new IT_[_num_cols];
 #ifdef DEBUG
           for(Index i(0); i < _num_cols; ++i)
           {
@@ -136,59 +136,43 @@ namespace FEAT
           // loop over all local row entries
           for(int i(0); i < row_map.get_num_local_dofs(); ++i)
           {
-            // loop over all row entry contributations
-            for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
+            // fetch row index
+            const Index ix = row_map.get_index(i);
+
+            // build column pointer for this row entry contribution
+            for(IT_ k(0); k < _num_of_offsets; ++k)
             {
-              // fetch row entry weight and pre-multiply by alpha
-              DT_ iw = alpha * DT_(row_map.get_weight(i, ic));
-
-              // fetch row index
-              Index ix = row_map.get_index(i, ic);
-
-              // build column pointer for this row entry contribution
-              for(IT_ k(0); k < _num_of_offsets; ++k)
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
               {
-                if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-                {
-                  _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
-                }
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
               }
+            }
 
-              // loop over all local column entries
-              for(int j(0); j < col_map.get_num_local_dofs(); ++j)
-              {
-                // loop over all column entry contributions
-                for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
-                {
-                  // fetch trial function dof weight
-                  DT_ jw = DT_(col_map.get_weight(j, jc));
+            // loop over all local column entries
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+            {
+              // fetch column index
+              const Index jx = col_map.get_index(j);
 
-                  // fetch column index
-                  Index jx = col_map.get_index(j, jc);
+              // ensure that the column pointer is valid for this index
+              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
-                  // ensure that the column pointer is valid for this index
-                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
+              // incorporate data into global matrix
+              _data[_col_ptr[jx]] += alpha * loc_mat[i][j];
 
-                  // incorporate data into global matrix
-                  _data[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
-
-                  // continue with next column contribution
-                }
-                // continue with next column entry
-              }
+              // continue with next column entry
+            }
 
 #ifdef DEBUG
-              // reformat column-pointer array
-              for(IT_ k(0); k < _num_of_offsets; ++k)
+            // reformat column-pointer array
+            for(IT_ k(0); k < _num_of_offsets; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
               {
-                if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-                {
-                  _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
-                }
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
               }
-#endif
-              // continue with next row contribution
             }
+#endif
             // continue with next row entry
           }
         }
@@ -231,7 +215,7 @@ namespace FEAT
           _data(matrix.val())
         {
           // allocate column-pointer array
-          _col_ptr = new IT_[matrix.columns()];
+          _col_ptr = new IT_[_num_cols];
 #ifdef DEBUG
           for(Index i(0); i < _num_cols; ++i)
           {
@@ -255,61 +239,43 @@ namespace FEAT
           // loop over all local row entries
           for(int i(0); i < row_map.get_num_local_dofs(); ++i)
           {
-            // loop over all row entry contributations
-            for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
+            // fetch row index
+            const Index ix = row_map.get_index(i);
+
+            // build column pointer for this row entry contribution
+            for(IT_ k(0); k < _num_of_offsets; ++k)
             {
-              // fetch row index
-              Index ix = row_map.get_index(i, ic);
-
-              // build column pointer for this row entry contribution
-              for(IT_ k(0); k < _num_of_offsets; ++k)
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
               {
-                if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-                {
-                  _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
-                }
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
               }
+            }
 
-              // loop over all local column entries
-              for(int j(0); j < col_map.get_num_local_dofs(); ++j)
-              {
-                // clear  accumulation entry
-                DT_ dx(DT_(0));
+            // loop over all local column entries
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+            {
+              // fetch column index
+              const Index jx = col_map.get_index(j);
 
-                // loop over all column entry contributions
-                for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
-                {
-                  // fetch column index
-                  Index jx = col_map.get_index(j, jc);
+              // ensure that the column pointer is valid for this index
+              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
-                  // ensure that the column pointer is valid for this index
-                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
+              // update local matrix data
+              loc_mat[i][j] += alpha * _data[_col_ptr[jx]];
 
-                  // update accumulator
-                  dx += DT_(col_map.get_weight(j, jc)) * _data[_col_ptr[jx]];
-
-                  // continue with next column contribution
-                }
-
-                // update local matrix data
-                loc_mat[i][j] += (alpha * DT_(row_map.get_weight(i, ic))) * dx;
-
-                // continue with next column entry
-              }
+              // continue with next column entry
+            }
 
 #ifdef DEBUG
-              // reformat column-pointer array
-              for(IT_ k(0); k < _num_of_offsets; ++k)
+            // reformat column-pointer array
+            for(IT_ k(0); k < _num_of_offsets; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
               {
-                if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-                {
-                  _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
-                }
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
               }
-#endif
-
-              // continue with next row contribution
             }
+#endif
             // continue with next row entry
           }
         }

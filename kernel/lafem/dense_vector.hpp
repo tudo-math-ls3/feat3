@@ -83,19 +83,12 @@ namespace FEAT
           // loop over all local entries
           for(int i(0); i < mapping.get_num_local_dofs(); ++i)
           {
-            // pre-multiply local entry by alpha
-            DT_ dx(alpha * loc_vec[i]);
+            // get dof index
+            Index dof_idx = mapping.get_index(i);
+            ASSERT(dof_idx < _num_entries);
 
-            // loop over all entry contributions
-            for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
-            {
-              // get dof index
-              Index dof_idx = mapping.get_index(i, ic);
-              ASSERT(dof_idx < _num_entries);
-
-              // update vector data
-              _data[dof_idx] += DT_(mapping.get_weight(i, ic)) * dx;
-            }
+            // update vector entry
+             _data[dof_idx] += alpha * loc_vec[i];
           }
         }
       }; // class ScatterAxpy
@@ -130,22 +123,12 @@ namespace FEAT
           // loop over all local entries
           for(int i(0); i < mapping.get_num_local_dofs(); ++i)
           {
-            // clear accumulation entry
-            DT_ dx(DT_(0));
-
-            // loop over all entry contributions
-            for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
-            {
-              // get dof index
-              Index dof_idx = mapping.get_index(i, ic);
-              ASSERT(dof_idx < _num_entries);
-
-              // update accumulator
-              dx += DT_(mapping.get_weight(i, ic)) * _data[dof_idx];
-            }
+            // get dof index
+            Index dof_idx = mapping.get_index(i);
+            ASSERT(dof_idx < _num_entries);
 
             // update local vector data
-            loc_vec[i] += alpha * dx;
+            loc_vec[i] += alpha * _data[dof_idx];
           }
         }
       }; // class GatherAxpy

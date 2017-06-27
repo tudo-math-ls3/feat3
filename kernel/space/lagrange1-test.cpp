@@ -406,41 +406,25 @@ public:
       // test function loop
       for(int i(0); i < num_loc_dofs; ++i)
       {
-        // test function contribution loop
-        for(int ic(0); ic < dof_mapping.get_num_contribs(i); ++ic)
+        // fetch test function dof index
+        Index idof = dof_mapping.get_index(i);
+
+        // build column pointer for this test function contribution
+        for(Index k(row_ptr[idof]); k < row_ptr[idof+1]; ++k)
         {
-          // fetch test function dof index
-          Index idof = dof_mapping.get_index(i, ic);
+          col_ptr[col_idx[k]] = k;
+        }
 
-          // fetch test function dof weight
-          DataType_ iw = DataType_(dof_mapping.get_weight(i, ic));
+        // trial function loop
+        for(int j(0); j < num_loc_dofs; ++j)
+        {
+          // fetch trial function dof index
+          Index jdof = dof_mapping.get_index(j);
 
-          // build column pointer for this test function contribution
-          for(Index k(row_ptr[idof]); k < row_ptr[idof+1]; ++k)
-          {
-            col_ptr[col_idx[k]] = k;
-          }
+          // incorporate data into global matrix
+          data[col_ptr[jdof]] += Lx(i,j);
 
-          // trial function loop
-          for(int j(0); j < num_loc_dofs; ++j)
-          {
-            // trial function contribution loop
-            for(int jc(0); jc < dof_mapping.get_num_contribs(j); ++jc)
-            {
-              // fetch trial function dof index
-              Index jdof = dof_mapping.get_index(j, jc);
-
-              // fetch trial function dof weight
-              DataType_ jw = DataType_(dof_mapping.get_weight(j, jc));
-
-              // incorporate data into global matrix
-              data[col_ptr[jdof]] += iw * jw * Lx(i,j);
-
-              // next trial function contribution
-            }
-            // continue with next trial function
-          }
-          // next test function contribution
+          // continue with next trial function
         }
         // continue with next test function
       }

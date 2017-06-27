@@ -212,10 +212,7 @@ namespace FEAT
           dof_map.prepare(cell);
           for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
-            ValueType dx(0);
-            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
-              dx += dof_map.get_weight(i,j) * v(dof_map.get_index(i,j));
-            loc_vec[i] = dx;
+            loc_vec[i] = v(dof_map.get_index(i));
           }
           dof_map.finish();
 
@@ -298,10 +295,7 @@ namespace FEAT
           dof_map.prepare(cell);
           for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
-            DataType dx(0);
-            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
-              dx += dof_map.get_weight(i,j) * DataType(data[dof_map.get_index(i,j)]);
-            loc_vec[i] = dx;
+            loc_vec[i] = DataType(data[dof_map.get_index(i)]);
           }
           dof_map.finish();
 
@@ -380,10 +374,7 @@ namespace FEAT
           dof_map.prepare(cell);
           for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
-            DataType dx(0);
-            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
-              dx += dof_map.get_weight(i,j) * DataType(data[dof_map.get_index(i,j)]);
-            loc_vec[i] = dx;
+            loc_vec[i] = DataType(data[dof_map.get_index(i)]);
           }
           dof_map.finish();
 
@@ -469,10 +460,7 @@ namespace FEAT
           dof_map.prepare(cell);
           for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
-            DataType dx(0);
-            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
-              dx += dof_map.get_weight(i,j) * DataType(data[dof_map.get_index(i,j)]);
-            loc_vec[i] = dx;
+            loc_vec[i] = DataType(data[dof_map.get_index(i)]);
           }
           dof_map.finish();
 

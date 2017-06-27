@@ -42,6 +42,10 @@ namespace FEAT
           typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
           DofAssignType dof_assign(space);
 
+          // get the vector data array
+          auto* vals = vector.elements();
+          XASSERT(vals != nullptr);
+
           // loop over all entities
           const Index num_entities = space.get_mesh().get_num_entities(shape_dim_);
           for(Index i(0); i < num_entities; ++i)
@@ -58,13 +62,7 @@ namespace FEAT
             const int num_dofs = dof_assign.get_num_assigned_dofs();
             for(int j(0); j < num_dofs; ++j)
             {
-              // loop over all contributions
-              const int num_contribs = dof_assign.get_num_contribs(j);
-              for(int k(0); k < num_contribs; ++k)
-              {
-                Index idx(dof_assign.get_index(j,k));
-                vector(idx, vector(idx) + dof_assign.get_weight(j,k) * node_data[j]);
-              }
+              vals[dof_assign.get_index(j)] += node_data[j];
             }
 
             // finish

@@ -121,29 +121,6 @@ namespace FEAT
           return DofMirrorHelper<Space_, MeshPart_, 0>::fill(idx, 0, space, mesh_part);
         }
       };
-
-      template<
-        typename Space_,
-        int shape_dim_ = Space_::shape_dim>
-      struct MaxDofContrib
-      {
-        static int value(const Space_& space)
-        {
-          int max_contrib(MaxDofContrib<Space_, shape_dim_-1>::value(space));
-          typename Space_::template DofAssignment<shape_dim_>::Type dof_assign(space);
-          return std::max(max_contrib, dof_assign.get_max_contribs());
-        }
-      };
-
-      template<typename Space_>
-      struct MaxDofContrib<Space_, 0>
-      {
-        static int value(const Space_& space)
-        {
-          typename Space_::template DofAssignment<0>::Type dof_assign(space);
-          return dof_assign.get_max_contribs();
-        }
-      };
     } // namespace Intern
     /// \endcond
 
@@ -177,8 +154,6 @@ namespace FEAT
         LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror,
         const Space_& space, const MeshPart_& mesh_part)
       {
-        XASSERT(Intern::MaxDofContrib<Space_>::value(space) == 1); // deprecated
-
         // count number of dofs in mirror
         const Index count = Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::count(space, mesh_part);
 

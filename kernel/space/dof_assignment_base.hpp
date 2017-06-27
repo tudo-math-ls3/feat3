@@ -60,33 +60,13 @@ namespace FEAT
         _cell_index = ~Index(0);
       }
 
-      int get_max_assigned_dofs() const
-      {
-        return 1;
-      }
-
 #ifdef DOXYGEN
+      int get_max_assigned_dofs() const;
+
       int get_num_assigned_dofs() const;
+
+      Index get_index(int assign_idx) const;
 #endif // DOXYGEN
-
-      int get_max_contribs() const
-      {
-        return 1;
-      }
-
-      int get_num_contribs(int /*assign_idx*/) const
-      {
-        return 1;
-      }
-
-#ifdef DOXYGEN
-      Index get_index(int assign_idx, int contrib_idx = 0) const;
-#endif // DOXYGEN
-
-      DataType_ get_weight(int /*assign_idx*/, int /*contrib_idx*/ = 0) const
-      {
-        return DataType_(1.0);
-      }
     }; // class DofAssignmentBase
 
     /// \cond internal
@@ -176,7 +156,7 @@ namespace FEAT
       }
 
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(int assign_idx, int DOXY(contrib_idx) = 0) const
+      Index get_index(int assign_idx) const
       {
         return _dof_offset + Index(dofs_per_cell) * this->_cell_index + Index(assign_idx);
       }

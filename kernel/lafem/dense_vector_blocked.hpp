@@ -103,11 +103,11 @@ namespace FEAT
         typedef Mem::Main MemType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
-        typedef Tiny::Vector<DT_, BlockSize_> DataTypeBlocked;
+        typedef Tiny::Vector<DT_, BlockSize_> ValueType;
 
       private:
         IT_ _num_entries;
-        DataTypeBlocked* _data;
+        ValueType* _data;
 
       public:
         explicit ScatterAxpy(VectorType& vector) :
@@ -122,12 +122,12 @@ namespace FEAT
           // loop over all local entries
           for(int i(0); i < mapping.get_num_local_dofs(); ++i)
           {
-            // loop over all entry contributions
-            for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
-            {
-              // update vector data
-              _data[mapping.get_index(i, ic)] += (alpha * DT_(mapping.get_weight(i, ic))) * loc_vec[i];
-            }
+            // get dof index
+            Index dof_idx = mapping.get_index(i);
+            ASSERT(dof_idx < _num_entries);
+
+            // update vector data
+            _data[dof_idx] += alpha * loc_vec[i];
           }
         }
       }; // class ScatterAxpy
@@ -144,11 +144,11 @@ namespace FEAT
         typedef Mem::Main MemType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
-        typedef Tiny::Vector<DT_, BlockSize_> DataTypeBlocked;
+        typedef Tiny::Vector<DT_, BlockSize_> ValueType;
 
       private:
         IT_ _num_entries;
-        const DataTypeBlocked* _data;
+        const ValueType* _data;
 
       public:
         explicit GatherAxpy(const VectorType& vector) :
@@ -163,18 +163,12 @@ namespace FEAT
           // loop over all local entries
           for(int i(0); i < mapping.get_num_local_dofs(); ++i)
           {
-            // clear accumulation entry
-            DataTypeBlocked dx(DT_(0));
-
-            // loop over all entry contributions
-            for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
-            {
-              // update accumulator
-              dx += DT_(mapping.get_weight(i, ic)) * _data[mapping.get_index(i, ic)];
-            }
+            // get dof index
+            Index dof_idx = mapping.get_index(i);
+            ASSERT(dof_idx < _num_entries);
 
             // update local vector data
-            loc_vec[i] += alpha * dx;
+            loc_vec[i].axpy(alpha, _data[dof_idx]);
           }
         }
       }; // class GatherAxpy

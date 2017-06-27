@@ -437,11 +437,7 @@ namespace FEAT
             const int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j)
             {
-              const int num_contribs(dof_assign.get_num_contribs(j));
-              for(int k(0); k < num_contribs; ++k)
-              {
-                idx.insert(dof_assign.get_index(j, k));
-              }
+              idx.insert(dof_assign.get_index(j));
             }
             dof_assign.finish();
           }
@@ -489,13 +485,7 @@ namespace FEAT
             const int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j)
             {
-              const int num_contribs(dof_assign.get_num_contribs(j));
-              for(int k(0); k < num_contribs; ++k)
-              {
-                Index index(dof_assign.get_index(j, k));
-                DataType_ weight(dof_assign.get_weight(j, k));
-                idx.insert(std::make_pair(index, (weight*node_data[j])));
-              }
+              idx.insert(std::make_pair(dof_assign.get_index(j), node_data[j]));
             }
             dof_assign.finish();
           }
@@ -547,13 +537,7 @@ namespace FEAT
             const int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j)
             {
-              const int num_contribs(dof_assign.get_num_contribs(j));
-              for(int k(0); k < num_contribs; ++k)
-              {
-                Index index(dof_assign.get_index(j, k));
-                DataType_ weight(dof_assign.get_weight(j, k));
-                idx.insert(std::make_pair(index, (weight*node_data[j])));
-              }
+              idx.insert(std::make_pair(dof_assign.get_index(j), node_data[j]));
             }
             dof_assign.finish();
           }

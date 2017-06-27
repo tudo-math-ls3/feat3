@@ -53,28 +53,10 @@ namespace FEAT
         return 0;
       }
 
-      /** \copydoc DofAssignmentBase::get_max_contribs() */
-      int get_max_contribs() const
-      {
-        return 0;
-      }
-
-      /** \copydoc DofAssignmentBase::get_num_contribs() */
-      int get_num_contribs(int /*assign_idx*/) const
-      {
-        throw InternalError("invalid call of DofAssignmentNull::get_num_contribs()");
-      }
-
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(int /*assign_idx*/, int /*contrib_idx*/ = 0) const
+      Index get_index(int /*assign_idx*/) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_index()");
-      }
-
-      /** \copydoc DofAssignmentBase::get_weight() */
-      DataType_ get_weight(int /*assign_idx*/, int /*contrib_idx*/ = 0) const
-      {
-        throw InternalError("invalid call of DofAssignmentNull::get_weight()");
       }
     }; // class DofAssignmentNull<...>
 
@@ -123,7 +105,7 @@ namespace FEAT
       }
 
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(int assign_idx, int DOXY(contrib_idx) = 0) const
+      Index get_index(int assign_idx) const
       {
         return Index(dofs_per_cell_) * this->_cell_index + Index(assign_idx);
       }

@@ -87,67 +87,18 @@ namespace FEAT
        * The total number of global degress of freedom for the finite element space.
        */
       Index get_num_global_dofs() const;
+
+      /**
+       * \brief Returns the mapped dof index.
+       *
+       * \param[in] local_dof_idx
+       * The index of the local dof whose mapped index is to be returned.
+       *
+       * \returns
+       * The mapped dof index.
+       */
+      Index get_index(int local_dof_idx) const;
 #endif // DOXYGEN
-
-      /**
-       * \brief Returns the maximum number of dof contributions.
-       *
-       * In the case of hanging vertices, values to a dof associated with such a vertex can get distributed to
-       * adjacent dof. This is the maximum number of of such dof.
-       *
-       * As nonconforming meshes are not implemented yet, this is always 1.
-       */
-      int get_max_contribs() const
-      {
-        return 1;
-      }
-
-      /**
-       * \brief Returns the number of dof contributions.
-       *
-       * \param[in] local_dof_idx
-       * The index of the local dof whose contribution count is to be returned.
-       *
-       * \returns
-       * The number of global dof contributions for the specified local dof.
-       */
-      int get_num_contribs(int DOXY(local_dof_idx)) const
-      {
-        return 1;
-      }
-
-#ifdef DOXYGEN
-      /**
-       * \brief Returns the mapped dof contribution index.
-       *
-       * \param[in] local_dof_idx
-       * The index of the local dof whose mapped contribution index is to be returned.
-       *
-       * \param[in] contrib_idx
-       * The contribution index for the local dof.
-       *
-       * \returns
-       * The mapped dof contribution index.
-       */
-      Index get_index(int local_dof_idx, int contrib_idx = 0) const;
-#endif // DOXYGEN
-
-      /**
-       * \brief Returns the mapped dof contribution weight.
-       *
-       * \param[in] local_dof_idx
-       * The index of the local dof whose mapped contribution index is to be returned.
-       *
-       * \param[in] contrib_idx
-       * The contribution index for the local dof.
-       *
-       * \returns
-       * The mapped dof contribution index.
-       */
-      Real get_weight(int DOXY(local_dof_idx), int DOXY(contrib_idx) = 0) const
-      {
-        return Real(1.0);
-      }
     }; // class DofMappingBase<...>
   } // namespace Space
 } // namespace FEAT
