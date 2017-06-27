@@ -123,5 +123,20 @@ solver with schwarz-ilu preconditioner on a cuda gpu.
 
 \note The referenced precon/solver sections may lie in the parent solver's section or in global scope.
 
+\note The entry point solver must always be in main memory (due to MatrixStock limitations). If someone wants to execute a solver solely in cuda memory, on can use
+for example a 1,1 Richardson solver as a simple wrapper, only triggering main->cuda and vice versa conversion at start and end.
+
+\verbatim
+[entry-point-solver]
+type = richardson
+min_iter = 1
+max_iter = 1
+precon = cuda-only-solver
+
+[cuda-only-solver]
+type = imba_cuda_solver
+memorytype = cuda
+[...]
+\endverbatim
 
  **/
