@@ -236,14 +236,17 @@ compiler = ""
 cuda_arch = ""
 cuda_verbose = False
 
+unused_extra_options = copy.copy(extra_options)
 for option in extra_options:
   if option.startswith("--cpu="):
+    unused_extra_options.remove(option)
     if cputype:
       print ("Error: multiple cpu parameters in\n" + "\n".join(extra_options))
       exit(1)
     cputype = option.replace("--cpu=", "", 1)
 
   if option.startswith("--system_host_compiler="):
+    unused_extra_options.remove(option)
     if system_host_compiler:
       print ("Error: multiple system_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
@@ -253,6 +256,7 @@ for option in extra_options:
     cmake_flags += " -DFEAT_SYSTEM_HOST_COMPILER=" + system_host_compiler
 
   if option.startswith("--cuda_host_compiler="):
+    unused_extra_options.remove(option)
     if cuda_host_compiler:
       print ("Error: multiple cuda_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
@@ -261,6 +265,7 @@ for option in extra_options:
       print ("Error: cuda_host_compiler " + cuda_host_compiler + " does not exist!")
 
   if option.startswith("--compiler="):
+    unused_extra_options.remove(option)
     if compiler:
       print ("Error: multiple compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
@@ -269,27 +274,34 @@ for option in extra_options:
       print ("Error: compiler " + compiler + " does not exist!")
 
   if option.startswith("--cuda_arch="):
+    unused_extra_options.remove(option)
     if cuda_arch:
       print ("Error: multiple cuda_arch parameters in\n" + "\n".join(extra_options))
       exit(1)
     cuda_arch = option.replace("--cuda_arch=", "", 1)
 
   if option.startswith("--cuda_verbose"):
+    unused_extra_options.remove(option)
     cuda_verbose = True
 
   if option.startswith("--export_compile_commands"):
+    unused_extra_options.remove(option)
     cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 
   if option.startswith("--unroll_banded"):
+    unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_UNROLL_BANDED:BOOL=TRUE"
 
   if option.startswith("--eickt"):
+    unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_EICKT:BOOL=TRUE"
 
   if option.startswith("--sf_esoteric"):
+    unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_SF_ESOTERIC:BOOL=TRUE"
 
   if option.startswith("--ovr_mpi_ops"):
+    unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
 
 if not cputype:
@@ -495,6 +507,12 @@ if len(unused_tokens) == 0:
 else:
   print
   print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
+if len(unused_extra_options) == 0:
+  #print ("Unused extra option tokens: none")
+  pass
+else:
+  print
+  print ("Warning: Unused extra option tokens: " + " ".join(unused_extra_options))
 print
 print ("Extra Options: " + " ".join(extra_options))
 print
