@@ -53,7 +53,8 @@ namespace FEAT
           return count;
         }
 
-        static Index fill(Index idx[], Index offset, const Space_& space, const MeshPart_& mesh_part)
+        template<typename IT_>
+        static Index fill(IT_ idx[], Index offset, const Space_& space, const MeshPart_& mesh_part)
         {
           // fetch the target set for this dimension
           const typename MeshPart_::template TargetSet<shape_dim_>::Type&
@@ -74,7 +75,7 @@ namespace FEAT
             int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j, ++offset)
             {
-              idx[offset] = dof_assign.get_index(j);
+              idx[offset] = IT_(dof_assign.get_index(j));
             }
             dof_assign.finish();
           }
@@ -96,7 +97,8 @@ namespace FEAT
             DofMirrorHelper<Space_, MeshPart_, shape_dim_>::count(space, mesh_part);
         }
 
-        static Index fill(Index idx[], const Space_& space, const MeshPart_& mesh_part)
+        template<typename IT_>
+        static Index fill(IT_ idx[], const Space_& space, const MeshPart_& mesh_part)
         {
           Index offset =  DofMirrorHelpWrapper<Space_, MeshPart_, shape_dim_ - 1>::fill(idx, space, mesh_part);
           return DofMirrorHelper<Space_, MeshPart_, shape_dim_>::fill(idx, offset, space, mesh_part);
@@ -113,7 +115,8 @@ namespace FEAT
           return DofMirrorHelper<Space_, MeshPart_, 0>::count(space, mesh_part);
         }
 
-        static Index fill(Index idx[], const Space_& space, const MeshPart_& mesh_part)
+        template<typename IT_>
+        static Index fill(IT_ idx[], const Space_& space, const MeshPart_& mesh_part)
         {
           return DofMirrorHelper<Space_, MeshPart_, 0>::fill(idx, 0, space, mesh_part);
         }
