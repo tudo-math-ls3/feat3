@@ -179,6 +179,8 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -m64 -march=barcelona"
     elif cpu == "magnycours":
       cxxflags += " -m64 -march=barcelona"
+      #gcc O3 is broken on magnycours
+      cxxflags = cxxflags.replace("O3", "O2")
 
     #ARM
     elif cpu == "cortexa15":
