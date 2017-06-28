@@ -523,6 +523,9 @@ String Statistics::get_formatted_solver_internals(String target)
 {
   Dist::Comm comm(Dist::Comm::world());
 
+  if (_formatted_solver_trees.count(target) == 0)
+    compress_solver_expressions();
+
   auto solver_time_mg = FEAT::Statistics::get_time_mg(target);
   auto solver_time_mg_mpi_execute = FEAT::Statistics::get_time_mg_mpi_execute(target);
   auto solver_time_mg_mpi_wait_reduction = FEAT::Statistics::get_time_mg_mpi_wait_reduction(target);

@@ -192,6 +192,9 @@ namespace PoissonDirichlet2D
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
       system_levels, domain);
 
+    if (args.check("statistics") >= 0)
+        comm.print("\n" + FEAT::Statistics::get_formatted_solver_internals("default"));
+
     // release solver
     solver->done();
     matrix_stock.hierarchy_done();
