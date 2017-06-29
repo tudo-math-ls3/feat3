@@ -38,7 +38,7 @@ namespace HierarchTransferTestApp
   typedef Space::Lagrange2::Element<TrafoType> SpaceType;
 
   typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-  typedef Control::Domain::HierarchUnitCubeDomainControl<DomainLevelType> DomainControlType;
+  typedef Control::Domain::HierarchUnitCubeDomainControl2<DomainLevelType> DomainControlType;
 
   typedef Control::ScalarBasicSystemLevel<> SystemLevelType;
 
@@ -49,6 +49,9 @@ namespace HierarchTransferTestApp
     const Dist::Comm& comm = domain.comm();
 
     comm.print(">>>>> RESTRICTION-TEST <<<<<");
+
+    // timings vector
+    std::vector<double> times(domain.size_virtual(), 0.0);
 
     Analytic::StaticWrapperFunction<2, MyTestFunc> test_func;
     Assembly::Common::ForceFunctional<decltype(test_func)> force(test_func);
@@ -73,7 +76,9 @@ namespace HierarchTransferTestApp
         {
           // send restriction to parent
           XASSERT(domain.back().is_child());
+          TimeStamp stamp;
           system.back()->transfer_sys.rest_send(vec_fine);
+          times.at(i) += stamp.elapsed_now();
         }
         // exit loop
         break;
@@ -88,7 +93,9 @@ namespace HierarchTransferTestApp
       GlobalVectorType vec_rst(&sys_lvl_c.gate_sys, dom_lvl_c.space.get_num_dofs());
 
       // restrict fine vector
+      TimeStamp stamp;
       sys_lvl_f.transfer_sys.rest(vec_fine, vec_rst);
+      times.at(i) += stamp.elapsed_now();
 
       /*
       {
@@ -130,6 +137,15 @@ namespace HierarchTransferTestApp
       comm.print("RESTRICTION-TEST: PASSED");
     else
       comm.print("RESTRICTION-TEST: FAILED");
+
+    // compute maximum timings
+    std::vector<double> tmax(times.size());
+    comm.allreduce(times.data(), tmax.data(), times.size(), Dist::op_max);
+
+    // print timings of rank 0 and max
+    comm.print("\n Restriction Timings:");
+    for(std::size_t i(0); i < times.size(); ++i)
+      comm.print(stringify(i).pad_front(2) + ": " + stringify_fp_fix(times.at(i), 3, 8) + " [" + stringify_fp_fix(tmax.at(i), 3, 8) + "]");
   }
 
   void test_prol(DomainControlType& domain, std::deque<std::shared_ptr<SystemLevelType>>& system)
@@ -137,6 +153,9 @@ namespace HierarchTransferTestApp
     const Dist::Comm& comm = domain.comm();
 
     comm.print(">>>>> PROLONGATION-TEST <<<<<");
+
+    // timings vector
+    std::vector<double> times(domain.size_virtual(), 0.0);
 
     Analytic::StaticWrapperFunction<2, MyTestFunc> test_func;
 
@@ -161,11 +180,15 @@ namespace HierarchTransferTestApp
         GlobalVectorType vec_crs(&sys_lvl_c.gate_sys, dom_lvl_c.space.get_num_dofs());
         Assembly::Interpolator::project(vec_crs.local(), test_func, dom_lvl_c.space);
 
+        TimeStamp stamp;
         sys_lvl_f.transfer_sys.prol(vec_prol, vec_crs);
+        times.at(i) += stamp.elapsed_now();
       }
       else if((i+1) < domain.size_virtual())
       {
+        TimeStamp stamp;
         sys_lvl_f.transfer_sys.prol_recv(vec_prol);
+        times.at(i) += stamp.elapsed_now();
       }
       else
         break;
@@ -202,27 +225,44 @@ namespace HierarchTransferTestApp
       comm.print("PROLONGATION-TEST: PASSED");
     else
       comm.print("PROLONGATION-TEST: FAILED");
+
+    // compute maximum timings
+    std::vector<double> tmax(times.size());
+    comm.allreduce(times.data(), tmax.data(), times.size(), Dist::op_max);
+
+    // print timings of rank 0 and max
+    comm.print("\nProlongation Timings:");
+    for(std::size_t i(0); i < times.size(); ++i)
+      comm.print(stringify(i).pad_front(2) + ": " + stringify_fp_fix(times.at(i), 3, 8) + " [" + stringify_fp_fix(tmax.at(i), 3, 8) + "]");
   }
 
-  void run()
+  void run(int argc, char** argv)
   {
     Dist::Comm comm = Dist::Comm::world();
 
-    const int nprocs = comm.size();
+    /*const int nprocs = comm.size();
 
-    std::deque<int> lvls;
+    std::deque<int> lvls, lyrs;
     lvls.push_back(0);
+    lyrs.push_back(1);
     comm.print("Levels:");
-    for(int l(1), k(1); k <= nprocs; ++l, k *= 4)
+    for(int l(1), k(1); k <= nprocs; ++l, k *= 16)
     {
       lvls.push_front(2*l);
+      lyrs.push_front(2);
       comm.print(
         stringify(k).pad_front(3) + ": " +
         stringify(lvls.at(std::size_t(1))).pad_front(2) + " > " +
         stringify(lvls.front()).pad_front(2));
     }
 
-    DomainControlType domain(comm, lvls);
+    DomainControlType domain(comm, lvls, lyrs);
+    */
+
+    std::vector<String> slvls;
+    for(int i(1); i < argc; ++i)
+      slvls.push_back(argv[i]);
+    DomainControlType domain(comm, slvls);
 
     comm.print("\nLayers:");
     domain.dump_layers();
@@ -263,7 +303,7 @@ int main(int argc, char** argv)
   Runtime::initialise(argc, argv);
   try
   {
-    HierarchTransferTestApp::run();
+    HierarchTransferTestApp::run(argc, argv);
   }
   catch (const std::exception& exc)
   {

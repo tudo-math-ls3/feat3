@@ -275,17 +275,6 @@ namespace FEAT
           Index num_elems = mesh_node->get_mesh()->get_num_elements();
           XASSERT(num_elems == 4);
 
-          Adjacency::Graph ranks_at_elem(num_elems, 4, num_elems);
-          Index* ptr = ranks_at_elem.get_domain_ptr();
-          Index* idx = ranks_at_elem.get_image_idx();
-
-          for(Index i(0); i < num_elems; ++i)
-          {
-            ptr[i] = i;
-            idx[i] = i;
-          }
-          ptr[num_elems] = num_elems;
-
           const Index num_entities[] = {4, 4, 1};
 
           const Index ivert[4][4] =
@@ -326,6 +315,252 @@ namespace FEAT
           }
         }
       }; // class HierarchUnitCubeDomainControl<...>
+
+
+      template<typename DomainLevel_>
+      class HierarchUnitCubeDomainControl2 :
+        public DomainControl<DomainLevel_>
+      {
+      public:
+        typedef DomainControl<DomainLevel_> BaseClass;
+        typedef typename BaseClass::LayerType LayerType;
+        typedef typename BaseClass::LevelType LevelType;
+        typedef typename BaseClass::MeshType MeshType;
+        typedef typename BaseClass::AtlasType AtlasType;
+        typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
+        typedef Geometry::MeshPart<MeshType> MeshPartType;
+
+        static_assert(MeshType::shape_dim == 2, "HierarchUnitCubeDomainControl works only for 2D meshes");
+
+      public:
+        explicit HierarchUnitCubeDomainControl2(const Dist::Comm& comm_, const std::deque<int>& lvls, const std::deque<int>& lyrs) :
+          BaseClass(comm_)
+        {
+          _create(lvls, lyrs);
+        }
+
+        explicit HierarchUnitCubeDomainControl2(const Dist::Comm& comm_, const std::vector<String>& lvls) :
+          BaseClass(comm_)
+        {
+          std::deque<int> ilvls, ilyrs;
+          XASSERT(!lvls.empty());
+
+          ilvls.resize(lvls.size());
+          ilyrs.resize(lvls.size(), 1);
+          for(std::size_t i(0); i < lvls.size(); ++i)
+          {
+            std::deque<String> parts;
+            lvls.at(i).split_by_string(parts, ":");
+            if(!parts.front().parse(ilvls.at(i)))
+            {
+              comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as level");
+              FEAT::Runtime::abort();
+            }
+            if((parts.size() > std::size_t(1)) && !parts.back().parse(ilyrs.at(i)))
+            {
+              comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as layer");
+              FEAT::Runtime::abort();
+            }
+          }
+          if(ilvls.size() < std::size_t(2))
+          {
+            ilvls.push_back(0);
+            ilyrs.push_back(0);
+          }
+
+          _create(ilvls, ilyrs);
+        }
+
+      protected:
+        static int _ilog4(int x)
+        {
+          int r = 0;
+          for(; x > 1; ++r)
+          {
+            if((x % 4) > 0)
+              return -1;
+            x /= 4;
+          }
+          return r;
+        }
+
+        // converts a rank from 2-level to lexi ordering
+        static int _2lvl2lexi(int rank, int size)
+        {
+          const int ls = _ilog4(size);
+          int ix(0), iy(0);
+          for(int i(0); i < ls; ++i)
+          {
+            ix |= (rank >> (i+0)) & (1 << i);
+            iy |= (rank >> (i+1)) & (1 << i);
+          }
+          return iy*(1 << ls) + ix;
+        }
+
+        // converts a vector of ranks from lexi to 2-level ordering
+        static void _lexi22lvl(std::vector<int>& ranks, std::map<int,int>& reranks, int size)
+        {
+          const int ls = _ilog4(size);
+          for(auto& rank : ranks)
+          {
+            const int ix = rank % (1 << ls);
+            const int iy = rank / (1 << ls);
+            int rr = 0;
+            for(int i(0); i < ls; ++i)
+            {
+              rr |= (ix & (1 << i)) << (i+0);
+              rr |= (iy & (1 << i)) << (i+1);
+            }
+            reranks.insert(std::make_pair(rank, rr));
+            rank = rr;
+          }
+        }
+
+        void _create(const std::deque<int>& lvls, const std::deque<int>& lyrs)
+        {
+          const int log4n = _ilog4(this->_comm.size());
+          XASSERTM(log4n >= 0, "number of processes must be a power of 4");
+
+          XASSERT(!lvls.empty());
+          XASSERT(lvls.size() == lyrs.size());
+
+          // create layers for this process
+          _create_layers(lyrs);
+
+          this->_layer_levels.resize(this->_layers.size());
+
+          // loop over all layers
+          for(std::size_t i(0); i < this->_layers.size(); ++i)
+          {
+            auto& layer = *this->_layers.at(i);
+            auto& laylevs = this->_layer_levels.at(i);
+
+            const int csize = layer.comm().size();
+            const int crank = _2lvl2lexi(layer.comm().rank(), csize);
+
+            std::vector<int> ranks;
+            std::map<int,int> reranks; // neighbour rank map: lexi -> 2lvl
+
+            // create root mesh node
+            std::shared_ptr<MeshNodeType> mesh_node;
+            const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(crank, csize, mesh_node, ranks);
+
+            // translate neighbour ranks from lexi to 2lvl
+            _lexi22lvl(ranks, reranks, csize);
+
+            // rename halos
+            mesh_node->rename_halos(reranks);
+
+            // set layer neighbours
+            layer.set_neighbour_ranks(ranks);
+
+            // create domain level
+            laylevs.push_front(std::make_shared<LevelType>(base_lvl, mesh_node));
+
+            // refine and create child mesh parts
+            if(i > std::size_t(0))
+            {
+              int children = this->_layers.at(i-1)->comm().size() / csize;
+              int crs_lvl = base_lvl;
+              for(int nel(1); nel < children; nel *= 4)
+              {
+                std::shared_ptr<MeshNodeType> ref_node = std::shared_ptr<MeshNodeType>(laylevs.front()->get_mesh_node()->refine());
+                laylevs.push_front(std::make_shared<LevelType>(++crs_lvl, ref_node));
+                //ref_node = std::shared_ptr<MeshNodeType>(ref_node->refine());
+              }
+              this->_create_child_meshparts(laylevs.front()->get_mesh_node_ptr());
+            }
+
+            const int head_lvl = laylevs.front()->get_level_index();
+            const int fin_lvl = lvls.at(i);
+            const int crs_lvl = lvls.at(i+1);
+
+            // refine up the desired fine level
+            for(int l(head_lvl); l < fin_lvl; ++l)
+            {
+              std::shared_ptr<MeshNodeType> ref_node = std::shared_ptr<MeshNodeType>(laylevs.front()->get_mesh_node()->refine());
+              laylevs.push_front(std::make_shared<LevelType>(l+1, ref_node));
+            }
+
+            // drop all levels below desired coarse level
+            for(int l(base_lvl); l < crs_lvl; ++l)
+            {
+              laylevs.pop_back();
+            }
+          }
+
+          // compile the virtual level list
+          this->compile_virtual_levels();
+        }
+
+        void _create_layers(const std::deque<int>& lyrs)
+        {
+          //if(this->_comm.rank() == 0) __debugbreak();
+
+          // create main layer
+          this->_layers.push_back(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
+
+          // the world comm layer is already pushed
+          for(int ilay(1); (ilay+1) < int(lyrs.size()); ++ilay)
+          {
+            // get child layer
+            DomainLayer& child = *this->_layers.back();
+
+            // get the child comm
+            const Dist::Comm& comm_c = child.comm();
+
+            // my rank in child comm
+            const int rank = comm_c.rank();
+
+            // compute number of siblings
+            const int nsib = Math::sqr(1 << lyrs.at(std::size_t(ilay)));
+            XASSERT(nsib <= comm_c.size());
+
+            // create sibling comm
+            Dist::Comm comm_s = comm_c.comm_create_range_incl(nsib, rank & ~(nsib-1));
+            XASSERT(comm_s.size() == nsib);
+
+            // set sibling comm in child layer
+            child.set_parent(std::move(comm_s), 0); // rank 0 is parent
+
+            // create parent comm
+            Dist::Comm comm_p = comm_c.comm_create_range_incl(comm_c.size()/nsib, 0, nsib);
+            if(comm_p.is_null())
+              break;
+
+            // finally, add to our layer deque
+            this->_layers.push_back(std::make_shared<DomainLayer>(std::move(comm_p), ilay));
+          }
+        }
+
+        void _create_child_meshparts(std::shared_ptr<MeshNodeType> mesh_node)
+        {
+          const Index num_elems = mesh_node->get_mesh()->get_num_elements();
+
+          const Index num_entities[] = {4, 4, 1};
+          const auto& ivert = mesh_node->get_mesh()->template get_index_set<2,0>();
+          const auto& iedge = mesh_node->get_mesh()->template get_index_set<2,1>();
+
+          for(Index i(0); i < num_elems; ++i)
+          {
+            MeshPartType* part = new MeshPartType(num_entities, false);
+
+            // manually override target indices
+            Index* iv = part->template get_target_set<0>().get_indices();
+            Index* ie = part->template get_target_set<1>().get_indices();
+            Index* iq = part->template get_target_set<2>().get_indices();
+
+            for(int j(0); j < 4; ++j)
+            {
+              iv[j] = ivert[i][j];
+              ie[j] = iedge[i][j];
+            }
+            iq[0] = i;
+
+            mesh_node->add_mesh_part("_patch:" + stringify(i), part);
+          }
+        }
+      }; // class HierarchUnitCubeDomainControl2<...>
     } // namespace Domain
   } // namespace Control
 } // namespace FEAT

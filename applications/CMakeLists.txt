@@ -54,7 +54,7 @@ if (FEAT_HAVE_MPI)
     --build-target hierarch_transfer_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app 4 2:1 0 ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_4 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -68,7 +68,7 @@ if (FEAT_HAVE_MPI)
     --build-target hierarch_transfer_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 16 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 16 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app 6 4:1 2:1 0 ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_16 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST hierarch_transfer_test-app_mpi_16 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAT_HAVE_MPI)
@@ -79,7 +79,7 @@ else (FEAT_HAVE_MPI)
     --build-target hierarch_transfer_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app 3 0)
   SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
