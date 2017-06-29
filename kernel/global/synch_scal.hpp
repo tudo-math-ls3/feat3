@@ -34,9 +34,9 @@ namespace FEAT
       /// should we compute the sqrt of the result
       bool _sqrt;
       /// holds our mpi execution toe
-      DT_ _mpi_exec;
+      double _mpi_exec;
       /// holds our mpi reduction wait toe
-      DT_ _mpi_wait;
+      double _mpi_wait;
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
 #ifdef FEAT_MPI_THREAD_MULTIPLE
       /// mutex for our cv
@@ -76,8 +76,8 @@ namespace FEAT
         _r(DT_(0)),
         _x(x),
         _sqrt(sqrt),
-        _mpi_exec(DT_(0)),
-        _mpi_wait(DT_(0)),
+        _mpi_exec(double(0)),
+        _mpi_wait(double(0)),
 #ifdef FEAT_MPI_THREAD_MULTIPLE
         _flag_allreduce_called(false),
         _thread(_wait_function, std::cref(_x), std::cref(comm), std::cref(op), std::ref(_r), std::ref(_mpi_exec), std::ref(_mpi_wait),
@@ -145,7 +145,7 @@ namespace FEAT
 
     private:
 #ifdef FEAT_HAVE_MPI
-      static void _wait_function(const DT_ & x, const Dist::Comm& comm, const Dist::Operation & op, DT_ & r, DT_ & mpi_exec, DT_ & mpi_wait, std::mutex & mutex,
+      static void _wait_function(const DT_ & x, const Dist::Comm& comm, const Dist::Operation & op, DT_ & r, double & mpi_exec, double & mpi_wait, std::mutex & mutex,
           std::condition_variable & cv_allreduce_called, bool & flag_allreduce_called)
       {
         TimeStamp ts_start;

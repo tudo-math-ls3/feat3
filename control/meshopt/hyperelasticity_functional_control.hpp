@@ -8,10 +8,11 @@
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
 
+#include <kernel/solver/solver_factory.hpp>
+
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
 
 #include <control/domain/domain_control.hpp>
-#include <control/solver_factory.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_precond_factory.hpp>
 
@@ -227,7 +228,7 @@ namespace FEAT
 
               precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);
 
-              solver = Control::SolverFactory::create_nonlinear_optimiser
+              solver = Solver::SolverFactory::create_nonlinear_optimiser
                 (_system_levels.at(meshopt_lvl_pos)->global_functional,
                 _system_levels.at(meshopt_lvl_pos)->filter_sys, &solver_config, solver_name, precond);
               solver->init();

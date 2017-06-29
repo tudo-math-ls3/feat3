@@ -17,8 +17,8 @@
 #include <kernel/global/vector.hpp>
 #include <kernel/meshopt/dudv_functional.hpp>
 #include <kernel/solver/matrix_stock.hpp>
+#include <kernel/solver/solver_factory.hpp>
 
-#include <control/solver_factory.hpp>
 #include <control/domain/domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 
@@ -231,7 +231,7 @@ namespace FEAT
               }
 
               // Create our solver
-              solver = Control::SolverFactory::create_scalar_solver(
+              solver = Solver::SolverFactory::create_scalar_solver(
                 _mst, &solver_config, solver_name, meshopt_lvl_pos);
 
               // Now initialise the multigrid hierarchy in the MatrixStock

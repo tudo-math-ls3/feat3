@@ -1099,7 +1099,7 @@ struct NavierStokesScrewsApp
       matrix_stock_velo.transfers.push_back(system_level->transfer_velo.clone(LAFEM::CloneMode::Shallow));
     }
 
-    auto tsolver_a = Control::SolverFactory::create_scalar_solver(matrix_stock_velo, &solver_config, "linsolver_a");
+    auto tsolver_a = Solver::SolverFactory::create_scalar_solver(matrix_stock_velo, &solver_config, "linsolver_a");
     Solver::PreconditionedIterativeSolver<typename decltype(tsolver_a)::element_type::VectorType>* solver_a =
       (Solver::PreconditionedIterativeSolver<typename decltype(tsolver_a)::element_type::VectorType>*) &(*tsolver_a);
     matrix_stock_velo.hierarchy_init_symbolic();
@@ -1124,7 +1124,7 @@ struct NavierStokesScrewsApp
       matrix_stock_pres.transfers.push_back(system_level->transfer_pres.clone(LAFEM::CloneMode::Shallow));
     }
 
-    auto tsolver_s = Control::SolverFactory::create_scalar_solver(matrix_stock_pres, &solver_config, "linsolver_s");
+    auto tsolver_s = Solver::SolverFactory::create_scalar_solver(matrix_stock_pres, &solver_config, "linsolver_s");
     Solver::PreconditionedIterativeSolver<typename decltype(tsolver_s)::element_type::VectorType>* solver_s =
       (Solver::PreconditionedIterativeSolver<typename decltype(tsolver_s)::element_type::VectorType>*) &(*tsolver_s);
     matrix_stock_pres.hierarchy_init_symbolic();
@@ -1141,7 +1141,7 @@ struct NavierStokesScrewsApp
     ms_mass_p.gates_col.push_back(&the_system_level.gate_pres);
     ms_mass_p.filters.push_back(mass_p_filter.clone(LAFEM::CloneMode::Shallow));
 
-    auto tsolver_m_p = Control::SolverFactory::create_scalar_solver(ms_mass_p, &solver_config, "solver_m_p");
+    auto tsolver_m_p = Solver::SolverFactory::create_scalar_solver(ms_mass_p, &solver_config, "solver_m_p");
     Solver::PreconditionedIterativeSolver<typename decltype(tsolver_m_p)::element_type::VectorType>* solver_m_p =
       (Solver::PreconditionedIterativeSolver<typename decltype(tsolver_m_p)::element_type::VectorType>*) &(*tsolver_m_p);
     solver_m_p->init_symbolic();

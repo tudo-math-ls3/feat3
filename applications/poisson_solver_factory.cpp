@@ -26,11 +26,11 @@
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/solver/matrix_stock.hpp>
+#include <kernel/solver/solver_factory.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
-#include <control/solver_factory.hpp>
 
 
 namespace PoissonDirichlet2D
@@ -168,7 +168,7 @@ namespace PoissonDirichlet2D
     args.parse("solver-ini", solver_ini_name);
     PropertyMap property_map;
     property_map.parse(solver_ini_name, true);
-    auto solver = Control::SolverFactory::create_scalar_solver(matrix_stock, &property_map, "linsolver");
+    auto solver = Solver::SolverFactory::create_scalar_solver(matrix_stock, &property_map, "linsolver");
 
     matrix_stock.hierarchy_init();
 

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CONTROL_SOLVER_FACTORY_HPP
-#define CONTROL_SOLVER_FACTORY_HPP 1
+#ifndef KERNEL_SOLVER_SOLVER_FACTORY_HPP
+#define KERNEL_SOLVER_SOLVER_FACTORY_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
@@ -45,7 +45,7 @@
 
 namespace FEAT
 {
-  namespace Control
+  namespace Solver
   {
     struct SolverFactory
     {
@@ -359,7 +359,7 @@ namespace FEAT
 #endif
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "memorytype/datatype/indextype combination unknown!");
+            throw InternalError(__func__, __FILE__, __LINE__, "memorytype/datatype/indextype combination unknown!\n Did you try configure with the --eickt flag?");
           }
 
           return precon;
@@ -837,7 +837,34 @@ namespace FEAT
 
     }; // SolverFactory
 
-  } // namespace Control
+#ifdef FEAT_EICKT
+    using MST1_ = Solver::MatrixStock<
+      Global::Matrix<LAFEM::SparseMatrixCSR<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>,
+      Global::Filter<LAFEM::UnitFilter<Mem::Main, double, Index>, LAFEM::VectorMirror<Mem::Main, double, Index>>,
+      Global::Transfer<LAFEM::Transfer<LAFEM::SparseMatrixCSR<Mem::Main, double, Index>>, LAFEM::VectorMirror<Mem::Main, double, Index>>>;
+
+    extern template std::shared_ptr<Solver::SolverBase<MST1_::VectorType>>  SolverFactory::create_scalar_solver<
+      MST1_,
+      MST1_::VectorType>
+      (MST1_&, PropertyMap*, const String&, std::size_t);
+
+    extern template std::shared_ptr<Solver::SolverBase<MST1_::VectorType::LocalVectorType>>  SolverFactory::create_scalar_solver<
+      MST1_,
+      MST1_::VectorType::LocalVectorType>
+      (MST1_&, PropertyMap*, const String&, std::size_t);
+
+    extern template std::shared_ptr<Solver::SolverBase<MST1_::VectorType>> SolverFactory::create_scalar_solver_by_section<
+      MST1_,
+      MST1_::VectorType>
+      (MST1_&, PropertyMap*, const String&, size_t);
+
+    extern template std::shared_ptr<Solver::SolverBase<MST1_::VectorType::LocalVectorType>> SolverFactory::create_scalar_solver_by_section<
+      MST1_,
+      MST1_::VectorType::LocalVectorType>
+      (MST1_&, PropertyMap*, const String&, size_t);
+#endif
+
+  } // namespace Solver
 } // namespace FEAT
 
-#endif // CONTROL_SOLVER_FACTORY_HPP
+#endif // KERNEL_SOLVER_SOLVER_FACTORY_HPP

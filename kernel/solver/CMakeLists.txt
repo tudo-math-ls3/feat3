@@ -12,6 +12,7 @@ if (FEAT_EICKT)
   SET (kernel-solver-list
     ${kernel-solver-list}
     matrix_stock-eickt.cpp
+    solver_factory-eickt.cpp
     )
 endif(FEAT_EICKT)
 

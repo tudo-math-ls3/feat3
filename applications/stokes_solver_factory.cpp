@@ -19,11 +19,11 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/solver/matrix_stock.hpp>
+#include <kernel/solver/solver_factory.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/stokes_basic.hpp>
 #include <control/statistics.hpp>
-#include <control/solver_factory.hpp>
 
 namespace StokesPoiseuille2D
 {
@@ -240,8 +240,8 @@ namespace StokesPoiseuille2D
     args.parse("solver-ini", solver_ini_name);
     PropertyMap property_map;
     property_map.parse(solver_ini_name, true);
-    auto solver_a = Control::SolverFactory::create_scalar_solver(matrix_stock_a, &property_map, "linsolver_a");
-    auto solver_s = Control::SolverFactory::create_scalar_solver(matrix_stock_s, &property_map, "linsolver_s");
+    auto solver_a = Solver::SolverFactory::create_scalar_solver(matrix_stock_a, &property_map, "linsolver_a");
+    auto solver_s = Solver::SolverFactory::create_scalar_solver(matrix_stock_s, &property_map, "linsolver_s");
 
     matrix_stock_a.hierarchy_init();
     matrix_stock_s.hierarchy_init();
