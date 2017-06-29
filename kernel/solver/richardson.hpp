@@ -189,6 +189,7 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
+        IterationStats pre_iter(*this);
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
         VectorType& vec_def(this->_vec_def);
@@ -198,6 +199,8 @@ namespace FEAT
 
         // compute initial defect
         Status status = this->_set_initial_defect(vec_def, vec_sol);
+
+        pre_iter.destroy();
 
         // start iterating
         while(status == Status::progress)
