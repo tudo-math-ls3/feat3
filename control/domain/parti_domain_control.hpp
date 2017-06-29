@@ -4,7 +4,6 @@
 
 #include <kernel/base_header.hpp>
 
-#include <kernel/util/comm_base.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/runtime.hpp>

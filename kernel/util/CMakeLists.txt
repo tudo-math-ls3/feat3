@@ -9,7 +9,6 @@ ADD_LIBRARY(kernel-util STATIC
   dist.cpp
   dist_file_io.cpp
   exception.cpp
-  environment.cpp
   function_scheduler.cpp
   kahan_summation.cpp
   memory_pool.cpp

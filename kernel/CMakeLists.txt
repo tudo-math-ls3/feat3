@@ -7,7 +7,6 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_SUBDIRECTORY( adjacency )
 ADD_SUBDIRECTORY( assembly )
 ADD_SUBDIRECTORY( cubature )
-ADD_SUBDIRECTORY( foundation )
 ADD_SUBDIRECTORY( geometry )
 ADD_SUBDIRECTORY( lafem )
 ADD_SUBDIRECTORY( meshopt )
@@ -24,7 +23,6 @@ TARGET_LINK_LIBRARIES (feat
   kernel-adjacency
 # kernel-assembly
   kernel-cubature
-  kernel-foundation
   kernel-geometry
   kernel-lafem
   kernel-meshopt
