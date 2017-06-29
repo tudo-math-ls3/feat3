@@ -623,7 +623,7 @@ namespace NvSCCNDQ2P1dc
     {
       static constexpr std::size_t pl = 20u;
       static constexpr char pc = '.';
-      comm.print("\nProblem Paramters:");
+      comm.print("\nProblem Parameters:");
       comm.print(String("Nu").pad_back(pl, pc) + ": " + stringify(nu));
       comm.print(String("V-Max").pad_back(pl, pc) + ": " + stringify(v_max));
       comm.print(String("System").pad_back(pl, pc) + ": " + (navier ? "Navier-Stokes" : "Stokes"));

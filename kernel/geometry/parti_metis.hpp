@@ -152,7 +152,7 @@ namespace FEAT
             idx[offset + j] = item;
             ++j;
           }
-          offset += temp.at(i).size();
+          offset += Index(temp.at(i).size());
           ptr[i+1] = offset;
         }
 
