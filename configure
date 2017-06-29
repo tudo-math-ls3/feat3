@@ -126,23 +126,6 @@ for i in range(1, len(sys.argv)):
   if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
     extra_options.append(sys.argv[i])
 
-# check for in-source configure
-# [:-9] strips the /configure from sys.argv[0]
-if is_subdirectory(os.getcwd(), sys.argv[0][:-9]):
-  if not "--in-source" in extra_options:
-    print("ERROR: You are trying to configure for an in-source build, which is a really bad idea.")
-    print("It is recommended that you call this configure script from a separate build directory.")
-    print("If you really insist on an in-source build, you need to specify the '--in-source' option.")
-    sys.exit(1)
-
-# check for in-home configure
-if os.path.realpath(os.getcwd()) == os.path.realpath(os.path.expanduser("~")):
-  if not "--in-home" in extra_options:
-    print("ERROR: You are trying to configure for a build in your home directory, which is a really bad idea.")
-    print("It is recommended that you call this configure script from a separate build directory.")
-    print("If you really insist on a build in your home directory, you need to specify the '--in-home' option.")
-    sys.exit(1)
-
 # check for cmake binary
 if not is_found ("cmake"):
   print("Error: no cmake binary found!")
@@ -303,6 +286,28 @@ for option in extra_options:
   if option.startswith("--ovr_mpi_ops"):
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
+
+
+# check for in-source configure
+# [:-9] strips the /configure from sys.argv[0]
+if is_subdirectory(os.getcwd(), sys.argv[0][:-9]):
+  if not "--in-source" in extra_options:
+    print("ERROR: You are trying to configure for an in-source build, which is a really bad idea.")
+    print("It is recommended that you call this configure script from a separate build directory.")
+    print("If you really insist on an in-source build, you need to specify the '--in-source' option.")
+    sys.exit(1)
+  else:
+    unused_extra_options.remove("--in-source")
+
+# check for in-home configure
+if os.path.realpath(os.getcwd()) == os.path.realpath(os.path.expanduser("~")):
+  if not "--in-home" in extra_options:
+    print("ERROR: You are trying to configure for a build in your home directory, which is a really bad idea.")
+    print("It is recommended that you call this configure script from a separate build directory.")
+    print("If you really insist on a build in your home directory, you need to specify the '--in-home' option.")
+    sys.exit(1)
+  else:
+    unused_extra_options.remove("--in-home")
 
 if not cputype:
   cputype = detect_cpu()
