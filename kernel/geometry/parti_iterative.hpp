@@ -9,6 +9,7 @@
 #include <kernel/util/random.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/mutable_priority_queue.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 #include <map>
 #include <vector>
