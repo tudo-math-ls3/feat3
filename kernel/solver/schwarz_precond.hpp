@@ -177,7 +177,7 @@ namespace FEAT
     template<typename LocalFilter_, typename LocalSolver_, typename Mirror_>
     inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>> new_schwarz_precond(
       std::shared_ptr<LocalSolver_> local_solver,
-      Global::Filter<LocalFilter_, Mirror_>& filter)
+      const Global::Filter<LocalFilter_, Mirror_>& filter)
     {
       return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (local_solver, filter);
@@ -186,7 +186,7 @@ namespace FEAT
     template<typename LocalFilter_, typename Mirror_>
     inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>> new_schwarz_precond(
       std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
-      Global::Filter<LocalFilter_, Mirror_>& filter)
+      const Global::Filter<LocalFilter_, Mirror_>& filter)
     {
       return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (local_solver, filter);
@@ -224,7 +224,8 @@ namespace FEAT
     >
     new_schwarz_precond(
       const String& section_name, PropertyMap* section,
-      std::shared_ptr<LocalSolver_> local_solver, Global::Filter<LocalFilter_, Mirror_>& filter)
+      std::shared_ptr<LocalSolver_> local_solver,
+      const Global::Filter<LocalFilter_, Mirror_>& filter)
     {
       return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (section_name, section, local_solver, filter);
@@ -242,7 +243,7 @@ namespace FEAT
     new_schwarz_precond(
       const String& section_name, PropertyMap* section,
       std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
-      Global::Filter<LocalFilter_, Mirror_>& filter)
+      const Global::Filter<LocalFilter_, Mirror_>& filter)
     {
       return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (section_name, section, local_solver, filter);
