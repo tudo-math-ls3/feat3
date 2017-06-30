@@ -28,6 +28,19 @@ namespace FEAT
       W
     };
 
+    /**
+     * \brief Multigrid adaptive Coarse-Grid-Correction enumeration
+     */
+    enum class MultiGridAdaptCGC
+    {
+      /// fixed coarse grid correction damping
+      Fixed,
+      /// Energy-Minimisation
+      MinEnergy,
+      /// Defect-Minimisation
+      MinDefect
+    };
+
     /// \cond internal
     inline std::ostream& operator<<(std::ostream& os, MultiGridCycle cycle)
     {
@@ -435,7 +448,7 @@ namespace FEAT
         /// deque of unique solver object pointers
         std::deque<SolverType*> unique_solvers;
         /// four temporary vectors
-        SystemVectorType vec_rhs, vec_sol, vec_def, vec_cor;
+        SystemVectorType vec_rhs, vec_sol, vec_def, vec_cor, vec_tmp;
 
         /// total smoother application time
         double time_smooth;
@@ -482,11 +495,13 @@ namespace FEAT
           vec_sol = matrix.create_vector_r();
           vec_def = matrix.create_vector_r();
           vec_cor = matrix.create_vector_r();
+          vec_tmp = matrix.create_vector_r();
         }
 
         void done_symbolic()
         {
           // release our vectors
+          vec_tmp.clear();
           vec_cor.clear();
           vec_def.clear();
           vec_sol.clear();
@@ -993,6 +1008,8 @@ namespace FEAT
       std::shared_ptr<HierarchyType> _hierarchy;
       /// the multigrid cycle
       MultiGridCycle _cycle;
+      /// the coarse grid correction type
+      MultiGridAdaptCGC _adapt_cgc;
       /// the top-level of this multigrid
       Index _top_level;
       /// the coarse-level of this multigrid
@@ -1037,6 +1054,7 @@ namespace FEAT
         BaseClass(),
         _hierarchy(hierarchy),
         _cycle(cycle),
+        _adapt_cgc(MultiGridAdaptCGC::Fixed),
         _top_level(Index(top_level)),
         _crs_level(crs_level >= 0 ? Index(crs_level) : Index(int(_hierarchy->size_virtual()) + crs_level))
       {
@@ -1047,6 +1065,17 @@ namespace FEAT
       /// virtual destructor
       virtual ~MultiGrid()
       {
+      }
+
+      /**
+       * \brief Sets the adaption mode for the coarse grid correction.
+       *
+       * \param[in] adapt_cgc
+       * The adaption mode for the coarse grid correction.
+       */
+      void set_adapt_cgc(MultiGridAdaptCGC adapt_cgc)
+      {
+        _adapt_cgc = adapt_cgc;
       }
 
       /**
@@ -1796,8 +1825,41 @@ namespace FEAT
           // apply correction filter
           system_filter_f.filter_cor(lvl_f.vec_cor);
 
+          // initialise omega for (adaptive) coarse grid correction
+          DataType omega_cgc = DataType(1);
+
+          // use some sort of adaptive cgc?
+          if(_adapt_cgc != MultiGridAdaptCGC::Fixed)
+          {
+            // multiply coarse grid correction by system matrix
+            TimeStamp stamp_defect;
+            system_matrix.apply(lvl_f.vec_tmp, lvl_f.vec_cor);
+            lvl_f.time_defect += stamp_defect.elapsed_now();
+
+            // apply filter
+            system_filter_f.filter_def(lvl_f.vec_tmp);
+
+            // compute adaptive omega
+            switch(_adapt_cgc)
+            {
+            case MultiGridAdaptCGC::MinEnergy:
+              omega_cgc = lvl_f.vec_def.dot(lvl_f.vec_cor)
+                        / lvl_f.vec_tmp.dot(lvl_f.vec_cor);
+              break;
+
+            case MultiGridAdaptCGC::MinDefect:
+              omega_cgc = lvl_f.vec_def.dot(lvl_f.vec_tmp)
+                        / lvl_f.vec_tmp.dot(lvl_f.vec_tmp);
+              break;
+
+            default:
+              // This default block is required to make the GCC happy...
+              break;
+            }
+          }
+
           // update our solution vector
-          lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol);
+          lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, omega_cgc);
 
           // get our post-smoother
           std::shared_ptr<SolverType> smoother = lvl_f.level->get_smoother_post();
@@ -1806,12 +1868,34 @@ namespace FEAT
           if(smoother && (cur_smooth || (i > cur_lvl)))
           {
             // compute new defect
-            TimeStamp stamp_defect;
-            system_matrix.apply(lvl_f.vec_def, lvl_f.vec_sol, lvl_f.vec_rhs, -DataType(1));
-            lvl_f.time_defect += stamp_defect.elapsed_now();
+            if(_adapt_cgc != MultiGridAdaptCGC::Fixed)
+            {
+              // We have used some sort of adaptive coarse grid correction.
+              // In this case, the current solution vector is
+              //    sol_new = sol_old + omega * cor
+              //
+              // Moreover, we have the following vectors at hand:
+              //    1) tmp = A*cor
+              //    2) def_old = rhs - A*sol_old
+              //
+              // So we can apply the same "trick" as in the PCG method to update our
+              // defect vector instead of recomputing it by a matrix-vector mult, i.e.:
+              //   def_new = rhs - A * sol_new
+              //           = rhs - A * (sol_old + omega * cor)
+              //           = rhs - A *  sol_old - omega * A * cor
+              //           = def_old            - omega * tmp
+              lvl_f.vec_def.axpy(lvl_f.vec_tmp, lvl_f.vec_def, -omega_cgc);
+            }
+            else
+            {
+              // we have to recompute the defect by (rhs - A*sol_new)
+              TimeStamp stamp_defect;
+              system_matrix.apply(lvl_f.vec_def, lvl_f.vec_sol, lvl_f.vec_rhs, -DataType(1));
+              lvl_f.time_defect += stamp_defect.elapsed_now();
 
-            // apply defect filter
-            system_filter_f.filter_def(lvl_f.vec_def);
+              // apply defect filter
+              system_filter_f.filter_def(lvl_f.vec_def);
+            }
 
             // apply post-smoother
             Statistics::add_solver_expression(std::make_shared<ExpressionCallSmoother>(this->name(), smoother->name()));

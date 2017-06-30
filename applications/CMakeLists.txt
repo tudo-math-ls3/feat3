@@ -19,6 +19,7 @@ SET (app_list
   poisson_dirichlet_2d
   poisson_mixed
   poisson_neumann_2d
+  poisson_scarc
   poisson_solver_factory
   stokes_dricav_2d
   stokes_poiseuille_2d

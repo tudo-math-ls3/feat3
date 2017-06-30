@@ -585,7 +585,7 @@ namespace FEAT
               }
             }
 
-            // These parameters have to be known befor calling the constructor, so we have to parse them here
+            // These parameters have to be known before calling the constructor, so we have to parse them here
             auto cycle_p = section->query("cycle");
             if (!cycle_p.second)
               throw InternalError(__func__, __FILE__, __LINE__, "mg section without cycle key is not allowed!");
@@ -596,23 +596,28 @@ namespace FEAT
             lvl_max = Math::max(lvl_max, int(solver_level));
             lvl_min = Math::min(lvl_min, int(matrix_stock.size_virtual)-1);
 
-            if (cycle_p.first == "v")
+            Solver::MultiGridCycle cycle(Solver::MultiGridCycle::V);
+
+            if(!cycle_p.first.parse(cycle))
             {
-              auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::V, lvl_max, lvl_min);
-              result = mgv;
-            }
-            else if (cycle_p.first == "w")
-            {
-              auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::W, lvl_max, lvl_min);
-              result = mgv;
-            }
-            else if (cycle_p.first == "f")
-            {
-              auto mgv = Solver::new_multigrid(hierarchy, Solver::MultiGridCycle::F, lvl_max, lvl_min);
-              result = mgv;
-            }
-            else
               throw InternalError(__func__, __FILE__, __LINE__, "mg cycle " + cycle_p.first + " unknown!");
+            }
+
+            auto mgv = Solver::new_multigrid(hierarchy, cycle, lvl_max, lvl_min);
+
+            auto adapt_cgc_p = section->query("adapt_cgc");
+            if(adapt_cgc_p.second)
+            {
+              if(adapt_cgc_p.first == "fixed")
+                mgv->set_adapt_cgc(Solver::MultiGridAdaptCGC::Fixed);
+              else if(adapt_cgc_p.first == "min_energy")
+                mgv->set_adapt_cgc(Solver::MultiGridAdaptCGC::MinEnergy);
+              else if(adapt_cgc_p.first == "min_defect")
+                mgv->set_adapt_cgc(Solver::MultiGridAdaptCGC::MinDefect);
+              else
+                throw InternalError(__func__, __FILE__, __LINE__, "unknown coarse grid correction adaptivity mode: " + adapt_cgc_p.first);
+            }
+            result = mgv;
           }
           else if (solver_type == "schwarz")
           {

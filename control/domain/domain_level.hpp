@@ -16,6 +16,7 @@ namespace FEAT
       {
       public:
         typedef Mesh_ MeshType;
+        typedef typename MeshType::ShapeType ShapeType;
         typedef Geometry::MeshPart<Mesh_> PartType;
         typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
 

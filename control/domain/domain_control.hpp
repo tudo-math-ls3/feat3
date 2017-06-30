@@ -312,6 +312,7 @@ namespace FEAT
         typedef DomainLayer LayerType;
         typedef VirtualLevel<LevelType> VirtLevelType;
 
+        typedef typename LevelType::ShapeType ShapeType;
         typedef typename LevelType::MeshType MeshType;
         typedef typename LevelType::MeshNodeType MeshNodeType;
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
