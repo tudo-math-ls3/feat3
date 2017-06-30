@@ -99,10 +99,10 @@ namespace FEAT
         BaseClass("Chebyshev", section_name, section),
         _system_matrix(matrix),
         _system_filter(filter),
-        _min_ev(0),
-        _max_ev(0),
-        _fraction_min_ev(0.5),
-        _fraction_max_ev(0.8)
+        _min_ev(DataType(0)),
+        _max_ev(DataType(0)),
+        _fraction_min_ev(DataType(0.5)),
+        _fraction_max_ev(DataType(0.8))
         {
           auto fmin_p = section->query("fraction_min_ev");
           if(fmin_p.second)
@@ -181,7 +181,7 @@ namespace FEAT
         VectorType& z(this->_vec_def);
         const MatrixType& matrix(this->_system_matrix);
         v.format(DataType(3));
-        DataType tolerance(1e-4);
+        DataType tolerance(DataType(1e-4));
         Index max_iters(7);
         v.scale(v, DataType(1) / v.norm2());
         DataType lambda_old(0), lambda(0);
