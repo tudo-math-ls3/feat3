@@ -40,7 +40,7 @@ namespace FEAT
    *      http://www.jstatsoft.org/v08/i14
    * \see http://en.wikipedia.org/wiki/Xorshift
    *
-   * \note The implementation in this class corresponds to the <c>xorshift64*</c> example in Figure 19 of the
+   * \note The implementation in this class corresponds to the <c>xorshift64*</c> example in Figure 10 of the
    * first article by Vigna mentioned above.
    *
    * \author Peter Zajac
