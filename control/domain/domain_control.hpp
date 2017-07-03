@@ -367,9 +367,12 @@ namespace FEAT
 
         std::size_t bytes() const
         {
-          std::size_t s = _atlas.bytes();;
-          for(auto it = _layers.begin(); it != _layers.end(); ++it)
-            s += (*it)->bytes();
+          std::size_t s = _atlas.bytes();
+          for(const auto& lyr : _layers)
+            s += lyr->bytes();
+          for(const auto& lyr_lvl : _layer_levels)
+            for(const auto& lvl : lyr_lvl)
+              s += lvl->bytes();
           return s;
         }
 
