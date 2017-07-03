@@ -338,9 +338,22 @@ else (FEAT_HAVE_MPI)
     --build-target poisson_solver_factory
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini)
   SET_PROPERTY(TEST poisson_solver_factory_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_solver_factory_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+
+  if (FEAT_HAVE_CUDA)
+    ADD_TEST(poisson_solver_factory_serial_cuda ${CMAKE_CTEST_COMMAND}
+      --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+      --build-generator ${CMAKE_GENERATOR}
+      --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+      --build-target poisson_solver_factory
+      --build-nocmake
+      --build-noclean
+      --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example_cuda.ini)
+    SET_PROPERTY(TEST poisson_solver_factory_serial_cuda PROPERTY LABELS "serial")
+    SET_PROPERTY(TEST poisson_solver_factory_serial_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  endif (FEAT_HAVE_CUDA)
 endif (FEAT_HAVE_MPI)
 
 
