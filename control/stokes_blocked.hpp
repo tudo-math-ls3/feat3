@@ -154,8 +154,8 @@ namespace FEAT
         transfer_velo(&coarse_muxer_velo),
         transfer_pres(&coarse_muxer_pres),
         transfer_sys(&coarse_muxer_sys)
-        {
-        }
+      {
+      }
 
       virtual ~StokesBlockedSystemLevel()
       {
@@ -180,6 +180,8 @@ namespace FEAT
         transfer_sys.get_mat_rest().template at<0,0>() = transfer_velo.get_mat_rest().clone(LAFEM::CloneMode::Shallow);
         transfer_sys.get_mat_prol().template at<1,1>() = transfer_pres.get_mat_prol().clone(LAFEM::CloneMode::Shallow);
         transfer_sys.get_mat_rest().template at<1,1>() = transfer_pres.get_mat_rest().clone(LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_trunc().template at<0,0>() = transfer_velo.get_mat_trunc().clone(LAFEM::CloneMode::Shallow);
+        transfer_sys.get_mat_trunc().template at<1,1>() = transfer_pres.get_mat_trunc().clone(LAFEM::CloneMode::Shallow);
         transfer_sys.compile();
       }
 
@@ -371,7 +373,7 @@ namespace FEAT
         LocalVeloVector loc_vec_weight = loc_prol_wrapped.create_vector_l();
 
         // create a scalar weight vector for the assembly
-        auto loc_scal_vec_weight = loc_prol.create_vector_l();
+        LocalScalarVector loc_scal_vec_weight = loc_prol.create_vector_l();
 
         // get the data arrays of the weight vectors
         auto* v_wb = loc_vec_weight.elements();
@@ -384,7 +386,7 @@ namespace FEAT
 
           // assemble prolongation matrix
           Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_scal_vec_weight,
-          space_f, space_c, cubature);
+            space_f, space_c, cubature);
 
           // copy weights from scalar to blocked
           for(Index i(0); i < loc_prol.rows(); ++i)
@@ -447,7 +449,7 @@ namespace FEAT
 
           // assemble prolongation matrix
           Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
-          space_f, space_c, cubature);
+            space_f, space_c, cubature);
 
           // synchronise weight vector
           this->gate_pres.sync_0(loc_vec_weight);
@@ -475,6 +477,221 @@ namespace FEAT
         this->assemble_velocity_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
         this->assemble_pressure_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
 
+        this->compile_system_transfer();
+      }
+
+      template<typename DomainLevel_, typename Cubature_>
+      void assemble_velocity_truncation(
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature,
+        const StokesBlockedSystemLevel* sys_lvl_coarse = nullptr)
+      {
+        // if the coarse level is a parent, then we need the coarse system level
+        XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
+
+        // get fine and coarse domain levels
+        const DomainLevel_& level_f = *virt_lvl_fine;
+        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+
+        const auto& space_f = level_f.space_velo;
+        const auto& space_c = level_c.space_velo;
+
+        // get local transfer operator
+        LocalVeloTransfer& loc_trans = this->transfer_velo.local();
+
+        // get local transfer matrices
+        const LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
+        LocalVeloTransferMatrix& loc_trunc_wrapped = loc_trans.get_mat_trunc();
+
+        // get the matrix blocks
+        const typename LocalVeloTransferMatrix::BaseClass& loc_rest = loc_rest_wrapped;
+        typename LocalVeloTransferMatrix::BaseClass& loc_trunc = loc_trunc_wrapped;
+
+        // restriction matrix must be already assembled
+        XASSERTM(loc_rest.size() > Index(0), "you need to call 'assemble_velocity_transfer' first");
+
+        // clone sparsity pattern of restriction matrix
+        loc_trunc = loc_rest.clone(LAFEM::CloneMode::Layout);
+
+        // create local weight vector
+        LocalVeloVector loc_vec_weight = loc_rest_wrapped.create_vector_l();
+
+        // create a scalar weight vector for the assembly
+        LocalScalarVector loc_scal_vec_weight = loc_rest.create_vector_l();
+
+        // get the data arrays of the weight vectors
+        auto* v_wb = loc_vec_weight.elements();
+        auto* v_ws = loc_scal_vec_weight.elements();
+
+        // format
+        loc_trunc.format();
+        loc_scal_vec_weight.format();
+
+        // assemble truncation matrix
+        Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_scal_vec_weight, space_f, space_c, cubature);
+
+        // copy weights from scalar to blocked
+        for(Index i(0); i < loc_trunc.rows(); ++i)
+          v_wb[i] = v_ws[i];
+
+        // We now need to synchronise the weight vector in analogy to the prolongation matrix assembly.
+        // Note that the weight vector is now a coarse-level vector, so we need to synchronise over
+        // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
+        // level, as in this case we have to join/split around the synch operation.
+
+        // synchronise weight vector using the muxer/gate
+        if(!virt_lvl_coarse.is_child())
+        {
+          // The coarse level is a simple (non-child) level that exists on all processes,
+          // so simply synch over the coarse-level gate:
+          sys_lvl_coarse->gate_velo.sync_0(loc_vec_weight);
+        }
+        else if(virt_lvl_coarse.is_parent())
+        {
+          // The coarse level is a child level and this is one of the parent processes which contain
+          // the coarse-level gate. So we first need to join the weight vector onto the parent processes
+          // first, then synch that joined vector over the parent gate and finally split the result
+          // to all child processes -- this "emulates" a synch over the (non-existent) coarse-level
+          // child gate, which is what we actually require here...
+
+          // create temporary vector on parent partitioning
+          LocalVeloVector loc_tmp = sys_lvl_coarse->gate_velo._freqs.clone(LAFEM::CloneMode::Allocate);
+
+          // join child weights over muxer
+          this->coarse_muxer_velo.join(loc_vec_weight, loc_tmp);
+
+          // sync over coarse gate
+          sys_lvl_coarse->gate_velo.sync_0(loc_tmp);
+
+          // split over muxer
+          this->coarse_muxer_velo.split(loc_vec_weight, loc_tmp);
+        }
+        else // ghost
+        {
+          // The coarse level is a ghost level, i.e. a child but not a parent. In this case, we
+          // only have to participate in the join/send operations of the muxer, which are part
+          // of the operations executed on the parents handled by the else-if case above.
+
+          this->coarse_muxer_velo.join_send(loc_vec_weight);
+
+          // parent performs sync over its gate here (see above else-if)
+
+          this->coarse_muxer_velo.split_recv(loc_vec_weight);
+        }
+
+        // copy weights from blocked to scalar
+        for(Index i(0); i < loc_trunc.rows(); ++i)
+          v_ws[i] = v_wb[i][0];
+
+        // invert components
+        loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
+
+        // scale reduction matrix
+        loc_trunc.scale_rows(loc_trunc, loc_scal_vec_weight);
+      }
+
+      template<typename DomainLevel_, typename Cubature_>
+      void assemble_pressure_truncation(
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature,
+        const StokesBlockedSystemLevel* sys_lvl_coarse = nullptr)
+      {
+        // if the coarse level is a parent, then we need the coarse system level
+        XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
+
+        // get fine and coarse domain levels
+        const DomainLevel_& level_f = *virt_lvl_fine;
+        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+
+        const auto& space_f = level_f.space_pres;
+        const auto& space_c = level_c.space_pres;
+
+        // get local transfer operator
+        LocalPresTransfer& loc_trans = this->transfer_pres.local();
+
+        // get local transfer matrices
+        const LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
+        LocalPresTransferMatrix& loc_trunc = loc_trans.get_mat_trunc();
+
+        // restriction matrix must be already assembled
+        XASSERTM(loc_rest.size() > Index(0), "you need to call 'assemble_prescity_transfer' first");
+
+        // clone sparsity pattern of restriction matrix
+        loc_trunc = loc_rest.clone(LAFEM::CloneMode::Layout);
+
+        // create local weight vector
+        LocalPresVector loc_vec_weight = loc_trunc.create_vector_l();
+
+        // format
+        loc_trunc.format();
+        loc_vec_weight.format();
+
+        // assemble truncation matrix
+        Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_vec_weight, space_f, space_c, cubature);
+
+        // We now need to synchronise the weight vector in analogy to the prolongation matrix assembly.
+        // Note that the weight vector is now a coarse-level vector, so we need to synchronise over
+        // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
+        // level, as in this case we have to join/split around the synch operation.
+
+        // synchronise weight vector using the muxer/gate
+        if(!virt_lvl_coarse.is_child())
+        {
+          // The coarse level is a simple (non-child) level that exists on all processes,
+          // so simply synch over the coarse-level gate:
+          sys_lvl_coarse->gate_pres.sync_0(loc_vec_weight);
+        }
+        else if(virt_lvl_coarse.is_parent())
+        {
+          // The coarse level is a child level and this is one of the parent processes which contain
+          // the coarse-level gate. So we first need to join the weight vector onto the parent processes
+          // first, then synch that joined vector over the parent gate and finally split the result
+          // to all child processes -- this "emulates" a synch over the (non-existent) coarse-level
+          // child gate, which is what we actually require here...
+
+          // create temporary vector on parent partitioning
+          LocalPresVector loc_tmp = sys_lvl_coarse->gate_pres._freqs.clone(LAFEM::CloneMode::Allocate);
+
+          // join child weights over muxer
+          this->coarse_muxer_pres.join(loc_vec_weight, loc_tmp);
+
+          // sync over coarse gate
+          sys_lvl_coarse->gate_pres.sync_0(loc_tmp);
+
+          // split over muxer
+          this->coarse_muxer_pres.split(loc_vec_weight, loc_tmp);
+        }
+        else // ghost
+        {
+          // The coarse level is a ghost level, i.e. a child but not a parent. In this case, we
+          // only have to participate in the join/send operations of the muxer, which are part
+          // of the operations executed on the parents handled by the else-if case above.
+
+          this->coarse_muxer_pres.join_send(loc_vec_weight);
+
+          // parent performs sync over its gate here (see above else-if)
+
+          this->coarse_muxer_pres.split_recv(loc_vec_weight);
+        }
+
+        // invert components
+        loc_vec_weight.component_invert(loc_vec_weight);
+
+        // scale reduction matrix
+        loc_trunc.scale_rows(loc_trunc, loc_vec_weight);
+      }
+
+      template<typename DomainLevel_, typename Cubature_>
+      void assemble_truncations(
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature,
+        const StokesBlockedSystemLevel* sys_lvl_coarse = nullptr)
+      {
+        this->assemble_velocity_truncation(virt_lvl_fine, virt_lvl_coarse, cubature, sys_lvl_coarse);
+        this->assemble_pressure_truncation(virt_lvl_fine, virt_lvl_coarse, cubature, sys_lvl_coarse);
         this->compile_system_transfer();
       }
 

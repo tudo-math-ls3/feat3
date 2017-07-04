@@ -257,6 +257,98 @@ namespace FEAT
         transfer_sys.compile();
       }
 
+      template<typename DomainLevel_, typename Cubature_>
+      void assemble_truncation(
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const Cubature_& cubature,
+        const ScalarBasicSystemLevel* sys_lvl_coarse = nullptr)
+      {
+        // if the coarse level is a parent, then we need the coarse system level
+        XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
+
+        // get fine and coarse domain levels
+        const DomainLevel_& level_f = *virt_lvl_fine;
+        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+
+        const auto& space_f = level_f.space;
+        const auto& space_c = level_c.space;
+
+        // get local transfer operator
+        LocalSystemTransfer& loc_trans = this->transfer_sys.local();
+
+        // get local transfer matrices
+        const LocalSystemTransferMatrix& loc_rest = loc_trans.get_mat_rest();
+        LocalSystemTransferMatrix& loc_trunc = loc_trans.get_mat_trunc();
+
+        // restriction matrix must be already assembled
+        XASSERTM(loc_rest.size() > Index(0), "you need to call 'assemble_transfer' first");
+
+        // clone sparsity pattern of restriction matrix
+        loc_trunc = loc_rest.clone(LAFEM::CloneMode::Layout);
+
+        // create local weight vector
+        LocalSystemVector loc_vec_weight = loc_trunc.create_vector_l();
+
+        // format
+        loc_trunc.format();
+        loc_vec_weight.format();
+
+        // assemble truncation matrix
+        Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_vec_weight, space_f, space_c, cubature);
+
+        // We now need to synchronise the weight vector in analogy to the prolongation matrix assembly.
+        // Note that the weight vector is now a coarse-level vector, so we need to synchronise over
+        // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
+        // level, as in this case we have to join/split around the synch operation.
+
+        // synchronise weight vector using the muxer/gate
+        if(!virt_lvl_coarse.is_child())
+        {
+          // The coarse level is a simple (non-child) level that exists on all processes,
+          // so simply synch over the coarse-level gate:
+          sys_lvl_coarse->gate_sys.sync_0(loc_vec_weight);
+        }
+        else if(virt_lvl_coarse.is_parent())
+        {
+          // The coarse level is a child level and this is one of the parent processes which contain
+          // the coarse-level gate. So we first need to join the weight vector onto the parent processes
+          // first, then synch that joined vector over the parent gate and finally split the result
+          // to all child processes -- this "emulates" a synch over the (non-existent) coarse-level
+          // child gate, which is what we actually require here...
+
+          // create temporary vector on parent partitioning
+          LocalSystemVector loc_tmp = sys_lvl_coarse->gate_sys._freqs.clone(LAFEM::CloneMode::Allocate);
+
+          // join child weights over muxer
+          this->coarse_muxer_sys.join(loc_vec_weight, loc_tmp);
+
+          // sync over coarse gate
+          sys_lvl_coarse->gate_sys.sync_0(loc_tmp);
+
+          // split over muxer
+          this->coarse_muxer_sys.split(loc_vec_weight, loc_tmp);
+        }
+        else // ghost
+        {
+          // The coarse level is a ghost level, i.e. a child but not a parent. In this case, we
+          // only have to participate in the join/send operations of the muxer, which are part
+          // of the operations executed on the parents handled by the else-if case above.
+
+          this->coarse_muxer_sys.join_send(loc_vec_weight);
+
+          // parent performs sync over its gate here (see above else-if)
+
+          this->coarse_muxer_sys.split_recv(loc_vec_weight);
+        }
+
+        // invert components
+        loc_vec_weight.component_invert(loc_vec_weight);
+
+        // scale reduction matrix
+        loc_trunc.scale_rows(loc_trunc, loc_vec_weight);
+      }
+
       template<typename Space_, typename Cubature_>
       void assemble_laplace_matrix(const Space_& space, const Cubature_& cubature, const DataType nu = DataType(1))
       {

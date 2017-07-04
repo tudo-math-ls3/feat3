@@ -48,7 +48,7 @@ namespace HierarchTransferTestApp
   {
     const Dist::Comm& comm = domain.comm();
 
-    comm.print(">>>>> RESTRICTION-TEST <<<<<");
+    comm.print(">>>>> RESTRICTION-TEST <<<<<\n");
 
     // timings vector
     std::vector<double> times(domain.size_virtual(), 0.0);
@@ -143,7 +143,7 @@ namespace HierarchTransferTestApp
     comm.allreduce(times.data(), tmax.data(), times.size(), Dist::op_max);
 
     // print timings of rank 0 and max
-    comm.print("\n Restriction Timings:");
+    comm.print("\nRestriction Timings:");
     for(std::size_t i(0); i < times.size(); ++i)
       comm.print(stringify(i).pad_front(2) + ": " + stringify_fp_fix(times.at(i), 3, 8) + " [" + stringify_fp_fix(tmax.at(i), 3, 8) + "]");
   }
@@ -152,7 +152,7 @@ namespace HierarchTransferTestApp
   {
     const Dist::Comm& comm = domain.comm();
 
-    comm.print(">>>>> PROLONGATION-TEST <<<<<");
+    comm.print(">>>>> PROLONGATION-TEST <<<<<\n");
 
     // timings vector
     std::vector<double> times(domain.size_virtual(), 0.0);
@@ -236,6 +236,104 @@ namespace HierarchTransferTestApp
       comm.print(stringify(i).pad_front(2) + ": " + stringify_fp_fix(times.at(i), 3, 8) + " [" + stringify_fp_fix(tmax.at(i), 3, 8) + "]");
   }
 
+  void test_trunc(DomainControlType& domain, std::deque<std::shared_ptr<SystemLevelType>>& system)
+  {
+    const Dist::Comm& comm = domain.comm();
+
+    comm.print(">>>>> TRUNCATION-TEST <<<<<\n");
+
+    // timings vector
+    std::vector<double> times(domain.size_virtual(), 0.0);
+
+    Analytic::StaticWrapperFunction<2, MyTestFunc> test_func;
+
+    // interpolate global vector on finest level
+    GlobalVectorType vec_fine(&system.front()->gate_sys, domain.front()->space.get_num_dofs());
+    Assembly::Interpolator::project(vec_fine.local(), test_func, domain.front()->space);
+
+    String msg;
+    DataType derr = DataType(0);
+
+    for(std::size_t i(0); i < system.size(); ++i)
+    {
+      // no more system levels?
+      if((i+1) >= system.size())
+      {
+        // do we have another virtual domain level?
+        if((i+1) < domain.size_virtual())
+        {
+          // send truncation to parent
+          XASSERT(domain.back().is_child());
+          TimeStamp stamp;
+          system.back()->transfer_sys.trunc_send(vec_fine);
+          times.at(i) += stamp.elapsed_now();
+        }
+        // exit loop
+        break;
+      }
+
+      auto& sys_lvl_f = *system.at(i);
+      auto& sys_lvl_c = *system.at(i+1);
+      auto& dom_lvl_c = *domain.at(i+1);
+
+      // create coarse vectors
+      GlobalVectorType vec_crs(&sys_lvl_c.gate_sys, dom_lvl_c.space.get_num_dofs());
+      GlobalVectorType vec_trc(&sys_lvl_c.gate_sys, dom_lvl_c.space.get_num_dofs());
+
+      // truncate fine vector
+      TimeStamp stamp;
+      sys_lvl_f.transfer_sys.trunc(vec_fine, vec_trc);
+      times.at(i) += stamp.elapsed_now();
+
+      /*
+      {
+        const auto& vdl = domain.at(i+1);
+        String name = "trunc." + stringify(vdl->get_level_index());
+        Geometry::ExportVTK<MeshType> vtk(vdl->get_mesh());
+        vtk.add_vertex_scalar("test", vec_trc.local().elements());
+        vtk.write(name, vdl.layer().comm());
+      }
+      */
+
+      // interpolate coarse vector
+      Assembly::Interpolator::project(vec_crs.local(), test_func, dom_lvl_c.space);
+
+      // compute difference norm
+      GlobalVectorType vec_err = vec_crs.clone();
+      vec_err.axpy(vec_trc, vec_crs, -DataType(1));
+      DataType de = vec_err.norm2();
+      derr += de;
+      msg += " | " + stringify_fp_sci(de, 3);
+
+      // replace fine by coarse
+      vec_fine = std::move(vec_crs);
+    }
+
+    comm.barrier();
+    comm.allprint(msg);
+
+    // compute final error
+    derr /= DataType(system.size());
+    DataType derr_total;
+    comm.allreduce(&derr, &derr_total, std::size_t(1), Dist::op_max);
+
+    comm.print(String("\nTotal Error: ") + stringify_fp_sci(derr_total) + "\n");
+
+    if(derr_total < Math::pow(Math::eps<DataType>(), DataType(0.9)))
+      comm.print("TRUNCATION-TEST: PASSED");
+    else
+      comm.print("TRUNCATION-TEST: FAILED");
+
+    // compute maximum timings
+    std::vector<double> tmax(times.size());
+    comm.allreduce(times.data(), tmax.data(), times.size(), Dist::op_max);
+
+    // print timings of rank 0 and max
+    comm.print("\nTruncation Timings:");
+    for(std::size_t i(0); i < times.size(); ++i)
+      comm.print(stringify(i).pad_front(2) + ": " + stringify_fp_fix(times.at(i), 3, 8) + " [" + stringify_fp_fix(tmax.at(i), 3, 8) + "]");
+  }
+
   void run(int argc, char** argv)
   {
     Dist::Comm comm = Dist::Comm::world();
@@ -286,6 +384,14 @@ namespace HierarchTransferTestApp
       }
     }
 
+    for(std::size_t i(0); i < domain.size_physical(); ++i)
+    {
+      if(i+1 < domain.size_physical())
+        system.at(i)->assemble_truncation(domain.at(i), domain.at(i+1), cubature, system.at(i+1).get());
+      else if(i+1 < domain.size_virtual())
+        system.at(i)->assemble_truncation(domain.at(i), domain.at(i+1), cubature);
+    }
+
     comm.print(String(60, '='));
 
     test_rest(domain, system);
@@ -293,6 +399,10 @@ namespace HierarchTransferTestApp
     comm.print(String(60, '='));
 
     test_prol(domain, system);
+
+    comm.print(String(60, '='));
+
+    test_trunc(domain, system);
 
     comm.print(String(60, '='));
   }

@@ -690,9 +690,19 @@ namespace NvSCCNDQ2P1dc
       {
         system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
         system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
-        system_levels.at(i)->transfer_velo.get_mat_prol().shrink(1E-5);
-        system_levels.at(i)->transfer_velo.get_mat_rest().shrink(1E-5);
-        system_levels.at(i)->compile_system_transfer();
+      }
+    }
+
+    if(navier)
+    {
+      // assemble velocity truncation operators -- we need those for the assembly of the
+      // non-linear burgers operators on the coarser levels
+      for (Index i(0); i < num_levels; ++i)
+      {
+        if(i+1 < num_levels)
+          system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature, system_levels.at(i+1).get());
+        else if(i+1 < domain.size_virtual())
+          system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature);
       }
     }
 
@@ -1062,36 +1072,22 @@ namespace NvSCCNDQ2P1dc
             if((i+1) >= domain.size_virtual())
               break;
 
-            // get local coarse dofs
-            Index nloc_cdofs = system_levels.at(i)->transfer_velo.local().get_mat_rest().rows();
-
-            // get our velocity muxer
-            auto& muxer = system_levels.at(i)->coarse_muxer_velo;
-
-            // join via muxer
-            if(muxer.is_parent())
+            // does this process have another system level?
+            if((i+1) < system_levels.size())
             {
-              XASSERT(i+1 < system_levels.size());
-              Index ncvdofs = system_levels.at(i+1)->matrix_a.local().rows();
-              vec_conv.from_1_to_0();
-              typename SystemLevelType::LocalVeloVector vec_cc(vec_conv.local(), nloc_cdofs, IndexType(0));
-              typename SystemLevelType::LocalVeloVector vec_cv(ncvdofs, DataType(0));
-              muxer.join(vec_cc, vec_cv);
-              vec_conv = typename SystemLevelType::GlobalVeloVector(&system_levels.at(i+1)->gate_velo, std::move(vec_cv));
-              vec_conv.sync_0();
-            }
-            else if(muxer.is_child())
-            {
-              vec_conv.from_1_to_0();
-              typename SystemLevelType::LocalVeloVector vec_cc(vec_conv.local(), nloc_cdofs, IndexType(0));
-              muxer.join_send(vec_cc);
+              // create a coarse mesh velocity vector
+              auto vec_crs = system_levels.at(i+1)->matrix_a.create_vector_l();
+
+              // truncate fine mesh velocity vector
+              system_levels.at(i)->transfer_velo.trunc(vec_conv, vec_crs);
+
+              // the coarse vector is our next convection vector
+              vec_conv = std::move(vec_crs);
             }
             else
             {
-              XASSERT(i+1 < system_levels.size());
-              // no muxing necessary
-              typename SystemLevelType::LocalVeloVector vec_cc(vec_conv.local(), nloc_cdofs, IndexType(0));
-              vec_conv = typename SystemLevelType::GlobalVeloVector(&system_levels.at(i+1)->gate_velo, vec_cc.clone());
+              // this process is a child, so send truncation to parent
+              system_levels.at(i)->transfer_velo.trunc_send(vec_conv);
             }
           }
         }

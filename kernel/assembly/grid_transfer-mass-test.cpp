@@ -6,7 +6,6 @@
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
@@ -94,10 +93,7 @@ public:
     mass_c.add_double_mat_mult(rest_matrix, mass_f, prol_matrix, -DataType(1), true);
 
     // the resulting matrix should now be the null matrix
-    DataType err = Math::sqr(mass_c.norm_frobenius());
-
-    // and check for zero
-    TEST_CHECK_EQUAL_WITHIN_EPS(err, DataType(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqr(mass_c.norm_frobenius()), DataType(0), eps);
   }
 };
 

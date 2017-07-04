@@ -13,6 +13,7 @@ SET (test_list
   discrete_evaluator-test
   grid_transfer-test
   grid_transfer-mass-test
+  grid_transfer-tip-test
   interpolator-test
   linear_functional-test
   rew_projector-test

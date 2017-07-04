@@ -44,15 +44,17 @@ namespace FEAT
       Matrix_ _mat_prol;
       /// the internal restriction matrix
       Matrix_ _mat_rest;
+      /// the internal truncation matrix
+      Matrix_ _mat_trunc;
 
     public:
-      /// standard constrctor
+      /// standard constructor
       Transfer()
       {
       }
 
       /**
-       * \brief Creates the transfer from given prolongation and restiction matrices
+       * \brief Creates the transfer from given prolongation and restriction matrices
        *
        * \param[in] mat_prol
        * The prolongation matrix.
@@ -62,14 +64,36 @@ namespace FEAT
        */
       explicit Transfer(Matrix_&& mat_prol, Matrix_&& mat_rest) :
         _mat_prol(std::forward<Matrix_>(mat_prol)),
-        _mat_rest(std::forward<Matrix_>(mat_rest))
+        _mat_rest(std::forward<Matrix_>(mat_rest)),
+        _mat_trunc()
+      {
+      }
+
+
+      /**
+       * \brief Creates the transfer from given prolongation, restriction and reduction matrices
+       *
+       * \param[in] mat_prol
+       * The prolongation matrix.
+       *
+       * \param[in] mat_rest
+       * The restriction matrix.
+       *
+       * \param[in] mat_trunc
+       * The truncation matrix.
+       */
+      explicit Transfer(Matrix_&& mat_prol, Matrix_&& mat_rest, Matrix_&& mat_trunc) :
+        _mat_prol(std::forward<Matrix_>(mat_prol)),
+        _mat_rest(std::forward<Matrix_>(mat_rest)),
+        _mat_trunc(std::forward<Matrix_>(mat_trunc))
       {
       }
 
       /// move-constructor
       Transfer(Transfer&& other) :
         _mat_prol(std::forward<Matrix_>(other._mat_prol)),
-        _mat_rest(std::forward<Matrix_>(other._mat_rest))
+        _mat_rest(std::forward<Matrix_>(other._mat_rest)),
+        _mat_trunc(std::forward<Matrix_>(other._mat_trunc))
       {
       }
 
@@ -86,6 +110,7 @@ namespace FEAT
 
         _mat_prol = std::forward<Matrix_>(other._mat_prol);
         _mat_rest = std::forward<Matrix_>(other._mat_rest);
+        _mat_trunc = std::forward<Matrix_>(other._mat_trunc);
 
         return *this;
       }
@@ -99,6 +124,7 @@ namespace FEAT
 
         _mat_prol.convert(other.get_mat_prol());
         _mat_rest.convert(other.get_mat_rest());
+        _mat_trunc.convert(other.get_mat_trunc());
       }
 
       /**
@@ -111,7 +137,7 @@ namespace FEAT
        */
       Transfer clone(CloneMode clone_mode = CloneMode::Weak) const
       {
-        return Transfer(_mat_prol.clone(clone_mode), _mat_rest.clone(clone_mode));
+        return Transfer(_mat_prol.clone(clone_mode), _mat_rest.clone(clone_mode), _mat_trunc.clone(clone_mode));
       }
 
       /**
@@ -121,7 +147,7 @@ namespace FEAT
        */
       std::size_t bytes() const
       {
-        return _mat_prol.bytes() + _mat_rest.bytes();
+        return _mat_prol.bytes() + _mat_rest.bytes() + _mat_trunc.bytes();
       }
 
       void compile()
@@ -149,6 +175,16 @@ namespace FEAT
       {
         return _mat_rest;
       }
+
+      Matrix_& get_mat_trunc()
+      {
+        return _mat_trunc;
+      }
+
+      const Matrix_& get_mat_trunc() const
+      {
+        return _mat_trunc;
+      }
       /// \endcond
 
       /**
@@ -157,6 +193,38 @@ namespace FEAT
       bool is_ghost() const
       {
         return false;
+      }
+
+      /**
+       * \brief Applies the truncation operator
+       *
+       * \param[in] vec_fine
+       * The fine-mesh primal vector to be truncated.
+       *
+       * \param[out] vec_coarse
+       * The truncated coarse-mesh primal vector.
+       *
+       * \returns \c true
+       */
+      bool trunc(const VectorType& vec_fine, VectorType& vec_coarse) const
+      {
+        _mat_trunc.apply(vec_coarse, vec_fine);
+        return true;
+      }
+
+      /**
+       * \brief Sends the truncation for a ghost operator
+       *
+       * \attention
+       * This function is defined only for compatibility with the Global::Transfer class
+       * and must not be called, as this function will throw an exception otherwise.
+       *
+       * \param[in] vec_fine
+       * The fine-mesh primal vector to be truncated.
+       */
+      bool trunc_send(const VectorType& DOXY(vec_fine)) const
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "This function must not be called");
       }
 
       /**
@@ -179,10 +247,14 @@ namespace FEAT
       /**
        * \brief Sends the restriction for a ghost operator
        *
+       * \attention
+       * This function is defined only for compatibility with the Global::Transfer class
+       * and must not be called, as this function will throw an exception otherwise.
+       *
        * \param[in] vec_fine
        * The fine-mesh dual vector to be restricted.
        */
-      bool rest_send(const VectorType&) const
+      bool rest_send(const VectorType& DOXY(vec_fine)) const
       {
         throw InternalError(__func__, __FILE__, __LINE__, "This function must not be called");
       }
@@ -191,10 +263,10 @@ namespace FEAT
        * \brief Applies the prolongation operator
        *
        * \param[out] vec_fine
-       * The prolongated fine-mesh primal vector.
+       * The prolonged fine-mesh primal vector.
        *
        * \param[in] vec_coarse
-       * The coarse-mesh primal vector to be prolongated.
+       * The coarse-mesh primal vector to be prolonged.
        *
        * \returns \c true
        */
@@ -207,8 +279,12 @@ namespace FEAT
       /**
        * \brief Receives the prolongation for a ghost operator
        *
+       * \attention
+       * This function is defined only for compatibility with the Global::Transfer class
+       * and must not be called, as this function will throw an exception otherwise.
+       *
        * \param[out] vec_fine
-       * The prolongated fine-mesh primal vector.
+       * The prolonged fine-mesh primal vector.
        */
       bool prol_recv(VectorType& DOXY(vec_fine)) const
       {
@@ -217,6 +293,10 @@ namespace FEAT
 
       /**
        * \brief Cancels the prolongation.
+       *
+       * \attention
+       * This function is defined only for compatibility with the Global::Transfer class
+       * and must not be called, as this function will throw an exception otherwise.
        */
       void prol_cancel() const
       {

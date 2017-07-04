@@ -171,6 +171,16 @@ namespace FEAT
       {
         return _transfer.get_mat_rest();
       }
+
+      LocalMatrixType& get_mat_trunc()
+      {
+        return _transfer.get_mat_trunc();
+      }
+
+      const LocalMatrixType& get_mat_trunc() const
+      {
+        return _transfer.get_mat_trunc();
+      }
       /// \endcond
 
       /**
@@ -179,6 +189,48 @@ namespace FEAT
       bool is_ghost() const
       {
         return (_coarse_muxer != nullptr) && _coarse_muxer->is_ghost();
+      }
+
+      /**
+       * \brief Applies the truncation operator
+       *
+       * \param[in] vec_fine
+       * The fine-mesh dual vector to be truncated.
+       *
+       * \param[out] vec_coarse
+       * The truncated coarse-mesh dual vector.
+       *
+       * \returns \c true
+       */
+      bool trunc(const VectorType& vec_fine, VectorType& vec_coarse) const
+      {
+        if((_coarse_muxer == nullptr) || (!_coarse_muxer->is_child()))
+        {
+          _transfer.trunc(vec_fine.local(), vec_coarse.local());
+        }
+        else
+        {
+          XASSERT(_coarse_muxer->is_parent());
+          _transfer.trunc(vec_fine.local(), _vec_tmp);
+          _coarse_muxer->join(_vec_tmp, vec_coarse.local());
+        }
+        vec_coarse.sync_0();
+        return true;
+      }
+
+      /**
+       * \brief Sends the truncation for a ghost operator
+       *
+       * \param[in] vec_fine
+       * The fine-mesh dual vector to be truncated.
+       */
+      bool trunc_send(const VectorType& vec_fine) const
+      {
+        XASSERT(_coarse_muxer != nullptr);
+        XASSERT(_coarse_muxer->is_ghost());
+        _transfer.trunc(vec_fine.local(), _vec_tmp);
+        _coarse_muxer->join_send(_vec_tmp);
+        return true;
       }
 
       /**
@@ -227,10 +279,10 @@ namespace FEAT
        * \brief Applies the prolongation operator
        *
        * \param[out] vec_fine
-       * The prolongated fine-mesh primal vector.
+       * The prolonged fine-mesh primal vector.
        *
        * \param[in] vec_coarse
-       * The coarse-mesh primal vector to be prolongated.
+       * The coarse-mesh primal vector to be prolonged.
        *
        * \returns \c true
        */
@@ -263,7 +315,7 @@ namespace FEAT
        * \brief Receives the prolongation for a ghost operator
        *
        * \param[out] vec_fine
-       * The prolongated fine-mesh primal vector.
+       * The prolonged fine-mesh primal vector.
        */
       bool prol_recv(VectorType& vec_fine) const
       {

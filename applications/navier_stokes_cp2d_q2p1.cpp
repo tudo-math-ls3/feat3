@@ -897,6 +897,19 @@ namespace NavierStokesCP2D
       }
     }
 
+    if(cfg.multigrid_a)
+    {
+      // assemble velocity truncation operators -- we need those for the assembly of the
+      // non-linear burgers operators on the coarser levels
+      for (Index i(0); i < num_levels; ++i)
+      {
+        if(i+1 < num_levels)
+          system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature, system_levels.at(i+1).get());
+        else if(i+1 < domain.size_virtual())
+          system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature);
+      }
+    }
+
     /* ***************************************************************************************** */
 
     comm.print("Assembling basic matrices...");
@@ -1312,18 +1325,43 @@ namespace NavierStokesCP2D
         watch_asm_mat.start();
         if(cfg.multigrid_a)
         {
+          // clone convection vector
+          auto vec_cv = vec_conv.clone();
+
           // assemble burgers matrices on all levels
           for(std::size_t i(0); i < system_levels.size(); ++i)
           {
+            // assemble burgers matrix on this level
             auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
-            typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
             loc_mat_a.format();
-            burgers_mat.assemble_matrix(loc_mat_a, vec_cv, domain.at(i)->space_velo, cubature);
+            burgers_mat.assemble_matrix(loc_mat_a, vec_cv.local(), domain.at(i)->space_velo, cubature);
+
+            // no more virtual levels to restrict to?
+            if((i+1) >= domain.size_virtual())
+              break;
+
+            // does this process have another system level?
+            if((i+1) < system_levels.size())
+            {
+              // create a coarse mesh velocity vector
+              auto vec_crs = system_levels.at(i+1)->matrix_a.create_vector_l();
+
+              // truncate fine mesh velocity vector
+              system_levels.at(i)->transfer_velo.trunc(vec_cv, vec_crs);
+
+              // the coarse vector is our next convection vector
+              vec_cv = std::move(vec_crs);
+            }
+            else
+            {
+              // this process is a child, so send truncation to parent
+              system_levels.at(i)->transfer_velo.trunc_send(vec_cv);
+            }
           }
         }
         else
         {
-          // assemble burgers matrices on finest level
+          // assemble burgers matrices on finest level only
           the_system_level.matrix_a.local().format();
           burgers_mat.assemble_matrix(
             the_system_level.matrix_a.local(), vec_conv.local(), the_domain_level.space_velo, cubature);
