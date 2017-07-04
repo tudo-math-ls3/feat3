@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CONTROL_POISSON_MIXED_HPP
-#define CONTROL_POISSON_MIXED_HPP 1
+#ifndef CONTROL_SCALAR_MIXED_HPP
+#define CONTROL_SCALAR_MIXED_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -52,7 +52,7 @@ namespace FEAT
       typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
       typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
     >
-    class PoissonMixedSystemLevel
+    class ScalarMixedSystemLevel
     {
       public:
         // basic types
@@ -161,7 +161,7 @@ namespace FEAT
         /**
          * \brief Empty standard constructor
          */
-        PoissonMixedSystemLevel() :
+        ScalarMixedSystemLevel() :
           matrix_a(&gate_velo, &gate_velo),
           lumped_matrix_a(&gate_velo),
           matrix_b(&gate_velo, &gate_pres),
@@ -180,7 +180,7 @@ namespace FEAT
          * List of MeshPart names where essential boundary conditions (in this case: Neumann) are to be enforced.
          *
          */
-        explicit PoissonMixedSystemLevel(const std::deque<String>& neumann_list) :
+        explicit ScalarMixedSystemLevel(const std::deque<String>& neumann_list) :
           matrix_a(&gate_velo, &gate_velo),
           lumped_matrix_a(&gate_velo),
           matrix_b(&gate_velo, &gate_pres),
@@ -192,7 +192,7 @@ namespace FEAT
           {
           }
 
-        virtual ~PoissonMixedSystemLevel()
+        virtual ~ScalarMixedSystemLevel()
         {
         }
 
@@ -230,7 +230,7 @@ namespace FEAT
         }
 
         template<typename M_, typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
-        void convert(const PoissonMixedSystemLevel<dim_, M_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
+        void convert(const ScalarMixedSystemLevel<dim_, M_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
         {
           gate_velo.convert(other.gate_velo);
           gate_pres.convert(other.gate_pres);
@@ -591,8 +591,8 @@ namespace FEAT
             }
           }
         }
-    }; // class PoissonMixedSystemLevel<...>
+    }; // class ScalarMixedSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
 
-#endif // CONTROL_POISSON_MIXED_HPP
+#endif // CONTROL_SCALAR_MIXED_HPP

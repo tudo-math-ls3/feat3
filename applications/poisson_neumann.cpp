@@ -24,7 +24,7 @@
 #include <control/domain/unit_cube_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
-namespace PoissonNeumann2D
+namespace PoissonNeumann
 {
   using namespace FEAT;
 
@@ -39,24 +39,16 @@ namespace PoissonNeumann2D
     typedef Real DataType;
     typedef Index IndexType;
 
-    // choose cycle
-    Solver::MultiGridCycle cycle = Solver::MultiGridCycle::V;
-    if(args.parse("cycle", cycle) < 0)
-    {
-      comm.print("ERROR: Invalid cycle");
-      Runtime::abort();
-    }
-    comm.print("Cycle: " + stringify(cycle));
-
-    // choose our desired analytical solution
-    Analytic::Common::CosineWaveFunction<2> sol_func;
-
     // define our domain type
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
 
-    // fetch our mesh type
+    // fetch our mesh and shape types
     typedef typename DomainControlType::MeshType MeshType;
+    typedef typename DomainControlType::ShapeType ShapeType;
+
+    // choose our desired analytical solution
+    Analytic::Common::CosineWaveFunction<ShapeType::dimension> sol_func;
 
     // define our system level
     typedef Control::ScalarMeanFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
@@ -185,7 +177,7 @@ namespace PoissonNeumann2D
     }
 
     // create our solver
-    auto mgv = Solver::new_multigrid(multigrid_hierarchy, cycle);
+    auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
 
     auto solver = Solver::new_pcg(matrix, filter, mgv);
 
@@ -237,7 +229,7 @@ namespace PoissonNeumann2D
     if (args.check("vtk") >= 0)
     {
       // build VTK name
-      String vtk_name = String("./poisson-neumann-2d");
+      String vtk_name = String("./poisson-neumann");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(comm.size());
 
@@ -275,7 +267,6 @@ namespace PoissonNeumann2D
     args.support("level");
     args.support("no-err");
     args.support("vtk");
-    args.support("cycle");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -346,14 +337,14 @@ namespace PoissonNeumann2D
     // print elapsed runtime
     comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
-} // namespace PoissonNeumann2D
+} // namespace PoissonNeumann
 
 int main(int argc, char* argv [])
 {
   FEAT::Runtime::initialise(argc, argv);
   try
   {
-    PoissonNeumann2D::main(argc, argv);
+    PoissonNeumann::main(argc, argv);
   }
   catch (const std::exception& exc)
   {

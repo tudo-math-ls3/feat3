@@ -31,7 +31,7 @@
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
 
-namespace PoissonDirichlet2D
+namespace PoissonDirichlet
 {
   using namespace FEAT;
 
@@ -46,15 +46,16 @@ namespace PoissonDirichlet2D
     typedef double DataType;
     typedef Index IndexType;
 
-    // choose our desired analytical solution
-    Analytic::Common::ExpBubbleFunction<2> sol_func;
-
     // define our domain type
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
 
-    // fetch our mesh type
+    // fetch our mesh and shape types
     typedef typename DomainControlType::MeshType MeshType;
+    typedef typename DomainControlType::ShapeType ShapeType;
+
+    // choose our desired analytical solution
+    Analytic::Common::ExpBubbleFunction<ShapeType::dimension> sol_func;
 
     // define our system level
     typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
@@ -236,7 +237,7 @@ namespace PoissonDirichlet2D
     if (args.check("vtk") >= 0)
     {
       // build VTK name
-      String vtk_name = String("./poisson-dirichlet-2d");
+      String vtk_name = String("./poisson-dirichlet");
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(comm.size());
 
@@ -363,14 +364,14 @@ namespace PoissonDirichlet2D
     // print elapsed runtime
     comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
-} // namespace PoissonDirichlet2D
+} // namespace PoissonDirichlet
 
 int main(int argc, char* argv [])
 {
   FEAT::Runtime::initialise(argc, argv);
   try
   {
-    PoissonDirichlet2D::main(argc, argv);
+    PoissonDirichlet::main(argc, argv);
   }
   catch (const std::exception& exc)
   {

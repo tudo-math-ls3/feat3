@@ -30,7 +30,7 @@
 #include <kernel/util/time_stamp.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
-#include <control/poisson_mixed.hpp>
+#include <control/scalar_mixed.hpp>
 #include <control/statistics.hpp>
 
 namespace PoissonMixed
@@ -256,10 +256,10 @@ namespace PoissonMixed
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
 
-    // fetch our mesh type
+    // fetch our mesh and shape types
     typedef typename DomainControlType::MeshType MeshType;
-
-    static constexpr int dim = MeshType::world_dim;
+    typedef typename DomainControlType::ShapeType ShapeType;
+    static constexpr int dim = ShapeType::dimension;
 
     // choose our desired analytical solution
     // This has homogeneous Dirichlet BCs
@@ -268,7 +268,7 @@ namespace PoissonMixed
     Analytic::Common::CosineWaveFunction<dim> sol_func;
 
     // define our system level
-    typedef Control::PoissonMixedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::ScalarMixedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
@@ -612,7 +612,6 @@ namespace PoissonMixed
     {
       // build VTK name
       String vtk_name = String("./poisson-mixed");
-      vtk_name += "-"+stringify(dim)+"d";
       vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
       vtk_name += "-n" + stringify(comm.size());
 
