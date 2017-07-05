@@ -15,7 +15,6 @@ namespace FEAT
      */
     enum class BiCGStabPreconVariant
     {
-      undefined = 0,
       left,
       right
     };
@@ -28,22 +27,18 @@ namespace FEAT
     {
       switch(precon_variant)
       {
-        case BiCGStabPreconVariant::undefined:
-          return os << "undefined";
         case BiCGStabPreconVariant::left:
           return os << "left";
         case BiCGStabPreconVariant::right:
           return os << "right";
         default:
-          return os << "-unknown-";
+          return os << "unknown";
       }
     }
 
     inline void operator<<(BiCGStabPreconVariant& precon_variant, const String& precon_variant_name)
     {
-      if(precon_variant_name == "undefined")
-        precon_variant = BiCGStabPreconVariant::undefined;
-      else if(precon_variant_name == "left")
+      if(precon_variant_name == "left")
         precon_variant = BiCGStabPreconVariant::left;
       else if(precon_variant_name == "right")
         precon_variant = BiCGStabPreconVariant::right;
@@ -185,6 +180,7 @@ namespace FEAT
           _system_filter(filter),
           _precon_variant(precon_variant)
         {
+          XASSERT(precon_variant == BiCGStabPreconVariant::left || precon_variant == BiCGStabPreconVariant::right);
         }
 
         /**

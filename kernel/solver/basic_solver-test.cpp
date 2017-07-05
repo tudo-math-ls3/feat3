@@ -9,6 +9,7 @@
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/solver/bicgstab.hpp>
+#include <kernel/solver/bicgstabl.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/rgcr.hpp>
@@ -193,6 +194,25 @@ public:
       test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
+    // test BiCGStabL-ILU(0) L=1 -> BiCGStab
+    {
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      // create a BiCGStab solver
+      BiCGStabL<MatrixType, FilterType> solver(matrix, filter, 1, precon, BiCGStabLPreconVariant::left);
+      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 12);
+    }
+
+    // test BiCGStabL-ILU(0) L=4
+    {
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      // create a BiCGStab solver
+      BiCGStabL<MatrixType, FilterType> solver(matrix, filter, 4, precon, BiCGStabLPreconVariant::right);
+      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 3);
+    }
+
+
     // test BiCGStab-right-SOR(1) aka GS
     {
       auto precon = Solver::new_sor_precond(matrix, filter, DataType(1));
@@ -366,6 +386,24 @@ public:
       test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
+    // test BiCGStabL-ILU(0) L=1 -> BiCGStab
+    {
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter);
+      // create a BiCGStab solver
+      BiCGStabL<MatrixType, FilterType> solver(matrix, filter, 1, precon, BiCGStabLPreconVariant::left);
+      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 12);
+    }
+
+    // test BiCGStabL-ILU(0) L=4
+    {
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      // create a BiCGStab solver
+      BiCGStabL<MatrixType, FilterType> solver(matrix, filter, 4, precon, BiCGStabLPreconVariant::right);
+      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 3);
+    }
+
     // test FGMRES-JAC
     {
       // create a Jacobi preconditioner
@@ -415,6 +453,8 @@ public:
       RGCR<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("RGCR-SPAI", solver, vec_sol, vec_ref, vec_rhs, 17);
     }
+
+
 
 #ifdef FEAT_HAVE_CUSOLVER
     // test BiCGStab-SOR

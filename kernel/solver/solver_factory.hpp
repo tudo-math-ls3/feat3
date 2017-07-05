@@ -10,6 +10,7 @@
 #include <kernel/solver/pcr.hpp>
 #include <kernel/solver/psd.hpp>
 #include <kernel/solver/bicgstab.hpp>
+#include <kernel/solver/bicgstabl.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/chebyshev.hpp>
 #include <kernel/solver/fgmres.hpp>
@@ -437,6 +438,13 @@ namespace FEAT
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_bicgstab(
+              section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+          }
+          else if (solver_type == "bicgstabl")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            result = Solver::new_bicgstabl(
               section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "fgmres")
