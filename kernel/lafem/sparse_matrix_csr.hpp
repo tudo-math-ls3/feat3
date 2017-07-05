@@ -2160,7 +2160,8 @@ namespace FEAT
        * \attention
        * This function assumes that the output matrix already contains the
        * required sparsity pattern. This function will throw an exception
-       * if the sparsity pattern of the output matrix is incomplete.
+       * if the sparsity pattern of the output matrix is incomplete unless
+       * \p allow_incomplete is set to \c true.
        *
        * \note
        * This function currently only supports data in main memory.
@@ -2169,7 +2170,7 @@ namespace FEAT
        * The three matrices to be multiplied
        *
        * \param[in] alpha
-       * The scaling factor for the product.
+       * The scaling factor for the product
        *
        * \param[in] allow_incomplete
        * Specifies whether the output matrix structure is allowed to be incomplete.
@@ -2227,9 +2228,19 @@ namespace FEAT
               //   X_i. += (alpha * D_ik * A_kl) * B_l.
               IT_ ij = row_ptr_x[i];
               IT_ lj = row_ptr_b[l];
-              while((ij < row_ptr_x[i+1]) && (lj < row_ptr_b[l+1]))
+              while(lj < row_ptr_b[l+1])
               {
-                if(col_idx_x[ij] == col_idx_b[lj])
+                if(ij >= row_ptr_x[i+1])
+                {
+                  // we have reached the end of row X_i, but there is at least
+                  // one entry in row B_l left, so the pattern of X is incomplete
+                  // We let the caller decide whether this is a valid case or not:
+                  if(allow_incomplete)
+                    break;  // continue with next row
+                  else
+                    throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
+                }
+                else if(col_idx_x[ij] == col_idx_b[lj])
                 {
                   // okay: B_lj contributes to X_ij
                   data_x[ij] += omega * data_b[lj];
@@ -2273,7 +2284,8 @@ namespace FEAT
        * \attention
        * This function assumes that the output matrix already contains the
        * required sparsity pattern. This function will throw an exception
-       * if the sparsity pattern of the output matrix is incomplete.
+       * if the sparsity pattern of the output matrix is incomplete unless
+       * \p allow_incomplete is set to \c true.
        *
        * \note
        * This function currently only supports data in main memory.
@@ -2282,10 +2294,10 @@ namespace FEAT
        * The vector representing the diagonal matrix A.
        *
        * \param[in] d, b
-       * The left and right multiplicant matrices
+       * The left and right multiplicand matrices
        *
        * \param[in] alpha
-       * The scaling factor for the product.
+       * The scaling factor for the product
        *
        * \param[in] allow_incomplete
        * Specifies whether the output matrix structure is allowed to be incomplete.
@@ -2335,9 +2347,19 @@ namespace FEAT
             //   X_i. += (alpha * D_ik * A_kk) * B_k.
             IT_ ij = row_ptr_x[i];
             IT_ kj = row_ptr_b[k];
-            while((ij < row_ptr_x[i+1]) && (kj < row_ptr_b[k+1]))
+            while(kj < row_ptr_b[l+1])
             {
-              if(col_idx_x[ij] == col_idx_b[kj])
+              if(ij >= row_ptr_x[i+1])
+              {
+                // we have reached the end of row X_i, but there is at least
+                // one entry in row B_l left, so the pattern of X is incomplete
+                // We let the caller decide whether this is a valid case or not:
+                if(allow_incomplete)
+                  break; // continue with next row
+                else
+                  throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
+              }
+              else if(col_idx_x[ij] == col_idx_b[kj])
               {
                 // okay: B_kj contributes to X_ij
                 data_x[ij] += omega * data_b[kj];
