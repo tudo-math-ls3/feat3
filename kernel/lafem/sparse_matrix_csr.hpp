@@ -2347,7 +2347,7 @@ namespace FEAT
             //   X_i. += (alpha * D_ik * A_kk) * B_k.
             IT_ ij = row_ptr_x[i];
             IT_ kj = row_ptr_b[k];
-            while(kj < row_ptr_b[l+1])
+            while(kj < row_ptr_b[k+1])
             {
               if(ij >= row_ptr_x[i+1])
               {
