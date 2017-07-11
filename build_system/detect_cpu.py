@@ -39,6 +39,35 @@ def detect_cpu():
 
     return cputype
 
+# detect power architecture
+  if "ppc64" in platform.machine():
+    if platform.system() == "Linux":
+      d = {}
+      f = open("/proc/cpuinfo")
+      input = f.read()
+      lines = input.split("\n")
+
+      for line in lines:
+        values = line.split("\t: ")
+        if len(values) == 2:
+          d[values[0].strip()] = values[1].strip()
+        else:
+          values = line.split(":")
+          if len(values) == 2:
+            d[values[0].strip()] = values[1].strip()
+
+      cpu_name = d["cpu"]
+
+      # PowerPC
+      if "POWER7" in cpu_name:
+        cputype = "power7"
+
+    else:
+      print ("detect_cpu: operating system not supported")
+      return cputype
+
+    return cputype
+
 #no special arch detected, assume x86 from now
 # read int cpu information
   if platform.system() == "Linux":

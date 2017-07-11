@@ -187,6 +187,10 @@ def configure_gcc(cpu, buildid, compiler):
       # https://community.arm.com/groups/tools/blog/2013/04/15/arm-cortex-a-processors-and-gcc-command-lines
       cxxflags += " -ffast-math -funsafe-math-optimizations -mcpu=cortex-a15 -mfpu=neon-vfpv4  -mfloat-abi=hard -mthumb"
 
+    #POWER
+    elif cpu == "power7":
+      cxxflags += " -mcpu=a2 -fpermissive"
+
     else:
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
