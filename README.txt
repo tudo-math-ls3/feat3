@@ -4,7 +4,7 @@ FEAT3 README
 FEAT depends on:
 cmake 2.8 or greater
 python 2.6 or greater
-gcc 4.8+ or icc 15+ or clang 3.6+
+gcc 4.8+ or icc 15+ or clang 3.6+ or MSVC++ 2015+
 
 Additionally you will need a proper buildsystem, e.g. gnumake.
 
@@ -30,10 +30,21 @@ The tutorial folder contains some sample applications with extensive in code doc
 === ADDITIONAL SOFTWARE SUPPORT ===
 OpenMPI 1.8.5+
 MPICH 3.2+
+Microsoft MPI 7.1
 CUDA 6.5+
 CCache 3.2+
 Ninja 1.6+
 Valgrind 3.10+
 Score-P 1.4.2+
+Intel MKL 15+
 
 Alglib, Fparser, Umfpack and Parmetis are downloaded and build automatically, when included in the configure flags.
+
+=== git commit hooks ===
+When working with the git repository, the following instructions install a proper commite template and additional pre commit hooks, superseeding the usual pre push hooks.
+in feat src root
+cp /home/user/gitlsiii/feast.git/commit-template .git
+git config commit.template .git/commit-template
+cd .git/hooks
+git init
+git pull .. remotes/origin/hooks
