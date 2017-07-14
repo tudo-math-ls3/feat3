@@ -43,7 +43,7 @@ Alglib, Fparser, Umfpack and Parmetis are downloaded and build automatically, wh
 === git commit hooks ===
 When working with the git repository, the following instructions install a proper commite template and additional pre commit hooks, superseeding the usual pre push hooks.
 in feat src root
-cp /home/user/gitlsiii/feast.git/commit-template .git
+cp /home/user/git/feat3.git/commit-template .git
 git config commit.template .git/commit-template
 cd .git/hooks
 git init
