@@ -21,15 +21,5 @@ namespace FEAT
       MST1_,
       MST1_::VectorType>
       (MST1_&, PropertyMap*, const String&, std::size_t);
-
-    template std::shared_ptr<SolverBase<MST1_::VectorType>> SolverFactory::create_scalar_solver_by_section<
-      MST1_,
-      MST1_::VectorType>
-      (MST1_&, PropertyMap*, const String&, size_t);
-
-    template std::shared_ptr<SolverBase<MST1_::VectorType::LocalVectorType>> SolverFactory::create_scalar_solver_by_section<
-      MST1_,
-      MST1_::VectorType::LocalVectorType>
-      (MST1_&, PropertyMap*, const String&, size_t);
   }
 }

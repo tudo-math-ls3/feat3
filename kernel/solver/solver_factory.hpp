@@ -866,6 +866,8 @@ namespace FEAT
       MST1_::VectorType::LocalVectorType>
       (MST1_&, PropertyMap*, const String&, std::size_t);
 
+    /// \compilerhack ICC < 18 fail to link this with undefined reference to `__must_be_linked_with_icc_or_xild' error
+#if not (defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1800))
     extern template std::shared_ptr<Solver::SolverBase<MST1_::VectorType>> SolverFactory::create_scalar_solver_by_section<
       MST1_,
       MST1_::VectorType>
@@ -875,6 +877,7 @@ namespace FEAT
       MST1_,
       MST1_::VectorType::LocalVectorType>
       (MST1_&, PropertyMap*, const String&, size_t);
+#endif //FEAT_COMPILER_INTEL
 #endif
 
   } // namespace Solver

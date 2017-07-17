@@ -12,7 +12,8 @@ if (FEAT_EICKT)
   SET (kernel-solver-list
     ${kernel-solver-list}
     matrix_stock-eickt.cpp
-    solver_factory-eickt.cpp
+    solver_factory-eickt1.cpp
+    solver_factory-eickt2.cpp
     )
 endif(FEAT_EICKT)
 
@@ -23,6 +24,9 @@ if (FEAT_HAVE_MKL)
 endif(FEAT_HAVE_MKL)
 
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
+if (FEAT_COTIRE)
+  cotire(kernel-solver)
+endif (FEAT_COTIRE)
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
 if (FEAT_HAVE_CUDA)
