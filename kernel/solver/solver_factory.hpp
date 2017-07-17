@@ -359,7 +359,7 @@ namespace FEAT
 #endif
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "memorytype/datatype/indextype combination unknown!\n Did you try configure with the --eickt flag?");
+            throw InternalError(__func__, __FILE__, __LINE__, "memorytype/datatype/indextype combination unknown!\n Did you try configure with the --sf_esoteric flag?");
           }
 
           return precon;
