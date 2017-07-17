@@ -181,6 +181,11 @@ unconditionally trigger the start of all mpi communication.
 This macro is defined if the command line option <code>\--mpi_thread_multiple</code> is passed to the configure script.
 
 <hr>
+\subsection ppm_feat_mpi2_only FEAT_MPI2_ONLY
+
+This macro can be defined to restrict mpi operations to version MPI 2.
+
+<hr>
 \subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
 This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
 

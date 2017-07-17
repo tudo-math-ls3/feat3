@@ -92,7 +92,11 @@ namespace FEAT
         _cv_allreduce_called.wait(l, [this]() {return _flag_allreduce_called == true; });
 #else // no FEAT_MPI_THREAD_MULTIPLE
         TimeStamp ts_start;
+#ifndef FEAT_MPI2_ONLY
         _req = comm.iallreduce(&_x, &_r, std::size_t(1), op);
+#else
+        comm.allreduce(&_x, &_r, std::size_t(1), op);
+#endif
         Statistics::add_time_mpi_execute(ts_start.elapsed_now());
 #endif // FEAT_MPI_THREAD_MULTIPLE
       }
@@ -129,7 +133,9 @@ namespace FEAT
         Statistics::add_time_mpi_wait_reduction(_mpi_wait);
 #else // no FEAT_MPI_THREAD_MULTIPLE
         TimeStamp ts_start;
+#ifndef FEAT_MPI2_ONLY
         _req.wait();
+#endif
         Statistics::add_time_mpi_wait_reduction(ts_start.elapsed_now());
 #endif // FEAT_MPI_THREAD_MULTIPLE
 #endif // FEAT_HAVE_MPI
@@ -150,13 +156,19 @@ namespace FEAT
       {
         TimeStamp ts_start;
         std::unique_lock<std::mutex> l(mutex);
+#ifndef FEAT_MPI2_ONLY
         Dist::Request req = comm.iallreduce(&x, &r, std::size_t(1), op);
+#else
+        comm.allreduce(&x, &r, std::size_t(1), op);
+#endif
         flag_allreduce_called = true;
         l.unlock();
         cv_allreduce_called.notify_all();
         mpi_exec = ts_start.elapsed_now();
         ts_start.stamp();
+#ifndef FEAT_MPI2_ONLY
         req.wait();
+#endif
         mpi_wait = ts_start.elapsed_now();
       }
 #endif // FEAT_HAVE_MPI
