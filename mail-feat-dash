@@ -18,7 +18,7 @@ sys.dont_write_bytecode = True
 def get_messages(r, stage, status):
   return Message.select().where(Message.runid == r.id, Message.stage == stage, Message.status == status)
 
-myDB = pw.MySQLDatabase("feastdash", host="augias", port=3306, user="feastdash", passwd="feastdash")
+myDB = pw.MySQLDatabase("feastdash", host="featdash", port=3306, user="feastdash", passwd="feastdash")
 myDB.connect()
 
 class MySQLModel(pw.Model):

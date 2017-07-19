@@ -327,7 +327,7 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
 
 dump_filename = ""
 scratch = ""
-sqlhost = "augias"
+sqlhost = "feat3hub"
 sqlport = 3306
 note = ""
 nothirdparty = False
