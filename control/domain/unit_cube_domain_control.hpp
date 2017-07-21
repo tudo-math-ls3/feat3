@@ -371,6 +371,53 @@ namespace FEAT
           _create(ilvls, ilyrs);
         }
 
+        explicit HierarchUnitCubeDomainControl2(const Dist::Comm& comm_, const std::deque<String>& lvls) :
+          BaseClass(comm_)
+        {
+          std::deque<int> ilvls, ilyrs;
+          XASSERT(!lvls.empty());
+
+          ilvls.resize(lvls.size());
+          ilyrs.resize(lvls.size(), 1);
+          for(std::size_t i(0); i < lvls.size(); ++i)
+          {
+            std::deque<String> parts;
+            lvls.at(i).split_by_string(parts, ":");
+            if(!parts.front().parse(ilvls.at(i)))
+            {
+              comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as level");
+              FEAT::Runtime::abort();
+            }
+            if((parts.size() > std::size_t(1)) && !parts.back().parse(ilyrs.at(i)))
+            {
+              comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as layer");
+              FEAT::Runtime::abort();
+            }
+          }
+          if(ilvls.size() < std::size_t(2))
+          {
+            ilvls.push_back(0);
+            ilyrs.push_back(0);
+          }
+
+          _create(ilvls, ilyrs);
+        }
+
+        std::deque<std::pair<int,int>> get_level_indices() const
+        {
+          std::deque<std::pair<int,int>> lvs;
+          for(std::size_t i(0); i < this->_layer_levels.size(); ++i)
+            lvs.push_back(
+              std::make_pair(
+                this->_layer_levels.at(i).front()->get_level_index(),
+                this->_layers.at(i)->comm().size()));
+          lvs.push_back(
+            std::make_pair(
+              this->_layer_levels.back().back()->get_level_index(),
+              this->_layers.back()->comm().size()));
+          return lvs;
+        }
+
       protected:
         static int _ilog4(int x)
         {

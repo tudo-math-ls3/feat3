@@ -16,6 +16,7 @@ SET (app_list
   meshopt_hyperelasticity_resize-app
   navier_stokes_ccnd_q2p1
   navier_stokes_cp2d_q2p1
+  poisson_bench_mg
   poisson_dirichlet
   poisson_mixed
   poisson_neumann

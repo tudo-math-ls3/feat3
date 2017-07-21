@@ -114,6 +114,13 @@ namespace FEAT
       {
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->gate_sys.bytes() + this->coarse_muxer_sys.bytes()
+          + this->transfer_sys.bytes() + (*this->matrix_sys).bytes();
+      }
+
       template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const ScalarBasicSystemLevel<M_, D_, I_, SM_> & other)
       {
@@ -409,7 +416,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + this->coarse_muxer_sys.bytes() + (*this->filter_sys).bytes();
+        return BaseClass::bytes() + (*this->filter_sys).bytes();
       }
 
       /**
@@ -497,7 +504,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + this->coarse_muxer_sys.bytes() + (*this->filter_sys).bytes();
+        return BaseClass::bytes() + (*this->filter_sys).bytes();
       }
 
       /**
