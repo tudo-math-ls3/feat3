@@ -111,6 +111,9 @@
 /// cmake 'makefile' generator
 #define CMAKE_GENERATOR "${CMAKE_GENERATOR}"
 
+/// SHA1 of HEAD in FEAT_SRC_DIR
+#define FEAT_GIT_SHA1 "${FEAT_GIT_SHA1}"
+
 /// Should we unroll all banded matrix kernels via template meta programming?
 #cmakedefine FEAT_UNROLL_BANDED
 

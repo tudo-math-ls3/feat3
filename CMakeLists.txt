@@ -12,6 +12,16 @@ site_name( FEAT_HOSTNAME )
 include (CTest)
 ENABLE_TESTING()
 
+find_package(Git)
+if(GIT_FOUND)
+  execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --verify HEAD
+    WORKING_DIRECTORY ${FEAT_SOURCE_DIR}
+    OUTPUT_VARIABLE FEAT_GIT_SHA1
+    ERROR_VARIABLE FEAT_GIT_SHA1
+    )
+  STRING(STRIP "${FEAT_GIT_SHA1}" FEAT_GIT_SHA1)
+endif(GIT_FOUND)
+
 if (FEAT_COTIRE)
   include(${FEAT_SOURCE_DIR}/build_system/cotire.cmake)
 endif (FEAT_COTIRE)

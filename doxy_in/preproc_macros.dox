@@ -221,6 +221,7 @@ This macro can be used to force the compiler to compile a function without inlin
 \section preproc_sec_misc Miscellaneous Macros
 This section enlists various macros which do not fit into any other section.
 
+<hr>
 \subsection ppm_feat_warnings FEAT_DISABLE_WARNINGS / FEAT_RESTORE_WARNINGS
 This macro pair can be used to modify the compiler's diagnostics settings to suppress warnings for the inclusion of
 third-party header includes.
@@ -246,6 +247,10 @@ FEAT_RESTORE_WARNINGS
 
 // ...
 \endcode
+
+<hr>
+\subsection ppm_feat_git_sha1 FEAT_GIT_SHA1
+This macro contains the git sha1 checksum of the current HEAD in FEAT_SOURCE_DIR, at the time configure was executed.
 
 <hr><hr>
 \section preproc_sec_build_system Build-System Macros
