@@ -95,7 +95,10 @@ namespace FEAT
       {
         this->_scalar_index.push_back(num_idx); // number of indices
         if(num_idx > Index(0))
+        {
           this->_indices.push_back(MemoryPool<MemType>::template allocate_memory<IndexType>(num_idx));
+          this->_indices_size.push_back(num_idx);
+        }
       }
 
       /// move-ctor
