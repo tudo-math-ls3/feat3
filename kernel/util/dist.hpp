@@ -46,7 +46,7 @@ namespace FEAT
     bool initialise(int& argc, char**& argv);
 
     /**
-     * \brief Initialises the distributed communication system.
+     * \brief Finalises the distributed communication system.
      *
      * This function is effectively a wrapper around the \c MPI_Init function.
      *
