@@ -126,6 +126,9 @@ namespace FEAT
     info.current_swap     = std::size_t(0);
 
 #elif defined(__unix__)
+    // see:
+    // https://linux.die.net/man/2/getrusage
+    // https://www.freebsd.org/cgi/man.cgi?query=getrusage
     struct rusage r_usage;
     if (0 != getrusage(RUSAGE_SELF, &r_usage))
       throw InternalError(__func__, __FILE__, __LINE__, "Error in getrusage call!");
@@ -134,7 +137,11 @@ namespace FEAT
     info.current_physical = (size_t)r_usage.ru_maxrss;
     info.current_virtual = (size_t)r_usage.ru_maxrss;
     info.current_swap = std::size_t(0);
-
+    // 'ru_maxrss' is given in kilobytes
+    info.peak_physical *= 1024u;
+    info.peak_virtual *= 1024u;
+    info.current_physical *= 1024u;
+    info.current_virtual *= 1024u;
 #endif
 
       return info;
