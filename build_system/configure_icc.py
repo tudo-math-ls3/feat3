@@ -71,7 +71,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
     elif cpu == "ivybridge":
       cxxflags += " -xCORE-AVX-I"
     # Haswell, Broadwell and Skylake do support -xcore-AVX2, but all
-    # Intel compilers up to 16.0.4 produce code with significantly
+    # Intel compilers up to 17.0.4 produce code with significantly
     # lower precision, most notably in kernel/solver/optimiser-test.
     # This is the case for both Haswell and Skylake CPUs.
     # At this point it is not clear if there is a compiler bug or this
