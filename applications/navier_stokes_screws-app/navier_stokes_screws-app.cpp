@@ -294,7 +294,7 @@ class ExtrudedPartiDomainControl :
 template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
 struct NavierStokesScrewsApp
 {
-  static constexpr bool extrude = true;
+  static constexpr bool extrude = false;
 
   /// The memory architecture. Although this looks freely chosable, it has to be Mem::Main for now because all the
   /// Hyperelasticity functionals are implemented for Mem::Main only
@@ -1938,7 +1938,7 @@ struct NavierStokesScrewsApp
         {
           auto& dom_lvl = extruded_dom_ctrl.front();
 
-          String vtk_name = String("flow_n"+stringify(comm.size())+"_"+stringify(time_step));
+          String vtk_name = String("flow_n"+stringify(comm.size())+"_"+stringify(time_step).pad_front(6,'0'));
           comm.print("Writing "+vtk_name+".vtk");
 
           // Create a VTK exporter for our mesh
