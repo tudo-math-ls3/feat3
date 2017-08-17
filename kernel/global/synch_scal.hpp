@@ -97,7 +97,7 @@ namespace FEAT
 #else
         comm.allreduce(&_x, &_r, std::size_t(1), op);
 #endif
-        Statistics::add_time_mpi_execute(ts_start.elapsed_now());
+        Statistics::add_time_mpi_execute_reduction(ts_start.elapsed_now());
 #endif // FEAT_MPI_THREAD_MULTIPLE
       }
 #else // non-MPI version
@@ -129,7 +129,7 @@ namespace FEAT
 #ifdef FEAT_HAVE_MPI
 #ifdef FEAT_MPI_THREAD_MULTIPLE
         _thread.join();
-        Statistics::add_time_mpi_execute(_mpi_exec);
+        Statistics::add_time_mpi_execute_reduction(_mpi_exec);
         Statistics::add_time_mpi_wait_reduction(_mpi_wait);
 #else // no FEAT_MPI_THREAD_MULTIPLE
         TimeStamp ts_start;

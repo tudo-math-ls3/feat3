@@ -1020,8 +1020,12 @@ namespace FEAT
 
       /// array containing toe for each processed level
       std::vector<double> _toes;
-      /// array containing toe of mpi execution for each processed level
-      std::vector<double> _mpi_execs;
+      /// array containing toe of mpi execution reduction for each processed level
+      std::vector<double> _mpi_execs_reduction;
+      /// array containing toe of mpi execution spmv for each processed level
+      std::vector<double> _mpi_execs_spmv;
+      /// array containing toe of mpi execution collective for each processed level
+      std::vector<double> _mpi_execs_collective;
       /// array containing toe of mpi wait reduction for each processed level
       std::vector<double> _mpi_waits_reduction;
       /// array containing toe of mpi wait spmv for each processed level
@@ -1173,7 +1177,9 @@ namespace FEAT
 
         // allocate statistics vectors
         _toes.resize(num_lvls, 0.0);
-        _mpi_execs.resize(num_lvls, 0.0);
+        _mpi_execs_reduction.resize(num_lvls, 0.0);
+        _mpi_execs_spmv.resize(num_lvls, 0.0);
+        _mpi_execs_collective.resize(num_lvls, 0.0);
         _mpi_waits_reduction.resize(num_lvls, 0.0);
         _mpi_waits_spmv.resize(num_lvls, 0.0);
         _mpi_waits_collective.resize(num_lvls, 0.0);
@@ -1191,7 +1197,9 @@ namespace FEAT
       virtual void done_symbolic() override
       {
         _toes.clear();
-        _mpi_execs.clear();
+        _mpi_execs_reduction.clear();
+        _mpi_execs_spmv.clear();
+        _mpi_execs_collective.clear();
         _mpi_waits_reduction.clear();
         _mpi_waits_spmv.clear();
         _mpi_waits_collective.clear();
@@ -1252,7 +1260,9 @@ namespace FEAT
         for(std::size_t i(0); i <  std::size_t(_hierarchy->size_virtual()); ++i)
         {
           _toes.at(i) = 0.0;
-          _mpi_execs.at(i) = 0.0;
+          _mpi_execs_reduction.at(i) = 0.0;
+          _mpi_execs_spmv.at(i) = 0.0;
+          _mpi_execs_collective.at(i) = 0.0;
           _mpi_waits_reduction.at(i) = 0.0;
           _mpi_waits_spmv.at(i) = 0.0;
           _mpi_waits_collective.at(i) = 0.0;
@@ -1294,7 +1304,7 @@ namespace FEAT
         for(std::size_t i(0); i <  std::size_t(_hierarchy->size_virtual()); ++i)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionLevelTimings>(this->name(), Index(i),
-            _toes.at(i), _mpi_execs.at(i), _mpi_waits_reduction.at(i), _mpi_waits_spmv.at(i), _mpi_waits_collective.at(i)));
+            _toes.at(i), _mpi_execs_reduction.at(i), _mpi_execs_spmv.at(i), _mpi_execs_collective.at(i), _mpi_waits_reduction.at(i), _mpi_waits_spmv.at(i), _mpi_waits_collective.at(i)));
         }
 
         // okay
@@ -1503,7 +1513,9 @@ namespace FEAT
 
         // process the coarse grid level
         TimeStamp at;
-        double mpi_exec_start(Statistics::get_time_mpi_execute());
+        double mpi_exec_reduction_start(Statistics::get_time_mpi_execute_reduction());
+        double mpi_exec_spmv_start(Statistics::get_time_mpi_execute_spmv());
+        double mpi_exec_collective_start(Statistics::get_time_mpi_execute_collective());
         double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
         double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
@@ -1536,11 +1548,15 @@ namespace FEAT
         lvl_crs.time_coarse += stamp_coarse.elapsed_now();
 
         _toes.at(std::size_t(_crs_level)) += at.elapsed_now();
-        double mpi_exec_stop(Statistics::get_time_mpi_execute());
+        double mpi_exec_reduction_stop(Statistics::get_time_mpi_execute_reduction());
+        double mpi_exec_spmv_stop(Statistics::get_time_mpi_execute_spmv());
+        double mpi_exec_collective_stop(Statistics::get_time_mpi_execute_collective());
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
         double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
-        _mpi_execs.at(std::size_t(_crs_level)) += mpi_exec_stop - mpi_exec_start;
+        _mpi_execs_reduction.at(std::size_t(_crs_level)) += mpi_exec_reduction_stop - mpi_exec_reduction_start;
+        _mpi_execs_spmv.at(std::size_t(_crs_level)) += mpi_exec_spmv_stop - mpi_exec_spmv_start;
+        _mpi_execs_collective.at(std::size_t(_crs_level)) += mpi_exec_collective_stop - mpi_exec_collective_start;
         _mpi_waits_reduction.at(std::size_t(_crs_level)) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
         _mpi_waits_spmv.at(std::size_t(_crs_level)) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
         _mpi_waits_collective.at(std::size_t(_crs_level)) += mpi_wait_stop_collective - mpi_wait_start_collective;
@@ -1592,7 +1608,9 @@ namespace FEAT
       Status _apply_smooth_peak(Index cur_lvl)
       {
         TimeStamp at;
-        double mpi_exec_start(Statistics::get_time_mpi_execute());
+        double mpi_exec_reduction_start(Statistics::get_time_mpi_execute_reduction());
+        double mpi_exec_spmv_start(Statistics::get_time_mpi_execute_spmv());
+        double mpi_exec_collective_start(Statistics::get_time_mpi_execute_collective());
         double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
         double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
@@ -1637,11 +1655,15 @@ namespace FEAT
 
         TimeStamp bt;
         _toes.at(std::size_t(cur_lvl)) += bt.elapsed(at);
-        double mpi_exec_stop(Statistics::get_time_mpi_execute());
+        double mpi_exec_reduction_stop(Statistics::get_time_mpi_execute_reduction());
+        double mpi_exec_spmv_stop(Statistics::get_time_mpi_execute_spmv());
+        double mpi_exec_collective_stop(Statistics::get_time_mpi_execute_collective());
         double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
         double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
         double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
-        _mpi_execs.at(std::size_t(cur_lvl)) += mpi_exec_stop - mpi_exec_start;
+        _mpi_execs_reduction.at(std::size_t(cur_lvl)) += mpi_exec_reduction_stop - mpi_exec_reduction_start;
+        _mpi_execs_spmv.at(std::size_t(cur_lvl)) += mpi_exec_spmv_stop - mpi_exec_spmv_start;
+        _mpi_execs_collective.at(std::size_t(cur_lvl)) += mpi_exec_collective_stop - mpi_exec_collective_start;
         _mpi_waits_reduction.at(std::size_t(cur_lvl)) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
         _mpi_waits_spmv.at(std::size_t(cur_lvl)) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
         _mpi_waits_collective.at(std::size_t(cur_lvl)) += mpi_wait_stop_collective - mpi_wait_start_collective;
@@ -1666,7 +1688,9 @@ namespace FEAT
         for(Index i(cur_lvl); i < last_level; ++i)
         {
           TimeStamp at;
-          double mpi_exec_start(Statistics::get_time_mpi_execute());
+          double mpi_exec_reduction_start(Statistics::get_time_mpi_execute_reduction());
+          double mpi_exec_spmv_start(Statistics::get_time_mpi_execute_spmv());
+          double mpi_exec_collective_start(Statistics::get_time_mpi_execute_collective());
           double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
           double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
@@ -1751,11 +1775,15 @@ namespace FEAT
 
           // collect timings
           _toes.at((size_t)i) += at.elapsed_now();
-          double mpi_exec_stop(Statistics::get_time_mpi_execute());
+          double mpi_exec_reduction_stop(Statistics::get_time_mpi_execute_reduction());
+          double mpi_exec_spmv_stop(Statistics::get_time_mpi_execute_spmv());
+          double mpi_exec_collective_stop(Statistics::get_time_mpi_execute_collective());
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
-          _mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
+          _mpi_execs_reduction.at((size_t)i) += mpi_exec_reduction_stop - mpi_exec_reduction_start;
+          _mpi_execs_spmv.at((size_t)i) += mpi_exec_spmv_stop - mpi_exec_spmv_start;
+          _mpi_execs_collective.at((size_t)i) += mpi_exec_collective_stop - mpi_exec_collective_start;
           _mpi_waits_reduction.at((size_t)i) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
           _mpi_waits_spmv.at((size_t)i) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
           _mpi_waits_collective.at((size_t)i) += mpi_wait_stop_collective - mpi_wait_start_collective;
@@ -1787,7 +1815,9 @@ namespace FEAT
         {
           --i;
           TimeStamp at;
-          double mpi_exec_start(Statistics::get_time_mpi_execute());
+          double mpi_exec_reduction_start(Statistics::get_time_mpi_execute_reduction());
+          double mpi_exec_spmv_start(Statistics::get_time_mpi_execute_spmv());
+          double mpi_exec_collective_start(Statistics::get_time_mpi_execute_collective());
           double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
           double mpi_wait_start_collective(Statistics::get_time_mpi_wait_collective());
@@ -1910,11 +1940,15 @@ namespace FEAT
           }
 
           _toes.at((size_t)i) += at.elapsed_now();
-          double mpi_exec_stop(Statistics::get_time_mpi_execute());
+          double mpi_exec_reduction_stop(Statistics::get_time_mpi_execute_reduction());
+          double mpi_exec_spmv_stop(Statistics::get_time_mpi_execute_spmv());
+          double mpi_exec_collective_stop(Statistics::get_time_mpi_execute_collective());
           double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
           double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           double mpi_wait_stop_collective(Statistics::get_time_mpi_wait_collective());
-          _mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
+          _mpi_execs_reduction.at((size_t)i) += mpi_exec_reduction_stop - mpi_exec_reduction_start;
+          _mpi_execs_spmv.at((size_t)i) += mpi_exec_spmv_stop - mpi_exec_spmv_start;
+          _mpi_execs_collective.at((size_t)i) += mpi_exec_collective_stop - mpi_exec_collective_start;
           _mpi_waits_reduction.at((size_t)i) += mpi_wait_stop_reduction - mpi_wait_start_reduction;
           _mpi_waits_spmv.at((size_t)i) += mpi_wait_stop_spmv - mpi_wait_start_spmv;
           _mpi_waits_collective.at((size_t)i) += mpi_wait_stop_collective - mpi_wait_start_collective;

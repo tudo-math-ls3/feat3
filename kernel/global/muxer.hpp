@@ -275,7 +275,7 @@ namespace FEAT
         BufferMain parent_buffer_main;
         parent_buffer_main.convert(parent_buffer);
 
-        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
 
         // gather to parent sibling
         TimeStamp ts_collective;
@@ -323,7 +323,7 @@ namespace FEAT
         // allocate child buffers
         BufferMain child_buffers_main(_buffer_size * num_children);
 
-        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
 
         // gather from siblings
         TimeStamp ts_collective;
@@ -345,7 +345,7 @@ namespace FEAT
           // scatter buffers
           _child_mirrors.at(i).scatter_axpy(vec_trg, child_buffers, DataType(1), i*_buffer_size);
         }
-        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
       }
 
       /**
@@ -378,7 +378,7 @@ namespace FEAT
         // scatter into target vector
         vec_trg.format();
         _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
-        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
       }
 
       /**
@@ -423,7 +423,7 @@ namespace FEAT
         // create parent buffer
         BufferMain parent_buffer_main(_buffer_size);
 
-        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
 
         // scatter to siblings
         TimeStamp ts_collective;
@@ -440,7 +440,7 @@ namespace FEAT
         vec_trg.format();
         _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
 
-        Statistics::add_time_mpi_execute(ts_execute.elapsed_now());
+        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
       }
     }; // class Muxer<...>
   } // namespace Global

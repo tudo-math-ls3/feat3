@@ -104,7 +104,7 @@ namespace FEAT
           _send_reqs.push_back(_comm.isend(_send_bufs.at(i).elements(), _send_bufs.at(i).size(), ranks.at(i)));
         }
 
-        Statistics::add_time_mpi_execute(ts_start.elapsed_now());
+        Statistics::add_time_mpi_execute_spmv(ts_start.elapsed_now());
       }
 #else // non-MPI version
       SynchVectorTicket(VT_ &, const Dist::Comm&, const std::vector<int>& ranks, const std::vector<VMT_> &) :

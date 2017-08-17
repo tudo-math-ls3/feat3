@@ -42,16 +42,22 @@ namespace FEAT
       /// global time of execution for special preconditioner kernel type operations
       static KahanAccumulation _time_precon;
 
-      /// global time of execution for mpi related operations, e.g. send/recv or gather/scatter
-      static KahanAccumulation _time_mpi_execute;
-
       /// global time of execution for mpi related idle/wait tasks of (scalar) reduction operations
-      static KahanAccumulation _time_mpi_wait_reduction;
+      static KahanAccumulation _time_mpi_execute_reduction;
 
       /// global time of execution for mpi related idle/wait tasks of spmv operations
-      static KahanAccumulation _time_mpi_wait_spmv;
+      static KahanAccumulation _time_mpi_execute_spmv;
 
       /// global time of execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
+      static KahanAccumulation _time_mpi_execute_collective;
+
+      /// global time of wait execution for mpi related idle/wait tasks of (scalar) reduction operations
+      static KahanAccumulation _time_mpi_wait_reduction;
+
+      /// global time of wait execution for mpi related idle/wait tasks of spmv operations
+      static KahanAccumulation _time_mpi_wait_spmv;
+
+      /// global time of wait execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
       static KahanAccumulation _time_mpi_wait_collective;
 
       /// a consecutive list of all solver actions
@@ -63,13 +69,17 @@ namespace FEAT
       /// overall time per reset call per solver name string.
       static std::map<String, std::list<double>> _overall_toe;
       static std::map<String, std::list<Index>> _overall_iters;
-      static std::map<String, std::list<double>> _overall_mpi_execute;
+      static std::map<String, std::list<double>> _overall_mpi_execute_reduction;
+      static std::map<String, std::list<double>> _overall_mpi_execute_spmv;
+      static std::map<String, std::list<double>> _overall_mpi_execute_collective;
       static std::map<String, std::list<double>> _overall_mpi_wait_reduction;
       static std::map<String, std::list<double>> _overall_mpi_wait_spmv;
       static std::map<String, std::list<double>> _overall_mpi_wait_collective;
       /// mapping of solver name to list of outer multigrid level timings. each std::vector holds a complete level hierarchy of timings.
       static std::map<String, std::list<std::vector<double>>> _outer_mg_toe;
-      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_reduction;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_spmv;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_collective;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_reduction;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_spmv;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_collective;
@@ -153,12 +163,16 @@ namespace FEAT
         _solver_expressions.clear();
         _overall_toe.clear();
         _overall_iters.clear();
-        _overall_mpi_execute.clear();
+        _overall_mpi_execute_reduction.clear();
+        _overall_mpi_execute_spmv.clear();
+        _overall_mpi_execute_collective.clear();
         _overall_mpi_wait_reduction.clear();
         _overall_mpi_wait_spmv.clear();
         _overall_mpi_wait_collective.clear();
         _outer_mg_toe.clear();
-        _outer_mg_mpi_execute.clear();
+        _outer_mg_mpi_execute_reduction.clear();
+        _outer_mg_mpi_execute_spmv.clear();
+        _outer_mg_mpi_execute_collective.clear();
         _outer_mg_mpi_wait_reduction.clear();
         _outer_mg_mpi_wait_spmv.clear();
         _outer_mg_mpi_wait_collective.clear();
@@ -211,9 +225,17 @@ namespace FEAT
       {
         _time_precon = KahanSum(_time_precon, seconds);
       }
-      inline static void add_time_mpi_execute(double seconds)
+      inline static void add_time_mpi_execute_reduction(double seconds)
       {
-        _time_mpi_execute = KahanSum(_time_mpi_execute, seconds);
+        _time_mpi_execute_reduction = KahanSum(_time_mpi_execute_reduction, seconds);
+      }
+      inline static void add_time_mpi_execute_spmv(double seconds)
+      {
+        _time_mpi_execute_spmv = KahanSum(_time_mpi_execute_spmv, seconds);
+      }
+      inline static void add_time_mpi_execute_collective(double seconds)
+      {
+        _time_mpi_execute_collective = KahanSum(_time_mpi_execute_collective, seconds);
       }
       inline static void add_time_mpi_wait_reduction(double seconds)
       {
@@ -244,9 +266,17 @@ namespace FEAT
       {
         return _time_precon.sum;
       }
-      inline static double get_time_mpi_execute()
+      inline static double get_time_mpi_execute_reduction()
       {
-        return _time_mpi_execute.sum;
+        return _time_mpi_execute_reduction.sum;
+      }
+      inline static double get_time_mpi_execute_spmv()
+      {
+        return _time_mpi_execute_spmv.sum;
+      }
+      inline static double get_time_mpi_execute_collective()
+      {
+        return _time_mpi_execute_collective.sum;
       }
       inline static double get_time_mpi_wait_reduction()
       {
@@ -306,10 +336,22 @@ namespace FEAT
         return _overall_iters.at(target);
       }
 
-      /// retrieve list of all overall solver mpi execute toe entries
-      static inline std::list<double> & get_time_mpi_execute(String target)
+      /// retrieve list of all overall solver mpi execute reduction toe entries
+      static inline std::list<double> & get_time_mpi_execute_reduction(String target)
       {
-        return _overall_mpi_execute.at(target);
+        return _overall_mpi_execute_reduction.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute spmv toe entries
+      static inline std::list<double> & get_time_mpi_execute_spmv(String target)
+      {
+        return _overall_mpi_execute_spmv.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute collective toe entries
+      static inline std::list<double> & get_time_mpi_execute_collective(String target)
+      {
+        return _overall_mpi_execute_collective.at(target);
       }
 
       /// retrieve list of all overall solver mpi reduction wait toe entries
@@ -336,10 +378,22 @@ namespace FEAT
         return _outer_mg_toe.at(target);
       }
 
-      /// retrieve list of all overall solver mpi execute toe entries per level
-      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute(String target)
+      /// retrieve list of all overall solver mpi execute reduction toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute_reduction(String target)
       {
-        return _outer_mg_mpi_execute.at(target);
+        return _outer_mg_mpi_execute_reduction.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute spmv toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute_spmv(String target)
+      {
+        return _outer_mg_mpi_execute_spmv.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute collective toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute_collective(String target)
+      {
+        return _outer_mg_mpi_execute_collective.at(target);
       }
 
       /// retrieve list of all overall solver mpi reduction wait toe entries per level
@@ -372,14 +426,6 @@ namespace FEAT
         return _outer_schwarz_iters.at(target);
       }
 
-      /*
-      /// Retrieve formatted time consumption overview in percent
-      static String get_formatted_times()
-      {
-        double total_time = get_time_reduction() + get_time_spmv() + get_time_axpy() + get_time_precon() + get_time_mpi_execute() + get_time_mpi_wait();
-        return get_formatted_times(total_time);
-      }*/
-
       /**
        * \brief Retrieve formatted time consumption overview in percent relative to some provided total time
        *
@@ -401,8 +447,12 @@ namespace FEAT
         _time_axpy.correction = 0.;
         _time_precon.sum = 0.;
         _time_precon.correction = 0.;
-        _time_mpi_execute.sum = 0.;
-        _time_mpi_execute.correction = 0.;
+        _time_mpi_execute_reduction.sum = 0.;
+        _time_mpi_execute_reduction.correction = 0.;
+        _time_mpi_execute_spmv.sum = 0.;
+        _time_mpi_execute_spmv.correction = 0.;
+        _time_mpi_execute_collective.sum = 0.;
+        _time_mpi_execute_collective.correction = 0.;
         _time_mpi_wait_reduction.sum = 0.;
         _time_mpi_wait_reduction.correction = 0.;
         _time_mpi_wait_spmv.sum = 0.;
