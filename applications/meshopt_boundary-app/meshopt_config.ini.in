@@ -2,13 +2,13 @@
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
 dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r
-meshopt_level = -1
+meshopt_lvl = -1
 
 [DuDvDefault]
 type = DuDv
 config_section = DuDvDefaultParameters
 dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r
-meshopt_level = -1
+meshopt_lvl = -1
 
 [DuDvDefaultParameters]
 solver_config = PCG-MG
