@@ -97,6 +97,20 @@ namespace FEAT
     }; // class Umfpack
 
     /**
+     * \brief Creates a new Umfpack solver object
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \returns
+     * A shared pointer to a new Umfpack object.
+     */
+    inline std::shared_ptr<Umfpack> new_umfpack(const LAFEM::SparseMatrixCSR<Mem::Main, double, Index>& matrix)
+    {
+      return std::make_shared<Umfpack>(matrix);
+    }
+
+    /**
      * \brief UMFPACK Mean solver class
      *
      * This class implements a variant of the Umfpack solver, which is capable of solving linear
@@ -190,6 +204,44 @@ namespace FEAT
        */
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override;
     }; // class UmfpackMean
+
+    /**
+     * \brief Creates a new UmfpackMean solver object
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] weight_vector
+     * The weight vector to be used as a Lagrange multiplier.
+     *
+     * \returns
+     * A shared pointer to a new UmfpackMean object.
+     */
+    inline std::shared_ptr<UmfpackMean> new_umfpack_mean(
+      const LAFEM::SparseMatrixCSR<Mem::Main, double, Index>& matrix,
+      const LAFEM::DenseVector<Mem::Main, double, Index>& weight_vector)
+    {
+      return std::make_shared<UmfpackMean>(matrix, weight_vector);
+    }
+
+    /**
+     * \brief Creates a new UmfpackMean solver object
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * A reference to the mean filter containing the weight vector.
+     *
+     * \returns
+     * A shared pointer to a new UmfpackMean object.
+     */
+    inline std::shared_ptr<UmfpackMean> new_umfpack_mean(
+      const LAFEM::SparseMatrixCSR<Mem::Main, double, Index>& matrix,
+      const LAFEM::MeanFilter<Mem::Main, double, Index>& filter)
+    {
+      return std::make_shared<UmfpackMean>(matrix, filter);
+    }
 
     /**
      * \brief Generic UMFPACK solver class
@@ -292,6 +344,7 @@ namespace FEAT
       virtual void done_numeric() override
       {
         _umfpack.done_numeric();
+        BaseClass::done_numeric();
       }
 
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override

@@ -10,9 +10,43 @@ namespace FEAT
 {
   namespace Solver
   {
-    template<typename Idx_, int sidx = sizeof(Idx_), bool eq_ = (sizeof(int) == sizeof(SuiteSparse_long))>
+    /**
+     * \brief Umfpack function wrapper helper class template
+     *
+     * The UMFPACK library contains multiple versions of its functions which
+     * offer the same functionality for different data/index types.
+     * Most notably, UMFPACK provides functions for two types on indices, which
+     * are used for the row-pointer and column-index arrays:
+     * - The "*_di_*" functions work with indices of type 'int', which is always
+     *   a 32-bit integer type
+     * - The "*_dl_*" functions work with indices of type 'SuiteSparse_long', which
+     *   is a typedef that coincides to '__int64' for 64-bit Windows systems and
+     *   'long' for any other platform.
+     *
+     * Unfortunately, this leads to a problem on 32-bit Windows systems: both versions
+     * work with 32-bit ints and there is no variant for 64-bit ints on 32-bit Windows
+     * systems.
+     *
+     * The task of this wrapper class is to choose the corresponding UMFPACK functions
+     * depending on the size of the FEAT::Index type and the current platform.
+     *
+     * \tparam Idx_
+     * The type that is used as an index type for the row-pointer and column-index arrays.
+     * This type usually coincides with FEAT::Index.
+     *
+     * \tparam sidx_
+     * The size of Idx_ in bytes.
+     *
+     * \tparam eq_
+     * Specifies whether 'int' and 'SuiteSparse_long' have the same size.
+     * If so, the specialisation for 64-bit integers is disabled, as UMFPACK does not offer it.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Idx_, int sidx_ = sizeof(Idx_), bool eq_ = (sizeof(int) == sizeof(SuiteSparse_long))>
     struct UmfpackWrapper;
 
+    // specialisation for Idx_ = 32-bit integer
     template<typename Idx_, bool eq_>
     struct UmfpackWrapper<Idx_, sizeof(int), eq_>
     {
@@ -59,6 +93,7 @@ namespace FEAT
       }
     };
 
+    /// specialisation for Idx_ = 64-bit integer (only non-32-bit-windows systems)
     template<typename Idx_>
     struct UmfpackWrapper<Idx_, sizeof(SuiteSparse_long), false>
     {
@@ -104,6 +139,10 @@ namespace FEAT
           data, x, b, nume, control, info));
       }
     };
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
 
     Umfpack::Umfpack(const Umfpack::MatrixType& system_matrix) :
       _system_matrix(system_matrix),
@@ -273,6 +312,8 @@ namespace FEAT
 
     void UmfpackMean::init_symbolic()
     {
+      BaseClass::init_symbolic();
+
       // get the number of rows/columns
       const Index n = _weight_vector.size();
       if((n != _system_matrix.rows()) || (n != _system_matrix.columns()))
@@ -333,10 +374,14 @@ namespace FEAT
       _vec_b.clear();
       _vec_x.clear();
       _solver_matrix.clear();
+
+      BaseClass::done_symbolic();
     }
 
     void UmfpackMean::init_numeric()
     {
+      BaseClass::init_numeric();
+
       const Index n = _system_matrix.rows();
 
       // get input matrix arrays
@@ -379,6 +424,8 @@ namespace FEAT
     void UmfpackMean::done_numeric()
     {
       _umfpack.done_numeric();
+
+      BaseClass::done_numeric();
     }
 
     Status UmfpackMean::apply(VectorType& vec_sol, const VectorType& vec_rhs)

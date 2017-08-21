@@ -49,7 +49,7 @@ public:
     {
       // create an Umfpack solver
       Umfpack umfpack(mat_sys);
-      // initialse
+      // initialise
       umfpack.init();
       // solve
       umfpack.apply(vec_sol, vec_rhs);
@@ -129,7 +129,7 @@ public:
     {
       // create an UmfpackMean solver
       UmfpackMean umfpack(mat_sys, vec_one);
-      // initialse
+      // initialise
       umfpack.init();
       // solve
       umfpack.apply(vec_sol, vec_rhs);
