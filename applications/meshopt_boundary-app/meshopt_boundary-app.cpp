@@ -242,7 +242,7 @@ struct MeshoptBoundaryApp
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
@@ -266,7 +266,7 @@ struct MeshoptBoundaryApp
 
       cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-      dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+      meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
 
       String msg("");
       comm.print(msg);
@@ -324,7 +324,7 @@ struct MeshoptBoundaryApp
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
@@ -348,7 +348,7 @@ struct MeshoptBoundaryApp
 
       cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-      dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+      meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
 
       String msg("");
       comm.print(msg);
@@ -518,7 +518,7 @@ struct MeshoptBoundaryApp
       if(write_vtk && ( (n%vtk_freq == 0) || abort ))
       {
         // Compute mesh quality on the finest
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
 
         String vtk_name = String(file_basename+"_post_"+stringify(n));
         // Create a VTK exporter for our mesh
@@ -542,7 +542,7 @@ struct MeshoptBoundaryApp
 
         cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
 
         String msg;
         msg = String("Post total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
@@ -598,7 +598,7 @@ struct MeshoptBoundaryApp
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());

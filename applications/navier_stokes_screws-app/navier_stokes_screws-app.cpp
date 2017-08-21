@@ -691,7 +691,7 @@ struct NavierStokesScrewsApp
         comm.print("Writing "+vtk_name+".vtk");
 
         // Compute mesh quality on this level
-        dom_ctrl.compute_mesh_quality(
+        meshopt_ctrl->compute_mesh_quality(
           edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data(), lvl_index);
 
         // Create a VTK exporter for our mesh
@@ -718,7 +718,7 @@ struct NavierStokesScrewsApp
 
       cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-      dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+      meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
       String msg("");
 
@@ -788,7 +788,7 @@ struct NavierStokesScrewsApp
 
       cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-      dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+      meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
       String msg("");
       comm.print(msg);
@@ -1464,7 +1464,7 @@ struct NavierStokesScrewsApp
           //  watch_vtk.start();
 
           //  // Compute mesh quality on the finest
-          //  dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+          //  meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
           //  String vtk_name = String("mesh_pre_n"+stringify(comm.size())+"_"+stringify(time_step));
           //  // Create a VTK exporter for our mesh
@@ -1918,7 +1918,7 @@ struct NavierStokesScrewsApp
         //  auto& dom_lvl = dom_ctrl.front();
 
         //  // Compute mesh quality on the finest
-        //  dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+        //  meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
         //  // Create a VTK exporter for our mesh
         //  Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
@@ -2032,7 +2032,7 @@ struct NavierStokesScrewsApp
 
         cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max, vol);
 
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise.data(), qi_cellwise.data());
 
         String msg;
         msg = String("Post total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);

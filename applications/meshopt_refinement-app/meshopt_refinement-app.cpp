@@ -224,7 +224,7 @@ struct MeshoptRefinementApp
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
@@ -251,7 +251,7 @@ struct MeshoptRefinementApp
       // If we did not compute this for the vtk output, we have to do it here
       if(!write_vtk)
       {
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
       }
 
       String msg("");
@@ -316,7 +316,7 @@ struct MeshoptRefinementApp
         comm.print("Writing "+vtk_name);
 
         // Compute mesh quality on this level
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise, lvl_index);
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(dom_lvl->get_mesh());
@@ -343,7 +343,7 @@ struct MeshoptRefinementApp
       // If we did not compute this for the vtk output, we have to do it here
       if(!write_vtk)
       {
-        dom_ctrl.compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
+        meshopt_ctrl->compute_mesh_quality(edge_angle, qi_min, qi_mean, edge_angle_cellwise, qi_cellwise);
       }
 
       String msg("");
