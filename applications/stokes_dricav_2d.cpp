@@ -332,9 +332,8 @@ namespace StokesDriCav2D
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
 
-#ifdef FEAT_HAVE_MPI
-    comm.print("NUM-PROCS: " + stringify(comm.size()));
-#endif
+    // print number of processes
+    comm.print("Number of Processes: " + stringify(comm.size()));
 
     // create arg parser
     SimpleArgParser args(argc, argv);
@@ -351,6 +350,7 @@ namespace StokesDriCav2D
       // print all unsupported options to cerr
       for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
         comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
+
       // abort
       FEAT::Runtime::abort();
     }
@@ -362,6 +362,7 @@ namespace StokesDriCav2D
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
     typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
+    // parse levels
     int lvl_max = 3;
     int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);

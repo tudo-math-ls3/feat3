@@ -21,7 +21,7 @@
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/richardson.hpp>
 
-#include <control/domain/unit_cube_domain_control.hpp>
+#include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
 namespace PoissonNeumann
@@ -255,18 +255,19 @@ namespace PoissonNeumann
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
 
-    // initialise
-#ifdef FEAT_HAVE_MPI
-    comm.print("NUM-PROCS: " + stringify(comm.size()));
-#endif
+    // print number of processes
+    comm.print("Number of Processes: " + stringify(comm.size()));
 
     // create arg parser
     SimpleArgParser args(argc, argv);
 
     // check command line arguments
+    Control::Domain::add_supported_pdc_args(args);
+    args.support("mesh");
     args.support("level");
     args.support("no-err");
     args.support("vtk");
+    args.support("dump");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -275,7 +276,22 @@ namespace PoissonNeumann
       // print all unsupported options to cerr
       for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
         comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
+
+      comm.print(std::cerr, "Supported Options are:");
+      comm.print(std::cerr, args.get_supported_help());
+
       // abort
+      FEAT::Runtime::abort();
+    }
+
+    if(args.check("mesh") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
+      FEAT::Runtime::abort();
+    }
+    if(args.check("level") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--level <levels>' is missing!");
       FEAT::Runtime::abort();
     }
 
@@ -285,51 +301,35 @@ namespace PoissonNeumann
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-    // parse levels
-    std::deque<int> lvls;
-    {
-      auto p = args.query("level");
-      if(p == nullptr)
-      {
-        lvls.push_back(5);
-      }
-      else
-      {
-        XASSERTM(!p->second.empty(), "no levels given to --level option");
-
-        lvls.resize(p->second.size());
-        for(std::size_t i(0); i < p->second.size(); ++i)
-        {
-          if(!p->second.at(i).parse(lvls.at(i)))
-          {
-            comm.print(std::cerr, "ERROR: failed to parse '" + p->second.at(i) + "' as level");
-            FEAT::Runtime::abort();
-          }
-        }
-      }
-      if(lvls.size() < std::size_t(2))
-        lvls.push_back(0);
-    }
-
     // create a time-stamp
     TimeStamp time_stamp;
 
     // let's create our domain
+    comm.print("Preparing domain...");
+
+    // create our domain control
     typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-    Control::Domain::HierarchUnitCubeDomainControl<DomainLevelType> domain(comm, lvls);
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
+
+    domain.parse_args(args);
+    domain.set_desired_levels(args.query("level")->second);
+    domain.create(args.query("mesh")->second);
+
+    // print partitioning info
+    comm.print(domain.get_chosen_parti_info());
 
     // plot our levels
-    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvls.front()) + "]");
-    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvls.back()) + "]");
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
+    comm.print("LVL-MED: " + stringify(domain.med_level_index()) + " [" + stringify(domain.get_desired_level_med()) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
 
+    // dump domain info if desired
+    if(args.check("dump") >= 0)
     {
-      String s = String("Phys/Virt Sizes: ") + stringify(domain.size_physical()) + " / " + stringify(domain.size_virtual());
-      comm.allprint(s);
+      domain.dump_layers();
+      domain.dump_layer_levels();
+      domain.dump_virt_levels();
     }
-
-    domain.dump_layers();
-    domain.dump_layer_levels();
-    domain.dump_virt_levels();
 
     // run our application
     run(args, domain);

@@ -402,9 +402,8 @@ namespace PoissonScaRC
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
 
-#ifdef FEAT_HAVE_MPI
-    comm.print("NUM-PROCS: " + stringify(comm.size()));
-#endif
+    // print number of processes
+    comm.print("Number of Processes: " + stringify(comm.size()));
 
     // create arg parser
     SimpleArgParser args(argc, argv);

@@ -451,9 +451,8 @@ namespace StokesVortex2D
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
 
-#ifdef FEAT_HAVE_MPI
-    comm.print("NUM-PROCS: " + stringify(comm.size()));
-#endif
+    // print number of processes
+    comm.print("Number of Processes: " + stringify(comm.size()));
 
     // create arg parser
     SimpleArgParser args(argc, argv);
@@ -483,45 +482,20 @@ namespace StokesVortex2D
     typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
     // parse levels
-    std::deque<int> lvls;
-    {
-      auto p = args.query("level");
-      if(p == nullptr)
-      {
-        lvls.push_back(3);
-      }
-      else
-      {
-        XASSERTM(!p->second.empty(), "no levels given to --level option");
-
-        lvls.resize(p->second.size());
-        for(std::size_t i(0); i < p->second.size(); ++i)
-        {
-          if(!p->second.at(i).parse(lvls.at(i)))
-          {
-            comm.print(std::cerr, "ERROR: failed to parse '" + p->second.at(i) + "' as level");
-            FEAT::Runtime::abort();
-          }
-        }
-      }
-      if(lvls.size() < std::size_t(2))
-        lvls.push_back(0);
-    }
+    int lvl_max = 3;
+    int lvl_min = 0;
+    args.parse("level", lvl_max, lvl_min);
 
     // create a time-stamp
     TimeStamp time_stamp;
 
     // let's create our domain
     typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
-    Control::Domain::HierarchUnitCubeDomainControl<DomainLevelType> domain(comm, lvls);
+    Control::Domain::UnitCubeDomainControl<DomainLevelType> domain(comm, lvl_max, lvl_min);
 
     // plot our levels
-    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvls.front()) + "]");
-    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvls.back()) + "]");
-
-    domain.dump_layers();
-    domain.dump_layer_levels();
-    domain.dump_virt_levels();
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(lvl_max) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(lvl_min) + "]");
 
     // run our application
     run(args, domain);

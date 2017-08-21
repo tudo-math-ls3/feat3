@@ -700,7 +700,9 @@ int run_app(int argc, char* argv[])
 
   // create world communicator
   Dist::Comm comm(Dist::Comm::world());
-  comm.print("NUM-PROCS: "+stringify(comm.size()));
+
+  // print number of processes
+  comm.print("Number of Processes: " + stringify(comm.size()));
 
   // Filenames to read the mesh from, parsed from the application config file
   std::deque<String> mesh_files;
