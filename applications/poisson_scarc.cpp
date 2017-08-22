@@ -415,7 +415,6 @@ namespace PoissonScaRC
     args.support("no-err");
     args.support("vtk");
     args.support("statistics");
-    args.support("dump");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -470,14 +469,6 @@ namespace PoissonScaRC
     comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
     //comm.print("LVL-MED: " + stringify(domain.med_level_index()) + " [" + stringify(domain.get_desired_level_med()) + "]");
     comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
-
-    // dump domain info if desired
-    if(args.check("dump") >= 0)
-    {
-      domain.dump_layers();
-      domain.dump_layer_levels();
-      domain.dump_virt_levels();
-    }
 
     // run our application
     run(args, domain);

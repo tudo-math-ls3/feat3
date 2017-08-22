@@ -22,12 +22,42 @@ namespace FEAT
      */
     namespace Domain
     {
+      /**
+       * \brief Domain Layer class
+       *
+       * This class implements a class for domain layers, i.e. objects which represent
+       * a partitioning of the available process set in a domain decomposition based
+       * parallel application.
+       *
+       * In the most basic case, a domain layer consists of two important parts:
+       * - A Dist::Comm communicator which represents the set of all MPI processes
+       *   that participate in the decomposition of a domain.
+       * - A set of ranks that represent the neighbours of this process within
+       *   the communicator.
+       *
+       * In a simple parallel application, there exists just a single domain layer,
+       * whose communicator is the world communicator (i.e. the set of all available
+       * processes). In more complex scenarios, an application may contain a list of
+       * domain layers, where each domain layer represents a subset of the processes
+       * contained in the previous domain layer, thus forming a "process hierarchy".
+       *
+       * In such a process hierarchy, a whole group of "siblings" in a particular
+       * domain layer is reduced onto a single parent process in the next domain layer.
+       *
+       * In case of multiple domain layers forming a hierarchy, each layer (except
+       * for the last one) also contains two additional objects:
+       * - A Dist::Comm communicator which represents the set of all sibling processes
+       *   which are reduced to a single parent in the next layer.
+       * - The rank of parent process within the sibling communicator.
+       *
+       * \author Peter Zajac
+       */
       class DomainLayer
       {
       protected:
         /// the layer index
         int _layer_index;
-        /// the communicator for this level
+        /// the communicator for this layer
         Dist::Comm _comm;
         /// the ranks of the neighbour processes in this layer
         std::vector<int> _neighbour_ranks;
@@ -142,6 +172,21 @@ namespace FEAT
         }
       }; // class DomainLayer
 
+      /**
+       * \brief Virtual Domain Level class template
+       *
+       * This class acts as a wrapper around the actual domain levels, which contain the
+       * actual mesh, trafo and finite element space objects. The purpose of this class
+       * it to correctly manage domain levels which lay on the interface between two
+       * domain layers, as in this case, some special treatment is required for the
+       * implementation of a recursively partitioned mesh hierarchy.
+       *
+       * \tparam DomLvl_
+       * The class representing a particular domain level; this class should derive from the
+       * FEAT::Control::Domain::DomainLevel class template.
+       *
+       * \author Peter Zajac
+       */
       template<typename DomLvl_>
       class VirtualLevel
       {
@@ -302,8 +347,23 @@ namespace FEAT
           XASSERT(bool(_layer_parent));
           return *_layer_parent;
         }
+
+        std::size_t bytes() const
+        {
+          if(is_parent())
+            return this->_level_child->bytes() + this->_layer_parent->bytes();
+          else if(is_child())
+            return this->_level_child->bytes();
+          else
+            return this->_level->bytes();
+        }
       }; // class VirtualLevel<...>
 
+      /**
+       * \brief Domain control base-class template
+       *
+       * \author Peter Zajac
+       */
       template<typename DomLvl_>
       class DomainControl
       {
@@ -316,7 +376,6 @@ namespace FEAT
         typedef typename LevelType::MeshType MeshType;
         typedef typename LevelType::MeshNodeType MeshNodeType;
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
-        typedef typename MeshType::CoordType CoordType;
 
       protected:
         const Dist::Comm& _comm;
@@ -549,7 +608,7 @@ namespace FEAT
           _comm.allreduce(&my_virt_size, &_virt_size, std::size_t(1), Dist::op_max);
         }
 
-        void dump_layers()
+        String dump_layers() const
         {
           String msg;
           msg += "(" + stringify(_layers.size()) + "):";
@@ -568,10 +627,10 @@ namespace FEAT
               msg += lyr.is_parent() ? "*}" : " }";
             }
           }
-          _comm.allprint(msg);
+          return msg;
         }
 
-        void dump_layer_levels()
+        String dump_layer_levels() const
         {
           String msg;
           for(auto it = _layer_levels.begin(); it != _layer_levels.end(); ++it)
@@ -581,10 +640,10 @@ namespace FEAT
             for(auto jt = it->begin(); jt != it->end(); ++jt)
               msg += " " + stringify((*jt)->get_level_index());
           }
-          _comm.allprint(msg);
+          return msg;
         }
 
-        void dump_virt_levels()
+        String dump_virt_levels() const
         {
           String msg;
           for(auto it = _virt_levels.begin(); it != _virt_levels.end(); ++it)
@@ -603,7 +662,7 @@ namespace FEAT
                 msg += String(np+1, ' ') + "}";
             }
           }
-          _comm.allprint(msg);
+          return msg;
         }
       }; // class DomainControl<...>
     } // namespace Domain

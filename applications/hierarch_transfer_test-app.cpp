@@ -363,11 +363,11 @@ namespace HierarchTransferTestApp
     DomainControlType domain(comm, slvls);
 
     comm.print("\nLayers:");
-    domain.dump_layers();
+    comm.allprint(domain.dump_layers());
     comm.print("\nLayer-Levels:");
-    domain.dump_layer_levels();
+    comm.allprint(domain.dump_layer_levels());
     comm.print("\nVirtual Levels:");
-    domain.dump_virt_levels();
+    comm.allprint(domain.dump_virt_levels());
 
     Cubature::DynamicFactory cubature("auto-degree:5");
 
