@@ -1565,7 +1565,7 @@ namespace FEAT
         ASSERT(row < rows());
         ASSERT(col < columns());
 
-        const Index nchunk(Index(floor(row / float(C()))));
+        const Index nchunk(Index(Math::floor(row / float(C()))));
         Index start(Index(MemoryPool<Mem_>::get_element(cs(), nchunk)));
         Index max(Index(MemoryPool<Mem_>::get_element(rl(), row)));
         for (Index i(start + row - nchunk * C()), j(0) ; j < max && Index(MemoryPool<Mem_>::get_element(col_ind(), i)) <= col ; i += C(), ++j)
