@@ -95,7 +95,7 @@ namespace PoissonDirichlet
     std::vector<std::array<double, Times::count>> times;
 
     // (physical, virtual)
-    std::array<unsigned long, 2> mem_use, mem_use_sum, mem_use_max;
+    std::array<unsigned long long, 2> mem_use, mem_use_sum, mem_use_max;
 
     double toe_asm_rhs;
 
