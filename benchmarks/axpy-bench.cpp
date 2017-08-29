@@ -49,7 +49,7 @@ void run()
   typedef typename VT_::IndexType IT_;
   typedef typename VT_::MemType Mem_;
 
-  Index size(5000000ul);
+  Index size(50000000ul);
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<std::endl;
   DenseVector<Mem_, DT_, IT_> x(size, DT_(1.234));

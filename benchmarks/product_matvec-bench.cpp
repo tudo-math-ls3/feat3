@@ -100,8 +100,8 @@ void run()
   typedef typename SM_::MemType Mem_;
 
   std::vector<IT_> num_of_nodes;
-  num_of_nodes.push_back(1300);
-  num_of_nodes.push_back(1300);
+  num_of_nodes.push_back(2000);
+  num_of_nodes.push_back(2000);
 
   // generate FE matrix A
   SparseMatrixBanded<Mem::Main, DT_, IT_> bm(PointstarStructureFE::template value<DT_>(1, num_of_nodes));

@@ -53,7 +53,7 @@ void run()
   typedef typename DM_::DataType DT_;
   typedef typename DM_::MemType Mem_;
 
-  Index size(1000);
+  Index size(2000);
   DenseMatrix<Mem::Main, DT_, Index> x_local(size, size), y_local(size, size);
   for (Index i(0) ; i < size ; ++i)
   {
