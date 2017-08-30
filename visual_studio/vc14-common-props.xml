@@ -63,14 +63,15 @@
   <!-- ********************************************************************* -->
   <!-- FEAT Third-Party Library Detection -->
   <!-- ********************************************************************* -->
-  <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
-    <FeatHaveUmfpack>true</FeatHaveUmfpack>
-  </PropertyGroup>
   <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveAlgLib>true</FeatHaveAlgLib>
   </PropertyGroup>
   <PropertyGroup Condition="Exists('..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveFParser>true</FeatHaveFParser>
+  </PropertyGroup>
+  <!-- Note: half is a pure header library -->
+  <PropertyGroup Condition="Exists('..\thirdparty\half\include\half.hpp')">
+    <FeatHaveHalfMath>true</FeatHaveHalfMath>
   </PropertyGroup>
   <PropertyGroup Condition="Exists('..\lib\metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveMetis>true</FeatHaveMetis>
@@ -78,6 +79,9 @@
   <!-- Note: ParMETIS can only be used in combination with MPI -->
   <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveUmfpack>true</FeatHaveUmfpack>
   </PropertyGroup>
   <PropertyGroup Condition="Exists('..\lib\zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveZlib>true</FeatHaveZlib>
@@ -91,24 +95,24 @@
   <ItemGroup Label="FEAT Defines">
     <FeatDef Condition="'$(DebugMode)'=='true'"
       Include="DEBUG" />
-    <FeatDef Condition="'$(SerialMode)'=='true'"
-      Include="SERIAL" />
     <FeatDef Condition="'$(SerialMode)'=='false'"
       Include="FEAT_HAVE_MPI" />
     <FeatDef Condition="'$(BackendCUDA)'=='true'"
       Include="FEAT_HAVE_CUDA" />
     <FeatDef Condition="'$(BackendMKL)'=='true'"
       Include="FEAT_HAVE_MKL" />
-    <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
-      Include="FEAT_HAVE_UMFPACK" />
     <FeatDef Condition="'$(FeatHaveAlgLib)'=='true'"
       Include="FEAT_HAVE_ALGLIB" />
     <FeatDef Condition="'$(FeatHaveFParser)'=='true'"
       Include="FEAT_HAVE_FPARSER" />
+    <FeatDef Condition="'$(FeatHaveHalfMath)'=='true'"
+      Include="FEAT_HAVE_HALFMATH" />
     <FeatDef Condition="'$(FeatHaveMetis)'=='true'"
       Include="FEAT_HAVE_METIS" />
     <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
       Include="FEAT_HAVE_PARMETIS" />
+    <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
+      Include="FEAT_HAVE_UMFPACK" />
     <FeatDef Condition="'$(FeatHaveZlib)'=='true'"
       Include="FEAT_HAVE_ZLIB" />
   </ItemGroup>
@@ -121,14 +125,16 @@
       Include="$(MKL_PATH)\include" />
     <FeatIncDir Condition="'$(FeatHaveAlgLib)'=='true'"
       Include="$(FeatRootPath)\thirdparty\ALGLIB\src;" />
-    <FeatIncDir Condition="'$(FeatHaveUmfpack)'=='true'"
-      Include="$(FeatRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeatRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeatRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
     <FeatIncDir Condition="'$(FeatHaveFParser)'=='true'"
       Include="$(FeatRootPath)\thirdparty\fparser;" />
+    <FeatIncDir Condition="'$(FeatHaveHalfMath)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\half\include;" />
     <FeatIncDir Condition="'$(FeatHaveMetis)'=='true'"
       Include="$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
     <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
       Include="$(FeatRootPath)\thirdparty\parmetis\include;" />
+    <FeatIncDir Condition="'$(FeatHaveUmfpack)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeatRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeatRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
     <FeatIncDir Condition="'$(FeatHaveZlib)'=='true'"
       Include="$(FeatRootPath)\thirdparty\zlib;" />
   </ItemGroup>
