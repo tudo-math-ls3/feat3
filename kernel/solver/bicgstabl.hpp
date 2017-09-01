@@ -210,7 +210,8 @@ namespace FEAT
             XASSERTM(l_pm > 0, "bicgstabl polynomial degree must be greather than zero!");
           }
           this->_l = l_pm;
-          this->set_plot_name("BiCGStab(" + stringify(_l) + ")");
+          if(this->_plot_name == "BiCGStabL")
+            this->set_plot_name("BiCGStab(" + stringify(_l) + ")");
         }
 
         /// \copydoc SolverBase::name()

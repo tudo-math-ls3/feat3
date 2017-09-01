@@ -105,7 +105,10 @@ namespace FEAT
         if(krylov_dim_p.second)
         {
           set_krylov_dim(Index(std::stoul(krylov_dim_p.first)));
-          this->set_plot_name("FGMRES("+stringify(_krylov_dim)+")");
+          if  (this->_plot_name == "FGMRES")
+          {
+            this->set_plot_name("FGMRES("+stringify(_krylov_dim)+")");
+          }
         }
         else
         {
