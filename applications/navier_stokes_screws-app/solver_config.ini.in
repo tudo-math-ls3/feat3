@@ -6,7 +6,7 @@
 #tol_rel = 1e2
 #tol_abs = 1e-8
 #precon = jac
-#plot = summary
+#plot_mode = summary
 
 [linsolver_a]
 type = fgmres
@@ -15,7 +15,7 @@ tol_rel = 1e-8
 precon = mgv_a
 precon_variant = left
 krylov_dim = 7
-plot = all
+plot_mode = all
 
 [mgv_a]
 type = mg
@@ -47,7 +47,7 @@ tol_abs = 1e-8
 tol_rel = 1e-4
 precon = mgv_s
 #min_stag_iter = 3
-plot = summary
+plot_mode = summary
 
 [mgv_s]
 type = mg
@@ -63,7 +63,7 @@ coarse = Coarse-S
 
 [Coarse-S]
 type = pcg
-plot = none
+plot_mode = none
 max_iter = 1000
 tol_rel = 1e-8
 precon = jac
@@ -74,7 +74,7 @@ max_iter = 100
 tol_rel = 1e-8
 tol_abs = 1e-4
 precon = jac
-plot = summary
+plot_mode = summary
 
 [FGMRES-Jacobi]
 type = fgmres
@@ -84,7 +84,7 @@ max_iter = 1000
 
 [ALGLIBMinLBFGS]
 type = ALGLIBMinLBFGS
-plot = iter
+plot_mode = iter
 max_iter = 10000
 tol_rel = 1e-8
 lbfgs_dim = 7
@@ -92,7 +92,7 @@ keep_iterates = 0
 
 [ALGLIBMinCG]
 type = ALGLIBMinCG
-plot = summary
+plot_mode = summary
 tol_rel = 1e-8
 max_iter = 10000
 direction_update = DYHSHybrid
@@ -101,7 +101,7 @@ keep_iterates = 0
 [NLCG]
 type = NLCG
 precon = none
-plot = summary
+plot_mode = summary
 tol_rel = 1e-8
 max_iter = 1000
 linesearch = MQCLinesearch
@@ -110,7 +110,7 @@ keep_iterates = 0
 
 [MQCLinesearch]
 type = MQCLinesearch
-plot = none
+plot_mode = none
 max_iter = 20
 tol_decrease = 1e-3
 tol_curvature = 0.3
@@ -125,7 +125,7 @@ linear_solver = Meshopt-PCG
 type = pcg
 max_iter = 500
 tol_rel = 1e-8
-plot = summary
+plot_mode = summary
 precon = Meshopt-MG
 
 [Meshopt-MG]
@@ -147,14 +147,14 @@ max_iter = 6
 
 [PCG-Jacobi]
 type = pcg
-plot = none
+plot_mode = none
 max_iter = 1000
 tol_rel = 1e-8
 precon = jac
 
 [Richardson-MGV]
 type = richardson
-plot = iter
+plot_mode = iter
 tol_rel = 1e-8
 max_iter = 1
 precon = mgv_a

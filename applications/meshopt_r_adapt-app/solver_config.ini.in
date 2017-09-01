@@ -4,7 +4,7 @@ precon = none
 tol_rel = 1e-8
 max_iter = 10000
 lbfgs_dim = 10
-plot = iter
+plot_mode = iter
 keep_iterates = 0
 
 [ALGLIBMinCG]
@@ -13,7 +13,7 @@ precon = none
 tol_rel = 1e-8
 max_iter = 10000
 direction_update = DYHSHybrid
-plot = iter
+plot_mode = iter
 keep_iterates = 0
 
 [NLCG]
@@ -23,12 +23,12 @@ tol_rel = 1e-8
 max_iter = 10000
 linesearch = MQCLinesearch
 direction_update = DYHSHybrid
-plot = iter
+plot_mode = iter
 keep_iterates = 0
 
 [MQCLinesearch]
 type = MQCLinesearch
-plot = none
+plot_mode = none
 max_iter = 20
 tol_decrease = 1e-3
 tol_curvature = 0.3
@@ -36,7 +36,7 @@ keep_iterates = 0
 
 [secantlinesearch]
 type = SecantLinesearch
-plot = none
+plot_mode = none
 initial_step = 1e-2
 max_iter = 100
 keep_iterates = 0
@@ -53,7 +53,7 @@ max_iter = 10
 tol_rel = 1e5
 tol_abs = 1e-8
 initial_penalty_param = 2e4
-plot = iter
+plot_mode = iter
 inner_solver = NLCG
 
 [PCG-MG]
@@ -61,7 +61,7 @@ type = pcg
 max_iter = 100
 min_stag_iter = 1
 tol_rel = 1e-8
-plot = iter
+plot_mode = iter
 precon = MG2
 
 [PCG-JAC]
@@ -72,7 +72,7 @@ precon = jac
 
 [Richardson-MG]
 type = richardson
-plot = iter
+plot_mode = iter
 tol_rel = 1e-8
 max_iter = 100
 precon = MG2

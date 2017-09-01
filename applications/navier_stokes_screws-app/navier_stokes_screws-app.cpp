@@ -2241,6 +2241,10 @@ struct NavierStokesScrewsApp
     // write timings
     if(comm.rank() == 0)
     {
+      comm.print("");
+      comm.print(FEAT::Statistics::get_formatted_solver_tree("solver_a").trim());
+      comm.print(FEAT::Statistics::get_formatted_solver_tree("solver_s").trim());
+      comm.print("");
       dump_time(comm, "Total solver time", t_total, t_total);
       dump_time(comm, "Matrix assembly time", t_asm_mat, t_total);
       dump_time(comm, "Vector assembly time", t_asm_rhs, t_total);
@@ -2517,7 +2521,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "precon = mgv_a" << std::endl;
   iss << "precon_variant = left" << std::endl;
   iss << "krylov_dim = 7" << std::endl;
-  iss << "plot = all" << std::endl;
+  iss << "plot_mode = all" << std::endl;
 
   iss << "[mgv_a]" << std::endl;
   iss << "type = mg" << std::endl;
@@ -2549,7 +2553,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = mgv_s" << std::endl;
   iss << "min_stag_iter = 3" << std::endl;
-  iss << "plot = summary" << std::endl;
+  iss << "plot_mode = summary" << std::endl;
 
   iss << "[mgv_s]" << std::endl;
   iss << "type = mg" << std::endl;
@@ -2565,7 +2569,7 @@ static void read_test_solver_config(std::stringstream& iss)
 
   iss << "[Coarse-S]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "plot = none" << std::endl;
+  iss << "plot_mode = none" << std::endl;
   iss << "max_iter = 1000" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
@@ -2576,12 +2580,12 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "tol_abs = 1e-4" << std::endl;
   iss << "precon = jac" << std::endl;
-  iss << "plot = summary" << std::endl;
+  iss << "plot_mode = summary" << std::endl;
 
   iss << "[NLCG]" << std::endl;
   iss << "type = NLCG" << std::endl;
   iss << "precon = none" << std::endl;
-  iss << "plot = all" << std::endl;
+  iss << "plot_mode = all" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "max_iter = 1000" << std::endl;
   iss << "linesearch = MQCLinesearch" << std::endl;
@@ -2590,7 +2594,7 @@ static void read_test_solver_config(std::stringstream& iss)
 
   iss << "[MQCLinesearch]" << std::endl;
   iss << "type = MQCLinesearch" << std::endl;
-  iss << "plot = none" << std::endl;
+  iss << "plot_mode = none" << std::endl;
   iss << "max_iter = 20" << std::endl;
   iss << "tol_decrease = 1e-3" << std::endl;
   iss << "tol_curvature = 0.3" << std::endl;
@@ -2600,7 +2604,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "type = pcg" << std::endl;
   iss << "max_iter = 500" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
-  iss << "plot = summary" << std::endl;
+  iss << "plot_mode = summary" << std::endl;
   iss << "precon = Meshopt-MG" << std::endl;
 
   iss << "[Meshopt-MG]" << std::endl;
@@ -2622,7 +2626,7 @@ static void read_test_solver_config(std::stringstream& iss)
 
   iss << "[PCG-Jacobi]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "plot = none" << std::endl;
+  iss << "plot_mode = none" << std::endl;
   iss << "max_iter = 1000" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;

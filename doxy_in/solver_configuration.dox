@@ -25,14 +25,14 @@ yields a classical pcg-jac setup with the solver tree root section 'solver' and 
 \warning Do not create circles e.g. cg-richardson-cg, as they will crash your application.
 
 The supported solver/precon types are (with a list of supported keys, in addition to the mandatory type key):
-- richardson (precon, max_iter, min_iter, tol_rel, plot, omega)
-- pcg (precon, max_iter, min_iter, tol_rel, plot)
-- bicgstab (precon, max_iter, min_iter, tol_rel, plot)
-- fgmres (precon, max_iter, min_iter, tol_rel, plot, krylov_dim)
-- pmr (precon, max_iter, min_iter, tol_rel, plot)
-- pcr (precon, max_iter, min_iter, tol_rel, plot)
-- psd (precon, max_iter, min_iter, tol_rel, plot)
-- rgcr (precon, max_iter, min_iter, tol_rel, plot)
+- richardson (precon, max_iter, min_iter, tol_rel, plot_mode, omega)
+- pcg (precon, max_iter, min_iter, tol_rel, plot_mode)
+- bicgstab (precon, max_iter, min_iter, tol_rel, plot_mode)
+- fgmres (precon, max_iter, min_iter, tol_rel, plot_mode, krylov_dim)
+- pmr (precon, max_iter, min_iter, tol_rel, plot_mode)
+- pcr (precon, max_iter, min_iter, tol_rel, plot_mode)
+- psd (precon, max_iter, min_iter, tol_rel, plot_mode)
+- rgcr (precon, max_iter, min_iter, tol_rel, plot_mode)
 - mg (hierarchy, lvl_min, lvl_max, cycle)
 - scarcmg (hierarchy, lvl_min, lvl_max, cycle)
 - hierarchy (coarse, smoother)
@@ -43,7 +43,7 @@ The supported solver/precon types are (with a list of supported keys, in additio
 - ssor (omega)
 - scale (omega)
 - polynomial (omega, m)
-- chebyshev (chebyshev, max_inter, min_iter, tol-rel, plot)
+- chebyshev (chebyshev, max_inter, min_iter, tol-rel, plot_mode)
 - schwarz (solver)
 
 The supported keys semantics:
@@ -51,7 +51,7 @@ The supported keys semantics:
 - max_iter: The maximum amount of iterations for the given solver.
 - min_iter: The minimum amount of iterations for the given solver.
 - tol_rel: Relative convergence criterium.
-- plot: none/summary/iter/all.
+- plot_mode: none/summary/iter/all.
 - krylov_dim: Maximum krylov subspace dimension.
 - hierarchy: Reference to another section, which shall be used as the multigrid hierarchy
 - lvl_min: coarsest multigrid level (relative to the hierarchy)
@@ -75,7 +75,7 @@ precon = mgv
 krylov_dim = 5
 max_iter = 1000
 tol_rel = 1e-8
-plot = iter
+plot_mode = iter
 
   [mgv]
   type = mg

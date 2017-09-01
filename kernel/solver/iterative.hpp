@@ -201,14 +201,23 @@ namespace FEAT
         {
         Dist::Comm comm(Dist::Comm::world());
 
-        auto plot_p = section->get_entry("plot");
-        if (plot_p.second)
+        auto plot_mode_p = section->get_entry("plot_mode");
+        if (plot_mode_p.second)
         {
           PlotMode plot_mode;
-          plot_mode << plot_p.first;
+          plot_mode << plot_mode_p.first;
           if(comm.rank() == 0)
           {
             set_plot_mode(plot_mode);
+          }
+        }
+
+        auto plot_name_p = section->get_entry("plot_name");
+        if (plot_name_p.second)
+        {
+          if(comm.rank() == 0)
+          {
+            set_plot_name(plot_name_p.first);
           }
         }
 

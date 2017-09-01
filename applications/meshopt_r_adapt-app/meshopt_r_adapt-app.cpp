@@ -985,7 +985,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "[NLCG]" << std::endl;
   iss << "type = NLCG" << std::endl;
   iss << "precon = none" << std::endl;
-  iss << "plot = iter" << std::endl;
+  iss << "plot_mode = iter" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "max_iter = 500" << std::endl;
   iss << "linesearch = MQCLinesearch" << std::endl;
@@ -998,12 +998,12 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "tol_rel = 1e5" << std::endl;
   iss << "tol_abs = 1e-8" << std::endl;
   iss << "initial_penalty_param = 2e4" << std::endl;
-  iss << "plot = iter" << std::endl;
+  iss << "plot_mode = iter" << std::endl;
   iss << "inner_solver = NLCG" << std::endl;
 
   iss << "[MQCLinesearch]" << std::endl;
   iss << "type = MQCLinesearch" << std::endl;
-  iss << "plot = none" << std::endl;
+  iss << "plot_mode = none" << std::endl;
   iss << "max_iter = 20" << std::endl;
   iss << "tol_decrease = 1e-3" << std::endl;
   iss << "tol_curvature = 0.3" << std::endl;
