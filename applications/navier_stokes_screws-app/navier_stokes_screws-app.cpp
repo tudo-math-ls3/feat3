@@ -94,7 +94,7 @@ struct MeshExtrudeHelper<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Coor
 
 static inline void dump_time(const Dist::Comm& comm, String s, double t, double total)
 {
-  comm.print(s.pad_back(30, '.') + ": " + stringify_fp_fix(t, 3, 10)
+  comm.print(s.pad_back(30, '.') + ": " + stringify_fp_fix(t, 3, 12)
       + " (" + stringify_fp_fix(100.0*t/total,3,7) + "%)");
 }
 
@@ -373,8 +373,9 @@ struct NavierStokesScrewsApp
     TimeStamp stamp_start;
 
     // create a batch of stop-watches
-    StopWatch watch_total, watch_asm_rhs, watch_asm_mat,
-    watch_sol_init, watch_solver_a, watch_solver_s, watch_solver_m_p, watch_vtk, watch_meshopt, watch_quality;
+    StopWatch watch_total, watch_asm_rhs, watch_asm_mat, watch_asm_fil,
+      watch_sol_init, watch_solver_a, watch_solver_s, watch_solver_m_p, watch_vtk,
+      watch_meshopt, watch_quality, watch_meshopt_preproc;
 
     watch_total.start();
 
@@ -1377,6 +1378,8 @@ struct NavierStokesScrewsApp
 
       bool failure(false);
 
+      comm.print("");
+      comm.print(String(80u, '#'));
       comm.print("Timestep "+stringify(time_step)+": t = "+stringify_fp_fix(time)+", angle = "
           +stringify_fp_fix(alpha/(DataType(2)*pi)*DataType(360)) + " degrees\n");
 
@@ -1453,11 +1456,13 @@ struct NavierStokesScrewsApp
         watch_meshopt.stop();
         if(meshopt_preproc!=nullptr)
         {
+          watch_meshopt_preproc.start();
           comm.print("Meshopt preprocessor:");
           meshopt_preproc->prepare(new_coords);
           meshopt_preproc->optimise();
           comm.print("");
           new_coords.copy(meshopt_preproc->get_coords());
+          watch_meshopt_preproc.stop();
 
           //if(write_vtk && ( (time_step%vtk_freq == 0) || failure))
           //{
@@ -1579,6 +1584,7 @@ struct NavierStokesScrewsApp
         }
 
         // Assemble filters on all levels
+        watch_asm_fil.start();
         for(Index i(0); i < num_levels; ++i)
         {
           // get our local system filters
@@ -1597,6 +1603,7 @@ struct NavierStokesScrewsApp
           system_levels.at(i)->assemble_global_filters(extruded_dom_ctrl.at(i)->space_pres, cubature);
 
         } // all levels
+        watch_asm_fil.stop();
 
         // apply filter onto solution vector
         filter_v.filter_sol(vec_sol_v.at(0));
@@ -2068,6 +2075,43 @@ struct NavierStokesScrewsApp
       // compress all statistics from the current timestep for further analysis after the solution is finished
       FEAT::Statistics::compress_solver_expressions();
 
+      // write timings
+      if(comm.rank() == 0)
+      {
+        double t_total = watch_total.elapsed();
+
+        double t_asm_mat = watch_asm_mat.elapsed();
+        double t_asm_rhs = watch_asm_rhs.elapsed();
+        double t_asm_fil = watch_asm_fil.elapsed();
+        double t_meshopt = watch_meshopt.elapsed();
+        double t_meshopt_preproc = watch_meshopt_preproc.elapsed();
+        double t_mesh_quality = watch_quality.elapsed();
+        double t_sol_init = watch_sol_init.elapsed();
+        double t_solver_a = watch_solver_a.elapsed();
+        double t_solver_m_p = watch_solver_m_p.elapsed();
+        double t_solver_s = watch_solver_s.elapsed();
+        double t_vtk = watch_vtk.elapsed();
+
+        double t_sum =
+          t_asm_mat + t_asm_rhs + t_asm_fil +
+          t_meshopt + t_meshopt_preproc + t_mesh_quality +
+          t_sol_init + t_solver_a + t_solver_s + t_solver_m_p + t_vtk;
+
+        dump_time(comm, "Total solver time", t_total, t_total);
+        dump_time(comm, "Matrix assembly time", t_asm_mat, t_total);
+        dump_time(comm, "Vector assembly time", t_asm_rhs, t_total);
+        dump_time(comm, "Filter assembly time", t_asm_fil, t_total);
+        dump_time(comm, "Solver init time", t_sol_init, t_total);
+        dump_time(comm, "Solver-A time", t_solver_a, t_total);
+        dump_time(comm, "Solver-S time", t_solver_s, t_total);
+        dump_time(comm, "Solver-M_p time", t_solver_m_p, t_total);
+        dump_time(comm, "Mesh optimisation time", t_meshopt, t_total);
+        dump_time(comm, "Mesh opt preproc time", t_meshopt_preproc, t_total);
+        dump_time(comm, "Mesh quality computation time", t_mesh_quality, t_total);
+        dump_time(comm, "VTK write time", t_vtk, t_total);
+        dump_time(comm, "Other time", t_total-t_sum, t_total);
+      }
+
       if(failure)
       {
         break;
@@ -2179,7 +2223,9 @@ struct NavierStokesScrewsApp
     double t_total = watch_total.elapsed();
     double t_asm_mat = watch_asm_mat.elapsed();
     double t_asm_rhs = watch_asm_rhs.elapsed();
+    double t_asm_fil = watch_asm_fil.elapsed();
     double t_meshopt = watch_meshopt.elapsed();
+    double t_meshopt_preproc = watch_meshopt_preproc.elapsed();
     double t_mesh_quality = watch_quality.elapsed();
     double t_sol_init = watch_sol_init.elapsed();
     double t_solver_a = watch_solver_a.elapsed();
@@ -2187,15 +2233,17 @@ struct NavierStokesScrewsApp
     double t_solver_s = watch_solver_s.elapsed();
     double t_vtk = watch_vtk.elapsed();
 
-    double t_sum = t_asm_mat + t_asm_rhs + t_sol_init + t_solver_a + t_solver_s + t_vtk + t_meshopt + t_mesh_quality;
+    double t_sum =
+      t_asm_mat + t_asm_rhs + t_asm_fil +
+      t_meshopt + t_meshopt_preproc + t_mesh_quality +
+      t_sol_init + t_solver_a + t_solver_s + t_solver_m_p + t_vtk;
 
     // write timings
     if(comm.rank() == 0)
     {
-      comm.print("");
       dump_time(comm, "Total solver time", t_total, t_total);
-      dump_time(comm, "Matrix sssembly time", t_asm_mat, t_total);
-      dump_time(comm, "Vector sssembly time", t_asm_rhs, t_total);
+      dump_time(comm, "Matrix assembly time", t_asm_mat, t_total);
+      dump_time(comm, "Vector assembly time", t_asm_rhs, t_total);
       dump_time(comm, "Solver init time", t_sol_init, t_total);
       dump_time(comm, "Solver-A time", t_solver_a, t_total);
       dump_time(comm, "Solver-S time", t_solver_s, t_total);
@@ -2242,6 +2290,7 @@ int run_app(int argc, char* argv[])
   comm.print("Number of Processes: " + stringify(comm.size()));
 
   // Filenames to read the mesh from, parsed from the application config file
+  String mesh_path;
   std::deque<String> mesh_files;
   // String containing the mesh type, read from the header of the mesh file
   String mesh_type("");
@@ -2257,6 +2306,7 @@ int run_app(int argc, char* argv[])
   SimpleArgParser args(argc, argv);
   args.support("application_config");
   args.support("help");
+  args.support("mesh-path");
   args.support("test");
   args.support("vtk");
   args.support("xml");
@@ -2279,6 +2329,11 @@ int run_app(int argc, char* argv[])
   {
     test = true;
   }
+
+  // query mesh directory path
+  args.parse("mesh-path", mesh_path);
+  if(!mesh_path.empty() && !mesh_path.ends_with('/'))
+    mesh_path.push_back('/');
 
   // create a mesh file reader
   Geometry::MeshFileReader mesh_file_reader;
@@ -2356,16 +2411,7 @@ int run_app(int argc, char* argv[])
   // Now we have all configurations in the corresponding streams and know the mesh file names
 
   // Read all mesh files
-  std::deque<std::stringstream> mesh_streams(mesh_files.size());
-  for(std::size_t i(0); i < mesh_files.size(); ++i)
-  {
-    // Read the stream
-    comm.print("Reading mesh file "+mesh_files.at(i));
-    DistFileIO::read_common(mesh_streams.at(i), mesh_files.at(i));
-
-    // Add to mesh reader
-    mesh_file_reader.add_stream(mesh_streams.at(i));
-  }
+  mesh_file_reader.add_mesh_files(comm, mesh_files, mesh_path);
 
   int ret(1);
 
@@ -2595,8 +2641,8 @@ static void read_test_solver_config(std::stringstream& iss)
 
 static void read_test_mesh_file_names(std::deque<String>& mesh_files)
 {
-  mesh_files.push_back(String(FEAT_SRC_DIR)+"/data/meshes/screws_2d_chart_bezier_24_28.xml");
-  mesh_files.push_back(String(FEAT_SRC_DIR)+"/data/meshes/screws_2d_mesh_quad_opt_ss_360_1.xml");
+  mesh_files.push_back("screws_2d_chart_bezier_24_28.xml");
+  mesh_files.push_back("screws_2d_mesh_quad_opt_ss_360_1.xml");
 }
 
 static void display_help(const Dist::Comm& comm)

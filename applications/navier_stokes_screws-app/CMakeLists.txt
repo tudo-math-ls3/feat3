@@ -23,7 +23,7 @@ if (NOT FEAT_DEBUG_MODE)
       --build-target navier_stokes_screws-app
       --build-nocmake
       --build-noclean
-      --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/navier_stokes_screws-app/navier_stokes_screws-app --test 1 ${MPIEXEC_POSTFLAGS})
+      --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/navier_stokes_screws-app/navier_stokes_screws-app --test 1 --mesh-path ${FEAT_SOURCE_DIR}/data/meshes ${MPIEXEC_POSTFLAGS})
     SET_PROPERTY(TEST navier_stokes_screws_app_test_1_mpi_4 PROPERTY LABELS "mpi")
     SET_PROPERTY(TEST navier_stokes_screws_app_test_1_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -36,7 +36,7 @@ if (NOT FEAT_DEBUG_MODE)
         --build-target navier_stokes_screws-app
         --build-nocmake
         --build-noclean
-        --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/navier_stokes_screws-app/navier_stokes_screws-app --test 1)
+        --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/navier_stokes_screws-app/navier_stokes_screws-app --test 1 --mesh-path ${FEAT_SOURCE_DIR}/data/meshes)
       SET_PROPERTY(TEST navier_stokes_screws_app_test_1_serial PROPERTY LABELS "serial")
       SET_PROPERTY(TEST navier_stokes_screws_app_test_1_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAT_HAVE_MPI)
