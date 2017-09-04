@@ -28,6 +28,15 @@ namespace FEAT
         template <typename DT_, typename IT_>
         static void csr_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+        static void csrb(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
+        {
+          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(diag, val, col_ind, row_ptr, rows);
+        }
+
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+        static void csrb_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+
         template <typename DT_ , typename IT_>
         static void ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
           const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
@@ -56,6 +65,9 @@ namespace FEAT
       {
         template <typename DT_, typename IT_>
         static void csr(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+        static void csrb(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,

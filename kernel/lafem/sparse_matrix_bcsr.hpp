@@ -17,6 +17,7 @@
 #include <kernel/lafem/arch/lumping.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/row_norm.hpp>
+#include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/statistics.hpp>
@@ -1615,18 +1616,7 @@ namespace FEAT
         XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
         XASSERTM(rows() == columns(), "matrix is not square!");
 
-        /// \todo Replace by Arch::kernels
-        const Index n = rows();
-        for(Index i(0); i < n; ++i)
-        {
-          auto diag_sub_matrix = (*this)(i, i);
-          FEAT::Tiny::Vector<DT_, BlockHeight_> diag_sub_vector;
-          for (int j(0) ; j < BlockHeight_ ; ++j)
-          {
-            diag_sub_vector[j] = diag_sub_matrix[j][j];
-          }
-          diag(i, diag_sub_vector);
-        }
+        Arch::Diagonal<Mem_>::template csrb<DataType, IndexType, BlockHeight, BlockWidth>(diag.template elements<Perspective::pod>(), val<Perspective::pod>(), col_ind(), row_ptr(), rows());
       }
 
       /// extract main diagonal vector from matrix

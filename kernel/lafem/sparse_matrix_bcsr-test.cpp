@@ -450,12 +450,15 @@ public:
     SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> smb(2, 2, dv2, dv1, dv3);
 
     auto diag = smb.extract_diag();
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[0], 1);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[1], 5);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[2], 9);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[3], 10);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[4], 14);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[5], 18);
+    typedef decltype(diag) DiagType;
+    typename DiagType::template ContainerTypeByMDI<Mem::Main, DT_, IT_> diag_main;
+    diag_main.convert(diag);
+    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[0], 1);
+    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[1], 5);
+    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[2], 9);
+    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[3], 10);
+    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[4], 14);
+    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[5], 18);
   }
 };
 SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float_ulong;
@@ -465,6 +468,12 @@ SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr
 #ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRDiagTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float128_ulong;
 SparseMatrixBCSRDiagTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float128_uint;
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRDiagTest<Mem::CUDA, float, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float_ulong_cuda;
+SparseMatrixBCSRDiagTest<Mem::CUDA, double, unsigned long> cpu_sparse_matrix_bcsr_diag_test_double_ulong_cuda;
+SparseMatrixBCSRDiagTest<Mem::CUDA, float, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float_uint_cuda;
+SparseMatrixBCSRDiagTest<Mem::CUDA, double, unsigned int> cpu_sparse_matrix_bcsr_diag_test_double_uint_cuda;
 #endif
 
 

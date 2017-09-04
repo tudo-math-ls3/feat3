@@ -30,6 +30,30 @@ namespace FEAT
         }
       }
 
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+      void Diagonal<Mem::Main>::csrb_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
+      {
+        for (Index row(0); row < rows; row++)
+        {
+          for (Index i(0) ; i < BlockHeight_ ; ++i)
+          {
+            diag[row * BlockHeight_ + i] = DT_(0);
+          }
+          const Index end = row_ptr[row + 1];
+
+          for (Index col = row_ptr[row]; col < end; col++)
+          {
+            if (row == col_ind[col])
+            {
+              for (Index i(0) ; i < BlockHeight_ ; ++i)
+              {
+                diag[row * BlockHeight_ + i] = val[(col * BlockHeight_ * BlockWidth_) + i + i * BlockWidth_];
+              }
+            }
+          }
+        }
+      }
+
       template <typename DT_, typename IT_>
       void Diagonal<Mem::Main>::ell_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
         const IT_ * const cs, const IT_ * const /*cl*/, const Index C, const Index rows)
