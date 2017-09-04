@@ -773,6 +773,7 @@ struct NavierStokesScrewsApp
     if(solve_mesh_optimisation)
     {
       // Optimise the mesh
+      FEAT::Statistics::expression_target = "meshopt_preproc";
       watch_meshopt.start();
       meshopt_ctrl->optimise();
       extruded_dom_ctrl.extrude_vertex_sets();
@@ -1458,6 +1459,7 @@ struct NavierStokesScrewsApp
         {
           watch_meshopt_preproc.start();
           comm.print("Meshopt preprocessor:");
+          FEAT::Statistics::expression_target = "meshopt_preproc";
           meshopt_preproc->prepare(new_coords);
           meshopt_preproc->optimise();
           comm.print("");
@@ -1494,6 +1496,7 @@ struct NavierStokesScrewsApp
 
         comm.print("Mesh optimisation:");
         // Now prepare the functional
+        FEAT::Statistics::expression_target = "meshopt";
         meshopt_ctrl->prepare(new_coords);
         meshopt_ctrl->optimise();
         new_coords.copy(meshopt_ctrl->get_coords());
