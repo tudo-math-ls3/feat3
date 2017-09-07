@@ -535,32 +535,32 @@ if len(unused_tokens) == 0:
   #print ("Unused Build-ID tokens: none")
   pass
 else:
-  print
+  print ("")
   print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
 if len(unused_extra_options) == 0:
   #print ("Unused extra option tokens: none")
   pass
 else:
-  print
+  print ("")
   print ("Warning: Unused extra option tokens: " + " ".join(unused_extra_options))
-print
+print ("")
 print ("Extra Options: " + " ".join(extra_options))
-print
+print ("")
 print ("CPU Type: " + cputype)
-print
+print ("")
 print ("cxx: " + os.environ["CXX"])
-print
+print ("")
 print ("cxxflags: " + os.environ["CXXFLAGS"])
-print
+print ("")
 print ("ldflags: " + os.environ["LDFLAGS"])
-print
+print ("")
 if (cuda_arch != ""):
   print ("cuda_arch: " + cuda_arch)
-print
+print ("")
 print ("Generator: " + generator)
-print
+print ("")
 print ("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname))
-print
+print ("")
 #start actual configuration
 print ("============== CMAKE =====================")
 sys.stdout.flush()

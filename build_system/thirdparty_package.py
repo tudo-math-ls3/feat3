@@ -7,10 +7,6 @@ import subprocess
 import imp
 import inspect
 import glob
-from urllib import FancyURLopener
-
-class MyOpener(FancyURLopener):
-    version = "Wget/1.13.4 (linux-gnu)"
 
 # Baseclass for third party packages
 class ThirdpartyPackage(object):
@@ -73,8 +69,11 @@ class ThirdpartyPackage(object):
 # Downloads a file from url and saves it to filename
 def download(url,filename):
   import sys
-  urlretrieve = MyOpener().retrieve
   if sys.version_info[0] < 3:
+    from urllib import FancyURLopener
+    class MyOpener(FancyURLopener):
+      version = "Wget/1.13.4 (linux-gnu)"
+    urlretrieve = MyOpener().retrieve
     urlretrieve(url, filename)
   else:
     import urllib.request
