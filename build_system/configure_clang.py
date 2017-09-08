@@ -21,6 +21,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
   if major > 3 or (major == 3 and minor >= 9):
     cxxflags += " -Wcomma"
 
+  if major >= 5:
+    cxxflags += " -Wcast-qual -Wunused-lambda-capture -Wstrict-prototypes"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 
@@ -31,6 +34,10 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
       cxxflags += " -O0"
     else:
       cxxflags += " -Og"
+
+    if major >= 5:
+      cxxflags += " -fsanitize=pointer-overflow -fsanitize=nullability"
+
     cxxflags += " -ftemplate-backtrace-limit=0 -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     if platform.system() != "Darwin":
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
