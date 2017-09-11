@@ -121,8 +121,6 @@ namespace FEAT
        *
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
-       *
-       * \compilerhack GCC 6.1 template compiler bug
        */
       template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void operator()(
@@ -132,10 +130,11 @@ namespace FEAT
         // typedef mumbo-jumbo
         typedef EvalData<SpaceEvalTraits, space_cfg_> EvalDataType;
 
-        // Note:
+
+        // \compilerhack GCC 6.1 template compiler bug
         // The following static constexpr bool variables are required to
         // circumvent a compiler bug in GCC 6.1
-
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 70000)
         // compute basis values
         static constexpr bool want_value = *(EvalDataType::config & SpaceTags::value);
         Intern::BasisEvalHelper<want_value>::eval_values(space_data, cast(), trafo_data);
@@ -145,6 +144,14 @@ namespace FEAT
         // compute basis hessians
         static constexpr bool want_hess = *(EvalDataType::config & SpaceTags::hess);
         Intern::BasisEvalHelper<want_hess>::eval_hessians(space_data, cast(), trafo_data);
+#else
+        // compute basis values
+        Intern::BasisEvalHelper<*(EvalDataType::config & SpaceTags::value)>::eval_values(space_data, cast(), trafo_data);
+        // compute basis gradients
+        Intern::BasisEvalHelper<*(EvalDataType::config & SpaceTags::grad)>::eval_gradients(space_data, cast(), trafo_data);
+        // compute basis hessians
+        Intern::BasisEvalHelper<*(EvalDataType::config & SpaceTags::hess)>::eval_hessians(space_data, cast(), trafo_data);
+#endif
       }
 
       /**
