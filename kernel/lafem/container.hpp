@@ -417,8 +417,8 @@ namespace FEAT
         DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
-        /// \compilerhack clang/icc seems to use older libc++ without std::underlying_type
-#if defined(FEAT_COMPILER_CLANG) || defined(FEAT_COMPILER_INTEL)
+        /// \compilerhack clang seems to use older libc++ without std::underlying_type
+#if defined(FEAT_COMPILER_CLANG)
         uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
         uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
@@ -515,8 +515,8 @@ namespace FEAT
         DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
-        // clang/icc seems to use older libc++ without std::underlying_type
-#if defined(FEAT_COMPILER_CLANG) || defined(FEAT_COMPILER_INTEL)
+        /// \compilerhack clang seems to use older libc++ without std::underlying_type
+#if defined(FEAT_COMPILER_CLANG)
         uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
         uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
