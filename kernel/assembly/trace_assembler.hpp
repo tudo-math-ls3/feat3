@@ -576,8 +576,14 @@ namespace FEAT
         typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
         TrafoFacetEvaluator trafo_facet_eval(trafo);
 
+        /// \compilerhack PGI does not understand complex template statements
+#ifdef FEAT_COMPILER_PGI
+        static constexpr TrafoTags trafo_facet_eval_tags = TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat;
+        typedef typename TrafoFacetEvaluator::template ConfigTraits <trafo_facet_eval_tags>::EvalDataType TrafoFacetEvalData;
+#else
         typedef typename TrafoFacetEvaluator::template ConfigTraits
           <TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat>::EvalDataType TrafoFacetEvalData;
+#endif
 
         // create a space evaluator and evaluation data
         typename AsmTraits::TrialEvaluator space_eval_v(space_v);

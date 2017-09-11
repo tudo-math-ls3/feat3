@@ -146,7 +146,14 @@ namespace FEAT
 
         static constexpr int image_dim = TrafoEvalTraits::image_dim;
 
+        // declare trafo evaluation data
+        /// \compilerhack PGI does not understand complex template statements
+#ifdef FEAT_COMPILER_PGI
+        static constexpr TrafoTags trafo_tags = TrafoTags::img_point | TrafoTags::jac_det;
+        typedef typename TrafoEvalType::template ConfigTraits<trafo_tags>::EvalDataType TrafoEvalData;
+#else
         typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType TrafoEvalData;
+#endif
 
         typedef Cubature::Rule<FacetType, DataType_, DataType_, DomainPointType> CubRuleType;
 
