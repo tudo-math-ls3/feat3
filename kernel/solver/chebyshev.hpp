@@ -15,6 +15,8 @@ namespace FEAT
      *
      * This class represents the Chebyshev-Polynomial "Solver"
      *
+     * \cite NLA:NLA1808
+     *
      */
     template<typename Matrix_, typename Filter_>
     class Chebyshev :
