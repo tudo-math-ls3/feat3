@@ -1,7 +1,7 @@
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- include build-mode support -->
-  <Import Project="vc14-build-modes.xml"/>
+  <Import Project="build-modes.xml"/>
 
   <!-- Set platform toolset; must be defined before the following imports -->
   <PropertyGroup Label="Configuration">
@@ -63,27 +63,27 @@
   <!-- ********************************************************************* -->
   <!-- FEAT Third-Party Library Detection -->
   <!-- ********************************************************************* -->
-  <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveAlgLib>true</FeatHaveAlgLib>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveFParser>true</FeatHaveFParser>
   </PropertyGroup>
   <!-- Note: half is a pure header library -->
-  <PropertyGroup Condition="Exists('..\thirdparty\half\include\half.hpp')">
+  <PropertyGroup Condition="Exists('..\..\thirdparty\half\include\half.hpp')">
     <FeatHaveHalfMath>true</FeatHaveHalfMath>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveMetis>true</FeatHaveMetis>
   </PropertyGroup>
   <!-- Note: ParMETIS can only be used in combination with MPI -->
-  <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+  <PropertyGroup Condition="Exists('..\..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveUmfpack>true</FeatHaveUmfpack>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveZlib>true</FeatHaveZlib>
   </PropertyGroup>
 

@@ -28,7 +28,7 @@
     <ClCompile>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;FEAT_STDC_ASSERT;$(FeatDefList)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;$(FeatDefList)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FeatRootPath);$(FeatIncDirList)</AdditionalIncludeDirectories>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>

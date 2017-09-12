@@ -24,8 +24,8 @@
 
 using namespace std;
 
-#define KERNEL_PROJECT_PATH "./kernel/kernel.vc14.vcxproj"
-#define BUILD_MODES_PATH "./visual_studio/vc14-build-modes.xml"
+#define KERNEL_PROJECT_PATH "./build_system/vc14/kernel.vc14.vcxproj"
+#define BUILD_MODES_PATH "./build_system/vc14/build-modes.xml"
 
 class ArgList :
   public deque<string>
@@ -333,7 +333,7 @@ public:
 
     // include kernel project
     ofs << "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"kernel.vc14\", \"";
-    ofs << root_path << "\\kernel\\kernel.vc14.vcxproj\", \"" << kernel_guid << "\"" << endl;
+    ofs << root_path << "\\build_system\\vc14\\kernel.vc14.vcxproj\", \"" << kernel_guid << "\"" << endl;
     ofs << "EndProject" << endl;
 
     // write solution configurations
@@ -402,7 +402,7 @@ public:
 
     // write common config import
     ofs << "  <!-- import common config -->" << endl;
-    ofs << "  <Import Project=\"$(FeatRootPath)\\visual_studio\\vc14-common-config.xml\" />" << endl;
+    ofs << "  <Import Project=\"$(FeatRootPath)\\build_system\\vc14\\common-config.xml\" />" << endl;
 
     // write header inclusion list
     ofs << "  <!-- ********************************************************************* -->" << endl;
@@ -431,13 +431,13 @@ public:
     ofs << "  <!-- Final Imports -->" << endl;
     ofs << "  <!-- ********************************************************************* -->" << endl;
     ofs << "  <ItemGroup>" << endl;
-    ofs << "    <ProjectReference Include=\"$(FeatRootPath)\\kernel\\kernel.vc14.vcxproj\">" << endl;
+    ofs << "    <ProjectReference Include=\"$(FeatRootPath)\\build_system\\vc14\\kernel.vc14.vcxproj\">" << endl;
     ofs << "      <Project>" << kernel_guid << "</Project>" << endl;
     ofs << "    </ProjectReference>" << endl;
     ofs << "  </ItemGroup>" << endl;
 
     // write app-target import
-    ofs << "  <Import Project=\"$(FeatRootPath)\\visual_studio\\vc14-target-app.xml\" />" << endl;
+    ofs << "  <Import Project=\"$(FeatRootPath)\\build_system\\vc14\\target-app.xml\" />" << endl;
 
     // end-of-file
     ofs << "</Project>" << endl;

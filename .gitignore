@@ -58,6 +58,9 @@ thirdparty/parmetis/*
 thirdparty/SuiteSparse/*
 thirdparty/zlib/*
 
+# Ignore Visual Studio symlinks
+build_system/vc14/kernel/
+
 # Ignore Visual Studio user/filter files
 *.vcxproj.user
 *.vcxproj.filters
@@ -71,6 +74,7 @@ win/*
 *.opensdf
 *.sdf
 *.suo
+*.VC.db
 ipch
 
 # Ignore Windows Links
