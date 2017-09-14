@@ -1710,7 +1710,7 @@ namespace NavierStokesCP2D
     );
     args.support("flowbench","\nEnables the computation of 'flow around a cylinder' post-processing\nquantities such as drag, lift, etc.\n");
     args.support("deformation", "\nUse deformation tensor instead of gradient tensor.\n");
-    args.support("nu <nu>", "\nSets the viscosity parameter.\n");
+    args.support("nu", "<nu>\nSets the viscosity parameter.\n");
     args.support("time-max", "<T_max>\nSets the maximum simulation time T_max.\n");
     args.support("time-steps", "<N>\nSets the number of time-steps for the time interval.\n");
     args.support("max-time-steps", "<N>\nSets the maximum number of time-steps to perform.\n");
