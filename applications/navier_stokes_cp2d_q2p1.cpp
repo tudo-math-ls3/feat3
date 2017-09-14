@@ -431,7 +431,8 @@ namespace NavierStokesCP2D
         part_names_out = args.query("part-out")->second;
       if(args.check("part-no") > 0)
         part_names_no = args.query("part-no")->second;
-      args.parse("profile", ix0, iy0, ix1, iy1, vmax);
+      args.parse("profile", ix0, iy0, ix1, iy1);
+      args.parse("vmax", vmax);
       args.parse("time-max", time_max);
       args.parse("time-steps", time_steps);
       if(args.parse("max-time-steps", max_time_steps) < 1)
@@ -865,7 +866,7 @@ namespace NavierStokesCP2D
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
-    const Index num_levels = domain.size_physical();
+    const Index num_levels = Index(domain.size_physical());
 
     // create a batch of stop-watches
     StopWatch watch_total, watch_asm_rhs, watch_asm_mat, watch_calc_def,
@@ -1718,6 +1719,7 @@ namespace NavierStokesCP2D
     args.support("part-out", "<names...>\nSpecifies the names of the outflow mesh-parts.\n");
     args.support("part-no", "<names...>\nSpecifies the names of the noflow mesh-parts.\n");
     args.support("profile", "<x0> <y0> <x1> <y1>\nSpecifies the line segment coordinates for the inflow profile.\n");
+    args.support("vmax", "<v-max>\nSpecifies the maximum inflow velocity.\n");
     args.support("level", "<max> [<min>]\nSets the maximum and minimum mesh refinement levels.\n");
     args.support("vtk", "<name> [<step>]\nSets the name for VTK output and the time-stepping for the output (optional).\n");
     args.support("mesh-file", "<name>\nSpecifies the filename of the input mesh file.\n");
