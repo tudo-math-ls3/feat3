@@ -195,6 +195,12 @@ namespace FEAT
         return _sv.elements();
       }
 
+      /// Permutate internal vector according to the given Permutation
+      void permute(Adjacency::Permutation & perm)
+      {
+        _sv.permute(perm);
+      }
+
 #ifdef DOXYGEN
       // The following documentation block is visible to Doxygen only. The actual implementation is matrix type
       // specific and provided below.

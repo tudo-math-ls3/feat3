@@ -36,12 +36,12 @@ namespace FEAT
         Index iters(1);
         //warmup
         func();
-        MemoryPool<Mem::CUDA>::synchronize();
+        MemoryPool<Mem::CUDA>::synchronise();
 
         TimeStamp at, bt;
         at.stamp();
         func();
-        MemoryPool<Mem::CUDA>::synchronize();
+        MemoryPool<Mem::CUDA>::synchronise();
         bt.stamp();
         double test_run_time(bt.elapsed(at));
         if (test_run_time < 0.1)
@@ -55,7 +55,7 @@ namespace FEAT
           {
             func();
           }
-          MemoryPool<Mem::CUDA>::synchronize();
+          MemoryPool<Mem::CUDA>::synchronise();
           bt.stamp();
           times.push_back(bt.elapsed(at));
         }

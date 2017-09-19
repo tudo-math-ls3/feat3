@@ -221,7 +221,7 @@ void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index c
 #endif
 }
 
-void MemoryPool<Mem::CUDA>::synchronize()
+void MemoryPool<Mem::CUDA>::synchronise()
 {
   cudaDeviceSynchronize();
 }

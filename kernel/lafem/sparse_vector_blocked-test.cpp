@@ -57,6 +57,7 @@ public:
     TEST_CHECK_EQUAL(a(1)[0], tv1[1]);
     TEST_CHECK_EQUAL(a(6)[1], tv2[1]);
     TEST_CHECK_EQUAL(a(2)[0], a.zero_element()[0]);
+    TEST_CHECK_EQUAL(a.used_elements(), Index(3));
 
     SparseVectorBlocked<Mem_, DT_, IT_, 2> b(a.clone());
     TEST_CHECK_EQUAL(a, b);
@@ -69,6 +70,17 @@ public:
     {
       c(c.size() - i, tv1);
     }
+
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rng(seed);
+    Adjacency::Permutation prm_rnd(a.size(), rng);
+    SparseVectorBlocked<Mem_, DT_, IT_, 2> ap(a.clone());
+    ap.permute(prm_rnd);
+    prm_rnd = prm_rnd.inverse();
+    ap.permute(prm_rnd);
+    TEST_CHECK_EQUAL(ap, a);
+    TEST_CHECK_EQUAL(ap.used_elements(), Index(4));
   }
 };
 SparseVectorBlockedTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_test_float;

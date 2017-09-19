@@ -11,6 +11,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/arch/max_element.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 namespace FEAT
 {
@@ -65,21 +66,20 @@ namespace FEAT
       static void _insertion_sort(T1_ * key, T2_ * val1, Index size)
       {
         T1_ swap_key;
-        Tiny::Vector<T2_, BlockSize_> swap1;
+        T2_ swap1;
         for (Index i(1), j ; i < size ; ++i)
         {
-          swap_key = MemoryPool<Mem_>::get_element(key, i);
-          MemoryPool<Mem_>::download(swap1.v, val1 + i * Index(BlockSize_), Index(BlockSize_));
+          swap_key = key[i];
+          swap1 = val1[i];
           j = i;
-          while (j > 0 && MemoryPool<Mem_>::get_element(key, j - 1) > swap_key)
+          while (j > 0 && key[j-1] > swap_key)
           {
-            MemoryPool<Mem_>::copy(key + j, key + j - 1, 1);
-            MemoryPool<Mem_>::copy(val1 + j * Index(BlockSize_),
-            val1 + (j - 1) * Index(BlockSize_), Index(BlockSize_));
+            key[j] = key[j-1];
+            val1[j] = val1[j-1];
             --j;
           }
-          MemoryPool<Mem_>::set_memory(key + j, swap_key);
-          MemoryPool<Mem_>::upload(val1 + j * Index(BlockSize_), swap1.v, Index(BlockSize));
+          key[j] = swap_key;
+          val1[j] = swap1;
         }
       }
 
@@ -109,6 +109,7 @@ namespace FEAT
       static constexpr int BlockSize = BlockSize_;
       /// Our value type
       typedef Tiny::Vector<DT_, BlockSize_> ValueType;
+      typedef ValueType VT_;
 
       /**
        * \brief Constructor
@@ -209,6 +210,7 @@ namespace FEAT
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other)
       {
+        this->sort();
         this->clone(other);
       }
 
@@ -398,26 +400,51 @@ namespace FEAT
           if(_used_elements() == Index(0))
             return;
 
-          _insertion_sort(this->_indices.at(0), this->_elements.at(0), _used_elements());
+          IT_ * pindices;
+          VT_ * pelements;
+          if (typeid(Mem_) == typeid(Mem::Main))
+          {
+            pindices = this->_indices.at(0);
+            pelements = this->elements();
+          }
+          else
+          {
+            pindices = new IT_[_allocated_elements()];
+            pelements = new VT_[_allocated_elements()];
+            MemoryPool<Mem_>::download(pindices, this->_indices.at(0), _allocated_elements());
+            MemoryPool<Mem_>::download((DT_*)pelements, this->_elements.at(0), _allocated_elements() * BlockSize_);
+          }
+
+          _insertion_sort(pindices, pelements, _used_elements());
 
           // find and mark duplicate entries
           for (Index i(1) ; i < _used_elements() ; ++i)
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i - 1) == MemoryPool<Mem_>::get_element(this->_indices.at(0), i))
+            if (pindices[i-1] == pindices[i])
             {
-              MemoryPool<Mem_>::set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
+              pindices[i-1] = std::numeric_limits<IT_>::max();
             }
           }
 
           // sort out marked duplicated elements
-          _insertion_sort(this->_indices.at(0), this->_elements.at(0), _used_elements());
+          _insertion_sort(pindices, pelements, _used_elements());
           Index junk(0);
-          while (MemoryPool<Mem_>::get_element(this->_indices.at(0), _used_elements() - 1 - junk) == std::numeric_limits<IT_>::max()
-                 && junk < _used_elements())
+          while (pindices[_used_elements() - 1 - junk] == std::numeric_limits<IT_>::max() && junk < _used_elements())
             ++junk;
           _used_elements() -= junk;
+
+          if (typeid(Mem_) != typeid(Mem::Main))
+          {
+            MemoryPool<Mem_>::upload(this->_indices.at(0), pindices, _allocated_elements());
+            MemoryPool<Mem_>::upload(this->_elements.at(0), (DT_*)pelements, _allocated_elements() * BlockSize_);
+            delete[] pindices;
+            delete[] pelements;
+          }
         }
       }
+
+      ///@name Linear algebra operations
+      ///@{
 
       /**
        * \brief Retrieve the absolute maximum value of this vector.
@@ -438,6 +465,32 @@ namespace FEAT
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
+      }
+
+      ///@}
+
+      /// Permutate vector according to the given Permutation
+      void permute(Adjacency::Permutation & perm)
+      {
+        if (perm.size() == 0)
+          return;
+
+        XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
+
+        SparseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> local;
+        local.convert(*this);
+        SparseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> target(this->size());
+
+        auto inv = perm.inverse();
+        const Index * const inv_pos(inv.get_perm_pos());
+        for (Index i(0) ; i < local.used_elements() ; ++i)
+        {
+          const Index col = local.indices()[i];
+          target(inv_pos[col], local(col));
+        }
+
+        target.sort();
+        this->assign(target);
       }
 
       /**

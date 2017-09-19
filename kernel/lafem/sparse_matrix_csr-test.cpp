@@ -818,18 +818,19 @@ public:
 
       auto a_backup = a.clone(CloneMode::Deep);
 
-      SparseMatrixCSR<Mem::Main, DT_, IT_> a_main;
-      a_main.convert(a);
-      Adjacency::Graph graph(Adjacency::rt_as_is, a_main);
-
-      Adjacency::Permutation perm = Adjacency::CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_desc);
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation perm(a.rows(), rng);
 
       a.permute(perm, perm);
       x.permute(perm);
 
       a.apply(r, x);
       DT_ norm = r.norm2();
-      TEST_CHECK_EQUAL_WITHIN_EPS(norm, ref_norm, 1e-3);
+      DT_ deviation = norm / ref_norm;
+      TEST_CHECK(deviation > DT_(0.99));
+      TEST_CHECK(deviation < DT_(1.01));
 
       a = a_backup.clone(CloneMode::Deep);
       auto perm_inv = perm.inverse();

@@ -49,17 +49,17 @@ namespace FEAT
         T2_ swap1;
         for (Index i(1), j ; i < size ; ++i)
         {
-          swap_key = MemoryPool<Mem_>::get_element(key, i);
-          swap1 = MemoryPool<Mem_>::get_element(val1, i);
+          swap_key = key[i];
+          swap1 = val1[i];
           j = i;
-          while (j > 0 && MemoryPool<Mem_>::get_element(key, j - 1) > swap_key)
+          while (j > 0 && key[j-1] > swap_key)
           {
-            MemoryPool<Mem_>::copy(key + j, key + j - 1, 1);
-            MemoryPool<Mem_>::copy(val1 + j, val1 + j - 1, 1);
+            key[j] = key[j-1];
+            val1[j] = val1[j-1];
             --j;
           }
-          MemoryPool<Mem_>::set_memory(key + j, swap_key);
-          MemoryPool<Mem_>::set_memory(val1 + j, swap1);
+          key[j] = swap_key;
+          val1[j] = swap1;
         }
       }
 
@@ -151,6 +151,8 @@ namespace FEAT
           MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
           MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+
+        this->sort();
       }
 
       /**
@@ -238,6 +240,8 @@ namespace FEAT
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseVector<Mem2_, DT2_, IT2_> & other)
       {
+        // clean up previous mess before creating a new vector
+        this->sort();
         this->clone(other);
       }
 
@@ -388,24 +392,46 @@ namespace FEAT
           if(_used_elements() == Index(0))
             return;
 
-          _insertion_sort(this->_indices.at(0), this->_elements.at(0), _used_elements());
+          IT_ * pindices;
+          DT_ * pelements;
+          if (typeid(Mem_) == typeid(Mem::Main))
+          {
+            pindices = this->_indices.at(0);
+            pelements = this->_elements.at(0);
+          }
+          else
+          {
+            pindices = new IT_[_allocated_elements()];
+            pelements = new DT_[_allocated_elements()];
+            MemoryPool<Mem_>::download(pindices, this->_indices.at(0), _allocated_elements());
+            MemoryPool<Mem_>::download(pelements, this->_elements.at(0), _allocated_elements());
+          }
+
+          _insertion_sort(pindices, pelements, _used_elements());
 
           // find and mark duplicate entries
           for (Index i(1) ; i < _used_elements() ; ++i)
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i - 1) == MemoryPool<Mem_>::get_element(this->_indices.at(0), i))
+            if (pindices[i-1] == pindices[i])
             {
-              MemoryPool<Mem_>::set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
+              pindices[i-1] = std::numeric_limits<IT_>::max();
             }
           }
 
           // sort out marked duplicated elements
-          _insertion_sort(this->_indices.at(0), this->_elements.at(0), _used_elements());
+          _insertion_sort(pindices, pelements, _used_elements());
           Index junk(0);
-          while (MemoryPool<Mem_>::get_element(this->_indices.at(0), _used_elements() - 1 - junk) == std::numeric_limits<IT_>::max()
-                 && junk < _used_elements())
+          while (pindices[_used_elements() - 1 - junk] == std::numeric_limits<IT_>::max() && junk < _used_elements())
             ++junk;
           _used_elements() -= junk;
+
+          if (typeid(Mem_) != typeid(Mem::Main))
+          {
+            MemoryPool<Mem_>::upload(this->_indices.at(0), pindices, _allocated_elements());
+            MemoryPool<Mem_>::upload(this->_elements.at(0), pelements, _allocated_elements());
+            delete[] pindices;
+            delete[] pelements;
+          }
         }
       }
 
@@ -718,6 +744,9 @@ namespace FEAT
       /// Permutate vector according to the given Permutation
       void permute(Adjacency::Permutation & perm)
       {
+        if (perm.size() == 0)
+          return;
+
         XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
         SparseVector<Mem::Main, DT_, IT_> local;
@@ -732,6 +761,7 @@ namespace FEAT
           target(inv_pos[col], local(col));
         }
 
+        target.sort();
         this->assign(target);
       }
 

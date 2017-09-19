@@ -103,6 +103,7 @@ namespace FEAT
       static constexpr int BlockWidth = BlockWidth_;
       /// Value type, meaning the type of each block
       typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      using VT_ = ValueType;
 
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
@@ -1625,6 +1626,85 @@ namespace FEAT
         VectorTypeL diag = create_vector_l();
         extract_diag(diag);
         return diag;
+      }
+
+      /// Permutate matrix rows and columns according to the given Permutations
+      void permute(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)
+      {
+        if (perm_row.size() == 0 && perm_col.size() == 0)
+          return;
+
+        XASSERTM(perm_row.size() == this->rows(), "Container rows does not match permutation size");
+        XASSERTM(perm_col.size() == this->columns(), "Container columns does not match permutation size");
+
+        // http://de.mathworks.com/help/matlab/math/sparse-matrix-operations.html#f6-13070
+        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> local;
+        local.convert(*this);
+        IT_ * temp_row_ptr = new IT_[rows() + 1];
+        IT_ * temp_col_ind = new IT_[used_elements()];
+        VT_ * temp_val = new VT_[used_elements()];
+
+        Index * perm_pos;
+        perm_pos = perm_row.get_perm_pos();
+
+        //permute rows from local to temp_*
+        Index new_start(0);
+        temp_row_ptr[0] = 0;
+        for (Index row(0) ; row < local.rows() ; ++row)
+        {
+          Index row_size(local.row_ptr()[perm_pos[row] + 1] - local.row_ptr()[perm_pos[row]]);
+
+          //iterate over all elements in single one new and old row
+          for (Index i(new_start), j(local.row_ptr()[perm_pos[row]]) ; i < new_start + row_size ; ++i, ++j)
+          {
+            temp_col_ind[i] = local.col_ind()[j];
+            temp_val[i] = local.val()[j];
+          }
+
+          new_start += row_size;
+          temp_row_ptr[row+1] = (IT_)new_start;
+        }
+
+        //use inverse col permutation as lookup table: i -> new location of i
+        Adjacency::Permutation perm_col_inv = perm_col.inverse();
+        perm_pos = perm_col_inv.get_perm_pos();
+
+        //permute columns from temp_* to local
+        ::memcpy(local.row_ptr(), temp_row_ptr, (rows() + 1) * sizeof(IT_));
+        ::memcpy(local.val(), temp_val, used_elements() * sizeof(VT_));
+        for (Index i(0) ; i < used_elements() ; ++i)
+        {
+          local.col_ind()[i] = (IT_)perm_pos[temp_col_ind[i]];
+        }
+
+        delete[] temp_row_ptr;
+        delete[] temp_col_ind;
+        delete[] temp_val;
+
+        //sort columns in every row by column index
+        IT_ swap_key;
+        VT_ swap_val;
+        for (Index row(0) ; row < rows() ; ++row)
+        {
+          Index offset(local.row_ptr()[row]);
+          Index row_size(local.row_ptr()[row+1] - local.row_ptr()[row]);
+          for (Index i(1), j ; i < row_size ; ++i)
+          {
+            swap_key = local.col_ind()[i + offset];
+            swap_val = local.val()[i + offset];
+            j = i;
+            while (j > 0 && local.col_ind()[j - 1 + offset] > swap_key)
+            {
+              local.col_ind()[j + offset] = local.col_ind()[j - 1 + offset];
+              local.val()[j + offset] = local.val()[j - 1 + offset];
+              --j;
+            }
+            local.col_ind()[j + offset] = swap_key;
+            local.val()[j + offset] = swap_val;
+          }
+        }
+
+        this->assign(local);
       }
 
       /**

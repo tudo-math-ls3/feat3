@@ -1150,11 +1150,11 @@ namespace FEAT
         if (perm.size() == 0)
           return;
 
-        XASSERTM(perm.size() == this->template size<Perspective::pod>(), "Container size does not match permutation size");
+        XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
         DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> local;
         local.convert(*this);
-        perm(local.template elements<Perspective::pod>());
+        perm(local.template elements<Perspective::native>());
         this->assign(local);
       }
 

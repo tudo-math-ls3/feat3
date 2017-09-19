@@ -3,6 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/util/binary_stream.hpp>
+#include <kernel/adjacency/cuthill_mckee.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -721,4 +722,94 @@ SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcs
 SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_double_ulong;
 SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_float_uint;
 SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_double_uint;
+#endif
+
+/**
+ * \brief Test class for the sparse matrix csr blocked permute method.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRPermuteTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixBCSRPermuteTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRPermuteTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRPermuteTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+      dv1(i, DT_(i+1));
+    DenseVector<Mem_, IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> a(2, 2, dv2, dv1, dv3);
+
+    DenseVector<Mem_, DT_, IT_> x(a.template columns<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> r(a.template rows<Perspective::pod>());
+    for (Index i(0) ; i < x.size() ; ++i)
+    {
+      x(i, DT_(i));
+    }
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> rb(r);
+
+    /////////////////////////
+
+    std::cout<<xb<<std::endl;
+    a.apply(rb, xb);
+    DT_ ref_norm = rb.norm2();
+
+    auto a_backup = a.clone(CloneMode::Deep);
+
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rng(seed);
+    Adjacency::Permutation perm(a.rows(), rng);
+
+    a.permute(perm, perm);
+    xb.permute(perm);
+
+    std::cout<<xb<<std::endl;
+    a.apply(rb, xb);
+    DT_ norm = r.norm2();
+    TEST_CHECK_EQUAL_WITHIN_EPS(norm, ref_norm, 1e-4);
+
+    a = a_backup.clone(CloneMode::Deep);
+    auto perm_inv = perm.inverse();
+    a.permute(perm_inv, perm);
+    a.permute(perm, perm_inv);
+    TEST_CHECK_EQUAL(a, a_backup);
+  }
+};
+SparseMatrixBCSRPermuteTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_permute_test_float_ulong;
+SparseMatrixBCSRPermuteTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_permute_test_double_ulong;
+SparseMatrixBCSRPermuteTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_permute_test_float_uint;
+SparseMatrixBCSRPermuteTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_permute_test_double_uint;
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRPermuteTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_permute_test_float128_ulong;
+SparseMatrixBCSRPermuteTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_permute_test_float128_uint;
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRPermuteTest<Mem::CUDA, float, unsigned long> cpu_sparse_matrix_bcsr_permute_test_float_ulong_cuda;
+SparseMatrixBCSRPermuteTest<Mem::CUDA, double, unsigned long> cpu_sparse_matrix_bcsr_permute_test_double_ulong_cuda;
+SparseMatrixBCSRPermuteTest<Mem::CUDA, float, unsigned int> cpu_sparse_matrix_bcsr_permute_test_float_uint_cuda;
+SparseMatrixBCSRPermuteTest<Mem::CUDA, double, unsigned int> cpu_sparse_matrix_bcsr_permute_test_double_uint_cuda;
 #endif

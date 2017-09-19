@@ -100,7 +100,7 @@ namespace FEAT
         template <typename DT1_, typename DT2_>
         static void convert(DT1_ * dest, const DT2_ * src, const Index count);
 
-        static void synchronize();
+        static void synchronise();
 
         static void reset_device();
 
@@ -328,7 +328,7 @@ namespace FEAT
           }
         }
 
-        static void synchronize()
+        static void synchronise()
         {
         }
     };

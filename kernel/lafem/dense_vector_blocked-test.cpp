@@ -655,7 +655,7 @@ public:
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
       Random rng(seed);
-      Adjacency::Permutation prm_rnd(a.size() * BS_, rng);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
       DT_ max = a.max_element();
@@ -677,4 +677,78 @@ DenseVectorBlockedMaxElementTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_max_
 DenseVectorBlockedMaxElementTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_max_element_test_double_uint;
 DenseVectorBlockedMaxElementTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_max_element_test_float_ulong;
 DenseVectorBlockedMaxElementTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_max_element_test_double_ulong;
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_,
+  Index BS_>
+class DenseVectorBlockedPermuteTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorBlockedPermuteTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedPermuteTest")
+  {
+  }
+
+  virtual ~DenseVectorBlockedPermuteTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    bool one_error(false);
+
+    for (Index size(10) ; size < 1e4 ; size*=2)
+    {
+      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        Tiny::Vector<DT_, BS_> tv1;
+        for (Index j(0) ; j < BS_ ; ++j)
+          tv1.v[j]  = DT_((i * BS_ + j) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        a_local(i, tv1);
+      }
+
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> a;
+      a.convert(a_local);
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> ref(a.size());
+      ref.copy(a);
+
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      //allow identity permutation once per test due to rng...
+      if (a==ref)
+      {
+        if(one_error)
+        {
+          TEST_CHECK(false);
+        }
+        else
+        {
+          one_error = true;
+        }
+      }
+
+      auto prm_inv = prm_rnd.inverse();
+      a.permute(prm_inv);
+      TEST_CHECK_EQUAL(a, ref);
+    }
+  }
+};
+DenseVectorBlockedPermuteTest<Mem::Main, float, unsigned int, 2> dv_permute_test_float_uint;
+DenseVectorBlockedPermuteTest<Mem::Main, double, unsigned int, 2> dv_permute_test_double_uint;
+DenseVectorBlockedPermuteTest<Mem::Main, float, unsigned long, 3> dv_permute_test_float_ulong;
+DenseVectorBlockedPermuteTest<Mem::Main, double, unsigned long, 3> dv_permute_test_double_ulong;
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedPermuteTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_permute_test_float_uint;
+DenseVectorBlockedPermuteTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_permute_test_double_uint;
+DenseVectorBlockedPermuteTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_permute_test_float_ulong;
+DenseVectorBlockedPermuteTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_permute_test_double_ulong;
 #endif
