@@ -122,7 +122,7 @@
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
-#include <kernel/assembly/common_functionals.hpp>          // NEW: for LaplaceFunctional
+#include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional / ForceFunctional
 
 // FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
@@ -141,18 +141,38 @@ using namespace FEAT;
 // We're opening a new namespace for our tutorial.
 namespace Tutorial04
 {
+  // Note:
+  // This tutorial works for all shape-types. However, the console output is partially 'hard-wired'
+  // for the 2D case to keep the code simple.
+
+  // Once again, we use quadrilaterals.
+  typedef Shape::Quadrilateral ShapeType;
+  // Use the unstructured conformal mesh class
+  typedef Geometry::ConformalMesh<ShapeType> MeshType;
+  // Define the corresponding mesh-part type
+  typedef Geometry::MeshPart<MeshType> MeshPartType;
+  // Use the standard transformation mapping
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+  // Use the Lagrange-1 element
+  typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+  // Our LAFEM containers work in main memory.
+  typedef Mem::Main MemType;
+  // Our data arrays should be double precision.
+  typedef double DataType;
+  // Use the default index type for indexing.
+  typedef Index IndexType;
+
+  // Use the standard dense vector
+  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  // Use the standard CSR matrix format
+  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  // Use the unit-filter for Dirichlet boundary conditions
+  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+
   // Here's our main function
   void main(int argc, char* argv[])
   {
-    // Once again, we use quadrilaterals.
-    typedef Shape::Quadrilateral ShapeType;
-    // We want double precision.
-    typedef double DataType;
-    // Use the default index type.
-    typedef Index IndexType;
-    // Moreover, we use main memory for our containers.
-    typedef Mem::Main MemType;
-
     // As a very first step, we create our argument parser that we will use to analyse
     // the command line arguments. All we need to do is to create an instance of the
     // SimpleArgParser class and pass the 'argc' and 'argv' parameters to its constructor.
@@ -177,7 +197,7 @@ namespace Tutorial04
     // Confused?
     // Assume the caller entered the following at the command line:
     //
-    // "./my_appliation foobar --quiet --level 5 2 --file ./myfile"
+    // "./my_application foobar --quiet --level 5 2 --file ./myfile"
     //
     // This call has a total of 8 arguments:
     // 0: "./my_application" is the path of the application's binary.
@@ -197,7 +217,7 @@ namespace Tutorial04
     // 1. By telling the parser all our supported options, we may later on instruct the
     //    parser to check if the caller has supplied any unsupported options, so that
     //    we may print an appropriate error message. Without this, any mistyped option
-    //    (e.g. '--level' instead of '--level') will simply be ignored by the parser
+    //    (e.g. '--levle' instead of '--level') will simply be ignored by the parser
     //    without emitting any warning or error message.
     // 2. Moreover, we can instruct the parser to give us a string containing all
     //    the supported options and their descriptions which we may then print out
@@ -278,7 +298,19 @@ namespace Tutorial04
 #ifdef FEAT_HAVE_FPARSER
       std::cout << "Remarks regarding function formulae:" << std::endl;
       std::cout << "The <formula> parameters of the options '--u', '--f' and '--g'" << std::endl;
-      std::cout << "are expected to be function formulae in the variables 'x' and 'y'" << std::endl;
+      std::cout << "are expected to be function formulae in the variables ";
+      switch(ShapeType::dimension)
+      {
+      case 1:
+        std::cout << "'x'" << std::endl;
+        break;
+      case 2:
+        std::cout << "'x' and 'y'" << std::endl;
+        break;
+      case 3:
+        std::cout << "'x', 'y' and 'z'" << std::endl;
+        break;
+      }
       std::cout << "As an example, one may specify" << std::endl;
       std::cout << "             --u \"sin(pi*x)*sin(pi*y)\"" << std::endl;
       std::cout << "to define the reference solution to be the sine-bubble." << std::endl;
@@ -364,7 +396,7 @@ namespace Tutorial04
     // value of the parse function is positive:
     bool want_vtk = (args.parse("vtk", vtk_name) > 0);
 
-    // Now we will parse the formulas for our PDE functions if the fparser library in enabled.
+    // Now we will parse the formulae for our PDE functions if the fparser library in enabled.
 
 #ifdef FEAT_HAVE_FPARSER
     // Let's initialise our reference solution, the rhs and the dbc function formulae
@@ -388,9 +420,9 @@ namespace Tutorial04
     // At this point, we have at least one function formula. Now, we need to create
     // three instances of the ParsedFunction class template, which we will pass on
     // to our assembly functions later on. The only template parameter is the dimension
-    // of the function to be parsed, which is 2 in our case:
-    Analytic::ParsedFunction<2> rhs_function; // right-hand-side
-    Analytic::ParsedFunction<2> dbc_function; // boundary conditions
+    // of the function to be parsed:
+    Analytic::ParsedFunction<ShapeType::dimension> rhs_function; // right-hand-side
+    Analytic::ParsedFunction<ShapeType::dimension> dbc_function; // boundary conditions
 
     // In the case of the reference solution function, we also require the computation of
     // derivates for the assembly of the right-hand-side (if 'f' is not given explicitly)
@@ -398,7 +430,7 @@ namespace Tutorial04
     // Unfortunately, the ParsedFunction cannot compute the derivatives by itself, so
     // we need to put it into an 'AutoDerive' function wrapper - this one will add
     // the numeric computation of derivatives to our ParsedFunction automagically.
-    Analytic::AutoDerive<Analytic::ParsedFunction<2>> sol_function;
+    Analytic::AutoDerive<Analytic::ParsedFunction<ShapeType::dimension>> sol_function;
 
     // We have three ParsedFunction object, but we still need to supply them with
     // our (or the caller's) function formulae:
@@ -449,6 +481,10 @@ namespace Tutorial04
 
     // Okay, if the arrived here, then all formulae specified by the caller (if any) were
     // parsed successfully, so we'll write our functions to cout for convenience.
+    // Note:
+    // At this point, we always output 'x,y' as the arguments of u, f and g, even if this
+    // tutorial was modified to use a 1D or 3D shape. This is only to keep the following
+    // code simple and to avoid a nested if-orgy here.
     std::cout << std::endl;
     std::cout << "Function summary:" << std::endl;
     if(have_u)
@@ -471,93 +507,68 @@ namespace Tutorial04
 
 #else
     // Without the fparser library, we use the sine-bubble as a solution.
-    Analytic::Common::SineBubbleFunction<2> sol_function;
+    Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
     // The following two functions will not be used and are therefore just 'dummies',
     // which are only declared here to avoid even more #ifdef's in the following code.
-    Analytic::Common::ConstantFunction<2> dbc_function(0.0);
-    Analytic::Common::ConstantFunction<2> rhs_function(0.0);
-    bool have_u = true;
-    bool have_f = false;
-    bool have_g = false;
+    Analytic::Common::ConstantFunction<ShapeType::dimension> dbc_function(0.0);
+    Analytic::Common::ConstantFunction<ShapeType::dimension> rhs_function(0.0);
+    const bool have_u = true;
+    const bool have_f = false;
+    const bool have_g = false;
 #endif
 
     // Okay, that was the interesting part.
     // The remainder of this tutorial is more or less the same as in Tutorial 01 and 02.
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Create Mesh and Boundary
+    // Create Mesh, Boundary, Trafo and Space
 
-    // Define the mesh type
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
-    // Define the boundary type
-    typedef Geometry::MeshPart<MeshType> BoundaryType;
-    // Define the mesh factory type
-    typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
-    // And define the boundary factory type
-    typedef Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
-
-    std::cout << "Assembling System on Level " << level << "..." << std::endl;
+    std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
 
     // Create the mesh
-    MeshFactoryType mesh_factory(level);
+    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
 
     // And create the boundary
-    BoundaryFactoryType boundary_factory(mesh);
-    BoundaryType boundary(boundary_factory);
+    Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
+    MeshPartType boundary(boundary_factory);
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Create Trafo and Space
+    // Create Mesh, Boundary, Trafo and Space
 
-    // Define the trafo
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    std::cout << "Creating Trafo and Space..." << std::endl;
 
     // Let's create a trafo object now.
     TrafoType trafo(mesh);
 
-    // Use the Lagrange-1 element (aka "Q1"):
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
-
     // Create the desire finite element space.
     SpaceType space(trafo);
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Allocate linear system and perform symbolic assembly
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Symbolic linear system assembly
 
-    // Define the vector type
-    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-
-    // Define the matrix type
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-
-    // Define the filter type
-    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+    std::cout << "Allocating matrix and vectors..." << std::endl;
 
     // Allocate matrix and assemble its structure
     MatrixType matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+
+    // Allocate vectors
+    VectorType vec_sol = matrix.create_vector_r();
+    VectorType vec_rhs = matrix.create_vector_l();
 
     // Create a cubature factory
     Cubature::DynamicFactory cubature_factory("auto-degree:5");
 
     // First of all, format the matrix entries to zero.
     matrix.format();
+    vec_rhs.format();
+    vec_sol.format();
 
     // Create the pre-defined Laplace operator:
     Assembly::Common::LaplaceOperator laplace_operator;
 
     // And assemble that operator
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_operator, space, cubature_factory);
-
-    // Allocate vectors
-    VectorType vec_sol(matrix.create_vector_r());
-    VectorType vec_rhs(matrix.create_vector_r());
-
-    // Format the right-hand-side vector entries to zero.
-    vec_rhs.format();
-
-    // Finally, clear the initial solution vector.
-    vec_sol.format();
 
     // Now, let us assemble the right-hand-side function.
     if(have_f)
@@ -684,7 +695,7 @@ namespace Tutorial04
 
     // That's it for today.
     std::cout << std::endl << "Finished!" << std::endl;
-  } // int main(...)
+  } // void main(...)
 } // namespace Tutorial04
 
 // Here's our main function

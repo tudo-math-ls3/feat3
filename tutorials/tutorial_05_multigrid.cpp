@@ -91,33 +91,33 @@ namespace Tutorial05
 {
   // Once again, we use quadrilaterals.
   typedef Shape::Quadrilateral ShapeType;
-  // We want double precision.
-  typedef double DataType;
-  // Use the default index type.
-  typedef Index IndexType;
-  // Moreover, we use main memory.
+  // Use the unstructured conformal mesh class
+  typedef Geometry::ConformalMesh<ShapeType> MeshType;
+  // Define the corresponding mesh-part type
+  typedef Geometry::MeshPart<MeshType> MeshPartType;
+  // Use the standard transformation mapping
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+  // Use the Lagrange-1 element
+  typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+  // Our LAFEM containers work in main memory.
   typedef Mem::Main MemType;
+  // Our data arrays should be double precision.
+  typedef double DataType;
+  // Use the default index type for indexing.
+  typedef Index IndexType;
 
-  // We also define the other types here, as we will need them for the next class
-
-  // Define the vector type
+  // Use the standard dense vector
   typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-  // Define the matrix type
+  // Use the standard CSR matrix format
   typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  // Define the filter type
+  // Use the unit-filter for Dirichlet boundary conditions
   typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
   // The next one is new: this is the class that is responsible for the grid transfer.
+  // In contrast to the other LAFEM containers that we have typedefed before, the 'Transfer'
+  // class template requires a matrix type instead of the usual mem-data-index type triplet.
   typedef LAFEM::Transfer<MatrixType> TransferType;
-
-  // Define the mesh type
-  typedef Geometry::ConformalMesh<ShapeType> MeshType;
-  // Define the boundary type
-  typedef Geometry::MeshPart<MeshType> BoundaryType;
-  // Define the trafo type
-  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-  // Define the space type
-  typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -237,7 +237,7 @@ namespace Tutorial05
 
       // Create the boundary object for the boundary condition assembly
       Geometry::BoundaryFactory<MeshType> boundary_factory(lvl.mesh);
-      BoundaryType boundary(boundary_factory);
+      MeshPartType boundary(boundary_factory);
 
       // Assemble the unit filter for homogeneous Dirichlet boundary conditions
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
@@ -321,7 +321,7 @@ namespace Tutorial05
     // Now assemble the right-hand-side vector; this is virtually identical to tutorial 01.
 
     // Our desired reference solution function:
-    Analytic::Common::SineBubbleFunction<2> sol_function;
+    Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
 
     // Create a corresponding right-hand-side functional:
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
@@ -356,10 +356,10 @@ namespace Tutorial05
     // constructor parameter is the size of the level hierarchy, i.e. the total number of
     // levels that we want to create:
     auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
-      MatrixType,   // the system matrix type
-      FilterType,   // the system filter type
-      TransferType  // the transfer operator type
-      >>( levels.size() );
+      MatrixType,          // the system matrix type
+      FilterType,          // the system filter type
+      TransferType         // the transfer operator type
+      >>( levels.size() ); // the number of levels in the hierarchy
 
     // Now we need to fill this empty hierarchy object with life, i.e. we have to attach
     // all our matrices and filters to it. Moreover, we also need to create the corresponding
@@ -505,7 +505,7 @@ namespace Tutorial05
     Geometry::ExportVTK<MeshType> exporter(lvl_fine.mesh);
 
     // add our solution and rhs vectors
-    exporter.add_vertex_scalar("solution", vec_sol.elements());
+    exporter.add_vertex_scalar("sol", vec_sol.elements());
     exporter.add_vertex_scalar("rhs", vec_rhs.elements());
 
     // finally, write the VTK file
@@ -513,7 +513,7 @@ namespace Tutorial05
 
     // That's all, folks.
     std::cout << "Finished!" << std::endl;
-  } // int main(...)
+  } // void main(...)
 } // namespace Tutorial05
 
 // Here's our main function

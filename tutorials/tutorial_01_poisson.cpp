@@ -24,19 +24,21 @@
 //
 // The basic program flow of this application is as follows:
 //
-// 1. Create a mesh and a boundary description by using a factory.
+// 1. Define the required types for spatial discretisation and linear algebra.
 //
-// 2. Create a trafo based on the mesh and a finite element space based on the trafo.
+// 2. Create a mesh and a boundary mesh-part by using a factory.
 //
-// 3. Assemble the PDE operator and the force to a matrix and a right-hand-side vector.
+// 3. Create a trafo based on the mesh and a finite element space based on the trafo.
 //
-// 4. Assemble the boundary conditions to a filter.
+// 4. Assemble the PDE operator and the force to a matrix and a right-hand-side vector.
 //
-// 5. Solve the resulting linear system using a simple fire-and-forget solver.
+// 5. Assemble the boundary conditions to a filter.
 //
-// 6. Compute the L2- and H1-errors against the analytical reference solution.
+// 6. Solve the resulting linear system using a simple fire-and-forget solver.
 //
-// 7. Write the result to a VTK file for visual post-processing, if desired.
+// 7. Compute the L2- and H1-errors against the analytical reference solution.
+//
+// 8. Write the result to a VTK file for visual post-processing, if desired.
 //
 // \author Peter Zajac
 //
@@ -52,7 +54,7 @@
 // FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
+#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactory
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
@@ -61,7 +63,7 @@
 
 // FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
-#include <kernel/space/lagrange2/element.hpp>            // the Lagrange-2 Element (aka "Q2")
+#include <kernel/space/lagrange2/element.hpp>              // the Lagrange-2 Element (aka "Q2")
 
 // FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
@@ -71,13 +73,13 @@
 
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
-#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
+#include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
+#include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
+#include <kernel/assembly/error_computer.hpp>              // for ScalarErrorComputer
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
-#include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
-#include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
 
 // FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
@@ -90,10 +92,12 @@
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// We are using FEAT
+// We are using FEAT, so use the namespace here.
 using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
+// The only reason for this is that some compilers may give us warnings about "shadowing" types
+// otherwise -- this would not be dramatic, but somewhat annoying...
 namespace Tutorial01
 {
   // We start with a set of typedefs, which make up the basic configuration for this
@@ -101,140 +105,188 @@ namespace Tutorial01
   // (2) specialise FEAT to do, out of the many possibilities, only what we want to do in
   // this tutorial.
 
-  // First, we define the 'shape type' of the mesh that we want to use.
-  // We use a quadrilateral mesh for this tutorial, so typedef the quadrilateral shape.
-  typedef Shape::Quadrilateral ShapeType;
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  // Next, we need to define the memory type, the data type and the algorithm type for
-  // the linear algebra containers and operations. Details about these types will be
-  // discussed in another tutorial.
+  // First, we need to specify what type of mesh and what type of finite element space we want
+  // to use in this tutorial application. For this, FEAT uses a "template type nesting" approach,
+  // in which have to define the corresponding classes by nesting them.
 
-  // We want double precision.
-  typedef double DataType;
+  // The first type that we need to choose is the "shape type" of the mesh, i.e. the type of
+  // cells/elements that our mesh should contain. At this point, we implicitly also choose whether
+  // this will be a 1D, 2D or 3D tutorial, depending on the dimension of the chosen shape-type.
+  // There are 5 shape-types available in FEAT and for this tutorial we pick quadrilateral elements.
 
-  // We use the default 'Index' type for indexing:
-  typedef Index IndexType;
+  //typedef Shape::Hypercube<1> ShapeType;  // 1D
+  //typedef Shape::Triangle ShapeType;      // 2D, same as Shape::Simplex<2>
+  typedef Shape::Quadrilateral ShapeType;   // 2D, same as Shape::Hypercube<2>
+  //typedef Shape::Tetrahedron ShapeType;   // 3D, same as Shape::Simplex<3>
+  //typedef Shape::Hexahedron ShapeType;    // 3D, same as Shape::Hypercube<3>
 
-  // Moreover, we use main memory (aka "RAM") for our containers. FEAT supports GPUs and other
-  // architectures, but we do not want to make use of anything that does not reside in host memory.
-  typedef Mem::Main MemType;
+  // The next step in the "template type nesting" approach is the choice of a mesh class.
+  // We want to employ a simple unstructured conformal mesh, which is implemented by the
+  // "Geometry::ConformalMesh" class template. At this point, we have to pass the chosen
+  // shape-type as the first template parameter to the class template.
+  typedef Geometry::ConformalMesh<ShapeType> MeshType;
+
+  // The next type that we will require later is the "mesh-part" type. Object of this class
+  // are used to describe certain mesh regions of some interest, e.g. boundary regions of
+  // the mesh that we want to use for the definition of some boundary conditions.
+  // The corresponding class is the "Geometry::MeshPart" class template and its one and only
+  // template parameter is the mesh type that we have just defined:
+  typedef Geometry::MeshPart<MeshType> MeshPartType;
+
+  // The next thing we need is a transformation that our finite element spaces should use.
+  // The transformation is responsible for providing the "reference-to-real-cell" mapping
+  // functionality that is used by both the finite element space as well as various assembly
+  // algorithms. Currently, the only available transformation is the "standard" mapping,
+  // which represents a first-order transformation. The corresponding class is the
+  // "Trafo::Standard::Mapping" class template and its one and only template parameter is
+  // the underlying mesh type that we have defined above:
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+  // Finally, as the last step of our "template type nesting" approach is the definition of
+  // the actual finite element space(s). In this tutorial we want to stick with the simple
+  // standard first-order H1-conforming Q1 (or P1) space, which is implemented by the
+  // "Space::Lagrange1::Element" class template. This element family takes the transformation
+  // type as the one and only template parameter:
+
+  // Use the Lagrange-1 element (aka "Q1" or "P1"):
+  typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+  // Or you could also use the Lagrange-2 element (aka "Q2" or "P2") instead:
+  //typedef Space::Lagrange2::Element<TrafoType> SpaceType;
+
+
+  // Before we continue, let us recapitulate what we have defined so far:
+  // Reading the previous "template type nesting" odyssey in a bottom-up manner show us that
+  // "SpaceType" is a
+  // - Lagrange-1 (Q1/P1) finite element space defined on a
+  // - standard transformation mapping defined on a
+  // - conformal (unstructured) mesh consisting of
+  // - quadrilateral cells/elements
+
+  // At this point, you maybe already have an idea why we use those typedefs:
+
+  // We could simply change the "ShapeType" definition from "Shape::Quadrilateral" to, say,
+  // "Shape::Tetrahedron" and "SpaceType" would automatically be switched from a 2D Q1 element
+  // to the matching 3D P1 element! This type of modularity is a major ingredient when it
+  // comes to writing truly multi-dimensional applications -- or in other (more fancy) words:
+  // Write a 2D application and get the 3D version for free! Yay!
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  // Here's our tutorial's main function
+  // In the next part, we have to define the linear algebra container types (matrix, vector, filter)
+  // that our tutorial will use. At first, it may seem confusing that we have to define a type for
+  // vectors via some template typedefs instead of using "the almighty one-size-fits-all vector"
+  // class. Again, the reason is modularity: FEAT has much more to offer than just the standard
+  // types, although that is all that we want to consider in this tutorial.
+
+  // First, we have to choose the "Memory-Data-Index" type triplet, which specifies the basic types
+  // that our linear algebra containers will use for their elements.
+
+  // The first one is the memory type: This "tag class" specifies in which type of memory our
+  // matrices and vectors will operate. In this tutorial, we want to stick with the main memory,
+  // which is simply the RAM that the CPU has access to. FEAT also supports linear algebra
+  // containers which work on GPUs using CUDA, but this will be covered another time.
+  typedef Mem::Main MemType;
+
+  // The second type is the data type: This is simply the type of the matrix and vector elements,
+  // which is typically the double-precision floating point type aka "double". FEAT also supports
+  // other data types as single or even quadruple precision, but we want to avoid that for now.
+  typedef double DataType;
+
+  // The third type is the index type: This is used by various containers which also store arrays
+  // of indices, such as the row-pointer and column-index arrays of the CSR matrix format.
+  // In particular, any (sufficiently large) integer type will do, so we stick to the "Index" type,
+  // which corresponds to "unsigned long" by default.
+  typedef Index IndexType;
+
+
+  // Based on the three memory, data and index typedefs, we can now define the vector type.
+  // In this tutorial, we want to solve a simple scalar PDE, so we require just a "standard"
+  // vector class, which is implemented by the "LAFEM::DenseVector" class template:
+  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+
+  // Furthermore, for the discretised Poisson operator, we require a scalar sparse matrix type.
+  // We choose the famous CSR format here, because it is pretty much standard for unstructured FEM:
+  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+
+  // Finally, we need a filter. Filters are responsible for "enforcing" simple linear constraints
+  // such as boundary conditions and are required by the linear solver framework. In this tutorial,
+  // we have a scalar PDE with Dirichlet boundary conditions and for this type of problem, we
+  // require a so-called "unit-filter":
+  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+
+  // That's it for the linear algebra types.
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  // Here's our tutorial's main function.
   void main(Index level)
   {
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Geometry typedefs
-
-    // First, we need to define the type of mesh we want to use.
-    // For the purpose of this tutorial, we employ a ConformalMesh, whose first template parameter is
-    // the shape-type that we want to use, and which we typedef'ed to Quadrilateral above.
-    // All other parameters are optional and we're not interested in using anything else than the
-    // standard parameters for now.
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
-
-    // Moreover, we need to define a boundary type, which is required for the assembly of boundary
-    // conditions. In this example, we employ the MeshPart class template for this purpose, which is
-    // perfectly appropriate for the pure Dirichlet case we want to solve. Note that this class template
-    // is also templatised in the MeshType that we're using.
-    typedef Geometry::MeshPart<MeshType> BoundaryType;
-
-    // In this tutorial, we will generate the mesh and its boundary information by using a so-called
-    // factory instead of reading them from a file. This is a convenient shortcut that FEAT provides,
-    // the more general case is covered in advanced tutorials.
-    // For our purpose here, we need to define a RefinedUnitCubeFactory, which will (as the name suggests)
-    // generate a refined unit-square mesh for us.
-    typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
-
-    // Furthermore, we need a factory for the cell sub-set representing our domain's boundary.
-    // The BoundaryFactory class template will generate such a cell sub-set representing the whole
-    // boundary of the domain, so we also typedef it here.
-    typedef Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Geometry initialisation
+    // Okay, we have already defined the mesh, trafo and space types, so we can start our
+    // actual tutorial code by creating those.
 
     std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
 
-    // First of all, create a mesh factory object representing a refined unit-square domain according
-    // to the refinement scheme specified by the above type definitions.
-    MeshFactoryType mesh_factory(level);
+    // In a "real-life" application, we would either read the mesh from an input file or call
+    // some sort of mesh generator library/tool to create a mesh for us, but in this tutorial,
+    // we want to stick with a more simple solution, especially to avoid dependencies on external
+    // files, libraries or tools. Instead, we will use the "RefinedUnitCubeFactory", which will
+    // (as the name suggests) generate a refined unit-square mesh for us.
 
-    // Create a mesh by using our factory.
+    // First of all, create a mesh factory object representing a refined unit-square domain
+    // and pass the desired refinement level to its constructor:
+    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
+
+    // Now create the actual mesh by using that factory:
     MeshType mesh(mesh_factory);
 
-    std::cout << "Creating Boundary..." << std::endl;
+    // Furthermore, we require a mesh-part that represents the boundary of the mesh for the
+    // assembly of Dirichlet boundary conditions later on. Again, this would typically come
+    // from an external file or a mesh generator, but we stick to a more simple solution.
+    // We will utilise the "BoundaryFactory", which will create a boundary mesh-part for a
+    // given mesh. Note that this BoundaryFactory class works for any given input mesh and
+    // not only for meshes created by the RefinedUnitCubeFactory.
 
     // Now let's create a boundary factory for our mesh.
-    BoundaryFactoryType boundary_factory(mesh);
+    Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
 
-    // And create the boundary by using the factory.
-    BoundaryType boundary(boundary_factory);
+    // And create the boundary mesh-part by using the factory.
+    MeshPartType boundary(boundary_factory);
 
-    // Voila, we now have a mesh and a corresponding boundary cell sub-set.
+    // Voila, we now have a mesh and a corresponding boundary mesh-part.
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Trafo initialisation
 
-    // The next thing we need is a transformation that our finite element spaces should use.
-    // Here, we use the standard transformation, which we'll typedef here.
-    // The Mapping class template takes the mesh type as a template parameter.
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Trafo and Finite Element Space initialisation
 
-    std::cout << "Creating Trafo..." << std::endl;
+    std::cout << "Creating Trafo and Space..." << std::endl;
+
+    // We have already defined the types of the transformation and finite element space,
+    // so we just need to create the objects.
 
     // Let's create a trafo object now. Its only parameter is the mesh that it is defined on.
     TrafoType trafo(mesh);
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Finite Element Space initialisation
-
-    // Now we need to define the finite element space which shall be used for our Poisson problem.
-    // All finite element spaces are parameterised (templated) by the transformation type.
-
-    // Use the Lagrange-1 element (aka "Q1"):
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
-
-    // Use the Lagrange-2 element (aka "Q2"):
-    // typedef Space::Lagrange2::Element<TrafoType> SpaceType;
-
-    std::cout << "Creating Space..." << std::endl;
-
     // Create the desire finite element space. Its only parameter is the trafo that it is defined on.
     SpaceType space(trafo);
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Linear System type definitions
-
-    // The next step is defining the types of vectors and matrices which we want to use.
-
-    // Based on the three data, index and memory typedefs, we now define the vector type.
-    // Since we have a scalar problem, we require a dense vector, which is simply FEAT's name for
-    // contiguous storage.
-    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-
-    // Furthermore, for the discretised Poisson operator, we require a sparse matrix type.
-    // We choose the CSR format here, because it is pretty much standard.
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-
-    // Moreover, we need a boundary condition filter. Filters can be used to apply boundary conditions
-    // in matrices and vectors. Since we are using Dirichlet boundary conditions for our problem, we
-    // need a so-called "unit filter".
-    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
+
     std::cout << "Allocating matrix and vectors..." << std::endl;
 
     // Now we need to perform the symbolic matrix assembly, i.e., the computation of the non-zero
-    // pattern and the allocation of storage for the three CSR arrays.
-    // The class which performs this task is the SymbolicAssembler class:
+    // sparsity pattern and the allocation of the internal matrix arrays. For this, we first create
+    // an empty matrix and then call the SymbolicAssembler to create the matrix sparsity pattern:
     MatrixType matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
-    // Note: The "1" at the end of the function name "assemble_matrix_std1" indicates, that there
+
+    // Note: The "1" at the end of the function name "assemble_matrix_std1" indicates that there
     // is only one finite element space involved in the assembly, i.e. the test- and trial-
-    // spaces are identical. The symbolic assembler also contains a function named
+    // spaces are identical. The symbolic assembler also provides a function named
     // "assemble_matrix_std2", which takes two (possibly different) finite element spaces as
     // test- and trial-spaces, but we're not going to use it for now. However, this is
     // required for more complex PDEs like, e.g., the Stokes equations.
@@ -248,6 +300,19 @@ namespace Tutorial01
     VectorType vec_sol = matrix.create_vector_r();
     VectorType vec_rhs = matrix.create_vector_l();
 
+    // Okay, we now have a matrix and two vectors. The internal arrays of those object are
+    // allocated, but their data arrays are still uninitialised (automatic initialisation is
+    // not performed due to performance reasons). Before we can continue with the numerical
+    // assembly, we first need to reset the matrix and data arrays, i.e. set all entries
+    // to zero, which is done by calling the "format" function. This is required because the
+    // assembly methods for the matrix and the right-hand-side work in an "additive" way, i.e.
+    // the assembled operators/functionals are added onto the given matrix/vector, so we
+    // have to start with a null-matrix/-vector.
+
+    matrix.format();
+    vec_rhs.format();
+    vec_sol.format();
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
@@ -256,7 +321,7 @@ namespace Tutorial01
     // There are several cubature rules available in FEAT, and a complete list can be queried
     // by compiling and executing the 'cub-list' tool in the 'tools' directory.
     // We choose the 'auto-degree:n' rule here, which will automatically choose an appropriate
-    // cubature rule  that can integrate polynomials up to degree n exactly. Some other possible
+    // cubature rule that can integrate polynomials up to degree n exactly. Some other possible
     // choices are also provided here, but commented out.
     Cubature::DynamicFactory cubature_factory(
       "auto-degree:5"          // automatic cubature rule for 5th degree polynomials
@@ -265,19 +330,13 @@ namespace Tutorial01
     //"newton-cotes-open:5"    // 5x5 'open' Newton-Cotes rule
     //"trapezoidal"            // trapezoidal rule (works for all shape types)
     //"barycentre"             // barycentre rule (not recommended due to insufficient order)
-      );
+    );
 
     std::cout << "Assembling system matrix..." << std::endl;
 
-    // The assembly routines require the matrix to filled with zeros, so we use a LAFEM routine to
-    // zero out everything
-    matrix.format();
-
-    // We want to assemble the 2D "-Laplace" operator -u_xx -u_yy.
-    // Note that so far, we did not consider the notion of operators at all.
-    // For this operator, FEAT provides a pre-defined bilinear operator class, of which we first need
-    // to create an instance. Check the implementation of this factory, and additional tutorials, on how
-    // to implement more complex operators.
+    // We want to assemble the 2D "-Laplace" operator (-u_xx -u_yy).
+    // In this tutorial, we use a pre-defined class for the implementation of this operator.
+    // The definition of other and more complex PDE operators is discussed in another tutorial.
     Assembly::Common::LaplaceOperator laplace_operator;
 
     // Next, we call the bilinear operator assembler to assemble the operator into a matrix.
@@ -285,30 +344,26 @@ namespace Tutorial01
     // BilinearOperatorAssembler class also has a "1" suffix indicating that there is only one
     // finite element space involved:
     Assembly::BilinearOperatorAssembler::assemble_matrix1(
-        matrix,           // the matrix that receives the assembled operator
-        laplace_operator, // the operator that is to be assembled
-        space,            // the finite element space in use
-        cubature_factory  // the cubature factory to be used for integration
-        );
-
-    std::cout << "Assembling right-hand-side vector..." << std::endl;
+      matrix,           // the matrix that receives the assembled operator
+      laplace_operator, // the operator that is to be assembled
+      space,            // the finite element space in use
+      cubature_factory  // the cubature factory to be used for integration
+    );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: RHS (linear forms)
 
-    // The assembly follows pretty much the same generic structure. We use the opportunity to
-    // explain how to prescribe systems with analytically-known solutions.
+    std::cout << "Assembling right-hand-side vector..." << std::endl;
 
-    // Initialise the right-hand-side vector entries to zero.
-    vec_rhs.format();
+    // The assembly of right-hand-side vector follows pretty much the same generic structure.
+    // We use the opportunity to explain how to prescribe systems with analytically-known solutions.
 
-    // We need an analytic functional representing the right-hand-side, or more generally
-    // speaking, any force.
     // In this tutorial, we first choose a reference solution for our PDE and then assemble the
     // corresponding right-hand-side for our Poisson problem. We choose the "sine-bubble" function,
     // which is pre-defined as a 'common function' in the "analytic/common.hpp" header,
-    // so we can use it here:
-    Analytic::Common::SineBubbleFunction<2> sol_function;
+    // so we can use it here. The SineBubbleFunction is implemented for 1D, 2D and 3D, so we
+    // need to specify the desired dimension, which we can obtain from the ShapeType definition:
+    Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
 
     // Next, we need a linear functional that can be applied onto test functions for our
     // right-hand-side vector. The sine-bubble is an eigenfunction of the Laplace operator,
@@ -324,17 +379,11 @@ namespace Tutorial01
     // Now we can call the LinearFunctionalAssembler class to assemble our linear
     // functional into a vector.
     Assembly::LinearFunctionalAssembler::assemble_vector(
-        vec_rhs,          // the vector that receives the assembled functional
-        force_functional, // the functional that is to be assembled
-        space,            // the finite element space in use
-        cubature_factory  // the cubature factory to be used for integration
-        );
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Solution initialisation.
-
-    // Clear the initial solution vector (because its contents are undefined up to now).
-    vec_sol.format();
+      vec_rhs,          // the vector that receives the assembled functional
+      force_functional, // the functional that is to be assembled
+      space,            // the finite element space in use
+      cubature_factory  // the cubature factory to be used for integration
+    );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
@@ -373,7 +422,7 @@ namespace Tutorial01
     filter.filter_sol(vec_sol);
 
     // Now we have set up the linear system representing our discretised Poisson PDE, including
-    // the homogene Dirichlet boundary conditions.
+    // the homogeneous Dirichlet boundary conditions.
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
@@ -436,7 +485,7 @@ namespace Tutorial01
       sol_function,     // the analytic function object, declared for RHS assembly
       space,            // the finite element space
       cubature_factory  // and the cubature factory used for integration
-      );
+    );
 
     // The returned ScalarErrorInfo object contains all computed error norms,
     // so we may print the errors by simply pushing the object to cout:
@@ -464,7 +513,7 @@ namespace Tutorial01
       vertex_sol,   // the vector that receives the projection
       vec_sol,      // the vector to be projected
       space         // the finite element space in use
-      );
+    );
 
     // And the same for the right-hand-side:
     Assembly::DiscreteVertexProjector::project(vertex_rhs, vec_rhs, space);
@@ -473,7 +522,7 @@ namespace Tutorial01
     Geometry::ExportVTK<MeshType> exporter(mesh);
 
     // add the vertex-projection of our solution and rhs vectors
-    exporter.add_vertex_scalar("solution", vertex_sol.elements());
+    exporter.add_vertex_scalar("sol", vertex_sol.elements());
     exporter.add_vertex_scalar("rhs", vertex_rhs.elements());
 
     // finally, write the VTK file
@@ -481,7 +530,7 @@ namespace Tutorial01
 
     // That's all, folks.
     std::cout << "Finished!" << std::endl;
-  } // int main(...)
+  } // void main(...)
 } // namespace Tutorial01
 
 // Here's our main function

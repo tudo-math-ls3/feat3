@@ -87,14 +87,36 @@ using namespace FEAT;
 // We're opening a new namespace for our tutorial.
 namespace Tutorial03
 {
+  // Note:
+  // This tutorial works only for 2D shapes, i.e. quadrilaterals or triangles.
+  // The reason for this is that the implementation of the 'AndicoreData' class below as well as
+  // its setup at the beginning of the 'main' function is restricted to 2D for the sake of keeping
+  // the code simple. However, the remainder of this tutorial code works for any shape type.
+
   // Once again, we use quadrilaterals.
   typedef Shape::Quadrilateral ShapeType;
-  // We want double precision.
-  typedef double DataType;
-  // Use the default index type.
-  typedef Index IndexType;
-  // Moreover, we use main memory (aka "RAM") for our containers.
+  // Use the unstructured conformal mesh class
+  typedef Geometry::ConformalMesh<ShapeType> MeshType;
+  // Define the corresponding mesh-part type
+  typedef Geometry::MeshPart<MeshType> MeshPartType;
+  // Use the standard transformation mapping
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+  // Use the Lagrange-1 element
+  typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+  // Our LAFEM containers work in main memory.
   typedef Mem::Main MemType;
+  // Our data arrays should be double precision.
+  typedef double DataType;
+  // Use the default index type for indexing.
+  typedef Index IndexType;
+
+  // Use the standard dense vector
+  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  // Use the standard CSR matrix format
+  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  // Use the unit-filter for Dirichlet boundary conditions
+  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -420,60 +442,31 @@ namespace Tutorial03
     // Choose a non-negative value for the reaction
     andicore_data.c = 0.3;
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Create Mesh and Boundary
-
-    // Define the mesh type
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
-    // Define the boundary type
-    typedef Geometry::MeshPart<MeshType> BoundaryType;
-    // Define the mesh factory type
-    typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
-    // And define the boundary factory type
-    typedef Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Create Mesh, Boundary, Trafo and Space
 
     std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
 
     // Create the mesh
-    MeshFactoryType mesh_factory(level);
+    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
 
-    std::cout << "Creating Boundary..." << std::endl;
-
     // And create the boundary
-    BoundaryFactoryType boundary_factory(mesh);
-    BoundaryType boundary(boundary_factory);
+    Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
+    MeshPartType boundary(boundary_factory);
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Create Trafo and Space
+    // Create Mesh, Boundary, Trafo and Space
 
-    // Define the trafo
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-
-    std::cout << "Creating Trafo..." << std::endl;
+    std::cout << "Creating Trafo and Space..." << std::endl;
 
     // Let's create a trafo object now.
     TrafoType trafo(mesh);
 
-    // Use the Lagrange-1 element (aka "Q1"):
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
-
-    std::cout << "Creating Space..." << std::endl;
-
     // Create the desire finite element space.
     SpaceType space(trafo);
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Allocate linear system and perform symbolic assembly
-
-    // Define the vector type
-    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-
-    // Define the matrix type
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-
-    // Define the filter type
-    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Symbolic linear system assembly
 
     std::cout << "Allocating matrix and vectors..." << std::endl;
 
@@ -485,7 +478,7 @@ namespace Tutorial03
     VectorType vec_sol = matrix.create_vector_r();
     VectorType vec_rhs = matrix.create_vector_l();
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Perform numerical matrix assembly
 
     // Create a cubature factory
@@ -510,7 +503,7 @@ namespace Tutorial03
     // The next task is the assembly of the right-hand-side vector.
     // As our functional is parameterised in the solution function, we first need to create an
     // object representing that solution function. We choose the standard sine-bubble:
-    Analytic::Common::SineBubbleFunction<2> sol_function;
+    Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
 
     // Now, we utilise our custom AndicoreFunctional to obtain a functional that combines
     // the desired analytical solution with our andicore PDE operator:
@@ -605,7 +598,7 @@ namespace Tutorial03
     Geometry::ExportVTK<MeshType> exporter(mesh);
 
     // add the vertex-projection of our solution and rhs vectors
-    exporter.add_vertex_scalar("solution", vertex_sol.elements());
+    exporter.add_vertex_scalar("sol", vertex_sol.elements());
     exporter.add_vertex_scalar("rhs", vertex_rhs.elements());
 
     // finally, write the VTK file
@@ -613,7 +606,7 @@ namespace Tutorial03
 
     // That's it for today.
     std::cout << "Finished!" << std::endl;
-  } // int main(...)
+  } // void main(...)
 } // namespace Tutorial03
 
 // Here's our main function

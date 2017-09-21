@@ -21,30 +21,32 @@
 //
 // The basic program flow of this application is as follows:
 //
-//  1. Create a distributed communicator for inter-process communication.
+//  1. Define the basic spatial discretisation types, as usual.
 //
-//  2. Create a mesh-node that represents the patch (sub-domain) of this process
+//  2. Define the local and global linear algebra container classes.
+//
+//  3. Create a distributed communicator for inter-process communication.
+//
+//  4. Create a mesh-node that represents the patch (sub-domain) of this process
 //     along with neighbourhood information required for communication.
 //
-//  3. Create a trafo and a finite element space for the patch of this process.
+//  5. Create a trafo and a finite element space for the patch of this process.
 //
-//  4. Define the local and global linear algebra container classes.
+//  6. Assemble a gate that defines the global (parallel) linear algebra operations.
 //
-//  5. Assemble a gate that defines the global (parallel) linear algebra operations.
+//  7. Create a global matrix and some global vectors.
 //
-//  6. Create a global matrix and some global vectors.
+//  8. Assemble the (global) system matrix and the (global) right-hand-side vector.
 //
-//  7. Assemble the (global) system matrix and the (global) right-hand-side vector.
+//  9. Assemble the (global) boundary condition filter.
 //
-//  8. Assemble the (global) boundary condition filter.
+// 10. Set up a PCG-Schwarz-ILU solver using a "type-1" Schwarz matrix.
 //
-//  9. Set up a PCG-Schwarz-ILU solver using a "type-1" Schwarz matrix.
+// 11. Solve the linear system.
 //
-// 10. Solve the linear system.
+// 12. Compute the (global) L2- and H1-errors against the analytical reference solution.
 //
-// 11. Compute the (global) L2- and H1-errors against the analytical reference solution.
-//
-// 12. Write the result to a partitioned VTU file set for visual post-processing.
+// 13. Write the result to a partitioned VTU file set for visual post-processing.
 //
 // \author Peter Zajac
 //
@@ -113,25 +115,106 @@ using namespace FEAT;
 // We're opening a new namespace for our tutorial.
 namespace Tutorial06
 {
-  // Once again, we use quadrilaterals.
-  typedef Shape::Quadrilateral ShapeType;
-
   // Note:
   // This tutorial works only for Hypercube meshes, as there exists no patch generator for
-  // Simplex meshes yet. If you want to switch from quadrilaterals (2D) to edges (1D) or
-  // hexahedra (3D), then you need to manually modify two parts of this tutorial in addition
-  // to changing the ShapeType definition above:
-  // 1. Change the communicator size sanity check at the beginning of the 'main' function to
-  //    check for powers of 2 in the 1D case or powers of 8 in the 3D case.
-  // 2. Change the number of boundaries in the for-loop of the unit-filter assembly to
-  //    2 boundaries in the 1D case or 6 boundaries in the 3D case.
+  // Simplex meshes (yet). If you want to switch from quadrilaterals (2D) to edges (1D) or
+  // hexahedra (3D), then you need to manually adjust the communicator size sanity check at
+  // the beginning of the 'main' function to check for powers of 2 in the 1D case or
+  // powers of 8 in the 3D case in addition to changing the ShapeType definition below.
 
-  // We want double precision.
-  typedef double DataType;
-  // Use the default index type.
-  typedef Index IndexType;
-  // Moreover, we use main memory.
+  // Once again, we use quadrilaterals.
+  typedef Shape::Quadrilateral ShapeType;
+  // Use the unstructured conformal mesh class
+  typedef Geometry::ConformalMesh<ShapeType> MeshType;
+  // Define the corresponding mesh-part type
+  typedef Geometry::MeshPart<MeshType> MeshPartType;
+  // Use the standard transformation mapping
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+  // Use the Lagrange-1 element
+  typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+
+  // In addition to the usual types above, we also need to define another important mesh class
+  // for this tutorial: the "mesh-node" type:
+  // A mesh-node is a management object, which organises a mesh as well as a set of mesh-parts
+  // that refer to the corresponding mesh along with some other data that we are not interested in
+  // here. We did not use mesh-nodes in the previous tutorials, as there was only just one mesh
+  // and a single mesh-part for the whole domain boundary, which we have managed by ourselves.
+
+  // The class that we require here is a RootMeshNode and its only parameter is the mesh type:
+  typedef Geometry::RootMeshNode<MeshType> RootMeshNodeType;
+
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // Linear System type definitions
+
+  // Our LAFEM containers work in main memory.
   typedef Mem::Main MemType;
+  // Our data arrays should be double precision.
+  typedef double DataType;
+  // Use the default index type for indexing.
+  typedef Index IndexType;
+
+  // Now we have arrived at the first main part of this tutorial: the definition of a global
+  // (i.e. distributed) linear algebra system. This involves several additional steps
+  // in comparison to the previous (purely sequential) tutorials.
+
+  // As usual, we first define the basic matrix, vector and filter types.
+  // We will name them "Local***Type" as there will also be global counterparts,
+  // which use the local types as internal containers. In this context, the term "local"
+  // refers to "local to this process".
+
+  // Our local matrix type: a standard CSR matrix
+  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
+
+  // Our local vector type: the usual dense vector
+  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
+
+  // Our local filter type: the unit filter for Dirichlet boundary conditions
+  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
+
+  // The first new type that we require is a "vector mirror".
+  // A mirror is one of the core components of a distributed linear algebra system
+  // in the context of domain decomposition, which is used to gather and scatter
+  // the data that is shared between several processes over their "halos".
+  // Note that we will not use the mirrors directly once we have assembled them,
+  // however, we still need to define the types for the definition of our global
+  // containers, which will then use the mirrors internally.
+
+  // The vector mirror takes the usual memory, data and index types as template parameters:
+  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
+
+  // Now comes the second core component of a global linear algebra system: the "gate".
+  // A gate is responsible for providing basic parallel synchronisation and communication
+  // functionality, which is used by the global linear algebra containers that we will
+  // define in a moment. We will not use any of the gate's functionality directly after
+  // its initial creation, as we will simply work with global matrices and vectors, which
+  // internally use the gate's functionality. Note that each gate object is associated
+  // with a single finite element space object - so in a more complex application with
+  // several different finite element spaces defined on possibly more than just a
+  // single mesh (level), there would be one gate per FE space per mesh.
+
+  // The gate class template is defined in the "Global" namespace and it takes two
+  // template arguments: the local vector and the vector mirror types:
+  typedef Global::Gate<LocalVectorType, VectorMirrorType> GateType;
+
+  // Furthermore, we need to define the global (i.e. distributed) linear algebra types,
+  // i.e. global matrix, vector and filter types.
+
+  // First, we define the global matrix type.
+
+  // The template arguments of the global matrix class template are the local matrix type,
+  // which is used as an internal container, as well as two vector mirrors, which correspond
+  // to the test- and trial-spaces of the matrix, which are identical in our case:
+  typedef Global::Matrix<LocalMatrixType, VectorMirrorType, VectorMirrorType> GlobalMatrixType;
+
+  // Next we need a compatible global vector. In analogy to the matrix, the template arguments
+  // are the local vector type and the vector mirror type:
+  typedef Global::Vector<LocalVectorType, VectorMirrorType> GlobalVectorType;
+
+  // Finally, we also need a global filter, whose template arguments are the local filter
+  // as well as the vector mirror type:
+  typedef Global::Filter<LocalFilterType, VectorMirrorType> GlobalFilterType;
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -162,7 +245,7 @@ namespace Tutorial06
     // At this point, we check the number of processes. As this is a simple tutorial without
     // any sophisticated partitioning algorithm, we are stuck to process counts which are
     // powers of 4 (in 2D). Also, we do not allow more than 64 processes, just to simplify
-    // the condition of the following if-statement --  the tutorial code itself works even
+    // the condition of the following if-statement -- the tutorial code itself works even
     // for process counts of 256, 1024, etc.
     if((comm.size() != 1) && (comm.size() != 4) && (comm.size() != 16) && (comm.size() != 64))
     {
@@ -217,20 +300,11 @@ namespace Tutorial06
     // We will require these names for the assembly of boundary conditions later on.
     // Note: in 3D there would be six boundary faces named from 'bnd:0' to 'bnd:5'.
 
-    // Define the mesh type, just as in any previous tutorials
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
-
-    // Define the mesh-part type; this was usually defined as "BoundaryType" in the previous tutorials.
-    typedef Geometry::MeshPart<MeshType> MeshPartType;
-
-    // We now need to define the previously mentioned "mesh-node" type.
-    // A mesh-node is a management object, which organises a mesh as well as a set of mesh-parts
-    // that refer to the corresponding mesh along with some other data that we are not interested
-    // in here. We did not use mesh-nodes in the previous tutorials, as there was only just one
-    // mesh and a single mesh-part, which we have managed by ourselves.
-
-    // The class that we require here is a RootMeshNode:
-    typedef Geometry::RootMeshNode<MeshType> RootMeshNodeType;
+    // In contrast to the UnitCubeFactory and BoundaryFactory classes that we have used in the
+    // previous tutorials to obtain our mesh, the generator that we want to use will create
+    // a mesh-node for us. This mesh-node contains the actual mesh itself, which we will
+    // reference later on, as well as the boundary mesh-parts and so-called halos, which we
+    // will discuss in a minute.
 
     // Normally (i.e. in a "real world" application), mesh nodes are managed by a domain controller
     // class, which also takes care of allocating and deleting mesh nodes on the heap.
@@ -312,12 +386,6 @@ namespace Tutorial06
     // from the mesh-node:
     MeshType& mesh = *root_mesh_node->get_mesh();
 
-    // Define the transformation
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-
-    // Use the Lagrange-1 element (aka "Q1"):
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
-
     // Create the trafo
     TrafoType trafo(mesh);
 
@@ -328,70 +396,6 @@ namespace Tutorial06
     // the local patch, i.e. the trafo and the space do not know about the fact that we are
     // running a parallel simulation. All global interaction and communication is performed
     // only on the linear algebra level, which are going to set up in the next few steps.
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Linear System type definitions
-
-    // Now we have arrived at the main part of this tutorial: the definition of a global
-    // (i.e. distributed) linear algebra system. This involves several additional steps
-    // in comparison to the previous (purely sequential) tutorials.
-
-    // As usual, we first define the basic matrix, vector and filter types.
-    // We will name them "LocalXYZType" as there will also be global counterparts,
-    // which use the local types as internal containers. In this context, the term "local"
-    // refers to "local to this process".
-
-    // Our local matrix type: a standard CSR matrix
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
-
-    // Our local vector type: the usual dense vector
-    typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
-
-    // Our local filter type: the unit filter for Dirichlet boundary conditions
-    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
-
-    // The first new type that we require is a "vector mirror".
-    // A mirror is one of the core components of a distributed linear algebra system
-    // in the context of domain decomposition, which is used to gather and scatter
-    // the data that is shared between several processes over their "halos".
-    // Note that we will not use the mirrors directly once we have assembled them,
-    // however, we still need to define the types for the definition of our global
-    // containers, which will then use the mirrors internally.
-
-    // The vector mirror takes the usual memory, data and index types as template parameters:
-    typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
-
-    // Now comes the second core component of a global linear algebra system: the "gate".
-    // A gate is responsible for providing basic parallel synchronisation and communication
-    // functionality, which is used by the global linear algebra containers that we will
-    // define in a moment. We will not use any of the gate's functionality directly after
-    // its initial creation, as we will simply work with global matrices and vectors, which
-    // internally use the gate's functionality. Note that each gate object is associated
-    // with a single finite element space object - so in a more complex application with
-    // several different finite element spaces defined on possibly more than just a
-    // single mesh (level), there would be one gate per FE space per mesh.
-
-    // The gate class template is defined in the "Global" namespace and it takes two
-    // template arguments: the local vector and the vector mirror types:
-    typedef Global::Gate<LocalVectorType, VectorMirrorType> GateType;
-
-    // Furthermore, we need to define the global (i.e. distributed) linear algebra types,
-    // i.e. global matrix, vector and filter types.
-
-    // First, we define the global matrix type.
-
-    // The template arguments of the global matrix class template are the local matrix type,
-    // which is used as an internal container, as well as two vector mirrors, which correspond
-    // to the test- and trial-spaces of the matrix, which are identical in our case:
-    typedef Global::Matrix<LocalMatrixType, VectorMirrorType, VectorMirrorType> GlobalMatrixType;
-
-    // Next we need a compatible global vector. In analogy to the matrix, the template arguments
-    // are the local vector type and the vector mirror type:
-    typedef Global::Vector<LocalVectorType, VectorMirrorType> GlobalVectorType;
-
-    // Finally, we also need a global filter, whose template arguments are the local filter
-    // as well as the vector mirror type:
-    typedef Global::Filter<LocalFilterType, VectorMirrorType> GlobalFilterType;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -408,18 +412,17 @@ namespace Tutorial06
     // the communication with that neighbour - so let's loop over all neighbour ranks:
     for(auto it = neighbour_ranks.begin(); it != neighbour_ranks.end(); ++it)
     {
+      // Get the rank of our neighbour process:
+      const int neighbour_rank = *it;
+
       // As already mentioned before, our mesh-node does not only contain the mesh itself,
       // but also other important stuff, such as the "halos", which describe the overlap of
       // neighboured patches. For the assembly of the mirror, we need to get the halo mesh-part
       // from the mesh-node first:
-      const MeshPartType* neighbour_halo = root_mesh_node->find_halo_mesh_part(*it);
-      if(neighbour_halo == nullptr)
-      {
-        // This should *never* happen!
-        std::cerr << "ERROR: Process " << comm.rank()
-          << " failed to retrieve halo for neighbour " << (*it) << std::endl;
-        Runtime::abort();
-      }
+      const MeshPartType* neighbour_halo = root_mesh_node->find_halo_mesh_part(neighbour_rank);
+
+      // Ensure that we have a halo for this neighbour rank:
+      XASSERTM(neighbour_halo != nullptr, "Failed to retrieve neighbour halo!");
 
       // Now that we have the halo mesh-part, we can create and assemble the corresponding mirror:
       VectorMirrorType neighbour_mirror;
@@ -433,9 +436,11 @@ namespace Tutorial06
 
       // Once the mirror is assembled, we give it over to our gate.
       gate.push(
-        *it,                          // the process rank of the neighbour
+        neighbour_rank,               // the process rank of the neighbour
         std::move(neighbour_mirror)   // the mirror for the neighbour
       );
+
+      // continue with next neighbour rank
     }
 
     // At this point, our gate contains all the mirrors required for the communication with our
@@ -535,7 +540,7 @@ namespace Tutorial06
     vec_rhs_local.format();
 
     // Again, we use the sine-bubble as a reference solution:
-    Analytic::Common::SineBubbleFunction<2> sol_function;
+    Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
 
     // Create a force functional for our solution:
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
@@ -548,10 +553,10 @@ namespace Tutorial06
     // Now comes the small but significant difference:
     // In contrast to global matrices, global rhs vectors *must* be synchronised manually after the
     // local vector assembly!!! This task is easy but also easily overlooked, as we just have to
-    // call the 'synch_0' member function of the global vector object:
+    // call the 'sync_0' member function of the global vector object:
     vec_rhs.sync_0();
 
-    // Beware:
+    // But Beware:
     // If you forget to synchronise the global RHS vector, you will not experience any crashes
     // or solver breakdowns, which would indicate that something is wrong, but you will get
     // wrong results -- and by "wrong" I do not mean "inaccurate" -- I mean *GARBAGE* !
@@ -591,11 +596,11 @@ namespace Tutorial06
     // for us, also created boundary mesh-parts, which are already contained in the mesh-node.
     // The important difference is that the generator created four mesh-parts, named from
     // "bnd:0" to "bnd:3", representing the four boundary edges of the unit-square domain.
+    // Note that if you have changed the ShapeType to hexahedra, the corresponding domain
+    // has six boundary faces named "bnd:0" to "bnd:5".
 
-    // So we need a loop over the four boundaries here:
-    // (Note: If you switch this tutorial to 3D hexahedra, you need to loop over the *six*
-    //        boundary faces "bnd:0" to "bnd:5" here)
-    for(int ibnd(0); ibnd < 4; ++ibnd)
+    // To keep this part of the code dimension-independent, we loop up to 2*dimension:
+    for(int ibnd(0); ibnd < 2*ShapeType::dimension; ++ibnd)
     {
       // Build the name of the boundary mesh-part and call the mesh-node's "find_mesh_part"
       // function to get a pointer to the mesh-part:
@@ -626,7 +631,8 @@ namespace Tutorial06
 
     // At this point, we have added all boundary mesh-part of our patch to the assembler.
     // Note: If our patch is an inner patch, then we have added no boundary mesh-parts to
-    // the assembler, but that's fine as the unit-filter assembler can work with that.
+    // the assembler, but that's fine as the unit-filter assembler can work with that, as
+    // in this case the unit-filter will be an empty filter.
 
     // Finally, assemble the local filter:
     unit_asm.assemble(filter_local, space);
@@ -752,7 +758,7 @@ namespace Tutorial06
     Geometry::ExportVTK<MeshType> exporter(mesh);
 
     // Add the vertex-projection of our (local) solution and rhs vectors
-    exporter.add_vertex_scalar("solution", vec_sol_local.elements());
+    exporter.add_vertex_scalar("sol", vec_sol_local.elements());
     exporter.add_vertex_scalar("rhs", vec_rhs_local.elements());
 
     // Finally, write the VTK files by calling the "write" function of the exporter and pass the
@@ -764,7 +770,7 @@ namespace Tutorial06
 
     // That's all, folks.
     comm.print("Finished!");
-  } // int main(...)
+  } // void main(...)
 } // namespace Tutorial06
 
 // Here's our main function
