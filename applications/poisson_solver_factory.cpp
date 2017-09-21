@@ -33,7 +33,7 @@
 #include <control/statistics.hpp>
 
 
-namespace PoissonDirichlet2D
+namespace PoissonSolverFactory
 {
   using namespace FEAT;
 
@@ -48,22 +48,20 @@ namespace PoissonDirichlet2D
     typedef double DataType;
     typedef Index IndexType;
 
-    // choose our desired analytical solution
-    Analytic::Common::ExpBubbleFunction<2> sol_func;
-
     // define our domain type
     typedef Control::Domain::DomainControl<DomainLevel_> DomainControlType;
     typedef typename DomainControlType::LevelType DomainLevelType;
 
     // fetch our mesh type
     typedef typename DomainControlType::MeshType MeshType;
+    typedef typename MeshType::ShapeType ShapeType;
 
     // define our system level
     typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
-    const Index num_levels = domain.size_physical();
+    const Index num_levels = Index(domain.size_physical());
 
     // create system levels
     for (Index i(0); i < num_levels; ++i)
@@ -130,7 +128,8 @@ namespace PoissonDirichlet2D
       typename SystemLevelType::LocalSystemVector& vec_f = vec_rhs.local();
 
       // assemble the force
-      Assembly::Common::LaplaceFunctional<decltype(sol_func)> force_func(sol_func);
+      Analytic::Common::ConstantFunction<ShapeType::dimension> one_func(1.0);
+      Assembly::Common::ForceFunctional<decltype(one_func)> force_func(one_func);
       Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_domain_level.space, cubature);
 
       // sync the vector
@@ -203,24 +202,6 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    if (args.check("no-err") < 0)
-    {
-      // Compute and print the H0-/H1-errors
-      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
-        (vec_sol.local(), sol_func, the_domain_level.space, cubature);
-
-      // synhronise all local errors
-      errors.synchronise(comm);
-
-      // print errors
-      comm.print("");
-      comm.print(errors.format_string());
-    }
-
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-
     if (args.check("vtk") >= 0)
     {
       // build VTK name
@@ -259,6 +240,45 @@ namespace PoissonDirichlet2D
         throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
       }
     }
+  }
+
+  template<typename Shape_>
+  void run_shape(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
+  {
+    comm.print(String("Shape-Type: ") + Shape_::name());
+
+    // define our mesh type
+    typedef Shape_ ShapeType;
+    typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+    // create a time-stamp
+    TimeStamp time_stamp;
+
+    // let's create our domain
+    comm.print("Preparing domain...");
+
+    // create our domain control
+    typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, false);
+
+    domain.parse_args(args);
+    domain.set_desired_levels(args.query("level")->second);
+    domain.create(mesh_reader);
+
+    // print partitioning info
+    comm.print(domain.get_chosen_parti_info());
+
+    // plot our levels
+    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
+    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
+
+    // run our application
+    run(args, domain);
+
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 
   void main(int argc, char* argv [])
@@ -311,48 +331,43 @@ namespace PoissonDirichlet2D
       FEAT::Runtime::abort();
     }
 
-    // define our mesh type
-    typedef Shape::Hypercube<2> ShapeType;
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+    // Our mesh file reader
+    Geometry::MeshFileReader mesh_reader;
 
-    // create a time-stamp
-    TimeStamp time_stamp;
+    // read in the mesh files
+    mesh_reader.add_mesh_files(comm, args.query("mesh")->second);
 
-    // let's create our domain
-    comm.print("Preparing domain...");
+    // read the mesh file root markups
+    mesh_reader.read_root_markup();
+    String mesh_type = mesh_reader.get_meshtype_string();
 
-    // create our domain control
-    typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, false);
+    comm.print(String("Mesh File Type: ") + mesh_type);
 
-    domain.parse_args(args);
-    domain.set_desired_levels(args.query("level")->second);
-    domain.create(args.query("mesh")->second);
-
-    // print partitioning info
-    comm.print(domain.get_chosen_parti_info());
-
-    // plot our levels
-    comm.print("LVL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
-    //comm.print("LVL-MED: " + stringify(domain.med_level_index()) + " [" + stringify(domain.get_desired_level_med()) + "]");
-    comm.print("LVL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
-
-    // run our application
-    run(args, domain);
-
-    // print elapsed runtime
-    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+    // run 2D or 3D ?
+    if(mesh_type == "conformal:hypercube:1:1")
+      run_shape<Shape::Hypercube<1>>(args, comm, mesh_reader);
+    else if(mesh_type == "conformal:hypercube:2:2")
+      run_shape<Shape::Hypercube<2>>(args, comm, mesh_reader);
+    else if(mesh_type == "conformal:hypercube:3:3")
+      run_shape<Shape::Hypercube<3>>(args, comm, mesh_reader);
+    else if(mesh_type == "conformal:simplex:2:2")
+      run_shape<Shape::Simplex<2>>(args, comm, mesh_reader);
+    else if(mesh_type == "conformal:simplex:3:3")
+      run_shape<Shape::Simplex<3>>(args, comm, mesh_reader);
+    else
+    {
+      comm.print(std::cerr, "ERROR: unsupported mesh type '" + mesh_type + "'");
+      FEAT::Runtime::abort();
+    }
   }
-} // namespace PoissonDirichlet2D
+} // namespace PoissonSolverFactory
 
 int main(int argc, char* argv [])
 {
   FEAT::Runtime::initialise(argc, argv);
   try
   {
-    PoissonDirichlet2D::main(argc, argv);
+    PoissonSolverFactory::main(argc, argv);
   }
   catch (const std::exception& exc)
   {
