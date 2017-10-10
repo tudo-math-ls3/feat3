@@ -16,7 +16,7 @@ def configure_gcc(cpu, buildid, compiler):
     sys.exit(1)
 
   cmake_flags = ""
-  cxxflags = "-pipe -std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla"
+  cxxflags = "-pipe -std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wlogical-op -Wdouble-promotion -Wformat=2"
   if (major == 4 and minor >= 9) or major > 4:
     cxxflags += " -fdiagnostics-color=always"
 
@@ -29,7 +29,7 @@ def configure_gcc(cpu, buildid, compiler):
     #cxxflags += " -Wnull-dereference" #produces too much false positives
 
   if major >= 7:
-    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull"
+    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull -Wrestrict"
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
