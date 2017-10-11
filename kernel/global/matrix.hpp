@@ -95,6 +95,16 @@ namespace FEAT
         this->_matrix.convert(*other);
       }
 
+      const GateRowType* get_row_gate() const
+      {
+        return _row_gate;
+      }
+
+      const GateColType* get_col_gate() const
+      {
+        return _col_gate;
+      }
+
       Matrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return Matrix(_row_gate, _col_gate, _matrix.clone(mode));
