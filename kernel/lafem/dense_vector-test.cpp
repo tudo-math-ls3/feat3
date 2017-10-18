@@ -88,7 +88,7 @@ public:
     TEST_CHECK_EQUAL(e, d);
     e.clone(a);
     for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL(e(i), a(i));
+      TEST_CHECK_EQUAL(DT_(e(i)), a(i));
 
     b.clone(a);
     TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());
@@ -141,7 +141,7 @@ public:
       k.write_out(FileMode::fm_mtx, mts);
       DenseVector<Mem_, DT_, IT_> l(FileMode::fm_mtx, mts);
       for (Index i(0) ; i < k.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-4);
+        TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), DT_(1e-4));
     }
 
     {
@@ -149,7 +149,7 @@ public:
       k.write_out(FileMode::fm_exp, ts);
       DenseVector<Mem_, DT_, IT_> m(FileMode::fm_exp, ts);
       for (Index i(0) ; i < k.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-4);
+        TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), DT_(1e-4));
     }
 
     {
@@ -158,14 +158,14 @@ public:
       bs.seekg(0);
       DenseVector<Mem_, DT_, IT_> n(FileMode::fm_dv, bs);
       for (Index i(0) ; i < k.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), DT_(1e-5));
     }
 
     {
       auto op = k.serialise();
       DenseVector<Mem_, DT_, IT_> o(op);
       for (Index i(0) ; i < k.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), DT_(1e-5));
     }
 
     // new clone testing
@@ -254,18 +254,18 @@ public:
       c.axpy(a, b, s);
       result_local.copy(c);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), DT_(1e-2));
 
       a.axpy(a, b, s);
       result_local.copy(a);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), DT_(1e-2));
 
       a.copy(a_local);
       b.axpy(a, b, s);
       result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), DT_(1e-2));
     }
   }
 };

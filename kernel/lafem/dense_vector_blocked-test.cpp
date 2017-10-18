@@ -125,14 +125,14 @@ public:
     DenseVectorBlocked<Mem_, DT_, IT_, 3> l(FileMode::fm_mtx, mts);
     TEST_CHECK_EQUAL(l, g);
     /*for (Index i(0) ; i < g.template size<Perspective::pod>() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(l.template elements<Perspective::pod>()[i], g.template elements<Perspective::pod>()[i], 1e-4);*/
+      TEST_CHECK_EQUAL_WITHIN_EPS(l.template elements<Perspective::pod>()[i], g.template elements<Perspective::pod>()[i], DT_(1e-4));*/
 
     std::stringstream ts;
     g.write_out(FileMode::fm_exp, ts);
     DenseVectorBlocked<Mem_, DT_, IT_, 3> m(FileMode::fm_exp, ts);
     TEST_CHECK_EQUAL(m, g);
     /*for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-4);*/
+      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), DT_(1e-4));*/
 
     BinaryStream bs;
     g.write_out(FileMode::fm_dvb, bs);
@@ -140,13 +140,13 @@ public:
     DenseVectorBlocked<Mem_, DT_, IT_, 3> n(FileMode::fm_dvb, bs);
     TEST_CHECK_EQUAL(n, g);
     /*for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);*/
+      TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), DT_(1e-5));*/
 
     auto op = g.serialise();
     DenseVectorBlocked<Mem_, DT_, IT_, 3> o(op);
     TEST_CHECK_EQUAL(o, g);
     /*for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);*/
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), DT_(1e-5));*/
   }
 };
 DenseVectorBlockedTest<Mem::Main, float, unsigned int> cpu_dense_vector_blocked_test_float_uint;
@@ -213,20 +213,20 @@ public:
       result_local.copy(c);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], DT_(1e-2));
 
       a.axpy(a, b, s);
       result_local.copy(a);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], DT_(1e-2));
 
       a.copy(a_local);
       b.axpy(a, b, s);
       result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], DT_(1e-2));
     }
   }
 };

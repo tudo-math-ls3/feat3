@@ -103,7 +103,7 @@ public:
     auto op = b.serialise();
     SparseVector<Mem_, DT_, IT_> o(op);
     for (Index i(0) ; i < b.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), b(i), 1e-5);
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), b(i), DT_(1e-5));
 
     //increase vector size above alloc_increment
     SparseVector<Mem_, DT_, IT_> p(3001);

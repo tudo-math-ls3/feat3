@@ -215,7 +215,7 @@ public:
       // apply-test for alpha = 0.0
       a.apply(r, x, y, DT_(0.0));
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), DT_(1e-2));
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -224,7 +224,7 @@ public:
       ref.axpy(ref, y);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), DT_(1e-2));
 
       // apply-test for alpha = 4711.1
       //r.gaxpyg(s, a, x, y);
@@ -238,13 +238,13 @@ public:
       ref_local.copy(ref);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
 
       a.apply(r, x);
       result_local.copy(r);
       a_local.apply(ref_local, x_local);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
     }
   }
 };
@@ -723,7 +723,7 @@ public:
       SparseMatrixELL<Mem_, DT_, IT_> a(a_local);
 
       DT_ c = a.norm_frobenius();
-      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, 1e-5);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, DT_(1e-5));
     }
   }
 };

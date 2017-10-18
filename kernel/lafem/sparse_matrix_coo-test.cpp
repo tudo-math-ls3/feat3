@@ -52,10 +52,10 @@ public:
     a(3,3,1);
     a(1,2,8);
     TEST_CHECK_EQUAL(a.used_elements(), 3ul);
-    TEST_CHECK_EQUAL(a(1, 2), 8.);
-    TEST_CHECK_EQUAL(a(5, 5), 2.);
-    TEST_CHECK_EQUAL(a(3, 3), 1.);
-    TEST_CHECK_EQUAL(a(1, 3), 0.);
+    TEST_CHECK_EQUAL(a(1, 2), DT_(8));
+    TEST_CHECK_EQUAL(a(5, 5), DT_(2));
+    TEST_CHECK_EQUAL(a(3, 3), DT_(1));
+    TEST_CHECK_EQUAL(a(1, 3), DT_(0));
 
     a.format();
     TEST_CHECK_EQUAL(a.used_elements(), Index(3));
@@ -64,16 +64,16 @@ public:
     a(5,5,8);
     a(5,5,2);
     TEST_CHECK_EQUAL(a.used_elements(), 3ul);
-    TEST_CHECK_EQUAL(a(1, 2), 7.);
-    TEST_CHECK_EQUAL(a(5, 5), 2.);
+    TEST_CHECK_EQUAL(a(1, 2), DT_(7));
+    TEST_CHECK_EQUAL(a(5, 5), DT_(2));
 
     a.format();
     a(1,2,8);
     a(5,5,2);
     a(1,2,7);
     TEST_CHECK_EQUAL(a.used_elements(), 3ul);
-    TEST_CHECK_EQUAL(a(1, 2), 7.);
-    TEST_CHECK_EQUAL(a(5, 5), 2.);
+    TEST_CHECK_EQUAL(a(1, 2), DT_(7));
+    TEST_CHECK_EQUAL(a(5, 5), DT_(2));
 
     SparseMatrixCOO<Mem_, DT_, IT_> b;
     b.convert(a);
@@ -212,7 +212,7 @@ public:
       // apply-test for alpha = 0.0
       a.apply(r, x, y, DT_(0.0));
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), DT_(1e-2));
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -221,7 +221,7 @@ public:
       ref.axpy(ref, y);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), DT_(1e-2));
 
       // apply-test for alpha = 4711.1
       //r.axpy(s, a, x, y);
@@ -235,7 +235,7 @@ public:
       ref_local.copy(ref);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
 
       a.apply(r, x);
       result_local.copy(r);
@@ -248,7 +248,7 @@ public:
         ref_local(a_local.row_indices()[i], t);
       }
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
     }
   }
 };

@@ -149,7 +149,7 @@ public:
       a.apply(r, x, y, DT_(0.0));
       result_local.copy(r);
       for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y_local(i), result_local(i), _eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(y_local(i), result_local(i), DT_(_eps));
 
       a.apply(r, x);
       result_local.copy(r);
@@ -163,7 +163,7 @@ public:
         ref_local(i, sum);
       }
       for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(_eps));
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -179,7 +179,7 @@ public:
       }
 
       for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(_eps));
 
       // apply-test for s = 0.123
       a.apply(r, x, y, s);
@@ -190,7 +190,7 @@ public:
       ref_local.copy(ref);
 
       for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(_eps));
     }
   }
 };
@@ -218,7 +218,7 @@ class DenseMatrixMultiplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  double _eps;
+   double _eps;
 
   explicit DenseMatrixMultiplyTest(double eps)
     : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixMultiplyTest"),
@@ -272,7 +272,7 @@ public:
       for (Index i(0) ; i < result.rows() ; ++i)
       {
         for (Index j(0) ; j < result.columns() ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i, j), ref_local(i, j), _eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i, j), ref_local(i, j), DT_(_eps));
       }
     }
   }

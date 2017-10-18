@@ -254,7 +254,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
     {
-      if (fabs(ref1(i)) > eps)
+      if (Math::abs(ref1(i)) > eps)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref1(i), eps);
     }
 
@@ -268,7 +268,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
     {
-      if (fabs(ref1(i)) > eps)
+      if (Math::abs(ref1(i)) > eps)
         TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)), r(i), eps);
     }
 
@@ -282,7 +282,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
     {
-      if (fabs(ref1(i)) > eps)
+      if (Math::abs(ref1(i)) > eps)
         TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)) * s, r(i), eps);
     }
   }

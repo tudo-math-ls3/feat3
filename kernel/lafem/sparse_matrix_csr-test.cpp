@@ -314,7 +314,7 @@ public:
       result_local.copy(r);
       ref_local.copy(y);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -324,14 +324,14 @@ public:
       ref.axpy(ref, y);
       ref_local.copy(ref);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
 
       // apply-test for alpha = -1.0 and &r==&y
       r.copy(y);
       a.apply(r, x, r, DT_(-1.0));
       result_local.copy(r);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
 
       // apply-test for alpha = 4711.1
       //r.axpy(s, a, x, y);
@@ -343,20 +343,20 @@ public:
       ref.axpy(ref, y);
       ref_local.copy(ref);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
 
       // apply-test for alpha = 4711.1 and &r==&y
       r.copy(y);
       a.apply(r, x, r, s);
       result_local.copy(r);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
 
       a.apply(r, x);
       result_local.copy(r);
       a_local.apply(ref_local, x_local);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
 
       // transposed apply-test for alpha = 4711.1
       if (!(typeid(Mem::CUDA) == typeid(Mem_) && typeid(IT_) == typeid(unsigned long)))
@@ -370,7 +370,7 @@ public:
         ref.axpy(ref, y);
         ref_local.copy(ref);
         for (Index i(0) ; i < size ; ++i)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
       }
     }
   }
@@ -470,18 +470,18 @@ public:
       r_local.convert(r);
       for (Index i(0) ; i < size ; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], ref_local(i), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], ref_local(i) * DT_(0.5), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], ref_local(i) * DT_(2.0), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], ref_local(i), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], ref_local(i) * DT_(0.5), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], ref_local(i) * DT_(2.0), DT_(1e-5));
       }
 
       a.apply(r, x, y, DT_(-1));
       r_local.convert(r);
       for (Index i(0) ; i < size ; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] - ref_local(i), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] - ref_local(i) * DT_(0.5), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - ref_local(i) * DT_(2.0), 1e-4);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] - ref_local(i), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] - ref_local(i) * DT_(0.5), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - ref_local(i) * DT_(2.0), DT_(1e-4));
       }
 
       DT_ alpha(0.75);
@@ -489,9 +489,9 @@ public:
       r_local.convert(r);
       for (Index i(0) ; i < size ; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] + alpha * ref_local(i), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] + alpha * ref_local(i) * DT_(0.5), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] + alpha * ref_local(i) * DT_(2.0), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] + alpha * ref_local(i), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] + alpha * ref_local(i) * DT_(0.5), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] + alpha * ref_local(i) * DT_(2.0), DT_(1e-5));
       }
     }
   }

@@ -374,32 +374,32 @@ public:
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     // &r == &y
     r.copy(y);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(r, xb, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(rb, xb, y, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
   }
 };
 SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_float_ulong;
@@ -790,7 +790,7 @@ public:
     std::cout<<xb<<std::endl;
     a.apply(rb, xb);
     DT_ norm = r.norm2();
-    TEST_CHECK_EQUAL_WITHIN_EPS(norm, ref_norm, 1e-4);
+    TEST_CHECK_EQUAL_WITHIN_EPS(norm, ref_norm, DT_(1e-4));
 
     a = a_backup.clone(CloneMode::Deep);
     auto perm_inv = perm.inverse();
