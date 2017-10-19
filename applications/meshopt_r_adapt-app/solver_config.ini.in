@@ -4,7 +4,7 @@ precon = none
 tol_rel = 1e-8
 max_iter = 10000
 lbfgs_dim = 10
-plot_mode = iter
+plot_mode = all
 keep_iterates = 0
 
 [ALGLIBMinCG]
@@ -13,7 +13,7 @@ precon = none
 tol_rel = 1e-8
 max_iter = 10000
 direction_update = DYHSHybrid
-plot_mode = iter
+plot_mode = all
 keep_iterates = 0
 
 [NLCG]
@@ -23,7 +23,7 @@ tol_rel = 1e-8
 max_iter = 10000
 linesearch = MQCLinesearch
 direction_update = DYHSHybrid
-plot_mode = iter
+plot_mode = all
 keep_iterates = 0
 
 [MQCLinesearch]
@@ -53,7 +53,7 @@ max_iter = 10
 tol_rel = 1e5
 tol_abs = 1e-8
 initial_penalty_param = 2e4
-plot_mode = iter
+plot_mode = all
 inner_solver = NLCG
 
 [PCG-MG]
@@ -62,6 +62,15 @@ max_iter = 100
 min_stag_iter = 1
 tol_rel = 1e-8
 plot_mode = iter
+precon = MG2
+
+[WEAK-PCG-MG]
+type = pcg
+max_iter = 10
+min_stag_iter = 1
+tol_abs = 1e-3
+tol_rel = 1e-5
+plot_mode = summary
 precon = MG2
 
 [PCG-JAC]
@@ -90,7 +99,7 @@ min_iter = 4
 precon = jac
 
 [jac]
-type = jacobiobi
+type = jacobi
 omega = 0.5
 
 [MG1]

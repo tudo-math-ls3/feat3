@@ -22,4 +22,5 @@ fac_norm = 1.0
 fac_det = 1.0
 fac_cof = 0.0
 fac_reg = 1e-8
+exponent_det = 2
 scale_computation = current_uniform

@@ -84,7 +84,7 @@ max_iter = 1000
 
 [ALGLIBMinLBFGS]
 type = ALGLIBMinLBFGS
-plot_mode = iter
+plot_mode = summary
 max_iter = 10000
 tol_rel = 1e-8
 lbfgs_dim = 7
