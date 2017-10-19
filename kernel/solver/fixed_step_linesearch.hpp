@@ -109,9 +109,9 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::get_rel_update()
-        virtual DataType get_rel_update() override
+        virtual DataType get_rel_update() const override
         {
-          return _step_length;
+          return _step_length*this->_norm_dir;
         }
 
         /**
@@ -148,6 +148,7 @@ namespace FEAT
          */
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_dir) override
         {
+          this->_norm_dir = vec_dir.norm2();
           // clear solution vector
           vec_cor.format();
           vec_cor.axpy(vec_dir, vec_cor, _step_length);
@@ -170,6 +171,7 @@ namespace FEAT
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
+          this->_norm_dir = vec_dir.norm2();
           vec_sol.axpy(vec_dir, vec_sol, _step_length);
 
           this->_functional.prepare(vec_sol, this->_filter);

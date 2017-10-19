@@ -356,7 +356,7 @@ int main(int argc, char* argv[])
       my_linesearch = new_fixed_step_linesearch(my_op, my_filter, steplength);
     }
     my_linesearch->set_max_iter(20);
-    my_linesearch->set_plot_mode(Solver::PlotMode::all);
+    //my_linesearch->set_plot_mode(Solver::PlotMode::all);
 
     // The default is no preconditioner
     String precon_name("none");

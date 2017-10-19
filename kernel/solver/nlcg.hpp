@@ -130,8 +130,6 @@ namespace FEAT
         VectorType _vec_r;
         /// descend direction vector
         VectorType _vec_p;
-        /// descend direction vector, normalised for better numerical stability
-        VectorType _vec_pn;
         /// temporary vector: Preconditioned defect
         VectorType _vec_z;
         /// temporary vector: y[k+1] = r[k+1] - r[k]
@@ -296,7 +294,6 @@ namespace FEAT
           // create three temporary vectors
           _vec_r = this->_functional.create_vector_r();
           _vec_p = this->_functional.create_vector_r();
-          _vec_pn = this->_functional.create_vector_r();
           _vec_y = this->_functional.create_vector_r();
           _vec_z = this->_functional.create_vector_r();
 
@@ -311,7 +308,6 @@ namespace FEAT
             iterates->clear();
 
           this->_vec_p.clear();
-          this->_vec_pn.clear();
           this->_vec_r.clear();
           this->_vec_y.clear();
           this->_vec_z.clear();
@@ -471,26 +467,18 @@ namespace FEAT
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
           }
+          //this->_vec_z.copy(this->_vec_r);
 
           // The first direction has to be the (preconditioned) steepest descent direction
           this->_vec_p.copy(this->_vec_z);
 
-          // First scale so that all entries are |.| < 1
-          this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
-          // Now scale so that normed_dir.norm2() == 1. Note that this will only be approximately true, so we
-          // compute and use its norm later on anyway
-          this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
 
           ////std::cout << "dir " << *_vec_p << std::endl;
           //DataType max_elem(this->_vec_p.max_element());
           //DataType scale1 = DataType(1)/max_elem;
           //std::cout << "max_elem   " << max_elem << " " << scale1 << std::endl;
-          //this->_vec_pn.scale(this->_vec_p, scale1);
-          //DataType new_norm(_vec_pn.norm2());
           //DataType scale2(DataType(1)/new_norm);
           //std::cout << " new norm  " << new_norm << " " << scale2 << std::endl;
-          //this->_vec_pn.scale(_vec_pn, scale2);
-          ////std::cout << "normalised dir " << *_vec_pn << std::endl;
 
           // Compute initial eta = < p, r>
           eta = this->_vec_p.dot(this->_vec_r);
@@ -499,8 +487,6 @@ namespace FEAT
           if(eta <= DataType(0))
           {
             this->_vec_p.copy(this->_vec_r);
-            this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
-            this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
           }
 
           // compute initial gamma = < z[0], r[0] >
@@ -536,9 +522,14 @@ namespace FEAT
             // Copy information to the linesearch
             _linesearch->set_initial_fval(this->_fval);
             _linesearch->set_grad_from_defect(this->_vec_r);
+            // If we are using a preconditioner, use the additional information about the preconditioned step length in the line search
+            if(this->_precond != nullptr)
+            {
+              _linesearch->set_dir_scaling(true);
+            }
 
             // Call the linesearch to update vec_sol
-            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_pn);
+            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_p);
 
             // Copy back information from the linesearch
             this->_fval = _linesearch->get_final_fval();
@@ -621,20 +612,12 @@ namespace FEAT
               this->_vec_p.axpy(this->_vec_p, this->_vec_z, beta);
             }
 
-            // First scale so that all entries are |.| < 1
-            this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
-            // Now scale so that normed_dir.norm2() == 1. Note that this will only be approximately true, so we
-            // compute and use its norm later on anyway
-            this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
 
             //max_elem = this->_vec_p.max_element();
             //scale1 = DataType(1)/max_elem;
             //std::cout << "max_elem   " << max_elem << " " << scale1 << std::endl;
-            //this->_vec_pn.scale(this->_vec_p, scale1);
-            //new_norm = this->_vec_pn.norm2();
             //scale2 = DataType(1)/new_norm;
             //std::cout << " new norm  " << new_norm << " " << scale2 << std::endl;
-            //this->_vec_pn.scale(_vec_pn, scale2);
 
             eta = this->_vec_p.dot(this->_vec_r);
 
@@ -643,8 +626,6 @@ namespace FEAT
             if(eta <= DataType(0))
             {
               this->_vec_p.copy(this->_vec_r);
-              this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
-              this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
               //return Status::aborted;
             }
 

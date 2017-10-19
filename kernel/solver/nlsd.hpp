@@ -298,7 +298,6 @@ namespace FEAT
           this->_vec_p.copy(this->_vec_r);
 
           // apply preconditioner to defect vector
-          //if(!this->_apply_precond(this->_vec_tmp, this->_vec_r, this->_filter))
           if(!this->_apply_precond(this->_vec_p, this->_vec_r, this->_filter))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
@@ -325,6 +324,11 @@ namespace FEAT
             // Copy information to the linesearch
             _linesearch->set_initial_fval(this->_fval);
             _linesearch->set_grad_from_defect(this->_vec_r);
+            // If we are using a preconditioner, use the additional information about the preconditioned step length in the line search
+            if(this->_precond != nullptr)
+            {
+              _linesearch->set_dir_scaling(true);
+            }
 
             // Call the linesearch to update vec_sol
             status = _linesearch->correct(vec_sol, this->_vec_p);

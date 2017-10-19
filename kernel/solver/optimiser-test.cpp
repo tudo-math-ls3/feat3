@@ -62,6 +62,7 @@ class NLCGTest:
 
     void run() const override
     {
+      int failed_checks(0);
       // The analytic function
       Function_ my_function;
       // Create the (nonlinear) operator
@@ -92,7 +93,7 @@ class NLCGTest:
       }
 
       my_linesearch->set_max_iter(20);
-      //my_linesearch->set_plot_mode(Solver::PlotMode::summary);
+      my_linesearch->set_plot_mode(Solver::PlotMode::all);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
@@ -110,14 +111,13 @@ class NLCGTest:
         throw InternalError(__func__, __FILE__, __LINE__, "Got invalid precon_type: "+_precon_type);
       }
 
-      std::shared_ptr<Solver::IterativeSolver<typename OperatorType::VectorTypeR>> solver;
-      solver = new_nlcg(my_functional, my_filter, my_linesearch, _update, false, my_precond);
+      auto solver = new_nlcg(my_functional, my_filter, my_linesearch, _update, false, my_precond);
 
       solver->init();
-      solver->set_tol_abs(Math::eps<DT_>());
+      solver->set_tol_abs(Math::pow(Math::eps<DT_>(), DT_(0.75)));
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::summary);
-      solver->set_max_iter(250);
+      solver->set_plot_mode(Solver::PlotMode::all);
+      solver->set_max_iter(100);
 
       // This will hold the solution
       auto sol = my_functional.create_vector_r();
@@ -151,13 +151,32 @@ class NLCGTest:
       }
 
       // Check if we stayed in the iteration number bound
-      TEST_CHECK_MSG(solver->get_num_iter() <= _max_iter, TestTraitsType::name()+" "+solver->name()+": num_iter = "+stringify(solver->get_num_iter())+" > "+stringify(_max_iter)+" = max_iter");
+      if(solver->get_num_iter() > _max_iter)
+      {
+        ++failed_checks;
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << std::endl;
+      }
+
       // Check if we stayed in the functional evaluation number bound
-      TEST_CHECK_MSG(my_functional.get_num_func_evals() <= _max_func_evals, TestTraitsType::name()+" "+solver->name()+": num_func_evals = "+stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals");
+      if(my_functional.get_num_func_evals() > _max_func_evals)
+      {
+        ++failed_checks;
+        std::cout << "num_func_evals = "
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << std::endl;
+      }
+
       // Check if we found a valid minimum
-      TEST_CHECK_MSG(min_dist < _tol, TestTraitsType::name()+" "+solver->name()+": min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+      if(min_dist > _tol)
+      {
+        ++failed_checks;
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << std::endl;
+      }
 
       solver->done();
+
+      TEST_CHECK_MSG(failed_checks == 0,TestTraitsType::name()+" "+solver->name()+" "+my_linesearch->name()+": "
+          +stringify(failed_checks)+ " failed checks");
+
     }
 };
 
@@ -183,7 +202,7 @@ NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_d(double(0.5), Index(47), Index(231),"NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_hessian_rb_d(double(1), Index(25), Index(42), "MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_hessian_rb_d(double(0.95), Index(25), Index(42), "MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
 nlcg_sw_hessian_gp_d(double(0.5), Index(15), Index(95), "MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
@@ -250,6 +269,7 @@ class NLSDTest:
 
     void run() const override
     {
+      int failed_checks(0);
       // The analytic function
       Function_ my_function;
       // Create the (nonlinear) operator
@@ -283,7 +303,7 @@ class NLSDTest:
       }
 
       my_linesearch->set_max_iter(20);
-      my_linesearch->set_plot_mode(Solver::PlotMode::none);
+      my_linesearch->set_plot_mode(Solver::PlotMode::all);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
@@ -301,13 +321,12 @@ class NLSDTest:
         throw InternalError("Got invalid precon_type: "+_precon_type);
       }
 
-      std::shared_ptr<Solver::IterativeSolver<typename OperatorType::VectorTypeR>> solver;
-      solver = new_nlsd(my_functional, my_filter, my_linesearch, false, my_precond);
+      auto solver = new_nlsd(my_functional, my_filter, my_linesearch, false, my_precond);
 
       solver->init();
-      solver->set_tol_abs(Math::eps<DT_>());
+      solver->set_tol_abs(Math::pow(Math::eps<DT_>(), DT_(0.75)));
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::summary);
+      solver->set_plot_mode(Solver::PlotMode::all);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -344,11 +363,31 @@ class NLSDTest:
       }
 
       // Check if we stayed in the iteration number bound
-      TEST_CHECK_MSG(solver->get_num_iter() <= _max_iter, TestTraitsType::name()+" "+solver->name()+": num_iter = "+stringify(solver->get_num_iter())+" > "+stringify(_max_iter)+" = max_iter");
+      if(solver->get_num_iter() > _max_iter)
+      {
+        ++failed_checks;
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << std::endl;
+      }
+
       // Check if we stayed in the functional evaluation number bound
-      TEST_CHECK_MSG(my_functional.get_num_func_evals() <= _max_func_evals, TestTraitsType::name()+" "+solver->name()+": num_func_evals = "+stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals");
+      if(my_functional.get_num_func_evals() > _max_func_evals)
+      {
+        ++failed_checks;
+        std::cout << "num_func_evals = "
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << std::endl;
+      }
+
       // Check if we found a valid minimum
-      TEST_CHECK_MSG(min_dist < _tol, TestTraitsType::name()+" "+solver->name()+": min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+      if(min_dist > _tol)
+      {
+        ++failed_checks;
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << std::endl;
+      }
+
+      solver->done();
+
+      TEST_CHECK_MSG(failed_checks == 0,TestTraitsType::name()+" "+solver->name()+" "+my_linesearch->name()+": "
+          +stringify(failed_checks)+ " failed checks");
 
     }
 };
@@ -410,6 +449,7 @@ class ALGLIBMinLBFGSTest:
 
     void run() const override
     {
+      int failed_checks(0);
       // The analytic function
       Function_ my_function;
       // Create the (nonlinear) operator
@@ -422,7 +462,7 @@ class ALGLIBMinLBFGSTest:
       solver->init();
       solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::none);
+      solver->set_plot_mode(Solver::PlotMode::all);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -458,11 +498,32 @@ class ALGLIBMinLBFGSTest:
         }
       }
 
-      TEST_CHECK_MSG(solver->get_num_iter() <= _max_iter, TestTraitsType::name()+" "+solver->name()+": num_iter = "+stringify(solver->get_num_iter())+" > "+stringify(_max_iter)+" = max_iter");
+      // Check if we stayed in the iteration number bound
+      if(solver->get_num_iter() > _max_iter)
+      {
+        ++failed_checks;
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << std::endl;
+      }
+
       // Check if we stayed in the functional evaluation number bound
-      TEST_CHECK_MSG(my_functional.get_num_func_evals() <= _max_func_evals, TestTraitsType::name()+" "+solver->name()+": num_func_evals = "+stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals");
+      if(my_functional.get_num_func_evals() > _max_func_evals)
+      {
+        ++failed_checks;
+        std::cout << "num_func_evals = "
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << std::endl;
+      }
+
       // Check if we found a valid minimum
-      TEST_CHECK_MSG(min_dist < _tol, TestTraitsType::name()+" "+solver->name()+": min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+      if(min_dist > _tol)
+      {
+        ++failed_checks;
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << std::endl;
+      }
+
+      solver->done();
+
+      TEST_CHECK_MSG(failed_checks == 0,TestTraitsType::name()+" "+solver->name()+": "
+          +stringify(failed_checks)+ " failed checks");
 
     }
 };
@@ -517,6 +578,7 @@ class ALGLIBMinCGTest:
 
     void run() const override
     {
+      int failed_checks(0);
       // The analytic function
       Function_ my_function;
       // Create the (nonlinear) operator
@@ -524,14 +586,13 @@ class ALGLIBMinCGTest:
       // The filter
       FilterType my_filter;
 
-      std::shared_ptr<Solver::IterativeSolver<typename OperatorType::VectorTypeR>> solver;
-      solver = new_alglib_mincg(my_functional, my_filter, _direction_update, false);
+      auto solver = new_alglib_mincg(my_functional, my_filter, _direction_update, false);
 
       solver->init();
-      solver->set_tol_abs(Math::eps<DT_>());
+      solver->set_tol_abs(Math::pow(Math::eps<DT_>(), DT_(0.75)));
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::summary);
-      solver->set_max_iter(250);
+      solver->set_plot_mode(Solver::PlotMode::all);
+      solver->set_max_iter(100);
 
       // This will hold the solution
       auto sol = my_functional.create_vector_r();
@@ -544,7 +605,7 @@ class ALGLIBMinCGTest:
       sol(0,starting_point);
 
       // Solve the optimisation problem
-      std::cout << solver->correct(sol, rhs) << std::endl;
+      solver->correct(sol, rhs);
 
       solver->done();
 
@@ -566,11 +627,33 @@ class ALGLIBMinCGTest:
         }
       }
 
-      TEST_CHECK_MSG(solver->get_num_iter() <= _max_iter, TestTraitsType::name()+" "+solver->name()+": num_iter = "+stringify(solver->get_num_iter())+" > "+stringify(_max_iter)+" = max_iter");
+      // Check if we stayed in the iteration number bound
+      if(solver->get_num_iter() > _max_iter)
+      {
+        ++failed_checks;
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << std::endl;
+      }
+
       // Check if we stayed in the functional evaluation number bound
-      TEST_CHECK_MSG(my_functional.get_num_func_evals() <= _max_func_evals, TestTraitsType::name()+" "+solver->name()+": num_func_evals = "+stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals");
+      if(my_functional.get_num_func_evals() > _max_func_evals)
+      {
+        ++failed_checks;
+        std::cout << "num_func_evals = "
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << std::endl;
+      }
+
       // Check if we found a valid minimum
-      TEST_CHECK_MSG(min_dist < _tol, TestTraitsType::name()+" "+solver->name()+": min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+      if(min_dist > _tol)
+      {
+        ++failed_checks;
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << std::endl;
+      }
+
+      solver->done();
+
+      TEST_CHECK_MSG(failed_checks == 0,TestTraitsType::name()+" "+solver->name()+": "
+          +stringify(failed_checks)+ " failed checks");
+
     }
 };
 

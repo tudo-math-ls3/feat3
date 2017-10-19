@@ -57,8 +57,6 @@ namespace FEAT
         typedef Linesearch<Functional_, Filter_> BaseClass;
 
       protected:
-        /// Last successful line step, needs to start with 1
-        DataType _alpha_0;
         /// Hard maximum for the step length
         DataType _alpha_hard_max;
         /// Hard minimum for the step length
@@ -84,7 +82,6 @@ namespace FEAT
          */
         explicit MQCLinesearch(Functional_& functional, Filter_& filter, bool keep_iterates = false) :
           BaseClass("MQC-LS", functional, filter, keep_iterates),
-          _alpha_0(DataType(1)),
           _alpha_hard_max(DataType(0)),
           _alpha_hard_min(DataType(0)),
           _alpha_soft_max(DataType(0)),
@@ -110,14 +107,12 @@ namespace FEAT
          */
         explicit MQCLinesearch(const String& section_name, PropertyMap* section,
         Functional_& functional, Filter_& filter) :
-          BaseClass("SW-LS", section_name, section, functional, filter),
-          _alpha_0(DataType(1)),
+          BaseClass("MQC-LS", section_name, section, functional, filter),
           _alpha_hard_max(DataType(0)),
           _alpha_hard_min(DataType(0)),
           _alpha_soft_max(DataType(0)),
           _alpha_soft_min(DataType(0))
           {
-
           }
 
         /// \copydoc ~BaseClass()
@@ -135,17 +130,10 @@ namespace FEAT
         virtual void reset() override
         {
           BaseClass::reset();
-          _alpha_0 = DataType(1);
           _alpha_hard_max = DataType(0);
           _alpha_hard_min = DataType(0);
           _alpha_soft_max = DataType(0);
           _alpha_soft_min = DataType(0);
-        }
-
-        /// \copydoc BaseClass::get_rel_update()
-        virtual DataType get_rel_update() override
-        {
-          return this->_alpha_min*this->_norm_dir;
         }
 
         /**
@@ -187,8 +175,10 @@ namespace FEAT
           this->_functional.prepare(vec_sol, this->_filter);
 
           // apply
+
           Status st(_apply_intern(vec_sol, vec_dir));
           this->plot_summary(st);
+
           return st;
         }
 
@@ -214,18 +204,32 @@ namespace FEAT
           static constexpr DataType extrapolation_width = DataType(4);
           Status status(Status::progress);
 
-          // Set the first step
-          DataType alpha(_alpha_0);
-          // It is critical that this was set from the outside!
-          DataType fval(this->_fval_0);
-          // We want to minimise <vec_dir, vec_grad()>
-          DataType df(vec_dir.dot(this->_vec_grad));
+          // The step length wrt. to the NORMALISED search direction
+          DataType alpha(0);
+          // The functional value
+          DataType fval(0);
+          /// <vec_pn, vec_grad>. We want to find the minimum of the functional value along vec_pn
+          DataType df(0);
 
-          this->_startup(fval, df, vec_sol, vec_dir);
+          // Perform initialisations and checks
+          Status st = this->_startup(alpha, fval, df, vec_sol, vec_dir);
+          //alpha = this->_alpha_0;
+          if(st != Status::progress)
+          {
+            return st;
+          }
+
+          // Scaling if we are to use step sizes wrt. to the non-normalised search direction
+          // This appears to be the right thing theoretically, but in practice not using the search direction norm as
+          // initial guess for the step size works better. Stupid reality...
+          //if(this->_dir_scaling)
+          //{
+          //  alpha = this->_norm_dir;
+          //}
 
           // Set hard limits to default values if they have not been set
           _alpha_hard_min = DataType(0);
-          // This bogus value should be around 1e50 for double precision. It is chosen make comparing results with
+          // This bogus value should be around 1e50 for double precision. It is chosen to make comparing results with
           // ALGLIB easier
           if(_alpha_hard_max < Math::eps<DataType>())
           {
@@ -234,10 +238,10 @@ namespace FEAT
 
           // Set the intervall of uncertainty
           _alpha_soft_min = DataType(0);
-          _alpha_soft_max = _alpha_0 + extrapolation_width*_alpha_0;
+          _alpha_soft_max = this->_alpha_0 + extrapolation_width*this->_alpha_0;
           _alpha_soft_max = Math::min(_alpha_soft_max, _alpha_hard_max);
 
-          //std::cout << "Linesearch initial alpha " << _alpha_0 << std::endl;
+          //std::cout << "Linesearch initial alpha " << this->_alpha_0 << std::endl;
 
           DataType alpha_lo(0);
           // It is critical that _f_0 was set from the outside!
@@ -282,10 +286,10 @@ namespace FEAT
             //std::cout << "Set alpha_smin " << _alpha_soft_min << " alpha_smax " << _alpha_soft_max << std::endl;
 
             // Update solution: sol <- initial_sol + _alpha*dir
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
+            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
             //std::cout << "Linesearch alpha " << alpha << std::endl;
             //std::cout << "initial_sol " << *(this->_vec_initial_sol) << std::endl;
-            //std::cout << "dir " << *vec_dir << std::endl;
+            //std::cout << "dir " << *this->_vec_pn << std::endl;
             //std::cout << "sol " << *vec_sol << std::endl;
 
             // Prepare and evaluate
@@ -297,7 +301,7 @@ namespace FEAT
             this->_filter.filter_def(this->_vec_grad);
 
             // New directional derivative and new defect
-            df = vec_dir.dot(this->_vec_grad);
+            df = this->_vec_pn.dot(this->_vec_grad);
             status = this->_check_convergence(fval, df, alpha);
 
             // If success is reported, check if it is a real success or if something fishy is going on
@@ -385,22 +389,22 @@ namespace FEAT
 
           } // while(status == Status:progress)
 
-          this->_alpha_min = alpha;//*this->_norm_dir;
+          this->_alpha_min = alpha;
           this->_fval_min = fval;
 
           // If we are successful, we save the last step length as the new initial step length
           if(status == Status::success)
           {
-            this->_alpha_0 = alpha*this->_norm_dir;
+            this->_alpha_0 = this->_alpha_min;
           }
           // If we are not successful, we update the best step length and need to re-evaluate everything for that
           // step
           else
           {
-            this->_alpha_min = alpha_lo;//*this->_norm_dir;
+            this->_alpha_min = alpha_lo;
             this->_fval_min = fval_lo;
             //std::cout << "Unusual termination alpha_lo " << alpha_lo << "fval_lo " << fval_lo << std::endl;
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_lo);
+            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha_lo);
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);

@@ -52,6 +52,8 @@ namespace FEAT
         VectorType _vec_initial_sol;
         /// temporary vector
         VectorType _vec_tmp;
+        /// descend direction vector, normalised for better numerical stability
+        VectorType _vec_pn;
 
         /// Functional functional value
         DataType _fval_min;
@@ -60,6 +62,8 @@ namespace FEAT
         /// Threshold for trimming function value and gradient
         DataType _trim_threshold;
 
+        /// Initial line search parameter
+        DataType _alpha_0;
         /// Line search parameter
         DataType _alpha_min;
         /// Initial <vec_dir, vec_grad>
@@ -75,6 +79,9 @@ namespace FEAT
         DataType _tol_decrease;
         /// Tolerance for the update step
         DataType _tol_step;
+        /// Use the search direction norm for step scaling? This can be important if the search direction was
+        /// preconditioned (e.g. the Newton direction)
+        bool _dir_scaling;
 
       public:
         /// For debugging purposes, it is possible to save all iterates to this
@@ -105,6 +112,7 @@ namespace FEAT
           _fval_min(Math::huge<DataType>()),
           _fval_0(Math::huge<DataType>()),
           _trim_threshold(Math::huge<DataType>()),
+          _alpha_0(1),
           _alpha_min(0),
           _delta_0(Math::huge<DataType>()),
           _norm_dir(0),
@@ -112,6 +120,7 @@ namespace FEAT
           _tol_curvature(DataType(0.3)),
           _tol_decrease(DataType(1e-3)),
           _tol_step(DataType(Math::pow(Math::eps<DataType>(), DataType(0.85)))),
+          _dir_scaling(false),
           iterates(nullptr)
           {
             if(keep_iterates)
@@ -147,6 +156,7 @@ namespace FEAT
           _fval_min(Math::huge<DataType>()),
           _fval_0(Math::huge<DataType>()),
           _trim_threshold(Math::huge<DataType>()),
+          _alpha_0(1),
           _alpha_min(DataType(0)),
           _delta_0(Math::huge<DataType>()),
           _norm_dir(DataType(0)),
@@ -154,6 +164,7 @@ namespace FEAT
           _tol_curvature(0.3),
           _tol_decrease(1e-3),
           _tol_step(DataType(Math::pow(Math::eps<DataType>(), DataType(0.85)))),
+          _dir_scaling(false),
           iterates(nullptr)
           {
             // Check if we have to keep the iterates
@@ -267,12 +278,26 @@ namespace FEAT
           _tol_step = tol_step;
         }
 
+        /**
+         * \brief Determines if search direction scaling is to be used
+         *
+         * Internally, the search direction vector gets normalised ( \f$ \| p \|_2 = 1 \f$) for numerical stablility.
+         * Some line searches have a heuristic for choosing the initial step length \f$ \alpha_0 \f$, which can use
+         * \f$ \| p \|_2 \f$ if \c _dir_scaling is set to \c true. This is useful when using a preconditioner
+         * (e.g. Newton).
+         */
+        void set_dir_scaling(const bool b)
+        {
+          _dir_scaling = b;
+        }
+
         /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
         {
           // Create temporary vectors
           _vec_initial_sol = this->_functional.create_vector_r();
           _vec_tmp = this->_functional.create_vector_r();
+          _vec_pn = this->_functional.create_vector_r();
           _vec_grad = this->_functional.create_vector_r();
           BaseClass::init_symbolic();
         }
@@ -282,6 +307,7 @@ namespace FEAT
         {
           // Clear temporary vectors
           _vec_initial_sol.clear();
+          _vec_pn.clear();
           _vec_tmp.clear();
           _vec_grad.clear();
           BaseClass::done_symbolic();
@@ -295,6 +321,7 @@ namespace FEAT
           _fval_min = Math::huge<DataType>();
           _fval_0 = Math::huge<DataType>();
           _trim_threshold = Math::huge<DataType>();
+          _alpha_0 = DataType(1),
           _alpha_min = DataType(0);
           _delta_0 = Math::huge<DataType>();
           _norm_dir = DataType(0);
@@ -319,12 +346,14 @@ namespace FEAT
          * \f]
          *
          * Used for determining if the linesearch stagnated without updating the solution in a significant way.
+         * As this base class normalises \f$ d \f$ in _startup(), it just return \f$ \alpha \f$. Derived classes
+         * NOT performing this normalisation must overwrite this.
          *
          * \returns The relative update.
          */
-        virtual DataType get_rel_update()
+        virtual DataType get_rel_update() const
         {
-          return Math::abs(_alpha_min)*_norm_dir;
+          return Math::abs(this->_alpha_min);
         }
 
         /**
@@ -432,11 +461,14 @@ namespace FEAT
         /**
          * \brief Performs the startup of the iteration
          *
-         * \param[in] fval
+         * \param[out] alpha
+         * The initial step size value.
+         *
+         * \param[out] fval
          * The initial functional value.
          *
-         * \param[in] df
-         * The initial direction derivative value: \f$ df = \left< dir, grad \right>\f$.
+         * \param[out] delta
+         * The initial direction derivative value: \f$ \delta = \left< dir, grad \right>\f$.
          *
          * \param[in] vec_sol
          * The initial guess.
@@ -449,17 +481,24 @@ namespace FEAT
          *
          * \returns Status::progress if no error occurred.
          */
-        virtual Status _startup(const DataType fval, const DataType df, const VectorType& vec_sol,
-        const VectorType& vec_dir)
+        virtual Status _startup(DataType& alpha, DataType& fval, DataType& delta, const VectorType& vec_sol, const VectorType& vec_dir)
         {
           Status status(Status::progress);
 
           this->_num_iter = Index(0);
           this->_vec_initial_sol.copy(vec_sol);
 
-          this->_fval_0 = fval;
+          this->_vec_pn.copy(vec_dir);
+          this->_norm_dir = this->_vec_pn.norm2();
+
+          // First scale so that all entries are |.| < 1
+          this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.max_element());
+          // Now scale so that vec_pn.norm2() == 1. Note that this will only be approximately true
+          this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
+
+          // It is critical that fval_0 was set from outside using set_initial_fval!
           this->_fval_min = this->_fval_0;
-          this->_delta_0 = df;
+          this->_delta_0 = this->_vec_pn.dot(this->_vec_grad);
 
           if(this->_delta_0 > DataType(0))
           {
@@ -470,8 +509,6 @@ namespace FEAT
           // Compute initial defect. We want to minimise d^T * grad(_functional)
           this->_def_init = Math::abs(this->_delta_0);
 
-          // Norm of the search direction
-          this->_norm_dir = vec_dir.norm2();
           // Norm of the initial guess
           this->_norm_sol = vec_sol.norm2();
 
@@ -487,10 +524,16 @@ namespace FEAT
             << std::endl;
           }
 
-          if(!Math::isfinite(fval) || !Math::isfinite(this->_delta_0) || !Math::isfinite(this->_norm_dir))
+          if(!Math::isfinite(this->_fval_0) || !Math::isfinite(this->_delta_0) || !Math::isfinite(this->_norm_dir))
           {
             status = Status::aborted;
           }
+
+          // Set initial step size
+          alpha = _alpha_0;
+          // Other intitial values
+          fval = _fval_0;
+          delta = _delta_0;
 
           return status;
         }

@@ -153,24 +153,26 @@ namespace FEAT
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
-          Status status(Status::progress);
-
+          // The step length wrt. to the NORMALISED search direction
           DataType alpha(0);
-          // It is critical that this and _vec_grad were set from the outside!
-          DataType fval(this->_fval_0);
-          DataType df(vec_dir.dot(this->_vec_grad));
+          // The functional value
+          DataType fval(0);
+          /// <vec_pn, vec_grad>. We want to find the minimum of the functional value along vec_pn
+          DataType df(0);
 
-          // Setup
-          status = this->_startup(fval, df, vec_sol, vec_dir);
+          // Perform initialisations and checks
+          Status st = this->_startup(alpha, fval, df, vec_sol, vec_dir);
+          //  Because of the Newton-Raphson update x[k+1] = x[k] + alpha[k+1] d and alpha[k+1] = alpha[k] - < g[k], d > / < d, H[k] d >,
+          // || d ||_2 does not matter and the relative update is invariant
 
           // Compute new _alpha <- _alpha - grad.dot(vec_dir) / vec_dir.dot(Hess*vec_dir)
-          this->_functional.apply_hess(this->_vec_tmp, vec_dir);
+          this->_functional.apply_hess(this->_vec_tmp, this->_vec_pn);
           this->_filter.filter_def(this->_vec_tmp);
 
-          alpha -= this->_vec_grad.dot(vec_dir)/vec_dir.dot(this->_vec_tmp);
+          alpha = -this->_vec_grad.dot(this->_vec_pn)/this->_vec_pn.dot(this->_vec_tmp);
 
           // start iterating
-          while(status == Status::progress)
+          while(st == Status::progress)
           {
             IterationStats stat(*this);
 
@@ -184,37 +186,37 @@ namespace FEAT
             //this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
-            df = vec_dir.dot(this->_vec_grad);
+            df = this->_vec_pn.dot(this->_vec_grad);
 
-            if(fval < this->_fval_min)
+            if(fval <= this->_fval_min)
             {
               this->_fval_min = fval;
               this->_alpha_min = alpha;
             }
 
-            status = this->_check_convergence(fval, df, alpha);
+            st = this->_check_convergence(fval, df, alpha);
 
-            if(status != Status::progress)
+            if(st != Status::progress)
             {
               break;
             }
 
-            // Compute new _alpha <- _alpha - grad.dot(vec_dir) / vec_dir.dot(Hess*vec_dir)
-            this->_functional.apply_hess(this->_vec_tmp, vec_dir);
+            // Compute new _alpha <- _alpha - grad.dot(this->_vec_pn) / this->_vec_pn.dot(Hess*this->_vec_pn)
+            this->_functional.apply_hess(this->_vec_tmp, this->_vec_pn);
             this->_filter.filter_def(this->_vec_tmp);
 
-            alpha -= this->_vec_grad.dot(vec_dir)/vec_dir.dot(this->_vec_tmp);
+            alpha -= this->_vec_grad.dot(this->_vec_pn)/this->_vec_pn.dot(this->_vec_tmp);
 
             // Update solution
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
+            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
 
           }
 
           // If we are not successful, we update the best step length and need to re-evaluate everything for that
           // step
-          if(status != Status::success)
+          if(st != Status::success)
           {
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, this->_alpha_min);
+            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, this->_alpha_min);
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);
@@ -226,7 +228,7 @@ namespace FEAT
           }
 
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
-          return status;
+          return st;
         }
 
     }; // class NewtonRaphsonLinesearch

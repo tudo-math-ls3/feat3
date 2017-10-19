@@ -41,8 +41,6 @@ namespace FEAT
         static constexpr DataType secant_step_default = DataType(1e-2);
 
       protected:
-        /// Initial step for the "other" secant point.
-        DataType _alpha_0;
         /// Default step for calculating the "other" secant point in the initial step. Crucial
         DataType _secant_step;
 
@@ -68,9 +66,9 @@ namespace FEAT
           const DataType secant_step = secant_step_default,
           const bool keep_iterates = false) :
           BaseClass("S-LS", functional, filter, keep_iterates),
-          _alpha_0(secant_step),
           _secant_step(secant_step)
           {
+            this->_alpha_0 = _secant_step;
           }
 
         /**
@@ -92,7 +90,6 @@ namespace FEAT
         explicit SecantLinesearch(const String& section_name, PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass("S-LS", section_name, section, functional, filter),
-          _alpha_0(secant_step_default),
           _secant_step(secant_step_default)
           {
             auto secant_step_p = section->query("secant_step");
@@ -100,6 +97,8 @@ namespace FEAT
             {
               set_secant_step(DataType(std::stod(secant_step_p.first)));
             }
+
+            this->_alpha_0 = _secant_step;
           }
 
         /// \copydoc ~BaseClass()
@@ -117,7 +116,7 @@ namespace FEAT
         virtual void reset() override
         {
           BaseClass::reset();
-          _alpha_0 = _secant_step;
+          this->_alpha_0 = _secant_step;
         }
 
         /**
@@ -205,24 +204,29 @@ namespace FEAT
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 
-          Status status(Status::progress);
+          // The step length wrt. to the NORMALISED search direction
+          DataType alpha(0);
+          // The functional value
+          DataType fval(0);
+          /// <vec_pn, vec_grad>. We want to find the minimum of the functional value along vec_pn
+          DataType df(0);
 
-          // It is critical that this was set from the outside!
-          DataType fval(this->_fval_0);
-          /// <vec_dir, vec_grad>. We want to find the minimum of the functional value along vec_dir
-          DataType df(vec_dir.dot(this->_vec_grad));
-          // Setup
-          status = this->_startup(fval, df, vec_sol, vec_dir);
+          // Perform initialisations and checks
+          Status st = this->_startup(alpha, fval, df, vec_sol, vec_dir);
+          // Use the additional information about the preconditioned search direction's length?
+          if(this->_dir_scaling)
+          {
+            alpha *= this->_norm_dir;
+          }
 
-          // The second secant point in the first iteration is x + _secant_step * vec_dir
-          DataType alpha(_alpha_0/this->_norm_dir);
           DataType alpha_update(alpha);
 
+          // The second secant point in the first iteration is x + _secant_step * vec_dir
           // The first "other" point for the secant
-          vec_sol.axpy(vec_dir, this->_vec_initial_sol, _secant_step/this->_norm_dir);
+          vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
 
           // start iterating
-          while(status == Status::progress)
+          while(st == Status::progress)
           {
             IterationStats stat(*this);
 
@@ -244,17 +248,17 @@ namespace FEAT
 
             // Set new defect, do convergence checks and compute the new _alpha
             DataType df_prev = df;
-            df = vec_dir.dot(this->_vec_grad);
+            df = this->_vec_pn.dot(this->_vec_grad);
 
-            status = this->_check_convergence(fval, df, alpha);
+            st = this->_check_convergence(fval, df, alpha);
 
             // Check if the diffence in etas is too small, thus leading to a huge update of relative size > sqrt(eps)
             if(Math::abs(df - df_prev) < Math::abs(alpha_update*df)*Math::sqrt(Math::eps<DataType>()))
             {
-              status = Status::stagnated;
+              st = Status::stagnated;
             }
 
-            if(status != Status::progress)
+            if(st != Status::progress)
             {
               break;
             }
@@ -264,20 +268,20 @@ namespace FEAT
             alpha += alpha_update;
 
             // Update the solution
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
+            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
           }
 
           // If we are successful, we could save the last step length as the new initial step length. This is
           // disabled by default, as it can lead to stagnation e.g. for minimising the Rosenbrock function.
-          //if(status == Status::success)
+          //if(st == Status::success)
           //{
-          //  this->_alpha_0 = this->_alpha_min*this->_norm_dir;
+          //  this->_alpha_0 = this->_alpha_min/this->_norm_dir;
           //}
           // If we are not successful, we update the best step length and need to re-evaluate everything for that
           // step
-          if(status != Status::success)
+          if(st != Status::success)
           {
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, this->_alpha_min);
+            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, this->_alpha_min);
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);
@@ -288,7 +292,7 @@ namespace FEAT
             this->_filter.filter_def(this->_vec_grad);
           }
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::undefined, this->get_num_iter()));
-          return status;
+          return st;
         }
 
     }; // class SecantLinesearch
