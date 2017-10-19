@@ -691,8 +691,6 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "solver_config_file = ./solver_config.ini" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    //iss << "parti-type = fallback parmetis" << std::endl;
-    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "refinement_adapt_mode = none" << std::endl;
     iss << "finest_adapt_mode = chart" << std::endl;
     iss << "lvl_min = 1" << std::endl;
@@ -705,8 +703,6 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "solver_config_file = ./solver_config.ini" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    //iss << "parti-type = fallback parmetis" << std::endl;
-    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "refinement_adapt_mode = none" << std::endl;
     iss << "finest_adapt_mode = chart" << std::endl;
     iss << "lvl_min = 1" << std::endl;
@@ -769,7 +765,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[NLCG]" << std::endl;
     iss << "type = NLCG" << std::endl;
     iss << "precon = DuDvPrecon" << std::endl;
-    iss << "plot_mode = iter" << std::endl;
+    iss << "plot_mode = all" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "max_iter = 1000" << std::endl;
     iss << "linesearch = MQCLinesearch" << std::endl;
@@ -836,7 +832,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "[NLCG]" << std::endl;
     iss << "type = NLCG" << std::endl;
     iss << "precon = DuDvPrecon" << std::endl;
-    iss << "plot_mode = iter" << std::endl;
+    iss << "plot_mode = all" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "max_iter = 100" << std::endl;
     iss << "linesearch = MQCLinesearch" << std::endl;
@@ -851,14 +847,14 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
 
     iss << "[PCG-JAC]" << std::endl;
     iss << "type = pcg" << std::endl;
-    iss << "max_iter = 10" << std::endl;
+    iss << "max_iter = 100" << std::endl;
     iss << "tol_rel = 1e-8" << std::endl;
     iss << "precon = jac" << std::endl;
 
     iss << "[PCG-MG]" << std::endl;
     iss << "type = pcg" << std::endl;
-    iss << "max_iter = 2" << std::endl;
-    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "max_iter = 10" << std::endl;
+    iss << "tol_rel = 1e-3" << std::endl;
     iss << "plot_mode = summary" << std::endl;
     iss << "precon = MG1" << std::endl;
 
@@ -876,16 +872,26 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "min_iter = 4" << std::endl;
     iss << "precon = jac" << std::endl;
 
+    iss << "[cg]" << std::endl;
+    iss << "type = pcg" << std::endl;
+    iss << "max_iter = 4" << std::endl;
+    iss << "min_iter = 4" << std::endl;
+
     iss << "[jac]" << std::endl;
     iss << "type = jacobi" << std::endl;
     iss << "omega = 0.7" << std::endl;
 
     iss << "[MG1]" << std::endl;
     iss << "type = mg" << std::endl;
-    iss << "hierarchy = s:rich-c:pcg" << std::endl;
+    iss << "hierarchy = s:cg-c:pcg" << std::endl;
     iss << "lvl_min = -1" << std::endl;
     iss << "lvl_max = 0" << std::endl;
     iss << "cycle = v" << std::endl;
+
+    iss << "[s:cg-c:pcg]" << std::endl;
+    iss << "type = hierarchy" << std::endl;
+    iss << "smoother = cg" << std::endl;
+    iss << "coarse = PCG-JAC" << std::endl;
 
     iss << "[s:rich-c:pcg]" << std::endl;
     iss << "type = hierarchy" << std::endl;

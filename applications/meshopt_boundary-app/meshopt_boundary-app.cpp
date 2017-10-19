@@ -902,8 +902,6 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "midpoint = 0.0 0.0" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    //iss << "parti-type = fallback parmetis" << std::endl;
-    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "lvl_min = 1" << std::endl;
     iss << "lvl_max = 5" << std::endl;
   }
@@ -917,8 +915,6 @@ static void read_test_application_config(std::stringstream& iss, const int test_
     iss << "midpoint = 0.0 0.0" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
-    //iss << "parti-type = fallback parmetis" << std::endl;
-    //iss << "parti-rank-elems = 4" << std::endl;
     iss << "lvl_min = 1" << std::endl;
     iss << "lvl_max = 3" << std::endl;
   }
@@ -970,7 +966,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "[NLCG]" << std::endl;
   iss << "type = NLCG" << std::endl;
   iss << "precon = DuDvPrecon" << std::endl;
-  iss << "plot_mode = iter" << std::endl;
+  iss << "plot_mode = all" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "max_iter = 1000" << std::endl;
   iss << "linesearch = MQCLinesearch" << std::endl;
@@ -1002,7 +998,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "max_iter = 10" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = MG1" << std::endl;
-  iss << "plot_mode = iter" << std::endl;
+  iss << "plot_mode = summary" << std::endl;
 
   iss << "[rich]" << std::endl;
   iss << "type = richardson" << std::endl;
