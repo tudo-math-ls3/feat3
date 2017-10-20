@@ -29,6 +29,9 @@ TARGET_LINK_LIBRARIES(tutorial-05-multigrid feat)
 ADD_EXECUTABLE(tutorial-06-global tutorial_06_global.cpp)
 TARGET_LINK_LIBRARIES(tutorial-06-global feat)
 
+ADD_EXECUTABLE(tutorial-07-stokes tutorial_07_stokes.cpp)
+TARGET_LINK_LIBRARIES(tutorial-07-stokes feat)
+
 # tutorials target
 ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-01-poisson
@@ -37,4 +40,5 @@ ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-04-parser
   tutorial-05-multigrid
   tutorial-06-global
+  tutorial-07-stokes
 )

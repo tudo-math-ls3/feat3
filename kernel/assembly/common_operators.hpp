@@ -92,6 +92,94 @@ namespace FEAT
       }; // class LaplaceOperator
 
       /**
+       * \brief -Laplace operator implementation
+       *
+       * This functor implements the weak formulation of the bilinear blocked Laplace operator, i.e.
+       *   \f[ \nabla \varphi \cdot \nabla\psi \f]
+       *
+       * This functor can be used with the BilinearOperator assembly class template to assemble a
+       * blocked Laplace/Stiffness matrix.
+       *
+       * \author Peter Zajac
+       */
+      template<int dimension_>
+      class LaplaceOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        /// Every block is a dimension x dimension matrix
+        static constexpr int BlockHeight = dimension_;
+        /// Every block is a dimension x dimension matrix
+        static constexpr int BlockWidth = dimension_;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        /**
+         * \brief Laplace evaluator class template
+         *
+         * \tparam AsmTraits_
+         * The assembly traits class.
+         *
+         * \author Peter Zajac
+         */
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] operat
+           * A reference to the Laplace operator object.
+           */
+          explicit Evaluator(const LaplaceOperatorBlocked& DOXY(operat))
+          {
+          }
+
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
+          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            const DataType scalar = dot(phi.grad, psi.grad);
+            OperatorValueType r(DataType(0));
+            for(int i(0); i < OperatorValueType::m; ++i)
+            {
+              r(i,i) = scalar;
+            }
+            return r;
+          }
+        }; // class LaplaceOperatorBlocked::Evaluator<...>
+      }; // class LaplaceOperatorBlocked
+
+      /**
        * \brief Identity operator implementation
        *
        * This functor implements the weak formulation of the bilinear scalar Identity operator, i.e.
@@ -198,7 +286,7 @@ namespace FEAT
          */
         template<typename AsmTraits_>
         class Evaluator :
-            public BilinearOperator::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
           /// the data type to be used
@@ -248,7 +336,7 @@ namespace FEAT
             return r;
           }
         }; // class IdentityOperatorBlocked::Evaluator<...>
-      }; // class DuDVOperatorBlocked
+      }; // class IdentityOperatorBlocked
 
       /**
        * \brief Trial-Derivative operator implementation
@@ -580,7 +668,7 @@ namespace FEAT
          */
         template<typename AsmTraits_>
         class Evaluator :
-            public BilinearOperator::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
           /// the data type to be used
@@ -694,7 +782,7 @@ namespace FEAT
          */
         template<typename AsmTraits_>
         class Evaluator :
-            public BilinearOperator::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
           /// the data type to be used

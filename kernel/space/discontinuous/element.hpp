@@ -133,6 +133,22 @@ namespace FEAT
         }
 
       }; // class Element
+
+      /**
+       * \brief P0dc element template alias.
+       *
+       * This is merely a template alias for "Element<Trafo_, Variant::StdPolyP<0>>".
+       */
+      template<typename Trafo_>
+      using ElementP0 = Element<Trafo_, Variant::StdPolyP<0> >;
+
+      /**
+       * \brief P1dc element template alias.
+       *
+       * This is merely a template alias for "Element<Trafo_, Variant::StdPolyP<1>>".
+       */
+      template<typename Trafo_>
+      using ElementP1 = Element<Trafo_, Variant::StdPolyP<1> >;
     } // namespace Discontinuous
   } // namespace Space
 } // namespace FEAT
