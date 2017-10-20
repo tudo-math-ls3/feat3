@@ -93,7 +93,7 @@ class NLCGTest:
       }
 
       my_linesearch->set_max_iter(20);
-      my_linesearch->set_plot_mode(Solver::PlotMode::all);
+      my_linesearch->set_plot_mode(Solver::PlotMode::none);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
@@ -114,9 +114,9 @@ class NLCGTest:
       auto solver = new_nlcg(my_functional, my_filter, my_linesearch, _update, false, my_precond);
 
       solver->init();
-      solver->set_tol_abs(Math::pow(Math::eps<DT_>(), DT_(0.75)));
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::all);
+      solver->set_plot_mode(Solver::PlotMode::summary);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -205,7 +205,7 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_hessian_rb_d(double(0.95), Index(25), Index(42), "MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
-nlcg_sw_hessian_gp_d(double(0.5), Index(15), Index(95), "MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
+nlcg_sw_hessian_gp_d(double(0.5), Index(16), Index(99), "MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
 
 #ifdef FEAT_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
@@ -220,10 +220,10 @@ nlcg_sw_bs_q(__float128(1), Index(23), Index(74), "MQCLinesearch", "none", NLCGD
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(1), Index(11), Index(23), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_sw_hb_f_cuda(float(0.9), Index(11), Index(23), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(150), "SecantLinesearch", "none", NLCGDirectionUpdate::PolakRibiere);
+nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none", NLCGDirectionUpdate::PolakRibiere);
 #endif
 
 /**
@@ -303,7 +303,7 @@ class NLSDTest:
       }
 
       my_linesearch->set_max_iter(20);
-      my_linesearch->set_plot_mode(Solver::PlotMode::all);
+      my_linesearch->set_plot_mode(Solver::PlotMode::none);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
@@ -318,15 +318,15 @@ class NLSDTest:
       }
       else if(_precon_type != "none")
       {
-        throw InternalError("Got invalid precon_type: "+_precon_type);
+        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid precon_type: "+_precon_type);
       }
 
       auto solver = new_nlsd(my_functional, my_filter, my_linesearch, false, my_precond);
 
       solver->init();
-      solver->set_tol_abs(Math::pow(Math::eps<DT_>(), DT_(0.75)));
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::all);
+      solver->set_plot_mode(Solver::PlotMode::summary);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -462,7 +462,7 @@ class ALGLIBMinLBFGSTest:
       solver->init();
       solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::all);
+      solver->set_plot_mode(Solver::PlotMode::summary);
       solver->set_max_iter(100);
 
       // This will hold the solution
@@ -589,9 +589,9 @@ class ALGLIBMinCGTest:
       auto solver = new_alglib_mincg(my_functional, my_filter, _direction_update, false);
 
       solver->init();
-      solver->set_tol_abs(Math::pow(Math::eps<DT_>(), DT_(0.75)));
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot_mode(Solver::PlotMode::all);
+      solver->set_plot_mode(Solver::PlotMode::summary);
       solver->set_max_iter(100);
 
       // This will hold the solution
