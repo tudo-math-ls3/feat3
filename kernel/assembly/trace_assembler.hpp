@@ -10,6 +10,8 @@
 #include <kernel/geometry/intern/congruency_sampler.hpp>
 #include <kernel/geometry/intern/congruency_trafo.hpp>
 #include <kernel/geometry/intern/index_representative.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 
 #include <vector>
 
