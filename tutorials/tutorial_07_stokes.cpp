@@ -343,7 +343,7 @@ namespace Tutorial07
     // by calling the 'at' member function template and passing the desired index as a template
     // parameter:
     unit_asm.assemble(
-      filter.template at<0>(), // velocity unit-filter component of system filter
+      filter.at<0>(), // velocity unit-filter component of system filter
       space_velo,              // velocity space
       profile_function         // parabolic profile function
     );
@@ -353,7 +353,7 @@ namespace Tutorial07
     // by the MeanFilterAssembler. Note that there is no special setup required for this assembler,
     // so we can call the "assemble" function directly:
     Assembly::MeanFilterAssembler::assemble(
-      filter.template at<1>(),  // pressure mean-filter component of system filter
+      filter.at<1>(),  // pressure mean-filter component of system filter
       space_pres,               // pressure space
       cubature_factory          // cubature factory
     );
@@ -381,12 +381,12 @@ namespace Tutorial07
     // In this tutorial, we are dealing with a unit-filter/mean-filter pair for a Stokes system.
     // In this case, we have to apply the 'filter_mat' function of the velocity unit-filter
     // into the "A" sub-matrix (in analogy to the previous tutorials):
-    filter.template at<0>().filter_mat(matrix.block_a());
+    filter.at<0>().filter_mat(matrix.block_a());
 
     // Moreover, we have also have to apply the unit-filter onto the sub-matrix "B", this
     // time calling the "filter_offdiag_row_mat" function to zero our all rows of B, which
     // correspond to test function DOFs affected by Dirichlet boundary conditions:
-    filter.template at<0>().filter_offdiag_row_mat(matrix.block_b());
+    filter.at<0>().filter_offdiag_row_mat(matrix.block_b());
 
     // The mean-filter component of the pressure does not provide a means to filter matrices,
     // thus the "D" sub-matrix remains unfiltered -- this is, by the way, the reason why the
@@ -474,7 +474,7 @@ namespace Tutorial07
     // The class that performs this analysis is the "VelocityAnalyser" and it returns a
     // "VelicityInfo" object of the appropriate datatype and dimension:
     Assembly::VelocityInfo<DataType, dim> velo_info = Assembly::VelocityAnalyser::compute(
-      vec_sol.template at<0>(), // the velocity field
+      vec_sol.at<0>(), // the velocity field
       space_velo,               // the velocity space
       cubature_factory          // a cubature factory
     );
@@ -498,7 +498,7 @@ namespace Tutorial07
     // and not a scalar function, we have to call the "add_vertex_vector" function instead of
     // "add_vertex_scalar". Note that we can directly pass the Q2 solution vector to the function
     // without projecting it explicitly to the vertices:
-    exporter.add_vertex_vector("velocity", vec_sol.template at<0>());
+    exporter.add_vertex_vector("velocity", vec_sol.at<0>());
 
     // Our pressure is a scalar function defined in the P1dc space. Unfortunately, we cannot simply
     // pass the pressure component of the solution vector to the 'add_scalar_cell' function, but we
@@ -507,7 +507,7 @@ namespace Tutorial07
     VectorPresType cell_pres;
     Assembly::DiscreteCellProjector::project(
       cell_pres,                // the vector that receives the cell-projection of the pressure
-      vec_sol.template at<1>(), // the pressure-vector to be projection
+      vec_sol.at<1>(), // the pressure-vector to be projection
       space_pres,               // the pressure space
       cubature_factory          // a cubature factory for the projection.
     );
