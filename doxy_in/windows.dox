@@ -196,7 +196,7 @@ circumvent Visual Studio's internal limitations by creating a symbolic link for 
 open a command prompt in the FEAT root directory and execute the following command:
 
 \verbatim
-mklink /D build_system\vc14\kernel kernel
+mklink /D build_system\vc14\kernel ..\..\kernel
 \endverbatim
 
 \subsection windows_vcgen_build Building the vc14_gen Tool
