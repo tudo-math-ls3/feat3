@@ -714,6 +714,7 @@ int run_app(int argc, char* argv[])
 
   // Filenames to read the mesh from, parsed from the application config file
   std::deque<String> mesh_files;
+  String mesh_path;
   // String containing the mesh type, read from the header of the mesh file
   String mesh_type("");
   // Is the application running as a test? Read from the command line arguments
@@ -727,6 +728,7 @@ int run_app(int argc, char* argv[])
   // Create a parser for command line arguments.
   SimpleArgParser args(argc, argv);
   args.support("application_config");
+  args.support("mesh-path");
   args.support("help");
   args.support("test");
   args.support("vtk");
@@ -757,6 +759,15 @@ int run_app(int argc, char* argv[])
     if(test_number != 1 && test_number != 2)
     {
       throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
+    }
+  }
+
+  // parse mesh directory
+  if(args.check("mesh-path") >= 0)
+  {
+    if(args.parse("mesh-path", mesh_path) != 1)
+    {
+      throw InternalError(__func__, __FILE__ , __LINE__, "Failed to parse mesh directory");
     }
   }
 
@@ -836,16 +847,7 @@ int run_app(int argc, char* argv[])
   // Now we have all configurations in the corresponding streams and know the mesh file names
 
   // Read all mesh files
-  std::deque<std::stringstream> mesh_streams(mesh_files.size());
-  for(std::size_t i(0); i < mesh_files.size(); ++i)
-  {
-    // Read the stream
-    comm.print("Reading mesh file "+mesh_files.at(i));
-    DistFileIO::read_common(mesh_streams.at(i), mesh_files.at(i));
-
-    // Add to mesh reader
-    mesh_file_reader.add_stream(mesh_streams.at(i));
-  }
+  mesh_file_reader.add_mesh_files(comm, mesh_files, mesh_path);
 
   int ret(1);
 
@@ -1026,31 +1028,29 @@ static void read_test_solver_config(std::stringstream& iss)
 
 static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int test_number)
 {
-  String mesh_filename(FEAT_SRC_DIR);
   if(test_number == 1)
   {
-    mesh_filename +="/data/meshes/unit-circle-quad.xml";
+    mesh_files.push_back("unit-circle-quad.xml");
   }
   else if(test_number == 2)
   {
-    mesh_filename +="/data/meshes/unit-axe-tria.xml";
+    mesh_files.push_back("unit-axe-tria.xml");
   }
   else
   {
     throw InternalError(__func__,__FILE__,__LINE__,"Encountered unhandled test "+stringify(test_number));
   }
-
-  mesh_files.push_back(mesh_filename);
 }
 
 static void display_help(const Dist::Comm& comm)
 {
   if(comm.rank() == 0)
   {
-    std::cout << "meshopt_boundary-app: Moving the boundary of a mesh and computing an extension into the interiour"
+    std::cout << "meshopt_boundary-app: Moving the boundary of a mesh and computing an extension into the interior"
     << std::endl;
     std::cout << "Mandatory arguments:" << std::endl;
     std::cout << " --application_config: Path to the application configuration file" << std::endl;
+    std::cout << " --mesh-path: Path to the mesh directory" << std::endl;
     std::cout << "Optional arguments:" << std::endl;
     std::cout << " --test: Run as a test. Ignores configuration files and uses hard coded settings." << std::endl;
     std::cout << " --test [1 or 2]: Run as a test. Ignores configuration files and uses hard coded settings. " <<
