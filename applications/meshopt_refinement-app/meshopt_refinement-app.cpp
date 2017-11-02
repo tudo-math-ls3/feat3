@@ -441,9 +441,9 @@ struct MeshoptRefinementApp
             " but is "+stringify_fp_fix(qi_min)+"\n");
         ret++;
       }
-      if(cell_size_defect > DT_(1.2e-1))
+      if(cell_size_defect > DT_(1.8e-1))
       {
-        comm.print("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(1.2e-1)+
+        comm.print("FAILED: Post Initial cell size distribution defect should be <= "+stringify_fp_fix(1.8e-1)+
             " but is "+stringify_fp_fix(cell_size_defect)+"\n");
         ret++;
       }
