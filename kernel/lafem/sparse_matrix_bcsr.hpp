@@ -1866,6 +1866,7 @@ namespace FEAT
           row_ptr_a = new IT_[a.rows() + 1];
           MemoryPool<Mem_>::template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
         }
+
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
           col_ind_b = (IT_*)b.col_ind();
@@ -1890,6 +1891,7 @@ namespace FEAT
             break;
           }
         }
+
         if (ret)
         {
           for (Index i(0) ; i < a.template used_elements<Perspective::pod>() ; ++i)
@@ -1901,6 +1903,7 @@ namespace FEAT
             }
           }
         }
+
         if (ret)
         {
           for (Index i(0) ; i < a.rows() + 1; ++i)

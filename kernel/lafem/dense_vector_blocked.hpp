@@ -1196,14 +1196,19 @@ namespace FEAT
         DT_ * tb;
 
         if(std::is_same<Mem::Main, Mem_>::value)
+        {
           ta = (DT_*)a.elements();
+        }
         else
         {
           ta = new DT_[a.template size<Perspective::pod>()];
           MemoryPool<Mem_>::template download<DT_>(ta, a.template elements<Perspective::pod>(), a.template size<Perspective::pod>());
         }
+
         if(std::is_same<Mem::Main, Mem2_>::value)
+        {
           tb = (DT_*)b.elements();
+        }
         else
         {
           tb = new DT_[b.template size<Perspective::pod>()];
@@ -1211,11 +1216,13 @@ namespace FEAT
         }
 
         for (Index i(0) ; i < a.template size<Perspective::pod>() ; ++i)
+        {
           if (ta[i] != tb[i])
           {
             ret = false;
             break;
           }
+        }
 
         if(! std::is_same<Mem::Main, Mem_>::value)
           delete[] ta;

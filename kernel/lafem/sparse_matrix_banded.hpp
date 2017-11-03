@@ -1269,6 +1269,7 @@ namespace FEAT
           val_a = new DT_[a.num_of_offsets() * a.rows()];
           MemoryPool<Mem_>::template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
         }
+
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
           offsets_b = (IT_*)b.offsets();
