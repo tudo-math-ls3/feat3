@@ -385,7 +385,7 @@ namespace FEAT
 
       /** \brief Clone operation
        *
-       * Create a deep clone of this container.
+       * Create a clone of this container.
        *
        * \param[in] clone_mode The actual cloning procedure.
        *
@@ -399,17 +399,17 @@ namespace FEAT
 
       /** \brief Clone operation
        *
-       * Create a deep clone of this container.
+       * Create a clone of this container.
        *
        * \param[in] other The source container to create the clone from.
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
       template<typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
-        {
-          Container<Mem_, DT_, IT_>::clone(other, clone_mode);
-        }
+      void clone(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+      }
 
       /**
        * \brief Conversion method

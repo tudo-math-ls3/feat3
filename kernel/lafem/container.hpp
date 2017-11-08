@@ -18,51 +18,6 @@
 #include <cstdlib>
 #include <stdint.h>
 
-#define InsertWeakClone( TContainer )                             \
-  /** \brief Clone operation                                      \
-   *                                                              \
-   * Create a weak clone of this container.                       \
-   *                                                              \
-   * \param[in] clone_mode The actual cloning procedure.          \
-   *                                                              \
-   */                                                             \
-  TContainer clone(CloneMode clone_mode = CloneMode::Weak) const  \
-  {                                                               \
-    TContainer t;                                                 \
-    t.clone(*this, clone_mode);                                   \
-    return t;                                                     \
-  }                                                               \
-  using Container<Mem_, DT_, IT_>::clone;
-
-#define InsertDeepClone( TContainer )                                   \
-  /** \brief Clone operation                                            \
-   *                                                                    \
-   * Create a deep clone of this container.                             \
-   *                                                                    \
-   * \param[in] clone_mode The actual cloning procedure.                \
-   *                                                                    \
-   */                                                                   \
-  TContainer clone(CloneMode clone_mode = CloneMode::Deep) const        \
-  {                                                                     \
-    TContainer t;                                                       \
-    t.clone(*this, clone_mode);                                         \
-    return t;                                                           \
-  }                                                                     \
-  /** \brief Clone operation                                            \
-   *                                                                    \
-   * Create a deep clone of this container.                             \
-   *                                                                    \
-   * \param[in] other The source container to create the clone from.    \
-   * \param[in] clone_mode The actual cloning procedure.                \
-   *                                                                    \
-   */                                                                   \
-  template<typename Mem2_, typename DT2_, typename IT2_>                \
-  void clone(const TContainer<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep) \
-  {                                                                     \
-    Container<Mem_, DT_, IT_>::clone(other, clone_mode);                \
-  }                                                                     \
-
-
 namespace FEAT
 {
   /**

@@ -551,9 +551,33 @@ namespace FEAT
         return *this;
       }
 
-/// \cond nodoxy
-      InsertWeakClone( SparseMatrixCSR )
-/// \endcond
+      /** \brief Clone operation
+       *
+       * Create a clone of this container.
+       *
+       * \param[in] clone_mode The actual cloning procedure.
+       *
+       */
+      SparseMatrixCSR clone(CloneMode clone_mode = CloneMode::Weak) const
+      {
+        SparseMatrixCSR t;
+        t.clone(*this, clone_mode);
+        return t;
+      }
+
+      /** \brief Clone operation
+       *
+       * Create a clone of another container.
+       *
+       * \param[in] other The source container to create the clone from.
+       * \param[in] clone_mode The actual cloning procedure.
+       *
+       */
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      void clone(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
+      {
+        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+      }
 
       /**
        * \brief Conversion method
