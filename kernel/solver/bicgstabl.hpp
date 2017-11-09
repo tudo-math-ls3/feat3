@@ -549,9 +549,10 @@ namespace FEAT
     {
       return std::make_shared<BiCGStabL<Matrix_, Filter_>>(matrix, filter, l, nullptr);
     }
+
     template<typename Matrix_, typename Filter_, typename Precond_>
     inline std::shared_ptr<BiCGStabL<Matrix_, Filter_>> new_bicgstabl(
-      const Matrix_& matrix, const Filter_& filter, int l = 2,
+      const Matrix_& matrix, const Filter_& filter, int l,
       std::shared_ptr<Precond_> precond, BiCGStabLPreconVariant precon_variant = BiCGStabLPreconVariant::left)
     {
       return std::make_shared<BiCGStabL<Matrix_, Filter_>>(matrix, filter, l, precond, precon_variant);
