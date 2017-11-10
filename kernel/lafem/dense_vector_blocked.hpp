@@ -957,10 +957,8 @@ namespace FEAT
                 const DenseVectorBlocked & y,
                 const DT_ alpha = DT_(1))
       {
-        if (x.size() != y.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-        if (x.size() != this->size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(x.size() == y.size(), "Vector size does not match!");
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
         if(Math::abs(alpha) < Math::eps<DT_>())
         {
@@ -986,10 +984,8 @@ namespace FEAT
        */
       void component_product(const DenseVectorBlocked & x, const DenseVectorBlocked & y)
       {
-        if (this->size() != x.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-        if (this->size() != y.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(this->size() == x.size(), "Vector size does not match!");
+        XASSERTM(this->size() == y.size(), "Vector size does not match!");
 
         TimeStamp ts_start;
 
@@ -1011,8 +1007,7 @@ namespace FEAT
        */
       void component_invert(const DenseVectorBlocked & x, const DT_ alpha = DT_(1))
       {
-        if (this->size() != x.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(this->size() == x.size(), "Vector size does not match!");
 
         TimeStamp ts_start;
 
@@ -1031,8 +1026,7 @@ namespace FEAT
        */
       void scale(const DenseVectorBlocked & x, const DT_ alpha)
       {
-        if (x.size() != this->size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
         TimeStamp ts_start;
 
@@ -1054,8 +1048,7 @@ namespace FEAT
        */
       DataType triple_dot(const DenseVectorBlocked & x, const DenseVectorBlocked & y) const
       {
-        if (x.template size<Perspective::pod>() != this->template size<Perspective::pod>() || y.template size<Perspective::pod>() != this->template size<Perspective::pod>())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
+        XASSERTM(x.template size<Perspective::pod>() != this->template size<Perspective::pod>() || y.template size<Perspective::pod>() == this->template size<Perspective::pod>(), "Vector sizes does not match!");
 
         TimeStamp ts_start;
 
@@ -1077,8 +1070,7 @@ namespace FEAT
        */
       DataType dot(const DenseVectorBlocked & x) const
       {
-        if (x.size() != this->size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
         TimeStamp ts_start;
 

@@ -430,10 +430,8 @@ namespace FEAT
 
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
         DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
         DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());
@@ -467,12 +465,9 @@ namespace FEAT
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType , IndexType>& x,
                  const DenseVector<MemType, DataType , IndexType>& y, DataType alpha = DataType(1)) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-        if (y.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
         DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
         DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());

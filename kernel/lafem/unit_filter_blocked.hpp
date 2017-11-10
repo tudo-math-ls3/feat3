@@ -97,8 +97,7 @@ namespace FEAT
                                  DenseVectorBlocked<Mem_, IT_, IT_, BlockSize_> & indices) :
         _sv(size_in, values, indices)
       {
-        if (values.size() != indices.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
+        XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
       }
 
       /// move-ctor
@@ -280,8 +279,7 @@ namespace FEAT
       template<int BlockWidth_>
       void filter_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IT_* row_ptr(matrix.row_ptr());
         const IT_* col_idx(matrix.col_ind());
@@ -306,8 +304,7 @@ namespace FEAT
       template<int BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IT_* row_ptr(matrix.row_ptr());
         auto* v(matrix.val());
@@ -338,8 +335,7 @@ namespace FEAT
        */
       void filter_rhs(VectorType& vector) const
       {
-        if(_sv.size() != vector.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilterBlocked<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
             (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
@@ -365,8 +361,7 @@ namespace FEAT
        */
       void filter_def(VectorType& vector) const
       {
-        if(_sv.size() != vector.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilterBlocked<Mem_>::template filter_def<DT_, IT_, BlockSize_>
             (vector.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );

@@ -257,8 +257,7 @@ namespace FEAT
         {
           if(_sv.empty())
             return;
-          if(_sv.size() != vector.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
             Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
               (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
@@ -288,8 +287,7 @@ namespace FEAT
         {
           if(_sv.empty())
             return;
-          if(_sv.size() != vector.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
             Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
               (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );

@@ -1803,22 +1803,14 @@ namespace FEAT
                 const SparseMatrixELL & y,
                 DT_ alpha = DT_(1))
       {
-        if (x.rows() != y.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
-        if (x.rows() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
-        if (x.columns() != y.columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
-        if (x.columns() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
-        if (x.used_elements() != y.used_elements())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
-        if (x.used_elements() != this->used_elements())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
-        if (x.C() != y.C())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix chunk size do not match!");
-        if (x.C() != this->C())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix chunk size do not match!");
+        XASSERTM(x.rows() == y.rows(), "Matrix rows do not match!");
+        XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
+        XASSERTM(x.columns() == y.columns(), "Matrix columns do not match!");
+        XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
+        XASSERTM(x.used_elements() == y.used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.C() == y.C(), "Matrix chunk size do not match!");
+        XASSERTM(x.C() == this->C(), "Matrix chunk size do not match!");
 
         if (Math::abs(alpha) < Math::eps<DT_>())
         {
@@ -1844,14 +1836,10 @@ namespace FEAT
        */
       void scale(const SparseMatrixELL & x, const DT_ alpha)
       {
-        if (x.rows() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
-        if (x.columns() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
-        if (x.used_elements() != this->used_elements())
-          throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
-        if (x.C() != this->C())
-          throw InternalError(__func__, __FILE__, __LINE__, "Chunk size does not match!");
+        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
+        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.C() == this->C(), "Chunk size does not match!");
 
         TimeStamp ts_start;
 
@@ -2060,14 +2048,10 @@ namespace FEAT
        */
       void scale_rows(const SparseMatrixELL & x, const DenseVector<Mem_,DT_,IT_> & s)
       {
-        if (x.rows() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
-        if (x.columns() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
-        if (x.used_elements() != this->used_elements())
-          throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
-        if (s.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
+        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(s.size() == this->rows(), "Vector size does not match!");
 
         TimeStamp ts_start;
 
@@ -2087,14 +2071,10 @@ namespace FEAT
        */
       void scale_cols(const SparseMatrixELL & x, const DenseVector<Mem_,DT_,IT_> & s)
       {
-        if (x.rows() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
-        if (x.columns() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
-        if (x.used_elements() != this->used_elements())
-          throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
-        if (s.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
+        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(s.size() == this->columns(), "Vector size does not match!");
 
         TimeStamp ts_start;
 
@@ -2115,10 +2095,8 @@ namespace FEAT
        */
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
         TimeStamp ts_start;
 
@@ -2128,8 +2106,7 @@ namespace FEAT
           return;
         }
 
-        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 2);
         Arch::Apply<Mem_>::ell(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->val(),
@@ -2153,12 +2130,9 @@ namespace FEAT
                  const DenseVector<Mem_, DT_, IT_>& y,
                  const DT_ alpha = DT_(1)) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-        if (y.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
         TimeStamp ts_start;
 
@@ -2168,8 +2142,7 @@ namespace FEAT
           return;
         }
 
-        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements() * 3);
         Arch::Apply<Mem_>::ell(r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->val(),

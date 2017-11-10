@@ -104,14 +104,10 @@ namespace FEAT
         if(this == &other)
           return;
 
-        if (_elements.size() != other.get_elements().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
-        if (_indices.size() != other.get_indices().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
-        if (_scalar_index.size() != other.get_scalar_index().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
-        if (_scalar_dt.size() != other.get_scalar_dt().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
+        XASSERTM(_elements.size() == other.get_elements().size(), "Container size mismatch!");
+        XASSERTM(_indices.size() == other.get_indices().size(), "Container size mismatch!");
+        XASSERTM(_scalar_index.size() == other.get_scalar_index().size(), "Container size mismatch!");
+        XASSERTM(_scalar_dt.size() == other.get_scalar_dt().size(), "Container size mismatch!");
 
         if (full)
         {
@@ -120,16 +116,14 @@ namespace FEAT
 
           for (Index i(0) ; i < _indices.size() ; ++i)
           {
-            if (_indices_size.at(i) != other.get_indices_size().at(i))
-              throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
+            XASSERTM(_indices_size.at(i) == other.get_indices_size().at(i), "Container size mismatch!");
             MemoryPool<Mem_>::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
           }
         }
 
         for (Index i(0) ; i < _elements.size() ; ++i)
         {
-          if (_elements_size.at(i) != other.get_elements_size().at(i))
-            throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
+          XASSERTM(_elements_size.at(i) == other.get_elements_size().at(i), "Container size mismatch!");
           MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
         }
 
@@ -138,14 +132,10 @@ namespace FEAT
       template <typename Mem2_>
       void _copy_content(const Container<Mem2_, DT_, IT_> & other, bool full)
       {
-        if (_elements.size() != other.get_elements().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
-        if (_indices.size() != other.get_indices().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
-        if (_scalar_index.size() != other.get_scalar_index().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
-        if (_scalar_dt.size() != other.get_scalar_dt().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
+        XASSERTM(_elements.size() == other.get_elements().size(), "Container size mismatch!");
+        XASSERTM(_indices.size() == other.get_indices().size(), "Container size mismatch!");
+        XASSERTM(_scalar_index.size() == other.get_scalar_index().size(), "Container size mismatch!");
+        XASSERTM(_scalar_dt.size() == other.get_scalar_dt().size(), "Container size mismatch!");
 
         if (full)
         {
@@ -154,8 +144,7 @@ namespace FEAT
 
           for (Index i(0) ; i < _indices.size() ; ++i)
           {
-            if (_indices_size.at(i) != other.get_indices_size().at(i))
-              throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
+            XASSERTM(_indices_size.at(i) == other.get_indices_size().at(i), "Container size mismatch!");
             if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
               MemoryPool<Mem2_>::template download<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
             else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
@@ -167,8 +156,7 @@ namespace FEAT
 
         for (Index i(0) ; i < _elements.size() ; ++i)
         {
-          if (_elements_size.at(i) != other.get_elements_size().at(i))
-            throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
+          XASSERTM(_elements_size.at(i) == other.get_elements_size().at(i), "Container size mismatch!");
           if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
             MemoryPool<Mem2_>::template download<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
           else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
@@ -476,8 +464,7 @@ namespace FEAT
 #else
         uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
 #endif
-        if (magic != uiarray[1])
-          throw InternalError(__func__, __FILE__, __LINE__, "_deserialise: given FileMode incompatible with given array!");
+        XASSERTM(magic == uiarray[1], "_deserialise: given FileMode incompatible with given array!");
 
         //ensure that we have the same integral/floating type configuration, that was used when storing the serialised data
         XASSERT(Type::Traits<DT_>::is_int == Type::Helper::extract_intness(uiarray[2]));

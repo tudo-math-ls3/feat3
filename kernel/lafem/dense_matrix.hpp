@@ -355,12 +355,9 @@ namespace FEAT
        */
       void scale(const DenseMatrix & x, const DT_ alpha)
       {
-        if (x.rows() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
-        if (x.columns() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
-        if (x.used_elements() != this->used_elements())
-          throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
+        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
+        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
 
         Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->used_elements());
       }
@@ -383,13 +380,10 @@ namespace FEAT
        */
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
-        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Arch::Apply<Mem_>::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
             x.elements(), this->rows(), this->columns());
@@ -409,15 +403,11 @@ namespace FEAT
                  const DenseVector<Mem_, DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-        if (y.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
-        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         if(Math::abs(alpha) < Math::eps<DT_>())
         {

@@ -133,8 +133,7 @@ namespace FEAT
         Container<Mem_, DT_, IT_>(size_in)
       {
         XASSERT(size_in != Index(0));
-        if (indices_in.size() != elements_in.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
+        XASSERTM(indices_in.size() == elements_in.size(), "Vector size mismatch!");
 
         this->_scalar_index.push_back(elements_in.size());
         this->_scalar_index.push_back(elements_in.size());

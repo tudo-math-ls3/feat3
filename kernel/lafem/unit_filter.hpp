@@ -77,8 +77,7 @@ namespace FEAT
       explicit UnitFilter(Index size_in, DenseVector<Mem_, DT_, IT_> & values, DenseVector<Mem_, IT_, IT_> & indices) :
         _sv(size_in, values, indices)
       {
-        if (values.size() != indices.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
+        XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
       }
 
       /// move-ctor
@@ -242,8 +241,7 @@ namespace FEAT
       ///\cond internal
       void filter_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IndexType* row_ptr(matrix.row_ptr());
         const IndexType* col_idx(matrix.col_ind());
@@ -262,8 +260,7 @@ namespace FEAT
 
       void filter_offdiag_row_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IndexType* row_ptr(matrix.row_ptr());
         DT_* v(matrix.val());
@@ -286,8 +283,7 @@ namespace FEAT
 
       void filter_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const Index tused_elements(matrix.used_elements());
         const IndexType* row_idx(matrix.row_indices());
@@ -313,8 +309,7 @@ namespace FEAT
 
       void filter_offdiag_row_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const Index tused_elements(matrix.used_elements());
         const Index* row_idx(matrix.row_indices());
@@ -344,8 +339,7 @@ namespace FEAT
 
       void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const Index tC(matrix.C());
         const IndexType * pcs(matrix.cs());
@@ -365,8 +359,7 @@ namespace FEAT
 
       void filter_offdiag_row_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
-        if(_sv.size() != matrix.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const Index tC(matrix.C());
         const IndexType * pcs(matrix.cs());
@@ -397,8 +390,7 @@ namespace FEAT
        */
       void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
       {
-        if(_sv.size() != vector.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilter<Mem_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
       }
@@ -423,8 +415,7 @@ namespace FEAT
        */
       void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
       {
-        if(_sv.size() != vector.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilter<Mem_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
       }
