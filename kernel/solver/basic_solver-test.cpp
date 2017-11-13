@@ -4,8 +4,10 @@
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/lafem/pointstar_structure.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/solver/bicgstab.hpp>
@@ -597,3 +599,146 @@ public:
 };
 
 BandedSolverTest<SparseMatrixBanded, Mem::Main, double, Index> banded_solver_csr_generic_double_index;
+
+
+template<typename MemType_, typename DataType_, typename IndexType_>
+class BCSRSolverTest :
+  public TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+{
+public:
+  static constexpr int dim = 2;
+  typedef DataType_ DataType;
+  typedef IndexType_ IndexType;
+  typedef LAFEM::SparseMatrixBCSR<MemType_, DataType, IndexType, dim, dim> MatrixType;
+  typedef LAFEM::DenseVectorBlocked<MemType_, DataType, IndexType, dim> VectorType;
+  typedef LAFEM::NoneFilterBlocked<MemType_, DataType, IndexType, dim> FilterType;
+
+public:
+  BCSRSolverTest() :
+    TestSystem::FullTaggedTest<MemType_, DataType, IndexType>("BCSRSolverTest")
+  {
+  }
+
+  virtual ~BCSRSolverTest()
+  {
+  }
+
+  template<typename Solver_>
+  void test_solver(String name, std::shared_ptr<Solver_> solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, Index ref_iters) const
+  {
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
+
+    // initialise solver
+    solver->init();
+
+    // solve
+    Solver::Status status = solver->apply(vec_sol, vec_rhs);
+    TEST_CHECK_MSG(Solver::status_success(status), (String("Failed to solve: '") + name + ("'")));
+
+    // release solver
+    solver->done();
+
+    // check against reference solution
+    vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_sol.norm2sqr(), DataType(0), tol);
+
+    // check for iteration count
+    TEST_CHECK_EQUAL_WITHIN_EPS(solver->get_num_iter(), ref_iters, 2);
+  }
+
+  virtual void run() const override
+  {
+    const Index m = 7;
+    const Index d = 2;
+
+    // create a pointstar factory
+    LAFEM::PointstarFactoryFD<DataType, IndexType> psf(m, d);
+
+    // create 5-point star CSR matrix
+    LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> csr_mat(psf.matrix_csr());
+
+    // create a Q2 bubble vector
+    LAFEM::DenseVector<Mem::Main, DataType, IndexType> q2b_vec(psf.vector_q2_bubble());
+
+    // construct blocked matrix in main memory
+    LAFEM::SparseMatrixBCSR<Mem::Main, DataType, IndexType, dim, dim> matrix_main(csr_mat.layout());
+    {
+      const IndexType num_rows = IndexType(csr_mat.rows());
+      const IndexType* row_ptr = csr_mat.row_ptr();
+      const IndexType* col_idx = csr_mat.col_ind();
+      const auto* data_a = csr_mat.val();
+      auto* data_b = matrix_main.val();
+
+      // create the following matrix:
+      // ( A  0 )
+      // (-I  A )
+      for(IndexType i(0); i < num_rows; ++i)
+      {
+        for(IndexType j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+        {
+          data_b[j][0][0] = data_b[j][1][1] = data_a[j];
+          data_b[j][0][1] = DataType(0);
+          data_b[j][1][0] = DataType(col_idx[j] == i ? -1 : 0);
+        }
+      }
+    }
+
+    // construct blocked vector in main memory
+    LAFEM::DenseVectorBlocked<Mem::Main, DataType, IndexType, dim> vec_ref_main(q2b_vec.size());
+    {
+      const Index n = q2b_vec.size();
+      const auto* data_x = q2b_vec.elements();
+      auto* data_y = vec_ref_main.elements();
+
+      for(Index i(0); i < n; ++i)
+      {
+        data_y[i][0] = DataType(0);
+        data_y[i][1] = data_x[i];
+      }
+    }
+
+    // create filter
+    FilterType filter;
+
+    // convert matrix
+    MatrixType matrix;
+    matrix.convert(matrix_main);
+
+    // convert reference vector
+    VectorType vec_ref;
+    vec_ref.convert(vec_ref_main);
+
+    // compute rhs vector
+    VectorType vec_rhs(vec_ref.clone(LAFEM::CloneMode::Layout));
+    matrix.apply(vec_rhs, vec_ref);
+
+    // initialise sol vector
+    VectorType vec_sol(vec_ref.clone(LAFEM::CloneMode::Layout));
+
+    // test Richardson-ILU
+    {
+      auto precon = Solver::new_ilu_precond(matrix, filter);
+      auto solver = Solver::new_richardson(matrix, filter, DataType(0.9), precon);
+      solver->set_max_iter(1000);
+      test_solver("Richardson-ILU", solver, vec_sol, vec_ref, vec_rhs, 43);
+    }
+
+    // test Richardson-SOR
+    {
+      auto precon = Solver::new_sor_precond(matrix, filter, DataType(1.2));
+      auto solver = Solver::new_richardson(matrix, filter, DataType(0.9), precon);
+      solver->set_max_iter(1000);
+      test_solver("Richardson-SOR", solver, vec_sol, vec_ref, vec_rhs, 83);
+    }
+
+    // test Richardson-SSOR
+    {
+      auto precon = Solver::new_ssor_precond(matrix, filter, DataType(1));
+      auto solver = Solver::new_richardson(matrix, filter, DataType(0.9), precon);
+      solver->set_max_iter(1000);
+      test_solver("Richardson-SSOR", solver, vec_sol, vec_ref, vec_rhs, 71);
+    }
+  }
+};
+
+BCSRSolverTest<Mem::Main, double, Index> bcsr_solver_test_main_double_index;

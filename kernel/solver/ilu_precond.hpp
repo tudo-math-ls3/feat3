@@ -405,7 +405,7 @@ namespace FEAT
       }; // class ILUCoreSymbolic
 
       /**
-       * \brief ILU Core
+       * \brief ILU Core for Scalar Matrices
        *
        * This class is responsible for the factorisation and management of an ILU(p) factorisation.
        *
@@ -418,7 +418,7 @@ namespace FEAT
        * \author Peter Zajac
        */
       template<typename DT_, typename IT_>
-      class ILUCore :
+      class ILUCoreScalar :
         public ILUCoreSymbolic<IT_>
       {
       protected:
@@ -785,7 +785,274 @@ namespace FEAT
             }
           }
         }
-      }; // class ILUCore
+      }; // class ILUCoreScalar
+
+      /**
+       * \brief ILU Core for Blocked Matrices
+       *
+       * This class is responsible for the factorisation and management of an ILU(p) factorisation.
+       *
+       * \tparam DT_
+       * The data-type to be used.
+       *
+       * \tparam IT_
+       * The index-type to be used.
+       *
+       * \tparam dim_
+       * The row/column block dimension
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_, typename IT_, int dim_>
+      class ILUCoreBlocked :
+        public ILUCoreSymbolic<IT_>
+      {
+      protected:
+        typedef ILUCoreSymbolic<IT_> BaseClass;
+
+        static_assert(dim_ > 0, "invalid block dimension");
+
+        typedef Tiny::Matrix<DT_, dim_, dim_> MatBlock;
+        typedef Tiny::Vector<DT_, dim_> VecBlock;
+
+        /// The data arrays of L, U and D.
+        std::vector<MatBlock> _data_l, _data_u, _data_d;
+
+      public:
+        /// Clears all data arrays.
+        void clear()
+        {
+          BaseClass::clear();
+          _data_l.clear();
+          _data_u.clear();
+          _data_d.clear();
+        }
+
+        /// Allocates the data arrays for the numeric factorisation
+        void alloc_data()
+        {
+          // resize data arrays
+          _data_d.resize(this->_n);
+          _data_l.resize(this->_col_idx_l.size());
+          _data_u.resize(this->_col_idx_u.size());
+        }
+
+        /// Returns the size of the numeric factorisation in bytes
+        std::size_t bytes_numeric() const
+        {
+          return sizeof(DT_) * std::size_t(Math::sqr(dim_)) * (_data_l.size() + _data_u.size() + _data_d.size());
+        }
+
+        /// Returns the total size of the factorisation in bytes
+        std::size_t bytes() const
+        {
+          return this->bytes_numeric() + this->bytes_symbolic();
+        }
+
+        /**
+         * \brief Copies the data arrays from an CSR input matrix
+         *
+         * \param[in] row_ptr_a
+         * The row-pointer array of the CSR input matrix.
+         *
+         * \param[in] col_idx_a
+         * The column-index array of the CSR input matrix.
+         *
+         * \param[in] data_a
+         * The data arrays of the CSR input matrix.
+         */
+        void copy_data_bcsr(const IT_* row_ptr_a, const IT_* col_idx_a, const MatBlock* data_a)
+        {
+          // loop over all rows
+          for(IT_ i(0); i < this->_n; ++i)
+          {
+            // get row pointer of a
+            IT_ ra = row_ptr_a[i];
+            IT_ xa = row_ptr_a[i+1];
+
+            // fetch row i of L
+            for(IT_ j(this->_row_ptr_l[i]); j < this->_row_ptr_l[i+1]; ++j)
+            {
+              if(this->_col_idx_l[j] == col_idx_a[ra])
+                _data_l[j] = data_a[ra++];
+              else //if(this->_col_idx_l[j] < col_idx_a[ra])
+                _data_l[j] = DT_(0);
+            }
+
+            // fetch diagonal of a
+            _data_d[i] = data_a[ra++];
+
+            // fetch row i of U
+            for(IT_ j(this->_row_ptr_u[i]); j < this->_row_ptr_u[i+1]; ++j)
+            {
+              if((ra < xa) && (this->_col_idx_u[j] == col_idx_a[ra]))
+                _data_u[j] = data_a[ra++];
+              else// if(this->_col_idx_u[j] < col_idx_a[ra])
+                _data_u[j] = DT_(0);
+            }
+          }
+        }
+
+        /**
+         * \brief Copies the data arrays from a CSR input matrix
+         *
+         * \param[in] matrix
+         * The input matrix.
+         */
+        void copy_data(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_>& matrix)
+        {
+          this->copy_data_bcsr(matrix.row_ptr(), matrix.col_ind(), matrix.val());
+        }
+
+        /**
+         * \brief Performs the (I+L)*(D+U) numeric factorisation
+         *
+         * This function performs the "classic" (I+L)*(D+U) numeric factorisation of the
+         * input matrix that has been set by a prior call to one of the #copy_data functions.
+         */
+        void factorise_numeric_il_du()
+        {
+          // get data arrays
+          const IT_* rptr_l = this->_row_ptr_l.data();
+          const IT_* cidx_l = this->_col_idx_l.data();
+          const IT_* rptr_u = this->_row_ptr_u.data();
+          const IT_* cidx_u = this->_col_idx_u.data();
+          MatBlock* data_l = this->_data_l.data();
+          MatBlock* data_u = this->_data_u.data();
+          MatBlock* data_d = this->_data_d.data();
+
+          // loop over all rows
+          for(IT_ i(0); i < this->_n; ++i)
+          {
+            // get row-end pointers of L and U
+            const IT_ ql = rptr_l[i+1];
+            const IT_ qu = rptr_u[i+1];
+
+            // loop over row i of L
+            for(IT_ j(rptr_l[i]); j < rptr_l[i+1]; ++j)
+            {
+              // get column index of L_ij
+              const IT_ cj = cidx_l[j];
+
+              // get L/U pointers
+              IT_ pl = j;
+              IT_ pu = rptr_u[i];
+
+              // update L_ij <- D_jj^{-1} * L_ij
+              {
+                //data_l[j] *= data_d[cj];
+                const MatBlock l_ij(data_l[j]);
+                data_l[j].set_mat_mat_mult(data_d[cj], l_ij);
+              }
+
+              // loop over row j of U and process row i of L
+              IT_ k(rptr_u[cj]);
+              for(; k < rptr_u[cj+1]; ++k)
+              {
+                const IT_ ck = cidx_u[k];
+                if(ck >= i)
+                  break;
+                for(; (pl < ql) && (cidx_l[pl] <= ck); ++pl)
+                {
+                  if(cidx_l[pl] == ck)
+                    //data_l[pl] -= data_l[j] * data_u[k];
+                    data_l[pl].add_mat_mat_mult(data_l[j], data_u[k], -DT_(1));
+                }
+              }
+
+              // process main diagonal entry
+              if(cidx_u[k] == i)
+              {
+                //data_d[i] -= data_l[j] * data_u[k];
+                data_d[i].add_mat_mat_mult(data_l[j], data_u[k], -DT_(1));
+                ++k;
+              }
+
+              // loop over row j of U and process row i of U
+              for(; k < rptr_u[cj+1]; ++k)
+              {
+                const IT_ ck = cidx_u[k];
+                for(; (pu < qu) && (cidx_u[pu] <= ck); ++pu)
+                {
+                  if(cidx_u[pu] == ck)
+                    //data_u[pu] -= data_l[j] * data_u[k];
+                    data_u[pu].add_mat_mat_mult(data_l[j], data_u[k], -DT_(1));
+                }
+              }
+            }
+
+            // invert main diagonal entry
+            {
+              //data_d[i] = DT_(1) / data_d[i];
+              const MatBlock d_ii(data_d[i]);
+              data_d[i].set_inverse(d_ii);
+            }
+          }
+        }
+
+        /**
+         * \brief Solves (I+L)*x = b
+         *
+         * \param[out] x
+         * The solution vector
+         *
+         * \param[in] b
+         * The right-hand-side vector
+         *
+         * \note
+         * \p x and \p b are allowed to refer to the same array.
+         */
+        void solve_il(VecBlock* x, const VecBlock* b) const
+        {
+          const IT_* rptr = this->_row_ptr_l.data();
+          const IT_* cidx = this->_col_idx_l.data();
+          const MatBlock* data_l = this->_data_l.data();
+
+          for(IT_ i(0); i < this->_n; ++i)
+          {
+            VecBlock r(b[i]);
+            for(IT_ j(rptr[i]); j < rptr[i+1]; ++j)
+            {
+              //r -= data_l[j] * x[cidx[j]];
+              r.add_mat_vec_mult(data_l[j], x[cidx[j]], -DT_(1));
+            }
+            x[i] = r;
+          }
+        }
+
+        /**
+         * \brief Solves (D+U)*x = b
+         *
+         * \param[out] x
+         * The solution vector
+         *
+         * \param[in] b
+         * The right-hand-side vector
+         *
+         * \note
+         * \p x and \p b are allowed to refer to the same array.
+         */
+        void solve_du(VecBlock* x, const VecBlock* b) const
+        {
+          const IT_* rptr = this->_row_ptr_u.data();
+          const IT_* cidx = this->_col_idx_u.data();
+          const MatBlock* data_u = this->_data_u.data();
+          const MatBlock* data_d = this->_data_d.data();
+
+          for(IT_ i(this->_n); i > IT_(0); )
+          {
+            --i;
+            VecBlock r(b[i]);
+            for(IT_ j(rptr[i]); j < rptr[i+1]; ++j)
+            {
+              //r -= data_u[j] * x[cidx[j]];
+              r.add_mat_vec_mult(data_u[j], x[cidx[j]], -DT_(1));
+            }
+            //x[i] = data_d[i] * r;
+            x[i].set_mat_vec_mult(data_d[i], r);
+          }
+        }
+      }; // class ILUCoreBlocked
     } // namespace Intern
 
     /**
@@ -796,9 +1063,7 @@ namespace FEAT
      * This implementation works for the following matrix types:
      * - LAFEM::SparseMatrixCSR in Mem::Main and Mem::CUDA
      * - LAFEM::SparseMatrixELL in Mem::Main and Mem::CUDA
-     * - LAFEM::SparseMatrixBSCR in Mem::CUDA
-     *
-     * \todo implement variant for SparseMatrixBCSR<Mem::Main,...>
+     * - LAFEM::SparseMatrixBSCR in Mem::Main and Mem::CUDA
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -829,7 +1094,7 @@ namespace FEAT
     protected:
       const MatrixType& _matrix;
       const FilterType& _filter;
-      Intern::ILUCore<DataType, IndexType> _ilu;
+      Intern::ILUCoreScalar<DataType, IndexType> _ilu;
       int _p;
 
     public:
@@ -850,7 +1115,7 @@ namespace FEAT
       }
 
       explicit ILUPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
@@ -962,8 +1227,160 @@ namespace FEAT
 
         return Status::success;
       }
-
     }; // class ILUPrecond<ScalarMatrix_<Mem::Main,...>,...>
+
+    /**
+     * \brief ILU(p) specialisation for SparseMatrixBCSR<Mem::Main,...>
+     *
+     * \author Peter Zajac
+     */
+    template<typename DT_, typename IT_, int dim_, typename Filter_>
+    class ILUPrecond<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_>, Filter_> :
+      public SolverBase<LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>>
+    {
+    public:
+      typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DT_ DataType;
+      typedef IT_ IndexType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef SolverBase<VectorType> BaseClass;
+
+    protected:
+      const MatrixType& _matrix;
+      const FilterType& _filter;
+      Intern::ILUCoreBlocked<DataType, IndexType, dim_> _ilu;
+      int _p;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] matrix
+       * The matrix to be used.
+       *
+       * \param[in] p
+       * Maximum level of fillin.
+       */
+      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const int p = 0) :
+        _matrix(matrix),
+        _filter(filter),
+        _p(p)
+      {
+      }
+
+      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+        const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
+        _matrix(matrix),
+        _filter(filter),
+        _p(-1)
+      {
+        // Check for _p
+        auto fill_in_param_p = section->query("fill_in_param");
+        if(fill_in_param_p.second)
+        {
+          _p = std::stoi(fill_in_param_p.first);
+        }
+        else
+        {
+          throw InternalError(__func__,__FILE__,__LINE__,
+          name() + "config section "+section_name+" is missing the mandatory fill_in_param!");
+        }
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~ILUPrecond()
+      {
+      }
+
+      /**
+       * \brief Sets the fill-in parameter
+       *
+       * \param[in] p
+       * The new fill-in parameter
+       */
+      void set_fill_in_param(int p)
+      {
+        XASSERT(p > 0);
+        _p = p;
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "ILU";
+      }
+
+      virtual void init_symbolic() override
+      {
+        if (_matrix.columns() != _matrix.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+
+        // set matrix structure
+        _ilu.set_struct(_matrix);
+
+        // perform symbolic factorisation
+        _ilu.factorise_symbolic(_p);
+
+        // allocate data arrays
+        _ilu.alloc_data();
+      }
+
+      virtual void done_symbolic() override
+      {
+        _ilu.clear();
+      }
+
+      virtual void init_numeric() override
+      {
+        _ilu.copy_data(_matrix);
+        _ilu.factorise_numeric_il_du();
+      }
+
+      /// \copydoc SolverBase::write_config()
+      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
+      {
+        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
+        my_section->add_entry("fill_in_param", stringify(_p));
+        return my_section;
+      }
+
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector to be preconditioned.
+       */
+      virtual Status apply(VectorType& out, const VectorType& in) override
+      {
+        TimeStamp ts_start;
+
+        // get vector data arrays
+        auto* x = out.elements();
+        const auto* b = in.elements();
+
+        // solve: (I+L)*y = b
+        _ilu.solve_il(x, b);
+
+        // solve: (D+U)*x = y
+        _ilu.solve_du(x, x);
+
+        // apply filter
+        this->_filter.filter_cor(out);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
+        Statistics::add_flops(_ilu.get_nnze() * 2 + out.size());
+
+        return Status::success;
+      }
+    }; // class ILUPrecond<SparseMatrixBCSR<Mem::Main,...>,...>
 
     /**
      * \brief ILU(0) preconditioner implementation
@@ -1015,7 +1432,7 @@ namespace FEAT
       }
 
       explicit ILUPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter)
@@ -1260,7 +1677,7 @@ namespace FEAT
        *
        */
       explicit ILUPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter)

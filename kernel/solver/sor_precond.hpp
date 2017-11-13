@@ -101,7 +101,7 @@ namespace FEAT
      *
      */
       explicit SORPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
@@ -124,22 +124,6 @@ namespace FEAT
       virtual String name() const override
       {
         return "SOR";
-      }
-
-      virtual void init_symbolic() override
-      {
-      }
-
-      virtual void done_symbolic() override
-      {
-      }
-
-      virtual void init_numeric() override
-      {
-      }
-
-      virtual void done_numeric() override
-      {
       }
 
       /**
@@ -237,7 +221,6 @@ namespace FEAT
           pout[i] = _omega * (pin[i] - d) / pval[col];
         }
       }
-
     }; // class SORPrecond<SparseMatrixCSR<Mem::Main>>
 
     template<typename Filter_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
@@ -330,7 +313,7 @@ namespace FEAT
      *
      */
       explicit SORPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
@@ -366,22 +349,6 @@ namespace FEAT
       {
         XASSERT(omega > DataType(0));
         _omega = omega;
-      }
-
-      virtual void init_symbolic() override
-      {
-      }
-
-      virtual void done_symbolic() override
-      {
-      }
-
-      virtual void init_numeric() override
-      {
-      }
-
-      virtual void done_numeric() override
-      {
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
@@ -493,7 +460,7 @@ namespace FEAT
      *
      */
       explicit SORPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
@@ -545,14 +512,6 @@ namespace FEAT
       virtual void done_symbolic() override
       {
         Intern::cuda_sor_done_symbolic(_colored_row_ptr, _rows_per_color, _inverse_row_ptr);
-      }
-
-      virtual void init_numeric() override
-      {
-      }
-
-      virtual void done_numeric() override
-      {
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
@@ -698,14 +657,6 @@ namespace FEAT
       virtual void done_symbolic() override
       {
         Intern::cuda_sor_done_symbolic(_colored_row_ptr, _rows_per_color, _inverse_row_ptr);
-      }
-
-      virtual void init_numeric() override
-      {
-      }
-
-      virtual void done_numeric() override
-      {
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override

@@ -62,7 +62,7 @@ namespace FEAT
       /// ilu fill-in
       int _ilu_p;
       /// ilu factorisation data
-      Intern::ILUCore<DataType, IndexType> _ilu;
+      Intern::ILUCoreScalar<DataType, IndexType> _ilu;
 
     public:
       /**
