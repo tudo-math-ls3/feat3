@@ -21,7 +21,7 @@
 
 #define CHECK_INTERNAL(was_ok, message)\
         if(! (was_ok))\
-          throw TestFailedException(__func__, __FILE__, __LINE__, message);
+          throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, message);
 
 /**
 * \file
@@ -417,14 +417,14 @@ namespace FEAT
       } catch (b &) { \
         TEST_CHECK(true); \
       } \
-    } catch (const TestFailedException &) { \
+    } catch (const FEAT::TestSystem::TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
+      throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAT::stringify(test_e.what()) + \
           " inside a TEST_CHECK_THROWS block"); \
     } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
+      throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_THROWS block"); \
     } \
   } while (false)
@@ -445,7 +445,7 @@ namespace FEAT
     pre; \
     try { \
       test; \
-    } catch (const TestFailedException & test_e) { \
+    } catch (const FEAT::TestSystem::TestFailedException & test_e) { \
       post; \
       throw; } \
     post; \
