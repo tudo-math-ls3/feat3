@@ -435,7 +435,7 @@ namespace FEAT
        *
        * Let \e y denote \c this vector, and let \e x in the input vector and \e A denote the input matrix, then
        * this function computes:
-       * \f[ y\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \f]
+       * \f[ y^\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \f]
        *
        * \param[in] x
        * The (left) multiplicant vector for the product.
@@ -454,6 +454,68 @@ namespace FEAT
           for(int i(0); i < m_; ++i)
           {
             v[j] += a.v[i][j] * x.v[i];
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Adds the result of a matrix-vector product onto this vector.
+       *
+       * Let \e y denote \c this vector, and let \e A denote the input matrix and \e x in the input vector, then
+       * this function computes:
+       * \f[ y \leftarrow y + \alpha\cdot A\cdot x \f]
+       *
+       * \param[in] a
+       * The matrix for the product.
+       *
+       * \param[in] x
+       * The (right) multiplicant vector for the product.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the product.
+       *
+       * \returns \p *this
+       */
+      template<int m_, int sma_, int sna_, int sx_>
+      Vector& add_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x, DataType alpha = DataType(1))
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          for(int j(0); j < m_; ++j)
+          {
+            v[i] += alpha * a.v[i][j] * x.v[j];
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Adds the result of a vector-matrix product onto this vector.
+       *
+       * Let \e y denote \c this vector, and let \e x in the input vector and \e A denote the input matrix, then
+       * this function computes:
+       * \f[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \f]
+       *
+       * \param[in] x
+       * The (left) multiplicant vector for the product.
+       *
+       * \param[in] a
+       * The matrix for the product.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the product.
+       *
+       * \returns \p *this
+       */
+      template<int m_, int sma_, int sna_, int sx_>
+      Vector& add_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a, DataType alpha = DataType(1))
+      {
+        for(int j(0); j < n_; ++j)
+        {
+          for(int i(0); i < m_; ++i)
+          {
+            v[j] += alpha * a.v[i][j] * x.v[i];
           }
         }
         return *this;
@@ -483,7 +545,6 @@ namespace FEAT
       {
         return Math::sqrt(norm_euclid_sqr());
       }
-
 
       /**
        * \brief Tiny::Vector streaming operator
