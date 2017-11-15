@@ -44,6 +44,9 @@ namespace FEAT
        *
        * \param[in] stroke
        * The stroke width in millimeters.
+       *
+       * \param[in] extra
+       * The extra bounding box offset in millimeters.
        */
       template<typename Shape_, int stride_, typename DataType_>
       static void write(
@@ -51,11 +54,13 @@ namespace FEAT
         const ConformalMesh<Shape_, 2, stride_, DataType_>& mesh,
         const double width = 100.0,
         const double height = 100.0,
-        const double stroke = 0.1)
+        const double stroke = 0.1,
+        const double extra = 0.0)
       {
         XASSERTM(width  >= 1.0, "invalid bounding box width");
         XASSERTM(height >= 1.0, "invalid bounding box height");
         XASSERTM(stroke > 0.01, "invalid stroke width");
+        XASSERTM(extra >= 0.0, "invalid bounding box extra");
 
         // get vertices-at-edge
         const auto& vtx = mesh.get_vertex_set();
@@ -84,8 +89,11 @@ namespace FEAT
         const double scale = Math::min(x_sc, y_sc);
 
         // compute bounding box (rounding up)
-        const int box_x = int(scale * double(x_max - x_min)) + 1;
-        const int box_y = int(scale * double(y_max - y_min)) + 1;
+        const int box_x = int(scale * double(x_max - x_min) + 2.0*extra) + 1;
+        const int box_y = int(scale * double(y_max - y_min) + 2.0*extra) + 1;
+
+        // compute offset from extra
+        const double box_o = 72.0 * extra / 25.4;
 
         // write EPS header
         os << "%!!PS-Adobe-3.0 EPSF-3.0" << std::endl;
@@ -107,10 +115,10 @@ namespace FEAT
           const auto& v1 = vtx[idx[i][1]];
 
           // transform vertices
-          double v0x = (double(v0[0]) - x_min) * scale;
-          double v0y = (double(v0[1]) - y_min) * scale;
-          double v1x = (double(v1[0]) - x_min) * scale;
-          double v1y = (double(v1[1]) - y_min) * scale;
+          double v0x = box_o + (double(v0[0]) - x_min) * scale;
+          double v0y = box_o + (double(v0[1]) - y_min) * scale;
+          double v1x = box_o + (double(v1[0]) - x_min) * scale;
+          double v1y = box_o + (double(v1[1]) - y_min) * scale;
 
           // write vertices
           os << v0x << " " << v0y << " moveto" << std::endl;
@@ -136,6 +144,9 @@ namespace FEAT
        *
        * \param[in] stroke
        * The stroke width in millimeters.
+       *
+       * \param[in] extra
+       * The extra bounding box offset in millimeters.
        */
       template<typename Shape_, int stride_, typename DataType_>
       static void write(
@@ -143,12 +154,13 @@ namespace FEAT
         const ConformalMesh<Shape_, 2, stride_, DataType_>& mesh,
         const double width = 100.0,
         const double height = 100.0,
-        const double stroke = 0.1)
+        const double stroke = 0.1,
+        const double extra = 0.0)
       {
         std::ofstream ofs(filename);
         if(!ofs.is_open() || !ofs.good())
           throw FileError(String("Failed to open output file: ") + filename);
-        write(ofs, mesh, width, height, stroke);
+        write(ofs, mesh, width, height, stroke, extra);
         ofs.close();
       }
     };

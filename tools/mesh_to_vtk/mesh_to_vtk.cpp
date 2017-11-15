@@ -450,7 +450,6 @@ int run(int argc, char* argv[])
   auto mpars = args.query("mesh");
   XASSERT(mpars != nullptr);
   const std::deque<String>& filenames = mpars->second;
-  std::deque<std::shared_ptr<std::ifstream>> streams;
 
   // our VTK output filename
   String vtk_name = get_file_title(filenames.back());
@@ -458,23 +457,7 @@ int run(int argc, char* argv[])
 
   // create an empty mesh file reader
   Geometry::MeshFileReader mesh_reader;
-
-  // open a stream for each filename
-  for(auto it = filenames.begin(); it != filenames.end(); ++it)
-  {
-    // try to open the file
-    streams.emplace_back(std::make_shared<std::ifstream>(*it, std::ios_base::in));
-    std::ifstream& ifs = *streams.back();
-    if(!ifs.is_open() || !ifs.good())
-    {
-      std::cerr << "ERROR: Failed to open mesh file '" << (*it) << "'" << std::endl;
-      return 1;
-    }
-
-    // add stream to reader
-    std::cout << "Adding '" << (*it) << "' to mesh file reader..." << std::endl;
-    mesh_reader.add_stream(ifs);
-  }
+  mesh_reader.add_mesh_files(filenames);
 
   // read root markup
   mesh_reader.read_root_markup();
@@ -484,27 +467,28 @@ int run(int argc, char* argv[])
 
   std::cout << "Mesh Type: " << mtype << std::endl;
 
-  int ret(1);
   if(mtype == "conformal:hypercube:1:1")
-    ret = run_xml<H1M1D>(args, mesh_reader, vtk_name);
+    return run_xml<H1M1D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:1:2")
-    ret = run_xml<H1M2D>(args, mesh_reader, vtk_name);
+    return run_xml<H1M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:1:3")
-    ret = run_xml<H1M3D>(args, mesh_reader, vtk_name);
+    return run_xml<H1M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:2:2")
-    ret = run_xml<H2M2D>(args, mesh_reader, vtk_name);
+    return run_xml<H2M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:2:3")
-    ret = run_xml<H2M3D>(args, mesh_reader, vtk_name);
+    return run_xml<H2M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:hypercube:3:3")
-    ret = run_xml<H3M3D>(args, mesh_reader, vtk_name);
+    return run_xml<H3M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:2:2")
-    ret = run_xml<S2M2D>(args, mesh_reader, vtk_name);
+    return run_xml<S2M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:2:3")
-    ret = run_xml<S2M3D>(args, mesh_reader, vtk_name);
+    return run_xml<S2M3D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:3:3")
-    ret = run_xml<S3M3D>(args, mesh_reader, vtk_name);
+    return run_xml<S3M3D>(args, mesh_reader, vtk_name);
 
-  return ret;
+  std::cout << "ERROR: unsupported mesh type!" << std::endl;
+
+  return 1;
 }
 
 int main(int argc, char* argv[])
