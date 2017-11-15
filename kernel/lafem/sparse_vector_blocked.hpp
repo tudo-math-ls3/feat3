@@ -174,6 +174,7 @@ namespace FEAT
        * Create a deep clone of this container.
        *
        * \param[in] clone_mode The actual cloning procedure.
+       * \returns The created clone.
        *
        */
       SparseVectorBlocked clone(CloneMode clone_mode = CloneMode::Deep) const

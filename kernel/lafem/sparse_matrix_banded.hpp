@@ -584,6 +584,7 @@ namespace FEAT
        * Create a clone of this container.
        *
        * \param[in] clone_mode The actual cloning procedure.
+       * \returns The created clone.
        *
        */
       SparseMatrixBanded clone(CloneMode clone_mode = CloneMode::Weak) const
