@@ -1679,6 +1679,24 @@ namespace NavierStokesCP2D
       dump_time(comm, "Solver-S Time", t_solver_s, t_total);
       dump_time(comm, "VTK-Write Time", t_vtk, t_total);
       dump_time(comm, "Other Time", t_total-t_sum, t_total);
+
+      if(cfg.multigrid_a)
+      {
+        comm.print("\nMultigrid-A Timings:");
+        dump_time(comm, "Smoother Time", multigrid_hierarchy_velo->get_time_smooth(), t_total);
+        dump_time(comm, "Coarse Grid Time", multigrid_hierarchy_velo->get_time_coarse(), t_total);
+        dump_time(comm, "Defect Calc Time", multigrid_hierarchy_velo->get_time_defect(), t_total);
+        dump_time(comm, "Grid Transfer Time", multigrid_hierarchy_velo->get_time_transfer(), t_total);
+      }
+
+      if(cfg.multigrid_s)
+      {
+        comm.print("\nMultigrid-S Timings:");
+        dump_time(comm, "Smoother Time", multigrid_hierarchy_pres->get_time_smooth(), t_total);
+        dump_time(comm, "Coarse Grid Time", multigrid_hierarchy_pres->get_time_coarse(), t_total);
+        dump_time(comm, "Defect Calc Time", multigrid_hierarchy_pres->get_time_defect(), t_total);
+        dump_time(comm, "Grid Transfer Time", multigrid_hierarchy_pres->get_time_transfer(), t_total);
+      }
     }
 
     if (cfg.statistics)
