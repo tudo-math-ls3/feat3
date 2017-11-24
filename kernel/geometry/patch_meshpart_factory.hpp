@@ -17,6 +17,7 @@ namespace FEAT
      * Type of the BaseMesh
      *
      * \author Jordi Paul
+     * \author Peter Zajac
      */
     template<typename MeshType_>
     class PatchMeshPartFactory : public Factory< MeshPart<MeshType_> >
@@ -38,8 +39,6 @@ namespace FEAT
         static constexpr int shape_dim = ShapeType::dimension;
 
       private:
-        /// Number of entities for each shape dimension
-        Index _num_entities[shape_dim + 1];
         /// This will hold all BaseMesh cell numbers of cells present in the patch
         std::vector<Index> _cells_patch;
 
@@ -55,24 +54,17 @@ namespace FEAT
          */
         explicit PatchMeshPartFactory(Index my_rank, const Adjacency::Graph& elems_at_rank)
         {
-          // The patch initially has no entities
-          for(int i(0); i < shape_dim + 1; ++i)
-            _num_entities[i] = 0;
-
-          XASSERT(my_rank <= elems_at_rank.get_num_nodes_domain());
+          XASSERT(my_rank < elems_at_rank.get_num_nodes_domain());
 
           // extract the elements of our rank
+          _cells_patch.reserve(elems_at_rank.degree(my_rank));
           for(auto it = elems_at_rank.image_begin(my_rank); it != elems_at_rank.image_end(my_rank); ++it)
             _cells_patch.push_back(*it);
-
-          // Now we know the number of cells
-          _num_entities[shape_dim] = Index(_cells_patch.size());
         }
 
         /// virtual destructor
         virtual ~PatchMeshPartFactory()
         {
-          _cells_patch.clear();
         }
 
         /**
@@ -96,8 +88,7 @@ namespace FEAT
         {
           XASSERT(dim >= 0);
           XASSERT(dim <= shape_dim);
-
-          return _num_entities[dim];
+          return (dim < shape_dim ? Index(0) : Index(_cells_patch.size()));
         }
 
         /**
@@ -138,17 +129,10 @@ namespace FEAT
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
-          Index ncells_patch(get_num_entities(shape_dim));
-
-          TargetSet new_target_set(ncells_patch);
-          for(Index k(0); k < ncells_patch; ++k)
-            new_target_set[k] = _cells_patch[k];
-
-          target_set_holder.template get_target_set<shape_dim>() = std::move(new_target_set);
-
-          return;
+          TargetSet& target_set = target_set_holder.template get_target_set<shape_dim>();
+          for(Index k(0); k < Index(_cells_patch.size()); ++k)
+            target_set[k] = _cells_patch[k];
         }
-
     }; // class PatchMeshPartFactory<MeshPart<...>>
   } // namespace Geometry
 } // namespace FEAT
