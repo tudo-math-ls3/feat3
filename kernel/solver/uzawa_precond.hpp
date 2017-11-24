@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_SOLVER_SCHUR_PRECOND_HPP
-#define KERNEL_SOLVER_SCHUR_PRECOND_HPP 1
+#ifndef KERNEL_SOLVER_UZAWA_PRECOND_HPP
+#define KERNEL_SOLVER_UZAWA_PRECOND_HPP 1
 
 // includes, FEAT
 #include <kernel/solver/base.hpp>
@@ -17,42 +17,42 @@ namespace FEAT
   namespace Solver
   {
     /**
-     * \brief Schur-Complement preconditioner type.
+     * \brief Uzawa preconditioner type.
      *
      * This enumeration specifies the various preconditioner types implemented in the
-     * SchurPrecond class template.
+     * UzawaPrecond class template.
      */
-    enum class SchurType
+    enum class UzawaType
     {
-      /// diagonal Schur-Complement preconditioner
+      /// diagonal Uzawa preconditioner
       diagonal,
-      /// lower-diagonal Schur-Complement preconditioner
+      /// lower-diagonal Uzawa preconditioner
       lower,
-      /// upper-diagonal Schur-Complement preconditioner
+      /// upper-diagonal Uzawa preconditioner
       upper,
-      /// full Schur-Complement preconditioner
+      /// full Uzawa preconditioner
       full
     };
 
     /**
-     * \brief Schur-Complement preconditioner
+     * \brief Uzawa preconditioner
      *
-     * This class implements the Schur-Complement preconditioner, which is a special preconditioner for
+     * This class implements the Uzawa preconditioner, which is a special preconditioner for
      * saddle-point systems of the form
      * \f[\begin{bmatrix} A & B\\D & 0\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
      *
      * Let \f$ S \approx -DA^{-1}B\f$ be an approximation of the Schur-complement matrix, then this
      * class supports a total of four different preconditioners for the saddle-point system above:
-     * - SchurType::diagonal: Solves the system
+     * - UzawaType::diagonal: Solves the system
      * \f[\begin{bmatrix} A & 0\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
      *
-     * - SchurType::lower: Solves the system
+     * - UzawaType::lower: Solves the system
      * \f[\begin{bmatrix} A & 0\\D & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
      *
-     * - SchurType::upper: Solves the system
+     * - UzawaType::upper: Solves the system
      * \f[\begin{bmatrix} A & B\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
      *
-     * - SchurType::full: Solves the system
+     * - UzawaType::full: Solves the system
      * \f[\begin{bmatrix} I & 0\\-DA^{-1} & I\end{bmatrix} \cdot \begin{bmatrix} A & B\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
      *
      * The required solution steps of \f$ A^{-1} \f$ and \f$ S^{-1} \f$ are performed by two sub-solvers,
@@ -70,7 +70,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
-    class SchurPrecond :
+    class UzawaPrecond :
       public SolverBase<LAFEM::TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL> >
     {
     public:
@@ -101,17 +101,17 @@ namespace FEAT
       std::shared_ptr<SolverA> _solver_a;
       /// our S-block solver
       std::shared_ptr<SolverS> _solver_s;
-      /// our Schur-Complement type
-      SchurType _schur_type;
+      /// our Uzawa type
+      UzawaType _uzawa_type;
       /// auto-initialise of S-solver
       const bool _auto_init_s;
-      /// a temporary defec vector
+      /// a temporary defect vector
       VectorTypeV _vec_tmp_v;
       VectorTypeP _vec_tmp_p;
 
     public:
       /**
-       * \brief Constructs a Schur-Complement preconditioner
+       * \brief Constructs a Uzawa preconditioner
        *
        * \param[in] matrix_a, matrix_b, matrix_d
        * The three sub-matrices of the saddle-point matrix.
@@ -133,7 +133,7 @@ namespace FEAT
        * object. If set to \c false, then the caller is responsible for the initialisation and
        * finalisation of the S-block solver object.
        */
-      explicit SchurPrecond(
+      explicit UzawaPrecond(
         const MatrixA_& matrix_a,
         const MatrixB_& matrix_b,
         const MatrixD_& matrix_d,
@@ -141,7 +141,7 @@ namespace FEAT
         const FilterP_& filter_p,
         std::shared_ptr<SolverA> solver_a,
         std::shared_ptr<SolverS> solver_s,
-        SchurType type = SchurType::diagonal,
+        UzawaType type = UzawaType::diagonal,
         bool auto_init_s = true) :
         _matrix_a(matrix_a),
         _matrix_b(matrix_b),
@@ -150,20 +150,20 @@ namespace FEAT
         _filter_p(filter_p),
         _solver_a(solver_a),
         _solver_s(solver_s),
-        _schur_type(type),
+        _uzawa_type(type),
         _auto_init_s(auto_init_s)
       {
         XASSERTM(solver_a != nullptr, "A-solver must be given");
         XASSERTM(solver_s != nullptr, "S-solver must be given");
       }
 
-      virtual ~SchurPrecond()
+      virtual ~UzawaPrecond()
       {
       }
 
       virtual String name() const override
       {
-        return "Schur";
+        return "Uzawa";
       }
 
       virtual void init_symbolic() override
@@ -176,7 +176,7 @@ namespace FEAT
         }
 
         // create a temporary vector
-        if(_schur_type != SchurType::diagonal)
+        if(_uzawa_type != UzawaType::diagonal)
         {
           _vec_tmp_v = _matrix_b.create_vector_l();
           _vec_tmp_p = _matrix_d.create_vector_l();
@@ -205,7 +205,7 @@ namespace FEAT
 
       virtual void done_symbolic() override
       {
-        if(_schur_type != SchurType::diagonal)
+        if(_uzawa_type != UzawaType::diagonal)
         {
           _vec_tmp_p.clear();
           _vec_tmp_v.clear();
@@ -230,11 +230,11 @@ namespace FEAT
         const VectorTypeP& rhs_p = vec_def.template at<Index(1)>();
 
         // now let's check the preconditioner type
-        switch(_schur_type)
+        switch(_uzawa_type)
         {
-        case SchurType::diagonal:
+        case UzawaType::diagonal:
           // solve A*u_v = f_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, rhs_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -242,7 +242,7 @@ namespace FEAT
           }
 
           // solve S*u_p = f_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, rhs_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -253,9 +253,9 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
 
-        case SchurType::lower:
+        case UzawaType::lower:
           // solve A*u_v = f_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, rhs_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -269,7 +269,7 @@ namespace FEAT
           this->_filter_p.filter_def(tmp_p);
 
           // solve S*u_p = g_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, tmp_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -280,9 +280,9 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
 
-        case SchurType::upper:
+        case UzawaType::upper:
           // solve S*u_p = f_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, rhs_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -296,7 +296,7 @@ namespace FEAT
           this->_filter_v.filter_def(tmp_v);
 
           // solve A*u_v = g_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, tmp_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -307,11 +307,11 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
           return Status::success;
 
-        case SchurType::full:
+        case UzawaType::full:
           // Note: We will use the first component of the solution vector here.
           //       It will be overwritten by the third solution step below.
           // solve A*u_v = f_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, rhs_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -325,7 +325,7 @@ namespace FEAT
           this->_filter_p.filter_def(tmp_p);
 
           // solve S*u_p = g_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(sol_p, tmp_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -339,7 +339,7 @@ namespace FEAT
           this->_filter_v.filter_def(tmp_v);
 
           // solve A*u_v = g_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(sol_v, tmp_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -355,10 +355,10 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
         return Status::aborted;
       }
-    }; // class SchurPrecond<...>
+    }; // class UzawaPrecond<...>
 
     /**
-     * \brief SchurPrecond specialisation for Global matrices
+     * \brief UzawaPrecond specialisation for Global matrices
      *
      * \author Peter Zajac
      */
@@ -366,7 +366,7 @@ namespace FEAT
       typename MatrixA_, typename MatrixB_, typename MatrixD_,
       typename FilterV_, typename FilterP_,
       typename MirrorV_, typename MirrorP_>
-    class SchurPrecond
+    class UzawaPrecond
       <
         Global::Matrix<MatrixA_, MirrorV_, MirrorV_>,
         Global::Matrix<MatrixB_, MirrorV_, MirrorP_>,
@@ -428,11 +428,11 @@ namespace FEAT
       GlobalVectorTypeP _vec_rhs_p, _vec_sol_p, _vec_def_p;
       std::shared_ptr<SolverA> _solver_a;
       std::shared_ptr<SolverS> _solver_s;
-      SchurType _schur_type;
+      UzawaType _uzawa_type;
       const bool _auto_init_s;
 
     public:
-      explicit SchurPrecond(
+      explicit UzawaPrecond(
         const GlobalMatrixTypeA& matrix_a,
         const GlobalMatrixTypeB& matrix_b,
         const GlobalMatrixTypeD& matrix_d,
@@ -440,7 +440,7 @@ namespace FEAT
         const GlobalFilterTypeP& filter_p,
         std::shared_ptr<SolverA> solver_a,
         std::shared_ptr<SolverS> solver_s,
-        SchurType type = SchurType::diagonal,
+        UzawaType type = UzawaType::diagonal,
         bool auto_init_s = true
         ) :
         _matrix_a(matrix_a),
@@ -450,14 +450,14 @@ namespace FEAT
         _filter_p(filter_p),
         _solver_a(solver_a),
         _solver_s(solver_s),
-        _schur_type(type),
+        _uzawa_type(type),
         _auto_init_s(auto_init_s)
       {
       }
 
       virtual String name() const override
       {
-        return "Schur";
+        return "Uzawa";
       }
 
       virtual void init_symbolic() override
@@ -474,7 +474,7 @@ namespace FEAT
         _vec_rhs_p = _matrix_d.create_vector_l();
         _vec_sol_p = _matrix_d.create_vector_l();
 
-        if(_schur_type != SchurType::diagonal)
+        if(_uzawa_type != UzawaType::diagonal)
         {
           _vec_def_v = _matrix_b.create_vector_l();
           _vec_def_p = _matrix_d.create_vector_l();
@@ -503,7 +503,7 @@ namespace FEAT
 
       virtual void done_symbolic() override
       {
-        if(_schur_type != SchurType::diagonal)
+        if(_uzawa_type != UzawaType::diagonal)
         {
           _vec_def_p.clear();
           _vec_def_v.clear();
@@ -528,11 +528,11 @@ namespace FEAT
         (*_vec_rhs_p).copy((*vec_def).template at<1>());
 
         // now let's check the preconditioner type
-        switch(_schur_type)
+        switch(_uzawa_type)
         {
-        case SchurType::diagonal:
+        case UzawaType::diagonal:
           // solve A*u_v = f_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_rhs_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -540,7 +540,7 @@ namespace FEAT
           }
 
           // solve S*u_p = f_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_rhs_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -550,9 +550,9 @@ namespace FEAT
           // okay
           break;
 
-        case SchurType::lower:
+        case UzawaType::lower:
           // solve A*u_v = f_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_rhs_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -566,7 +566,7 @@ namespace FEAT
           _filter_p.filter_def(_vec_def_p);
 
           // solve S*u_p = g_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_def_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -576,9 +576,9 @@ namespace FEAT
           // okay
           break;
 
-        case SchurType::upper:
+        case UzawaType::upper:
           // solve S*u_p = f_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_rhs_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -592,7 +592,7 @@ namespace FEAT
           _filter_v.filter_def(_vec_def_v);
 
           // solve A*u_v = g_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_def_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -602,11 +602,11 @@ namespace FEAT
           // okay
           break;
 
-        case SchurType::full:
+        case UzawaType::full:
           // Note: We will use the first component of the solution vector here.
           //       It will be overwritten by the third solution step below.
           // solve A*u_v = f_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_rhs_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -620,7 +620,7 @@ namespace FEAT
           _filter_p.filter_def(_vec_def_p);
 
           // solve S*u_p = g_p
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurS>(this->name(), this->_solver_s->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaS>(this->name(), this->_solver_s->name()));
           if(!status_success(_solver_s->apply(_vec_sol_p, _vec_def_p)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -634,7 +634,7 @@ namespace FEAT
           _filter_v.filter_def(_vec_def_v);
 
           // solve A*u_v = g_v
-          Statistics::add_solver_expression(std::make_shared<ExpressionCallSchurA>(this->name(), this->_solver_a->name()));
+          Statistics::add_solver_expression(std::make_shared<ExpressionCallUzawaA>(this->name(), this->_solver_a->name()));
           if(!status_success(_solver_a->apply(_vec_sol_v, _vec_def_v)))
           {
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, 0));
@@ -653,10 +653,10 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));
         return Status::success;
       }
-    }; // class SchurPrecond<...>
+    }; // class UzawaPrecond<...>
 
     /**
-     * \brief Creates a new SchurPrecond solver object
+     * \brief Creates a new UzawaPrecond solver object
      *
      * \param[in] matrix_a, matrix_b, matrix_d
      * The three sub-matrices of the saddle-point system matrix.
@@ -677,37 +677,37 @@ namespace FEAT
      * Specifies whether to automatically initialise the S-matrix solver.
      *
      * \returns
-     * A shared pointer to a new SchurPrecond object.
+     * A shared pointer to a new UzawaPrecond object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_, typename SolverA_, typename SolverS_>
-    inline std::shared_ptr<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_schur_precond(
+    inline std::shared_ptr<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_uzawa_precond(
       const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
       const FilterV_& filter_v, const FilterP_& filter_p,
       std::shared_ptr<SolverA_> solver_a,
       std::shared_ptr<SolverS_> solver_s,
-      SchurType type = SchurType::diagonal,
+      UzawaType type = UzawaType::diagonal,
       bool auto_init_s = true)
     {
-      return std::make_shared<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
+      return std::make_shared<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
         (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type, auto_init_s);
     }
 #else
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
-    inline std::shared_ptr<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_schur_precond(
+    inline std::shared_ptr<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_uzawa_precond(
       const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
       const FilterV_& filter_v, const FilterP_& filter_p,
       std::shared_ptr<SolverBase<typename MatrixB_::VectorTypeL>> solver_a,
       std::shared_ptr<SolverBase<typename MatrixD_::VectorTypeL>> solver_s,
-      SchurType type = SchurType::diagonal,
+      UzawaType type = UzawaType::diagonal,
       bool auto_init_s = true)
     {
-      return std::make_shared<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
+      return std::make_shared<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
         (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type, auto_init_s);
     }
 #endif
   } // namespace Solver
 } // namespace FEAT
 
-#endif // KERNEL_SOLVER_SCHUR_PRECOND_HPP
+#endif // KERNEL_SOLVER_UZAWA_PRECOND_HPP

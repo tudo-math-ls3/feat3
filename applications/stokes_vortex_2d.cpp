@@ -17,7 +17,7 @@
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
-#include <kernel/solver/schur_precond.hpp>
+#include <kernel/solver/uzawa_precond.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
@@ -333,8 +333,8 @@ namespace StokesVortex2D
       solver_s = glob_ilu;
     }
 
-    // create a global Schur-Complement preconditioner
-    auto schur = Solver::new_schur_precond(
+    // create a global Uzawa preconditioner
+    auto uzawa = Solver::new_uzawa_precond(
       the_system_level.matrix_a,
       the_system_level.matrix_b,
       the_system_level.matrix_d,
@@ -342,11 +342,11 @@ namespace StokesVortex2D
       the_system_level.filter_pres,
       solver_a,
       solver_s,
-      Solver::SchurType::upper
-      );
+      Solver::UzawaType::upper
+    );
 
     // create our solver
-    auto solver = Solver::new_richardson(matrix, filter, DataType(1), schur);
+    auto solver = Solver::new_richardson(matrix, filter, DataType(1), uzawa);
 
     // enable plotting
     if(comm.rank() == 0)

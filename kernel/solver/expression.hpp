@@ -41,10 +41,10 @@ namespace FEAT
       prol,
       /// restriction (multigrid)
       rest,
-      /// call S matrix solver (schur complement)
-      call_schur_s,
-      /// call A matrix solver (schur complement)
-      call_schur_a
+      /// call S matrix solver (uzawa complement)
+      call_uzawa_s,
+      /// call A matrix solver (uzawa complement)
+      call_uzawa_a
     };
 
     /// \cond internal
@@ -76,10 +76,10 @@ namespace FEAT
         return os << "prol";
         case ExpressionType::rest:
         return os << "rest";
-        case ExpressionType::call_schur_s:
-        return os << "schur_s";
-        case ExpressionType::call_schur_a:
-        return os << "schur_a";
+        case ExpressionType::call_uzawa_s:
+        return os << "uzawa_s";
+        case ExpressionType::call_uzawa_a:
+        return os << "uzawa_a";
       default:
         return os << "unknown";
       }
@@ -373,45 +373,45 @@ namespace FEAT
         }
     };
 
-    class ExpressionCallSchurS : public ExpressionBase
+    class ExpressionCallUzawaS : public ExpressionBase
     {
       public:
         String solver_s_name;
 
-        explicit ExpressionCallSchurS(String name, String solver_s_name_in) :
+        explicit ExpressionCallUzawaS(String name, String solver_s_name_in) :
           ExpressionBase(name),
           solver_s_name(solver_s_name_in)
         {
         }
 
-        virtual ~ExpressionCallSchurS()
+        virtual ~ExpressionCallUzawaS()
         {
         }
 
         virtual ExpressionType get_type() override
         {
-          return ExpressionType::call_schur_s;
+          return ExpressionType::call_uzawa_s;
         }
     };
 
-    class ExpressionCallSchurA : public ExpressionBase
+    class ExpressionCallUzawaA : public ExpressionBase
     {
       public:
         String solver_a_name;
 
-        explicit ExpressionCallSchurA(String name, String solver_a_name_in) :
+        explicit ExpressionCallUzawaA(String name, String solver_a_name_in) :
           ExpressionBase(name),
           solver_a_name(solver_a_name_in)
         {
         }
 
-        virtual ~ExpressionCallSchurA()
+        virtual ~ExpressionCallUzawaA()
         {
         }
 
         virtual ExpressionType get_type() override
         {
-          return ExpressionType::call_schur_a;
+          return ExpressionType::call_uzawa_a;
         }
     };
   } // namespace Solver

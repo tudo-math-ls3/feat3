@@ -17,7 +17,7 @@
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/ilu_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
-#include <kernel/solver/schur_precond.hpp>
+#include <kernel/solver/uzawa_precond.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
@@ -236,20 +236,20 @@ namespace StokesDriCav2D
       solver_s = glob_ilu;
     }
 
-    // create a global Schur-Complement preconditioner
-    auto schur = Solver::new_schur_precond(
-        the_system_level.matrix_a,
-        the_system_level.matrix_b,
-        the_system_level.matrix_d,
-        the_system_level.filter_velo,
-        the_system_level.filter_pres,
-        solver_a,
-        solver_s,
-        Solver::SchurType::full
-        );
+    // create a global Uzawa preconditioner
+    auto uzawa = Solver::new_uzawa_precond(
+      the_system_level.matrix_a,
+      the_system_level.matrix_b,
+      the_system_level.matrix_d,
+      the_system_level.filter_velo,
+      the_system_level.filter_pres,
+      solver_a,
+      solver_s,
+      Solver::UzawaType::full
+    );
 
     // create our solver
-    auto solver = Solver::new_pcg(matrix, filter, schur);
+    auto solver = Solver::new_pcg(matrix, filter, uzawa);
 
     // enable plotting
     if(comm.rank() == 0)

@@ -134,15 +134,15 @@ String Statistics::_generate_formatted_solver_tree(String target)
       }
     }
 
-    // the current solver is of schur complement type, search for a and s solver
+    // the current solver is of uzawa complement type, search for a and s solver
     // if both have been found, skip everything until solver end statement has been found
-    else if (names.back().starts_with("Schur"))
+    else if (names.back().starts_with("Uzawa"))
     {
       while (it != _solver_expressions[target].end())
       {
         auto expression = *it;
 
-        if (expression->get_type() == Solver::ExpressionType::call_schur_s && expression->solver_name == names.back() && (found.back() == 0 || found.back() == 2))
+        if (expression->get_type() == Solver::ExpressionType::call_uzawa_s && expression->solver_name == names.back() && (found.back() == 0 || found.back() == 2))
         {
           found.back() += 1;
           auto j = it;
@@ -162,7 +162,7 @@ String Statistics::_generate_formatted_solver_tree(String target)
           // s solver is no solver on its own, we can continue with the current solver's end statement search
           else
           {
-            auto t = dynamic_cast<Solver::ExpressionCallSchurS*>(expression.get());
+            auto t = dynamic_cast<Solver::ExpressionCallUzawaS*>(expression.get());
             if (found.back() == 1)
               tree += " ( S: " + t->solver_s_name;
             else
@@ -170,7 +170,7 @@ String Statistics::_generate_formatted_solver_tree(String target)
           }
         }
 
-        if (expression->get_type() == Solver::ExpressionType::call_schur_a && expression->solver_name == names.back() && (found.back() == 0 || found.back() == 1))
+        if (expression->get_type() == Solver::ExpressionType::call_uzawa_a && expression->solver_name == names.back() && (found.back() == 0 || found.back() == 1))
         {
           found.back() += 2;
           auto j = it;
@@ -190,7 +190,7 @@ String Statistics::_generate_formatted_solver_tree(String target)
           // a solver is no solver on its own, we can continue with the current solver's end statement search
           else
           {
-            auto t = dynamic_cast<Solver::ExpressionCallSchurA*>(expression.get());
+            auto t = dynamic_cast<Solver::ExpressionCallUzawaA*>(expression.get());
             if (found.back() == 2)
               tree += " ( A: " + t->solver_a_name;
             else
@@ -286,7 +286,7 @@ String Statistics::_generate_formatted_solver_tree(String target)
 
     else
     {
-      // the current solver is not of multigrid or schur type, i.e. is uses at most one preconditioner, search for its call or the solvers end.
+      // the current solver is not of multigrid or uzawa type, i.e. is uses at most one preconditioner, search for its call or the solvers end.
       while (it != _solver_expressions[target].end())
       {
         auto expression = *it;
@@ -428,16 +428,16 @@ void Statistics::print_solver_expressions()
           std::cout<<String(padding, ' ') << s << std::endl;
           break;
         }
-      case Solver::ExpressionType::call_schur_s:
+      case Solver::ExpressionType::call_uzawa_s:
         {
-          auto t = dynamic_cast<Solver::ExpressionCallSchurS*>(expression.get());
+          auto t = dynamic_cast<Solver::ExpressionCallUzawaS*>(expression.get());
           String s = stringify(t->get_type()) + "[" + stringify(t->solver_name) + "] (" + t->solver_s_name + ")";
           std::cout<<String(padding, ' ') << s << std::endl;
           break;
         }
-      case Solver::ExpressionType::call_schur_a:
+      case Solver::ExpressionType::call_uzawa_a:
         {
-          auto t = dynamic_cast<Solver::ExpressionCallSchurA*>(expression.get());
+          auto t = dynamic_cast<Solver::ExpressionCallUzawaA*>(expression.get());
           String s = stringify(t->get_type()) + "[" + stringify(t->solver_name) + "] (" + t->solver_a_name + ")";
           std::cout<<String(padding, ' ') << s << std::endl;
           break;
