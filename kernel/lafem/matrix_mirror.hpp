@@ -784,7 +784,7 @@ namespace FEAT
 
         // render the matrix structure to a graph to obtain
         // the celebrated ptr/idx array pair
-        Adjacency::Graph mat_graph(Adjacency::rt_injectify, tmpl_mat);
+        Adjacency::Graph mat_graph(Adjacency::RenderType::injectify, tmpl_mat);
         const Index* dom_ptr = mat_graph.get_domain_ptr();
         const Index* img_idx = mat_graph.get_image_idx();
 

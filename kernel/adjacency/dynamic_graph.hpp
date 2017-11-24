@@ -7,6 +7,7 @@
 #include <kernel/adjacency/adjactor.hpp>
 
 // includes, system
+#include <algorithm>
 #include <vector>
 #include <set>
 
@@ -92,13 +93,13 @@ namespace FEAT
       {
         switch(render_type)
         {
-        case rt_as_is:
-        case rt_injectify:
+        case RenderType::as_is:
+        case RenderType::injectify:
           _render_as_is(adjactor);
           break;
 
-        case rt_transpose:
-        case rt_injectify_transpose:
+        case RenderType::transpose:
+        case RenderType::injectify_transpose:
           _render_transpose(adjactor);
           break;
         }
@@ -132,13 +133,13 @@ namespace FEAT
       {
         switch(render_type)
         {
-        case rt_as_is:
-        case rt_injectify:
+        case RenderType::as_is:
+        case RenderType::injectify:
           _render_as_is(adjactor1, adjactor2);
           break;
 
-        case rt_transpose:
-        case rt_injectify_transpose:
+        case RenderType::transpose:
+        case RenderType::injectify_transpose:
           _render_transpose(adjactor1, adjactor2);
           break;
         }
@@ -304,7 +305,7 @@ namespace FEAT
       template<typename Adjactor_>
       void compose(const Adjactor_& adjactor)
       {
-        XASSERTM(_num_nodes_image <= adjactor.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(_num_nodes_image != adjactor.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor_::ImageIterator AImIt;
 
@@ -407,7 +408,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() != adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -442,7 +443,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() != adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;

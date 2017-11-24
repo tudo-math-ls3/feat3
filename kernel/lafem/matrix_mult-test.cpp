@@ -142,8 +142,8 @@ public:
     }
 
     // create matrix structure for X = D*A*B
-    Adjacency::Graph graph_da(Adjacency::rt_injectify, d, a);
-    Adjacency::Graph graph_dab(Adjacency::rt_injectify, graph_da, b);
+    Adjacency::Graph graph_da(Adjacency::RenderType::injectify, d, a);
+    Adjacency::Graph graph_dab(Adjacency::RenderType::injectify, graph_da, b);
     graph_dab.sort_indices();
     MatrixType x(graph_dab);
 

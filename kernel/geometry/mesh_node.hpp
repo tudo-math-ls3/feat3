@@ -883,11 +883,11 @@ namespace FEAT
           const auto& verts_at_elem = base_root_mesh->template get_index_set<MeshType::shape_dim, 0>();
 
           // build vertices-at-rank
-          Adjacency::Graph verts_at_rank(Adjacency::rt_injectify, elems_at_rank, verts_at_elem);
+          Adjacency::Graph verts_at_rank(Adjacency::RenderType::injectify, elems_at_rank, verts_at_elem);
 
           // transpose and build ranks-at-rank (via vertices)
-          Adjacency::Graph ranks_at_vert(Adjacency::rt_transpose, verts_at_rank);
-          Adjacency::Graph ranks_at_rank(Adjacency::rt_injectify, verts_at_rank, ranks_at_vert);
+          Adjacency::Graph ranks_at_vert(Adjacency::RenderType::transpose, verts_at_rank);
+          Adjacency::Graph ranks_at_rank(Adjacency::RenderType::injectify, verts_at_rank, ranks_at_vert);
 
           // build comm neighbour ranks vector
           for(auto it = ranks_at_rank.image_begin(Index(rank)); it != ranks_at_rank.image_end(Index(rank)); ++it)

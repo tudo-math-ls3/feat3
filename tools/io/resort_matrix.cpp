@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
       exit(EXIT_FAILURE);
     }
 
-    Graph graph(Adjacency::rt_as_is, orig);
+    Graph graph(Adjacency::RenderType::as_is, orig);
     Index best_radius;
     Index best_radius_index;
     orig.radius_row(best_radius, best_radius_index);

@@ -86,7 +86,7 @@ namespace FEAT
         _name(name_),
         _prio(prio_),
         _level(level_),
-        _patches(Adjacency::rt_as_is, graph_)
+        _patches(Adjacency::RenderType::as_is, graph_)
       {
       }
 

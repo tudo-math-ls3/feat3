@@ -28,7 +28,7 @@ namespace FEAT
       public:
         explicit PatchHaloBuild(const TargetSetHolder<Shape_>& tsh, const IndexSetHolder<Shape_>& ish) :
           _target_face(tsh.template get_target_set<face_dim>()),
-          _faces_at_elem(Adjacency::rt_as_is, ish.template get_index_set<Shape_::dimension, face_dim>())
+          _faces_at_elem(Adjacency::RenderType::as_is, ish.template get_index_set<Shape_::dimension, face_dim>())
         {
         }
 

@@ -89,7 +89,7 @@ namespace FEAT
        * \param[in] num_indices_image
        * The total number of image node indices for the graph.
        */
-      Graph(
+      explicit Graph(
         Index num_nodes_domain,
         Index num_nodes_image,
         Index num_indices_image);
@@ -120,7 +120,7 @@ namespace FEAT
        *    upon destruction.
        *  - If set to \c true then the caller remains responsible for the deallocation of the arrays.
        */
-      Graph(
+      explicit Graph(
         Index num_nodes_domain,
         Index num_nodes_image,
         Index num_indices_image,
@@ -148,7 +148,7 @@ namespace FEAT
        * \param[in] image_idx
        * The image node index array for the graph. Must not be \c nullptr.
        */
-      Graph(
+      explicit Graph(
         Index num_nodes_domain,
         Index num_nodes_image,
         Index num_indices_image,
@@ -167,10 +167,7 @@ namespace FEAT
        * A reference to the adjactor that is to be rendered.
        */
       template<typename Adjactor_>
-      explicit Graph(
-        RenderType render_type,
-        const Adjactor_& adjactor)
-         :
+      explicit Graph(RenderType render_type, const Adjactor_& adjactor) :
         _num_nodes_domain(0),
         _num_nodes_image(0),
         _num_indices_image(0),
@@ -180,24 +177,24 @@ namespace FEAT
       {
         switch(render_type)
         {
-        case rt_as_is:
+        case RenderType::as_is:
           _render_as_is(adjactor);
           break;
 
-        case rt_injectify:
+        case RenderType::injectify:
           _render_injectify(adjactor);
           break;
 
-        case rt_transpose:
+        case RenderType::transpose:
           _render_transpose(adjactor);
           break;
 
-        case rt_injectify_transpose:
+        case RenderType::injectify_transpose:
           _render_injectify_transpose(adjactor);
           break;
 
         default:
-          throw InternalError("Invalid render_type parameter!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Invalid render_type parameter!");
         }
       }
 
@@ -215,14 +212,8 @@ namespace FEAT
        * \param[in] adjactor2
        * A reference to the second adjactor in the composition that is to be rendered.
        */
-      template<
-        typename Adjactor1_,
-        typename Adjactor2_>
-      explicit Graph(
-        RenderType render_type,
-        const Adjactor1_& adjactor1,
-        const Adjactor2_& adjactor2)
-         :
+      template<typename Adjactor1_, typename Adjactor2_>
+      explicit Graph(RenderType render_type, const Adjactor1_& adjactor1, const Adjactor2_& adjactor2) :
         _num_nodes_domain(0),
         _num_nodes_image(0),
         _num_indices_image(0),
@@ -232,24 +223,24 @@ namespace FEAT
       {
         switch(render_type)
         {
-        case rt_as_is:
+        case RenderType::as_is:
           _render_as_is(adjactor1, adjactor2);
           break;
 
-        case rt_injectify:
+        case RenderType::injectify:
           _render_injectify(adjactor1, adjactor2);
           break;
 
-        case rt_transpose:
+        case RenderType::transpose:
           _render_transpose(adjactor1, adjactor2);
           break;
 
-        case rt_injectify_transpose:
+        case RenderType::injectify_transpose:
           _render_injectify_transpose(adjactor1, adjactor2);
           break;
 
         default:
-          throw InternalError("Invalid render_type parameter!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Invalid render_type parameter!");
         }
       }
 
@@ -274,7 +265,7 @@ namespace FEAT
        * \param[in] image_perm
        * The permutation of the image set.
        */
-      Graph(const Graph& other, const Permutation& domain_perm, const Permutation& image_perm);
+      explicit Graph(const Graph& other, const Permutation& domain_perm, const Permutation& image_perm);
 
       /// virtual destructor
       virtual ~Graph();
@@ -662,7 +653,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -723,7 +714,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
         _num_nodes_domain = adj1.get_num_nodes_domain();
@@ -766,7 +757,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -845,7 +836,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
         _num_nodes_domain = adj2.get_num_nodes_image();

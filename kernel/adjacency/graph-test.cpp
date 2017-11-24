@@ -372,15 +372,15 @@ public:
     Graph g(5, 7, 17, g_ptr, g_idx);
 
     // transpose the graph G
-    Graph f(rt_transpose, g);
+    Graph f(RenderType::transpose, g);
     TEST_CHECK(test_f(f));
 
     // render and test fg
-    Graph fg(rt_injectify, f, g);
+    Graph fg(RenderType::injectify, f, g);
     TEST_CHECK(test_fg(fg));
 
     // render and test gf
-    Graph gf(rt_injectify, g, f);
+    Graph gf(RenderType::injectify, g, f);
     TEST_CHECK(test_gf(gf));
 
     // test sorting

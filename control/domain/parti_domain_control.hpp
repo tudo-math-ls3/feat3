@@ -932,9 +932,9 @@ namespace FEAT
           /// \todo use centralised method for adj graph retrieval
           /// \todo does any partitioner need self-adjacencies? -> remove it in creation
           const auto dimension = MeshNodeType::MeshType::ShapeType::dimension;
-          Adjacency::Graph facets_at_elem(Adjacency::rt_as_is, base_mesh_node.get_mesh()->template get_index_set<dimension, dimension-1>());
-          Adjacency::Graph elems_at_facet(Adjacency::rt_transpose, facets_at_elem);
-          Adjacency::Graph adj_graph = Adjacency::Graph(Adjacency::rt_injectify, facets_at_elem, elems_at_facet);
+          Adjacency::Graph facets_at_elem(Adjacency::RenderType::as_is, base_mesh_node.get_mesh()->template get_index_set<dimension, dimension-1>());
+          Adjacency::Graph elems_at_facet(Adjacency::RenderType::transpose, facets_at_elem);
+          Adjacency::Graph adj_graph = Adjacency::Graph(Adjacency::RenderType::injectify, facets_at_elem, elems_at_facet);
 
           // create a metis partitioner
           Geometry::PartiMetis<MeshType> partitioner(adj_graph, nprocs);

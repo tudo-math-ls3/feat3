@@ -101,10 +101,10 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "invalid test-/trial-space pair");
 
         // render transposed test-dof-mapping
-        Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_graph);
+        Adjacency::Graph test_dof_support(Adjacency::RenderType::transpose, test_dof_graph);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_support, trial_dof_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_support, trial_dof_graph);
 
         // sort the dof-adjactor graph
         dof_adjactor.sort_indices();
@@ -129,10 +129,10 @@ namespace FEAT
         Adjacency::Graph dof_graph(Space::DofMappingRenderer::render(space));
 
         // render transposed dof-mapping
-        Adjacency::Graph dof_support(Adjacency::rt_transpose, dof_graph);
+        Adjacency::Graph dof_support(Adjacency::RenderType::transpose, dof_graph);
 
         // render composite dof-mapping/dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_support, dof_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_support, dof_graph);
 
         // sort the sof-adjactor graph
         dof_adjactor.sort_indices();
@@ -169,19 +169,19 @@ namespace FEAT
         const auto& facet_at_shape = test_space.get_trafo().get_mesh().template get_index_set<shape_dim, shape_dim-1>();
 
         // transpose to get the facet support
-        Adjacency::Graph shape_at_facet(Adjacency::rt_transpose, facet_at_shape);
+        Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
 
         // render transposed test-dof-mapping
-        Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_graph);
+        Adjacency::Graph test_dof_support(Adjacency::RenderType::transpose, test_dof_graph);
 
         // render extended test-dof-support
-        Adjacency::Graph test_dof_ext_sup(Adjacency::rt_injectify, test_dof_support, facet_at_shape);
+        Adjacency::Graph test_dof_ext_sup(Adjacency::RenderType::injectify, test_dof_support, facet_at_shape);
 
         // render extended trial-dof-mapping
-        Adjacency::Graph trial_dof_ext_graph(Adjacency::rt_injectify, shape_at_facet, trial_dof_graph);
+        Adjacency::Graph trial_dof_ext_graph(Adjacency::RenderType::injectify, shape_at_facet, trial_dof_graph);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_ext_sup, trial_dof_ext_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_ext_sup, trial_dof_ext_graph);
 
         // sort the dof-adjactor graph
         dof_adjactor.sort_indices();
@@ -213,16 +213,16 @@ namespace FEAT
         const auto& facet_at_shape = space.get_trafo().get_mesh().template get_index_set<shape_dim, shape_dim-1>();
 
         // transpose to get the facet support
-        Adjacency::Graph shape_at_facet(Adjacency::rt_transpose, facet_at_shape);
+        Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
 
         // render extended dof-mapping
-        Adjacency::Graph dof_ext_graph(Adjacency::rt_injectify, shape_at_facet, dof_graph);
+        Adjacency::Graph dof_ext_graph(Adjacency::RenderType::injectify, shape_at_facet, dof_graph);
 
         // render transposed extended dof-mapping
-        Adjacency::Graph dof_ext_sup(Adjacency::rt_transpose, dof_ext_graph);
+        Adjacency::Graph dof_ext_sup(Adjacency::RenderType::transpose, dof_ext_graph);
 
         // render composite dof-mapping/dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_ext_sup, dof_ext_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_ext_sup, dof_ext_graph);
 
         // sort the sof-adjactor graph
         dof_adjactor.sort_indices();
@@ -273,10 +273,10 @@ namespace FEAT
         Adjacency::Graph trial_dof_mapping(Space::DofMappingRenderer::render(coarse_space));
 
         // render transposed test-dof-mapping
-        Adjacency::Graph test_dof_support(Adjacency::rt_injectify_transpose, refine_adjactor, test_dof_mapping);
+        Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, refine_adjactor, test_dof_mapping);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_support, trial_dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_support, trial_dof_mapping);
 
         // sort the dof-adjactor graph
         dof_adjactor.sort_indices();

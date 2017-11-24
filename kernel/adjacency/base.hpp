@@ -19,7 +19,7 @@ namespace FEAT
      *
      * This enumeration specifies the different render modes available for the render constructors.
      */
-    enum RenderType
+    enum class RenderType
     {
       /**
        * \brief Render-As-Is mode
@@ -28,7 +28,7 @@ namespace FEAT
        * graph's adjacency information will be identical to the adjactor's, including adjacency
        * duplicates.
        */
-      rt_as_is = 0,
+      as_is = 0,
 
       /**
        * \brief Render-Injectified mode
@@ -37,7 +37,7 @@ namespace FEAT
        * each domain node will contain at most one adjacency to a specific image node - in other
        * words: the graph will not contain adjacency duplicates.
        */
-      rt_injectify = 1,
+      injectify = 1,
 
       /**
        * \brief Render-Transpose mode
@@ -47,17 +47,17 @@ namespace FEAT
        * node \e D has \e k adjacencies with an image node \e I, then the graph's domain node \e I
        * will have \e k adjacencies with the image node \e D.
        */
-      rt_transpose = 2,
+      transpose = 2,
 
       /**
        * \brief Render-Injectified-Transpose mode
        *
        * In this mode, the transpose of the adjactor passed to the constructor will be rendered
        * "injective".
-       * \see rt_transpose, rt_injectify
+       * \see RenderType::transpose, RenderType::injectify
        */
-      rt_injectify_transpose = 3
-    }; // enum RenderType
+      injectify_transpose = 3
+    }; // enum class RenderType
   } // namespace Adjacency
 } // namespace FEAT
 

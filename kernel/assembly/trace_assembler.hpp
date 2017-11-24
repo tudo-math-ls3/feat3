@@ -105,7 +105,7 @@ namespace FEAT
         _facets.clear();
 
         // build elements-at-facet graph
-        Adjacency::Graph elem_at_facet(Adjacency::rt_injectify_transpose,
+        Adjacency::Graph elem_at_facet(Adjacency::RenderType::injectify_transpose,
           _trafo.get_mesh().template get_index_set<shape_dim, facet_dim>());
 
         // loop over all facets

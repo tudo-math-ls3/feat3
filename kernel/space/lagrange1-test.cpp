@@ -286,10 +286,10 @@ public:
     neq = space.get_num_dofs();
 
     // render transposed dof-mapper to graph
-    Adjacency::Graph dof_support(Adjacency::rt_transpose, dof_mapping);
+    Adjacency::Graph dof_support(Adjacency::RenderType::transpose, dof_mapping);
 
     // render composite dof-support/dof-mapper graph
-    Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_support, dof_mapping);
+    Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_support, dof_mapping);
 
     // fetch graph arrays
     const Index* dom_ptr = dof_adjactor.get_domain_ptr();
