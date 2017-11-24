@@ -14,7 +14,6 @@
 #include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/adjacency/uni_edge_set.hpp>
 
 // includes, STL
 #include <map>
