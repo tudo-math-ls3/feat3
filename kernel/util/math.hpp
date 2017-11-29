@@ -208,6 +208,18 @@ namespace FEAT
     }
 
     /**
+     * \brief Returns the status of the sign bit.
+     *
+     * \param[in] x
+     * The value whose signbit status is to be returned.
+     */
+    template<typename T_>
+    inline bool signbit(T_ x)
+    {
+      return x < T_(0);
+    }
+
+    /**
      * \brief Returns the absolute value.
      *
      * \param[in] x The value to get the absolute value from.
