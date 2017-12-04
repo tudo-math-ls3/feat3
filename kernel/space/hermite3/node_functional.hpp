@@ -92,7 +92,7 @@ namespace FEAT
           typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
           // compute trafo data
-          DomainPointType dom_point;
+          DomainPointType dom_point(DataType_(0));
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
 
@@ -249,7 +249,7 @@ namespace FEAT
           typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
           // compute trafo data
-          DomainPointType dom_point;
+          DomainPointType dom_point(DataType_(0));
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
 
@@ -333,7 +333,7 @@ namespace FEAT
           typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
           // compute trafo data
-          DomainPointType dom_point;
+          DomainPointType dom_point(DataType_(0));
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
 

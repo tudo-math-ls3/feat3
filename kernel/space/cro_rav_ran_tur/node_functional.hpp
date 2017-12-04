@@ -104,7 +104,6 @@ namespace FEAT
           typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
           // compute trafo data
-          DomainPointType dom_point;
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, _barycentre);
 
