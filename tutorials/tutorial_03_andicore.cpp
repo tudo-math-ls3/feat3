@@ -6,7 +6,7 @@
 //
 // The PDE to be solved reads:
 //
-//    -grad(A*grad(u)) + dot(b,grad(u)) + c*u = f         in the domain [0,1]x[0,1]
+//    -div(A*grad(u)) + dot(b,grad(u)) + c*u = f          in the domain [0,1]x[0,1]
 //                                         u = 0          on the boundary
 //
 // where
