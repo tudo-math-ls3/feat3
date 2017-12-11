@@ -45,7 +45,7 @@ public:
   }
 };
 
-class VC12Gen
+class Generator
 {
 public:
   // build ids
@@ -69,10 +69,10 @@ public:
   // source file list
   set<string> cpp_list;
   // CUDA source file list
-  //set<string> cu_list;
+  set<string> cu_list;
 
 public:
-  VC12Gen() :
+  Generator() :
     kernel_guid(read_kernel_guid()),
     project_guid(gen_random_guid()),
     testing(false)
@@ -80,7 +80,7 @@ public:
     parse_build_modes();
   }
 
-  /// parses all build mode stringss from 'vc14-build-modes.xml'
+  /// parses all build mode strings from 'vc14-build-modes.xml'
   void parse_build_modes()
   {
     cout << "Parsing build modes..." << endl;
@@ -260,52 +260,33 @@ public:
     return gen_dirs(dirs);
   }
 
-  /// searches for *.hpp files in the application directory
-  void find_headers()
+  /// searches for *.<ext> files in the application directory
+  void find_files(set<string>& lst, string ext)
   {
     WIN32_FIND_DATA find_data;
     HANDLE find_handle;
 
     // find hpp files
     memset(&find_data, 0, sizeof(WIN32_FIND_DATA));
-    find_handle = FindFirstFile(string("./" + project_path + "/*.hpp").c_str(), &find_data);
+    find_handle = FindFirstFile(string("./" + project_path + "/*." + ext).c_str(), &find_data);
     if(find_handle !=  INVALID_HANDLE_VALUE)
     {
       bool found(true);
       while(found)
       {
-        hpp_list.insert(find_data.cFileName);
+        lst.insert(find_data.cFileName);
         found = FindNextFile(find_handle, &find_data) != FALSE;
       }
       FindClose(find_handle);
     }
   }
 
-  /// searches for *.cpp files in the application directory
-  void find_sources()
-  {
-    WIN32_FIND_DATA find_data;
-    HANDLE find_handle;
-
-    // find cpp files
-    memset(&find_data, 0, sizeof(WIN32_FIND_DATA));
-    find_handle = FindFirstFile(string("./" + project_path + "/*.cpp").c_str(), &find_data);
-    if(find_handle !=  INVALID_HANDLE_VALUE)
-    {
-      bool found(true);
-      while(found)
-      {
-        cpp_list.insert(find_data.cFileName);
-        found = FindNextFile(find_handle, &find_data) != FALSE;
-      }
-      FindClose(find_handle);
-    }
-  }
 
   void find_files()
   {
-    find_headers();
-    find_sources();
+    find_files(hpp_list, "hpp");
+    find_files(cpp_list, "cpp");
+    find_files(cu_list, "cu");
   }
 
   /// writes the application solution file
@@ -341,8 +322,8 @@ public:
     ofs << "\tGlobalSection(SolutionConfigurationPlatforms) = preSolution" << endl;
     for(vector<string>::iterator it(build_ids.begin()); it != build_ids.end(); ++it )
     {
-      ofs << "\t\t" << *it << "|Win32 = " << *it << "|Win32" << endl;
       ofs << "\t\t" << *it << "|x64 = " << *it << "|x64" << endl;
+      ofs << "\t\t" << *it << "|x86 = " << *it << "|x86" << endl;
     }
     ofs << "\tEndGlobalSection" << endl;
 
@@ -350,17 +331,17 @@ public:
     ofs << "\tGlobalSection(ProjectConfigurationPlatforms) = postSolution" << endl;
     for(vector<string>::iterator it(build_ids.begin()); it != build_ids.end(); ++it )
     {
-      ofs << "\t\t" << project_guid << "." << *it << "|Win32.ActiveCfg = " << *it << "|Win32" << endl;
-      ofs << "\t\t" << project_guid << "." << *it << "|Win32.Build.0 = " << *it << "|Win32" << endl;
       ofs << "\t\t" << project_guid << "." << *it << "|x64.ActiveCfg = " << *it << "|x64" << endl;
       ofs << "\t\t" << project_guid << "." << *it << "|x64.Build.0 = " << *it << "|x64" << endl;
+      ofs << "\t\t" << project_guid << "." << *it << "|x86.ActiveCfg = " << *it << "|Win32" << endl;
+      ofs << "\t\t" << project_guid << "." << *it << "|x86.Build.0 = " << *it << "|Win32" << endl;
     }
     for(vector<string>::iterator it(build_ids.begin()); it != build_ids.end(); ++it )
     {
-      ofs << "\t\t" << kernel_guid << "." << *it << "|Win32.ActiveCfg = " << *it << "|Win32" << endl;
-      ofs << "\t\t" << kernel_guid << "." << *it << "|Win32.Build.0 = " << *it << "|Win32" << endl;
       ofs << "\t\t" << kernel_guid << "." << *it << "|x64.ActiveCfg = " << *it << "|x64" << endl;
       ofs << "\t\t" << kernel_guid << "." << *it << "|x64.Build.0 = " << *it << "|x64" << endl;
+      ofs << "\t\t" << kernel_guid << "." << *it << "|x86.ActiveCfg = " << *it << "|Win32" << endl;
+      ofs << "\t\t" << kernel_guid << "." << *it << "|x86.Build.0 = " << *it << "|Win32" << endl;
     }
     ofs << "\tEndGlobalSection" << endl;
 
@@ -424,6 +405,15 @@ public:
       ofs << "    <ClCompile Include=\"" << root_path << "\\test_system\\test_system.cpp\" />" << endl;
     for(set<string>::iterator it(cpp_list.begin()); it != cpp_list.end(); ++it)
       ofs << "    <ClCompile Include=\"" << *it << "\" />" << endl;
+    ofs << "  </ItemGroup>" << endl;
+
+    // write CUDA inclusion list
+    ofs << "  <!-- ********************************************************************* -->" << endl;
+    ofs << "  <!-- CUDA File List -->" << endl;
+    ofs << "  <!-- ********************************************************************* -->" << endl;
+    ofs << "  <ItemGroup Label=\"CUDA-Files\">" << endl;
+    for(set<string>::iterator it(cu_list.begin()); it != cu_list.end(); ++it)
+      ofs << "    <CudaCompile Include=\"" << *it << "\" />" << endl;
     ofs << "  </ItemGroup>" << endl;
 
     // write kernel project reference
@@ -532,6 +522,24 @@ public:
         if((cmd != "y") && (cmd != "yes"))
           cpp_list.clear();
       }
+
+      if(!cu_list.empty())
+      {
+        cout << endl << "The following CUDA files have been found:" << endl;
+        set<string>::iterator it(cu_list.begin()), jt(cu_list.end());
+        for(; it != jt; ++it)
+          cout << "- " << *it << endl;
+
+        string cmd;
+        cout << endl << "Do you want these files to be included in the project file?" << endl;
+        cout << "Type 'y' for yes or 'n' for no" << endl;
+        cout << ">";
+        cin >> cmd;
+        cout << endl;
+
+        if((cmd != "y") && (cmd != "yes"))
+          cu_list.clear();
+      }
     }
 
     // generate
@@ -598,7 +606,7 @@ public:
       {
         string str(arg.substr(5));
         if(str == "*")
-          find_headers();
+          find_files(hpp_list, "hpp");
         else
           parse_list(hpp_list, str);
       }
@@ -606,26 +614,24 @@ public:
       {
         string str(arg.substr(5));
         if(str == "*")
-          find_sources();
+          find_files(cpp_list, "cpp");
         else
           parse_list(cpp_list, str);
       }
       else if(arg.substr(0,4).compare("-cu:") == 0)
       {
         string str(arg.substr(5));
-        //if(str == "*")
-        //  find_headers();
-        //else
-        //  parse_list(cu_list, str);
+        if(str == "*")
+          find_files(cu_list, "cu");
+        else
+          parse_list(cu_list, str);
       }
       else // unknown argument
         throw string("Unknown argument: '"  + arg + "'");
     }
 
     // generate directories
-    if(generate_dirs())
-    {
-    }
+    generate_dirs();
 
     // generate files
     generate_files();
@@ -714,17 +720,17 @@ int main(int argc, char** argv)
       cout << "                   list. Speficy '-cpp:*' to include all C++ source files" << endl;
       cout << "                   in the application directory automatically." << endl;
       cout << endl;
-      //cout << "-cu:<list>         Include all CUDA source files in the semicolon-separated" << endl;
-      //cout << "                   list. Speficy '-cu:*' to include all CUDA source files" << endl;
-      //cout << "                   in the application directory automatically." << endl;
-      //cout << endl;
+      cout << "-cu:<list>         Include all CUDA source files in the semicolon-separated" << endl;
+      cout << "                   list. Speficy '-cu:*' to include all CUDA source files" << endl;
+      cout << "                   in the application directory automatically." << endl;
+      cout << endl;
       return 0;
     }
   }
 
   try
   {
-    VC12Gen generator;
+    Generator generator;
     if(argc < 2)
       generator.main();
     else

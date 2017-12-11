@@ -51,7 +51,19 @@ Once you have installed MS-MPI and setup the launch service, there is nothing mo
 automatically detect that a MPI implementation is available.
 
 \subsection windows_prereqs_cuda Nvidia CUDA
-Nvidia CUDA is currently not supported by the FEAT Visual Studio build system.
+All that you have to do is to download and install the CUDA Toolkit from the Nvidia homepage:
+- https://developer.nvidia.com/cuda-downloads
+
+Once the installation is complete, you will be able to compile FEAT with CUDA support for the <b>x64</b> platform
+by selecting one of the configurations that contain the <c>cuda</c>
+
+\note
+Currently, the only supported version of CUDA is <b>9.1</b>.
+
+\attention
+CUDA can <b>not</b> be used for x86 (32-bit) builds of FEAT, as Nvidia does not provide some libraries (namely CUBLAS,
+CUSPARSE and CUSOLVER) for this platform. If you try anyway, you will end up with some unresolveable linker errors.
+
 
 \subsection windows_prereqs_imkl Intel MKL
 Intel MKL is currently not supported by the FEAT Visual Studio build system.
@@ -294,9 +306,9 @@ The list of all supported (and currently disabled) features is:
 - <c>dbg</c>: generate a debug binary (mutually exclusive with <c>opt</c>)
 - <c>opt</c>: generate an optimised binary (mutually exclusive with <c>dbg</c>)
 - <c>mpi</c>: build with MPI support (requires MS-MPI to be installed)
+- <c>cuda</c> build with Nvidia CUDA support (requires CUDA to be installed)
 - <c>omp</c>: build with OpenMP support (currently not available)
 - <c>mkl</c>: build with Intel MKL support (currently not available)
-- <c>cuda</c> build with Nvidia CUDA support (currently not available)
 
 So, for example the configuration <c>dbg</c> represents a simple debug build without any additional features such as
 MPI or CUDA, whereas <c>opt-mpi</c> represents an optimised build including MPI support.

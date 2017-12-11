@@ -76,28 +76,20 @@
     </ClCompile>
   </ItemDefinitionGroup>
 
-  <!-- CUDA Backend Settings -->
-  <PropertyGroup Condition="'$(BackendCUDA)'=='true'">
-    <CudaIntDir>$(FeatObjPath)\$(FeatBuildName)</CudaIntDir>
-  </PropertyGroup>
-
-  <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true'">
+  <!-- CUDA Settings -->
+  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true'">
     <CudaCompile>
       <GPUDebugInfo>$(DebugMode)</GPUDebugInfo>
       <HostDebugInfo>$(DebugMode)</HostDebugInfo>
+      <AdditionalCompilerOptions>/wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>
     </CudaCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true' And '$(FeatCudaArch)'!='' And '$(FeatCudaCode)'!=''">
-    <CudaCompile>
-      <CodeGeneration>$(FeatCudaArch),$(FeatCudaCode)</CodeGeneration>
-    </CudaCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true' And '$(Platform)'=='Win32'">
+  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='Win32'">
     <CudaCompile>
       <TargetMachinePlatform>32</TargetMachinePlatform>
     </CudaCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true' And '$(Platform)'=='x64'">
+  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='x64'">
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
     </CudaCompile>
@@ -108,7 +100,6 @@
   <!-- ************************************************************************************************************* -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionSettings">
-    <!--<Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.5.targets"
-      Condition="'$(CUDA_PATH)'!='' And '$(BackendCUDA)'=='true'"/>-->
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA $(FeatCudaVersion).targets" Condition="'$(FeatHaveCuda)'=='true'"/>
   </ImportGroup>
 </Project>

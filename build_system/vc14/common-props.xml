@@ -9,12 +9,19 @@
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
+  <!-- CUDA Backend Detection -->
+  <!-- ********************************************************************* -->
+  <PropertyGroup Condition="'$(BackendCUDA)'=='true' And '$(FeatHaveCuda)'=='' And '$(CUDA_PATH_V9_1)'!=''">
+    <FeatHaveCuda>true</FeatHaveCuda>
+    <FeatCudaVersion>9.1</FeatCudaVersion>
+  </PropertyGroup>
+
+  <!-- ********************************************************************* -->
   <!-- Visual Studio Import Mumbo-Jumbo -->
   <!-- ********************************************************************* -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <!--<Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.5.props"
-      Condition="'$(CUDA_PATH)'!='' And '$(BackendCUDA)'=='true'"/>-->
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA $(FeatCudaVersion).props" Condition="'$(FeatHaveCuda)'=='true'"/>
   </ImportGroup>
 
   <!-- ********************************************************************* -->
@@ -97,10 +104,10 @@
       Include="DEBUG" />
     <FeatDef Condition="'$(SerialMode)'=='false'"
       Include="FEAT_HAVE_MPI" />
-    <FeatDef Condition="'$(BackendCUDA)'=='true'"
-      Include="FEAT_HAVE_CUDA" />
-    <FeatDef Condition="'$(BackendMKL)'=='true'"
-      Include="FEAT_HAVE_MKL" />
+    <FeatDef Condition="'$(FeatHaveCuda)'=='true'"
+      Include="FEAT_HAVE_CUDA;FEAT_HAVE_CUSOLVER" />
+    <!--<FeatDef Condition="'$(BackendMKL)'=='true'"
+      Include="FEAT_HAVE_MKL" />-->
     <FeatDef Condition="'$(FeatHaveAlgLib)'=='true'"
       Include="FEAT_HAVE_ALGLIB" />
     <FeatDef Condition="'$(FeatHaveFParser)'=='true'"
@@ -121,8 +128,10 @@
   <ItemGroup Label="FEAT Include Paths">
     <FeatIncDir Condition="'$(SerialMode)'=='false'"
       Include="$(MSMPI_INC)" />
-    <FeatIncDir Condition="'$(BackendMKL)'=='true'"
-      Include="$(MKL_PATH)\include" />
+    <!--<FeatIncDir Condition="'$(BackendMKL)'=='true'"
+      Include="$(MKL_PATH)\include" />-->
+    <FeatIncDir Condition="'$(FeatHaveCuda)'=='true'"
+      Include="$(CUDA_PATH)\include" />
     <FeatIncDir Condition="'$(FeatHaveAlgLib)'=='true'"
       Include="$(FeatRootPath)\thirdparty\ALGLIB\src;" />
     <FeatIncDir Condition="'$(FeatHaveFParser)'=='true'"
@@ -146,12 +155,12 @@
       Include="$(MSMPI_LIB32)" />
     <FeatLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='x64'"
       Include="$(MSMPI_LIB64)" />
-    <FeatLibDir Condition="'$(BackendCUDA)'=='true'"
+    <FeatLibDir Condition="'$(FeatHaveCuda)'=='true'"
       Include="$(CudaToolkitLibDir)" />
-    <FeatLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
+    <!--<FeatLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
       Include="$(MKL_PATH)\lib\ia32" />
     <FeatLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
-      Include="$(MKL_PATH)\lib\intel64" />
+      Include="$(MKL_PATH)\lib\intel64" />-->
   </ItemGroup>
 
   <!-- FEAT additional library dependencies list -->
@@ -160,14 +169,14 @@
       Include="DbgHelp.lib" />
     <FeatLibDep Condition="'$(SerialMode)'=='false'"
       Include="msmpi.lib" />
-    <FeatLibDep Condition="'$(BackendCUDA)'=='true'"
-      Include="cudart.lib;cublas.lib" />
-    <FeatLibDep Condition="'$(BackendMKL)'=='true'"
+    <FeatLibDep Condition="'$(FeatHaveCuda)'=='true'"
+      Include="cudart.lib;cublas.lib;cusparse.lib" />
+    <!--<FeatLibDep Condition="'$(BackendMKL)'=='true'"
       Include="mkl_core.lib;mkl_sequential.lib" />
     <FeatLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
       Include="mkl_intel_c.lib" />
     <FeatLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
-      Include="mkl_intel_lp64.lib" />
+      Include="mkl_intel_lp64.lib" />-->
     <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveAlgLib)'=='true'"

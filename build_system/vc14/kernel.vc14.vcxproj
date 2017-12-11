@@ -26,11 +26,11 @@
   <!-- ************************************************************************************************************* -->
   <!-- File Inclusion Lists -->
   <!-- ************************************************************************************************************* -->
-  <!-- Header File List -->
+  <!-- C++ Header File List -->
   <ItemGroup>
     <ClInclude Include="kernel\**\*.hpp" />
   </ItemGroup>
-  <!-- Source File List -->
+  <!-- C++ Source File List -->
   <ItemGroup>
     <ClCompile Include="kernel\**\*.cpp" Exclude="@(FeatKernelExcludeSource)" />
     <ClCompile Include="@(FeatKernelIncludeSource)" Condition="'@(FeatKernelIncludeSource)'!=''" />
@@ -39,6 +39,10 @@
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+  </ItemGroup>
+  <!-- CUDA Source File List -->
+  <ItemGroup>
+    <CudaCompile Include="kernel\**\*.cu" />
   </ItemGroup>
   <!-- import lib target -->
   <Import Project="$(FeatRootPath)\build_system\vc14\target-lib.xml" />
