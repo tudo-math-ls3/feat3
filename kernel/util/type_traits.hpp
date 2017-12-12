@@ -616,9 +616,10 @@ namespace FEAT
         return "half";
       }
 
-      static uint64_t hash_code()
+      /// returns composition of datatype size, int-, float- and signed feature
+      static uint64_t feature_hash()
       {
-        return uint64_t(1234);
+        return uint64_t(sizeof(half_float::half)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
 #endif // FEAT_HAVE_HALFMATH $$ !__CUDACC__
