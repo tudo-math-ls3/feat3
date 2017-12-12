@@ -7,13 +7,13 @@
 
 #include <typeindex>
 
-#ifdef FEAT_HAVE_HALFMATH
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
 FEAT_DISABLE_WARNINGS
 #define HALF_ROUND_STYLE 2
 //#define HALF_ROUND_TIES_TO_EVEN 1
 #include <half.hpp>
 FEAT_RESTORE_WARNINGS
-#endif // FEAT_HAVE_HALFMATH
+#endif // FEAT_HAVE_HALFMATH $$ !defined(__CUDACC__)
 
 namespace FEAT
 {
@@ -587,9 +587,9 @@ namespace FEAT
         return uint64_t(sizeof(__float128)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
-#endif // FEAT_HAVE_QUADMATH && !__CUDA__CC
+#endif // FEAT_HAVE_QUADMATH && !__CUDACC__
 
-#ifdef FEAT_HAVE_HALFMATH
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
     /**
      * \brief Type Traits specialisation for <c>half</c>
      *
@@ -621,7 +621,7 @@ namespace FEAT
         return uint64_t(1234);
       }
     };
-#endif // FEAT_HAVE_HALFMATH
+#endif // FEAT_HAVE_HALFMATH $$ !__CUDACC__
   } // namespace Type
 } // namespace FEAT
 

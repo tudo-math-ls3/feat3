@@ -23,7 +23,8 @@
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
   _Pragma("clang diagnostic ignored \"-Wmismatched-tags\"") \
-  _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"")
+  _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"") \
+  _Pragma("clang diagnostic ignored \"-Wcomma\"")
 
 #define FEAT_RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 
