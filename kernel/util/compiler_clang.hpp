@@ -19,12 +19,20 @@
 
 #define FEAT_COMPILER "Clang Compiler" // __clang_version__ contains details
 
+#if(__clang_major__ > 3) || (clang_minor > 8)
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
   _Pragma("clang diagnostic ignored \"-Wmismatched-tags\"") \
   _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"") \
   _Pragma("clang diagnostic ignored \"-Wcomma\"")
+#else
+#define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+  _Pragma("clang diagnostic ignored \"-Wconversion\"") \
+  _Pragma("clang diagnostic ignored \"-Wmismatched-tags\"") \
+  _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"")
+#endif
 
 #define FEAT_RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 
