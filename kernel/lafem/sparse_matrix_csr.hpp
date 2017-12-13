@@ -277,12 +277,14 @@ namespace FEAT
       }
 
     public:
+      /// Our memory architecture type
+      typedef Mem_ MemType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
+      /// Value type, meaning the type of each 'block'
+      typedef DT_ ValueType;
       /// Compatible L-vector type
       typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
       /// Compatible R-vector type
