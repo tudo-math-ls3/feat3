@@ -100,7 +100,7 @@ namespace FEAT
             toe = LAFEM::Tuning::_run_bench(func);
             Util::cuda_check_last_error();
           }
-          catch (const FEAT::InternalError & e)
+          catch (const FEAT::InternalError&)
           {
             //did we get at least one valid configuration?
             if (best_toe < std::numeric_limits<double>::max())
@@ -136,7 +136,7 @@ namespace FEAT
             toe = LAFEM::Tuning::_run_bench(func);
             Util::cuda_check_last_error();
           }
-          catch (const FEAT::InternalError & e)
+          catch (const FEAT::InternalError&)
           {
             //did we get at least one valid configuration?
             if (best_toe < std::numeric_limits<double>::max())
