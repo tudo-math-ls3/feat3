@@ -1,4 +1,4 @@
-FEAT3 README
+FEAT 3 README
 
 === DEPENDECIES ===
 FEAT depends on:
@@ -41,10 +41,8 @@ Intel MKL 15+
 Alglib, Fparser, Umfpack and Parmetis are downloaded and build automatically, when included in the configure flags.
 
 === git commit hooks ===
-When working with the git repository, the following instructions install a proper commite template and additional pre commit hooks, superseeding the usual pre push hooks.
-in feat src root
-cp /home/user/git/feat3.git/commit-template .git
-git config commit.template .git/commit-template
-cd .git/hooks
-git init
-git pull .. remotes/origin/hooks
+When working with the git repository, the following instructions will install proper pre commit hooks.
+In the FEAT source root directory, execute:
+ cd .git/hooks
+ git init
+ git pull .. remotes/origin/hooks
