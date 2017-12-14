@@ -19,7 +19,7 @@
 
 #define FEAT_COMPILER "Clang Compiler" // __clang_version__ contains details
 
-#if(__clang_major__ > 3) || (clang_minor > 8)
+#if(__clang_major__ > 3) || (__clang_minor__ > 8)
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
