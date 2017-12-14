@@ -84,6 +84,11 @@ namespace FEAT
         const DataType_ scale = DataType_(1)
         ) const
       {
+        // validate matrix and vector dimensions
+        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
+
         typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
         typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
 
@@ -342,6 +347,10 @@ namespace FEAT
         const DataType_ scale = DataType_(1)
         ) const
       {
+        // validate matrix and vector dimensions
+        XASSERTM(vector.columns() == space.get_num_dofs(), "invalid vector size");
+        XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
+
         typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble

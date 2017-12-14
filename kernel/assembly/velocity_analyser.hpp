@@ -399,6 +399,9 @@ namespace FEAT
         // first of all, verify the dimensions
         static_assert(Space_::shape_dim == dim_, "invalid velocity field dimension");
 
+        // validate vector dimensions
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
+
         /// space type
         typedef Space_ SpaceType;
 

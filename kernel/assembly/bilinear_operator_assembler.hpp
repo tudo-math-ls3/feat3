@@ -56,6 +56,10 @@ namespace FEAT
         const CubatureFactory_& cubature_factory,
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
+        // validate matrix dimensions
+        XASSERTM(matrix.rows() == test_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == trial_space.get_num_dofs(), "invalid matrix dimensions");
+
         // matrix type
         typedef Matrix_ MatrixType;
         // functor type
@@ -213,6 +217,10 @@ namespace FEAT
         const CubatureFactory_& cubature_factory,
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
+        // validate matrix dimensions
+        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+
         // matrix type
         typedef Matrix_ MatrixType;
         // functor type
@@ -365,6 +373,10 @@ namespace FEAT
         // Make sure matrix and operator match
         static_assert(Operator_::BlockHeight == Matrix_::BlockHeight, "Operator/Matrix BlockHeight mismatch.");
         static_assert(Operator_::BlockWidth == Matrix_::BlockWidth, "Operator/Matrix BlockHeight mismatch.");
+        // validate matrix dimensions
+        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+
         // matrix type
         typedef Matrix_ MatrixType;
         // Block height

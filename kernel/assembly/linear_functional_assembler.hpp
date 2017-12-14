@@ -46,6 +46,9 @@ namespace FEAT
         const CubatureFactory_& cubature_factory,
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
       {
+        // validate vector dimensions
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
+
         // vector type
         typedef Vector_ VectorType;
         // functor type

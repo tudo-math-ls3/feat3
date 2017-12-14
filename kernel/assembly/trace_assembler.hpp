@@ -167,6 +167,10 @@ namespace FEAT
         const CubatureFactory_& cubature_factory,
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
       {
+        // validate matrix dimensions
+        XASSERTM(matrix.rows() == test_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == trial_space.get_num_dofs(), "invalid matrix dimensions");
+
         // matrix type
         typedef Matrix_ MatrixType;
         // functor type
@@ -348,6 +352,9 @@ namespace FEAT
         const CubatureFactory_& cubature_factory,
         typename Vector_::DataType alpha = typename Vector_::DataType(1)) const
       {
+        // validate vector dimensions
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
+
         // vector type
         typedef Vector_ VectorType;
         // functor type
@@ -549,6 +556,10 @@ namespace FEAT
         const SpaceP_& space_p,
         const CubatureFactory_& cubature_factory)
       {
+        // validate vector dimensions
+        XASSERTM(vector_v.size() == space_v.get_num_dofs(), "invalid velocity vector size");
+        XASSERTM(vector_p.size() == space_p.get_num_dofs(), "invalid pressure vector size");
+
         typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VeloVector;
         typedef LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> PresVector;
 

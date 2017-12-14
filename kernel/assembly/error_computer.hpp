@@ -368,6 +368,9 @@ namespace FEAT
         static_assert(Function_::can_grad || (max_norm_ < 1), "function gradients are required for H1-Error");
         static_assert(Function_::can_hess || (max_norm_ < 2), "function hessians are required for H2-Error");
 
+        // validate vector dimensions
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
+
         // vector type
         typedef Vector_ VectorType;
         // analytic function type
@@ -843,6 +846,9 @@ namespace FEAT
         static_assert(Function_::can_value, "function values are required for H0-Error");
         static_assert(Function_::can_grad || (max_norm_ < 1), "function gradients are required for H1-Error");
         static_assert(Function_::can_hess || (max_norm_ < 2), "function hessians are required for H2-Error");
+
+        // validate vector dimensions
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
 
         // vector type
         typedef Vector_ VectorType;

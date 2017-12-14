@@ -15,7 +15,7 @@ namespace FEAT
     /**
      * \brief Analytic vertex projector class
      *
-     * This class interpolates an function in the vertices of the trafo's underyling mesh.
+     * This class interpolates an function in the vertices of the trafo's underlying mesh.
      *
      * \author Peter Zajac
      */
@@ -86,7 +86,7 @@ namespace FEAT
     /**
      * \brief Analytic cell projector class
      *
-     * This class interpolates an analytic function in the cells of the trafo's underyling
+     * This class interpolates an analytic function in the cells of the trafo's underlying
      * mesh by computing the integral mean over the cell using a cubature rule.
      *
      * \author Peter Zajac
