@@ -348,7 +348,7 @@ namespace FEAT
         ) const
       {
         // validate matrix and vector dimensions
-        XASSERTM(vector.columns() == space.get_num_dofs(), "invalid vector size");
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
         typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
