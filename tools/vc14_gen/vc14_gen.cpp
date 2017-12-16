@@ -456,6 +456,33 @@ public:
     cout << "Project GUID: " << project_guid << endl;
     cout << endl;
 
+    if (!hpp_list.empty())
+    {
+      cout << "The following header files have been included in the project:" << endl;
+      set<string>::iterator it(hpp_list.begin()), jt(hpp_list.end());
+      for (; it != jt; ++it)
+        cout << "- " << *it << endl;
+      cout << std::endl;
+    }
+
+    if (!cpp_list.empty())
+    {
+      cout << "The following source files have been included in the project:" << endl;
+      set<string>::iterator it(cpp_list.begin()), jt(cpp_list.end());
+      for (; it != jt; ++it)
+        cout << "- " << *it << endl;
+      cout << std::endl;
+    }
+
+    if (!cu_list.empty())
+    {
+      cout << "The following CUDA files have been included in the project:" << endl;
+      set<string>::iterator it(cu_list.begin()), jt(cu_list.end());
+      for (; it != jt; ++it)
+        cout << "- " << *it << endl;
+      cout << std::endl;
+    }
+
     // write solution file
     write_solution();
 
@@ -620,7 +647,7 @@ public:
       }
       else if(arg.substr(0,4).compare("-cu:") == 0)
       {
-        string str(arg.substr(5));
+        string str(arg.substr(4));
         if(str == "*")
           find_files(cu_list, "cu");
         else
