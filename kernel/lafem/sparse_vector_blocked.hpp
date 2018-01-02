@@ -144,6 +144,42 @@ namespace FEAT
       }
 
       /**
+       * \brief Constructor
+       *
+       * \param[in] size_in The size of the created vector.
+       * \param[in] elements_in A list of non zero elements.
+       * \param[in] indices_in A list of non zero element indices.
+       * \param[in] is_sorted Indicates, if the elements are sorted by their indices: is_sorted = true (default)
+       *
+       * Creates a vector with a given size.
+       */
+      explicit SparseVectorBlocked(Index size_in, DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & elements_in,
+                            DenseVector<Mem_, IT_, IT_> & indices_in, bool is_sorted = true) :
+        Container<Mem_, DT_, IT_>(size_in)
+      {
+        XASSERT(size_in != Index(0));
+        XASSERTM(indices_in.size() == elements_in.size(), "Vector size mismatch!");
+
+        this->_scalar_index.push_back(elements_in.size());
+        this->_scalar_index.push_back(elements_in.size());
+        this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
+        this->_scalar_index.push_back(Index(is_sorted));
+        this->_scalar_dt.push_back(DT_(0));
+
+        this->_elements.push_back(elements_in.template elements<Perspective::pod>());
+        this->_elements_size.push_back(elements_in.template size<Perspective::pod>());
+        this->_indices.push_back(indices_in.elements());
+        this->_indices_size.push_back(indices_in.size());
+
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+
+        this->sort();
+      }
+
+      /**
        * \brief Move Constructor
        *
        * \param[in] other The source vector.

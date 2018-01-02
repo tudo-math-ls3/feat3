@@ -77,7 +77,7 @@ namespace FEAT
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: row count \n
      * _scalar_index[2]: column count \n
-     * _scalar_index[3]: non zero element count (used elements) (multiple of blocksize)\n
+     * _scalar_index[3]: non zero element count (used VT_ elements)\n
      * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
@@ -284,6 +284,38 @@ namespace FEAT
       /**
        * \brief Constructor
        *
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
+       * \param[in] used_elements_in The amount of non zero elements of the created matrix.
+       *
+       * Creates an empty (but allocated) matrix.
+       *
+       * \note The allocated memory will not be initialised.
+       */
+      explicit SparseMatrixBCSR(Index rows_in, Index columns_in, Index used_elements_in) :
+        Container<Mem_, DT_, IT_> (rows_in * columns_in)
+      {
+        XASSERT(rows_in != Index(0) && columns_in != Index(0));
+
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(used_elements_in);
+        this->_scalar_dt.push_back(DT_(0));
+
+        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
+        this->_indices_size.push_back(_used_elements());
+
+        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows() + 1));
+        this->_indices_size.push_back(_rows() + 1);
+
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements_size.push_back(used_elements<Perspective::pod>());
+
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] layout_in The layout to be used.
        *
        * Creates an empty matrix with given layout.
@@ -391,7 +423,7 @@ namespace FEAT
                                       DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        //todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
+        /// \todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
         XASSERT(col_ind_in.size() > 0);
         XASSERT(val_in.size() > 0);
         XASSERT(row_ptr_in.size() > 0);
@@ -1250,6 +1282,91 @@ namespace FEAT
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Calculate \f$this^\top \f$
+       *
+       * \return The transposed matrix
+       *
+       * \note The resulting matrix has transposed block dimensions, too.
+       */
+      SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
+      {
+        SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> x_t;
+        x_t.transpose(*this);
+        return x_t;
+      }
+
+      /**
+       * \brief Calculate \f$this \leftarrow x^\top \f$
+       *
+       * \param[in] x The matrix to be transposed.
+       */
+      void transpose(const SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> & x)
+      {
+        using XType = SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_>;
+        if (x.used_elements() == 0)
+        {
+          SparseMatrixBCSR r(x.rows(), x.columns());
+          this->assign(r);
+          return;
+        }
+
+        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockWidth_, BlockHeight_> tx;
+        tx.convert(x);
+
+        const Index txrows(tx.rows());
+        const Index txcolumns(tx.columns());
+        const Index txused_elements(tx.used_elements());
+
+        const IT_ * ptxcol_ind(tx.col_ind());
+        const IT_ * ptxrow_ptr(tx.row_ptr());
+        const typename XType::ValueType * ptxval(tx.val());
+
+        DenseVector<Mem::Main, IT_, IT_> tcol_ind(txused_elements);
+        DenseVector<Mem::Main, DT_, IT_> tval(txused_elements * BlockHeight_ * BlockWidth_);
+        DenseVector<Mem::Main, IT_, IT_> trow_ptr(txcolumns + 1, IT_(0));
+
+        IT_ * ptcol_ind(tcol_ind.elements());
+        VT_ * ptval((VT_*)tval.elements());
+        IT_ * ptrow_ptr(trow_ptr.elements());
+
+        ptrow_ptr[0] = 0;
+
+        for (Index i(0); i < txused_elements; ++i)
+        {
+          ++ptrow_ptr[ptxcol_ind[i] + 1];
+        }
+
+        for (Index i(1); i < txcolumns - 1; ++i)
+        {
+          ptrow_ptr[i + 1] += ptrow_ptr[i];
+        }
+
+        for (Index i(0); i < txrows; ++i)
+        {
+          for (IT_ k(ptxrow_ptr[i]); k < ptxrow_ptr[i+1]; ++k)
+          {
+            const IT_ l(ptxcol_ind[k]);
+            const IT_ j(ptrow_ptr[l]);
+            ptval[j].set_transpose(ptxval[k]);
+            ptcol_ind[j] = IT_(i);
+            ++ptrow_ptr[l];
+          }
+        }
+
+        for (Index i(txcolumns); i > 0; --i)
+        {
+          ptrow_ptr[i] = ptrow_ptr[i - 1];
+        }
+        ptrow_ptr[0] = 0;
+
+        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> tx_t(txcolumns, txrows, tcol_ind, tval, trow_ptr);
+
+        SparseMatrixBCSR<Mem_, DT_, IT_, BlockHeight_, BlockWidth_> x_t;
+        x_t.convert(tx_t);
+        this->assign(x_t);
       }
 
       /**

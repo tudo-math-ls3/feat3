@@ -94,7 +94,7 @@ namespace FEAT
        */
       explicit UnitFilterBlocked(Index size_in,
                                  DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & values,
-                                 DenseVectorBlocked<Mem_, IT_, IT_, BlockSize_> & indices) :
+                                 DenseVector<Mem_, IT_, IT_> & indices) :
         _sv(size_in, values, indices)
       {
         XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
@@ -198,7 +198,7 @@ namespace FEAT
       /// \returns The index array.
       const IT_* get_indices() const
       {
-        return _sv.indices;
+        return _sv.indices();
       }
 
       /// \returns The value array.
