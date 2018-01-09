@@ -876,61 +876,6 @@ namespace FEAT
 #endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
     /// \endcond
-
-    /**
-     * \brief Appends a set of strings.
-     *
-     * This method appends a set of strings given by two input iterators, separating them by a delimiter.
-     *
-     * \param[in] first, last
-     * Two forward iterators representing the string set.
-     *
-     * \param[in] delimiter
-     * A string acting as a delimiter.
-     *
-     * \returns \p *this
-     */
-    template<typename Iterator_>
-    String& join(
-      Iterator_ first,
-      Iterator_ last,
-      const String & delimiter = "")
-    {
-      Iterator_ it(first);
-      while(it != last)
-      {
-        append(*it);
-        if(++it == last)
-        {
-          return *this;
-        }
-        append(delimiter);
-      }
-      return *this;
-    }
-
-    /**
-     * \brief Appends a set of strings.
-     *
-     * This method appends a set of strings given by a container, e.g. <c>std::list<String></c>, separating each
-     * entry in the container by a delimiter.
-     *
-     * \param[in] container
-     * A string container.
-     *
-     * \param[in] delimiter
-     * A string acting as a delimiter.
-     *
-     * \returns \p *this
-     */
-    template<typename Container_>
-    String& join(
-      const Container_& container,
-      const String & delimiter = "")
-    {
-      return join(container.cbegin(), container.cend(), delimiter);
-    }
-
   }; // class String
 
   /// \cond internal
@@ -959,6 +904,62 @@ namespace FEAT
     return String(String::size_type(1), c).append(b);
   }
   /// \endcond
+
+  /**
+   * \brief Joins a sequence of strings.
+   *
+   * This functions joins a sequence of items given by two input iterators,
+   * separating them by a delimiter string.
+   *
+   * \param[in] first, last
+   * Two forward iterators representing the item sequence.
+   * Each item referenced by the iterators is converted via the stringify function.
+   *
+   * \param[in] delimiter
+   * A string acting as a delimiter.
+   *
+   * \returns A String containing the stringified items.
+   */
+  template<typename Iterator_>
+  String stringify_join(
+    Iterator_ first,
+    Iterator_ last,
+    const String & delimiter = "")
+  {
+    if(first == last)
+      return String();
+
+    Iterator_ it(first);
+    String str = stringify(*it);
+
+    for(++it; it != last; ++it)
+      str.append(delimiter).append(stringify(*it));
+
+    return str;
+  }
+
+  /**
+   * \brief Joins a sequence of strings.
+   *
+   * This method joins a sequence of items given by a container, e.g. <c>std::list<double></c>,
+   * separating each item in the container by a delimiter string.
+   *
+   * \param[in] container
+   * A container representing the item sequence.
+   * Each item referenced of the container is converted via the stringify function.
+   *
+   * \param[in] delimiter
+   * A string acting as a delimiter.
+   *
+   * \returns A String containing the stringified items.
+   */
+  template<typename Container_>
+  String stringify_join(
+    const Container_& container,
+    const String & delimiter = "")
+  {
+    return stringify_join(container.cbegin(), container.cend(), delimiter);
+  }
 
   /**
    * \brief Converts an item into a String.

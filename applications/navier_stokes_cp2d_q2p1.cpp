@@ -224,9 +224,7 @@ namespace NavierStokesCP2D
 
   static inline void dump_line(const Dist::Comm& comm, String s, const std::deque<String>& t)
   {
-    String tt;
-    tt.join(t, " ");
-    comm.print(s.pad_back(30, '.') + ": " + tt);
+    comm.print(s.pad_back(30, '.') + ": " + stringify_join(t, " "));
   }
 
   template<typename T_>

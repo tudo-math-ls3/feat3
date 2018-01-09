@@ -69,7 +69,7 @@ namespace FEAT
 
           // join up with remaining prefix parts (if any)
           if(!parts.empty())
-            return String().join(parts, ":").append(":").append(alias);
+            return stringify_join(parts, ":").append(":").append(alias);
           else
             return alias;
         }
