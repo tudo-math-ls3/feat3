@@ -16,7 +16,7 @@ namespace FEAT
      *
      * This class is responsible for assembling the vector-valued Burgers operator:
      *
-     * \f[\mathbf{N}(v,u,\psi) := -\nu \mathbf{L}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \theta \mathbf{M}(u,\psi)\f]
+     * \f[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \theta \mathbf{M}(u,\psi)\f]
      *
      * where
      * - \f$\mathbf{L}(u,\psi)\f$ is either the
