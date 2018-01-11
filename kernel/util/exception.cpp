@@ -34,23 +34,6 @@ namespace FEAT
 
   const char * Exception::what() const throw()
   {
-    /// \todo Add a working win32 alternative (see http://www.int0x80.gr/papers/name_mangling.pdf)
-    /*if (_what_str.empty())
-      {
-      int status(0);
-      char * const name(abi::__cxa_demangle(("_Z" + stringify(std::exception::what())).c_str(), 0, 0, &status));
-      if (0 == status)
-      {
-      _what_str = name;
-      _what_str += " (" + message() + ")";
-      std::free(name);
-      }
-      }*/
-    if (_what_str.empty())
-    {
-      _what_str = stringify(std::exception::what());
-      _what_str += " (" + message() + ")";
-    }
-    return _what_str.c_str();
+    return _message.empty() ? std::exception::what() : _message.c_str();
   }
 } // namespace FEAT

@@ -78,8 +78,8 @@ namespace FEAT
    * Use the XASSERTM macro if you want to use the assertion in both debug and non-debug modes.
    */
 #if defined(DEBUG)
-#  define ASSERT(expr) assertion(expr, #expr, __func__, __FILE__, __LINE__)
-#  define ASSERTM(expr, msg)  assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
+#  define ASSERT(expr) FEAT::assertion(expr, #expr, __func__, __FILE__, __LINE__)
+#  define ASSERTM(expr, msg) FEAT::assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
 #else
 #  define ASSERT(expr)
 #  define ASSERTM(expr, msg)
@@ -114,8 +114,8 @@ namespace FEAT
    * This macro will be compiled in both debug and non-debug mode builds.
    * Use the ASSERTM macro if you want to use the assertion ony in debug builds.
    */
-#define XASSERT(expr) assertion(expr, #expr, __func__, __FILE__, __LINE__)
-#define XASSERTM(expr, msg)  assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
+#define XASSERT(expr) FEAT::assertion(expr, #expr, __func__, __FILE__, __LINE__)
+#define XASSERTM(expr, msg) FEAT::assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
 
 } // namespace FEAT
 

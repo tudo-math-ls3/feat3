@@ -10,26 +10,21 @@
 #include <kernel/util/string.hpp>
 
 // includes, system
-#include <cstdlib>
 #include <iostream>
-#include <list>
 
 namespace FEAT
 {
   /**
-  * \brief Base exception class.
-  *
-  * \author Dirk Ribbrock
-  */
+   * \brief Base exception class.
+   *
+   * \author Dirk Ribbrock
+   */
   class Exception :
     public std::exception
   {
   private:
     /// descriptive error message
     const String _message;
-
-    /// Our what string (for std::exception).
-    mutable String _what_str;
 
   protected:
     /**
@@ -70,36 +65,36 @@ namespace FEAT
 
 
   /**
-  * \brief exception that is thrown if something that is never supposed to happen happens
-  *
-  * It simply prefixes the exception message with "Internal error: ", otherwise it does not differ from its
-  * parent class Exception.
-  *
-  * \author Dirk Ribbrock
-  */
+   * \brief exception that is thrown if something that is never supposed to happen happens
+   *
+   * It simply prefixes the exception message with "Internal error: ", otherwise it does not differ from its
+   * parent class Exception.
+   *
+   * \author Dirk Ribbrock
+   */
   class InternalError :
     public Exception
   {
   public:
     /**
-    * \brief Constructor.
-    *
-    * \param message_in
-    * A short error message.
-    */
+     * \brief Constructor.
+     *
+     * \param message_in
+     * A short error message.
+     */
     explicit InternalError(const String & message_in) :
       Exception("Internal error: " + message_in)
     {
     }
 
     /**
-    * \brief Constructor.
-    *
-    * \param function the current function name.
-    * \param file the current file name.
-    * \param line the current line number.
-    * \param message_in A short error message.
-    */
+     * \brief Constructor.
+     *
+     * \param function the current function name.
+     * \param file the current file name.
+     * \param line the current line number.
+     * \param message_in A short error message.
+     */
     InternalError(
         const char* const function,
         const char* const file,
@@ -109,6 +104,18 @@ namespace FEAT
     {
     }
   };
+
+  /**
+   * \def INTERNAL_ERROR
+   * \brief InteralError constructor macro definition
+   *
+   * This macro creates an InternalError exception and automatically supplies
+   * the function name, file name and line number to the constructor.
+   *
+   * \param msg
+   * The message to be passed to the constructor.
+   */
+#define INTERNAL_ERROR(msg) FEAT::InternalError(__func__, __FILE__, __LINE__, msg)
 
   /**
    * \brief Base class for file related errors
