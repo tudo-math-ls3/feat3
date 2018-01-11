@@ -5,11 +5,6 @@ cmake_minimum_required (VERSION 2.8)
 #enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-if (FEAT_HAVE_PARMETIS)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
-endif (FEAT_HAVE_PARMETIS)
-
 # applications to build
 ADD_EXECUTABLE(tutorial-01-poisson tutorial_01_poisson.cpp)
 TARGET_LINK_LIBRARIES(tutorial-01-poisson feat)
@@ -32,6 +27,9 @@ TARGET_LINK_LIBRARIES(tutorial-06-global feat)
 ADD_EXECUTABLE(tutorial-07-stokes tutorial_07_stokes.cpp)
 TARGET_LINK_LIBRARIES(tutorial-07-stokes feat)
 
+ADD_EXECUTABLE(tutorial-08-meshfile tutorial_08_meshfile.cpp)
+TARGET_LINK_LIBRARIES(tutorial-08-meshfile feat)
+
 # tutorials target
 ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-01-poisson
@@ -41,4 +39,5 @@ ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-05-multigrid
   tutorial-06-global
   tutorial-07-stokes
+  tutorial-08-meshfile
 )

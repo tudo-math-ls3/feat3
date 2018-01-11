@@ -18,7 +18,7 @@
 
 #include <deque>
 #include <vector>
-
+#include <memory>
 
 namespace FEAT
 {
@@ -988,6 +988,7 @@ namespace FEAT
         }
         else if(_topo_type == TopoType::parent)
         {
+          // Note: this has been outsourced to the MeshNodeLinker class!
           // Create the MeshPart's topology from the parent mesh's topology if told so
           //_mesh_part->deduct_topology(*(_root_node.get_mesh()->get_topology()));
           //_linker.meshpart_deduct_topology(_name);
@@ -1731,6 +1732,37 @@ namespace FEAT
 
         // execute linker
         linker.execute();
+      }
+
+      /**
+       * \brief Parses the mesh file into a mesh node and a mesh atlas.
+       *
+       * \param[in,out] mesh_atlas
+       * The mesh atlas into which charts are to be added. Is also used to search
+       * for charts for mesh parts.
+       *
+       * \param[in,out] part_set
+       * A pointer to the partition set that partitions are added to.
+       * May be \p nullptr, if the partitions are to be ignored.
+       *
+       * \returns
+       * A shared pointer to the root mesh node containing the mesh and the mesh parts.
+       * This mesh node is automatically linked to the given mesh atlas.
+       */
+      template<typename RootMesh_>
+      std::shared_ptr<RootMeshNode<RootMesh_>> parse(
+        MeshAtlas<RootMesh_>& mesh_atlas,
+        PartitionSet* part_set = nullptr)
+      {
+        // create new root mesh node
+        std::shared_ptr<RootMeshNode<RootMesh_>> root_mesh_node =
+          std::make_shared<RootMeshNode<RootMesh_>>(nullptr, &mesh_atlas);
+
+        // parse
+        this->parse(*root_mesh_node, mesh_atlas, part_set);
+
+        // return root mesh node
+        return root_mesh_node;
       }
     }; // class MeshFileReader
 
