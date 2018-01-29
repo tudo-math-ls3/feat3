@@ -124,6 +124,9 @@ namespace FEAT
       /// Compatible R-vector type
       typedef typename Intern::BCSRVectorHelper<Mem_, DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
 
+      static constexpr bool is_global = false;
+      static constexpr bool is_local = true;
+
       /**
        * \brief Scatter-Axpy operation for SparseMatrixBCSR
        *

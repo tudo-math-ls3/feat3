@@ -39,6 +39,9 @@ namespace FEAT
       template <typename Mem2_, typename DT2_, typename IT2_>
       using TransferTypeByMDI = class Transfer<typename Matrix_::template ContainerTypeByMDI<Mem2_, DT2_, IT2_>>;
 
+      static constexpr bool is_global = false;
+      static constexpr bool is_local = true;
+
     protected:
       /// the internal prolongation matrix
       Matrix_ _mat_prol;

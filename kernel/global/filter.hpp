@@ -29,6 +29,9 @@ namespace FEAT
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using FilterTypeByMDI = class Filter<typename LocalFilter_::template FilterType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
+      static constexpr bool is_global = true;
+      static constexpr bool is_local = false;
+
     protected:
       LocalFilter_ _filter;
 

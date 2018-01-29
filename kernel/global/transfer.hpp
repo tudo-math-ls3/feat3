@@ -39,6 +39,9 @@ namespace FEAT
         typename Mirror_::template MirrorType<Mem2_, DT2_, IT2_>
         >;
 
+      static constexpr bool is_global = true;
+      static constexpr bool is_local = false;
+
     public:
       /// the coarse-level multiplexer
       MuxerType* _coarse_muxer;

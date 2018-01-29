@@ -46,6 +46,9 @@ namespace FEAT
       using ContainerTypeByMDI = class Matrix<typename LocalMatrix_::template ContainerType<Mem2_, DataType2_, IndexType2_>, typename RowMirror_::template MirrorType<Mem2_, DataType2_, IndexType2_>,
             typename ColMirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
 
+      static constexpr bool is_global = true;
+      static constexpr bool is_local = false;
+
     protected:
       GateRowType* _row_gate;
       GateColType* _col_gate;
@@ -130,7 +133,7 @@ namespace FEAT
        */
       Index columns() const
       {
-        // Compute total number of rows and columns
+        // Compute total number of columns
         auto vec_r = create_vector_r();
         vec_r.format(DataType(1));
 
@@ -147,7 +150,7 @@ namespace FEAT
        */
       Index rows() const
       {
-        // Compute total number of rows and rows
+        // Compute total number of rows
         auto vec_l = create_vector_l();
         vec_l.format(DataType(1));
 

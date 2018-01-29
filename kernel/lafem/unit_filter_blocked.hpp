@@ -61,6 +61,9 @@ namespace FEAT
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
 
+      static constexpr bool is_global = false;
+      static constexpr bool is_local = true;
+
       static_assert(BlockSize > 1, "BlockSize has to be >= 2 in UnitFilterBlocked!");
 
     private:
