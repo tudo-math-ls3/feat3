@@ -32,6 +32,8 @@ def detect_cpu():
           cputype = "cortexa7"
         elif cpu_part == "0xc0f":
           cputype = "cortexa15"
+        elif cpu_part == "0xd03"
+          cputype = "cortexa53"
 
     else:
       print ("detect_cpu: operating system not supported")
