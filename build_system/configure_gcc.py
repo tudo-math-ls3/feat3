@@ -74,7 +74,7 @@ def configure_gcc(cpu, buildid, compiler):
       #use gcc provided binutils for lto
       cmake_flags += " -DCMAKE_RANLIB:PATH=" + find_exe("gcc-ranlib")
       cmake_flags += " -DCMAKE_AR:PATH=" + find_exe("gcc-ar")
-    if major >= 5:
+    if major >= 5 and "x86_64" in platform.machine():
       cxxflags +=" -malign-data=cacheline"
     if "opt" in buildid:
       cxxflags += " -O3"
