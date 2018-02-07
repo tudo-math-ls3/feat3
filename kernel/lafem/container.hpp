@@ -611,6 +611,24 @@ namespace FEAT
       }
 
       /**
+       * \brief Reset all elements of the container to random values.
+       *
+       * \param[in] rng The random number generator.
+       * \param[in] min Lower rng bound.
+       * \param[in] max Upper rng bound.
+       */
+      void format(Random & rng, DT_ min, DT_ max)
+      {
+        for (Index e(0) ; e < _elements.size() ; ++e)
+        {
+          for (Index i(0) ; i < _elements_size.at(e); ++i)
+          {
+            MemoryPool<Mem_>::set_memory(this->_elements.at(e) + i, rng(min, max));
+          }
+        }
+      }
+
+      /**
        * \brief Free all allocated arrays
        */
       virtual void clear()

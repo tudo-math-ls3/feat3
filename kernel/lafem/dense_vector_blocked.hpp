@@ -349,6 +349,23 @@ namespace FEAT
       }
 
       /**
+       * \brief Constructor
+       *
+       * \param[in] rng The random number generator.
+       * \param[in] size_in The vector size.
+       * \param[in] min Lower rng bound.
+       * \param[in] max Upper rng bound.
+       *
+       * Creates a vector from the given source file.
+       */
+      explicit DenseVectorBlocked(Random & rng, Index size_in, DataType min, DataType max) :
+        Container<Mem_, DT_, IT_>(size_in)
+      {
+        this->format(rng, min, max);
+      }
+
+
+      /**
        * \brief Move Constructor
        *
        * \param[in] other The source vector.

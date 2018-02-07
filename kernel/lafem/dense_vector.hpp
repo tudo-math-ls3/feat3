@@ -8,6 +8,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/random.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/edi.hpp>
@@ -382,6 +383,23 @@ namespace FEAT
       {
         deserialise<DT2_, IT2_>(input);
       }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] rng The random number generator.
+       * \param[in] size_in The vector size.
+       * \param[in] min Lower rng bound.
+       * \param[in] max Upper rng bound.
+       *
+       * Creates a vector from the given source file.
+       */
+      explicit DenseVector(Random & rng, Index size_in, DataType min, DataType max) :
+        Container<Mem_, DT_, IT_>(size_in)
+      {
+        this->format(rng, min, max);
+      }
+
 
       /**
        * \brief Move Constructor
