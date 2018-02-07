@@ -28,6 +28,7 @@
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/convert_precond.hpp>
 #include <kernel/solver/matrix_stock.hpp>
+#include <kernel/solver/idrs.hpp>
 
 // Includes for nonlinear optimisers
 #include <kernel/solver/linesearch.hpp>
@@ -491,6 +492,12 @@ namespace FEAT
             auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
             result = Solver::new_rgcr(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
+          }
+          else if (solver_type == "idrs")
+          {
+            auto& systems = matrix_stock.template get_systems<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
+            result = Solver::new_idrs(section_name, section, systems.at(solver_level), filters.at(solver_level), precon);
           }
           else if (solver_type == "pipepcg")
           {

@@ -26,6 +26,7 @@
 #include <kernel/solver/matrix_precond.hpp>
 #include <kernel/solver/pcgnr.hpp>
 #include <kernel/solver/pcgnrilu.hpp>
+#include <kernel/solver/idrs.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -223,6 +224,14 @@ public:
       test_solver("BiCGStab-right-SOR(1)", solver, vec_sol, vec_ref, vec_rhs, 29);
     }
 
+    // test IDR(4)-ILU(0)
+    {
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      // create a IDRS solver
+      IDRS<MatrixType, FilterType> solver(matrix, filter, 4, precon);
+      test_solver("IDR(4)-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 20);
+    }
     // test PCG-jac-matrix
     {
       SparseMatrixCOO<Mem::Main, DataType, IndexType> coo_jac(csr_mat.rows(), csr_mat.columns());
@@ -404,6 +413,15 @@ public:
       // create a BiCGStab solver
       BiCGStabL<MatrixType, FilterType> solver(matrix, filter, 4, precon, BiCGStabLPreconVariant::right);
       test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 3);
+    }
+    // test IDR(4)-ILU(0)
+
+    {
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      // create a IDRS solver
+      IDRS<MatrixType, FilterType> solver(matrix, filter, 4, precon);
+      test_solver("IDR(4)-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 20);
     }
 
     // test FGMRES-JAC

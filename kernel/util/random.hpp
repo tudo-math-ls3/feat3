@@ -4,11 +4,13 @@
 
 // includes, FEAT
 #include <kernel/util/type_traits.hpp>
+#include <kernel/util/dist.hpp>
 
 // includes, system
 #include <algorithm>
 #include <limits>
 #include <cstdint>
+#include <time.h>
 
 namespace FEAT
 {
@@ -56,6 +58,21 @@ namespace FEAT
 
     /// internal multiplier
     static constexpr SeedType xor_mult = SeedType(2685821657736338717ull);
+
+    /**
+    * \brief Get different seed for each MPI rank.
+    *
+    * seed = time(nullptr) + multiplier * mpi_rank
+    * \note multiplier = 0 will not necessarily give you the same seed in every process.
+    *
+    * \param[in] multiplier
+    *
+    */
+    static SeedType get_seed(SeedType multiplier = 100)
+    {
+      auto comm = Dist::Comm::world();
+      return SeedType(time(nullptr))+multiplier*SeedType(comm.rank());
+    }
 
   private:
     /// the rng's working values
