@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/norm.hpp>
@@ -420,6 +421,9 @@ namespace FEAT
             x.elements(), this->rows(), this->columns());
       }
 
+      /**
+       * \brief Calculate \f$ this \leftarrow x \cdot y \f$
+       */
       void multiply(DenseMatrix & x, DenseMatrix & y)
       {
         XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
@@ -429,6 +433,27 @@ namespace FEAT
         Arch::ProductMatMat<Mem_>::dense(this->elements(), x.elements(),
                                          y.elements(), this->rows(), this->columns(), x.columns());
 
+      }
+
+      /// Invert the matrix insitu
+      void invert()
+      {
+        XASSERTM(this->rows() == this->columns(), "matrix must be square!");
+        DenseMatrix<Mem::Main, DT_, IT_> m_main;
+        m_main.convert(*this);
+        IT_ * temp = new IT_[this->rows()];
+        Math::invert_matrix((IT_)this->rows(), (IT_)this->rows(), m_main.elements(), temp);
+        delete[] temp;
+        this->convert(m_main);
+      }
+
+      /// Create an inverse of the current matrix
+      DenseMatrix inverse() const
+      {
+        DenseMatrix result;
+        result.clone(*this);
+        result.invert();
+        return result;
       }
       ///@}
 

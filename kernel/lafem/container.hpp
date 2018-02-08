@@ -8,6 +8,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/base.hpp>
 #include <kernel/util/type_traits.hpp>
+#include <kernel/util/random.hpp>
 
 #include <vector>
 #include <limits>

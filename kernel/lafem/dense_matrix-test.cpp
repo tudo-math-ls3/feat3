@@ -72,6 +72,26 @@ public:
     auto kp = b.serialise();
     DenseMatrix<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, b);
+
+    // Lehmer matrix inverse test
+    DenseMatrix<Mem_, DT_, IT_> l(11, 11);
+    for(Index i(0) ; i < l.rows() ; ++i)
+    {
+      for(Index j(0) ; j < l.rows() ; ++j)
+      {
+        l(i,j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
+      }
+    }
+    auto m = l.inverse();
+    m.invert();
+    for(Index i(0) ; i < l.rows() ; ++i)
+    {
+      for(Index j(0) ; j < l.rows() ; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(m(i, j), l(i, j), Math::template eps<DT_>()*DT_(100));
+      }
+    }
+
   }
 };
 DenseMatrixTest<Mem::Main, float, unsigned int> cpu_dense_matrix_test_float_uint;

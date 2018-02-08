@@ -8,6 +8,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/random.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
