@@ -141,9 +141,26 @@ namespace FEAT
         _vector.clear();
       }
 
+      /**
+       * \brief Reset all elements of the container to a given value or zero if missing.
+       *
+       * \param[in] alpha The value to be set (defaults to 0)
+       */
       void format(DataType alpha = DataType(0))
       {
         _vector.format(alpha);
+      }
+
+      /**
+       * \brief Reset all elements of the container to random values.
+       *
+       * \param[in] rng The random number generator.
+       * \param[in] min Lower rng bound.
+       * \param[in] max Upper rng bound.
+       */
+      void format(Random & rng, DataType min, DataType max)
+      {
+        _vector.format(rng, min, max);
       }
 
       void copy(const Vector& x)
