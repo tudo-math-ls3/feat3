@@ -161,6 +161,7 @@ namespace FEAT
       void format(Random & rng, DataType min, DataType max)
       {
         _vector.format(rng, min, max);
+        sync_1();
       }
 
       void copy(const Vector& x)
