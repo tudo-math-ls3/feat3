@@ -29,7 +29,7 @@ def configure_gcc(cpu, buildid, compiler):
     #cxxflags += " -Wnull-dereference" #produces too much false positives
 
   if major >= 7:
-    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull -Wrestrict"
+    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull -Wrestrict -Walloc-zero -Wparentheses"
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
@@ -55,9 +55,6 @@ def configure_gcc(cpu, buildid, compiler):
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
     if platform.system() != "Darwin":
       cxxflags += " -D_GLIBCXX_DEBUG"
-    #if major >= 4 and minor >= 8 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
-      #cxxflags += " -fsanitize=address"
-      #sanitziers need these libraries
     cxxflags += " -lpthread -ldl"
     if (major >= 4 and minor >= 9) or major > 4:
       cxxflags += " -fsanitize=undefined"
@@ -66,6 +63,8 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
     if major >= 6:
       cxxflags += " -fsanitize=bounds-strict"
+    if major >= 6 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
+      cxxflags += " -fsanitize=address"
 
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
