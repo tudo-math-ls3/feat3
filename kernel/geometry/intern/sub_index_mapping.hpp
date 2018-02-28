@@ -85,8 +85,6 @@ namespace FEAT
 
         Index map(int cell, int face) const
         {
-          typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
-
           return Index(CongruencyMapping<CellType, face_dim_>::map(_cell_orient[cell], face));
         }
       }; // class SubIndexMapping
