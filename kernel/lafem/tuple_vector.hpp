@@ -252,6 +252,19 @@ namespace FEAT
         rest().format(value);
       }
 
+      /**
+       * \brief Reset all elements of the container to random values.
+       *
+       * \param[in] rng The random number generator.
+       * \param[in] min Lower rng bound.
+       * \param[in] max Upper rng bound.
+       */
+      void format(Random & rng, DataType min, DataType max)
+      {
+        first().format(rng, min, max);
+        rest().format(rng, min, max);
+      }
+
       /// Free all allocated arrays
       void clear()
       {
@@ -661,6 +674,11 @@ namespace FEAT
       void format(DataType value = DataType(0))
       {
         _first.format(value);
+      }
+
+      void format(Random & rng, DataType min, DataType max)
+      {
+        first().format(rng, min, max);
       }
 
       void clear()
