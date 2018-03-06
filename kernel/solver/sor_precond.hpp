@@ -521,7 +521,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        int status = Intern::cuda_sor_apply((int)vec_cor.size(), vec_cor.elements(), vec_def.elements(), (double*)_matrix.val(), (int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        int status = Intern::cuda_sor_apply((int)vec_cor.size(), vec_cor.elements(), vec_def.elements(), (const double*)_matrix.val(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
 
         this->_filter.filter_cor(vec_cor);
 
