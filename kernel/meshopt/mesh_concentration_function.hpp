@@ -179,7 +179,7 @@ namespace FEAT
       static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist, const EdgeFreqs_& edge_freqs)
       {
         DataType constraint(0);
-        const auto edge_idx = mesh.template get_index_set<1,0>();
+        const auto& edge_idx = mesh.template get_index_set<1,0>();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
           constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
@@ -196,7 +196,7 @@ namespace FEAT
         typedef Geometry::Intern::FaceIndexMapping<ShapeType, 1, 0> FimType;
 
         DataType constraint(0);
-        const auto idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto& idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint_vec[cell] = DataType(0);
@@ -222,7 +222,7 @@ namespace FEAT
       static void add_constraint_grad(
         Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist, const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
       {
-        const auto edge_idx = mesh.template get_index_set<1,0>();
+        const auto& edge_idx = mesh.template get_index_set<1,0>();
         /// Type of a mesh vertex
         typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
 
@@ -258,14 +258,14 @@ namespace FEAT
       static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist, const EdgeFreqs_& edge_freqs)
       {
         DataType constraint(0);
-        const auto edge_idx = mesh.template get_index_set<1,0>();
+        const auto& edge_idx = mesh.template get_index_set<1,0>();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
           constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
             eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
         }
 
-        const auto cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto& cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
@@ -284,7 +284,7 @@ namespace FEAT
         typedef Geometry::Intern::FaceIndexMapping<ShapeType, 1, 0> FimType;
 
         DataType constraint(0);
-        const auto idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto& idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint_vec[cell] = DataType(0);
@@ -320,7 +320,7 @@ namespace FEAT
         Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist,
         const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
       {
-        const auto edge_idx = mesh.template get_index_set<1,0>();
+        const auto& edge_idx = mesh.template get_index_set<1,0>();
         /// Type of a mesh vertex
         typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
 
@@ -342,7 +342,7 @@ namespace FEAT
           grad(j, grad(j) + edge_freqs(edge)*grad_loc);
         }
 
-        const auto cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto& cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           Index i(cell_idx(cell,Index(0)));
@@ -385,14 +385,14 @@ namespace FEAT
       static DataType compute_constraint(const Mesh_& mesh, const Dist_& dist, const EdgeFreqs_& edge_freqs)
       {
         DataType constraint(0);
-        const auto edge_idx = mesh.template get_index_set<1,0>();
+        const auto& edge_idx = mesh.template get_index_set<1,0>();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
           constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
             eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
         }
 
-        const auto face_idx = mesh.template get_index_set<2,0>();
+        const auto& face_idx = mesh.template get_index_set<2,0>();
         for(Index face(0); face < mesh.get_num_entities(2); ++face)
         {
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
@@ -401,7 +401,7 @@ namespace FEAT
             eval( - dist(face_idx(face,1)) * dist(face_idx(face,2)));
         }
 
-        const auto cell_idx = mesh.template get_index_set<3,0>();
+        const auto& cell_idx = mesh.template get_index_set<3,0>();
         for(Index cell(0); cell < mesh.get_num_entities(3); ++cell)
         {
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
@@ -425,7 +425,7 @@ namespace FEAT
         typedef Geometry::Intern::FaceIndexMapping<ShapeType, 2, 0> VertAtFace;
 
         DataType constraint(0);
-        const auto idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto& idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint_vec[cell] = DataType(0);
@@ -486,7 +486,7 @@ namespace FEAT
         Vector_& grad, const DataType alignment_fval, const DataType fac, const Mesh_& mesh, const Dist_& dist,
         const GradDist_& grad_dist, const EdgeFreqs_& edge_freqs)
       {
-        const auto edge_idx = mesh.template get_index_set<1,0>();
+        const auto& edge_idx = mesh.template get_index_set<1,0>();
         /// Type of a mesh vertex
         typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
 
@@ -508,7 +508,7 @@ namespace FEAT
           grad(j, grad(j) + edge_freqs(edge)*grad_loc);
         }
 
-        const auto face_idx = mesh.template get_index_set<2,0>();
+        const auto& face_idx = mesh.template get_index_set<2,0>();
         for(Index face(0); face < mesh.get_num_entities(2); ++face)
         {
           Index i(face_idx(face,Index(0)));
@@ -538,7 +538,7 @@ namespace FEAT
           grad(j, grad(j)+grad_loc);
         }
 
-        const auto cell_idx = mesh.template get_index_set<3,0>();
+        const auto& cell_idx = mesh.template get_index_set<3,0>();
         for(Index cell(0); cell < mesh.get_num_entities(2); ++cell)
         {
           Index i[4]{cell_idx(cell,Index(0)), cell_idx(cell,Index(1)),cell_idx(cell,Index(2)),cell_idx(cell,Index(3))};
