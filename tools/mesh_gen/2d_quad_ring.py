@@ -25,16 +25,26 @@ import sys
 import math
 
 # write ring meshpart
-def mp_ring(f, name, i, m, n):
-  f.write("  <MeshPart name=\"" + name + "\" parent=\"root\" topology=\"none\" size=\"%i %i\">\n" % (m,m))
+def mp_ring(f, name, chart, i, m, n):
+  f.write("  <MeshPart name=\"" + name + "\" chart=\"" + chart + "\"parent=\"root\" topology=\"full\" size=\"%i %i\">\n" % (m+1,m))
   f.write("    <Mapping dim=\"0\">\n")
   for j in range(0, m):
     f.write("      %i\n" % (i*m + j))
+  f.write("      %i\n" % (i*m))
   f.write("    </Mapping>\n")
   f.write("    <Mapping dim=\"1\">\n")
   for j in range(0, m):
     f.write("      %i\n" % (i*m + j))
   f.write("    </Mapping>\n")
+  f.write("    <Topology dim=\"1\">\n")
+  for j in range(0, m):
+    f.write("      %i %i\n" % (j, j+1))
+  #f.write("      %i %i\n" % (m-1, 0))
+  f.write("    </Topology>\n")
+  f.write("    <Attribute name=\"param\" dim=\"1\">\n")
+  for j in range(0, m+1):
+    f.write("      %g\n" % (float(j)/float(m)))
+  f.write("    </Attribute>\n")
   f.write("  </MeshPart>\n")
 
 ####################################################################################################
@@ -111,6 +121,14 @@ f.write("  <!-- call: " + myself)
 for i in range(1,8):
   f.write(" " + sys.argv[i])
 f.write(" -->\n")
+# write inner ring chart
+f.write("  <Chart name=\"inner\">\n")
+f.write("    <Circle radius=\"%g\" midpoint=\"%g %g\" domain=\"0 1\" />\n" % (r0, cx, cy))
+f.write("  </Chart>\n")
+# write outer ring chart
+f.write("  <Chart name=\"outer\">\n")
+f.write("    <Circle radius=\"%g\" midpoint=\"%g %g\" domain=\"0 1\" />\n" % (r1, cx, cy))
+f.write("  </Chart>\n")
 # write mesh
 f.write("  <Mesh type=\"conformal:hypercube:2:2\" size=\"%i %i %i\">\n" % (nv, ne, nq))
 f.write("    <Vertices>\n")
@@ -140,9 +158,9 @@ for i in range(0,n):
 f.write("    </Topology>\n")
 f.write("  </Mesh>\n")
 # write inner meshpart
-mp_ring(f, "bnd:i", 0, m, n)
+mp_ring(f, "bnd:i", "inner", 0, m, n)
 # write outer meshpart
-mp_ring(f, "bnd:o", n, m, n)
+mp_ring(f, "bnd:o", "outer", n, m, n)
 f.write("</FeatMeshFile>\n")
 
 print("Done!")
