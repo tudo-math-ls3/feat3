@@ -24,9 +24,11 @@ namespace FEAT
    * - #read_sequence: each process reads a single text or binary file, which is indexed
    *   by the process rank
    *
-   * Moreover, there is one sets of functions for writing files:
+   * Moreover, there are two sets of functions for writing files:
    * - #write_sequence: each process writes a single text or binary file, which is indexed
    *   by the process rank
+   * - #write_ordered: all processes write into a single common binary file, ordered by ranks,
+   *   and using the official MPI I/O routines
    *
    * Each function comes in two overloads: one for objects of type std::stringstream for text files
    * and another one for objects of type BinaryStream for binary files.
@@ -157,6 +159,9 @@ namespace FEAT
      * \param[in] comm
      * The communicator to be used for synchronisation. Ignored if compiled without MPI.
      *
+     * \param[in] truncate
+     * Specifies whether the output file(s) are to be truncated to the output size.
+     *
      * \throws FileNotCreated if the file could not be opened.
      */
     static void write_sequence(std::stringstream& stream, const String& pattern, const Dist::Comm& comm, bool truncate = true);
@@ -166,7 +171,6 @@ namespace FEAT
       Dist::Comm comm(Dist::Comm::world());
       write_sequence(stream, pattern, comm, truncate);
     }
-
 
     /**
      * \brief Writes a rank-indexed binary file sequence.
@@ -182,6 +186,9 @@ namespace FEAT
      * \param[in] comm
      * The communicator to be used for synchronisation. Ignored if compiled without MPI.
      *
+     * \param[in] truncate
+     * Specifies whether the output file(s) are to be truncated to the output size.
+     *
      * \throws FileNotCreated if the file could not be opened.
      */
     static void write_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm& comm, bool truncate = true);
@@ -190,6 +197,68 @@ namespace FEAT
     {
       Dist::Comm comm(Dist::Comm::world());
       write_sequence(stream, pattern, comm, truncate);
+    }
+
+    /**
+     * \brief Writes a buffer into a common binary file in rank order.
+     *
+     * This function write a single common binary file, where the individual processes
+     *  write their outputs in ascending order by their rank.
+     *
+     * \note This function is effectively a wrapper around \b MPI_File_write_ordered.
+     *
+     * \param[in] buffer
+     * A pointer to the binary buffer that is to be written. Must not be \c nullptr.
+     *
+     * \param[in] size
+     * The size of this process's buffer in bytes. May differ on each process.
+     *
+     * \param[in] filename
+     * The name of the common output file. Must be the same on all calling processes.
+     *
+     * \param[in] comm
+     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     *
+     * \param[in] truncate
+     * Specifies whether the output file(s) are to be truncated to the output size.
+     */
+    static void write_ordered(const void* buffer, const std::size_t size, const String& filename, const Dist::Comm& comm, bool truncate = true);
+
+    static void write_ordered(const void* buffer, const std::size_t size, const String& filename, bool truncate = true)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      write_ordered(buffer, size, filename, comm, truncate);
+    }
+
+    /**
+     * \brief Writes a binary stream into a common binary file in rank order.
+     *
+     * This function write a single common binary file, where the individual processes
+     *  write their outputs in ascending order by their rank.
+     *
+     * \note This function is effectively a wrapper around \b MPI_File_write_ordered.
+     *
+     * \param[in] stream
+     * The binary stream whose contents are to be written to the file.
+     *
+     * \param[in] filename
+     * The name of the common output file. Must be the same on all calling processes.
+     *
+     * \param[in] comm
+     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     *
+     * \param[in] truncate
+     * Specifies whether the output file(s) are to be truncated to the output size.
+     */
+    static void write_ordered(BinaryStream& stream, const String& filename, const Dist::Comm& comm, bool truncate = true)
+    {
+      write_ordered(stream.data(), std::size_t(stream.size()), filename, comm, truncate);
+    }
+
+    static void write_ordered(BinaryStream& stream, const String& filename, bool truncate = true)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      write_ordered(stream.data(), std::size_t(stream.size()), filename, comm, truncate);
     }
 
   protected:

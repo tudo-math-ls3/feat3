@@ -37,6 +37,9 @@ namespace FEAT
     // read into our stream buffer
     stream << ifs.rdbuf();
 
+    // close file
+    ifs.close();
+
     // sanity check
     XASSERT(stream.good());
   }
@@ -50,6 +53,9 @@ namespace FEAT
 
     // read our input stream
     stream.read_stream(ifs);
+
+    // close file
+    ifs.close();
 
     // sanity check
     XASSERT(stream.good());
@@ -69,6 +75,9 @@ namespace FEAT
 
     // write stream
     ofs << stream.rdbuf();
+
+    // close file
+    ofs.close();
   }
 
   void DistFileIO::_write_file(BinaryStream& stream, const String& filename, bool truncate)
@@ -85,6 +94,9 @@ namespace FEAT
 
     // write buffer
     stream.write_stream(ofs);
+
+    // close file
+    ofs.close();
   }
 
 #ifdef FEAT_HAVE_MPI
@@ -206,6 +218,32 @@ namespace FEAT
     }
   }
 
+  void DistFileIO::write_ordered(const void* buffer, const std::size_t size, const String& filename, const Dist::Comm& comm, bool truncate)
+  {
+    XASSERT((buffer != nullptr) || (size == std::size_t(0)));
+
+    // select file access mode
+    int amode = MPI_MODE_WRONLY | MPI_MODE_CREATE;
+
+    // open file
+    MPI_Status status;
+    MPI_File file = MPI_FILE_NULL;
+    MPI_File_open(comm.mpi_comm(), filename.c_str(), amode, MPI_INFO_NULL, &file);
+    XASSERTM(file != MPI_FILE_NULL, "failed to open file via MPI_File_open");
+
+    // truncate file?
+    if(truncate)
+    {
+      MPI_File_set_size(file, MPI_Offset(0));
+    }
+
+    // write buffer via collective
+    MPI_File_write_ordered(file, buffer, int(size), MPI_BYTE, &status);
+
+    // close file
+    MPI_File_close(&file);
+  }
+
 #else // non-MPI implementation
 
   void DistFileIO::read_common(std::stringstream& stream, const String& filename, const Dist::Comm&)
@@ -236,6 +274,27 @@ namespace FEAT
   void DistFileIO::write_sequence(BinaryStream& stream, const String& pattern, const Dist::Comm&, bool truncate)
   {
     _write_file(stream, _rankname(pattern, Index(0)), truncate);
+  }
+
+  void DistFileIO::write_ordered(const void* buffer, const std::size_t size, const String& filename, const Dist::Comm&, bool truncate)
+  {
+    XASSERT((buffer != nullptr) || (size == std::size_t(0)));
+
+    // determine output mode
+    std::ios_base::openmode mode = std::ios_base::out|std::ios_base::binary;
+    if(truncate)
+      mode |= std::ios_base::trunc;
+
+    // open output file
+    std::ofstream ofs(filename, mode);
+    if(!ofs.is_open() || !ofs.good())
+      throw FileNotCreated(filename);
+
+    // write buffer
+    ofs.write(reinterpret_cast<const char*>(buffer), std::streamsize(size));
+
+    // close stream
+    ofs.close();
   }
 
 #endif // FEAT_HAVE_MPI
