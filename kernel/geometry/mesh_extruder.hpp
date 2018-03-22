@@ -19,7 +19,7 @@ namespace FEAT
   {
     // Forward declarations of generic extruder class templates
     // Note: The following templates are only implemented for
-    //       SourceMesh_ = ConformalMesh<Hypercube<2>, 2, 2, ...>
+    //       SourceMesh_ = ConformalMesh<Hypercube<2>, 2, ...>
 
     template<typename SourceMesh_>
     class MeshExtruder;
@@ -39,13 +39,13 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename Coord_>
-    class MeshExtruder<ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_>>
+    class MeshExtruder<ConformalMesh<Shape::Hypercube<2>, 2, Coord_>>
     {
     public:
       typedef Coord_ CoordType;
 
-      typedef ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_> QuadMesh;
-      typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_> HexaMesh;
+      typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> QuadMesh;
+      typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> HexaMesh;
 
       typedef MeshAtlas<QuadMesh> QuadAtlas;
       typedef MeshAtlas<HexaMesh> HexaAtlas;
@@ -68,8 +68,8 @@ namespace FEAT
       typedef typename QuadPart::TargetSetHolderType QuadTrgSetHolder;
       typedef typename HexaPart::TargetSetHolderType HexaTrgSetHolder;
 
-      typedef typename QuadPart::MeshAttributeType QuadAttrib;
-      typedef typename HexaPart::MeshAttributeType HexaAttrib;
+      typedef typename QuadPart::AttributeSetType QuadAttrib;
+      typedef typename HexaPart::AttributeSetType HexaAttrib;
 
     protected:
       /// the number of slices in z-direction
@@ -587,30 +587,30 @@ namespace FEAT
        */
       void extrude_attribute(HexaAttrib*& hexa_attrib, const QuadAttrib& quad_attrib) const
       {
-        const Index quad_num_verts = quad_attrib.get_num_vertices();
-        const int quad_num_coords = quad_attrib.get_num_coords();
+        const Index quad_num_values = quad_attrib.get_num_values();
+        const int attrib_dim = quad_attrib.get_dimension();
 
         // create attribute
         XASSERT(hexa_attrib == nullptr);
-        hexa_attrib = new HexaAttrib(quad_num_verts * (_slices+1), quad_num_coords+1, 0);
+        hexa_attrib = new HexaAttrib(quad_num_values * (_slices+1), attrib_dim+1);
 
         // loop over all slices
         for(Index j(0); j <= _slices; ++j)
         {
           // compute slice index offset
-          const Index vo = j * quad_num_verts;
+          const Index vo = j * quad_num_values;
 
           // compute slice z-coord
           const CoordType z = _z_min + (CoordType(j) / CoordType(_slices))*(_z_max - _z_min);
 
           // loop over all vertices
-          for(Index i(0); i < quad_num_verts; ++i)
+          for(Index i(0); i < quad_num_values; ++i)
           {
-            for(int k(0); k < quad_num_coords; ++k)
+            for(int k(0); k < attrib_dim; ++k)
             {
-              (*hexa_attrib)[vo+i][k] = quad_attrib[i][k];
+              hexa_attrib->operator()(vo+i,k) = quad_attrib(i,k);
             }
-            (*hexa_attrib)[vo+i][quad_num_coords] = z;
+            hexa_attrib->operator()(vo+i, attrib_dim) = z;
           }
         }
       }
@@ -741,12 +741,12 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename Coord_>
-    class MeshExtruderFactory<ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_>> :
-      public Factory<ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_>>
+    class MeshExtruderFactory<ConformalMesh<Shape::Hypercube<2>, 2, Coord_>> :
+      public Factory<ConformalMesh<Shape::Hypercube<3>, 3, Coord_>>
     {
     public:
-      typedef ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_> QuadMesh;
-      typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_> HexaMesh;
+      typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> QuadMesh;
+      typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> HexaMesh;
       typedef MeshExtruder<QuadMesh> MeshExtruderType;
 
       typedef typename HexaMesh::VertexSetType VertexSetType;
@@ -806,12 +806,12 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename Coord_>
-    class MeshPartExtruderFactory<ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_>> :
-      public Factory<MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_>>>
+    class MeshPartExtruderFactory<ConformalMesh<Shape::Hypercube<2>, 2, Coord_>> :
+      public Factory<MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, Coord_>>>
     {
     public:
-      typedef ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_> QuadMesh;
-      typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_> HexaMesh;
+      typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> QuadMesh;
+      typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> HexaMesh;
 
       typedef MeshPart<QuadMesh> QuadPart;
       typedef MeshPart<HexaMesh> HexaPart;
@@ -820,8 +820,8 @@ namespace FEAT
 
       typedef typename HexaPart::IndexSetHolderType IndexSetHolderType;
       typedef typename HexaPart::TargetSetHolderType TargetSetHolderType;
-      typedef typename HexaPart::MeshAttributeContainer MeshAttributeContainer;
-      typedef typename HexaPart::MeshAttributeType HexaAttribute;
+      typedef typename HexaPart::AttributeSetContainer AttributeSetContainer;
+      typedef typename HexaPart::AttributeSetType HexaAttribute;
 
     protected:
       const MeshExtruderType& _mesh_extruder;
@@ -876,7 +876,7 @@ namespace FEAT
         }
       }
 
-      virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
+      virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
       {
         // extrude attributes
         for(const auto& quad_attrib : _quad_part.get_mesh_attributes())
@@ -897,12 +897,12 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename Coord_>
-    class MeshPartSliceExtruderFactory<ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_>> :
-      public Factory<MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_>>>
+    class MeshPartSliceExtruderFactory<ConformalMesh<Shape::Hypercube<2>, 2, Coord_>> :
+      public Factory<MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, Coord_>>>
     {
     public:
-      typedef ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_> QuadMesh;
-      typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_> HexaMesh;
+      typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> QuadMesh;
+      typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> HexaMesh;
 
       typedef MeshPart<QuadMesh> QuadPart;
       typedef MeshPart<HexaMesh> HexaPart;
@@ -911,8 +911,8 @@ namespace FEAT
 
       typedef typename HexaPart::IndexSetHolderType IndexSetHolderType;
       typedef typename HexaPart::TargetSetHolderType TargetSetHolderType;
-      typedef typename HexaPart::MeshAttributeContainer MeshAttributeContainer;
-      typedef typename HexaPart::MeshAttributeType HexaAttribute;
+      typedef typename HexaPart::AttributeSetContainer AttributeSetContainer;
+      typedef typename HexaPart::AttributeSetType HexaAttribute;
 
     protected:
       const MeshExtruderType& _mesh_extruder;
@@ -945,7 +945,7 @@ namespace FEAT
         index_set_holder = nullptr;
       }
 
-      virtual void fill_attribute_sets(MeshAttributeContainer& /*attribute_set_holder*/) override
+      virtual void fill_attribute_sets(AttributeSetContainer& /*attribute_set_holder*/) override
       {
       }
     }; // class MeshPartSliceExtruderFactory<ConformalMesh<Shape::Hypercube<2>,...>>

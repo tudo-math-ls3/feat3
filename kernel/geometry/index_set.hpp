@@ -5,6 +5,10 @@
 // includes, FEAT
 #include <kernel/shape.hpp>
 
+// includes, system
+#include <array>
+#include <vector>
+
 namespace FEAT
 {
   /**
@@ -12,6 +16,44 @@ namespace FEAT
    */
   namespace Geometry
   {
+    /**
+     * \brief Index Tuple class template
+     *
+     * This class is a simple wrapper around a fixed-size array,
+     * similar to the std::array class template.
+     * Its primary purpose is to avoid compiler warnings and error
+     * when used as a value-type in an std::vector.
+     *
+     * \author Peter Zajac
+     */
+    template<int num_indices_>
+    struct IndexTuple
+    {
+      static_assert(num_indices_ > 0, "invalid number of indices");
+
+      /// number of indices per entry
+      static constexpr int num_indices = num_indices_;
+
+      /// indices array
+      Index indices[num_indices];
+
+      /// access operator
+      Index& operator[](int i)
+      {
+        ASSERT(i >= 0);
+        ASSERT(i < num_indices);
+        return indices[i];
+      }
+
+      /// access operator
+      const Index& operator[](int i) const
+      {
+        ASSERT(i >= 0);
+        ASSERT(i < num_indices);
+        return indices[i];
+      }
+    }; // struct IndexTuple
+
     /**
      * \brief Conformal Index-Set class template
      *
@@ -34,31 +76,19 @@ namespace FEAT
       /// number of indices per entry
       static constexpr int num_indices = num_indices_;
 
-      /// index vector type
-      typedef Index IndexVectorType[num_indices];
-
-      /// index vector reference type
-      typedef IndexVectorType& IndexVectorReference;
-
-      /// const index vector reference type
-      typedef const IndexVectorType& ConstIndexVectorReference;
+      /// index tuple type
+      typedef IndexTuple<num_indices> IndexTupleType;
 
       /// ImageIterator type for Adjunctor interface implementation
       typedef const Index* ImageIterator;
 
     protected:
-      /// number of entities, i.e. number of cells
-      Index _num_entities;
       /// index bound;, i.e. number of edges if the IndexSet is to hold the information edges\@cells.
       /// Necessary for Adjunctor implementation
       Index _index_bound;
 
       /// index vector array
-      IndexVectorType* _indices;
-
-    private:
-      /// Copy assignment operator
-      IndexSet& operator=(const IndexSet&);
+      std::vector<IndexTupleType> _indices;
 
     public:
       /**
@@ -74,70 +104,20 @@ namespace FEAT
         Index num_entities = 0,
         Index index_bound = 0)
           :
-        _num_entities(num_entities),
         _index_bound(index_bound),
-        _indices(nullptr)
+        _indices(std::size_t(num_entities))
       {
-        if(num_entities > 0)
-        {
-          _indices = new IndexVectorType[num_entities];
-        }
-      }
-
-      /**
-       * \brief Copy Constructor
-       *
-       * \param[in] other
-       * The index set that is to be copied.
-       */
-      IndexSet(const IndexSet& other) :
-        _num_entities(other._num_entities),
-        _index_bound(other._index_bound),
-        _indices(nullptr)
-      {
-        if(_num_entities > 0)
-        {
-          _indices = new IndexVectorType[_num_entities];
-          for(Index i(0); i < _num_entities; ++i)
-          {
-            for(int j(0); j < num_indices_; ++j)
-            {
-              _indices[i][j] = other._indices[i][j];
-            }
-          }
-        }
       }
 
       /// virtual destructor
       virtual ~IndexSet()
       {
-        if(_indices != nullptr)
-        {
-          delete [] _indices;
-        }
-      }
-
-      /// Move assignment operator
-      IndexSet& operator=(IndexSet&& other)
-      {
-        if(_indices != nullptr)
-          delete[] _indices;
-
-        _indices = (other._indices);
-
-        _num_entities = other._num_entities;
-        _index_bound = other._index_bound;
-
-        other._indices = nullptr;
-        other._num_entities = 0;
-        other._index_bound = 0;
-        return *this;
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
-        return std::size_t(_num_entities) * sizeof(IndexVectorType);
+        return _indices.size() * sizeof(IndexTupleType);
       }
 
       /**
@@ -157,7 +137,7 @@ namespace FEAT
        */
       Index get_num_entities() const
       {
-        return _num_entities;
+        return Index(_indices.size());
       }
 
       /**
@@ -175,15 +155,15 @@ namespace FEAT
        * \returns
        * The index vector array.
        */
-      IndexVectorType* get_indices()
+      IndexTupleType* get_indices()
       {
-        return _indices;
+        return _indices.data();
       }
 
       /** \copydoc get_indices() */
-      const IndexVectorType* get_indices() const
+      const IndexTupleType* get_indices() const
       {
-        return _indices;
+        return _indices.data();
       }
 
       /**
@@ -195,18 +175,16 @@ namespace FEAT
        * \returns
        * A (const) reference to the index vector of the entity.
        */
-      IndexVectorReference operator[](Index i)
+      IndexTupleType& operator[](Index i)
       {
-        ASSERT(_indices != nullptr);
-        ASSERT(i < _num_entities);
+        ASSERT(i < get_num_entities());
         return _indices[i];
       }
 
       /** \copydoc operator[]() */
-      ConstIndexVectorReference operator[](Index i) const
+      const IndexTupleType& operator[](Index i) const
       {
-        ASSERT(_indices != nullptr);
-        ASSERT(i < _num_entities);
+        ASSERT(i < get_num_entities());
         return _indices[i];
       }
 
@@ -222,11 +200,10 @@ namespace FEAT
        * \returns
        * A (const) reference to the index of the local face \p j on entity \p i.
        */
-      Index& operator()(Index i, Index j)
+      Index& operator()(Index i, int j)
       {
-        ASSERT(_indices != nullptr);
-        ASSERT(i < _num_entities);
-        ASSERT(j < Index(num_indices));
+        ASSERT(i < get_num_entities());
+        ASSERT(j < num_indices);
         return _indices[i][j];
       }
 
@@ -243,11 +220,10 @@ namespace FEAT
        * \returns
        * A (const) reference to the index of the local face \p j on entity \p i.
        */
-      const Index& operator()(Index i, Index j) const
+      const Index& operator()(Index i, int j) const
       {
-        ASSERT(_indices != nullptr);
-        ASSERT(i < _num_entities);
-        ASSERT(j < Index(num_indices));
+        ASSERT(i < get_num_entities());
+        ASSERT(j < num_indices);
         return _indices[i][j];
       }
 
@@ -278,7 +254,7 @@ namespace FEAT
       /** \copydoc Adjacency::Adjactor::get_num_nodes_domain() */
       Index get_num_nodes_domain() const
       {
-        return _num_entities;
+        return get_num_entities();
       }
 
       /** \copydoc Adjacency::Adjactor::get_num_nodes_image() */
@@ -290,17 +266,15 @@ namespace FEAT
       /** \copydoc Adjacency::Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(_indices != nullptr);
-        ASSERT(domain_node < _num_entities);
-        return &_indices[domain_node][0];
+        ASSERT(domain_node < get_num_entities());
+        return reinterpret_cast<const Index*>(&_indices.data()[domain_node]);
       }
 
       /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(_indices != nullptr);
-        ASSERT(domain_node < _num_entities);
-        return &_indices[domain_node][num_indices];
+        ASSERT(domain_node < get_num_entities());
+        return reinterpret_cast<const Index*>(&_indices.data()[domain_node+1]);
       }
     }; // class IndexSet<...>
 
@@ -326,23 +300,17 @@ namespace FEAT
       IndexSetType _index_set;
 
     public:
-      explicit IndexSetWrapper(const Index num_entities[]) :
-        BaseClass(num_entities),
-        _index_set(
-          num_entities[Shape_::dimension],
-          num_entities[face_dim_])
-      {
-      }
-
-      explicit IndexSetWrapper() :
+      IndexSetWrapper() :
         BaseClass(),
         _index_set()
       {
       }
 
-      IndexSetWrapper(const IndexSetWrapper& other) :
-        BaseClass(other),
-        _index_set(other._index_set)
+      explicit IndexSetWrapper(const Index num_entities[]) :
+        BaseClass(num_entities),
+        _index_set(
+          num_entities[Shape_::dimension],
+          num_entities[face_dim_])
       {
       }
 
@@ -389,20 +357,15 @@ namespace FEAT
       IndexSetType _index_set;
 
     public:
+      IndexSetWrapper() :
+        _index_set()
+      {
+      }
+
       explicit IndexSetWrapper(const Index num_entities[]) :
         _index_set(
           num_entities[Shape_::dimension],
           num_entities[0])
-      {
-      }
-
-      IndexSetWrapper(const IndexSetWrapper& other) :
-        _index_set(other._index_set)
-      {
-      }
-
-      explicit IndexSetWrapper() :
-        _index_set()
       {
       }
 
@@ -495,21 +458,15 @@ namespace FEAT
       IndexSetWrapperType _index_set_wrapper;
 
     public:
+      IndexSetHolder() :
+        BaseClass(),
+        _index_set_wrapper()
+      {
+      }
+
       explicit IndexSetHolder(const Index num_entities[]) :
         BaseClass(num_entities),
         _index_set_wrapper(num_entities)
-      {
-      }
-
-      IndexSetHolder(const IndexSetHolder& other) :
-        BaseClass(other),
-        _index_set_wrapper(other._index_set_wrapper)
-      {
-      }
-
-      explicit IndexSetHolder() :
-        BaseClass(),
-        _index_set_wrapper()
       {
       }
 
@@ -588,15 +545,11 @@ namespace FEAT
     class IndexSetHolder<Shape::Vertex>
     {
     public:
+      IndexSetHolder()
+      {
+      }
+
       explicit IndexSetHolder(const Index* /*num_entities*/)
-      {
-      }
-
-      IndexSetHolder(const IndexSetHolder&)
-      {
-      }
-
-      explicit IndexSetHolder()
       {
       }
 

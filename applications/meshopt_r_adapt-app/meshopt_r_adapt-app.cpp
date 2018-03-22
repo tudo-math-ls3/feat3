@@ -688,15 +688,15 @@ int run_app(int argc, char* argv[])
   typedef Index IndexType;
 
   // This is the list of all supported meshes that could appear in the mesh file
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> H2M2D;
-  //typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> H3M3D;
-  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> S2M2D;
-  //typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> S3M3D;
-  //typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, 3, Real> S2M3D;
-  //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 1, 1, Real> H1M1D;
-  //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 2, 2, Real> H1M2D;
-  //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 3, 3, Real> H1M3D;
-  //typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> H2M3D;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, Real> H2M2D;
+  //typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, Real> H3M3D;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, Real> S2M2D;
+  //typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, Real> S3M3D;
+  //typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, Real> S2M3D;
+  //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 1, Real> H1M1D;
+  //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 2, Real> H1M2D;
+  //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 3, Real> H1M3D;
+  //typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, Real> H2M3D;
 
   // create world communicator
   Dist::Comm comm(Dist::Comm::world());

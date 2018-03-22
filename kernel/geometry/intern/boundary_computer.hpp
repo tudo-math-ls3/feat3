@@ -49,7 +49,7 @@ namespace FEAT
           // loop over all boundary facets
           for(Index i(0); i < Index(facets.size()); ++i)
           {
-            for(Index j(0); j < Index(face_index_set.get_num_indices()); ++j)
+            for(int j(0); j < face_index_set.get_num_indices(); ++j)
               ++caf[face_index_set(facets[i], j)];
           }
 
@@ -128,7 +128,7 @@ namespace FEAT
           for(Index i(0); i < face_index_set.get_num_entities(); ++i)
           {
             // loop over all facets adjacent to the current cell and increments its counter by one
-            for(Index j(0); j < Index(face_index_set.get_num_indices()); ++j)
+            for(int j(0); j < face_index_set.get_num_indices(); ++j)
               ++caf[face_index_set(i,j)];
           }
 

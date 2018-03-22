@@ -27,11 +27,11 @@ namespace FEAT
      */
     template<typename Shape_, typename CoordType_ = Real>
     class ReferenceCellFactory :
-      public Factory< ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, CoordType_> >
+      public Factory< ConformalMesh<Shape_, Shape_::dimension, CoordType_> >
     {
     public:
       /// mesh type
-      typedef ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, CoordType_> MeshType;
+      typedef ConformalMesh<Shape_, Shape_::dimension, CoordType_> MeshType;
       /// shape type
       typedef typename MeshType::ShapeType ShapeType;
       /// vertex set type

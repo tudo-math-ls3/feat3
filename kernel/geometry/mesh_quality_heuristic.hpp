@@ -565,7 +565,6 @@ namespace FEAT
       {
 
         typedef typename VtxType_::CoordType CoordType;
-        typedef typename VtxType_::ConstVertexReference ConstVertexReference;
         typedef typename VtxType_::VertexType DomainPointType;
 
         static constexpr int num_coords = VtxType_::num_coords;
@@ -589,14 +588,14 @@ namespace FEAT
           CoordType jac_det_min(Math::huge<CoordType>());
           CoordType jac_det_max(0);
 
-          ConstVertexReference v0 = vtx[idx(cell, 0)];
-          ConstVertexReference v1 = vtx[idx(cell, 1)];
-          ConstVertexReference v2 = vtx[idx(cell, 2)];
-          ConstVertexReference v3 = vtx[idx(cell, 3)];
-          ConstVertexReference v4 = vtx[idx(cell, 4)];
-          ConstVertexReference v5 = vtx[idx(cell, 5)];
-          ConstVertexReference v6 = vtx[idx(cell, 6)];
-          ConstVertexReference v7 = vtx[idx(cell, 7)];
+          const DomainPointType& v0 = vtx[idx(cell, 0)];
+          const DomainPointType& v1 = vtx[idx(cell, 1)];
+          const DomainPointType& v2 = vtx[idx(cell, 2)];
+          const DomainPointType& v3 = vtx[idx(cell, 3)];
+          const DomainPointType& v4 = vtx[idx(cell, 4)];
+          const DomainPointType& v5 = vtx[idx(cell, 5)];
+          const DomainPointType& v6 = vtx[idx(cell, 6)];
+          const DomainPointType& v7 = vtx[idx(cell, 7)];
 
           E[0] = v1 - v0;
           E[1] = v3 - v2;

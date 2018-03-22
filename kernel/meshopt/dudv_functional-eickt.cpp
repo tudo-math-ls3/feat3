@@ -10,13 +10,13 @@ using namespace FEAT;
 template class FEAT::Meshopt::DuDvFunctional
 <
   Mem::Main, double, Index,
-  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, double>>,
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, double>>,
   LAFEM::SparseMatrixBCSR
 >;
 
 template class FEAT::Meshopt::DuDvFunctional
 <
   Mem::Main, double, Index,
-  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>,
   LAFEM::SparseMatrixBCSR
 >;

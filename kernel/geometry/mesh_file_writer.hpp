@@ -142,8 +142,8 @@ namespace FEAT
         return "simplex";
       }
 
-      template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-      static String aux_meshtype_string(const ConformalMesh<Shape_, num_coords_, stride_, Coord_>&)
+      template<typename Shape_, int num_coords_, typename Coord_>
+      static String aux_meshtype_string(const ConformalMesh<Shape_, num_coords_, Coord_>&)
       {
         return String("conformal:") + aux_shape_string(Shape_()) + ":" + stringify(int(Shape_::dimension)) + ":" + stringify(num_coords_);
       }
@@ -237,10 +237,10 @@ namespace FEAT
        * \param[in] mesh
        * The (root) mesh to be exported.
        */
-      template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-      void write_mesh(const ConformalMesh<Shape_, num_coords_, stride_, Coord_>& mesh)
+      template<typename Shape_, int num_coords_, typename Coord_>
+      void write_mesh(const ConformalMesh<Shape_, num_coords_, Coord_>& mesh)
       {
-        typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         _os << _sindent << "<Mesh type=\"" << aux_meshtype_string(mesh) << "\"";
         _os << " size=\"" << mesh.get_num_entities(0);
         for(int i(1); i <= MeshType::shape_dim; ++i)
@@ -435,8 +435,8 @@ namespace FEAT
        *
        * \param[in] vertex_set
        */
-      template<int num_coords_, int stride_, typename Coord_>
-      void _write_vertex_set(const VertexSet<num_coords_, stride_, Coord_>& vertex_set)
+      template<int num_coords_, typename Coord_>
+      void _write_vertex_set(const VertexSet<num_coords_, Coord_>& vertex_set)
       {
         _os << _sindent << "<Vertices>" << std::endl;
         _push_indent();
@@ -462,18 +462,18 @@ namespace FEAT
        * The name of the attribute.
        */
       template<typename Data_>
-      void _write_attribute(const MeshAttribute<Data_>& attr, const String& name)
+      void _write_attribute(const AttributeSet<Data_>& attr, const String& name)
       {
         _os << _sindent << "<Attribute";
         _os << " name=\"" << name << "\"";
-        _os << " dim=\"" << attr.get_num_coords() << "\"";
+        _os << " dim=\"" << attr.get_dimension() << "\"";
         _os << ">" << std::endl;
         _push_indent();
-        for(Index i(0); i < attr.get_num_vertices(); ++i)
+        for(Index i(0); i < attr.get_num_values(); ++i)
         {
-          _os << _sindent << attr[i][0];
-          for(int j(1); j < attr.get_num_coords(); ++j)
-            _os << ' ' << attr[i][j];
+          _os << _sindent << attr(i, 0);
+          for(int j(1); j < attr.get_dimension(); ++j)
+            _os << ' ' << attr(i, j);
           _os << std::endl;
         }
         _pop_indent();

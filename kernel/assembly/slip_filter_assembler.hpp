@@ -104,9 +104,9 @@ namespace FEAT
           auto& idx_facet_at_shape(mesh.template get_index_set<ShapeType::dimension, facet_dim>());
 
           // This will contain the local vertex indices in the reference cell numbering
-          typename MeshType::template IndexSet<facet_dim, 0>::Type::IndexVectorType reference_numbering;
+          typename MeshType::template IndexSet<facet_dim, 0>::Type::IndexTupleType reference_numbering;
           // This will contain the local vertex indices as they are numbered in the mesh
-          typename MeshType::template IndexSet<facet_dim, 0>::Type::IndexVectorType my_numbering;
+          typename MeshType::template IndexSet<facet_dim, 0>::Type::IndexTupleType my_numbering;
 
           // Go check all cells in the mesh
           for(Index k(0); k < mesh.get_num_entities(ShapeType::dimension); ++k)
@@ -532,7 +532,7 @@ namespace FEAT
 
                 // evaluate the "node functional"
                 for(int j(0); j < idx.get_num_indices(); ++j)
-                  tmp += lagrange_1_vector(idx(shape, Index(j)));
+                  tmp += lagrange_1_vector(idx(shape, j));
 
                 tmp *= DataType(1)/DataType(idx.get_num_indices());
                 tmp.normalise();
@@ -561,7 +561,7 @@ namespace FEAT
 
                 // evaluate the "node functional"
                 for(int j(0); j < idx.get_num_indices(); ++j)
-                  tmp += lagrange_1_vector(idx(ts[shape], Index(j)));
+                  tmp += lagrange_1_vector(idx(ts[shape], j));
 
                 tmp *= DataType(1)/DataType(idx.get_num_indices());
                 tmp.normalise();

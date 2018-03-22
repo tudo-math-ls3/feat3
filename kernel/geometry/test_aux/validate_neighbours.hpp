@@ -56,20 +56,20 @@ namespace FEAT
         {
           for(int j(0); j < facet_idx.num_indices; ++j)
           {
-            Index other_cell(neigh[k][Index(j)]);
+            Index other_cell(neigh(k,j));
             // If we have a neighbour...
             if(other_cell != ~Index(0))
             {
               bool ok(false);
               // ... then this should NOT be the boundary
-              if(at_boundary[facet_idx[k][j]])
-                throw String("Facet "+stringify(facet_idx[k][j])+
+              if(at_boundary[facet_idx(k,j)])
+                throw String("Facet "+stringify(facet_idx(k,j))+
                     " is at the boundary, but the _neighbourinformation says it is not!");
 
               // Check for vice versa neighbour relationship
               for(int i(0); i < facet_idx.num_indices; ++i)
               {
-                if(neigh[other_cell][Index(i)] == k)
+                if(neigh(other_cell,i) == k)
                 {
                   ok = true;
                   break;
@@ -81,8 +81,8 @@ namespace FEAT
             else
             {
               /// So we do not have a neighbour. Then we SHOULD be at the boundary
-              if(!at_boundary[facet_idx[k][j]])
-               throw String("Facet "+stringify(facet_idx[k][j])+
+              if(!at_boundary[facet_idx(k,j)])
+               throw String("Facet "+stringify(facet_idx(k,j))+
                    " is not at the boundary, but the _neighbour information says it is!");
             }
           }

@@ -26,20 +26,18 @@ namespace FEAT
     template<
       int shape_dim_,
       int num_coords_ = shape_dim_,
-      int stride_ = num_coords_,
       typename Coord_ = Real>
     class StructuredMesh
     {
       static_assert(shape_dim_ > 0, "invalid shape dimension");
       static_assert(num_coords_ >= shape_dim_, "invalid number of coordinates");
-      static_assert(stride_ >= num_coords_, "invalid stride");
 
     public:
       /// Shape type
       typedef Shape::Hypercube<shape_dim_> ShapeType;
 
       /// vertex set type
-      typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
+      typedef VertexSet<num_coords_, Coord_> VertexSetType;
 
       /// index set holder type
       typedef StructIndexSetHolder<shape_dim_> IndexSetHolderType;
@@ -139,8 +137,6 @@ namespace FEAT
        * \param[in] other
        * The structured mesh that is to be copied.
        */
-      //template<int stride2_, typename Coord2_>
-      //StructuredMesh(const StructuredMesh<shape_dim_, num_coords_, stride2_, Coord2_>& other) :
       StructuredMesh(const StructuredMesh& other) :
         _vertex_set(other.get_vertex_set()),
         _index_set_holder(other.get_num_slices())
@@ -274,13 +270,12 @@ namespace FEAT
     template<
       int shape_dim_,
       int num_coords_,
-      int stride_,
       typename Coord_>
-    class Factory< StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> >
+    class Factory< StructuredMesh<shape_dim_, num_coords_, Coord_> >
     {
     public:
       /// mesh type
-      typedef StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> MeshType;
+      typedef StructuredMesh<shape_dim_, num_coords_, Coord_> MeshType;
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
 
@@ -320,14 +315,13 @@ namespace FEAT
     template<
       int shape_dim_,
       int num_coords_,
-      int stride_,
       typename Coord_>
-    class StandardRefinery<StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> > :
-      public Factory< StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> >
+    class StandardRefinery<StructuredMesh<shape_dim_, num_coords_, Coord_> > :
+      public Factory< StructuredMesh<shape_dim_, num_coords_, Coord_> >
     {
     public:
       /// mesh type
-      typedef StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> MeshType;
+      typedef StructuredMesh<shape_dim_, num_coords_, Coord_> MeshType;
       /// shape type
       typedef typename MeshType::ShapeType ShapeType;
       /// vertex set type

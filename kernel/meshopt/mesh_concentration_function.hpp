@@ -206,7 +206,7 @@ namespace FEAT
             int i(FimType::map(edge,0));
             int j(FimType::map(edge,1));
             DataType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, Index(i))) * dist(idx(cell, Index(j)))) );
+                eval(- DataType(1)*dist(idx(cell, i)) * dist(idx(cell, j))) );
 
             constraint_vec[cell] += my_constraint;
 
@@ -294,7 +294,7 @@ namespace FEAT
             int i(FimType::map(edge,0));
             int j(FimType::map(edge,1));
             DataType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, Index(i))) * dist(idx(cell, Index(j)))) );
+                eval(- DataType(1)*dist(idx(cell, i)) * dist(idx(cell, j))) );
 
             constraint_vec[cell] += my_constraint;
 
@@ -1042,7 +1042,7 @@ namespace FEAT
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              avg_dist += this->_dist(idx(cell,Index(j)));
+              avg_dist += this->_dist(idx(cell,j));
             }
 
             avg_dist = avg_dist/CoordType(Shape::FaceTraits<ShapeType,0>::count);
@@ -1138,7 +1138,7 @@ namespace FEAT
               grad_loc.format();
               for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
               {
-                Index i(idx(cell, Index(j)));
+                Index i(idx(cell, j));
                 // Get levelset
                 dist_loc(j) = _dist(i);
                 // Get levelset gradient
@@ -1151,7 +1151,7 @@ namespace FEAT
               {
                 for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
                 {
-                  Index i(idx(cell, Index(j)));
+                  Index i(idx(cell, j));
 
                   tmp(j*MeshType::world_dim +d) =
                     CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
@@ -1202,7 +1202,7 @@ namespace FEAT
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
               // Global vertex/dof index
-              Index i(idx(cell, Index(j)));
+              Index i(idx(cell, j));
               // Get levelset
               grad_dist_loc(j) = _dist(i);
               // Get levelset gradient
@@ -1215,7 +1215,7 @@ namespace FEAT
             // Add local contributions to global gradient vector
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, Index(j)));
+              Index i(idx(cell, j));
               this->_grad_conc(i, _grad_conc(i) + grad_loc[j]);
             }
           }

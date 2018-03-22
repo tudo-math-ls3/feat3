@@ -48,10 +48,10 @@ namespace FEAT
        * \param[in] extra
        * The extra bounding box offset in millimeters.
        */
-      template<typename Shape_, int stride_, typename DataType_>
+      template<typename Shape_, typename DataType_>
       static void write(
         std::ostream& os,
-        const ConformalMesh<Shape_, 2, stride_, DataType_>& mesh,
+        const ConformalMesh<Shape_, 2, DataType_>& mesh,
         const double width = 100.0,
         const double height = 100.0,
         const double stroke = 0.1,
@@ -148,10 +148,10 @@ namespace FEAT
        * \param[in] extra
        * The extra bounding box offset in millimeters.
        */
-      template<typename Shape_, int stride_, typename DataType_>
+      template<typename Shape_, typename DataType_>
       static void write(
         const String& filename,
-        const ConformalMesh<Shape_, 2, stride_, DataType_>& mesh,
+        const ConformalMesh<Shape_, 2, DataType_>& mesh,
         const double width = 100.0,
         const double height = 100.0,
         const double stroke = 0.1,

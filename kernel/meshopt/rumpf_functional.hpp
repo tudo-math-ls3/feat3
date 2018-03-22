@@ -207,7 +207,7 @@ namespace FEAT
         /// Shape type of the underlying transformation
         typedef Shape::Hypercube<shape_dim_> ShapeType;
         /// The transformation this functional works on
-        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<ShapeType, world_dim, world_dim, DataType_>> TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<ShapeType, world_dim, DataType_>> TrafoType;
         /// The FE space associated with the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
 

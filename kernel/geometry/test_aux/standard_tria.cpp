@@ -766,20 +766,20 @@ namespace FEAT
 
         // create mesh
         TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
-        // create a MeshAttribute that holds one value for each vertex
-        TriaSubMesh::MeshAttributeType* my_vertex_set = new TriaSubMesh::MeshAttributeType(num_entities[0],2);
+        // create a AttributeSet that holds one value for each vertex
+        TriaSubMesh::AttributeSetType* my_attrib_set = new TriaSubMesh::AttributeSetType(num_entities[0],2);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, "TriaSubMeshAttribute");
+        mesh->add_attribute(my_attrib_set, "TriaSubAttributeSet");
 
         // set up vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0, 10.0,
           0.0, 0.0,
           10.0, 0.0,
           6.0, 7.0
         };
-        copy_vtx(*(mesh->find_attribute("TriaSubMeshAttribute")), vtx);
+        copy_attr(*(mesh->find_attribute("TriaSubAttributeSet")), attr);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -844,7 +844,7 @@ namespace FEAT
           throw String("Triangle count mismatch");
 
         // check vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0, 10.0,
           0.0, 0.0,
@@ -857,8 +857,8 @@ namespace FEAT
           5.0, 0.0
         };
 
-        if(!comp_vtx(*(mesh.find_attribute("TriaSubMeshAttribute")), vtx))
-          throw String("Vertex coordinate refinement failure");
+        if(!comp_attr(*(mesh.find_attribute("TriaSubAttributeSet")), attr))
+          throw String("Attribute refinement failure");
 
         // check vertices-at-edge array
         Index v_e[] =
@@ -950,13 +950,13 @@ namespace FEAT
 
         // create mesh
         TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
-        // create a MeshAttribute that holds one value for each vertex
-        TriaSubMesh::MeshAttributeType* my_vertex_set = new TriaSubMesh::MeshAttributeType(num_entities[0], 1, 1);
+        // create a AttributeSet that holds one value for each vertex
+        TriaSubMesh::AttributeSetType* my_attrib_set = new TriaSubMesh::AttributeSetType(num_entities[0]);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, "PatchEdgeAttribute");
+        mesh->add_attribute(my_attrib_set, "PatchEdgeAttribute");
 
         // set up vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0,
           1.0,
@@ -964,7 +964,7 @@ namespace FEAT
           3.0,
           4.0
         };
-        copy_vtx(*(mesh->find_attribute("PatchEdgeAttribute")), vtx);
+        copy_attr(*(mesh->find_attribute("PatchEdgeAttribute")), attr);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -1004,7 +1004,7 @@ namespace FEAT
           throw String("Edge count mismatch");
 
         // check vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0,
           1.0,
@@ -1017,8 +1017,8 @@ namespace FEAT
           3.5
         };
 
-        if(!comp_vtx(*(mesh.find_attribute("PatchEdgeAttribute")), vtx))
-          throw String("Vertex coordinate refinement failure");
+        if(!comp_attr(*(mesh.find_attribute("PatchEdgeAttribute")), attr))
+          throw String("Attribute refinement failure");
 
         // check vertices-at-edge array
         Index v_e[] =

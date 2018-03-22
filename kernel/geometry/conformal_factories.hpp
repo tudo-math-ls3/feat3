@@ -25,13 +25,13 @@ namespace FEAT
     class UnitCubeFactory DOXY({});
 
     /// \cond internal
-    template<int stride_, typename Coord_>
-    class UnitCubeFactory< ConformalMesh<Shape::Hypercube<1>, 1, stride_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<1>, 1, stride_, Coord_> >
+    template<typename Coord_>
+    class UnitCubeFactory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> > :
+    public Factory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> >
     {
       public:
         /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<1>, 1, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Hypercube<1>, 1, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -62,15 +62,15 @@ namespace FEAT
 
     };
 
-    template<int stride_, typename Coord_>
-    class UnitCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> >
+    template<typename Coord_>
+    class UnitCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> > :
+    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
     {
       public:
         /// shape type
         typedef Shape::Hypercube<2> ShapeType;
         /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -126,7 +126,7 @@ namespace FEAT
             {
               for(int j(0); j < idx.num_indices; ++j)
               {
-                idx[Index(i)][Index(j)] = Index(FimType::map(i, j));
+                idx[Index(i)][j] = Index(FimType::map(i, j));
               }
             }
           }
@@ -138,20 +138,20 @@ namespace FEAT
               idx(index_set_holder.template get_index_set<2, face_dim_>());
             for(int j(0); j < idx.num_indices; ++j)
             {
-              idx[0][Index(j)] = Index(j);
+              idx[0][j] = Index(j);
             }
           }
     };
 
-    template<int stride_, typename Coord_>
-    class UnitCubeFactory< ConformalMesh<Shape::Hypercube<3>, 3, stride_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<3>, 3, stride_, Coord_> >
+    template<typename Coord_>
+    class UnitCubeFactory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> > :
+    public Factory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> >
     {
       public:
         /// shape type
         typedef Shape::Hypercube<3> ShapeType;
         /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<3>, 3, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -212,7 +212,7 @@ namespace FEAT
             {
               for(int j(0); j < idx.num_indices; ++j)
               {
-                idx[Index(i)][Index(j)] = Index(FimType::map(i, j));
+                idx[Index(i)][j] = Index(FimType::map(i, j));
               }
             }
           }
@@ -224,7 +224,7 @@ namespace FEAT
               idx(index_set_holder.template get_index_set<3, face_dim_>());
             for(int j(0); j < idx.num_indices; ++j)
             {
-              idx[Index(0)][Index(j)] = Index(j);
+              idx[Index(0)][j] = Index(j);
             }
           }
     };
@@ -286,13 +286,13 @@ namespace FEAT
      *
      * \author Jordi Paul
      */
-    template<int stride_, typename Coord_, int dim_>
-    class UnitCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> >
+    template<typename Coord_, int dim_>
+    class UnitCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> > :
+    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
     {
       public:
         /// mesh type
-        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -301,7 +301,7 @@ namespace FEAT
         /// shape convert factory type
         typedef ShapeConvertFactory<MeshType> FactoryType;
         /// mesh type to convert from
-        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, stride_, Coord_> GeneratorMeshType;
+        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, Coord_> GeneratorMeshType;
 
       public:
         UnitCubeFactory() :
@@ -358,12 +358,12 @@ namespace FEAT
     class RefineFactory DOXY({});
 
     /// \cond internal
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_, template<typename> class Factory_>
-    class RefineFactory< ConformalMesh<Shape_, num_coords_, stride_, Coord_>, Factory_ > :
-    public Factory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
+    template<typename Shape_, int num_coords_, typename Coord_, template<typename> class Factory_>
+    class RefineFactory< ConformalMesh<Shape_, num_coords_, Coord_>, Factory_ > :
+    public Factory< ConformalMesh<Shape_, num_coords_, Coord_> >
     {
       public:
-        typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         typedef typename MeshType::VertexSetType VertexSetType;
         typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
@@ -488,15 +488,15 @@ namespace FEAT
     /*
      * \brief Specialisation for Hypercube<2> meshes
      **/
-    template<int stride_, typename Coord_>
-    class UnitStarCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> >
+    template<typename Coord_>
+    class UnitStarCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> > :
+    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
     {
       public:
         /// shape type
         typedef Shape::Hypercube<2> ShapeType;
         /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -655,15 +655,15 @@ namespace FEAT
      * This uses the UnitStarCubeFactory for Hypercubes and then the ShapeConvertFactory.
      *
      **/
-    template<int stride_, typename Coord_, int dim_>
-    class UnitStarCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> >
+    template<typename Coord_, int dim_>
+    class UnitStarCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> > :
+    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
     {
       public:
         /// shape type
         typedef Shape::Simplex<dim_> ShapeType;
         /// mesh type
-        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -671,7 +671,7 @@ namespace FEAT
         /// shape convert factory type
         typedef ShapeConvertFactory<MeshType> FactoryType;
         /// mesh type to convert from
-        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, stride_, Coord_> GeneratorMeshType;
+        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, Coord_> GeneratorMeshType;
 
       private:
         GeneratorMeshType* _generator_mesh;
@@ -717,9 +717,6 @@ namespace FEAT
      * \tparam dim_
      * Dimension of the input points
      *
-     * \tparam stride_
-     * Padded dimension of the input points
-     *
      * \tparam Coord_
      * Floating point type for mesh coordinates
      *
@@ -728,13 +725,13 @@ namespace FEAT
      * This simply joins all points of a given std::deque together to a polygonal straight line graph.
      *
      */
-    template<int dim_, int stride_, typename Coord_>
+    template<int dim_, typename Coord_>
     class PolylineFactory :
-    public Factory< ConformalMesh<Shape::Hypercube<1>, dim_, stride_, Coord_> >
+    public Factory< ConformalMesh<Shape::Hypercube<1>, dim_, Coord_> >
     {
       public:
         /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<1>, dim_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Hypercube<1>, dim_, Coord_> MeshType;
         /// vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
         /// index holder type
@@ -742,7 +739,7 @@ namespace FEAT
 
       private:
         /// Reference to the set of points in the polyline
-        std::deque<Tiny::Vector<Coord_, dim_, stride_>>& _points;
+        std::deque<Tiny::Vector<Coord_, dim_>>& _points;
 
       public:
 

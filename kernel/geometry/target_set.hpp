@@ -5,6 +5,9 @@
 // includes, FEAT
 #include <kernel/shape.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAT
 {
   namespace Geometry
@@ -19,99 +22,42 @@ namespace FEAT
     class TargetSet
     {
     protected:
-      /// number of entities
-      Index _num_entities;
-
-      /// Index array. _indices[i] = j means that entity i represents entity j in the parent
-      Index* _indices;
-
-    private:
-      /// \brief Prevent the compiler from generating a copy assignment operator by declaring without implementing
-      TargetSet& operator=(const TargetSet&);
+      /// Index vector. _indices[i] = j means that entity i represents entity j in the parent
+      std::vector<Index> _indices;
 
     public:
+      /// standard constructor
+      TargetSet() :
+        _indices()
+      {
+      }
+
       /**
        * \brief Constructor
        *
        * \param[in] num_entities
        * The number of entities that are to be indexed.
        */
-      explicit TargetSet(Index num_entities = 0) :
-        _num_entities(num_entities),
-        _indices(nullptr)
+      explicit TargetSet(Index num_entities) :
+        _indices(std::size_t(num_entities))
       {
-        if(num_entities > 0)
-        {
-          _indices = new Index[num_entities];
-        }
-      }
-
-      /**
-       * \brief Copy Constructor
-       *
-       * \param[in] other
-       * The target set that is to be copied.
-       */
-      TargetSet(const TargetSet& other) :
-        _num_entities(other._num_entities),
-        _indices(nullptr)
-      {
-        if(_num_entities > 0)
-        {
-          _indices = new Index[_num_entities];
-          for(Index i(0); i < _num_entities; ++i)
-          {
-            _indices[i] = other._indices[i];
-          }
-        }
       }
 
       /// virtual destructor
       virtual ~TargetSet()
       {
-        if(_indices != nullptr)
-        {
-          delete [] _indices;
-        }
-        _indices = nullptr;
-      }
-
-      /**
-       * \brief Move assignment operator
-       *
-       * \param[in] other
-       * Other target set that gets moved to this.
-       *
-       * \returns
-       * A reference to the object other was moved to.
-       */
-      TargetSet& operator=(TargetSet&& other)
-      {
-        if(this != &other)
-        {
-          _num_entities = other._num_entities;
-
-          if(_indices != nullptr)
-            delete[] _indices;
-
-          _indices = other._indices;
-
-          other._num_entities = 0;
-          other._indices = nullptr;
-        }
-        return *this;
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
-        return std::size_t(_num_entities) * sizeof(Index);
+        return _indices.size() * sizeof(Index);
       }
 
       /// Returns the number of entities.
       Index get_num_entities() const
       {
-        return _num_entities;
+        return Index(_indices.size());
       }
 
       /**
@@ -119,24 +65,14 @@ namespace FEAT
        */
       Index* get_indices()
       {
-        return _indices;
+        return _indices.data();
       }
 
       /** \copydoc get_indices() */
       const Index* get_indices() const
       {
-        return _indices;
+        return _indices.data();
       }
-      /*
-      Index& get_index(Index i)
-      {
-        return _indices[i];
-      }
-
-      const Index& get_index(Index i) const
-      {
-        return _indices[i];
-      }*/
 
       /**
        * \brief Returns a target index.
@@ -149,12 +85,14 @@ namespace FEAT
        */
       Index& operator[](Index i)
       {
+        ASSERT(i < get_num_entities());
         return _indices[i];
       }
 
       /** \copydoc operator[]() */
       const Index& operator[](Index i) const
       {
+        ASSERT(i < get_num_entities());
         return _indices[i];
       }
     }; // class TargetSet
@@ -184,15 +122,15 @@ namespace FEAT
       TargetSet _target_set;
 
     public:
-      explicit TargetSetHolder(const Index num_entities[]) :
-        BaseClass(num_entities),
-        _target_set(num_entities[shape_dim])
+      TargetSetHolder() :
+        BaseClass(),
+        _target_set()
       {
       }
 
-      TargetSetHolder(const TargetSetHolder& other) :
-        BaseClass(other),
-        _target_set(other._target_set)
+      explicit TargetSetHolder(const Index num_entities[]) :
+        BaseClass(num_entities),
+        _target_set(num_entities[shape_dim])
       {
       }
 
@@ -260,11 +198,6 @@ namespace FEAT
 
       explicit TargetSetHolder(const Index num_entities[]) :
         _target_set(num_entities[0])
-      {
-      }
-
-      TargetSetHolder(const TargetSetHolder& other) :
-        _target_set(other._target_set)
       {
       }
 

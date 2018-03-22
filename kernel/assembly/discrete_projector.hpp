@@ -149,7 +149,7 @@ namespace FEAT
             }
 
             // fetch the vertex index
-            Index vi = vert_idx(cell, Index(k));
+            Index vi = vert_idx(cell, k);
 
             // add vertex contribution
             vector(vi, vector(vi) + value);

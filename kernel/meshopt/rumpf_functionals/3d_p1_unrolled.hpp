@@ -21,7 +21,7 @@ namespace FEAT
      */
     template<typename DataType_>
     class RumpfFunctionalUnrolled<DataType_,
-    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, DataType_>>> :
+    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, DataType_>>> :
       public RumpfFunctionalBase<DataType_>
       {
         public:
@@ -33,7 +33,7 @@ namespace FEAT
           /// Shape type of the underlying transformation
           typedef Shape::Simplex<3> ShapeType;
           /// The transformation this functional works on
-          typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<ShapeType, 3, 3, DataType_>> TrafoType;
+          typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<ShapeType, 3, DataType_>> TrafoType;
           /// Our world dimension
           static constexpr int world_dim = TrafoType::world_dim;
           /// Our shape dimension
@@ -703,7 +703,7 @@ namespace FEAT
 
     //#ifdef FEAT_EICKT
     //    extern template class RumpfFunctionalUnrolled<double,
-    //    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, double>>>;
+    //    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, double>>>;
     //#endif
     /// \endcond
   } // namespace Meshopt

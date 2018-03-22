@@ -104,6 +104,40 @@ namespace FEAT
         }
         return true;
       }
+
+      template<typename AttribSet_>
+      void copy_attr(AttribSet_& attr, const Real wtx[])
+      {
+        Index n = attr.get_num_values();
+        int num_coords = attr.get_dimension();
+        size_t k = 0;
+        for(Index i(0); i < n; ++i)
+        {
+          for(int j(0); j < num_coords; ++j, ++k)
+          {
+            attr(i,j) = wtx[k];
+          }
+        }
+      }
+
+      template<typename AttribSet_>
+      bool comp_attr(const AttribSet_& attr, const Real wtx[], Real tol = 1e-8)
+      {
+        Index n = attr.get_num_values();
+        int num_coords = attr.get_dimension();
+        size_t k = 0;
+        for(Index i(0); i < n; ++i)
+        {
+          for(int j(0); j < num_coords; ++j, ++k)
+          {
+            if(std::fabs(attr(i,j) - wtx[k]) > tol)
+            {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry

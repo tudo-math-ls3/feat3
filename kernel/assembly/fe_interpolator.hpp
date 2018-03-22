@@ -107,7 +107,7 @@ namespace FEAT
 
             typename Vector_::ValueType tmp(0);
 
-            for(Index i(0); i < Index(from_vertex_at_shape_idx.get_num_indices()); ++i)
+            for(int i(0); i < from_vertex_at_shape_idx.get_num_indices(); ++i)
             {
               tmp += from_coeffs(from_vertex_at_shape_idx(k,i));
             }

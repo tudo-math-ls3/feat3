@@ -72,7 +72,7 @@ template
     /// Shape of the mesh cells
     typedef ShapeType_ ShapeType;
     /// The complete mesh type
-    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, DataType> MeshType;
     /// The corresponding transformation
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     /// Our functional type
@@ -269,7 +269,7 @@ struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
   typedef FEAT::Shape::Hypercube<shape_dim> ShapeType;
   /// \brief Sets coordinates so we deal the the reference element
   template<typename DT_>
-  static void set_coords(Geometry::ConformalMesh<ShapeType, shape_dim, shape_dim, DT_>& mesh_, const DT_& scaling)
+  static void set_coords(Geometry::ConformalMesh<ShapeType, shape_dim, DT_>& mesh_, const DT_& scaling)
   {
     auto& coords = mesh_.get_vertex_set();
     Tiny::Vector<DT_, shape_dim > tmp;
@@ -314,7 +314,7 @@ struct helperclass< FEAT::Shape::Simplex<2> >
 {
   /// \brief Sets coordinates so we deal the the Rumpf reference element
   template<typename DT_>
-  static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<2>, 2, 2, DT_>& mesh_, const DT_& scaling)
+  static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<2>, 2, DT_>& mesh_, const DT_& scaling)
   {
     auto& coords = mesh_.get_vertex_set();
     Tiny::Vector<DT_, 2> tmp(0);
@@ -344,7 +344,7 @@ struct helperclass< FEAT::Shape::Simplex<3> >
   static constexpr int shape_dim = 3;
   /// \brief Sets coordinates so we deal the the Rumpf reference element
   template<typename DT_>
-  static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<3>,3,3, DT_>& mesh_, const DT_& scaling)
+  static void set_coords(Geometry::ConformalMesh<FEAT::Shape::Simplex<3>,3, DT_>& mesh_, const DT_& scaling)
   {
 
     Tiny::Matrix<DT_,shape_dim, shape_dim> trafo(DT_(0));

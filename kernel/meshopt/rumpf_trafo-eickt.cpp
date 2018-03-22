@@ -7,13 +7,13 @@ using namespace FEAT;
 
 // RumpfTrafos
 template struct FEAT::Meshopt::RumpfTrafo<
-  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double>>, double>;
+  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double>>, double>;
 
 template struct FEAT::Meshopt::RumpfTrafo<
-  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double>>, double>;
+  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double>>, double>;
 
 template struct FEAT::Meshopt::RumpfTrafo<
-  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double>>, double>;
+  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, double>>, double>;
 
 template struct FEAT::Meshopt::RumpfTrafo<
-  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, 3, double>>, double>;
+  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, double>>, double>;

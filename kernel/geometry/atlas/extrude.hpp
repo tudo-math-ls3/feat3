@@ -458,7 +458,7 @@ namespace FEAT
         {
           typedef typename Mesh_::ShapeType ShapeType;
           typedef typename Shape::FaceTraits<ShapeType, 1>::ShapeType SubShapeType;
-          typedef ConformalMesh<SubShapeType, 2, 2, CoordType> SubMeshType;
+          typedef ConformalMesh<SubShapeType, 2, CoordType> SubMeshType;
 
           // What have we here?
           if(name == "Circle")

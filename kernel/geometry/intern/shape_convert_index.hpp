@@ -51,13 +51,13 @@ namespace FEAT
           const Index iov = index_offsets[0];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<2> IndexSetTypeIn;
 
           // typedef index vector type
-          typedef IndexSetTypeIn::ConstIndexVectorReference ConstIndexVectorReference;
+          typedef IndexSetTypeIn::IndexTupleType IndexTupleTypeIn;
 
           // fetch the vertices-at-edge index set
           const IndexSetTypeIn& index_set_in = index_set_holder_in.get_index_set<1,0>();
@@ -69,10 +69,10 @@ namespace FEAT
           for(Index i(0); i < num_edges; ++i)
           {
             // fetch coarse mesh vertices-at-quad index vector
-            ConstIndexVectorReference v_e = index_set_in[i];
+            const IndexTupleTypeIn& v_e = index_set_in[i];
 
             // fetch fine mesh vertices-at-edge index vectors
-            IndexVectorReference e_0 = index_set_out[offset + i];
+            IndexTupleType& e_0 = index_set_out[offset + i];
 
             e_0[0] = iov + v_e[0];
             e_0[1] = iov + v_e[1];
@@ -110,13 +110,13 @@ namespace FEAT
           const Index ioq = index_offsets[2];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<4> IndexSetTypeIn;
 
           // typedef index vector type
-          typedef IndexSetTypeIn::ConstIndexVectorReference ConstIndexVectorReference;
+          typedef IndexSetTypeIn::IndexTupleType IndexTupleTypeIn;
 
           // fetch the vertices-at-quad index set
           const IndexSetTypeIn& index_set_in = index_set_holder_in.get_index_set<2,0>();
@@ -147,13 +147,13 @@ namespace FEAT
           for(Index i(0); i < num_quads; ++i)
           {
             // fetch coarse mesh vertices-at-quad index vector
-            ConstIndexVectorReference v_q = index_set_in[i];
+            const IndexTupleTypeIn& v_q = index_set_in[i];
 
             // fetch fine mesh vertices-at-edge index vectors
-            IndexVectorReference e_0 = index_set_out[offset + 4*i + 0];
-            IndexVectorReference e_1 = index_set_out[offset + 4*i + 1];
-            IndexVectorReference e_2 = index_set_out[offset + 4*i + 2];
-            IndexVectorReference e_3 = index_set_out[offset + 4*i + 3];
+            IndexTupleType& e_0 = index_set_out[offset + 4*i + 0];
+            IndexTupleType& e_1 = index_set_out[offset + 4*i + 1];
+            IndexTupleType& e_2 = index_set_out[offset + 4*i + 2];
+            IndexTupleType& e_3 = index_set_out[offset + 4*i + 3];
 
             e_0[0] = iov + v_q[0]; // v_0
             e_0[1] = ioq + i; // X
@@ -201,15 +201,15 @@ namespace FEAT
           const Index ioc = index_offsets[3];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<8> IndexSetTypeIn_v_c;
           typedef IndexSet<6> IndexSetTypeIn_q_c;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_v_c::ConstIndexVectorReference ConstIndexVectorReference_v_c;
-          typedef IndexSetTypeIn_q_c::ConstIndexVectorReference ConstIndexVectorReference_q_c;
+          typedef IndexSetTypeIn_v_c::IndexTupleType IndexTupleType_v_c;
+          typedef IndexSetTypeIn_q_c::IndexTupleType IndexTupleType_q_c;
 
           // fetch the vertices-at-hexa and the quad-at-hexa index set
           const IndexSetTypeIn_v_c& index_set_in_v_c = index_set_holder_in.get_index_set<3,0>();
@@ -222,24 +222,24 @@ namespace FEAT
           for(Index i(0); i < num_hexas; ++i)
           {
             // fetch coarse mesh vertices-at-hexa index vector
-            ConstIndexVectorReference_v_c v_c = index_set_in_v_c[i];
-            ConstIndexVectorReference_q_c q_c = index_set_in_q_c[i];
+            const IndexTupleType_v_c& v_c = index_set_in_v_c[i];
+            const IndexTupleType_q_c& q_c = index_set_in_q_c[i];
 
             // fetch new mesh vertices-at-edge index vectors
-            IndexVectorReference e_0 = index_set_out[offset + 14*i + 0];
-            IndexVectorReference e_1 = index_set_out[offset + 14*i + 1];
-            IndexVectorReference e_2 = index_set_out[offset + 14*i + 2];
-            IndexVectorReference e_3 = index_set_out[offset + 14*i + 3];
-            IndexVectorReference e_4 = index_set_out[offset + 14*i + 4];
-            IndexVectorReference e_5 = index_set_out[offset + 14*i + 5];
-            IndexVectorReference e_6 = index_set_out[offset + 14*i + 6];
-            IndexVectorReference e_7 = index_set_out[offset + 14*i + 7];
-            IndexVectorReference e_8 = index_set_out[offset + 14*i + 8];
-            IndexVectorReference e_9 = index_set_out[offset + 14*i + 9];
-            IndexVectorReference e_10 = index_set_out[offset + 14*i + 10];
-            IndexVectorReference e_11 = index_set_out[offset + 14*i + 11];
-            IndexVectorReference e_12 = index_set_out[offset + 14*i + 12];
-            IndexVectorReference e_13 = index_set_out[offset + 14*i + 13];
+            IndexTupleType& e_0 = index_set_out[offset + 14*i + 0];
+            IndexTupleType& e_1 = index_set_out[offset + 14*i + 1];
+            IndexTupleType& e_2 = index_set_out[offset + 14*i + 2];
+            IndexTupleType& e_3 = index_set_out[offset + 14*i + 3];
+            IndexTupleType& e_4 = index_set_out[offset + 14*i + 4];
+            IndexTupleType& e_5 = index_set_out[offset + 14*i + 5];
+            IndexTupleType& e_6 = index_set_out[offset + 14*i + 6];
+            IndexTupleType& e_7 = index_set_out[offset + 14*i + 7];
+            IndexTupleType& e_8 = index_set_out[offset + 14*i + 8];
+            IndexTupleType& e_9 = index_set_out[offset + 14*i + 9];
+            IndexTupleType& e_10 = index_set_out[offset + 14*i + 10];
+            IndexTupleType& e_11 = index_set_out[offset + 14*i + 11];
+            IndexTupleType& e_12 = index_set_out[offset + 14*i + 12];
+            IndexTupleType& e_13 = index_set_out[offset + 14*i + 13];
 
             // corner-midpoint edges
             e_0[0] = iov + v_c[0]; // v_0
@@ -320,13 +320,13 @@ namespace FEAT
           const Index ioq = index_offsets[2];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<4> IndexSetTypeIn;
 
           // typedef index vector type
-          typedef IndexSetTypeIn::ConstIndexVectorReference ConstIndexVectorReference;
+          typedef IndexSetTypeIn::IndexTupleType IndexTupleTypeIn;
 
           // fetch the vertices-at-quad index set
           const IndexSetTypeIn& index_set_in = index_set_holder_in.get_index_set<2,0>();
@@ -357,13 +357,13 @@ namespace FEAT
           for(Index i(0); i < num_quads; ++i)
           {
             // fetch coarse mesh vertices-at-quad index vector
-            ConstIndexVectorReference v_q = index_set_in[i];
+            const IndexTupleTypeIn& v_q = index_set_in[i];
 
             // fetch fine mesh vertices-at-edge index vectors
-            IndexVectorReference t_0 = index_set_out[offset + 4*i + 0];
-            IndexVectorReference t_1 = index_set_out[offset + 4*i + 1];
-            IndexVectorReference t_2 = index_set_out[offset + 4*i + 2];
-            IndexVectorReference t_3 = index_set_out[offset + 4*i + 3];
+            IndexTupleType& t_0 = index_set_out[offset + 4*i + 0];
+            IndexTupleType& t_1 = index_set_out[offset + 4*i + 1];
+            IndexTupleType& t_2 = index_set_out[offset + 4*i + 2];
+            IndexTupleType& t_3 = index_set_out[offset + 4*i + 3];
 
             t_0[0] = ioq + i; // X
             t_0[1] = iov + v_q[0]; // v_0
@@ -416,15 +416,15 @@ namespace FEAT
           const Index ioc = index_offsets[3];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<8> IndexSetTypeIn_v_c;
           typedef IndexSet<6> IndexSetTypeIn_q_c;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_v_c::ConstIndexVectorReference ConstIndexVectorReference_v_c;
-          typedef IndexSetTypeIn_q_c::ConstIndexVectorReference ConstIndexVectorReference_q_c;
+          typedef IndexSetTypeIn_v_c::IndexTupleType IndexTupleType_v_c;
+          typedef IndexSetTypeIn_q_c::IndexTupleType IndexTupleType_q_c;
 
           // fetch the vertices-at-hexa and quad-at-hexa index set
           const IndexSetTypeIn_v_c& index_set_in_v_c = index_set_holder_in.get_index_set<3,0>();
@@ -437,46 +437,46 @@ namespace FEAT
           for(Index i(0); i < num_cubes; ++i)
           {
             // fetch coarse mesh vertices-at-hexas and quad-at-hexa index vector
-            ConstIndexVectorReference_v_c v_c = index_set_in_v_c[i];
-            ConstIndexVectorReference_q_c q_c = index_set_in_q_c[i];
+            const IndexTupleType_v_c& v_c = index_set_in_v_c[i];
+            const IndexTupleType_q_c& q_c = index_set_in_q_c[i];
 
             // fetch fine mesh vertices-at-triangle index vectors
-            IndexVectorReference t_0 = index_set_out[offset + 36*i + 0];
-            IndexVectorReference t_1 = index_set_out[offset + 36*i + 1];
-            IndexVectorReference t_2 = index_set_out[offset + 36*i + 2];
-            IndexVectorReference t_3 = index_set_out[offset + 36*i + 3];
-            IndexVectorReference t_4 = index_set_out[offset + 36*i + 4];
-            IndexVectorReference t_5 = index_set_out[offset + 36*i + 5];
-            IndexVectorReference t_6 = index_set_out[offset + 36*i + 6];
-            IndexVectorReference t_7 = index_set_out[offset + 36*i + 7];
-            IndexVectorReference t_8 = index_set_out[offset + 36*i + 8];
-            IndexVectorReference t_9 = index_set_out[offset + 36*i + 9];
-            IndexVectorReference t_10 = index_set_out[offset + 36*i + 10];
-            IndexVectorReference t_11 = index_set_out[offset + 36*i + 11];
-            IndexVectorReference t_12 = index_set_out[offset + 36*i + 12];
-            IndexVectorReference t_13 = index_set_out[offset + 36*i + 13];
-            IndexVectorReference t_14 = index_set_out[offset + 36*i + 14];
-            IndexVectorReference t_15 = index_set_out[offset + 36*i + 15];
-            IndexVectorReference t_16 = index_set_out[offset + 36*i + 16];
-            IndexVectorReference t_17 = index_set_out[offset + 36*i + 17];
-            IndexVectorReference t_18 = index_set_out[offset + 36*i + 18];
-            IndexVectorReference t_19 = index_set_out[offset + 36*i + 19];
-            IndexVectorReference t_20 = index_set_out[offset + 36*i + 20];
-            IndexVectorReference t_21 = index_set_out[offset + 36*i + 21];
-            IndexVectorReference t_22 = index_set_out[offset + 36*i + 22];
-            IndexVectorReference t_23 = index_set_out[offset + 36*i + 23];
-            IndexVectorReference t_24 = index_set_out[offset + 36*i + 24];
-            IndexVectorReference t_25 = index_set_out[offset + 36*i + 25];
-            IndexVectorReference t_26 = index_set_out[offset + 36*i + 26];
-            IndexVectorReference t_27 = index_set_out[offset + 36*i + 27];
-            IndexVectorReference t_28 = index_set_out[offset + 36*i + 28];
-            IndexVectorReference t_29 = index_set_out[offset + 36*i + 29];
-            IndexVectorReference t_30 = index_set_out[offset + 36*i + 30];
-            IndexVectorReference t_31 = index_set_out[offset + 36*i + 31];
-            IndexVectorReference t_32 = index_set_out[offset + 36*i + 32];
-            IndexVectorReference t_33 = index_set_out[offset + 36*i + 33];
-            IndexVectorReference t_34 = index_set_out[offset + 36*i + 34];
-            IndexVectorReference t_35 = index_set_out[offset + 36*i + 35];
+            IndexTupleType& t_0 = index_set_out[offset + 36*i + 0];
+            IndexTupleType& t_1 = index_set_out[offset + 36*i + 1];
+            IndexTupleType& t_2 = index_set_out[offset + 36*i + 2];
+            IndexTupleType& t_3 = index_set_out[offset + 36*i + 3];
+            IndexTupleType& t_4 = index_set_out[offset + 36*i + 4];
+            IndexTupleType& t_5 = index_set_out[offset + 36*i + 5];
+            IndexTupleType& t_6 = index_set_out[offset + 36*i + 6];
+            IndexTupleType& t_7 = index_set_out[offset + 36*i + 7];
+            IndexTupleType& t_8 = index_set_out[offset + 36*i + 8];
+            IndexTupleType& t_9 = index_set_out[offset + 36*i + 9];
+            IndexTupleType& t_10 = index_set_out[offset + 36*i + 10];
+            IndexTupleType& t_11 = index_set_out[offset + 36*i + 11];
+            IndexTupleType& t_12 = index_set_out[offset + 36*i + 12];
+            IndexTupleType& t_13 = index_set_out[offset + 36*i + 13];
+            IndexTupleType& t_14 = index_set_out[offset + 36*i + 14];
+            IndexTupleType& t_15 = index_set_out[offset + 36*i + 15];
+            IndexTupleType& t_16 = index_set_out[offset + 36*i + 16];
+            IndexTupleType& t_17 = index_set_out[offset + 36*i + 17];
+            IndexTupleType& t_18 = index_set_out[offset + 36*i + 18];
+            IndexTupleType& t_19 = index_set_out[offset + 36*i + 19];
+            IndexTupleType& t_20 = index_set_out[offset + 36*i + 20];
+            IndexTupleType& t_21 = index_set_out[offset + 36*i + 21];
+            IndexTupleType& t_22 = index_set_out[offset + 36*i + 22];
+            IndexTupleType& t_23 = index_set_out[offset + 36*i + 23];
+            IndexTupleType& t_24 = index_set_out[offset + 36*i + 24];
+            IndexTupleType& t_25 = index_set_out[offset + 36*i + 25];
+            IndexTupleType& t_26 = index_set_out[offset + 36*i + 26];
+            IndexTupleType& t_27 = index_set_out[offset + 36*i + 27];
+            IndexTupleType& t_28 = index_set_out[offset + 36*i + 28];
+            IndexTupleType& t_29 = index_set_out[offset + 36*i + 29];
+            IndexTupleType& t_30 = index_set_out[offset + 36*i + 30];
+            IndexTupleType& t_31 = index_set_out[offset + 36*i + 31];
+            IndexTupleType& t_32 = index_set_out[offset + 36*i + 32];
+            IndexTupleType& t_33 = index_set_out[offset + 36*i + 33];
+            IndexTupleType& t_34 = index_set_out[offset + 36*i + 34];
+            IndexTupleType& t_35 = index_set_out[offset + 36*i + 35];
 
             // coarse edge triangles
             t_0[0] = ioc + i; // X
@@ -667,15 +667,15 @@ namespace FEAT
           const Index ioc = index_offsets[3];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<8> IndexSetTypeIn_v_c;
           typedef IndexSet<6> IndexSetTypeIn_q_c;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_v_c::ConstIndexVectorReference ConstIndexVectorReference_v_c;
-          typedef IndexSetTypeIn_q_c::ConstIndexVectorReference ConstIndexVectorReference_q_c;
+          typedef IndexSetTypeIn_v_c::IndexTupleType IndexTupleType_v_c;
+          typedef IndexSetTypeIn_q_c::IndexTupleType IndexTupleType_q_c;
 
           // fetch the vertices-at-hexas and quad-at-hexas index set
           const IndexSetTypeIn_v_c& index_set_in_v_c = index_set_holder_in.get_index_set<3,0>();
@@ -688,34 +688,34 @@ namespace FEAT
           for(Index i(0); i < num_cubes; ++i)
           {
             // fetch coarse mesh vertices-at-hexas and quad-at-hexas index vector
-            ConstIndexVectorReference_v_c v_c = index_set_in_v_c[i];
-            ConstIndexVectorReference_q_c q_c = index_set_in_q_c[i];
+            const IndexTupleType_v_c& v_c = index_set_in_v_c[i];
+            const IndexTupleType_q_c& q_c = index_set_in_q_c[i];
 
             // fetch fine mesh vertices-at-tetra index vectors
-            IndexVectorReference t_0 = index_set_out[offset + 24*i + 0];
-            IndexVectorReference t_1 = index_set_out[offset + 24*i + 1];
-            IndexVectorReference t_2 = index_set_out[offset + 24*i + 2];
-            IndexVectorReference t_3 = index_set_out[offset + 24*i + 3];
-            IndexVectorReference t_4 = index_set_out[offset + 24*i + 4];
-            IndexVectorReference t_5 = index_set_out[offset + 24*i + 5];
-            IndexVectorReference t_6 = index_set_out[offset + 24*i + 6];
-            IndexVectorReference t_7 = index_set_out[offset + 24*i + 7];
-            IndexVectorReference t_8 = index_set_out[offset + 24*i + 8];
-            IndexVectorReference t_9 = index_set_out[offset + 24*i + 9];
-            IndexVectorReference t_10 = index_set_out[offset + 24*i + 10];
-            IndexVectorReference t_11 = index_set_out[offset + 24*i + 11];
-            IndexVectorReference t_12 = index_set_out[offset + 24*i + 12];
-            IndexVectorReference t_13 = index_set_out[offset + 24*i + 13];
-            IndexVectorReference t_14 = index_set_out[offset + 24*i + 14];
-            IndexVectorReference t_15 = index_set_out[offset + 24*i + 15];
-            IndexVectorReference t_16 = index_set_out[offset + 24*i + 16];
-            IndexVectorReference t_17 = index_set_out[offset + 24*i + 17];
-            IndexVectorReference t_18 = index_set_out[offset + 24*i + 18];
-            IndexVectorReference t_19 = index_set_out[offset + 24*i + 19];
-            IndexVectorReference t_20 = index_set_out[offset + 24*i + 20];
-            IndexVectorReference t_21 = index_set_out[offset + 24*i + 21];
-            IndexVectorReference t_22 = index_set_out[offset + 24*i + 22];
-            IndexVectorReference t_23 = index_set_out[offset + 24*i + 23];
+            IndexTupleType& t_0 = index_set_out[offset + 24*i + 0];
+            IndexTupleType& t_1 = index_set_out[offset + 24*i + 1];
+            IndexTupleType& t_2 = index_set_out[offset + 24*i + 2];
+            IndexTupleType& t_3 = index_set_out[offset + 24*i + 3];
+            IndexTupleType& t_4 = index_set_out[offset + 24*i + 4];
+            IndexTupleType& t_5 = index_set_out[offset + 24*i + 5];
+            IndexTupleType& t_6 = index_set_out[offset + 24*i + 6];
+            IndexTupleType& t_7 = index_set_out[offset + 24*i + 7];
+            IndexTupleType& t_8 = index_set_out[offset + 24*i + 8];
+            IndexTupleType& t_9 = index_set_out[offset + 24*i + 9];
+            IndexTupleType& t_10 = index_set_out[offset + 24*i + 10];
+            IndexTupleType& t_11 = index_set_out[offset + 24*i + 11];
+            IndexTupleType& t_12 = index_set_out[offset + 24*i + 12];
+            IndexTupleType& t_13 = index_set_out[offset + 24*i + 13];
+            IndexTupleType& t_14 = index_set_out[offset + 24*i + 14];
+            IndexTupleType& t_15 = index_set_out[offset + 24*i + 15];
+            IndexTupleType& t_16 = index_set_out[offset + 24*i + 16];
+            IndexTupleType& t_17 = index_set_out[offset + 24*i + 17];
+            IndexTupleType& t_18 = index_set_out[offset + 24*i + 18];
+            IndexTupleType& t_19 = index_set_out[offset + 24*i + 19];
+            IndexTupleType& t_20 = index_set_out[offset + 24*i + 20];
+            IndexTupleType& t_21 = index_set_out[offset + 24*i + 21];
+            IndexTupleType& t_22 = index_set_out[offset + 24*i + 22];
+            IndexTupleType& t_23 = index_set_out[offset + 24*i + 23];
 
             // end up with X and use convention for tetrahedron index numbering (see wiki)
             // face 0
@@ -883,13 +883,13 @@ namespace FEAT
           const Index ioe = index_offsets[1];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<2> IndexSetTypeIn;
 
           // typedef index vector type
-          typedef IndexSetTypeIn::ConstIndexVectorReference ConstIndexVectorReference;
+          typedef IndexSetTypeIn::IndexTupleType IndexTupleTypeIn;
 
           // fetch the vertices-at-edge index set
           const IndexSetTypeIn& index_set_in = index_set_holder_in.get_index_set<1,0>();
@@ -901,11 +901,11 @@ namespace FEAT
           for(Index i(0); i < num_edges; ++i)
           {
             // fetch coarse mesh vertices-at-edge index vector
-            ConstIndexVectorReference v_e = index_set_in[i];
+            const IndexTupleTypeIn& v_e = index_set_in[i];
 
             // fetch fine mesh vertices-at-edge index vectors
-            IndexVectorReference e_0 = index_set_out[offset + 2*i+0];
-            IndexVectorReference e_1 = index_set_out[offset + 2*i+1];
+            IndexTupleType& e_0 = index_set_out[offset + 2*i+0];
+            IndexTupleType& e_1 = index_set_out[offset + 2*i+1];
 
             e_0[0] = iov + v_e[0];
             e_0[1] = ioe + i;
@@ -946,13 +946,13 @@ namespace FEAT
           const Index iot = index_offsets[2];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<3> IndexSetTypeIn;
 
           // typedef index vector type
-          typedef IndexSetTypeIn::ConstIndexVectorReference ConstIndexVectorReference;
+          typedef IndexSetTypeIn::IndexTupleType IndexTupleTypeIn;
 
           // fetch the edge-at-triangle index set
           const IndexSetTypeIn& index_set_in = index_set_holder_in.get_index_set<2,1>();
@@ -964,12 +964,12 @@ namespace FEAT
           for(Index i(0); i < num_trias; ++i)
           {
             // fetch coarse mesh edge-at-triangle index vector
-            ConstIndexVectorReference e_t = index_set_in[i];
+            const IndexTupleTypeIn& e_t = index_set_in[i];
 
             // fetch fine mesh vertices-at-edge index vectors
-            IndexVectorReference e_0 = index_set_out[offset + 3*i + 0];
-            IndexVectorReference e_1 = index_set_out[offset + 3*i + 1];
-            IndexVectorReference e_2 = index_set_out[offset + 3*i + 2];
+            IndexTupleType& e_0 = index_set_out[offset + 3*i + 0];
+            IndexTupleType& e_1 = index_set_out[offset + 3*i + 1];
+            IndexTupleType& e_2 = index_set_out[offset + 3*i + 2];
 
             // end with X
             e_0[0] = ioe + e_t[0]; // v_0
@@ -1014,13 +1014,13 @@ namespace FEAT
           const Index iotet = index_offsets[3];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<4> IndexSetTypeIn_t_tet;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_t_tet::ConstIndexVectorReference ConstIndexVectorReference_t_tet;
+          typedef IndexSetTypeIn_t_tet::IndexTupleType IndexTupleType_t_tet;
 
           // fetch the triangle-at-tetra
           const IndexSetTypeIn_t_tet& index_set_in_t_tet = index_set_holder_in.get_index_set<3,2>();
@@ -1032,13 +1032,13 @@ namespace FEAT
           for(Index i(0); i < num_tetras; ++i)
           {
             // fetch coarse mesh triangle-at-tetra index vector
-            ConstIndexVectorReference_t_tet t_tet = index_set_in_t_tet[i];
+            const IndexTupleType_t_tet& t_tet = index_set_in_t_tet[i];
 
             // fetch new mesh vertices-at-edge index vectors
-            IndexVectorReference e_0 = index_set_out[offset + 4*i + 0];
-            IndexVectorReference e_1 = index_set_out[offset + 4*i + 1];
-            IndexVectorReference e_2 = index_set_out[offset + 4*i + 2];
-            IndexVectorReference e_3 = index_set_out[offset + 4*i + 3];
+            IndexTupleType& e_0 = index_set_out[offset + 4*i + 0];
+            IndexTupleType& e_1 = index_set_out[offset + 4*i + 1];
+            IndexTupleType& e_2 = index_set_out[offset + 4*i + 2];
+            IndexTupleType& e_3 = index_set_out[offset + 4*i + 3];
 
 
             // end with X
@@ -1089,15 +1089,15 @@ namespace FEAT
           const Index iot = index_offsets[2];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<3> IndexSetTypeIn_v_t;
           typedef IndexSet<3> IndexSetTypeIn_e_t;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_v_t::ConstIndexVectorReference ConstIndexVectorReference_v_t;
-          typedef IndexSetTypeIn_e_t::ConstIndexVectorReference ConstIndexVectorReference_e_t;
+          typedef IndexSetTypeIn_v_t::IndexTupleType IndexTupleType_v_t;
+          typedef IndexSetTypeIn_e_t::IndexTupleType IndexTupleType_e_t;
 
           // fetch the vertices-at-triangle and edge-at-triangle index set
           const IndexSetTypeIn_v_t& index_set_in_v_t = index_set_holder_in.get_index_set<2,0>();
@@ -1110,13 +1110,13 @@ namespace FEAT
           for(Index i(0); i < num_trias; ++i)
           {
             // fetch coarse mesh vertices-at-triangle and edge-at-triangle index vector
-            ConstIndexVectorReference_v_t v_t = index_set_in_v_t[i];
-            ConstIndexVectorReference_e_t e_t = index_set_in_e_t[i];
+            const IndexTupleType_v_t& v_t = index_set_in_v_t[i];
+            const IndexTupleType_e_t& e_t = index_set_in_e_t[i];
 
             // fetch fine mesh vertices-at-quads index vectors
-            IndexVectorReference q_0 = index_set_out[offset + 3*i + 0];
-            IndexVectorReference q_1 = index_set_out[offset + 3*i + 1];
-            IndexVectorReference q_2 = index_set_out[offset + 3*i + 2];
+            IndexTupleType& q_0 = index_set_out[offset + 3*i + 0];
+            IndexTupleType& q_1 = index_set_out[offset + 3*i + 1];
+            IndexTupleType& q_2 = index_set_out[offset + 3*i + 2];
 
             // start with X and end with the corresponding corner
             // follow the convention in between (wiki)
@@ -1170,15 +1170,15 @@ namespace FEAT
           const Index iotet = index_offsets[3];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<6> IndexSetTypeIn_e_tet;
           typedef IndexSet<4> IndexSetTypeIn_t_tet;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_e_tet::ConstIndexVectorReference ConstIndexVectorReference_e_tet;
-          typedef IndexSetTypeIn_t_tet::ConstIndexVectorReference ConstIndexVectorReference_t_tet;
+          typedef IndexSetTypeIn_e_tet::IndexTupleType IndexTupleType_e_tet;
+          typedef IndexSetTypeIn_t_tet::IndexTupleType IndexTupleType_t_tet;
 
           // fetch the edge-at-tetra and triangle-at-tetra index set
           const IndexSetTypeIn_e_tet& index_set_in_e_tet = index_set_holder_in.get_index_set<3,1>();
@@ -1191,16 +1191,16 @@ namespace FEAT
           for(Index i(0); i < num_tetras; ++i)
           {
             // fetch coarse mesh edge-at-tetra and triangle-at-tetra index vector
-            ConstIndexVectorReference_e_tet e_tet = index_set_in_e_tet[i];
-            ConstIndexVectorReference_t_tet t_tet = index_set_in_t_tet[i];
+            const IndexTupleType_e_tet& e_tet = index_set_in_e_tet[i];
+            const IndexTupleType_t_tet& t_tet = index_set_in_t_tet[i];
 
             // fetch fine mesh vertices-at-quad index vectors
-            IndexVectorReference q_0 = index_set_out[offset + 6*i + 0];
-            IndexVectorReference q_1 = index_set_out[offset + 6*i + 1];
-            IndexVectorReference q_2 = index_set_out[offset + 6*i + 2];
-            IndexVectorReference q_3 = index_set_out[offset + 6*i + 3];
-            IndexVectorReference q_4 = index_set_out[offset + 6*i + 4];
-            IndexVectorReference q_5 = index_set_out[offset + 6*i + 5];
+            IndexTupleType& q_0 = index_set_out[offset + 6*i + 0];
+            IndexTupleType& q_1 = index_set_out[offset + 6*i + 1];
+            IndexTupleType& q_2 = index_set_out[offset + 6*i + 2];
+            IndexTupleType& q_3 = index_set_out[offset + 6*i + 3];
+            IndexTupleType& q_4 = index_set_out[offset + 6*i + 4];
+            IndexTupleType& q_5 = index_set_out[offset + 6*i + 5];
 
             // start with X move to the face with lower index
             // and end up with edge vertex index
@@ -1271,7 +1271,7 @@ namespace FEAT
           const Index iotet = index_offsets[3];
 
           // typedef index set vector reference for output index set
-          typedef IndexSetType::IndexVectorReference IndexVectorReference;
+          typedef IndexSetType::IndexTupleType IndexTupleType;
 
           // typedef index set types
           typedef IndexSet<4> IndexSetTypeIn_v_tet;
@@ -1279,9 +1279,9 @@ namespace FEAT
           typedef IndexSet<4> IndexSetTypeIn_t_tet;
 
           // typedef index vector type
-          typedef IndexSetTypeIn_v_tet::ConstIndexVectorReference ConstIndexVectorReference_v_tet;
-          typedef IndexSetTypeIn_e_tet::ConstIndexVectorReference ConstIndexVectorReference_e_tet;
-          typedef IndexSetTypeIn_t_tet::ConstIndexVectorReference ConstIndexVectorReference_t_tet;
+          typedef IndexSetTypeIn_v_tet::IndexTupleType IndexTupleType_v_tet;
+          typedef IndexSetTypeIn_e_tet::IndexTupleType IndexTupleType_e_tet;
+          typedef IndexSetTypeIn_t_tet::IndexTupleType IndexTupleType_t_tet;
 
           // fetch the vertices-at-tetra, edge-at-tetra and triangle-at-tetra index set
           const IndexSetTypeIn_v_tet& index_set_in_v_tet = index_set_holder_in.get_index_set<3,0>();
@@ -1295,15 +1295,15 @@ namespace FEAT
           for(Index i(0); i < num_tetras; ++i)
           {
             // fetch coarse mesh vertices-at-tetra, edge-at-tetra and triangle-at-tetra index vector
-            ConstIndexVectorReference_v_tet v_tet = index_set_in_v_tet[i];
-            ConstIndexVectorReference_e_tet e_tet = index_set_in_e_tet[i];
-            ConstIndexVectorReference_t_tet t_tet = index_set_in_t_tet[i];
+            const IndexTupleType_v_tet& v_tet = index_set_in_v_tet[i];
+            const IndexTupleType_e_tet& e_tet = index_set_in_e_tet[i];
+            const IndexTupleType_t_tet& t_tet = index_set_in_t_tet[i];
 
             // fetch fine mesh vertices-at-hexa index vectors
-            IndexVectorReference c_0 = index_set_out[offset + 4*i + 0];
-            IndexVectorReference c_1 = index_set_out[offset + 4*i + 1];
-            IndexVectorReference c_2 = index_set_out[offset + 4*i + 2];
-            IndexVectorReference c_3 = index_set_out[offset + 4*i + 3];
+            IndexTupleType& c_0 = index_set_out[offset + 4*i + 0];
+            IndexTupleType& c_1 = index_set_out[offset + 4*i + 1];
+            IndexTupleType& c_2 = index_set_out[offset + 4*i + 2];
+            IndexTupleType& c_3 = index_set_out[offset + 4*i + 3];
 
             // start with X. move the face with lowest index,
             // move to the next lowest face index and proceed according to

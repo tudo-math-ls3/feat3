@@ -6,7 +6,8 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/index_calculator.hpp>
-#include <kernel/geometry/mesh_attribute.hpp>
+#include <kernel/geometry/attribute_set.hpp>
+#include <kernel/geometry/intern/standard_attrib_refiner.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_subset_refiner.hpp>
 #include <kernel/geometry/intern/standard_target_refiner.hpp>
@@ -39,13 +40,13 @@ namespace FEAT
      * mesh it refers to.
      *
      * A MeshPart does not need to be connected or to have a topology, although it can implicitly use the parent's
-     * topology. It can have sets of MeshAttributes for each shape dimension. If the parent mesh is refine, it is
+     * topology. It can have sets of AttributeSets for each shape dimension. If the parent mesh is refine, it is
      * possible to use that information to create a refined version of the MeshPart, although particular care has to
-     * be taken when refining the MeshAttributes.
+     * be taken when refining the AttributeSets.
      *
      * A MeshPart can supply its own topology, which can be different from the parent's. One important example for
      * this is a MeshPart that defines the boundary of its parent mesh. If the boundary is parametrised using a
-     * MeshAttribute and the boundary is closed, the parametrisation requires the doubling of some mesh entities to
+     * AttributeSet and the boundary is closed, the parametrisation requires the doubling of some mesh entities to
      * correctly represent the parametrisation variable.
      *
      * \verbatim
@@ -83,9 +84,7 @@ namespace FEAT
      *
      */
     template<typename MeshType_>
-    class MeshPart
-    {
-    };
+    class MeshPart DOXY({});
 
     /**
      * \brief MeshPart Implementation for conformal meshes
@@ -96,23 +95,20 @@ namespace FEAT
      * \tparam num_coords_
      * Number of coordinates per vertex
      *
-     * \tparam stride_
-     * Padded num_coords_
-     *
      * \tparam Coord_
      * Data type for vertex coordinates, i.e. double
      *
      * \copydoc MeshPart
      *
      */
-    template<typename ShapeType_, int num_coords_, int stride_, typename Coord_>
-    class MeshPart<ConformalMesh<ShapeType_, num_coords_, stride_, Coord_>>
+    template<typename ShapeType_, int num_coords_, typename Coord_>
+    class MeshPart<ConformalMesh<ShapeType_, num_coords_, Coord_>>
     {
       public:
         /// Shape type
         typedef ShapeType_ ShapeType;
         /// Mesh type
-        typedef ConformalMesh<ShapeType, num_coords_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<ShapeType, num_coords_, Coord_> MeshType;
         /// Index set holder type
         typedef IndexSetHolder<ShapeType> IndexSetHolderType;
         /// Target set holder type
@@ -150,16 +146,16 @@ namespace FEAT
         /// Data type for attributes
         typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
         /// Type for mesh attributes
-        typedef MeshAttribute<AttributeDataType> MeshAttributeType;
+        typedef AttributeSet<AttributeDataType> AttributeSetType;
 
         /// submesh node bin container type
-        typedef std::map<String, MeshAttributeType*> MeshAttributeContainer;
+        typedef std::map<String, AttributeSetType*> AttributeSetContainer;
         /// submesh node iterator type
-        typedef typename MeshAttributeContainer::iterator MeshAttributeIterator;
+        typedef typename AttributeSetContainer::iterator AttributeSetIterator;
         /// submesh node const-iterator type
-        typedef typename MeshAttributeContainer::const_iterator MeshAttributeConstIterator;
+        typedef typename AttributeSetContainer::const_iterator AttributeSetConstIterator;
         /// submesh node reverse-iterator type
-        typedef typename MeshAttributeContainer::reverse_iterator MeshAttributeReverseIterator;
+        typedef typename AttributeSetContainer::reverse_iterator AttributeSetReverseIterator;
 
         /**
          * \brief Target set type class template.
@@ -184,12 +180,8 @@ namespace FEAT
         IndexSetHolderType* _index_set_holder;
         /// The target sets of the mesh.
         TargetSetHolderType _target_set_holder;
-        /// The vertex set of the mesh
-        MeshAttributeContainer _mesh_attributes;
-
-      private:
-        /// \brief Copy assignment operator
-        MeshPart& operator=(const MeshPart&);
+        /// The attribute sets of the mesh
+        AttributeSetContainer _mesh_attributes;
 
       public:
         /**
@@ -201,19 +193,18 @@ namespace FEAT
          *
          * \param[in] create_topology
          * Determines if the MeshPart is to have a mesh topology.
-         *
          */
         explicit MeshPart(const Index num_entities[], bool create_topology = false) :
           _index_set_holder(nullptr),
           _target_set_holder(num_entities),
           _mesh_attributes()
-          {
-            for(int i(0); i <= shape_dim; ++i)
-              _num_entities[i] = num_entities[i];
+        {
+          for(int i(0); i <= shape_dim; ++i)
+            _num_entities[i] = num_entities[i];
 
-            if(create_topology)
-              _index_set_holder = new IndexSetHolderType(num_entities);
-          }
+          if(create_topology)
+            _index_set_holder = new IndexSetHolderType(num_entities);
+        }
 
         /**
          * \brief Factory constructor
@@ -225,20 +216,19 @@ namespace FEAT
           _index_set_holder(nullptr),
           _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
           _mesh_attributes()
-          {
-            // Compute entity counts
-            Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
+        {
+          // Compute entity counts
+          Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
-            // Fill target sets
-            factory.fill_target_sets(_target_set_holder);
+          // Fill target sets
+          factory.fill_target_sets(_target_set_holder);
 
-            // Fill index sets
-            factory.fill_index_sets(_index_set_holder);
+          // Fill index sets
+          factory.fill_index_sets(_index_set_holder);
 
-            // Fill attribute sets
-            factory.fill_attribute_sets(_mesh_attributes);
-
-          }
+          // Fill attribute sets
+          factory.fill_attribute_sets(_mesh_attributes);
+        }
 
         /// Explicitly delete move constructor
         // This is just to avoid anyone using the implicitly generated one - it could be implemented if needed.
@@ -247,6 +237,12 @@ namespace FEAT
         /// Explicitly delete copy constructor. Objects of this class shall not be copied.
         MeshPart(const MeshPart&) = delete;
 
+        /// deleted Move assignment operator
+        MeshPart& operator=(MeshPart&&) = delete;
+
+        /// deleted Copy assignment operator
+        MeshPart& operator=(const MeshPart&) = delete;
+
         /// Virtual destructor
         virtual ~MeshPart()
         {
@@ -254,8 +250,8 @@ namespace FEAT
             delete _index_set_holder;
 
           // Loop over all mesh attributes in reverse order and delete them
-          MeshAttributeReverseIterator it(_mesh_attributes.rbegin());
-          MeshAttributeReverseIterator jt(_mesh_attributes.rend());
+          AttributeSetReverseIterator it(_mesh_attributes.rbegin());
+          AttributeSetReverseIterator jt(_mesh_attributes.rend());
           for(; it != jt; ++it)
           {
             if(it->second != nullptr)
@@ -313,16 +309,16 @@ namespace FEAT
          * \warning Will return nullptr if no Attribute with the given identifier is found
          *
          */
-        MeshAttributeType* find_attribute(const String& identifier)
+        AttributeSetType* find_attribute(const String& identifier)
         {
-          MeshAttributeIterator it(_mesh_attributes.find(identifier));
+          AttributeSetIterator it(_mesh_attributes.find(identifier));
           return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
         }
 
         /** \copydoc find_attribute() */
-        const MeshAttributeType* find_attribute(const String& identifier) const
+        const AttributeSetType* find_attribute(const String& identifier) const
         {
-          MeshAttributeConstIterator it(_mesh_attributes.find(identifier));
+          AttributeSetConstIterator it(_mesh_attributes.find(identifier));
           return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
         }
 
@@ -331,7 +327,7 @@ namespace FEAT
          *
          * \returns A const reference to the mesh attributes container
          */
-        const MeshAttributeContainer& get_mesh_attributes() const
+        const AttributeSetContainer& get_mesh_attributes() const
         {
           return _mesh_attributes;
         }
@@ -360,9 +356,9 @@ namespace FEAT
          * present, or false otherwise.
          *
          */
-        virtual bool add_attribute(MeshAttributeType* attribute, const String& identifier)
+        virtual bool add_attribute(AttributeSetType* attribute, const String& identifier)
         {
-          if(attribute != nullptr || (attribute->get_num_vertices() != get_num_entities(0)) )
+          if(attribute != nullptr || (attribute->get_num_values() != get_num_entities(0)) )
           {
             return (_mesh_attributes.insert( std::make_pair(identifier, attribute))).second;
           }
@@ -557,7 +553,7 @@ namespace FEAT
         /// Data type for attributes
         typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
-        typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename MeshPartType::AttributeSetContainer AttributeSetContainer;
         /// index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
         /// target set holder type
@@ -586,7 +582,7 @@ namespace FEAT
          * \param[in,out] attribute_set_holder
          * The attribute set holder whose attribute sets are to be filled.
          */
-        virtual void fill_attribute_sets(MeshAttributeContainer& attribute_set_holder) = 0;
+        virtual void fill_attribute_sets(AttributeSetContainer& attribute_set_holder) = 0;
 
         /**
          * \brief Fills the index sets.
@@ -621,9 +617,9 @@ namespace FEAT
         /// shape type
         typedef typename MeshType::ShapeType ShapeType;
         /// Attribute set type
-        typedef typename MeshType::MeshAttributeType AttributeType;
+        typedef typename MeshType::AttributeSetType AttributeType;
         /// index set holder type
-        typedef typename MeshType::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename MeshType::AttributeSetContainer AttributeSetContainer;
         /// index set holder type
         typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
         /// target set holder type
@@ -720,23 +716,23 @@ namespace FEAT
          * Container for the attribute sets being added to
          *
          */
-        virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
+        virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
         {
           // Attributes of shape dimension 0 only make sense if we have a mesh topology
           if(_coarse_mesh.has_topology())
           {
             // Iterate over the attributes in the coarse mesh
-            typename MeshType::MeshAttributeConstIterator it(_coarse_mesh.get_mesh_attributes().begin());
-            typename MeshType::MeshAttributeConstIterator jt(_coarse_mesh.get_mesh_attributes().end());
+            typename MeshType::AttributeSetConstIterator it(_coarse_mesh.get_mesh_attributes().begin());
+            typename MeshType::AttributeSetConstIterator jt(_coarse_mesh.get_mesh_attributes().end());
 
             for(; it != jt; ++it)
             {
               // Create a new empty attribute of the desired size
               AttributeType* refined_attribute = new AttributeType(
-                get_num_entities(0), it->second->get_num_coords(), 0);
+                get_num_entities(0), it->second->get_dimension());
 
               // Refine the attribute in the coarse mesh and write the result to the new attribute
-              Intern::StandardVertexRefineWrapper<ShapeType, AttributeType>
+              Intern::StandardAttribRefineWrapper<ShapeType, AttributeType>
                 ::refine(*refined_attribute, *(it->second), *_coarse_mesh.get_topology());
 
               // Add the attribute to the corresponding set
@@ -942,7 +938,7 @@ namespace FEAT
               for(int j(0); j < is_parent_above.get_num_indices(); ++j)
               {
                 // This is i.e. the global number of local edge j at face parent_index in the parent
-                Index parent_sub_entity_index(is_parent_above[parent_index][Index(j)]);
+                Index parent_sub_entity_index(is_parent_above(parent_index, j));
                 upper_origin_set[parent_sub_entity_index] = marker;
               }
             }
@@ -1057,15 +1053,15 @@ namespace FEAT
     /// \endcond
 
 #ifdef FEAT_EICKT
-    extern template class MeshPart<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
-    extern template class MeshPart<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
-    extern template class MeshPart<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
-    extern template class MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+    extern template class MeshPart<ConformalMesh<Shape::Simplex<2>, 2, Real>>;
+    extern template class MeshPart<ConformalMesh<Shape::Simplex<3>, 3, Real>>;
+    extern template class MeshPart<ConformalMesh<Shape::Hypercube<2>, 2, Real>>;
+    extern template class MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, Real>>;
 
-    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>>;
-    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>>;
-    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>>;
-    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>>;
+    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Simplex<2>, 2, Real>>>;
+    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Simplex<3>, 3, Real>>>;
+    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<2>, 2, Real>>>;
+    extern template class StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, Real>>>;
 #endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT

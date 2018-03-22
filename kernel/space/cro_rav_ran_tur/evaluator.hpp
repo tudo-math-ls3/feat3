@@ -391,7 +391,7 @@ namespace FEAT
           for(int i(0); i < 4; ++i)
           {
             // initialise facet evaluator
-            facet_eval.prepare(Index(facet_index_set(cell, Index(i))));
+            facet_eval.prepare(Index(facet_index_set(cell, i)));
 
             // map first cubature point
             facet_eval(facet_data, g1);
@@ -662,7 +662,7 @@ namespace FEAT
           for(int i(0); i < 6; ++i)
           {
             // initialise facet evaluator
-            facet_eval.prepare(Index(facet_index_set(cell, Index(i))));
+            facet_eval.prepare(Index(facet_index_set(cell, i)));
 
             // map first cubature point
             facet_eval(facet_data, g1);

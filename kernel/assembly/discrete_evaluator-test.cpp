@@ -45,7 +45,7 @@ public:
   void test_fe_eval(Index level, DataType val_tol, DataType grad_tol) const
   {
     typedef Shape::Hypercube<dim> ShapeType;
-    typedef Geometry::ConformalMesh<ShapeType, dim, dim, DataType> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType, dim, DataType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Trafo::InverseMapping<TrafoType, DataType> InvMappingType;
     typedef Space::Lagrange2::Element<TrafoType> SpaceType;

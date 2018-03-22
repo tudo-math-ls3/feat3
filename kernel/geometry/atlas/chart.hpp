@@ -280,7 +280,7 @@ namespace FEAT
             typedef typename MT_::VertexSetType VertexSetType;
 
             // attribute type of our mesh part
-            typedef typename PT_::MeshAttributeType AttributeType;
+            typedef typename PT_::AttributeSetType AttributeSetType;
 
             // First of all, check whether the chart can really perform
             // explicit adaption
@@ -288,12 +288,12 @@ namespace FEAT
               return false;
 
             // Try to fetch the parametrisation attribute.
-            const AttributeType* attrib = part.find_attribute("param");
+            const AttributeSetType* attrib = part.find_attribute("param");
             if(attrib == nullptr)
               return false;
 
             // We have the attribute; check whether it matches our chart
-            int attrib_dim = attrib->get_num_coords();
+            int attrib_dim = attrib->get_dimension();
             XASSERTM(attrib_dim == CT_::param_dim, "Invalid chart attribute dimension");
 
             // Get the vertex set of the mesh
@@ -309,7 +309,7 @@ namespace FEAT
               // apply the chart's map function
               chart.map_param(
                  reinterpret_cast<      WorldPoint&>(vtx[vidx[i]]),
-                *reinterpret_cast<const ParamPoint*>((*attrib)[i])
+                *reinterpret_cast<const ParamPoint*>(attrib->raw_at(i))
                 );
             }
 
@@ -357,7 +357,7 @@ namespace FEAT
         /// mesh-part type
         typedef typename BaseClass::PartType PartType;
         /// attribute type of our mesh-part
-        typedef typename PartType::MeshAttributeType AttributeType;
+        typedef typename PartType::AttributeSetType AttributeSetType;
         /// vertex set type of our mesh
         typedef typename MeshType::VertexSetType VertexSetType;
         /// coordinate type

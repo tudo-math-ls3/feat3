@@ -19,14 +19,13 @@ namespace FEAT
     template<
       typename Shape_,
       int num_coords_,
-      int stride_,
       typename Coord_>
-    class MacroFactory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
-      public Factory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
+    class MacroFactory<ConformalMesh<Shape_, num_coords_, Coord_> > :
+      public Factory<ConformalMesh<Shape_, num_coords_, Coord_> >
     {
     public:
       /// mesh typedef
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
       /// index holder type
@@ -57,18 +56,11 @@ namespace FEAT
 
         // fetch base-mesh vertex set
         const VertexSetType& vertex_set_in(_base_mesh.get_vertex_set());
-        typedef typename VertexSetType::VertexReference VertexRef;
-        typedef typename VertexSetType::ConstVertexReference VertexConstRef;
 
         // loop over all vertices
         for(Index i(0); i < Index(IndexSetType::num_indices); ++i)
         {
-          VertexRef vo(vertex_set[i]);
-          VertexConstRef vi(vertex_set_in[idx(_cell_idx, i)]);
-          for(int j(0); j < num_coords_; ++j)
-          {
-            vo[j] = vi[j];
-          }
+          vertex_set[i] = vertex_set_in[idx(_cell_idx, i)];
         }
       }
 
@@ -89,7 +81,7 @@ namespace FEAT
 
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
       typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
-      typedef typename MeshType::MeshAttributeContainer MeshAttributeContainer;
+      typedef typename MeshType::AttributeSetContainer AttributeSetContainer;
 
     protected:
       const BaseMesh_& _base_mesh;
@@ -108,7 +100,7 @@ namespace FEAT
         return Index(Intern::DynamicNumFaces<ShapeType>::value(dim));
       }
 
-      virtual void fill_attribute_sets(MeshAttributeContainer&) override
+      virtual void fill_attribute_sets(AttributeSetContainer&) override
       {
         // nothing to do here
       }
@@ -125,7 +117,6 @@ namespace FEAT
         // fill remaining indices
         Intern::MacroTargetWrapper<ShapeType>::build(target_set_holder, _base_mesh.get_index_set_holder(), _cell_idx);
       }
-
     };
     /// \endcond
   } // namespace Geometry

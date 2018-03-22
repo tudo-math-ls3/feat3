@@ -141,8 +141,8 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 int run(int argc, char* argv[])
 {
   // This is the list of all supported meshes that could appear in the mesh file
-  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> S2M2D;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> H2M2D;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, Real> S2M2D;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, Real> H2M2D;
 
   SimpleArgParser args(argc, argv);
 

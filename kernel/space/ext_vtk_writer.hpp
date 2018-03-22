@@ -587,7 +587,7 @@ namespace FEAT
             _ofs << num_idx;
             for(int j(0); j < num_idx; ++j)
             {
-              _ofs << " " << voff + idx[i][Index(VTKHelperType::map(j))];
+              _ofs << " " << voff + idx(i,VTKHelperType::map(j));
             }
             _ofs << std::endl;
           }

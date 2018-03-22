@@ -94,12 +94,12 @@ namespace FEAT
         Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
       }
 
-      virtual void fill_attribute_sets(typename MeshType::MeshAttributeContainer& DOXY(attribute_container)) override
+      virtual void fill_attribute_sets(typename MeshType::AttributeSetContainer&) override
       {
         // do nothing as the object has no attribute sets
       }
 
-      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder)) override
+      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*&) override
       {
         // do nothing as the object has no index sets
       }

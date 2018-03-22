@@ -63,7 +63,7 @@ namespace FEAT
             for(int j(0); j < facet_idx.num_indices; ++j)
             {
               // Index of the facet
-              Index l(facet_idx[k][Index(j)]);
+              Index l(facet_idx[k][j]);
 
               if(shared_by[l][0] == ~Index(0))
                 shared_by[l][0] = k;
@@ -81,7 +81,7 @@ namespace FEAT
             for(int j(0); j < facet_idx.num_indices; ++j)
             {
               // Index of the facet
-              Index l(facet_idx[k][Index(j)]);
+              Index l(facet_idx[k][j]);
 
               if(shared_by[l][0] == k)
                 neighbours[k][j] = shared_by[l][1];

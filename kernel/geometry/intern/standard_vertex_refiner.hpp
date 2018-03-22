@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_STANDARD_VERTEX_REFINER_HPP 1
 
 // includes, FEAT
-#include <kernel/geometry/intern/vertex_abacus.hpp>
+#include <kernel/geometry/vertex_set.hpp>
 #include <kernel/geometry/intern/standard_refinement_traits.hpp>
 
 namespace FEAT
@@ -34,17 +34,14 @@ namespace FEAT
           const VertexSetType& vertex_set_in)
         {
           // get the number of coarse mesh vertices
-          Index num_verts = vertex_set_in.get_num_vertices();
-          XASSERT(vertex_set_out.get_num_vertices() >= num_verts);
-
-          // create a vertex-abacus object
-          VertexAbacus<VertexSetType> abacus(vertex_set_in);
+          const Index num_verts = vertex_set_in.get_num_vertices();
+          XASSERT(vertex_set_out.get_num_vertices() >= offset+num_verts);
 
           // loop over all vertices
           for(Index i(0); i < num_verts; ++i)
           {
             // copy source vertex
-            abacus.copy(vertex_set_out[offset + i], vertex_set_in[i]);
+            vertex_set_out[offset + i] = vertex_set_in[i];
           }
 
           // return number of created vertices
@@ -72,8 +69,8 @@ namespace FEAT
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
-          typedef typename VertexSetType::VertexReference VertexReference;
+          typedef typename IndexSetType::IndexTupleType IndexTupleType;
+          typedef typename VertexSetType::VertexType VertexType;
           typedef typename VertexSetType::CoordType CoordType;
 
           // scaling factor
@@ -81,30 +78,25 @@ namespace FEAT
 
           // get number of cells
           Index num_cells = index_set_in.get_num_entities();
-
-          // create a vertex abacus object
-          VertexAbacus<VertexSetType> abacus(vertex_set_in);
+          XASSERT(vertex_set_out.get_num_vertices() >= offset+num_cells);
 
           // loop over all cells
           for(Index i(0); i < num_cells; ++i)
           {
             // get input index vector
-            ConstIndexVectorReference idx_in = index_set_in[i];
+            const IndexTupleType& idx_in = index_set_in[i];
 
             // get output vertex
-            VertexReference vtx_out = vertex_set_out[offset + i];
+            VertexType& vtx_out = vertex_set_out[offset + i];
 
             // clear output vertex
-            abacus.clear(vtx_out);
+            vtx_out.format();
 
             // add all other vertices onto it
             for(int k(0); k < IndexSetType::num_indices; ++k)
             {
-              abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
+              vtx_out.axpy(scale, vertex_set_in[idx_in[k]]);
             }
-
-            // scale the output vertex
-            abacus.scale(vtx_out, scale);
           }
 
           // return number of created vertices
@@ -113,15 +105,16 @@ namespace FEAT
       }; // struct StandardVertexRefiner<Hypercube<...>,...>
 
       /**
-       * \brief Vertex refiner implementation for Simplex<1> shape
+       * \brief Vertex refiner implementation for Simplex<...> shape
        *
        * \author Constantin Christof
        */
       template<
+        int cell_dim_,
         typename VertexSet_>
-      struct StandardVertexRefiner<Shape::Simplex<1>, VertexSet_>
+      struct StandardVertexRefiner<Shape::Simplex<cell_dim_>, VertexSet_>
       {
-        typedef Shape::Simplex<1> ShapeType;
+        typedef Shape::Simplex<cell_dim_> ShapeType;
         typedef IndexSet<Shape::FaceTraits<ShapeType, 0>::count> IndexSetType;
         typedef VertexSet_ VertexSetType;
 
@@ -131,8 +124,8 @@ namespace FEAT
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
-          typedef typename VertexSetType::VertexReference VertexReference;
+          typedef typename IndexSetType::IndexTupleType IndexTupleType;
+          typedef typename VertexSetType::VertexType VertexType;
           typedef typename VertexSetType::CoordType CoordType;
 
           // scaling factor
@@ -140,30 +133,25 @@ namespace FEAT
 
           // get number of cells
           Index num_cells = index_set_in.get_num_entities();
-
-          // create a vertex abacus object
-          VertexAbacus<VertexSetType> abacus(vertex_set_in);
+          XASSERT(vertex_set_out.get_num_vertices() >= offset+num_cells);
 
           // loop over all cells
           for(Index i(0); i < num_cells; ++i)
           {
             // get input index vector
-            ConstIndexVectorReference idx_in = index_set_in[i];
+            const IndexTupleType& idx_in = index_set_in[i];
 
             // get output vertex
-            VertexReference vtx_out = vertex_set_out[offset + i];
+            VertexType& vtx_out = vertex_set_out[offset + i];
 
             // clear output vertex
-            abacus.clear(vtx_out);
+            vtx_out.format();
 
             // add all other vertices onto it
             for(int k(0); k < IndexSetType::num_indices; ++k)
             {
-              abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
+              vtx_out.axpy(scale, vertex_set_in[idx_in[k]]);
             }
-
-            // scale the output vertex
-            abacus.scale(vtx_out, scale);
           }
 
           // return number of created vertices
@@ -194,65 +182,6 @@ namespace FEAT
           return 0;
         }
       }; // struct StandardVertexRefiner<Simplex<...>,...>
-
-      /**
-       * \brief Vertex refiner implementation for Simplex<3> shape
-       *
-       * \author Constantin Christof
-       */
-      template<
-        typename VertexSet_>
-      struct StandardVertexRefiner<Shape::Simplex<3>, VertexSet_>
-      {
-        typedef Shape::Simplex<3> ShapeType;
-        typedef IndexSet<Shape::FaceTraits<ShapeType, 0>::count> IndexSetType;
-        typedef VertexSet_ VertexSetType;
-
-        static Index refine(
-          Index offset,
-          VertexSetType& vertex_set_out,
-          const VertexSetType& vertex_set_in,
-          const IndexSetType& index_set_in)
-        {
-          typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
-          typedef typename VertexSetType::VertexReference VertexReference;
-          typedef typename VertexSetType::CoordType CoordType;
-
-          // scaling factor
-          static const CoordType scale = CoordType(1) / CoordType(IndexSetType::num_indices);
-
-          // get number of cells
-          Index num_cells = index_set_in.get_num_entities();
-
-          // create a vertex abacus object
-          VertexAbacus<VertexSetType> abacus(vertex_set_in);
-
-          // loop over all cells
-          for(Index i(0); i < num_cells; ++i)
-          {
-            // get input index vector
-            ConstIndexVectorReference idx_in = index_set_in[i];
-
-            // get output vertex
-            VertexReference vtx_out = vertex_set_out[offset + i];
-
-            // clear output vertex
-            abacus.clear(vtx_out);
-
-            // add all other vertices onto it
-            for(int k(0); k < IndexSetType::num_indices; ++k)
-            {
-              abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
-            }
-
-            // scale the output vertex
-            abacus.scale(vtx_out, scale);
-          }
-
-          // return number of created vertices
-          return num_cells;
-        }
-      }; // struct StandardVertexRefiner<Simplex<3>,...>
 
       /**
        * \brief Standard Vertex Refinement Wrapper class template

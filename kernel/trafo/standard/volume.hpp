@@ -187,7 +187,7 @@ namespace FEAT
             {
               for(int j(0); j < shape_dim_; j++)
               {
-                A(i,j) = DataType_(vtx[idx(cell,Index(j+1))][i]) - DataType_(vtx[idx(cell,0)][i]);
+                A(i,j) = DataType_(vtx[idx(cell,j+1)][i]) - DataType_(vtx[idx(cell,0)][i]);
               }
             }
 

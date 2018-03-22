@@ -159,11 +159,11 @@ namespace FEAT
        * \returns
        * The index of the local face \p j on entity \p i.
        */
-      Index operator()(Index i, Index j) const
+      Index operator()(Index i, int j) const
       {
         ASSERT(i < Index(_num_entities));
-        ASSERT(j < Index(num_indices));
-        return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(i, j, _num_slices);
+        ASSERT(j < num_indices);
+        return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(i, Index(j), _num_slices);
       }
 
       /* *************************************************************************************** */

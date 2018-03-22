@@ -129,9 +129,9 @@ namespace FEAT
       /** \copydoc DofMappingBase::get_index() */
       Index get_index(int local_dof_idx) const
       {
-        Index ldi_q = Index(local_dof_idx) / dofs_per_cell_;
-        Index ldi_r = Index(local_dof_idx) % dofs_per_cell_;
-        return Index(dofs_per_cell_) * _index_set(this->_cell_index, ldi_q) + ldi_r;
+        int ldi_q = local_dof_idx / dofs_per_cell_;
+        int ldi_r = local_dof_idx % dofs_per_cell_;
+        return Index(dofs_per_cell_) * _index_set(this->_cell_index, ldi_q) + Index(ldi_r);
       }
     };
 
@@ -261,7 +261,7 @@ namespace FEAT
           Index offs(UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::assemble(dof_idx, mesh, cell, k));
 
           const auto& index_set(mesh.template get_index_set<shape_dim_, cell_dim_>());
-          for(Index i(0); i < Index(cell_count); ++i)
+          for(int i(0); i < cell_count; ++i)
           {
             for(int j(0); j < dofs_per_cell; ++j, ++k)
             {
@@ -332,7 +332,7 @@ namespace FEAT
           {
             for(int j(0); j < dofs_per_cell; ++j, ++k)
             {
-              dof_idx[k] = index_set(cell,Index(i)) * dofs_per_cell + Index(j);
+              dof_idx[k] = index_set(cell,i) * dofs_per_cell + Index(j);
             }
           }
           return Index(dofs_per_cell) * mesh.get_num_entities(0);

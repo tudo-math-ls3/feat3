@@ -108,7 +108,7 @@ namespace FEAT
           typedef IndexSet<2> IndexSetTypeEV;
 
           // typedef index vector type
-          typedef IndexSetTypeEV::IndexVectorType IndexVectorTypeEV;
+          typedef IndexSetTypeEV::IndexTupleType IndexTupleTypeEV;
 
           // fetch the edge-vertex index sets
           const IndexSetTypeEV& index_src_e_v = index_set_holder_src.get_index_set<1,0>();
@@ -126,10 +126,10 @@ namespace FEAT
             const Index trg_e = target_set_e[i];
 
             // fetch target edge-vert index vector
-            const IndexVectorTypeEV& trg_e_v = index_trg_e_v[trg_e];
+            const IndexTupleTypeEV& trg_e_v = index_trg_e_v[trg_e];
 
             // fetch source edge-vert index vector
-            const IndexVectorTypeEV& src_e_v = index_src_e_v[i];
+            const IndexTupleTypeEV& src_e_v = index_src_e_v[i];
 
             // create a target-index mapping object
             TargetIndexMappingType tim(trg_e_v, src_e_v, target_set_v);
@@ -201,7 +201,7 @@ namespace FEAT
           typedef IndexSet<3> IndexSetTypeTV;
 
           // typedef index vector type
-          typedef IndexSetTypeTV::IndexVectorType IndexVectorTypeTV;
+          typedef IndexSetTypeTV::IndexTupleType IndexTupleTypeTV;
 
           // fetch the tria-vertex index sets
           const IndexSetTypeTV& index_src_t_v = index_set_holder_src.get_index_set<2,0>();
@@ -219,10 +219,10 @@ namespace FEAT
             const Index trg_t = target_set_t[i];
 
             // fetch target triangle-vert index vector
-            const IndexVectorTypeTV& trg_t_v = index_trg_t_v[trg_t];
+            const IndexTupleTypeTV& trg_t_v = index_trg_t_v[trg_t];
 
             // fetch source edge-vert index vector
-            const IndexVectorTypeTV& src_t_v = index_src_t_v[i];
+            const IndexTupleTypeTV& src_t_v = index_src_t_v[i];
 
             // create a target-index mapping object
             TargetIndexMappingType tim(trg_t_v, src_t_v, target_set_v);
@@ -271,7 +271,7 @@ namespace FEAT
           typedef IndexSet<3> IndexSetTypeTV;
 
           // typedef index vector type
-          typedef IndexSetTypeTV::IndexVectorType IndexVectorTypeTV;
+          typedef IndexSetTypeTV::IndexTupleType IndexTupleTypeTV;
 
           // fetch the tria-vertex index sets
           const IndexSetTypeTV& index_src_t_v = index_set_holder_src.get_index_set<2,0>();
@@ -289,10 +289,10 @@ namespace FEAT
             const Index trg_t = target_set_t[i];
 
             // fetch target tria-vert index vector
-            const IndexVectorTypeTV& trg_t_v = index_trg_t_v[trg_t];
+            const IndexTupleTypeTV& trg_t_v = index_trg_t_v[trg_t];
 
             // fetch source edge-vert index vector
-            const IndexVectorTypeTV& src_t_v = index_src_t_v[i];
+            const IndexTupleTypeTV& src_t_v = index_src_t_v[i];
 
             // create a target-index mapping object
             TargetIndexMappingType tim(trg_t_v, src_t_v, target_set_v);
@@ -442,7 +442,7 @@ namespace FEAT
           typedef IndexSet<2> IndexSetTypeEV;
 
           // typedef index vector type
-          typedef IndexSetTypeEV::IndexVectorType IndexVectorTypeEV;
+          typedef IndexSetTypeEV::IndexTupleType IndexTupleTypeEV;
 
           // fetch the edge-vertex index sets
           const IndexSetTypeEV& index_src_e_v = index_set_holder_src.get_index_set<1,0>();
@@ -460,10 +460,10 @@ namespace FEAT
             const Index trg_e = target_set_e[i];
 
             // fetch target edge-vert index vector
-            const IndexVectorTypeEV& trg_e_v = index_trg_e_v[trg_e];
+            const IndexTupleTypeEV& trg_e_v = index_trg_e_v[trg_e];
 
             // fetch source edge-vert index vector
-            const IndexVectorTypeEV& src_e_v = index_src_e_v[i];
+            const IndexTupleTypeEV& src_e_v = index_src_e_v[i];
 
             // create a target-index mapping object
             TargetIndexMappingType tim(trg_e_v, src_e_v, target_set_v);
@@ -512,7 +512,7 @@ namespace FEAT
           typedef IndexSet<4> IndexSetTypeQV;
 
           // typedef index vector type
-          typedef IndexSetTypeQV::IndexVectorType IndexVectorTypeQV;
+          typedef IndexSetTypeQV::IndexTupleType IndexTupleTypeQV;
 
           // fetch the quad-vertex index sets
           const IndexSetTypeQV& index_src_q_v = index_set_holder_src.get_index_set<2,0>();
@@ -530,10 +530,10 @@ namespace FEAT
             const Index trg_q = target_set_q[i];
 
             // fetch target quad-vert index vector
-            const IndexVectorTypeQV& trg_q_v = index_trg_q_v[trg_q];
+            const IndexTupleTypeQV& trg_q_v = index_trg_q_v[trg_q];
 
             // fetch source edge-vert index vector
-            const IndexVectorTypeQV& src_q_v = index_src_q_v[i];
+            const IndexTupleTypeQV& src_q_v = index_src_q_v[i];
 
             // create a target-index mapping object
             TargetIndexMappingType tim(trg_q_v, src_q_v, target_set_v);
@@ -585,7 +585,7 @@ namespace FEAT
           typedef IndexSet<4> IndexSetTypeQV;
 
           // typedef index vector type
-          typedef IndexSetTypeQV::IndexVectorType IndexVectorTypeQV;
+          typedef IndexSetTypeQV::IndexTupleType IndexTupleTypeQV;
 
           // fetch the quad-vertex index sets
           const IndexSetTypeQV& index_src_q_v = index_set_holder_src.get_index_set<2,0>();
@@ -603,10 +603,10 @@ namespace FEAT
             const Index trg_q = target_set_q[i];
 
             // fetch target quad-vert index vector
-            const IndexVectorTypeQV& trg_q_v = index_trg_q_v[trg_q];
+            const IndexTupleTypeQV& trg_q_v = index_trg_q_v[trg_q];
 
             // fetch source edge-vert index vector
-            const IndexVectorTypeQV& src_q_v = index_src_q_v[i];
+            const IndexTupleTypeQV& src_q_v = index_src_q_v[i];
 
             // create a target-index mapping object
             TargetIndexMappingType tim(trg_q_v, src_q_v, target_set_v);

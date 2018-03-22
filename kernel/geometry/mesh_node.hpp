@@ -7,8 +7,8 @@
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/macro_factory.hpp>
-#include <kernel/geometry/patch_factory.hpp>
-#include <kernel/geometry/patch_halo_builder.hpp>
+#include <kernel/geometry/patch_halo_factory.hpp>
+#include <kernel/geometry/patch_mesh_factory.hpp>
 #include <kernel/geometry/patch_meshpart_factory.hpp>
 #include <kernel/geometry/patch_meshpart_splitter.hpp>
 #include <kernel/geometry/partition_set.hpp>
@@ -920,11 +920,11 @@ namespace FEAT
           this->add_mesh_part(String("_patch:") + stringify(rank), patch_mesh_part);
         }
 
-        // Step 3: Create root mesh of partition by using PatchFactory
+        // Step 3: Create root mesh of partition by using PatchMeshFactory
         MeshType* patch_root_mesh = nullptr;
         {
           // create patch root mesh
-          PatchFactory<MeshType> patch_factory(*base_root_mesh, *patch_mesh_part);
+          PatchMeshFactory<MeshType> patch_factory(*base_root_mesh, *patch_mesh_part);
           patch_root_mesh = new MeshType(patch_factory);
         }
 
@@ -967,17 +967,17 @@ namespace FEAT
 
         // Step 6: Create halos
         {
-          // create halo builder
-          PatchHaloBuilder<MeshType> halo_builder(elems_at_rank, *base_root_mesh, *patch_mesh_part);
+          // create halo factory
+          PatchHaloFactory<MeshType> halo_factory(elems_at_rank, *base_root_mesh, *patch_mesh_part);
 
           // loop over all comm ranks
           for(auto it = comm_ranks.begin(); it != comm_ranks.end(); ++it)
           {
             // build halo
-            halo_builder.build(Index(*it));
+            halo_factory.build(Index(*it));
 
             // create halo mesh part
-            MeshPartType* halo_part = new MeshPartType(halo_builder);
+            MeshPartType* halo_part = new MeshPartType(halo_factory);
 
             // insert into patch mesh node
             patch_node->add_mesh_part(String("_halo:") + stringify(*it), halo_part);
@@ -1039,20 +1039,20 @@ namespace FEAT
     }; // class RootMeshNode
 
 #ifdef FEAT_EICKT
-    extern template class MeshNode<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>, ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
-    extern template class MeshNode<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>, ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
-    extern template class MeshNode<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>, ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
-    extern template class MeshNode<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>, ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+    extern template class MeshNode<ConformalMesh<Shape::Simplex<2>, 2, Real>, ConformalMesh<Shape::Simplex<2>, 2, Real>>;
+    extern template class MeshNode<ConformalMesh<Shape::Simplex<3>, 3, Real>, ConformalMesh<Shape::Simplex<3>, 3, Real>>;
+    extern template class MeshNode<ConformalMesh<Shape::Hypercube<2>, 2, Real>, ConformalMesh<Shape::Hypercube<2>, 2, Real>>;
+    extern template class MeshNode<ConformalMesh<Shape::Hypercube<3>, 3, Real>, ConformalMesh<Shape::Hypercube<3>, 3, Real>>;
 
-    extern template class MeshNode<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>, MeshPart<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>>;
-    extern template class MeshNode<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>, MeshPart<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>>;
-    extern template class MeshNode<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>, MeshPart<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>>;
-    extern template class MeshNode<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>, MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>>;
+    extern template class MeshNode<ConformalMesh<Shape::Simplex<2>, 2, Real>, MeshPart<ConformalMesh<Shape::Simplex<2>, 2, Real>>>;
+    extern template class MeshNode<ConformalMesh<Shape::Simplex<3>, 3, Real>, MeshPart<ConformalMesh<Shape::Simplex<3>, 3, Real>>>;
+    extern template class MeshNode<ConformalMesh<Shape::Hypercube<2>, 2, Real>, MeshPart<ConformalMesh<Shape::Hypercube<2>, 2, Real>>>;
+    extern template class MeshNode<ConformalMesh<Shape::Hypercube<3>, 3, Real>, MeshPart<ConformalMesh<Shape::Hypercube<3>, 3, Real>>>;
 
-    extern template class RootMeshNode<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
-    extern template class RootMeshNode<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
-    extern template class RootMeshNode<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
-    extern template class RootMeshNode<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+    extern template class RootMeshNode<ConformalMesh<Shape::Simplex<2>, 2, Real>>;
+    extern template class RootMeshNode<ConformalMesh<Shape::Simplex<3>, 3, Real>>;
+    extern template class RootMeshNode<ConformalMesh<Shape::Hypercube<2>, 2, Real>>;
+    extern template class RootMeshNode<ConformalMesh<Shape::Hypercube<3>, 3, Real>>;
 #endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT

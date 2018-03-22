@@ -40,9 +40,6 @@ namespace FEAT
      * \tparam num_coords_
      * World dimension
      *
-     * \tparam stride_
-     * Stride for world dimension coordinate vectors
-     *
      * \tparam Coord_
      * Floating point type for vertex coordinates
      *
@@ -50,10 +47,11 @@ namespace FEAT
      * first and can later be used to create several MeshParts referring to the PatchMeshPart by calling build() and
      * then the Factory interface, one at a time.
      *
+     * \author Jordi Paul
      */
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class PatchMeshPartSplitter<Geometry::ConformalMesh<Shape_, num_coords_, stride_, Coord_>> :
-    public Factory<MeshPart<Geometry::ConformalMesh<Shape_, num_coords_, stride_, Coord_>>>
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class PatchMeshPartSplitter<Geometry::ConformalMesh<Shape_, num_coords_, Coord_>> :
+    public Factory<MeshPart<Geometry::ConformalMesh<Shape_, num_coords_, Coord_>>>
     {
       public:
         /// Our shape type
@@ -61,13 +59,13 @@ namespace FEAT
         /// The shape dimension
         static constexpr int shape_dim = ShapeType::dimension;
         /// The mesh type
-        typedef Geometry::ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+        typedef Geometry::ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         /// The MeshPart type
         typedef Geometry::MeshPart<MeshType> MeshPartType;
         /// Data type for attributes
         typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
-        typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename MeshPartType::AttributeSetContainer AttributeSetContainer;
         /// Index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
         /// Target set holder type
@@ -80,7 +78,7 @@ namespace FEAT
         const MeshPartType& _patch_mesh_part;
 
         /// The mesh attributes of the current BaseMesh MeshPart
-        const MeshAttributeContainer* __cur_part_attribute_container;
+        const AttributeSetContainer* _cur_part_attribute_container;
         /// The topology of the current BaseMesh MeshPart
         const IndexSetHolder<ShapeType>* _cur_part_topology;
         /// The BaseMesh MeshPart to PatchMeshPart MeshPart mapping information
@@ -99,7 +97,7 @@ namespace FEAT
         explicit PatchMeshPartSplitter(const MeshType& base_mesh, const MeshPartType& patch_mesh_part) :
           _base_mesh(base_mesh),
           _patch_mesh_part(patch_mesh_part),
-          __cur_part_attribute_container(nullptr),
+          _cur_part_attribute_container(nullptr),
           _cur_part_topology(nullptr),
           _part_holder(patch_mesh_part.get_target_set_holder())
           {
@@ -125,7 +123,7 @@ namespace FEAT
         bool build(const MeshPartType& mesh_part)
         {
           _cur_part_topology = mesh_part.get_topology();
-          __cur_part_attribute_container = &(mesh_part.get_mesh_attributes());
+          _cur_part_attribute_container = &(mesh_part.get_mesh_attributes());
           return _part_holder.build(mesh_part.get_target_set_holder(), mesh_part.get_topology());
         }
 
@@ -153,9 +151,9 @@ namespace FEAT
          * \param[in,out] attribute_container
          * The attribute set holder whose attribute sets are to be filled.
          */
-        virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
+        virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
         {
-          _part_holder.fill_attribute_sets(attribute_container, *__cur_part_attribute_container);
+          _part_holder.fill_attribute_sets(attribute_container, *_cur_part_attribute_container);
         }
 
         /**
@@ -214,6 +212,7 @@ namespace FEAT
      * information so that the Factory interface can then be used to create the real PatchMeshPart MeshPart. One
      * at a time, that is.
      *
+     * \author Jordi Paul
      */
     class PatchPartMap
     {
@@ -313,15 +312,20 @@ namespace FEAT
           {
             // Create new attribute for the PatchMeshPart MeshPart
             Attribute_* new_attribute = new Attribute_(
-              Index(_indices.size()), it->second->get_num_coords(), it->second->get_stride());
+              Index(_indices.size()), it->second->get_dimension());
+
+            const int dim = it->second->get_dimension();
 
             // Emplace all elements referred to by the _io_map into new_attribute
             for(auto jt: _io_map)
-              new_attribute->operator()(jt.second, it->second->operator[](jt.first) );
+            {
+              for(int k(0); k < dim; ++k)
+                new_attribute->operator()(jt.second, k) = it->second->operator()(jt.first, k);
+            }
 
             // Push the new attribute to set_out
             if(!(attribute_container_out.insert(std::make_pair(it->first, new_attribute)).second))
-                throw InternalError(__func__,__FILE__,__LINE__, "Error inserting new MeshAttribute");
+                throw InternalError(__func__,__FILE__,__LINE__, "Error inserting new AttributeSet");
           }
 
         }
@@ -371,7 +375,7 @@ namespace FEAT
          */
         template<typename IndexSetType_>
         void fill_index_set(IndexSetType_& index_set_out, const IndexSetType_& index_set_in,
-        const std::map<Index, Index>& vertex_map) const
+          const std::map<Index, Index>& vertex_map) const
         {
           // We need to check all shape entities in the MeshPart referring to the BaseMesh
           for(Index k(0); k < index_set_in.get_num_entities(); ++k)
@@ -381,7 +385,7 @@ namespace FEAT
             if(kt != _io_map.end())
             {
               // For all vertices at that entity, we need to find them in the PatchMeshPart's MeshPart
-              for(Index j(0); j < Index(index_set_in.get_num_indices()); ++j)
+              for(int j(0); j < index_set_in.get_num_indices(); ++j)
               {
                 // Fetch the BaseMesh MeshPart's vertex number
                 Index i_in(index_set_in(k,j));
@@ -419,6 +423,7 @@ namespace FEAT
      * \tparam dim_
      * Shape dimension this container refers to
      *
+     * \author Jordi Paul
      */
     template<typename Shape_, int dim_ = Shape_::dimension>
     class PatchPartMapHolder :
@@ -500,21 +505,21 @@ namespace FEAT
         }
 
         /**
-         * \brief MeshPart Factory interface: Fills the MeshAttributeContainer
+         * \brief MeshPart Factory interface: Fills the AttributeSetContainer
          *
-         * \tparam MeshAttributeContainer_
-         * Type of the MeshAttributeContainer_.
+         * \tparam AttributeSetContainer_
+         * Type of the AttributeSetContainer_.
          *
          * \param[out] attribute_container_out
-         * MeshAttributeContainer of the PatchMeshPart's MeshPart to be filled
+         * AttributeSetContainer of the PatchMeshPart's MeshPart to be filled
          *
          * \param[in] attribute_container_in
-         * MeshAttributeContainer of the BaseMesh's MeshPart to restrict to the PatchMeshPart's MeshPart.
+         * AttributeSetContainer of the BaseMesh's MeshPart to restrict to the PatchMeshPart's MeshPart.
          */
-        template<typename MeshAttributeContainer_>
+        template<typename AttributeSetContainer_>
         void fill_attribute_sets(
-          MeshAttributeContainer_& attribute_container_out,
-          const MeshAttributeContainer_& attribute_container_in) const
+          AttributeSetContainer_& attribute_container_out,
+          const AttributeSetContainer_& attribute_container_in) const
         {
           // Fill attribute sets of one shape dimension lower first
           BaseClass::fill_attribute_sets(attribute_container_out, attribute_container_in);
@@ -594,10 +599,10 @@ namespace FEAT
           return _patch_map.size();
         }
 
-        template<typename MeshAttributeContainer_>
+        template<typename AttributeSetContainer_>
         void fill_attribute_sets(
-          MeshAttributeContainer_& attribute_container_out,
-          const MeshAttributeContainer_& attribute_container_in) const
+          AttributeSetContainer_& attribute_container_out,
+          const AttributeSetContainer_& attribute_container_in) const
         {
           // Fill attribute set to shape dimension 0
           _patch_map.fill_attribute_set( attribute_container_out, attribute_container_in);

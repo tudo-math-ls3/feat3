@@ -100,7 +100,7 @@ namespace FEAT
         Index i(0);
         for(Index j(0); j < 32; ++j)
         {
-          for(Index k(0); k < 2; ++k)
+          for(int k(0); k < 2; ++k)
           {
             if(set_v_e(j,k) != v_e[i])
             {
@@ -114,7 +114,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 12; ++j)
         {
-          for(Index k(0); k < 4; ++k)
+          for(int k(0); k < 4; ++k)
           {
             if(set_v_q(j,k) != v_q[i])
             {
@@ -128,7 +128,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 12; ++j)
         {
-          for(Index k(0); k < 4; ++k)
+          for(int k(0); k < 4; ++k)
           {
             if(set_e_q(j,k) != e_q[i])
             {
@@ -629,7 +629,7 @@ namespace FEAT
         Index i(0);
         for(Index j(0); j < 133; ++j)
         {
-          for(Index k(0); k < 2; ++k)
+          for(int k(0); k < 2; ++k)
           {
             if(set_v_e(j,k) != v_e[i])
             {
@@ -643,7 +643,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 98; ++j)
         {
-          for(Index k(0); k < 4; ++k)
+          for(int k(0); k < 4; ++k)
           {
             if(set_v_q(j,k) != v_q[i])
             {
@@ -657,7 +657,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 24; ++j)
         {
-          for(Index k(0); k < 8; ++k)
+          for(int k(0); k < 8; ++k)
           {
             if(set_v_h(j,k) != v_h[i])
             {
@@ -671,7 +671,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 98; ++j)
         {
-          for(Index k(0); k < 4; ++k)
+          for(int k(0); k < 4; ++k)
           {
             if(set_e_q(j,k) != e_q[i])
             {
@@ -685,7 +685,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 24; ++j)
         {
-          for(Index k(0); k < 12; ++k)
+          for(int k(0); k < 12; ++k)
           {
             if(set_e_h(j,k) != e_h[i])
             {
@@ -699,7 +699,7 @@ namespace FEAT
         i = 0;
         for(Index j(0); j < 24; ++j)
         {
-          for(Index k(0); k < 6; ++k)
+          for(int k(0); k < 6; ++k)
           {
             if(set_q_h(j,k) != q_h[i])
             {

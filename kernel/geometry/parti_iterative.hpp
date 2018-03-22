@@ -32,10 +32,10 @@ namespace FEAT
         }
       };
 
-      template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-        std::vector<Index> parti_iterative_distance(Index start, ConformalMesh<Shape_, num_coords_, stride_, Coord_> & mesh, Index num_ranks)
+      template<typename Shape_, int num_coords_, typename Coord_>
+        std::vector<Index> parti_iterative_distance(Index start, ConformalMesh<Shape_, num_coords_, Coord_> & mesh, Index num_ranks)
         {
-        typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         static constexpr int facet_dim = MeshType::shape_dim-1;
         const auto& facet_idx = mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
         // nachbar zu zelle i sind neighbours[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbours != ~Index(0)
@@ -76,7 +76,7 @@ namespace FEAT
           //update all neighbours
           for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
           {
-            Index other_cell(neighbours[next_node][Index(j)]);
+            Index other_cell(neighbours[next_node][j]);
             //update neighbour cell distance, if neighbour exists and neighbour is in the queue of pending nodes
             if (other_cell != ~Index(0) && pending_nodes.count(other_cell) > 0)
             {
@@ -92,12 +92,12 @@ namespace FEAT
         return distances;
       }
 
-      template<typename Shape_, int num_coords_, int stride_, typename Coord_>
+      template<typename Shape_, int num_coords_, typename Coord_>
       class PartiIterativeIndividual
       {
         public: //TODO write getter for cells per rank and make all member variables private
         /// our mesh type
-        typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         /// our mesh
         MeshType& _mesh;
         /// number of elements in input mesh
@@ -206,7 +206,7 @@ namespace FEAT
             {
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[cell][Index(j)]);
+                Index other_cell(neighbours[cell][j]);
                 // if neighbour exists and is not in our own patch
                 if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != rank)
                 {
@@ -256,7 +256,7 @@ namespace FEAT
             std::list<Index> trans_rank_neighbours;
             for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
             {
-              Index other_cell(neighbours[cell][Index(j)]);
+              Index other_cell(neighbours[cell][j]);
               // if neighbour exists and is not in our own patch
               if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != rank)
               {
@@ -283,7 +283,7 @@ namespace FEAT
             std::list<Index> in_rank_neighbours;
             for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
             {
-              Index other_cell(neighbours[cell][Index(j)]);
+              Index other_cell(neighbours[cell][j]);
               // if neighbour exists and is in our own patch
               if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) == rank)
               {
@@ -298,7 +298,7 @@ namespace FEAT
               bool other_neighbour = false;
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[neighbour][Index(j)]);
+                Index other_cell(neighbours[neighbour][j]);
                 if (other_cell != ~Index(0) && other_cell != cell && _rank_per_cell.at(other_cell) == rank)
                 {
                   other_neighbour = true;
@@ -330,7 +330,7 @@ namespace FEAT
               bool boundary(false);
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[neighbour][Index(j)]);
+                Index other_cell(neighbours[neighbour][j]);
                 if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != smallest_rank)
                 {
                   boundary = true;
@@ -368,7 +368,7 @@ namespace FEAT
             {
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[cell][Index(j)]);
+                Index other_cell(neighbours[cell][j]);
                 if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != rank)
                 {
                   ++sum;
@@ -457,8 +457,8 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class PartiIterative<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class PartiIterative<ConformalMesh<Shape_, num_coords_, Coord_>>
     {
       private:
         /// number of elements in input mesh
@@ -468,11 +468,11 @@ namespace FEAT
         /// Our communicator
         const Dist::Comm & _comm;
         /// Our population
-        std::list<Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, stride_, Coord_>> _population;
+        std::list<Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_>> _population;
 
       public:
       /// our mesh type
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
 
       /**
        * \brief Constructor
@@ -500,7 +500,7 @@ namespace FEAT
         mesh.fill_neighbours();
 
         {
-          Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, stride_, Coord_> indi(mesh, _comm, rng);
+          Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, _comm, rng);
           _population.push_back(indi);
         }
 
@@ -509,7 +509,7 @@ namespace FEAT
         {
           for (Index i(0) ; i < 10 ; ++i)
           {
-            Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, stride_, Coord_> indi(mesh, _comm, rng);
+            Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, _comm, rng);
             _population.push_back(indi);
           }
           _population.sort(Geometry::Intern::parti_iterative_compare_cell_deviation_simple<typename decltype(_population)::value_type>);

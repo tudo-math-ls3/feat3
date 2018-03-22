@@ -297,7 +297,7 @@ namespace FEAT
         IndexSetOut_& index_set_out)
       {
         // index vector reference
-        typedef typename IndexSetIn_::ConstIndexVectorReference ConstIndexVectorRefIn;
+        typedef typename IndexSetIn_::IndexTupleType IndexTupleTypeIn;
         typedef Intern::FaceIndexMapping<Shape_, face_dim_, 0> FimType;
 
         // fetch number of shapes
@@ -309,7 +309,7 @@ namespace FEAT
         for(Index i(0); i < num_entities; ++i)
         {
           // get vertex-index-vector of shape i
-          ConstIndexVectorRefIn current_cell_in = index_set_in[i];
+          const IndexTupleTypeIn& current_cell_in = index_set_in[i];
 
           // loop over all cells of shape i
           for(int j(0); j < IndexSetOut_::num_indices; ++j)

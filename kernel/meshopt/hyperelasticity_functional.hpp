@@ -1110,7 +1110,7 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+              x[j] = this->_coords_buffer(idx(cell,j));
             }
 
             auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
@@ -1130,7 +1130,7 @@ namespace FEAT
             // Add local contributions to global gradient vector
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell,Index(j)));
+              Index i(idx(cell,j));
               Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
               tmp += this->_mu(cell)*grad_loc[j];
 
@@ -1206,7 +1206,7 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+              x[j] = this->_coords_buffer(idx(cell,j));
             }
 
             auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
@@ -1351,44 +1351,44 @@ namespace FEAT
     extern template class HyperelasticityFunctional
     <
       Mem::Main, double, Index,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double >>,
       Meshopt::RumpfFunctional
       <
         double,
-        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>
+        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double >>
       >
     >;
 
     extern template class HyperelasticityFunctional
     <
       Mem::Main, double, Index,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double >>,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double >>,
       Meshopt::RumpfFunctional
       <
         double,
-        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double >>
+        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double >>
       >
     >;
 
     extern template class HyperelasticityFunctional
     <
       Mem::Main, double, Index,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, double >>,
       Meshopt::RumpfFunctional
       <
         double,
-        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>
+        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, double >>
       >
     >;
 
     extern template class HyperelasticityFunctional
     <
       Mem::Main, double, Index,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, 3, double >>,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, double >>,
       Meshopt::RumpfFunctional
       <
         double,
-        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, 3, double >>
+        Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, double >>
       >
     >;
     /// \endcond

@@ -58,17 +58,16 @@ namespace FEAT
     template<
       typename Shape_,
       int num_coords_,
-      int stride_,
       typename Coord_>
-    class ShapeConvertFactory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
-      public Factory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
+    class ShapeConvertFactory<ConformalMesh<Shape_, num_coords_, Coord_> > :
+      public Factory<ConformalMesh<Shape_, num_coords_, Coord_> >
     {
     public:
-      typedef Factory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > BaseClass;
+      typedef Factory<ConformalMesh<Shape_, num_coords_, Coord_> > BaseClass;
       typedef Shape_ ShapeType;
       typedef typename Intern::OtherShape<Shape_>::Type OtherShapeType;
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
-      typedef ConformalMesh<OtherShapeType, num_coords_, stride_, Coord_> OtherMeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
+      typedef ConformalMesh<OtherShapeType, num_coords_, Coord_> OtherMeshType;
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
       /// index holder type
@@ -129,15 +128,15 @@ namespace FEAT
     template<
       typename Shape_,
       typename Coord_>
-    class ShapeConvertFactory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > > :
-      public Factory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > >
+    class ShapeConvertFactory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Coord_> > > :
+      public Factory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Coord_> > >
     {
     public:
-      typedef Factory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > > BaseClass;
+      typedef Factory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Coord_> > > BaseClass;
       typedef Shape_ ShapeType;
       typedef typename Intern::OtherShape<Shape_>::Type OtherShapeType;
-      typedef MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > MeshType;
-      typedef MeshPart<ConformalMesh<OtherShapeType, Shape_::dimension, Shape_::dimension, Coord_> > OtherMeshType;
+      typedef MeshPart<ConformalMesh<Shape_, Shape_::dimension, Coord_> > MeshType;
+      typedef MeshPart<ConformalMesh<OtherShapeType, Shape_::dimension, Coord_> > OtherMeshType;
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
       /// index set holder type

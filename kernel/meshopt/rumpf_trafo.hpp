@@ -166,11 +166,11 @@ namespace FEAT
      *
      **/
     template<typename DataType_>
-    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,DataType_>>,DataType_>
+    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,DataType_>>,DataType_>
     {
       public:
         /// Our transformation type
-        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,DataType_>> TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,DataType_>> TrafoType;
         /// Our data type
         typedef DataType_ DataType;
         /// Our shape type, as the Rumpf smoother needs to know what we are working with
@@ -243,7 +243,7 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -272,14 +272,14 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, Index(j)));
+              Index i(idx(cell, j));
               grad_(i, grad_(i) + local_grad[j]);
             }
 
@@ -314,11 +314,11 @@ namespace FEAT
      *
      **/
     template<typename DataType_>
-    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>,3,3,DataType_>>,DataType_>
+    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>,3,DataType_>>,DataType_>
     {
       public:
         /// Our transformation type
-        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>,3,3,DataType_>> TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>,3,DataType_>> TrafoType;
         /// Our data type
         typedef DataType_ DataType;
         /// Our shape type, as the Rumpf smoother needs to know what we are working with
@@ -418,7 +418,7 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -447,14 +447,14 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, Index(j)));
+              Index i(idx(cell, j));
               grad_(i, grad_(i) + local_grad[j]);
             }
 
@@ -489,11 +489,11 @@ namespace FEAT
      *
      **/
     template<typename DataType_>
-    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,2,DataType_>>,DataType_>
+    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,DataType_>>,DataType_>
     {
       public:
         /// Our transformation type
-        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,2,DataType_>> TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,DataType_>> TrafoType;
         /// Our data type
         typedef DataType_ DataType;
         /// Our shape type, as the Rumpf smoother needs to know what we are working with
@@ -565,7 +565,7 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -593,13 +593,13 @@ namespace FEAT
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, Index(j)));
+              Index i(idx(cell, j));
               grad_(i, grad_(i) + local_grad[j]);
             }
 
@@ -639,11 +639,11 @@ namespace FEAT
      *
      **/
     template<typename DataType_>
-    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>,3,3,DataType_>>,DataType_>
+    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>,3,DataType_>>,DataType_>
     {
       public:
         /// Our transformation type
-        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3,DataType_>> TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3,DataType_>> TrafoType;
         /// Our data type
         typedef DataType_ DataType;
         /// Our shape type, as the Rumpf smoother needs to know what we are working with
@@ -723,7 +723,7 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -752,14 +752,14 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,Index(j)));
+              x[j] = coords_(idx(cell,j));
             }
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, Index(j)));
+              Index i(idx(cell, j));
               grad_(i, grad_(i) + local_grad[j]);
             }
 
@@ -790,13 +790,13 @@ namespace FEAT
     }; // RumpfTrafo<Simplex<3>>
 #ifdef FEAT_EICKT
     extern template struct RumpfTrafo<
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>, double >;
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>, double >;
     extern template struct RumpfTrafo<
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, double>>, double >;
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, double>>, double >;
     extern template struct RumpfTrafo<
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, double>>, double >;
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, double>>, double >;
     extern template struct RumpfTrafo<
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, double>>, double >;
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<3>, 3, double>>, double >;
 #endif // FEAT_EICKT
 
     /// \endcond

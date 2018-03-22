@@ -61,12 +61,12 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class Parti2Lvl<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class Parti2Lvl<ConformalMesh<Shape_, num_coords_, Coord_>>
     {
     public:
       /// our mesh type
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
 
     protected:
       /// number of elements in input mesh

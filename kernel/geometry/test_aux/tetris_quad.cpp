@@ -229,20 +229,20 @@ namespace FEAT
 
         // create mesh part
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
-        // create a MeshAttribute that holds one value for each vertex
-        QuadSubMesh::MeshAttributeType* my_vertex_set = new QuadSubMesh::MeshAttributeType(num_entities[0],1);
+        // create a AttributeSet that holds one value for each vertex
+        QuadSubMesh::AttributeSetType* my_attrib_set = new QuadSubMesh::AttributeSetType(num_entities[0],1);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, "EdgeSubMeshAttribute");
+        mesh->add_attribute(my_attrib_set, "EdgeSubAttributeSet");
 
         // set up vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0,
           1.0,
           2.0,
           3.0
         };
-        copy_vtx(*(mesh->find_attribute("EdgeSubMeshAttribute")), vtx);
+        copy_attr(*(mesh->find_attribute("EdgeSubAttributeSet")), attr);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -282,7 +282,7 @@ namespace FEAT
           throw String("Quad count mismatch");
 
         // check vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0,
           1.0,
@@ -292,8 +292,8 @@ namespace FEAT
           1.5,
           2.5
         };
-        if(!comp_vtx(*(mesh.find_attribute("EdgeSubMeshAttribute")), vtx))
-          throw String("Vertex coordinate refinement failure");
+        if(!comp_attr(*(mesh.find_attribute("EdgeSubAttributeSet")), attr))
+          throw String("Attribute refinement failure");
 
         // check vertices-at-edge array
         Index v_e[] =
@@ -349,13 +349,13 @@ namespace FEAT
 
         // create mesh
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
-        // create a MeshAttribute that holds one value for each vertex
-        QuadSubMesh::MeshAttributeType* my_vertex_set = new QuadSubMesh::MeshAttributeType(num_entities[0],2);
+        // create a AttributeSet that holds one value for each vertex
+        QuadSubMesh::AttributeSetType* my_attrib_set = new QuadSubMesh::AttributeSetType(num_entities[0],2);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, "QuadSubMeshAttribute");
+        mesh->add_attribute(my_attrib_set, "QuadSubAttributeSet");
 
         // set up vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0, 0.0,
           1.0, 1.0,
@@ -364,7 +364,7 @@ namespace FEAT
           1.0, 2.0,
           1.0, 0.0
         };
-        copy_vtx(*(mesh->find_attribute("QuadSubMeshAttribute")), vtx);
+        copy_attr(*(mesh->find_attribute("QuadSubAttributeSet")), attr);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -449,7 +449,7 @@ namespace FEAT
           throw String("Quad count mismatch");
 
         // check vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0, 0.0, // coarse mesh vertices
           1.0, 1.0,
@@ -467,8 +467,8 @@ namespace FEAT
           0.5, 1.5, // quad midpoints
           0.5, 0.5
         };
-        if(!comp_vtx(*(mesh.find_attribute("QuadSubMeshAttribute")), vtx))
-          throw String("Vertex coordinate refinement failure");
+        if(!comp_attr(*(mesh.find_attribute("QuadSubAttributeSet")), attr))
+          throw String("Attribute refinement failure");
 
         // check vertices-at-edge array
         Index v_e[] =
@@ -565,20 +565,20 @@ namespace FEAT
 
         // create mesh
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
-        // create a MeshAttribute that holds one value for each vertex
-        QuadSubMesh::MeshAttributeType* my_vertex_set = new QuadSubMesh::MeshAttributeType(num_entities[0],1);
+        // create a AttributeSet that holds one value for each vertex
+        QuadSubMesh::AttributeSetType* my_attrib_set = new QuadSubMesh::AttributeSetType(num_entities[0],1);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, "QuadSubMeshAttribute");
+        mesh->add_attribute(my_attrib_set, "QuadSubAttributeSet");
 
         // set up vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0,
           1.0,
           2.0,
           3.0
         };
-        copy_vtx(*(mesh->find_attribute("QuadSubMeshAttribute")), vtx);
+        copy_attr(*(mesh->find_attribute("QuadSubAttributeSet")), attr);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -618,7 +618,7 @@ namespace FEAT
           throw String("Quad count mismatch");
 
         // check vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0,
           1.0,
@@ -628,8 +628,8 @@ namespace FEAT
           1.5,
           2.5
         };
-        if(!comp_vtx(*(mesh.find_attribute("QuadSubMeshAttribute")), vtx))
-          throw String("Vertex coordinate refinement failure");
+        if(!comp_attr(*(mesh.find_attribute("QuadSubAttributeSet")), attr))
+          throw String("Attribute refinement failure");
 
         // check vertices-at-edge array
         Index v_e[] =

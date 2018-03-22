@@ -2,7 +2,7 @@
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
-#include <kernel/geometry/mesh_attribute.hpp>
+#include <kernel/geometry/attribute_set.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/target_set.hpp>
 
@@ -52,9 +52,9 @@ public:
   }
 
   typedef double DataType;
-  typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, DataType> MeshType;
+  typedef ConformalMesh<Shape::Hypercube<3>, 3, DataType> MeshType;
   typedef MeshPart<MeshType> MeshPartType;
-  typedef MeshAttribute<DataType> MeshAttributeType;
+  typedef AttributeSet<DataType> AttributeSetType;
 
   template<Index dim_>
   using TargetSetType = typename MeshPartType::TargetSet<dim_>::Type;
@@ -135,14 +135,14 @@ public:
     TEST_CHECK_MSG(ts_test0.get_num_entities() == ts_reference0.get_num_entities(), "num_entities mismatch for dimension 0");
     TEST_CHECK_MSG(check_target_set_consistency(ts_reference0, ts_test0), "ts_test did not contain all entities from ts_reference for dimension 0!");
 
-    // Check MeshAttribute functionality
+    // Check AttributeSet functionality
     // Create attributes of dimension 0
-    MeshAttributeType* att_0_1 = new MeshAttributeType(mesh_part_to_test.get_num_entities(0),1,1);
-    MeshAttributeType* att_0_2 = new MeshAttributeType(mesh_part_to_test.get_num_entities(0),1,1);
-    MeshAttributeType* att_0_3 = new MeshAttributeType(mesh_part_to_test.get_num_entities(0),1,1);
+    AttributeSetType* att_0_1 = new AttributeSetType(mesh_part_to_test.get_num_entities(0));
+    AttributeSetType* att_0_2 = new AttributeSetType(mesh_part_to_test.get_num_entities(0));
+    AttributeSetType* att_0_3 = new AttributeSetType(mesh_part_to_test.get_num_entities(0));
     // Change some data
-    (*att_0_1)[1][0] = DataType(12);
-    (*att_0_3)[1][0] = DataType(-5);
+    att_0_1->operator()(1,0) = DataType(12);
+    att_0_3->operator()(1,0) = DataType(-5);
 
     // Add attributes of dimension 0
     TEST_CHECK(mesh_part_to_test.get_num_attributes() == 0);
@@ -155,7 +155,7 @@ public:
     TEST_CHECK(!mesh_part_to_test.add_attribute(att_0_3,"SomeName"));
     // There should still be only 2 attributes in the mesh
     TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(),2);
-    TEST_CHECK_EQUAL((*mesh_part_to_test.find_attribute("SomeName"))[1][0], DataType(12));
+    TEST_CHECK_EQUAL(mesh_part_to_test.find_attribute("SomeName")->operator()(1,0), DataType(12));
     // There should still be only 2 attributes in the mesh
     TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(),2);
 

@@ -55,7 +55,7 @@ namespace FEAT
         /// The shape type is always Simplex<2>
         typedef Shape::Simplex<2> ShapeType;
         /// The type for the mesh defining the discrete surface
-        typedef ConformalMesh<ShapeType, 3, 3, CoordType> SurfaceMeshType;
+        typedef ConformalMesh<ShapeType, 3, CoordType> SurfaceMeshType;
         /// Pointer to the surface mesh object
         SurfaceMeshType* _surface_mesh;
 
@@ -245,7 +245,7 @@ namespace FEAT
           for(int j(0); j < SurfaceMeshType::shape_dim; ++j)
           {
             // Index of the local vertex i in the SurfaceMesh
-            Index i(idx(best_facet, Index(j+1)));
+            Index i(idx(best_facet, j+1));
             projected_point += coeffs[j]*vtx[i];
             coeff0 -= coeffs[j];
           }
@@ -292,9 +292,9 @@ namespace FEAT
           Tiny::Matrix<CoordType, 2, SurfaceMeshType::world_dim> coords(CoordType(0));
           Tiny::Matrix<CoordType, SurfaceMeshType::world_dim, 2> coords_transpose(CoordType(0));
 
-          Index i0(idx(facet, Index(0)));
-          Index i1(idx(facet, Index(1)));
-          Index i2(idx(facet, Index(2)));
+          Index i0(idx(facet, 0));
+          Index i1(idx(facet, 1));
+          Index i2(idx(facet, 2));
 
           coords[0] = vtx[i1] - vtx[i0];
           coords[1] = vtx[i2] - vtx[i0];
@@ -413,8 +413,8 @@ namespace FEAT
             // random vertex of the facet, compute the distances to all other points, and take the geometric mean.
             for(int j(0); j < idx_mp.num_indices-1; ++j)
             {
-              Index i0(idx_mp(current_facet, Index(0)));
-              Index i_mp(idx_mp(current_facet, Index(j+1)));
+              Index i0(idx_mp(current_facet, 0));
+              Index i_mp(idx_mp(current_facet, j+1));
               acceptable_distance *= ((vtx[i_mp] - vtx[i0]).norm_euclid());
             }
             acceptable_distance = Math::pow(
@@ -424,7 +424,7 @@ namespace FEAT
             for(int j(0); j < idx_mp.num_indices; ++j)
             {
               // The index of the local vertex j in the Meshpart
-              Index i_mp(idx_mp(current_facet, Index(j)));
+              Index i_mp(idx_mp(current_facet, j));
 
               if(vert_todo[i_mp])
               {
@@ -447,11 +447,11 @@ namespace FEAT
                 for(int i(0); i < SurfaceMeshType::shape_dim; ++i)
                 {
                   // Index of the local vertex i in the SurfaceMesh
-                  Index i_sm(idx_sm(facet_sm, Index(i+1)));
+                  Index i_sm(idx_sm(facet_sm, i+1));
                   vtx[i_parent] += coeffs[i]*vtx_sm[i_sm];
                   coeff0 -= coeffs[i];
                 }
-                vtx[i_parent] += coeff0*vtx_sm[idx_sm(facet_sm, Index(0))];
+                vtx[i_parent] += coeff0*vtx_sm[idx_sm(facet_sm, 0)];
 
               } // vert_todo[i_mp]
             } // vertices in current facet
@@ -459,7 +459,7 @@ namespace FEAT
             // Now add all neighbours that are still on the todo list to the search stack
             for(int l(0); l < neigh_mp.num_indices; ++l)
             {
-              Index k(neigh_mp(current_facet, Index(l)));
+              Index k(neigh_mp(current_facet, l));
               if(k != ~Index(0) && facet_todo[k])
               {
                 facet_todo[k] = false;
@@ -614,7 +614,7 @@ namespace FEAT
             // Collect all vertices that make up the cell in the coords matrix
             for(int j(0); j < SurfaceMeshType::shape_dim+1; ++j)
             {
-              Index i(idx(current, Index(j)));
+              Index i(idx(current, j));
               coords[j] = vtx[i];
             }
 
@@ -655,11 +655,11 @@ namespace FEAT
             for(int l(0); l < SurfaceMeshType::shape_dim+1; ++l)
             {
               // The neighbour over the l-th facet
-              Index n(neigh(current, Index(l)));
+              Index n(neigh(current, l));
               // Check if the neighbour exists and is still on the to do list
               if(n != ~ Index(0) && !_cell_marker[n])
               {
-                Index facet(facet_idx(current,Index(l)));
+                Index facet(facet_idx(current,l));
                 // If the neighbour is still on the to do list and the facet it lies at is in the traversed list,
                 // this means the barycentric coordinate for the corresponding direction was negative, meaning
                 // that x lies in that direction. So we add that neighbour to the front.
@@ -831,7 +831,7 @@ namespace FEAT
           {
             if(bary(l) < - tol)
             {
-              Index facet(facet_idx[Index(l)]);
+              Index facet(facet_idx[l]);
               ++num_negative;
               if(traversed[facet])
               {
@@ -922,7 +922,7 @@ namespace FEAT
       {
       public:
         typedef typename Mesh_::CoordType CoordType;
-        typedef VertexSet<3, 3, CoordType> VertexSetType;
+        typedef VertexSet<3, CoordType> VertexSetType;
 
       protected:
         VertexSetType& _vertex_set;

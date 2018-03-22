@@ -14,13 +14,13 @@ namespace FEAT
       template<typename Mesh_>
       class TetrisFactory;
 
-      template<int stride_, typename Coord_>
-      class TetrisFactory<ConformalMesh<Shape::Quadrilateral, 2, stride_, Coord_> > :
-        public Factory<ConformalMesh<FEAT::Shape::Quadrilateral, 2, stride_, Coord_> >
+      template<typename Coord_>
+      class TetrisFactory<ConformalMesh<Shape::Quadrilateral, 2, Coord_> > :
+        public Factory<ConformalMesh<FEAT::Shape::Quadrilateral, 2, Coord_> >
       {
       public:
         /// mesh type
-        typedef ConformalMesh<Shape::Quadrilateral, 2, stride_, Coord_> MeshType;
+        typedef ConformalMesh<Shape::Quadrilateral, 2, Coord_> MeshType;
         typedef Factory<MeshType> BaseClass;
 
         /// vertex set type

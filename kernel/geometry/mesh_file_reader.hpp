@@ -243,12 +243,12 @@ namespace FEAT
 
     }; // class ChartParser<...>
 
-    template<int num_coords_, int stride_, typename Coord_>
+    template<int num_coords_, typename Coord_>
     class VerticesParser :
       public Xml::MarkupParser
     {
     public:
-      typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
+      typedef VertexSet<num_coords_, Coord_> VertexSetType;
 
     protected:
       VertexSetType& _vertex_set;
@@ -580,7 +580,7 @@ namespace FEAT
       public Xml::MarkupParser
     {
     public:
-      typedef MeshAttribute<DataType_> AttribType;
+      typedef AttributeSet<DataType_> AttribType;
 
     protected:
       MeshPart_& _mesh_part;
@@ -602,7 +602,7 @@ namespace FEAT
 
       virtual ~AttributeParser()
       {
-        // Because adding the MeshAttribute to a MeshPart passes ownership, we just need to nullify the pointer here
+        // Because adding the AttributeSet to a MeshPart passes ownership, we just need to nullify the pointer here
         if(_attrib != nullptr)
           _attrib = nullptr;
       }
@@ -632,7 +632,7 @@ namespace FEAT
 
         // create mesh attribute
         _count = _mesh_part.get_num_entities(0);
-        _attrib = new AttribType(_count, int(_my_dim), 0);
+        _attrib = new AttribType(_count, int(_my_dim));
       }
 
       virtual void close(int iline, const String& sline) override
@@ -668,7 +668,7 @@ namespace FEAT
         // try to parse all coords
         for(int i(0); i < int(_my_dim); ++i)
         {
-          if(!svals.at(std::size_t(i)).parse((*_attrib)[_read][i]))
+          if(!svals.at(std::size_t(i)).parse(_attrib->operator()(_read,i)))
             throw Xml::ContentError(iline, sline, "Failed to parse value");
         }
 
@@ -682,12 +682,12 @@ namespace FEAT
     template<typename Mesh_>
     class MeshParser;
 
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class MeshParser<ConformalMesh<Shape_, num_coords_, stride_, Coord_>> :
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class MeshParser<ConformalMesh<Shape_, num_coords_, Coord_>> :
       public Xml::MarkupParser
     {
     public:
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
 
     protected:
       RootMeshNode<MeshType>& _root_node;
@@ -819,7 +819,7 @@ namespace FEAT
 
           // okay, create a vertex parser
           _have_verts = true;
-          return std::make_shared<VerticesParser<num_coords_, stride_, Coord_>>(_mesh->get_vertex_set());
+          return std::make_shared<VerticesParser<num_coords_, Coord_>>(_mesh->get_vertex_set());
         }
 
         // topology?
@@ -842,12 +842,12 @@ namespace FEAT
     template<typename Mesh_>
     class MeshPartParser;
 
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class MeshPartParser<ConformalMesh<Shape_, num_coords_, stride_, Coord_>> :
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class MeshPartParser<ConformalMesh<Shape_, num_coords_, Coord_>> :
       public Xml::MarkupParser
     {
     public:
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
       typedef MeshPart<MeshType> MeshPartType;
       typedef Atlas::ChartBase<MeshType> ChartType;
       enum class TopoType
@@ -1836,30 +1836,30 @@ namespace FEAT
     /// \endcond
 
 #ifdef FEAT_EICKT
-    extern template class MeshNodeLinker<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
-    extern template class MeshNodeLinker<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
-    extern template class MeshNodeLinker<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
-    extern template class MeshNodeLinker<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Simplex<2>, 2, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Simplex<3>, 3, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Hypercube<2>, 2, Real>>;
+    extern template class MeshNodeLinker<ConformalMesh<Shape::Hypercube<3>, 3, Real>>;
 
-    extern template void MeshFileReader::parse<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>(
-      MeshNodeLinker<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>&,
-      RootMeshNode<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>&,
-      MeshAtlas<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>&,
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Simplex<2>, 2, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Simplex<2>, 2, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Simplex<2>, 2, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Simplex<2>, 2, Real>>&,
       PartitionSet*);
-    extern template void MeshFileReader::parse<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>(
-      MeshNodeLinker<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>&,
-      RootMeshNode<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>&,
-      MeshAtlas<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>&,
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Simplex<3>, 3, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Simplex<3>, 3, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Simplex<3>, 3, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Simplex<3>, 3, Real>>&,
       PartitionSet*);
-    extern template void MeshFileReader::parse<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>(
-      MeshNodeLinker<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>&,
-      RootMeshNode<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>&,
-      MeshAtlas<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>&,
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Hypercube<2>, 2, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Hypercube<2>, 2, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Hypercube<2>, 2, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Hypercube<2>, 2, Real>>&,
       PartitionSet*);
-    extern template void MeshFileReader::parse<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>(
-      MeshNodeLinker<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>&,
-      RootMeshNode<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>&,
-      MeshAtlas<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>&,
+    extern template void MeshFileReader::parse<ConformalMesh<Shape::Hypercube<3>, 3, Real>>(
+      MeshNodeLinker<ConformalMesh<Shape::Hypercube<3>, 3, Real>>&,
+      RootMeshNode<ConformalMesh<Shape::Hypercube<3>, 3, Real>>&,
+      MeshAtlas<ConformalMesh<Shape::Hypercube<3>, 3, Real>>&,
       PartitionSet*);
 #endif // FEAT_EICKT
   } // namespace Geometry

@@ -4,7 +4,7 @@
 
 // includes, FEAT
 #include <kernel/geometry/index_set.hpp>
-#include <kernel/geometry/intern/vertex_abacus.hpp>
+#include <kernel/geometry/vertex_set.hpp>
 #include <kernel/geometry/intern/shape_convert_traits.hpp>
 #include <kernel/geometry/intern/entity_counter.hpp>
 
@@ -35,8 +35,8 @@ namespace FEAT
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
-          typedef typename VertexSetType::VertexReference VertexReference;
+          typedef typename IndexSetType::IndexTupleType IndexTupleType;
+          typedef typename VertexSetType::VertexType VertexType;
           typedef typename VertexSetType::CoordType CoordType;
 
           // scaling factor
@@ -45,29 +45,23 @@ namespace FEAT
           // get number of cells
           Index num_cells = index_set_in.get_num_entities();
 
-          // create a vertex abacus object
-          VertexAbacus<VertexSetType> abacus(vertex_set_in);
-
           // loop over all cells
           for(Index i(0); i < num_cells; ++i)
           {
             // get input index vector
-            ConstIndexVectorReference idx_in = index_set_in[i];
+            const IndexTupleType& idx_in = index_set_in[i];
 
             // get output vertex
-            VertexReference vtx_out = vertex_set_out[offset + i];
+            VertexType& vtx_out = vertex_set_out[offset + i];
 
             // clear output vertex
-            abacus.clear(vtx_out);
+            vtx_out.format();
 
             // add all other vertices onto it
             for(int k(0); k < IndexSetType::num_indices; ++k)
             {
-              abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
+              vtx_out.axpy(scale, vertex_set_in[idx_in[k]]);
             }
-
-            // scale the output vertex
-            abacus.scale(vtx_out, scale);
           }
 
           // return number of created vertices
@@ -94,14 +88,11 @@ namespace FEAT
           Index num_verts = vertex_set_in.get_num_vertices();
           XASSERT(vertex_set_out.get_num_vertices() >= num_verts);
 
-          // create a vertex-abacus object
-          VertexAbacus<VertexSetType> abacus(vertex_set_in);
-
           // loop over all vertices
           for(Index i(0); i < num_verts; ++i)
           {
             // copy source vertex
-            abacus.copy(vertex_set_out[offset + i], vertex_set_in[i]);
+            vertex_set_out[offset + i] = vertex_set_in[i];
           }
 
           // return number of created vertices

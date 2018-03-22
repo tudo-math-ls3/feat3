@@ -71,7 +71,7 @@ namespace FEAT
 
             // loop over all faces
             for(int j(0); j < nfe; ++j)
-              v += scale * vtx[fvo + facet(i,Index(j))];
+              v += scale * vtx[fvo + facet(i,j)];
           }
         }
       };

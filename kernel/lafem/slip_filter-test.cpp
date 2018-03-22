@@ -188,7 +188,7 @@ class SlipFilterAssemblyTest
     {
       static constexpr int world_dim = 2;
       typedef Shape::Simplex<world_dim> ShapeType;
-      typedef Geometry::ConformalMesh<ShapeType, world_dim, world_dim, DT_> MeshType;
+      typedef Geometry::ConformalMesh<ShapeType, world_dim, DT_> MeshType;
 
       typedef Tiny::Vector<DT_, world_dim> ValueType;
       typedef DenseVectorBlocked<MemType_, DT_, IT_, world_dim> VectorType;
@@ -364,7 +364,7 @@ class SlipFilterAssemblyTest
     {
       static constexpr int world_dim = 3;
       typedef Shape::Hypercube<world_dim> ShapeType;
-      typedef Geometry::ConformalMesh<ShapeType, world_dim, world_dim, DT_> MeshType;
+      typedef Geometry::ConformalMesh<ShapeType, world_dim, DT_> MeshType;
 
       typedef Tiny::Vector<DT_, world_dim> ValueType;
       typedef DenseVectorBlocked<MemType_, DT_, IT_, world_dim> VectorType;

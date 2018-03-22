@@ -99,7 +99,7 @@ public:
   {
     typedef Shape_ ShapeType;
     static constexpr int dim = ShapeType::dimension;
-    typedef Geometry::ConformalMesh<ShapeType, dim, dim, DataType_> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType, dim, DataType_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute tolerance

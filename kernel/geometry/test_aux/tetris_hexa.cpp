@@ -1449,13 +1449,13 @@ namespace FEAT
 
         // create mesh
         HexaSubMesh* mesh = new HexaSubMesh(num_entities, true);
-        // create a MeshAttribute that holds one value for each vertex
-        HexaSubMesh::MeshAttributeType* my_vertex_set = new HexaSubMesh::MeshAttributeType(num_entities[0],2);
+        // create a AttributeSet that holds one value for each vertex
+        HexaSubMesh::AttributeSetType* my_attrib_set = new HexaSubMesh::AttributeSetType(num_entities[0],2);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, "HexaSubMeshAttribute");
+        mesh->add_attribute(my_attrib_set, "HexaSubAttributeSet");
 
         // set up vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0, 0.0,
           1.0, 1.0,
@@ -1466,7 +1466,7 @@ namespace FEAT
           1.0, 0.0,
           0.0, 1.0
         };
-        copy_vtx(*(mesh->find_attribute("HexaSubMeshAttribute")), vtx);
+        copy_attr(*(mesh->find_attribute("HexaSubAttributeSet")), attr);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -1528,7 +1528,6 @@ namespace FEAT
 
       void validate_refined_tetris_quad_submesh_3d(const HexaSubMesh& mesh)
       {
-
         // validate sizes
         if(mesh.get_num_entities(0) != 21)
           throw String("Vertex count mismatch");
@@ -1538,7 +1537,7 @@ namespace FEAT
           throw String("Quad count mismatch");
 
         // check vertex coordinates array
-        Real vtx[] =
+        Real attr[] =
         {
           0.0, 0.0,
           1.0, 1.0,
@@ -1563,8 +1562,8 @@ namespace FEAT
           1.5, 0.5,
           1.5, 1.5
         };
-        if(!comp_vtx(*(mesh.find_attribute("HexaSubMeshAttribute")), vtx))
-          throw String("Vertex coordinate refinement failure");
+        if(!comp_attr(*(mesh.find_attribute("HexaSubAttributeSet")), attr))
+          throw String("Attribute refinement failure");
 
         // check vertices-at-edge array
         Index v_e[] =

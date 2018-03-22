@@ -14,43 +14,43 @@ using namespace FEAT;
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
   Mem::Main, double, Index,
-  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>,
+  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double >>,
   Meshopt::RumpfFunctional
   <
     double,
-    Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>
+    Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double >>
   >
 >;
 
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
   Mem::Main, double, Index,
-  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double >>,
+  Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double >>,
   Meshopt::RumpfFunctional
   <
     double,
-    Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, 3, double >>
+    Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double >>
   >
 >;
 
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
   Mem::Main, double, Index,
-  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>,
   Meshopt::RumpfFunctional
   <
     double,
-    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>
+    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>
   >
 >;
 
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
   Mem::Main, double, Index,
-  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, double>>,
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, double>>,
   Meshopt::RumpfFunctional
   <
     double,
-    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, double>>
+    Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, double>>
   >
 >;

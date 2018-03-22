@@ -108,8 +108,8 @@ namespace FEAT
           const VertexSetType& vertex_set = mesh.get_vertex_set();
 
           // fetch the vertex
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference vtx = vertex_set[cell_index];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& vtx = vertex_set[cell_index];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -231,9 +231,9 @@ namespace FEAT
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
           // fetch the vertices of the edge
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
-          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -385,10 +385,10 @@ namespace FEAT
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
           // fetch the vertices of the edge
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
-          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
-          ConstVertexReference v2 = vertex_set[index_set(cell_index, 2)];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -544,11 +544,11 @@ namespace FEAT
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
           // fetch the vertices of the edge
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
-          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
-          ConstVertexReference v2 = vertex_set[index_set(cell_index, 2)];
-          ConstVertexReference v3 = vertex_set[index_set(cell_index, 3)];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
+          const VertexType& v3 = vertex_set[index_set(cell_index, 3)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -707,9 +707,9 @@ namespace FEAT
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
           // fetch the vertices of the edge
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
-          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -861,11 +861,11 @@ namespace FEAT
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
           // fetch the vertices of the edge
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
-          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
-          ConstVertexReference v2 = vertex_set[index_set(cell_index, 2)];
-          ConstVertexReference v3 = vertex_set[index_set(cell_index, 3)];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
+          const VertexType& v3 = vertex_set[index_set(cell_index, 3)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -1025,15 +1025,15 @@ namespace FEAT
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
           // fetch the vertices of the edge
-          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
-          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
-          ConstVertexReference v2 = vertex_set[index_set(cell_index, 2)];
-          ConstVertexReference v3 = vertex_set[index_set(cell_index, 3)];
-          ConstVertexReference v4 = vertex_set[index_set(cell_index, 4)];
-          ConstVertexReference v5 = vertex_set[index_set(cell_index, 5)];
-          ConstVertexReference v6 = vertex_set[index_set(cell_index, 6)];
-          ConstVertexReference v7 = vertex_set[index_set(cell_index, 7)];
+          typedef typename VertexSetType::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
+          const VertexType& v3 = vertex_set[index_set(cell_index, 3)];
+          const VertexType& v4 = vertex_set[index_set(cell_index, 4)];
+          const VertexType& v5 = vertex_set[index_set(cell_index, 5)];
+          const VertexType& v6 = vertex_set[index_set(cell_index, 6)];
+          const VertexType& v7 = vertex_set[index_set(cell_index, 7)];
 
           // calculate transformation coefficients
           // j = _coeff[i][j] for all j = 0....7

@@ -30,7 +30,7 @@ namespace FEAT
         /// Data type for attributes
         typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
-        typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename MeshPartType::AttributeSetContainer AttributeSetContainer;
         /// Index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
         /// Target set holder type
@@ -99,7 +99,7 @@ namespace FEAT
          *
          * This MeshPart does not have any attributes.
          */
-        virtual void fill_attribute_sets(MeshAttributeContainer& DOXY(attribute_set_holder)) override
+        virtual void fill_attribute_sets(AttributeSetContainer& DOXY(attribute_set_holder)) override
         {
           // Do nothing
           return;

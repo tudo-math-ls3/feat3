@@ -481,14 +481,14 @@ namespace FEAT
     extern template class DuDvFunctional
     <
       Mem::Main, double, Index,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, double>>,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, double>>,
       LAFEM::SparseMatrixBCSR
     >;
 
     extern template class DuDvFunctional
     <
       Mem::Main, double, Index,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>,
       LAFEM::SparseMatrixBCSR
     >;
 #endif // FEAT_EICKT

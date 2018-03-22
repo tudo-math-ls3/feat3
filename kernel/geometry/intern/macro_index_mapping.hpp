@@ -54,9 +54,9 @@ namespace FEAT
           typedef FaceIndexMapping<Shape_, cell_dim_, face_dim_> FimType;
           for(Index i(0); i < Index(num_cells); ++i)
           {
-            for(Index j(0); j < Index(num_indices); ++j)
+            for(int j(0); j < num_indices; ++j)
             {
-              idx(i, j) = Index(FimType::map(int(i), int(j)));
+              idx(i, j) = Index(FimType::map(int(i), j));
             }
           }
         }
@@ -72,9 +72,9 @@ namespace FEAT
 
         static void build(IndexSet<num_indices>& idx)
         {
-          for(Index j(0); j < Index(num_indices); ++j)
+          for(int j(0); j < num_indices; ++j)
           {
-            idx(0, j) = j;
+            idx(0, j) = Index(j);
           }
         }
       };
@@ -143,18 +143,18 @@ namespace FEAT
           TargetSet& target = trg.template get_target_set<face_dim_>();
 
           // get our number of local faces
-          static constexpr Index num_faces = Index(Shape::FaceTraits<Shape_, face_dim_>::count);
+          static constexpr int num_faces = Shape::FaceTraits<Shape_, face_dim_>::count;
 
           // validate size
-          XASSERTM(target.get_num_entities() == num_faces, "invalid target set size");
+          XASSERTM(target.get_num_entities() == Index(num_faces), "invalid target set size");
 
           // get the index set
-          const IndexSet<int(num_faces)>& idx = ish.template get_index_set<Shape_::dimension, face_dim_>();
+          const IndexSet<num_faces>& idx = ish.template get_index_set<Shape_::dimension, face_dim_>();
 
           // loop over all faces
-          for(Index i(0); i < num_faces; ++i)
+          for(int i(0); i < num_faces; ++i)
           {
-            target[i] = idx(cell_idx, i);
+            target[Index(i)] = idx(cell_idx, i);
           }
 
           // recurse down
@@ -171,18 +171,18 @@ namespace FEAT
           TargetSet& target = trg.template get_target_set<0>();
 
           // get our number of local faces
-          static constexpr Index num_faces = Index(Shape::FaceTraits<Shape_,0>::count);
+          static constexpr int num_faces = Shape::FaceTraits<Shape_,0>::count;
 
           // validate size
-          XASSERTM(target.get_num_entities() == num_faces, "invalid target set size");
+          XASSERTM(target.get_num_entities() == Index(num_faces), "invalid target set size");
 
           // get the index set
-          const IndexSet<int(num_faces)>& idx = ish.template get_index_set<Shape_::dimension, 0>();
+          const IndexSet<num_faces>& idx = ish.template get_index_set<Shape_::dimension, 0>();
 
           // loop over all faces
-          for(Index i(0); i < num_faces; ++i)
+          for(int i(0); i < num_faces; ++i)
           {
-            target[i] = idx(cell_idx, i);
+            target[Index(i)] = idx(cell_idx, i);
           }
         }
       };

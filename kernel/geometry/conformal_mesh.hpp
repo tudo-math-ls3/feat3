@@ -27,12 +27,10 @@ namespace FEAT
     template<
       typename Shape_,
       int num_coords_ = Shape_::dimension,
-      int stride_ = num_coords_,
       typename Coord_ = Real>
     class ConformalMesh
     {
       static_assert(num_coords_ >= Shape_::dimension, "invalid number of coordinates");
-      static_assert(stride_ >= num_coords_, "invalid stride");
 
     public:
       /// Shape type
@@ -42,7 +40,7 @@ namespace FEAT
       typedef Coord_ CoordType;
 
       /// Vertex set type
-      typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
+      typedef VertexSet<num_coords_, Coord_> VertexSetType;
 
       /// Vertex type
       typedef typename VertexSetType::VertexType VertexType;
@@ -163,8 +161,6 @@ namespace FEAT
        * \param[in] other
        * The conformal mesh that is to be copied.
        */
-      //template<int stride2_, typename Coord2_>
-      //ConformalMesh(const ConformalMesh<Shape_, num_coords_, stride2_, Coord2_>& other) :
       ConformalMesh(const ConformalMesh& other) :
         _vertex_set(other.get_vertex_set()),
         _index_set_holder(other.get_index_set_holder()),
@@ -372,13 +368,12 @@ namespace FEAT
     template<
       typename Shape_,
       int num_coords_,
-      int stride_,
       typename CoordType_>
-    class Factory< ConformalMesh<Shape_, num_coords_, stride_, CoordType_> >
+    class Factory< ConformalMesh<Shape_, num_coords_, CoordType_> >
     {
     public:
       /// mesh typedef
-      typedef ConformalMesh<Shape_, num_coords_, stride_, CoordType_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, CoordType_> MeshType;
 
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
@@ -430,14 +425,13 @@ namespace FEAT
     template<
       typename Shape_,
       int num_coords_,
-      int stride_,
       typename CoordType_>
-    class StandardRefinery<ConformalMesh<Shape_, num_coords_, stride_, CoordType_> > :
-      public Factory< ConformalMesh<Shape_, num_coords_, stride_, CoordType_> >
+    class StandardRefinery<ConformalMesh<Shape_, num_coords_, CoordType_> > :
+      public Factory< ConformalMesh<Shape_, num_coords_, CoordType_> >
     {
     public:
       /// mesh type
-      typedef ConformalMesh<Shape_, num_coords_, stride_, CoordType_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, CoordType_> MeshType;
       /// shape type
       typedef typename MeshType::ShapeType ShapeType;
       /// vertex set type
@@ -524,15 +518,15 @@ namespace FEAT
     }; // class StandardRefinery<ConformalMesh<...>,Nil>
 
 #ifdef FEAT_EICKT
-    extern template class ConformalMesh<Shape::Simplex<2>, 2, 2, Real>;
-    extern template class ConformalMesh<Shape::Simplex<3>, 3, 3, Real>;
-    extern template class ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>;
-    extern template class ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>;
+    extern template class ConformalMesh<Shape::Simplex<2>, 2, Real>;
+    extern template class ConformalMesh<Shape::Simplex<3>, 3, Real>;
+    extern template class ConformalMesh<Shape::Hypercube<2>, 2, Real>;
+    extern template class ConformalMesh<Shape::Hypercube<3>, 3, Real>;
 
-    extern template class StandardRefinery<ConformalMesh<Shape::Simplex<2>, 2, 2, Real>>;
-    extern template class StandardRefinery<ConformalMesh<Shape::Simplex<3>, 3, 3, Real>>;
-    extern template class StandardRefinery<ConformalMesh<Shape::Hypercube<2>, 2, 2, Real>>;
-    extern template class StandardRefinery<ConformalMesh<Shape::Hypercube<3>, 3, 3, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Simplex<2>, 2, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Simplex<3>, 3, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Hypercube<2>, 2, Real>>;
+    extern template class StandardRefinery<ConformalMesh<Shape::Hypercube<3>, 3, Real>>;
 #endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT

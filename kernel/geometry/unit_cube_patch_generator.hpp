@@ -20,12 +20,12 @@ namespace FEAT
 
     /// \cond internal
     template<typename Coord_>
-    class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<1>, 1, 1, Coord_>>
+    class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<1>, 1, Coord_>>
     {
     public:
       typedef Shape::Hypercube<1> ShapeType;
       typedef Coord_ CoordType;
-      typedef ConformalMesh<ShapeType, 1, 1, Coord_> MeshType;
+      typedef ConformalMesh<ShapeType, 1, Coord_> MeshType;
       typedef MeshPart<MeshType> PartType;
       typedef RootMeshNode<MeshType> MeshNodeType;
 
@@ -57,7 +57,7 @@ namespace FEAT
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename BaseClass::AttributeSetContainer AttributeSetContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -75,7 +75,7 @@ namespace FEAT
           return Index(dim == 0 ? 1 : 0);
         }
 
-        virtual void fill_attribute_sets(MeshAttributeContainer&) override
+        virtual void fill_attribute_sets(AttributeSetContainer&) override
         {
         }
 
@@ -162,12 +162,12 @@ namespace FEAT
     }; // UnitCubePatchGenerator<Hypercube<1>>
 
     template<typename Coord_>
-    class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<2>, 2, 2, Coord_>>
+    class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<2>, 2, Coord_>>
     {
     public:
       typedef Shape::Hypercube<2> ShapeType;
       typedef Coord_ CoordType;
-      typedef ConformalMesh<ShapeType, 2, 2, Coord_> MeshType;
+      typedef ConformalMesh<ShapeType, 2, Coord_> MeshType;
       typedef MeshPart<MeshType> PartType;
       typedef RootMeshNode<MeshType> MeshNodeType;
 
@@ -205,7 +205,7 @@ namespace FEAT
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename BaseClass::AttributeSetContainer AttributeSetContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -223,7 +223,7 @@ namespace FEAT
           return Index(dim == 0 ? 1 : 0);
         }
 
-        virtual void fill_attribute_sets(MeshAttributeContainer&) override
+        virtual void fill_attribute_sets(AttributeSetContainer&) override
         {
         }
 
@@ -242,7 +242,7 @@ namespace FEAT
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename BaseClass::AttributeSetContainer AttributeSetContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -260,7 +260,7 @@ namespace FEAT
           return Index(dim == 0 ? 2 : (dim == 1 ? 1 : 0));
         }
 
-        virtual void fill_attribute_sets(MeshAttributeContainer&) override
+        virtual void fill_attribute_sets(AttributeSetContainer&) override
         {
         }
 
@@ -416,12 +416,12 @@ namespace FEAT
 
 
     template<typename Coord_>
-    class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<3>, 3, 3, Coord_>>
+    class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<3>, 3, Coord_>>
     {
     public:
       typedef Shape::Hypercube<3> ShapeType;
       typedef Coord_ CoordType;
-      typedef ConformalMesh<ShapeType, 3, 3, Coord_> MeshType;
+      typedef ConformalMesh<ShapeType, 3, Coord_> MeshType;
       typedef MeshPart<MeshType> PartType;
       typedef RootMeshNode<MeshType> MeshNodeType;
 
@@ -482,7 +482,7 @@ namespace FEAT
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename BaseClass::AttributeSetContainer AttributeSetContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -500,7 +500,7 @@ namespace FEAT
           return Index(dim == 0 ? 1 : 0);
         }
 
-        virtual void fill_attribute_sets(MeshAttributeContainer&) override
+        virtual void fill_attribute_sets(AttributeSetContainer&) override
         {
         }
 
@@ -519,7 +519,7 @@ namespace FEAT
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename BaseClass::AttributeSetContainer AttributeSetContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -537,7 +537,7 @@ namespace FEAT
           return Index(dim == 0 ? 2 : (dim == 1 ? 1 : 0));
         }
 
-        virtual void fill_attribute_sets(MeshAttributeContainer&) override
+        virtual void fill_attribute_sets(AttributeSetContainer&) override
         {
         }
 
@@ -559,7 +559,7 @@ namespace FEAT
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
+        typedef typename BaseClass::AttributeSetContainer AttributeSetContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -577,7 +577,7 @@ namespace FEAT
           return Index(dim == 0 ? 4 : (dim == 1 ? 4 : (dim == 2 ? 1 : 0)));
         }
 
-        virtual void fill_attribute_sets(MeshAttributeContainer&) override
+        virtual void fill_attribute_sets(AttributeSetContainer&) override
         {
         }
 

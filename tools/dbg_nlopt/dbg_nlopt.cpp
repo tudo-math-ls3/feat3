@@ -157,8 +157,8 @@ int run(Solver_& solver, Operator_& op)
     }
 
     // This Factory will create the polyline mesh
-    Geometry::PolylineFactory<dim, dim, DataType> pl_factory(points);
-    typedef Geometry::ConformalMesh<Shape::Hypercube<1>, dim, dim, DataType> PolylineMesh;
+    Geometry::PolylineFactory<dim, DataType> pl_factory(points);
+    typedef Geometry::ConformalMesh<Shape::Hypercube<1>, dim, DataType> PolylineMesh;
     PolylineMesh polyline(pl_factory);
 
     // Write this to file
@@ -178,7 +178,7 @@ int run(Solver_& solver, Operator_& op)
   // Shape for the mesh for plotting
   typedef Shape::Hypercube<dim> ShapeType;
   // The mesh tupe
-  typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
+  typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, DataType> MeshType;
   // We need a transformation so we can project the analytic function
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 

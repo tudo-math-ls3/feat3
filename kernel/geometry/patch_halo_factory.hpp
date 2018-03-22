@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_PATCH_HALO_BUILDER_HPP
-#define KERNEL_GEOMETRY_PATCH_HALO_BUILDER_HPP 1
+#ifndef KERNEL_GEOMETRY_PATCH_HALO_FACTORY_HPP
+#define KERNEL_GEOMETRY_PATCH_HALO_FACTORY_HPP 1
 
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
@@ -211,23 +211,23 @@ namespace FEAT
     /// \endcond
 
     template<typename Mesh_>
-    class PatchHaloBuilder;
+    class PatchHaloFactory;
 
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class PatchHaloBuilder<Geometry::ConformalMesh<Shape_, num_coords_, stride_, Coord_>> :
-      public Factory<MeshPart<Geometry::ConformalMesh<Shape_, num_coords_, stride_, Coord_>>>
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class PatchHaloFactory<Geometry::ConformalMesh<Shape_, num_coords_, Coord_>> :
+      public Factory<MeshPart<Geometry::ConformalMesh<Shape_, num_coords_, Coord_>>>
     {
     public:
       typedef Shape_ ShapeType;
       static constexpr int shape_dim = ShapeType::dimension;
 
-      typedef Geometry::ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef Geometry::ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
       typedef Geometry::MeshPart<MeshType> MeshPartType;
 
       /// Data type for attributes
       typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
       /// Mesh attribute holder type
-      typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
+      typedef typename MeshPartType::AttributeSetContainer AttributeSetContainer;
       /// index set holder type
       typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
       /// target set holder type
@@ -241,7 +241,7 @@ namespace FEAT
       Intern::PatchHaloBuildWrapper<ShapeType> _halo_wrapper;
 
     public:
-      explicit PatchHaloBuilder(
+      explicit PatchHaloFactory(
         const Adjacency::Graph& elems_at_rank,
         const MeshType& base_mesh,
         const MeshPartType& patch_mesh_part)
@@ -254,7 +254,7 @@ namespace FEAT
       {
       }
 
-      virtual ~PatchHaloBuilder()
+      virtual ~PatchHaloFactory()
       {
       }
 
@@ -272,7 +272,7 @@ namespace FEAT
         return _halo_wrapper.get_num_entities(dim);
       }
 
-      virtual void fill_attribute_sets(MeshAttributeContainer&) override
+      virtual void fill_attribute_sets(AttributeSetContainer&) override
       {
         // nothing to do
       }
@@ -286,8 +286,8 @@ namespace FEAT
       {
         _halo_wrapper.fill(target_set_holder);
       }
-    };
+    }; // class PatchHaloFactory<ConformalMesh<...>>
   } // namespace Geometry
 } // namespace FEAT
 
-#endif // KERNEL_GEOMETRY_PATCH_HALO_BUILDER_HPP
+#endif // KERNEL_GEOMETRY_PATCH_HALO_FACTORY_HPP

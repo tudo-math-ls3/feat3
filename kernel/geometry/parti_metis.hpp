@@ -38,8 +38,8 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class PartiMetis<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>
+    template<typename Shape_, int num_coords_, typename Coord_>
+    class PartiMetis<ConformalMesh<Shape_, num_coords_, Coord_>>
     {
       private:
         /// number of elements in input mesh
@@ -54,7 +54,7 @@ namespace FEAT
 
       public:
       /// our mesh type
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
 
       /**
        * \brief Constructor

@@ -28,16 +28,15 @@ namespace FEAT
     template<
       typename Shape_,
       int num_coords_,
-      int stride_,
       typename Coord_>
-    class BoundaryFactory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
-      public Factory<MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>>
+    class BoundaryFactory<ConformalMesh<Shape_, num_coords_, Coord_> > :
+      public Factory<MeshPart<ConformalMesh<Shape_, num_coords_, Coord_>>>
     {
     public:
       /// Our base class
-      typedef Factory<MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>> BaseClass;
+      typedef Factory<MeshPart<ConformalMesh<Shape_, num_coords_, Coord_>>> BaseClass;
       /// the input mesh type
-      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> InputMeshType;
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> InputMeshType;
       /// The MeshPart type
       typedef MeshPart<InputMeshType> MeshType;
       /// target set holder type
@@ -69,12 +68,12 @@ namespace FEAT
       }
 
       /// Fills the MeshPart's target set, except that it doesn't
-      virtual void fill_attribute_sets(typename BaseClass::MeshAttributeContainer& DOXY(target_set_holder)) override
+      virtual void fill_attribute_sets(typename BaseClass::AttributeSetContainer&) override
       {
       }
 
       /// Fills the MeshPart's index_set_holder, except that it doesn't as there is no topology
-      virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*& DOXY(index_set_holder)) override
+      virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*&) override
       {
       }
 

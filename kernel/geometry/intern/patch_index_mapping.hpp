@@ -26,7 +26,7 @@ namespace FEAT
           for(Index i(0); i < num_cells; ++i)
           {
             const Index isx(tsc[i]);
-            for(Index j(0); j < Index(num_indices_); ++j)
+            for(int j(0); j < num_indices_; ++j)
             {
               iso(i,j) = tsf[isi(isx, j)];
             }

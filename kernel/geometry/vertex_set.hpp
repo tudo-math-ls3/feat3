@@ -6,6 +6,9 @@
 #include <kernel/shape.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAT
 {
   namespace Geometry
@@ -18,9 +21,6 @@ namespace FEAT
      * \tparam num_coords_
      * The number of coordinates per vertex. Must be > 0.
      *
-     * \tparam stride_
-     * The stride for the vertex. Must be >= num_coords_.
-     *
      * \tparam Coord_
      * The data type for a vertex coordinate.
      *
@@ -28,38 +28,24 @@ namespace FEAT
      */
     template<
       int num_coords_,
-      int stride_ = num_coords_,
       typename Coord_ = Real>
     struct VertexSet
     {
       static_assert(num_coords_ > 0, "invalid num_coords_ parameter");
-      static_assert(stride_ >= num_coords_, "invalid stride_ parameter");
 
     public:
       /// number of coordinates per vertex
       static constexpr int num_coords = num_coords_;
-      /// vertex stride
-      static constexpr int stride = stride_;
 
       /// vertex coordinate type
       typedef Coord_ CoordType;
 
       /// vertex type
-      //typedef CoordType VertexType[stride_];
-      typedef Tiny::Vector<CoordType, num_coords, stride> VertexType;
-
-      /// vertex reference type
-      typedef VertexType& VertexReference;
-
-      /// const vertex reference type
-      typedef const VertexType& ConstVertexReference;
+      typedef Tiny::Vector<CoordType, num_coords> VertexType;
 
     protected:
-      /// number of vertices
-      Index _num_vertices;
-
-      /// vertex array
-      VertexType* _vertices;
+      /// vertex vector
+      std::vector<VertexType> _vertices;
 
       /// \cond internal
       template<int sm_, int sn_, int sv_>
@@ -88,9 +74,6 @@ namespace FEAT
 
       /// \endcond
 
-    private:
-      VertexSet& operator=(const VertexSet&);
-
     public:
       /**
        * \brief Constructor.
@@ -99,69 +82,19 @@ namespace FEAT
        * The number of vertices to be allocated in the vertex set.
        */
       explicit VertexSet(Index num_vertices) :
-        _num_vertices(num_vertices),
-        _vertices(nullptr)
+        _vertices(std::size_t(num_vertices))
       {
-        if(num_vertices > 0)
-        {
-          _vertices = new VertexType[num_vertices];
-        }
-      }
-
-      /// \cond internal
-      explicit VertexSet(
-        Index num_vertices,
-        int /*num_coords*/, // ignored
-        int /*stride*/)     // ignored
-         :
-        _num_vertices(num_vertices),
-        _vertices(nullptr)
-      {
-        if(num_vertices > 0)
-        {
-          _vertices = new VertexType[num_vertices];
-        }
-      }
-      /// \endcond
-
-      /**
-       * \brief Copy Constructor
-       *
-       * \param[in] other
-       * The vertex set that is to be copied.
-       */
-      //template<int stride2_, typename Coord2_>
-      //VertexSet(const VertexSet<num_coords_, stride2_, Coord2_>& other) :
-      VertexSet(const VertexSet& other) :
-        _num_vertices(other.get_num_vertices()),
-        _vertices(nullptr)
-      {
-        if(_num_vertices > 0)
-        {
-          _vertices = new VertexType[_num_vertices];
-          for(Index i(0); i < _num_vertices; ++i)
-          {
-            for(int j(0); j < num_coords_; ++j)
-            {
-              _vertices[i][j] = Coord_(other[i][j]);
-            }
-          }
-        }
       }
 
       /// virtual destructor
       virtual ~VertexSet()
       {
-        if(_vertices != nullptr)
-        {
-          delete [] _vertices;
-        }
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
-        return std::size_t(_num_vertices) * sizeof(VertexType);
+        return _vertices.size() * sizeof(VertexType);
       }
 
       /// Returns the number of coordinates per vertex.
@@ -170,16 +103,10 @@ namespace FEAT
         return num_coords_;
       }
 
-      /// Returns the vertex stride.
-      int get_stride() const
-      {
-        return stride_;
-      }
-
       /// Returns the number of vertices in the vertex set.
       Index get_num_vertices() const
       {
-        return _num_vertices;
+        return Index(_vertices.size());
       }
 
       /**
@@ -191,18 +118,16 @@ namespace FEAT
        * \returns
        * A reference to the vertex.
        */
-      VertexReference operator[](Index i)
+      VertexType& operator[](Index i)
       {
-        ASSERT(_vertices != nullptr);
-        ASSERT(i < _num_vertices);
+        ASSERT(i < get_num_vertices());
         return _vertices[i];
       }
 
       /** \copydoc operator[]() */
-      ConstVertexReference operator[](Index i) const
+      const VertexType& operator[](Index i) const
       {
-        ASSERT(_vertices != nullptr);
-        ASSERT(i < _num_vertices);
+        ASSERT(i < get_num_vertices());
         return _vertices[i];
       }
 
@@ -238,12 +163,10 @@ namespace FEAT
         Tiny::Matrix<CoordType, num_coords_, num_coords_> rot;
         _aux_rot_mat(rot, angles);
 
-        // loop over all vertices
-        VertexType tmp;
-        for(Index i(0); i < _num_vertices; ++i)
+        // transform all vertices
+        for(auto& v : _vertices)
         {
-          tmp = _vertices[i] - origin;
-          _vertices[i].set_mat_vec_mult(rot, tmp) += offset;
+          v.set_mat_vec_mult(rot, v - origin) += offset;
         }
       }
 

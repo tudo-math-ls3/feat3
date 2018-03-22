@@ -31,7 +31,7 @@ class BilinearOperatorTest :
   typedef typename MatrixType_::IndexType IndexType_;
   typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
 
-  typedef Geometry::ConformalMesh<Shape::Quadrilateral, 2, 2, DataType_> QuadMesh;
+  typedef Geometry::ConformalMesh<Shape::Quadrilateral, 2, DataType_> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
@@ -68,7 +68,7 @@ public:
   template<template<typename> class SpaceType_, typename ShapeType_, typename OperatorType_, int dim_>
   void test_apply1(const Index level, const int cubature_degree) const
   {
-    typedef Geometry::ConformalMesh<ShapeType_, dim_, dim_, DataType_> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType_, dim_, DataType_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef SpaceType_<TrafoType> SpaceType;
 
@@ -121,7 +121,7 @@ public:
   >
   void test_apply2(const Index level, const int cubature_degree) const
   {
-    typedef Geometry::ConformalMesh<ShapeType_, dim_, dim_, DataType_> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType_, dim_, DataType_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef TestSpaceType_<TrafoType> TestSpaceType;
     typedef TrialSpaceType_<TrafoType> TrialSpaceType;
@@ -258,7 +258,7 @@ public:
     LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
     for(Index i(0); i < num_quads; ++i)
     {
-      for(Index j(0); j < 4; ++j)
+      for(int j(0); j < 4; ++j)
         qatv(vatq(i,j), qatv(vatq(i,j)) + 1);
     }
 
@@ -289,10 +289,10 @@ public:
       // loop over all 4x4 entries
       for(int i(0); i < 4; ++i)
       {
-        Index nvi = qatv(vatq(cell,Index(i)));
+        Index nvi = qatv(vatq(cell,i));
         for(int j(0); j < 4; ++j)
         {
-          Index nvj = qatv(vatq(cell,Index(j)));
+          Index nvj = qatv(vatq(cell,j));
           if(i == j)
           {
             // main diagonal entry
@@ -360,7 +360,7 @@ class BandedBilinearOperatorTest :
   typedef LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
   typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
 
-  typedef Geometry::StructuredMesh<2, 2, 2, DataType_> QuadMesh;
+  typedef Geometry::StructuredMesh<2, 2, DataType_> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
@@ -480,7 +480,7 @@ public:
     LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
     for(Index i(0); i < num_quads; ++i)
     {
-      for(Index j(0); j < 4; ++j)
+      for(int j(0); j < 4; ++j)
         qatv(vatq(i,j), qatv(vatq(i,j)) + 1);
     }
 
@@ -511,10 +511,10 @@ public:
       // loop over all 4x4 entries
       for(int i(0); i < 4; ++i)
       {
-        Index nvi = qatv(vatq(cell,Index(i)));
+        Index nvi = qatv(vatq(cell,i));
         for(int j(0); j < 4; ++j)
         {
-          Index nvj = qatv(vatq(cell,Index(j)));
+          Index nvj = qatv(vatq(cell,j));
           if(i == j)
           {
             // main diagonal entry
