@@ -64,6 +64,7 @@ SET (test_list
   math-test
   memory_usage-test
   meta_math-test
+  pack-test
   property_map-test
   random-test
   simple_arg_parser-test
