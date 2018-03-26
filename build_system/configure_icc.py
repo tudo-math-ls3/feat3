@@ -85,6 +85,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
       cxxflags += " -xMIC-AVX512"
     elif cpu == "skylake":
       cxxflags += " -xCORE-AVX-I"
+    elif cpu == "kaby-lake":
+      cxxflags += " -xCORE-AVX-I"
     elif cpu == "itanium":
       # no setting necessary, the itanium version of the intel compiler
       # sets everything automatically
