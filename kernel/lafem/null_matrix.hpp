@@ -10,6 +10,7 @@
 #include <kernel/lafem/base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/util/checkpointable.hpp>
 
 namespace FEAT
 {
@@ -53,7 +54,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename Mem_, typename DT_, typename IT_, int BlockHeight_ = 1, int BlockWidth_ = 1>
-    class NullMatrix
+    class NullMatrix : public Checkpointable
     {
       static_assert(BlockHeight_ > 0, "invalid block size");
       static_assert(BlockWidth_ > 0, "invalid block size");
@@ -661,6 +662,24 @@ namespace FEAT
         // nothing to do here
       }
       /// \endcond
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return size_t(0);
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & /*data*/) override
+      {
+        // nothing to do here
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& /*data*/) override
+      {
+        // nothing to do here
+      }
 
       /* ******************************************************************* */
       /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */

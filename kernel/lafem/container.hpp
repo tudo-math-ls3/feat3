@@ -14,6 +14,7 @@
 #include <kernel/lafem/base.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/random.hpp>
+#include <kernel/util/checkpointable.hpp>
 
 #include <vector>
 #include <limits>
@@ -83,7 +84,7 @@ namespace FEAT
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class Container
+    class Container : public Checkpointable
     {
       template <typename Mem2_, typename DT2_, typename IT2_>
       friend class Container;
@@ -308,6 +309,39 @@ namespace FEAT
         }
       }
 
+       /**
+       * \brief Calculation of the serialised size of complete container entity.
+       *
+       * \return An unsigned int containing the size of serialised container.
+       *
+       * Calculate the size of the serialised container entity.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      uint64_t _serialised_size() const
+      {
+        Container<Mem::Main, DT2_, IT2_> tc(0);
+        tc.assign(*this);
+
+        uint64_t gsize(4 * sizeof(uint64_t)); //raw array size + magic number + type_index DT_ + type_index IT_
+        gsize += 6 * sizeof(uint64_t); // size of all six stl containers
+        gsize += tc._elements_size.size() * sizeof(uint64_t); // _elements_size contents
+        gsize += tc._indices_size.size() * sizeof(uint64_t); // _indices_size contents
+        gsize += tc._scalar_index.size() * sizeof(uint64_t); // _scalar_index contents
+        gsize += tc._scalar_dt.size() * sizeof(DT2_); // _scalar_dt contents
+
+        for (Index i(0) ; i < tc._elements_size.size() ; ++i)
+        {
+          gsize += tc._elements_size.at(i) * sizeof(DT2_); // actual array sizes
+        }
+        for (Index i(0) ; i < tc._indices_size.size() ; ++i)
+        {
+          gsize += tc._indices_size.at(i) * sizeof(IT2_); // actual array sizes
+        }
+        gsize +=16; //padding for datatype alignment mismatch
+
+        return gsize;
+      }
+
       /**
        * \brief Serialisation of complete container entity.
        *
@@ -343,22 +377,7 @@ namespace FEAT
         Container<Mem::Main, DT2_, IT2_> tc(0);
         tc.assign(*this);
 
-        uint64_t gsize(4 * sizeof(uint64_t)); //raw array size + magic number + type_index DT_ + type_index IT_
-        gsize += 6 * sizeof(uint64_t); // size of all six stl containers
-        gsize += tc._elements_size.size() * sizeof(uint64_t); // _elements_size contents
-        gsize += tc._indices_size.size() * sizeof(uint64_t); // _indices_size contents
-        gsize += tc._scalar_index.size() * sizeof(uint64_t); // _scalar_index contents
-        gsize += tc._scalar_dt.size() * sizeof(DT2_); // _scalar_dt contents
-
-        for (Index i(0) ; i < tc._elements_size.size() ; ++i)
-        {
-          gsize += tc._elements_size.at(i) * sizeof(DT2_); // actual array sizes
-        }
-        for (Index i(0) ; i < tc._indices_size.size() ; ++i)
-        {
-          gsize += tc._indices_size.at(i) * sizeof(IT2_); // actual array sizes
-        }
-        gsize +=16; //padding for datatype alignment mismatch
+        uint64_t gsize = this->template _serialised_size<DT2_, IT2_>();
 
         std::vector<char> result((size_t(gsize)));
         char * array(result.data());
@@ -769,6 +788,25 @@ namespace FEAT
         this->_scalar_dt = std::move(other._scalar_dt);
 
         this->_foreign_memory = other._foreign_memory;
+      }
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return this->template _serialised_size<>();
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        this->template _deserialise<>(FileMode::fm_binary, data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        auto buffer = this->template _serialise<>(FileMode::fm_binary);
+        data.insert(std::end(data), std::begin(buffer), std::end(buffer));
       }
 
       /**

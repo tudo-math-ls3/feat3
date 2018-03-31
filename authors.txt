@@ -12,6 +12,7 @@ to the main development code branch of FEAT3:
 2014 - 2017,   Jordi Paul
 2010 - 2019,   Dirk Ribbrock
 2014 - 2015,   Malte Schirwon
+2018 - 2019,   Kristina Sax
        2016,   David Schneider
 2018 - 2019,   Malte Schuh
 2013 - 2014,   Stefan Wahlers

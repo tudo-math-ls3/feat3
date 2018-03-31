@@ -11,6 +11,7 @@
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/util/checkpointable.hpp>
 
 // includes, system
 #include <type_traits>
@@ -63,7 +64,7 @@ namespace FEAT
       typename MatrixA_,
       typename MatrixB_ = MatrixA_,
       typename MatrixD_ = MatrixB_>
-    class SaddlePointMatrix
+    class SaddlePointMatrix : public Checkpointable
     {
     public:
       /// type of sub-matrix A
@@ -574,6 +575,48 @@ namespace FEAT
         }
       }
       /// \endcond
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return (3 * sizeof(uint64_t)) + this->block_a().get_checkpoint_size() + this->block_b().get_checkpoint_size() + this->block_d().get_checkpoint_size();
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed block a
+        std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t); //get iterator at the beginning of block a
+        std::vector<char>::iterator end = std::begin(data) + sizeof(uint64_t) + (int) isize; //get iterator at the beginning of block a
+        std::vector<char> buffer_a(start, end); //copy the data of block a to fresh vector
+        this->block_a().restore_from_checkpoint_data(buffer_a);
+
+        data.erase(std::begin(data), end);
+        isize = *(uint64_t*) data.data();
+        start = std::begin(data) + sizeof(uint64_t);
+        end = std::begin(data) + sizeof(uint64_t) + (int) isize;
+        std::vector<char> buffer_b(start, end);
+        this->block_b().restore_from_checkpoint_data(buffer_b);
+
+        data.erase(std::begin(data), end);
+        this->block_d().restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        uint64_t isize = this->block_a().get_checkpoint_size();
+        char* csize = reinterpret_cast<char*>(&isize);
+        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed block a to the overall checkpoint data
+        this->block_a().set_checkpoint_data(data); //add data of block a to the overall checkpoint
+
+        isize = this->block_b().get_checkpoint_size();
+        csize = reinterpret_cast<char*>(&isize);
+        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed block b to the overall checkpoint data
+        this->block_b().set_checkpoint_data(data); //add data of block b to the overall checkpoint
+
+        this->block_d().set_checkpoint_data(data); //add data of block d to the overall checkpoint
+      }
 
       /**
        * \brief Conversion method

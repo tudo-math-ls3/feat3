@@ -10,6 +10,7 @@
 #include <kernel/global/gate.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp> // required for LAFEM::CloneMode
+#include <kernel/util/checkpointable.hpp>
 
 namespace FEAT
 {
@@ -21,7 +22,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename LocalVector_, typename Mirror_>
-    class Vector
+    class Vector : public Checkpointable
     {
     public:
       typedef Gate<LocalVector_, Mirror_> GateType;
@@ -244,6 +245,24 @@ namespace FEAT
       std::shared_ptr<SynchScalarTicket<DataType>> max_element_async() const
       {
         return _gate->max_element_async(_vector);
+      }
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return _vector.get_checkpoint_size();
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char>& data) override
+      {
+        _vector.restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        _vector.set_checkpoint_data(data);
       }
     };
   } // namespace Global

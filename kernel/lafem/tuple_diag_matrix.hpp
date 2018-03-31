@@ -11,6 +11,7 @@
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/meta_element.hpp>
+#include <kernel/util/checkpointable.hpp>
 
 #include <fstream>
 
@@ -32,7 +33,7 @@ namespace FEAT
     template<
       typename First_,
       typename... Rest_>
-    class TupleDiagMatrix
+    class TupleDiagMatrix : public Checkpointable
     {
       // declare this class template as a friend for recursive inheritance
       template<typename, typename...>
@@ -536,6 +537,36 @@ namespace FEAT
       }
       /// \endcond
 
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return sizeof(uint64_t) + _first.get_checkpoint_size() + _rest.get_checkpoint_size(); //sizeof(uint64_t) bits needed to store lenght of checkpointed _first
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed _first
+        std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t);
+        std::vector<char>::iterator last_of_first = std::begin(data) + sizeof(uint64_t) + (int) isize;
+        std::vector<char> buffer_first(start, last_of_first);
+        _first.restore_from_checkpoint_data(buffer_first);
+
+        data.erase(std::begin(data), last_of_first);
+        _rest.restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        uint64_t isize = _first.get_checkpoint_size();
+        char* csize = reinterpret_cast<char*>(&isize);
+        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed _first element to the overall checkpoint data
+        _first.set_checkpoint_data(data); //add data of _first to the overall checkpoint
+
+        _rest.set_checkpoint_data(data); //generate and add checkpoint data for the _rest
+      }
+
       /**
        * \brief Conversion method
        *
@@ -573,7 +604,7 @@ namespace FEAT
 
     /// \cond internal
     template<typename First_>
-    class TupleDiagMatrix<First_>
+    class TupleDiagMatrix<First_> : public Checkpointable
     {
       template<typename,typename...>
       friend class TupleDiagMatrix;
@@ -846,6 +877,24 @@ namespace FEAT
       void set_line_revse(const Index row, DataType * const pval_set, const Index stride = 1) const
       {
         this->first().set_line_reverse(row, pval_set, stride);
+      }
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return _first.get_checkpoint_size();
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        _first.restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        _first.set_checkpoint_data(data);
       }
 
       /**

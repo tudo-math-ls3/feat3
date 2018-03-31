@@ -10,6 +10,7 @@
 // includes, FEAT
 #include <kernel/lafem/meta_element.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/util/checkpointable.hpp>
 
 // includes, system
 #include <iostream>
@@ -36,7 +37,7 @@ namespace FEAT
     template<
       typename SubType_,
       int count_>
-    class PowerVector
+    class PowerVector : public Checkpointable
     {
     private:
       // Note: the case = 1 is specialised below
@@ -244,6 +245,36 @@ namespace FEAT
       {
         XASSERTM((0 <= i) && (i < count_), "invalid sub-vector index");
         return (i == 0) ? _first : _rest.get(i-1);
+      }
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return sizeof(uint64_t) + _first.get_checkpoint_size() + _rest.get_checkpoint_size(); //sizeof(uint64_t) bits needed to store lenght of checkpointed _first
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed _first
+        std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t);
+        std::vector<char>::iterator last_of_first = std::begin(data) + sizeof(uint64_t) + (int) isize;
+        std::vector<char> buffer_first(start, last_of_first);
+        _first.restore_from_checkpoint_data(buffer_first);
+
+        data.erase(std::begin(data), last_of_first);
+        _rest.restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        uint64_t isize = _first.get_checkpoint_size();
+        char* csize = reinterpret_cast<char*>(&isize);
+        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed _first element to the overall checkpoint data
+        _first.set_checkpoint_data(data); //add data of _first to the overall checkpoint
+
+        _rest.set_checkpoint_data(data); //generate and add checkpoint data for the _rest
       }
 
       /// \cond internal
@@ -654,6 +685,18 @@ namespace FEAT
 
         _write_out_binary(file);
       }
+
+      /**
+       * \brief PowerVector comparison operator
+       *
+       * \param[in] a A vector to compare with.
+       * \param[in] b A vector to compare with.
+       */
+      template <typename Mem2_>
+      friend bool operator== (const PowerVector & a, const ContainerType<Mem2_> & b)
+      {
+        return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
+      }
     }; // class PowerVector<...>
 
     /// \cond internal
@@ -663,7 +706,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename SubType_>
-    class PowerVector<SubType_, 1>
+    class PowerVector<SubType_, 1> : public Checkpointable
     {
     private:
 
@@ -814,6 +857,24 @@ namespace FEAT
       const SubVectorType& first() const
       {
         return _first;
+      }
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return _first.get_checkpoint_size();
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        _first.restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        _first.set_checkpoint_data(data);
       }
 
       int blocks() const
@@ -1084,6 +1145,18 @@ namespace FEAT
         file.write(result.data(), long(result.size()));
 
         _write_out_binary(file);
+      }
+
+      /**
+       * \brief PowerVector comparison operator
+       *
+       * \param[in] a A vector to compare with.
+       * \param[in] b A vector to compare with.
+       */
+      template <typename Mem2_>
+      friend bool operator== (const PowerVector & a, const ContainerType<Mem2_> & b)
+      {
+        return (a.name() == b.name()) && (a.first() == b.first());
       }
     }; // class PowerVector<...,1>
 

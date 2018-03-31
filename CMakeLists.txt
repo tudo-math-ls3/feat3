@@ -194,6 +194,7 @@ ADD_SUBDIRECTORY( applications )
 ADD_SUBDIRECTORY( area51 )
 ADD_SUBDIRECTORY( benchmarks )
 ADD_SUBDIRECTORY( tutorials )
+ADD_SUBDIRECTORY( control )
 
 # store all variables describing the build in a custom header file
 # to use later on in the real code

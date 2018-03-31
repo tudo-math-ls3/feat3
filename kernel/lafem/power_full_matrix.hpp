@@ -13,6 +13,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/util/checkpointable.hpp>
 
 #include <fstream>
 
@@ -50,7 +51,7 @@ namespace FEAT
       typename SubType_,
       int width_,
       int height_>
-    class PowerFullMatrix
+    class PowerFullMatrix : public Checkpointable
     {
       static_assert((width_ > 0) && (height_ > 0), "invalid matrix dimensions");
 
@@ -387,6 +388,24 @@ namespace FEAT
       void convert_reverse(PowerFullMatrix<SubType2_, width_, height_> & other) const
       {
         _container.convert_reverse(other._container);
+      }
+
+      /// \copydoc Checkpointable::get_checkpoint_size()
+      virtual uint64_t get_checkpoint_size() override
+      {
+        return _container.get_checkpoint_size();
+      }
+
+      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      {
+        _container.restore_from_checkpoint_data(data);
+      }
+
+      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
+      virtual void set_checkpoint_data(std::vector<char>& data) override
+      {
+        _container.set_checkpoint_data(data);
       }
 
       /**
