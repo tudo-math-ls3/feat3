@@ -2684,9 +2684,9 @@ namespace FEAT
 
         if(std::is_same<Mem::Main, Mem_>::value)
         {
-          col_ind_a = (IT_*)a.col_ind();
-          val_a = (DT_*)a.val();
-          row_ptr_a = (IT_*)a.row_ptr();
+          col_ind_a = const_cast<IT_*>(a.col_ind());
+          val_a = const_cast<DT_*>(a.val());
+          row_ptr_a = const_cast<IT_*>(a.row_ptr());
         }
         else
         {
@@ -2699,9 +2699,9 @@ namespace FEAT
         }
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
-          col_ind_b = (IT_*)b.col_ind();
-          val_b = (DT_*)b.val();
-          row_ptr_b = (IT_*)b.row_ptr();
+          col_ind_b = const_cast<IT_*>(b.col_ind());
+          val_b = const_cast<DT_*>(b.val());
+          row_ptr_b = const_cast<IT_*>(b.row_ptr());
         }
         else
         {

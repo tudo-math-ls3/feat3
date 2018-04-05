@@ -1265,8 +1265,8 @@ namespace FEAT
 
         if(std::is_same<Mem::Main, Mem_>::value)
         {
-          offsets_a = (IT_*)a.offsets();
-          val_a = (DT_*)a.val();
+          offsets_a = const_cast<IT_*>(a.offsets());
+          val_a = const_cast<DT_*>(a.val());
         }
         else
         {
@@ -1278,8 +1278,8 @@ namespace FEAT
 
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
-          offsets_b = (IT_*)b.offsets();
-          val_b = (DT_*)b.val();
+          offsets_b = const_cast<IT_*>(b.offsets());
+          val_b = const_cast<DT_*>(b.val());
         }
         else
         {

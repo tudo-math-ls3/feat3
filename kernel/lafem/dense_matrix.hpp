@@ -512,7 +512,7 @@ namespace FEAT
 
         if(std::is_same<Mem::Main, Mem_>::value)
         {
-          ta = (DT_*)a.elements();
+          ta = const_cast<DT_*>(a.elements());
         }
         else
         {
@@ -522,7 +522,7 @@ namespace FEAT
 
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
-          tb = (DT_*)b.elements();
+          tb = const_cast<DT_*>(b.elements());
         }
         else
         {
