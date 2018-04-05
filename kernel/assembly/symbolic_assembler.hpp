@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/space/dof_mapping_renderer.hpp>
+#include <kernel/lafem/null_matrix.hpp>
 
 namespace FEAT
 {
@@ -301,6 +302,16 @@ namespace FEAT
         matrix = MatrixType_(assemble_graph_std2(test_space, trial_space));
       }
 
+      /// specialisation for NullMatrix
+      template<typename Mem_, typename DT_, typename IT_, int BH_, int BW_, typename TestSpace_, typename TrialSpace_>
+      static void assemble_matrix_std2(
+        LAFEM::NullMatrix<Mem_, DT_, IT_, BH_, BW_>& matrix,
+        const TestSpace_& test_space, const TrialSpace_& trial_space)
+      {
+        // only the dimensions are required here
+        matrix.resize(test_space.get_num_dofs(), trial_space.get_num_dofs());
+      }
+
       /**
        * \brief Assembles a standard matrix structure from a single space.
        *
@@ -314,6 +325,15 @@ namespace FEAT
       static void assemble_matrix_std1(MatrixType_ & matrix, const Space_& space)
       {
         matrix = MatrixType_(assemble_graph_std1(space));
+      }
+
+      /// specialisation for NullMatrix
+      template<typename Mem_, typename DT_, typename IT_, int BH_, int BW_, typename Space_>
+      static void assemble_matrix_std1(
+        LAFEM::NullMatrix<Mem_, DT_, IT_, BH_, BW_>& matrix, const Space_& space)
+      {
+        // only the dimensions are required here
+        matrix.resize(space.get_num_dofs(), space.get_num_dofs());
       }
 
       /**
@@ -365,7 +385,6 @@ namespace FEAT
       static void assemble_matrix_2lvl(MatrixType_ & matrix,
         const FineSpace_& fine_space, const CoarseSpace_& coarse_space)
       {
-        // assemble Graph
         matrix = MatrixType_(assemble_graph_2lvl(fine_space, coarse_space));
       }
     }; // class SymbolicAssembler
