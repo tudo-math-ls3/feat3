@@ -373,11 +373,10 @@ namespace FEAT
         return std::size_t(c);
       }
 #else // non-MPI implementation
-    private:
+    public:
       /// status-dummy for non-MPI builds
       int status;
 
-    public:
       Status() :
         status(0)
       {

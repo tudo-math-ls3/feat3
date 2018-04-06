@@ -190,14 +190,12 @@ namespace FEAT
           OperatorType::trial_config> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
-        typedef typename AsmTraits::TrafoType TrafoType;
 
         // shape types
-        typedef typename AsmTraits::ShapeType ShapeType;
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
 
         // fetch the trafo
-        const typename AsmTraits::TrafoType& trafo = test_space.get_trafo();
+        const TrafoType& trafo = test_space.get_trafo();
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -370,14 +368,12 @@ namespace FEAT
           FunctionalType::test_config> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
-        typedef typename AsmTraits::TrafoType TrafoType;
 
         // shape types
-        typedef typename AsmTraits::ShapeType ShapeType;
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
 
         // fetch the trafo
-        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+        const TrafoType& trafo = space.get_trafo();
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -573,14 +569,12 @@ namespace FEAT
           SpaceTags::value|SpaceTags::grad> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
-        typedef typename AsmTraits::TrafoType TrafoType;
 
         // shape types
-        typedef typename AsmTraits::ShapeType ShapeType;
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
 
         // fetch the trafo
-        const typename AsmTraits::TrafoType& trafo = space_v.get_trafo();
+        const TrafoType& trafo = space_v.get_trafo();
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
