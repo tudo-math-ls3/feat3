@@ -22,6 +22,9 @@ TARGET_LINK_LIBRARIES(dbg-trace-1 feat)
 ADD_EXECUTABLE(dbg-trace-2 dbg_trace/dbg_trace_2.cpp)
 TARGET_LINK_LIBRARIES(dbg-trace-2 feat)
 
+ADD_EXECUTABLE(dbg-tuple-matrix dbg_tuple_matrix/dbg_tuple_matrix.cpp)
+TARGET_LINK_LIBRARIES(dbg-tuple-matrix feat)
+
 ADD_EXECUTABLE(dbg-vanka dbg_vanka/dbg_vanka.cpp)
 TARGET_LINK_LIBRARIES(dbg-vanka feat)
 
