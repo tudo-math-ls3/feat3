@@ -523,7 +523,6 @@ namespace FEAT
         _ofs << "POINTS " << num_ref_verts << " double" << std::endl;
 
         // create trafo evaluator and data
-        typedef typename TrafoType::template Evaluator<>::Type TrafoEval;
         typedef typename TrafoEval::DomainPointType DomainPointType;
         typedef typename TrafoEval::template ConfigTraits<TrafoTags::img_point>::EvalDataType TrafoData;
         DomainPointType dom_point;
