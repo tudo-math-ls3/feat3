@@ -67,6 +67,16 @@ if exist "./zlib" (
   echo.
 )
 
+rem ===========================================================================
+echo **************************************************************************
+if exist "./triangle" (
+  call ./vc_internal/make_triangle_vc%VSVER%.cmd dbg x86
+  call ./vc_internal/make_triangle_vc%VSVER%.cmd opt x86
+) else (
+  echo triangle not found; skipping...
+  echo.
+)
+
 echo **************************************************************************
 
 rem ===========================================================================

@@ -85,6 +85,11 @@ This macro is defined by the build system detects a cuda sdk version equal or gr
 This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
 
 <hr>
+\subsection ppm_feat_have_halfmath FEAT_HAVE_HALFMATH
+This macro is defined by the build system if the FEAT kernel has support for halfmath datatypes.
+The datatypes name is half_float::half.
+
+<hr>
 \subsection ppm_feat_have_metis FEAT_HAVE_METIS
 This macro is defined by the build system if the FEAT kernel is linked against the METIS library.
 
@@ -111,13 +116,22 @@ which is included in the GCC compiler since version 4.6.0. If defined, correspon
 for the datatype <code>__float128</code> are supplied.
 
 <hr>
-\subsection ppm_feat_have_halfmath FEAT_HAVE_HALFMATH
-This macro is defined by the build system if the FEAT kernel has support for halfmath datatypes.
-The datatypes name is half_float::half.
+\subsection ppm_feat_have_triangle FEAT_HAVE_TRIANGLE
+This macro is defined by the build system if the FEAT kernel is linked against the triangle library,
+which offers a set of 2D triangular mesh generators.
+
+\note
+If you want to include the <c>triangle.h</c> header file, you first have to define the following preprocessor macros,
+\b before including the header itself:
+\code{.cpp}
+#define ANSI_DECLARATORS
+#define REAL double
+#define VOID void
+\endcode
 
 <hr>
 \subsection ppm_feat_have_umfpack FEAT_HAVE_UMFPACK
-This macro is defined by the build system if the FEAT kernel is linked agains the UMFPACK library, which is part of
+This macro is defined by the build system if the FEAT kernel is linked against the UMFPACK library, which is part of
 the SuiteSparse library package.
 
 <hr>

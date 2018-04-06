@@ -90,3 +90,15 @@ if (FEAT_HAVE_ZLIB)
   #  SET_PROPERTY(TARGET thirdparty-zlib APPEND_STRING PROPERTY LINK_FLAGS " -fno-lto")
   #endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 endif (FEAT_HAVE_ZLIB)
+
+if (FEAT_HAVE_TRIANGLE)
+  # only this one source file is required
+  file(GLOB triangle-list "${FEAT_SOURCE_DIR}/thirdparty/triangle/triangle.c")
+
+  ADD_LIBRARY(thirdparty-triangle STATIC ${triangle-list})
+  if (FEAT_COTIRE)
+    cotire(thirdparty-triangle)
+  endif (FEAT_COTIRE)
+  SET_PROPERTY(TARGET thirdparty-triangle APPEND PROPERTY COMPILE_FLAGS " -w -DANSI_DECLARATORS -DTRILIBRARY")
+  SET_PROPERTY(TARGET thirdparty-triangle APPEND PROPERTY LINK_FLAGS " -w")
+endif (FEAT_HAVE_TRIANGLE)

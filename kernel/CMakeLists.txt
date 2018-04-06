@@ -52,6 +52,10 @@ if (FEAT_HAVE_ZLIB)
   TARGET_LINK_LIBRARIES(feat thirdparty-zlib)
 endif (FEAT_HAVE_ZLIB)
 
+if (FEAT_HAVE_TRIANGLE)
+  TARGET_LINK_LIBRARIES(feat thirdparty-triangle)
+endif (FEAT_HAVE_TRIANGLE)
+
 #libquadmath needs to be the last library linked against
 if (FEAT_HAVE_QUADMATH)
   TARGET_LINK_LIBRARIES (feat -lquadmath)
