@@ -36,8 +36,7 @@
 #include <kernel/util/compiler_intel.hpp>      // Intel(R) C/C++ compiler
 #include <kernel/util/compiler_microsoft.hpp>  // Microsoft(R) (Visual) C/C++ compiler
 #include <kernel/util/compiler_oracle.hpp>     // SunStudio/OracleStudio C/C++ compiler
-#include <kernel/util/compiler_open64.hpp>     // Open64 C/C++ compiler
-// The GNU compiler must be the last one in this list, because other compilers (e.g. Intel and Open64, Clang)
+// The GNU compiler must be the last one in this list, because other compilers (e.g. Intel and Clang)
 // also define the __GNUC__ macro used to identify the GNU C/C++ compiler, thus leading to incorrect
 // compiler detection.
 #include <kernel/util/compiler_gnu.hpp>        // GNU C/C++ compiler
