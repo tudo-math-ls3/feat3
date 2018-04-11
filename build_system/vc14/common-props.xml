@@ -87,6 +87,9 @@
   <PropertyGroup Condition="Exists('..\..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\..\lib\triangle.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveTriangle>true</FeatHaveTriangle>
+  </PropertyGroup>
   <PropertyGroup Condition="Exists('..\..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveUmfpack>true</FeatHaveUmfpack>
   </PropertyGroup>
@@ -118,6 +121,8 @@
       Include="FEAT_HAVE_METIS" />
     <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
       Include="FEAT_HAVE_PARMETIS" />
+    <FeatDef Condition="'$(FeatHaveTriangle)'=='true'"
+      Include="FEAT_HAVE_TRIANGLE" />
     <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="FEAT_HAVE_UMFPACK" />
     <FeatDef Condition="'$(FeatHaveZlib)'=='true'"
@@ -133,7 +138,7 @@
     <FeatIncDir Condition="'$(FeatHaveCuda)'=='true'"
       Include="$(CUDA_PATH)\include" />
     <FeatIncDir Condition="'$(FeatHaveAlgLib)'=='true'"
-      Include="$(FeatRootPath)\thirdparty\ALGLIB\src;" />
+      Include="$(FeatRootPath)\thirdparty\ALGLIB\cpp\src;" />
     <FeatIncDir Condition="'$(FeatHaveFParser)'=='true'"
       Include="$(FeatRootPath)\thirdparty\fparser;" />
     <FeatIncDir Condition="'$(FeatHaveHalfMath)'=='true'"
@@ -142,6 +147,8 @@
       Include="$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
     <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
       Include="$(FeatRootPath)\thirdparty\parmetis\include;" />
+    <FeatIncDir Condition="'$(FeatHaveTriangle)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\triangle;" />
     <FeatIncDir Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="$(FeatRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeatRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeatRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
     <FeatIncDir Condition="'$(FeatHaveZlib)'=='true'"
@@ -177,8 +184,6 @@
       Include="mkl_intel_c.lib" />
     <FeatLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
       Include="mkl_intel_lp64.lib" />-->
-    <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"
-      Include="umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveAlgLib)'=='true'"
       Include="alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveFParser)'=='true'"
@@ -187,6 +192,10 @@
       Include="metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
       Include="parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveTriangle)'=='true'"
+      Include="triangle.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"
+      Include="umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveZlib)'=='true'"
       Include="zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>
