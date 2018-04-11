@@ -10,12 +10,17 @@
 
 #ifdef FEAT_HAVE_ALGLIB
 FEAT_DISABLE_WARNINGS
-#include <thirdparty/alglib/cpp/src/optimization.h>
+#include <optimization.h>
 FEAT_RESTORE_WARNINGS
+#endif // FEAT_HAVE_ALGLIB
+
+#if defined(FEAT_HAVE_ALGLIB) || defined(DOXYGEN)
+
 namespace FEAT
 {
   namespace Solver
   {
+    /// \cond internal
     namespace Intern
     {
       /// returns the object, if T_ has a GateType, i.e. is a GlobalVector - SFINAE at its best
@@ -31,8 +36,8 @@ namespace FEAT
       {
         return object;
       }
-
     } // namespace Intern
+    /// \endcond
 
     /**
      * \brief Wrapper around ALGLIB's lBFGS implementation for minimising an functional's gradient
@@ -1123,5 +1128,5 @@ namespace FEAT
       }
   } // namespace Solver
 } // namespace FEAT
-#endif // FEAT_HAVE_ALGLIB
+#endif // defined(FEAT_HAVE_ALGLIB) || defined(DOXYGEN)
 #endif // FEAT_KERNEL_SOLVER_ALGLIB_WRAPPER
