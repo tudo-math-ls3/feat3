@@ -438,13 +438,10 @@ namespace FEAT
       static constexpr int max_local_trial_dofs = TrialEvaluator::max_local_dofs;
       static constexpr int max_local_mult_dofs  = MultEvaluator::max_local_dofs;
 
-      /// local vector type
-      /// \todo this seems kinda wrong -- double-check this
-      typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> FunctionalValueType;
-      typedef Tiny::Vector<FunctionalValueType, SpaceEvaluator::max_local_dofs> LocalVectorType;
-      typedef Tiny::Vector<FunctionalValueType, BlockHeight> LocalTestVectorType;
-      typedef Tiny::Vector<FunctionalValueType, BlockWidth>  LocalTrialVectorType;
-      typedef Tiny::Vector<FunctionalValueType, BlockWidth> LocalMultVectorType;
+      /// local vector types
+      typedef Tiny::Vector<Tiny::Vector<DataType, BlockHeight>, TestEvaluator::max_local_dofs> LocalTestVectorType;
+      typedef Tiny::Vector<Tiny::Vector<DataType, BlockWidth>, TrialEvaluator::max_local_dofs> LocalTrialVectorType;
+      typedef LocalTrialVectorType LocalMultVectorType;
 
       /// local matrix type
       typedef Tiny::Matrix<OperatorValueType, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs> LocalMatrixType;
