@@ -98,9 +98,29 @@ if (FEAT_VALGRIND)
   #--keep-stacktraces=alloc-and-free
 endif (FEAT_VALGRIND)
 
+
+# include directories of third-party libraries
+
 if (FEAT_HAVE_ALGLIB)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/alglib/cpp/src/")
 endif(FEAT_HAVE_ALGLIB)
+
+if (FEAT_HAVE_FPARSER)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/fparser/")
+endif(FEAT_HAVE_FPARSER)
+
+if (FEAT_HAVE_HALFMATH)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/half/include/")
+endif(FEAT_HAVE_HALFMATH)
+
+if (FEAT_HAVE_PARMETIS)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
+endif (FEAT_HAVE_PARMETIS)
+
+if (FEAT_HAVE_TRIANGLE)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/triangle/")
+endif(FEAT_HAVE_TRIANGLE)
 
 if (FEAT_HAVE_UMFPACK)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
@@ -108,23 +128,10 @@ if (FEAT_HAVE_UMFPACK)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
 endif (FEAT_HAVE_UMFPACK)
 
-if (FEAT_HAVE_FPARSER)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/fparser/")
-endif(FEAT_HAVE_FPARSER)
-
-if (FEAT_HAVE_PARMETIS)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
-endif (FEAT_HAVE_PARMETIS)
-
 if (FEAT_HAVE_ZLIB)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/zlib/zlib-1.2.11/")
 endif(FEAT_HAVE_ZLIB)
 
-
-if (FEAT_HAVE_HALFMATH)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/half/include/")
-endif(FEAT_HAVE_HALFMATH)
 
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
