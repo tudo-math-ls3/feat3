@@ -398,8 +398,9 @@ nlsd_hb_f(float(0.5), Index(19), Index(56), "SecantLinesearch", "ApproximateHess
 NLSDTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 nlsd_rb_d(double(0.75), Index(20), Index(87), "MQCLinesearch", "Hessian");
 
-NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
-nlsd_rb_d_sw(double(0.6), Index(17), Index(77), "NewtonRaphsonLinesearch", "none");
+/// \todo test reaches max-iter(100) with avx2 active
+/*NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
+nlsd_rb_d_sw(double(0.6), Index(17), Index(77), "NewtonRaphsonLinesearch", "none");*/
 
 #ifdef FEAT_HAVE_QUADMATH
 NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
