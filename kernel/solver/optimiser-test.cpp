@@ -192,7 +192,7 @@ nlcg_sw_bs_d(double(0.33),Index(64), Index(240),"MQCLinesearch","none", NLCGDire
 
 // This is the weird Hager-Zhang update
 NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
-nlcg_s_hb_d(double(0.4),Index(27) ,Index(127),
+nlcg_s_hb_d(double(0.4),Index(27) ,Index(132),
 "NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::HagerZhang);
 
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
@@ -205,7 +205,7 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_hessian_rb_d(double(0.95), Index(25), Index(42), "MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
-nlcg_sw_hessian_gp_d(double(0.5), Index(16), Index(99), "MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
+nlcg_sw_hessian_gp_d(double(0.5), Index(16), Index(117), "MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
 
 #ifdef FEAT_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
@@ -410,7 +410,7 @@ nlsd_rb_q(__float128(0.55), Index(96), Index(158), "SecantLinesearch", "Hessian"
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f_cuda(float(0.75), Index(8), Index(35), "MQCLinesearch", "Hessian");
+nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian");
 #endif
 
 #ifdef FEAT_HAVE_ALGLIB
@@ -538,7 +538,7 @@ ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShe
 alg_lbfgs_bs_d(double(0.48), Index(34), Index(87));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::GoldsteinPriceFunction>
-alg_lbfgs_gp_d(double(0.65), Index(15), Index(59));
+alg_lbfgs_gp_d(double(0.65), Index(15), Index(79));
 
 /**
  * \brief Test class template for ALGLIB's mincg optimiser
@@ -664,5 +664,5 @@ ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFun
 alg_mincg_rb_d(double(0.8), Index(41), Index(118), NLCGDirectionUpdate::DYHSHybrid);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_mincg_bs_d(double(0.33), Index(58), Index(194), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_bs_d(double(0.33), Index(58), Index(217), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAT_HAVE_ALGLIB
