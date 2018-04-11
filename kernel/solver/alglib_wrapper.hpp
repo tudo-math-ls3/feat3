@@ -10,7 +10,7 @@
 
 #ifdef FEAT_HAVE_ALGLIB
 FEAT_DISABLE_WARNINGS
-#include <thirdparty/alglib/cpp/src/optimization.h>
+#include <optimization.h>
 FEAT_RESTORE_WARNINGS
 #endif // FEAT_HAVE_ALGLIB
 

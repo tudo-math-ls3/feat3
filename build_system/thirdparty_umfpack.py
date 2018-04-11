@@ -9,7 +9,7 @@ class SuiteSparse(ThirdpartyPackage):
   def __init__(self,trunk_dirname):
     self.name = "umfpack"
     self.dirname = "SuiteSparse"
-    self.filename = "SuiteSparse-4.4.3.tar.gz"
+    self.filename = "SuiteSparse-5.2.0.tar.gz"
     self.url = "http://faculty.cse.tamu.edu/davis/SuiteSparse/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_UMFPACK:BOOL=ON"
     self.trunk_dirname = trunk_dirname

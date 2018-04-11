@@ -34,7 +34,7 @@ set CXXFLAGS=%CXXFLAGS% /I"./triangle"
 set CXXFLAGS=%CXXFLAGS% /Fd"../obj/triangle.vc14-%1-%2/triangle.vc14-%1-%2.pdb"
 set CXXFLAGS=%CXXFLAGS% /Fp"../obj/triangle.vc14-%1-%2/triangle.vc14-%1-%2.pch"
 
-echo Compiling zlib Sources...
+echo Compiling Triangle Sources...
 cl %CXXFLAGS% ./triangle/triangle.c    /Fo"%OBJPATH%/triangle.obj"
 
 rem ===============================================================================================
