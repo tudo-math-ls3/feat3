@@ -650,7 +650,7 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        Intern::cuda_sor_init_symbolic((int)_matrix.rows(), (int)_matrix.used_elements(), (double*)_matrix.val(), (int*)_matrix.row_ptr(), (int*)_matrix.col_ind(), _ncolors,
+        Intern::cuda_sor_init_symbolic((int)_matrix.rows(), (int)_matrix.used_elements(), _matrix.template val<LAFEM::Perspective::pod>(), (int*)_matrix.row_ptr(), (int*)_matrix.col_ind(), _ncolors,
           _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
       }
 
