@@ -292,60 +292,52 @@ namespace FEAT
           }
 
           /// \copydoc BaseClass::print()
-          virtual void print() const override
+          virtual String info() const override
           {
-            Index pad_width(30);
-            Dist::Comm comm_world(Dist::Comm::world());
+            const Index pad_width(30);
 
             String msg;
 
-            msg = name().pad_back(pad_width, '.') + String(":");
-            comm_world.print(msg);
+            msg += name().pad_back(pad_width, '.') + String(":") + String("\n");
 
-            msg = String("level max/min").pad_back(pad_width, '.') + String(": ")
+            msg += String("level max/min").pad_back(pad_width, '.') + String(": ")
               + stringify(this->_dom_ctrl.max_level_index()) + String(" / ")
-              + stringify(this->_dom_ctrl.min_level_index());
-            comm_world.print(msg);
+              + stringify(this->_dom_ctrl.min_level_index()) + String("\n");
 
-            msg = String("optimisation on level").pad_back(pad_width, '.') + String(": ")
-              + stringify(meshopt_lvl);
-            comm_world.print(msg);
+            msg += String("optimisation on level").pad_back(pad_width, '.') + String(": ")
+              + stringify(meshopt_lvl) + String("\n");
 
             for(const auto& it : this->get_dirichlet_boundaries())
             {
-              msg = String("Displacement BC on").pad_back(pad_width, '.') + String(": ") + it;
-              comm_world.print(msg);
+              msg += String("Displacement BC on").pad_back(pad_width, '.') + String(": ") + it + String("\n");
             }
 
             for(const auto& it : this->get_slip_boundaries())
             {
-              msg = String("Unilateral BC of place on").pad_back(pad_width, '.') + String(": ") + it;
-              comm_world.print(msg);
+              msg += String("Unilateral BC of place on").pad_back(pad_width, '.') + String(": ") + it + String("\n");
             }
 
-            msg = String("DoF").pad_back(pad_width, '.') + String(": ")
-              + stringify(_system_levels.front()->global_functional.columns());
-            comm_world.print(msg);
+            msg += String("DoF").pad_back(pad_width, '.') + String(": ")
+              + stringify(_system_levels.front()->global_functional.columns()) + String("\n");
 
-            FEAT::Statistics::expression_target = name();
             try
             {
-              msg = String("Solver") .pad_back(pad_width, '.') + String(": ")
-                + FEAT::Statistics::get_formatted_solver_tree().trim();
-              comm_world.print(msg);
+              msg += String("Solver") .pad_back(pad_width, '.') + String(": ")
+                + FEAT::Statistics::get_formatted_solver_tree().trim() + String("\n");
             }
-            catch(std::exception& /*e*/)
+            catch(...)
             {
             }
 
             if(precond != nullptr)
             {
-              msg = String("Nonlinear preconditioner:");
-              comm_world.print(msg);
-              precond->print();
+              msg += String("Nonlinear preconditioner:\n");
+              msg += precond->info() + String("\n");
             }
 
-            (*(_system_levels.front()->global_functional)).print();
+            msg += (*(_system_levels.front()->global_functional)).info();
+
+            return msg;
           }
 
           /// \copydoc BaseClass::get_coords()

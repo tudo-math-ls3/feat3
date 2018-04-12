@@ -94,28 +94,16 @@ namespace FEAT
         }
 
         /// \brief Print basic information
-        void print()
+        String info() const
         {
-          Index pad_width(30);
-          Dist::Comm comm_world(Dist::Comm::world());
-
+          const Index pad_width(30);
           String msg;
-
-          msg = String("fac_frobenius").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_frobenius);
-          comm_world.print(msg);
-
-          msg = String("fac_cof").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_cof);
-          comm_world.print(msg);
-
-          msg = String("fac_det").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_det);
-          comm_world.print(msg);
-
-          msg = String("fac_rec_det").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_rec_det);
-          comm_world.print(msg);
-
-          msg = String("fac_reg").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_reg);
-          comm_world.print(msg);
-
+          msg += String("fac_frobenius").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_frobenius) + "\n";
+          msg += String("fac_cof").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_cof) + "\n";
+          msg += String("fac_det").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_det) + "\n";
+          msg += String("fac_rec_det").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_rec_det) + "\n";
+          msg += String("fac_reg").pad_back(pad_width, '.') + String(": ") + stringify_fp_sci(_fac_reg) + "\n";
+          return msg;
         }
 
     };

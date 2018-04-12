@@ -576,7 +576,7 @@ struct MeshoptRAdaptApp
 
     } // time loop
 
-    meshopt_ctrl->print();
+    comm.print(meshopt_ctrl->info());
 
     // Write final vtk output
     if(write_vtk)

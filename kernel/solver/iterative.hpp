@@ -198,7 +198,7 @@ namespace FEAT
 #else
         _skip_def_calc(true) // no potential problem in non-MPI builds
 #endif
-        {
+      {
         Dist::Comm comm(Dist::Comm::world());
 
         auto plot_mode_p = section->get_entry("plot_mode");
@@ -253,7 +253,7 @@ namespace FEAT
         if (min_stag_iter_p.second)
           set_min_stag_iter(Index(std::stoul(min_stag_iter_p.first)));
 
-        }
+      }
 
     public:
       /// Sets the relative tolerance for the solver.
@@ -453,8 +453,6 @@ namespace FEAT
       {
         XASSERT(parent != nullptr);
 
-        Dist::Comm comm(Dist::Comm::world());
-
         PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
         my_section->add_entry("plot_mode", stringify(_plot_mode));
@@ -515,16 +513,17 @@ namespace FEAT
       virtual void plot_summary(const Status st) const
       {
         // Print solver summary
-        if(_plot_summary())
-        {
-          Dist::Comm comm_world(Dist::Comm::world());
+        if(!_plot_summary())
+          return;
 
-          String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")\n");
-          msg += this->get_plot_name()  +": defect norm: "+stringify_fp_sci(this->_def_init)
-            + " -> "+stringify_fp_sci(this->_def_cur)
-            + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
-          comm_world.print(msg);
-        }
+        Dist::Comm comm_world(Dist::Comm::world());
+
+        String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")\n");
+        msg += this->get_plot_name()  +": defect norm: "+stringify_fp_sci(this->_def_init)
+          + " -> "+stringify_fp_sci(this->_def_cur)
+          + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+
+        comm_world.print(msg);
       }
 
       /**
@@ -849,8 +848,6 @@ namespace FEAT
       virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
       {
         XASSERT(parent != nullptr);
-
-        Dist::Comm comm(Dist::Comm::world());
 
         PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 

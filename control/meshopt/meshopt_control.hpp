@@ -244,7 +244,7 @@ namespace FEAT
           /**
            * \brief Prints settings of the control object
            */
-          virtual void print() const = 0;
+          virtual String info() const = 0;
 
 
         /**

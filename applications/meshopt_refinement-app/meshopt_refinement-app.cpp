@@ -449,7 +449,7 @@ struct MeshoptRefinementApp
       }
     }
 
-    meshopt_ctrl->print();
+    comm.print(meshopt_ctrl->info());
 
     // Print success or not
     if(ret == 0)

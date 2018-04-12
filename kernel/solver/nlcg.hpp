@@ -272,8 +272,6 @@ namespace FEAT
         {
           XASSERT(parent != nullptr);
 
-          Dist::Comm comm(Dist::Comm::world());
-
           PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("direction_update", stringify(_direction_update));

@@ -203,8 +203,6 @@ namespace FEAT
         {
           XASSERT(parent != nullptr);
 
-          Dist::Comm comm(Dist::Comm::world());
-
           PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("tol_fval", stringify_fp_sci(_tol_fval));

@@ -134,7 +134,7 @@ template
     // Create the mesh quality functional
     HyperelasticityFunctionalType rumpflpumpfl(rmn, trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
     // Print information
-    rumpflpumpfl.print();
+    std::cout << rumpflpumpfl.info() << std::endl;
 
     // init() sets the coordinates in the mesh and computes h
     rumpflpumpfl.init();

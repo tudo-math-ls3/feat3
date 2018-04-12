@@ -190,8 +190,6 @@ namespace FEAT
         {
           XASSERT(parent != nullptr);
 
-          Dist::Comm comm(Dist::Comm::world());
-
           PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 
           my_section->add_entry("lbfgs_dim", stringify(_lbfgs_dim));
@@ -730,8 +728,6 @@ namespace FEAT
         virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
         {
           XASSERT(parent != nullptr);
-
-          Dist::Comm comm(Dist::Comm::world());
 
           PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
 

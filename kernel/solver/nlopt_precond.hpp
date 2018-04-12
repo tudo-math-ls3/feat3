@@ -84,9 +84,12 @@ namespace FEAT
         virtual Status apply(VectorType& DOXY(vec_cor), const VectorType& DOXY(vec_def)) override = 0;
 
         /**
-         * \brief Prints information
+         * \brief Returns information
          */
-        virtual void print() const = 0;
+        virtual String info() const
+        {
+          return this->name();
+        }
 
     }; // class NLOptPrecond
 
@@ -169,12 +172,10 @@ namespace FEAT
           return st;
         }
 
-        /// \copydoc BaseClass::print()
-        virtual void print() const override
+        /// \copydoc BaseClass::info()
+        virtual String info() const override
         {
-          Dist::Comm comm(Dist::Comm::world());
-          comm.print(name());
-          _op.print();
+          return this->name() + "[" + _op.info() + "]";
         }
 
     }; // class NonlinearOperatorPrecondWrapper

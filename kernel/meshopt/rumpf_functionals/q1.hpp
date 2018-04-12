@@ -152,23 +152,12 @@ namespace FEAT
           /**
            * \brief Prints object parameters
            */
-          void print()
+          String info() const
           {
-            Index pad_width(30);
-            Dist::Comm comm_world(Dist::Comm::world());
-
-            String msg;
-
-            msg = name()+":";
-            comm_world.print(msg);
-
-            BaseClass::print();
-
-            msg = String("exponent_det").pad_back(pad_width, '.') + String(": ") + stringify(_exponent_det);
-            comm_world.print(msg);
-
-            msg = String("cubature_rule").pad_back(pad_width, '.') += String(": ") += _cubature_rule.get_name();
-            comm_world.print(msg);
+            const Index pad_width(30);
+            return name() + ":" + BaseClass::info()
+              + String("\nexponent_det").pad_back(pad_width, '.') + String(": ") + stringify(_exponent_det)
+              + String("\ncubature_rule").pad_back(pad_width, '.') + String(": ") + _cubature_rule.get_name();
           }
 
           void set_point(const TrafoEvalData& trafo_data, const TgradR& mat_tensor)

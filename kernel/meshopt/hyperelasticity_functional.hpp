@@ -615,23 +615,20 @@ namespace FEAT
         /**
          * \brief Prints some characteristics of the HyperelasticityFunctional object
          */
-        virtual void print()
+        virtual String info() const
         {
-          Index pad_width(30);
-          Dist::Comm comm_world(Dist::Comm::world());
+          const Index pad_width(30);
 
-          String msg(name()+":");
-          comm_world.print(msg);
+          String msg = name() + String("\nScale computation").pad_back(pad_width, '.')
+            + String(": ") + stringify(_scale_computation) + "\n";
 
-          msg = String("Scale computation").pad_back(pad_width, '.') + String(": ") + stringify(_scale_computation);
-          comm_world.print(msg);
-
-          _cell_functional->print();
+          msg += _cell_functional->info() + "\n";
           if(_mesh_conc != nullptr)
           {
-            _mesh_conc->print();
+            msg += _mesh_conc->info() + "\n";
           }
 
+          return msg;
         }
 
         /**

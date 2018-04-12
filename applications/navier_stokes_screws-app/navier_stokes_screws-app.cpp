@@ -653,9 +653,7 @@ struct NavierStokesScrewsApp
       }
     }
 
-    comm.print("");
-    meshopt_ctrl->print();
-    comm.print("");
+    comm.print(String("\n") + meshopt_ctrl->info() + String("\n"));
 
     String file_basename(name()+"_n"+stringify(comm.size()));
 

@@ -129,13 +129,6 @@ namespace FEAT
 
           return Status::success;
         }
-
-        /// \copydoc BaseClass::print()
-        virtual void print() const override
-        {
-          Dist::Comm comm(Dist::Comm::world());
-          comm.print(name());
-        }
     };
     /// \endcond
 
@@ -305,13 +298,6 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));
 
           return Status::success;
-        }
-
-        /// \copydoc BaseClass::print()
-        virtual void print() const override
-        {
-          Dist::Comm comm(Dist::Comm::world());
-          comm.print(name());
         }
     };
     /// \endcond
