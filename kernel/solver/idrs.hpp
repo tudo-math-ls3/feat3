@@ -9,8 +9,7 @@
 #include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/random.hpp>
-
-
+#include <kernel/util/dist.hpp>
 namespace FEAT
 {
   namespace Solver
@@ -69,6 +68,7 @@ namespace FEAT
       DMatrix _dmat_M, _dmat_Minv;
       /// local ("small") dense vectors
       DVector _dvec_m, _dvec_dm, _dvec_c;
+      bool _shadow_space_setup, _random;
 
     public:
       /**
@@ -91,7 +91,9 @@ namespace FEAT
         BaseClass("IDRS(" + stringify(krylov_dim) + ")", precond),
         _system_matrix(matrix),
         _system_filter(filter),
-        _krylov_dim(krylov_dim)
+        _krylov_dim(krylov_dim),
+        _shadow_space_setup(false),
+        _random(true)
       {
       }
 
@@ -99,7 +101,9 @@ namespace FEAT
       const MatrixType& matrix, const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("IDRS", section_name, section, precond),
         _system_matrix(matrix),
-        _system_filter(filter)
+        _system_filter(filter),
+        _shadow_space_setup(false),
+        _random(true)
       {
         // Check if we have set _krylov_dim
         auto krylov_dim_p = section->query("krylov_dim");
@@ -224,27 +228,38 @@ namespace FEAT
         return st;
       }
 
-    protected:
-      virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
+      /**
+      * \brief Reset the shadow space before the next system will be solved
+      *
+      * \param[in] random
+      * boolean whether the new shadow space should be random or not
+      */
+      void reset_shadow_space( bool random = true)
       {
-        IterationStats pre_iter(*this);
-        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
-        const MatrixType& matrix(this->_system_matrix);
-        const FilterType& filter(this->_system_filter);
+        _random = random;
+        _shadow_space_setup = false;
+      }
 
-        // compute initial defect
-        Status status = this->_set_initial_defect(this->_vec_res, vec_sol);
-        _vec_r.copy(_vec_res);
 
-        if(!this->_apply_precond(this->_vec_r, this->_vec_r, filter))
+
+    protected:
+
+      void _set_shadow_space()
+      {
+        //select set of random vectors
+
+        Random::SeedType seed;
+        if (_random)
         {
-          pre_iter.destroy();
-          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
-          return Status::aborted;
+          seed = Random::get_seed();
         }
+        else
+        {
+          auto comm = Dist::Comm::world();
+          seed = Random::SeedType(comm.rank());
+        }
+        Random rng(seed);
 
-        //select random vector set (shadow space)
-        Random rng(Random::get_seed());
         for (Index l(0); l<_krylov_dim; ++l)
           _vec_P.at(l).format(rng, DataType(0), DataType(1));
 
@@ -257,6 +272,32 @@ namespace FEAT
           }
           _vec_P.at(j).scale(_vec_P.at(j), DataType(1)/_vec_P.at(j).norm2());
         }
+        _shadow_space_setup = true;
+      }
+
+
+
+
+      virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
+      {
+        IterationStats pre_iter(*this);
+        Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
+        const MatrixType& matrix(this->_system_matrix);
+        const FilterType& filter(this->_system_filter);
+
+        // compute initial defect
+        Status status = this->_set_initial_defect(this->_vec_res, vec_sol);
+        _vec_t.copy(_vec_res);
+        if(!this->_apply_precond(this->_vec_r, this->_vec_t, filter))
+        {
+          pre_iter.destroy();
+          Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
+          return Status::aborted;
+        }
+        //select random vector set (shadow space)
+        if (!_shadow_space_setup)
+          _set_shadow_space();
+
         pre_iter.destroy();
 
         //produce start vectors
@@ -268,7 +309,7 @@ namespace FEAT
           filter.filter_def(_vec_v);
           //save unpreconditioned residual update
           _vec_t.copy(_vec_v);
-          if(!this->_apply_precond(this->_vec_v, this->_vec_v, filter))
+          if(!this->_apply_precond(this->_vec_v, this->_vec_t, filter))
           {
             first_iter.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
@@ -322,9 +363,9 @@ namespace FEAT
 
             if (k == 0)
             {
-              matrix.apply(_vec_t, _vec_v);
-              filter.filter_def(_vec_t);
-              if(!this->_apply_precond(this->_vec_t, this->_vec_t, filter))
+              matrix.apply(_vec_dR.at(oldest), _vec_v);
+              filter.filter_def(_vec_dR.at(oldest));
+              if(!this->_apply_precond(this->_vec_t, this->_vec_dR.at(oldest), filter))
               {
                 stat.destroy();
                 Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
@@ -357,7 +398,7 @@ namespace FEAT
               matrix.apply( _vec_dR.at(oldest), _vec_dX.at(oldest));
               filter.filter_def(_vec_dR.at(oldest));
               _vec_t.copy(_vec_dR.at(oldest));
-              if(!this->_apply_precond(this->_vec_dR.at(oldest), this->_vec_dR.at(oldest), filter))
+              if(!this->_apply_precond(this->_vec_dR.at(oldest), this->_vec_t, filter))
               {
                 stat.destroy();
                 Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));

@@ -212,6 +212,7 @@ public:
     {
       auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
       auto solver = Solver::new_idrs(matrix, filter, 4, precon);
+      solver->reset_shadow_space(false);
       test_solver("IDR(4)-ILU(0)", *solver, vec_sol, vec_ref, vec_rhs, 20);
     }
     // test PCG-jac-matrix
@@ -395,6 +396,7 @@ public:
     {
       auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
       auto solver = Solver::new_idrs(matrix, filter, 4, precon);
+      solver->reset_shadow_space(false);
       test_solver("IDR(4)-ILU(0)", *solver, vec_sol, vec_ref, vec_rhs, 20);
     }
 
