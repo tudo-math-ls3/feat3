@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/property_map.hpp>
@@ -72,8 +73,8 @@ namespace FEAT
     /**
      * \brief Status success check function
      *
-     * This function takes a Status value as input and checks whether it respresents a
-     * 'successul' run. A solving run is interpreted as successful, if one of the following
+     * This function takes a Status value as input and checks whether it represents a
+     * 'successful' run. A solving run is interpreted as successful, if one of the following
      * status codes was returned:
      *
      *  - Status::success
@@ -86,7 +87,7 @@ namespace FEAT
      * A status code returned by a solver.
      *
      * \returns
-     * \c true, if the run was successful, otherwise \c fase.
+     * \c true, if the run was successful, otherwise \c false.
      */
     inline bool status_success(Status status)
     {
@@ -168,16 +169,11 @@ namespace FEAT
       /// The type of vector this solver can be applied to
       typedef Vector_ VectorType;
 
-    private:
-      /// The name of the PropertyMap section this solver was configured by (if any)
-      String _section_name;
-
     public:
       /**
        * \brief Empty standard constructor
        */
       SolverBase()
-        : _section_name("")
       {
       }
 
@@ -194,10 +190,8 @@ namespace FEAT
        * A pointer to the PropertyMap section configuring this solver
        *
        */
-      explicit SolverBase(const String& config_section_name, PropertyMap* config_section) :
-        _section_name(config_section_name)
+      explicit SolverBase(const String& DOXY(section_name), PropertyMap* DOXY(config_section))
       {
-        XASSERT(config_section != nullptr);
       }
 
       /**
@@ -280,63 +274,6 @@ namespace FEAT
        * \returns A string describing the solver.
        */
       virtual String name() const = 0;
-
-      /**
-       * \brief Returns the name of the PropertyMap section this solver was configured by
-       *
-       * If the standard constructor was used, _section_name is the empty String and name() is returned instead.
-       * This is important for derived classes' write_config() functionality, so that the written section can be
-       * assigned a name.
-       */
-      virtual String get_section_name() const
-      {
-        if(_section_name == "")
-        {
-          return name();
-        }
-        else
-        {
-          return _section_name;
-        }
-      }
-
-      /**
-       * \brief Writes the solver configuration to a PropertyMap
-       *
-       * \param[in] parent
-       * The PropertyMap to add a new section to
-       *
-       * \param[in] new_section_name
-       * The name the new section will have
-       *
-       * \returns A pointer to the new section created in the PropertyMap
-       */
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const
-      {
-        XASSERT(parent != nullptr);
-
-        PropertyMap* config_section(nullptr);
-
-        if(new_section_name == "")
-        {
-          if(_section_name == "")
-          {
-            config_section = parent->add_section(name());
-          }
-          else
-          {
-            config_section = parent->add_section(_section_name);
-          }
-        }
-        else
-        {
-          config_section = parent->add_section(new_section_name);
-        }
-
-        config_section->add_entry("type",name());
-
-        return config_section;
-      }
 
       /**
        * \brief Solver application method
@@ -496,8 +433,7 @@ namespace FEAT
       ///destroy the objects contents (and generate Statistics::expression) before the actual destructor call
       void destroy()
       {
-        if (_destroyed)
-          throw InternalError(__func__, __FILE__, __LINE__, "IterationStats destroy method was already called before!");
+        XASSERTM(!_destroyed, "IterationStats::destroy() was already called before!");
 
         _mpi_execute_reduction_stop = Statistics::get_time_mpi_execute_reduction();
         _mpi_execute_spmv_stop = Statistics::get_time_mpi_execute_spmv();

@@ -267,24 +267,6 @@ namespace FEAT
             delete iterates;
         }
 
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("direction_update", stringify(_direction_update));
-          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
-          my_section->add_entry("linesearch", _linesearch->get_section_name());
-          my_section->add_entry("max_num_restarts", stringify(_max_num_restarts));
-
-          _linesearch->write_config(parent);
-
-          return my_section;
-
-        }
-
         /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {

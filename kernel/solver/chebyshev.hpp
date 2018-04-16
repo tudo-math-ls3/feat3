@@ -201,18 +201,6 @@ namespace FEAT
         _max_ev = lambda * _fraction_max_ev;
       }
 
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-        my_section->add_entry("fraction_min_ev", stringify_fp_sci(_fraction_min_ev));
-        my_section->add_entry("fraction_max_ev", stringify_fp_sci(_fraction_max_ev));
-
-        return my_section;
-      }
-
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // save defect

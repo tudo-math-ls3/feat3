@@ -198,19 +198,6 @@ namespace FEAT
 
         }
 
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("tol_fval", stringify_fp_sci(_tol_fval));
-          my_section->add_entry("tol_step", stringify_fp_sci(_tol_step));
-
-          return my_section;
-
-        }
 
         /**
          * \brief Gets the tolerance for function value improvement

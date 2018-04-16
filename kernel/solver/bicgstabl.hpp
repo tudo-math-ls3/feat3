@@ -250,7 +250,7 @@ namespace FEAT
             _vec_rj_hat.at(Index(i)).clear();
             _vec_uj_hat.at(Index(i)).clear();
           }
-        BaseClass::done_symbolic();
+          BaseClass::done_symbolic();
         }
 
         /// \copydoc IterativeSolver::correct()
@@ -296,18 +296,6 @@ namespace FEAT
         {
           XASSERT(precon_variant == BiCGStabLPreconVariant::left || precon_variant == BiCGStabLPreconVariant::right);
           _precon_variant = precon_variant;
-        }
-
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("precon_variant", stringify(_precon_variant));
-          my_section->add_entry("polynomial_degree", stringify(_l));
-          return my_section;
         }
 
       protected:

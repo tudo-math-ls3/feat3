@@ -102,9 +102,9 @@ int run(Solver_& solver, Operator_& op)
   solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot_mode(Solver::PlotMode::all);
 
-  PropertyMap config;
-  solver->write_config(&config, "dbg-nlopt-solver");
-  config.dump(std::cout);
+  //PropertyMap config;
+  //solver->write_config(&config, "dbg-nlopt-solver");
+  //config.dump(std::cout);
 
   // This will hold the solution
   auto sol = op.create_vector_r();

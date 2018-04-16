@@ -189,16 +189,6 @@ namespace FEAT
         _krylov_dim = krylov_dim;
       }
 
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-        my_section->add_entry("krylov_dim", stringify(_krylov_dim));
-
-        return my_section;
-      }
-
       /// \copydoc IterativeSolver::apply()
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {

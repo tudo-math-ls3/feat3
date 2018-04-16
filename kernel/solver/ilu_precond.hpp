@@ -1187,17 +1187,6 @@ namespace FEAT
         _ilu.factorise_numeric_il_du();
       }
 
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-        my_section->add_entry("fill_in_param", stringify(_p));
-
-        return my_section;
-      }
-
       /**
        * \brief apply the preconditioner
        *
@@ -1341,14 +1330,6 @@ namespace FEAT
       {
         _ilu.copy_data(_matrix);
         _ilu.factorise_numeric_il_du();
-      }
-
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-        my_section->add_entry("fill_in_param", stringify(_p));
-        return my_section;
       }
 
       /**
@@ -1500,17 +1481,6 @@ namespace FEAT
           (int*)_lu_matrix.row_ptr(),
           (int*)_lu_matrix.col_ind(),
           cuda_info);
-      }
-
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& section_name) const override
-      {
-
-        PropertyMap* my_section = BaseClass::write_config(parent, section_name);
-
-        my_section->add_entry("fill_in_param", stringify(0));
-
-        return my_section;
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
@@ -1742,17 +1712,6 @@ namespace FEAT
         _lu_matrix.copy(_matrix);
 
         Intern::cuda_ilub_init_numeric(_lu_matrix.template val<LAFEM::Perspective::pod>(), (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), cuda_info);
-      }
-
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-        my_section->add_entry("fill_in_param", stringify(0));
-
-        return my_section;
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override

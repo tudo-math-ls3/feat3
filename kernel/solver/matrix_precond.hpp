@@ -21,7 +21,7 @@ namespace FEAT
     /**
      * \brief Matrix preconditioner implementation
      *
-     * This class wrapps a matrix to be used as a preconditioner
+     * This class wraps a matrix to be used as a preconditioner
      *
      * \author Dirk Ribbrock
      */

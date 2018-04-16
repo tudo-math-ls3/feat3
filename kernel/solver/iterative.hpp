@@ -448,27 +448,6 @@ namespace FEAT
         return Math::pow(_def_cur / _def_init, DataType(1) / DataType(_num_iter));
       }
 
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const override
-      {
-        XASSERT(parent != nullptr);
-
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-        my_section->add_entry("plot_mode", stringify(_plot_mode));
-        my_section->add_entry("tol_rel", stringify_fp_sci(_tol_rel));
-        my_section->add_entry("tol_abs", stringify_fp_sci(_tol_abs));
-        my_section->add_entry("div_rel", stringify_fp_sci(_div_rel));
-        my_section->add_entry("div_abs", stringify_fp_sci(_div_abs));
-        my_section->add_entry("stag_rate", stringify_fp_sci(_stag_rate));
-        my_section->add_entry("max_iter", stringify(_max_iter));
-        my_section->add_entry("min_iter", stringify(_min_iter));
-        my_section->add_entry("min_stag_iter", stringify(_min_stag_iter));
-
-        return my_section;
-
-      }
-
       /**
        * \brief Solver correction method
        *
@@ -567,7 +546,7 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
         // plot?
-        if(this->_plot_mode == PlotMode::iter || this->_plot_mode == PlotMode::all)
+        if(this->_plot_iter())
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(0).pad_front(this->_iter_digits)
@@ -842,27 +821,6 @@ namespace FEAT
       /// virtual destructor
       virtual ~PreconditionedIterativeSolver()
       {
-      }
-
-      /// \copydoc SolverBase::write_config()
-      virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-      {
-        XASSERT(parent != nullptr);
-
-        PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-        if(_precond == nullptr)
-        {
-          my_section->add_entry("precon", "none");
-        }
-        else
-        {
-          my_section->add_entry("precond", _precond->get_section_name());
-          _precond->write_config(parent);
-        }
-
-        return my_section;
-
       }
 
       /// \copydoc SolverBase::init_symbolic()

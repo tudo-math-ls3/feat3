@@ -11,7 +11,7 @@ namespace FEAT
   {
 
     /**
-     * \brief Enum for diffent preconditioning variants for BiCGStab
+     * \brief Enum for different preconditioning variants for BiCGStab
      */
     enum class BiCGStabPreconVariant
     {
@@ -298,18 +298,6 @@ namespace FEAT
         {
           XASSERT(precon_variant == BiCGStabPreconVariant::left || precon_variant == BiCGStabPreconVariant::right);
           _precon_variant = precon_variant;
-        }
-
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("precon_variant", stringify(_precon_variant));
-
-          return my_section;
         }
 
       protected:

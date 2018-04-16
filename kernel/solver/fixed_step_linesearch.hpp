@@ -124,17 +124,6 @@ namespace FEAT
           _step_length = step_length;
         }
 
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("step_length", stringify_fp_sci(_step_length));
-
-          return my_section;
-        }
-
         /**
          * \brief Applies the solver, setting the initial guess to zero.
          *

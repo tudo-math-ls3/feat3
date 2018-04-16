@@ -229,22 +229,6 @@ namespace FEAT
           }
         }
 
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name = "") const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
-          my_section->add_entry("tol_decrease", stringify_fp_sci(_tol_decrease));
-          my_section->add_entry("tol_curvature", stringify_fp_sci(_tol_curvature));
-          my_section->add_entry("tol_step", stringify_fp_sci(_tol_step));
-
-          return my_section;
-
-        }
-
         /**
          * \brief Sets the tolerance for the sufficient decrease in curvature
          */

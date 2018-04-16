@@ -185,20 +185,6 @@ namespace FEAT
           }
         }
 
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("lbfgs_dim", stringify(_lbfgs_dim));
-          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
-
-          return my_section;
-
-        }
-
         /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {
@@ -723,21 +709,6 @@ namespace FEAT
             delete iterates;
         }
 
-
-        /// \copydoc SolverBase::write_config()
-        virtual PropertyMap* write_config(PropertyMap* parent, const String& new_section_name) const override
-        {
-          XASSERT(parent != nullptr);
-
-          PropertyMap* my_section = BaseClass::write_config(parent, new_section_name);
-
-          my_section->add_entry("direction_update", stringify(_direction_update));
-          my_section->add_entry("keep_iterates", stringify(iterates == nullptr ? 0 : 1));
-
-          return my_section;
-
-        }
-
         /// \copydoc SolverBase::init_symbolic()
         virtual void init_symbolic() override
         {
@@ -1092,9 +1063,9 @@ namespace FEAT
       Functional_& functional_, Filter_& filter_,
       NLCGDirectionUpdate du_ = ALGLIBMinCG<Functional_, Filter_>::direction_update_default,
       bool keep_iterates_ = false)
-      {
-        return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(functional_, filter_, du_, keep_iterates_);
-      }
+    {
+      return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(functional_, filter_, du_, keep_iterates_);
+    }
 
     /**
      * \brief Creates a new ALGLIBMinCG solver object using a PropertyMap
@@ -1119,9 +1090,9 @@ namespace FEAT
     inline std::shared_ptr<ALGLIBMinCG<Functional_, Filter_>> new_alglib_mincg(
       const String& section_name, PropertyMap* section,
       Functional_& functional_, Filter_& filter_)
-      {
-        return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(section_name, section, functional_, filter_);
-      }
+    {
+      return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(section_name, section, functional_, filter_);
+    }
   } // namespace Solver
 } // namespace FEAT
 #endif // defined(FEAT_HAVE_ALGLIB) || defined(DOXYGEN)
