@@ -631,7 +631,7 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        Intern::cuda_sor_init_symbolic((int)_matrix.rows(), (int)_matrix.used_elements(), _matrix.template val<LAFEM::Perspective::pod>(), (int*)_matrix.row_ptr(), (int*)_matrix.col_ind(), _ncolors,
+        Intern::cuda_sor_init_symbolic((int)_matrix.rows(), (int)_matrix.used_elements(), _matrix.template val<LAFEM::Perspective::pod>(), (const int*)_matrix.row_ptr(), (const int*)_matrix.col_ind(), _ncolors,
           _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
       }
 
@@ -647,8 +647,8 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        int status = Intern::cuda_ssor_forward_bcsr_apply<BlockHeight_>((int)vec_cor.size(), vec_cor. template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(), _matrix.template val<LAFEM::Perspective::pod>(), (int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
-        status |= Intern::cuda_ssor_backward_bcsr_apply<BlockHeight_>((int)vec_cor.size(), vec_cor.template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(), _matrix.template val<LAFEM::Perspective::pod>(), (int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        int status = Intern::cuda_ssor_forward_bcsr_apply<BlockHeight_>((int)vec_cor.size(), vec_cor. template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(), _matrix.template val<LAFEM::Perspective::pod>(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        status |= Intern::cuda_ssor_backward_bcsr_apply<BlockHeight_>((int)vec_cor.size(), vec_cor.template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(), _matrix.template val<LAFEM::Perspective::pod>(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
 
         vec_cor.scale(vec_cor, _omega * (2.0 - _omega));
 
