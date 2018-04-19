@@ -108,6 +108,11 @@ namespace FEAT
         return _col_gate;
       }
 
+      const Dist::Comm* get_comm() const
+      {
+        return _row_gate != nullptr ? _row_gate->get_comm() : nullptr;
+      }
+
       Matrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return Matrix(_row_gate, _col_gate, _matrix.clone(mode));

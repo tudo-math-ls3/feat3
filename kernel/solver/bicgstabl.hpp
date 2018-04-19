@@ -154,6 +154,8 @@ namespace FEAT
           _precon_variant(precon_variant),
           _l(l)
         {
+          // set communicator by system matrix
+          this->_set_comm_by_matrix(matrix);
           XASSERT(precon_variant == BiCGStabLPreconVariant::left || precon_variant == BiCGStabLPreconVariant::right);
           XASSERTM(_l > 0, "bicgstabl polynomial degree must be greather than zero!");
         }
@@ -188,6 +190,8 @@ namespace FEAT
           _system_filter(filter),
           _precon_variant(BiCGStabLPreconVariant::left)
         {
+          // set communicator by system matrix
+          this->_set_comm_by_matrix(matrix);
           // Check if we have set _p_variant
           auto p_variant_p = section->query("precon_variant");
           if(p_variant_p.second)

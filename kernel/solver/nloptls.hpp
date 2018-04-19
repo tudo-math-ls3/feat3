@@ -100,7 +100,7 @@ namespace FEAT
          *
          */
         explicit NLOptLS(const String& plot_name_, Functional_& functional, Filter_& filter,
-        std::shared_ptr<PrecondType> precond = nullptr) :
+          std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass(plot_name_, precond),
           _functional(functional),
           _filter(filter),
@@ -112,8 +112,10 @@ namespace FEAT
           _steplength(1),
           _ls_iter_digits(2),
           _ls_its(~Index(0))
-          {
-          }
+        {
+          // set communicator by functional (same interface as matrix)
+          this->_set_comm_by_matrix(functional);
+        }
 
         /**
          * \brief Constructor
@@ -138,7 +140,7 @@ namespace FEAT
          *
          */
         explicit NLOptLS(const String& plot_name, const String& section_name, PropertyMap* section,
-        Functional_& functional, Filter_& filter, std::shared_ptr<PrecondType> precond = nullptr) :
+          Functional_& functional, Filter_& filter, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass(plot_name, section_name, section, precond),
           _functional(functional),
           _filter(filter),
@@ -150,19 +152,22 @@ namespace FEAT
           _steplength(1),
           _ls_iter_digits(2),
           _ls_its(~Index(0))
-          {
-            auto tol_fval_p = section->get_entry("tol_fval");
-            if (tol_fval_p.second)
-            {
-              set_tol_fval((DataType)std::stod(tol_fval_p.first));
-            }
+        {
+          // set communicator by functional (same interface as matrix)
+          this->_set_comm_by_matrix(functional);
 
-            auto tol_step_p = section->get_entry("tol_step");
-            if (tol_step_p.second)
-            {
-              set_tol_step((DataType)std::stod(tol_step_p.first));
-            }
+          auto tol_fval_p = section->get_entry("tol_fval");
+          if (tol_fval_p.second)
+          {
+            set_tol_fval((DataType)std::stod(tol_fval_p.first));
           }
+
+          auto tol_step_p = section->get_entry("tol_step");
+          if (tol_step_p.second)
+          {
+            set_tol_step((DataType)std::stod(tol_step_p.first));
+          }
+        }
 
         /**
          * \brief Empty virtual destructor
@@ -179,8 +184,6 @@ namespace FEAT
           // Print solver summary
           if(this->_plot_summary())
           {
-            Dist::Comm comm_world(Dist::Comm::world());
-
             String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
                 +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
                 + stringify(_functional.get_num_grad_evals()) + " (grad) "
@@ -193,7 +196,12 @@ namespace FEAT
             msg += this->get_plot_name()  +": grad: "+stringify_fp_sci(this->_def_init)
               + " -> "+stringify_fp_sci(this->_def_cur)
               + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
-            comm_world.print(msg);
+
+            // print message line via comm (if available)
+            if(this->_comm != nullptr)
+              this->_comm->print(msg);
+            else
+              std::cout << msg << std::endl;
           }
 
         }
@@ -282,13 +290,18 @@ namespace FEAT
 
           if(this->_plot_iter())
           {
-            std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            <<  " (" << stringify(this->_ls_its).pad_front(_ls_iter_digits) << ")"
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " : " << stringify_fp_sci(this->_fval)
-            << std::endl;
+            String msg = this->_plot_name
+              +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+              +  " (" + stringify(this->_ls_its).pad_front(_ls_iter_digits) + ")"
+              + " : " + stringify_fp_sci(this->_def_cur)
+              + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
+              + " : " + stringify_fp_sci(this->_fval);
+
+            // print message line via comm (if available)
+            if(this->_comm != nullptr)
+              this->_comm->print(msg);
+            else
+              std::cout << msg << std::endl;
           }
 
           // Ensure that the initial fval and defect are neither NaN nor infinity
@@ -344,14 +357,20 @@ namespace FEAT
           // plot?
           if(this->_plot_iter())
           {
-            std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            <<  " (" << stringify(this->_ls_its).pad_front(_ls_iter_digits) << ")"
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " : " << stringify_fp_sci(this->_fval)
-            << " : " << stringify_fp_sci(this->_steplength)
-            << std::endl;
+            String msg = this->_plot_name
+              +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+              +  " (" + stringify(this->_ls_its).pad_front(_ls_iter_digits) + ")"
+              + " : " + stringify_fp_sci(this->_def_cur)
+              + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
+              + " : " + stringify_fp_sci(this->_fval)
+              + " : " + stringify_fp_sci(this->_steplength);
+
+            // print message line via comm (if available)
+            if(this->_comm != nullptr)
+              this->_comm->print(msg);
+            else
+              std::cout << msg << std::endl;
+
           }
 
           // ensure that the defect is neither NaN nor infinity

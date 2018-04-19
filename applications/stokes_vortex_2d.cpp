@@ -349,10 +349,7 @@ namespace StokesVortex2D
     auto solver = Solver::new_richardson(matrix, filter, DataType(1), uzawa);
 
     // enable plotting
-    if(comm.rank() == 0)
-    {
-      solver->set_plot_mode(Solver::PlotMode::iter);
-    }
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // set tolerance
     solver->set_tol_rel(tol_rel);

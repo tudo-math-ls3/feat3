@@ -105,7 +105,7 @@ namespace FEAT
          *
          */
         explicit Linesearch(const String& plot_name, Functional_& functional, Filter_& filter,
-        bool keep_iterates = false) :
+          bool keep_iterates = false) :
           BaseClass(plot_name),
           _functional(functional),
           _filter(filter),
@@ -123,6 +123,9 @@ namespace FEAT
           _dir_scaling(false),
           iterates(nullptr)
           {
+            // set communicator by functional (same interface as matrix)
+            this->_set_comm_by_matrix(functional);
+
             if(keep_iterates)
             {
               iterates = new std::deque<VectorType>;

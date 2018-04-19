@@ -70,33 +70,38 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
-    /**
-     * \brief Constructor using a PropertyMap
-     *
-     * \param[in] section_name
-     * The name of the config section, which it does not know by itself
-     *
-     * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
-     *
-     * \param[in] matrix
-     * The system matrix.
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     * \param[in] precond
-     * The preconditioner. May be \c nullptr.
-     *
-     */
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       * \param[in] precond
+       * The preconditioner. May be \c nullptr.
+       *
+       */
       explicit RBiCGStab(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
+        const MatrixType& matrix, const FilterType& filter,
+        std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("RBiCGStab", section_name, section, precond),
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /// \copydoc SolverBase::name()

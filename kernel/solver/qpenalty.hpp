@@ -77,13 +77,15 @@ namespace FEAT
          * The starting penalty parameter, defaults to 1.
          */
         explicit QPenalty(FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver,
-        DataType initial_penalty_param = DataType(1)) :
+          DataType initial_penalty_param = DataType(1)) :
           BaseClass("QPenalty"),
           _functional(functional),
           _inner_solver(inner_solver),
           _initial_penalty_param(initial_penalty_param),
           _tol_penalty(Math::pow(Math::huge<DataType>(), DataType(0.25)))
         {
+          // set communicator by functional (same interface as matrix)
+          this->_set_comm_by_matrix(functional);
         }
 
         /**
@@ -105,13 +107,16 @@ namespace FEAT
          * The inner solver for solving the penalised unconstrained optimisation problem.
          */
         explicit QPenalty(const String& section_name, PropertyMap* section,
-        FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
+          FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
           BaseClass("QPenalty", section_name, section),
           _functional(functional),
           _inner_solver(inner_solver),
           _initial_penalty_param(1),
           _tol_penalty(Math::pow(Math::huge<DataType>(), DataType(0.25)))
         {
+          // set communicator by functional (same interface as matrix)
+          this->_set_comm_by_matrix(functional);
+
           auto initial_penalty_param_p = section->query("initial_penalty_param");
           if(initial_penalty_param_p.second)
           {
@@ -246,15 +251,20 @@ namespace FEAT
 
             if(this->_plot_iter())
             {
-              std::cout << this->_plot_name
-              << ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-              << " (" << stringify(this->_inner_solver->get_num_iter()).pad_front(inner_iter_digits)
-              << ":" << inner_st << ")"
-              << " : " << stringify_fp_sci(this->_def_cur)
-              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-              << " / " << stringify_fp_sci(DataType(0.5)*Math::sqr(this->_def_cur))
-              << " : " << stringify_fp_sci(penalty_param)
-              << std::endl;
+              String msg = this->_plot_name
+                + ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+                + " (" + stringify(this->_inner_solver->get_num_iter()).pad_front(inner_iter_digits)
+                + ":" + stringify(inner_st) + ")"
+                + " : " + stringify_fp_sci(this->_def_cur)
+                + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
+                + " / " + stringify_fp_sci(DataType(0.5)*Math::sqr(this->_def_cur))
+                + " : " + stringify_fp_sci(penalty_param);
+
+              // print message line via comm (if available)
+              if(this->_comm != nullptr)
+                this->_comm->print(msg);
+              else
+                std::cout << msg << std::endl;
             }
 
             // ensure that the defect is neither NaN nor infinity
@@ -337,9 +347,15 @@ namespace FEAT
         // Plot?
         if(this->_plot_iter())
         {
-          std::cout << this->_plot_name
-            <<  ": " << stringify(0).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_init) << std::endl;
+          String msg = this->_plot_name
+            +  ": " + stringify(0).pad_front(this->_iter_digits)
+            + " : " + stringify_fp_sci(this->_def_init);
+
+          // print message line via comm (if available)
+          if(this->_comm != nullptr)
+            this->_comm->print(msg);
+          else
+            std::cout << msg << std::endl;
         }
 
         // Ensure that the defect is neither NaN nor infinity

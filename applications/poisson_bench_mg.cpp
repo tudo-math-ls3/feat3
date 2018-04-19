@@ -418,10 +418,7 @@ namespace PoissonDirichlet
     auto solver = Solver::new_richardson(the_system_level.matrix_sys, the_system_level.filter_sys, 1.0, mgv);
 
     // enable plotting
-    if(comm.rank() == 0)
-    {
-      solver->set_plot_mode(Solver::PlotMode::iter);
-    }
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // set tolerance
     solver->set_plot_name("Multigrid");

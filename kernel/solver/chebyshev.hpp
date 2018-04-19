@@ -67,7 +67,7 @@ namespace FEAT
        *
        */
       explicit Chebyshev(const MatrixType& matrix, const FilterType& filter,
-          const DataType fraction_min_ev = DataType(0.5), const DataType fraction_max_ev = DataType(0.8)) :
+        const DataType fraction_min_ev = DataType(0.5), const DataType fraction_max_ev = DataType(0.8)) :
         BaseClass("Chebyshev"),
         _system_matrix(matrix),
         _system_filter(filter),
@@ -76,6 +76,8 @@ namespace FEAT
         _fraction_min_ev(fraction_min_ev),
         _fraction_max_ev(fraction_max_ev)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /**
@@ -97,7 +99,7 @@ namespace FEAT
        * A shared pointer to a new Chebyshev object.
        */
       explicit Chebyshev(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass("Chebyshev", section_name, section),
         _system_matrix(matrix),
         _system_filter(filter),
@@ -106,6 +108,8 @@ namespace FEAT
         _fraction_min_ev(DataType(0.5)),
         _fraction_max_ev(DataType(0.8))
         {
+          // set communicator by system matrix
+          this->_set_comm_by_matrix(matrix);
           auto fmin_p = section->query("fraction_min_ev");
           if(fmin_p.second)
           {

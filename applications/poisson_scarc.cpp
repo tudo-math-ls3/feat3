@@ -269,11 +269,8 @@ namespace PoissonScaRC
     auto solver = Solver::new_richardson(the_system_level.matrix_sys, the_system_level.filter_sys, 1.0, global_mg);
 
     // enable plotting
-    if(comm.rank() == 0)
-    {
-      solver->set_plot_name("ScaRC");
-      solver->set_plot_mode(Solver::PlotMode::iter);
-    }
+    solver->set_plot_name("ScaRC");
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // set tolerance
     solver->set_tol_rel(1E-8);

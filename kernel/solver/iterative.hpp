@@ -12,6 +12,36 @@ namespace FEAT
 {
   namespace Solver
   {
+    /// \cond internal
+    namespace Intern
+    {
+      /// returns the underlying comm, if Matrix_ is a Global::Matrix - SFINAE at its best
+      template<typename Matrix_>
+      const Dist::Comm* get_mat_comm(const Matrix_& mat, typename Matrix_::GateRowType*)
+      {
+        return mat.get_comm();
+      }
+
+      template<typename Matrix_>
+      const Dist::Comm* get_mat_comm(const Matrix_&, ...)
+      {
+        return nullptr;
+      }
+
+      /// returns the underlying comm, if Vector_ is a Global::Vector - SFINAE at its best
+      template<typename Vector_>
+      const Dist::Comm* get_vec_comm(const Vector_& vec, typename Vector_::GateType*)
+      {
+        return vec.get_comm();
+      }
+
+      template<typename Vector_>
+      const Dist::Comm* get_vec_comm(const Vector_&, ...)
+      {
+        return nullptr;
+      }
+    } // namespace Intern
+    /// \endcond
 
     /**
      * \brief Solver plot modes enumeration
@@ -87,6 +117,8 @@ namespace FEAT
       typedef SolverBase<VectorType> BaseClass;
 
     protected:
+      /// Communicator of the solver
+      const Dist::Comm* _comm;
       /// name of the solver in plots
       String _plot_name;
       /// relative tolerance parameter
@@ -140,6 +172,7 @@ namespace FEAT
        */
       explicit IterativeSolver(const String& plot_name) :
         BaseClass(),
+        _comm(nullptr),
         _plot_name(plot_name),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
@@ -178,6 +211,7 @@ namespace FEAT
        */
       explicit IterativeSolver(const String& plot_name, const String& section_name, PropertyMap* section) :
         BaseClass(section_name, section),
+        _comm(nullptr),
         _plot_name(plot_name),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
@@ -199,26 +233,18 @@ namespace FEAT
         _skip_def_calc(true) // no potential problem in non-MPI builds
 #endif
       {
-        Dist::Comm comm(Dist::Comm::world());
-
         auto plot_mode_p = section->get_entry("plot_mode");
         if (plot_mode_p.second)
         {
           PlotMode plot_mode;
           plot_mode << plot_mode_p.first;
-          if(comm.rank() == 0)
-          {
-            set_plot_mode(plot_mode);
-          }
+          set_plot_mode(plot_mode);
         }
 
         auto plot_name_p = section->get_entry("plot_name");
         if (plot_name_p.second)
         {
-          if(comm.rank() == 0)
-          {
-            set_plot_name(plot_name_p.first);
-          }
+          set_plot_name(plot_name_p.first);
         }
 
         auto tol_abs_p = section->get_entry("tol_abs");
@@ -253,6 +279,42 @@ namespace FEAT
         if (min_stag_iter_p.second)
           set_min_stag_iter(Index(std::stoul(min_stag_iter_p.first)));
 
+      }
+
+      /**
+       * \brief Sets the communicator for the solver directly.
+       *
+       * \param[in] comm
+       * A pointer to the communicator that is to be used by the solver.
+       */
+      void _set_comm(const Dist::Comm* comm)
+      {
+        this->_comm = comm;
+      }
+
+      /**
+       * \brief Sets the communicator for the solver from a matrix.
+       *
+       * \param[in] matrix
+       * A reference to a matrix. If 'Matrix_' is a 'Global::Matrix',
+       * then the communicator of the matrix gate is taken.
+       */
+      template<typename Matrix_>
+      void _set_comm_by_matrix(const Matrix_& matrix)
+      {
+        this->_comm = Intern::get_mat_comm(matrix, nullptr);
+      }
+
+      /**
+       * \brief Sets the communicator for the solver from a vector.
+       *
+       * \param[in] vector
+       * A reference to a vector. If 'Vector_' is a 'Global::Vector',
+       * then the communicator of the vector gate is taken.
+       */
+      void _set_comm_by_vector(const Vector_& vector)
+      {
+        this->_comm = Intern::get_vec_comm(vector, nullptr);
       }
 
     public:
@@ -495,14 +557,16 @@ namespace FEAT
         if(!_plot_summary())
           return;
 
-        Dist::Comm comm_world(Dist::Comm::world());
-
-        String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")\n");
-        msg += this->get_plot_name()  +": defect norm: "+stringify_fp_sci(this->_def_init)
+        String msg;
+        msg += this->get_plot_name() + ": its:  " +stringify(this->get_num_iter()) +" (" + stringify(st) + ")\n";
+        msg += this->get_plot_name() + ": defect norm: "+stringify_fp_sci(this->_def_init)
           + " -> "+stringify_fp_sci(this->_def_cur)
           + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
 
-        comm_world.print(msg);
+        if(_comm != nullptr)
+          _comm->print(msg);
+        else
+          std::cout << msg << std::endl;
       }
 
       /**
@@ -548,9 +612,16 @@ namespace FEAT
         // plot?
         if(this->_plot_iter())
         {
-          std::cout << this->_plot_name
-            <<  ": " << stringify(0).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_init) << std::endl;
+          // compose message line
+          String msg = this->_plot_name
+            +  ": " + stringify(0).pad_front(this->_iter_digits)
+            + " : " + stringify_fp_sci(this->_def_init);
+
+          // print message line via comm (if available)
+          if(_comm != nullptr)
+            _comm->print(msg);
+          else
+            std::cout << msg << std::endl;
         }
 
         // ensure that the defect is neither NaN nor infinity
@@ -604,12 +675,18 @@ namespace FEAT
         // plot?
         if(this->_plot_iter())
         {
-          std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " / " << stringify_fp_fix(this->_def_cur / def_old)
-            << std::endl;
+          // compose message line
+          String msg = this->_plot_name
+            +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+            + " : " + stringify_fp_sci(this->_def_cur)
+            + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
+            + " / " + stringify_fp_fix(this->_def_cur / def_old);
+
+          // print message line via comm (if available)
+          if(_comm != nullptr)
+            _comm->print(msg);
+          else
+            std::cout << msg << std::endl;
         }
 
         // ensure that the defect is neither NaN nor infinity
@@ -682,12 +759,18 @@ namespace FEAT
         // plot?
         if(this->_plot_iter())
         {
-          std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " / " << stringify_fp_fix(this->_def_cur / def_old)
-            << std::endl;
+          // compose message line
+          String msg = this->_plot_name
+            +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+            + " : " + stringify_fp_sci(this->_def_cur)
+            + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
+            + " / " + stringify_fp_fix(this->_def_cur / def_old);
+
+          // print message line via comm (if available)
+          if(_comm != nullptr)
+            _comm->print(msg);
+          else
+            std::cout << msg << std::endl;
         }
 
         // ensure that the defect is neither NaN nor infinity

@@ -71,35 +71,39 @@ namespace FEAT
         _system_filter(filter),
         _omega(omega)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
-    /**
-     * \brief Constructor using a PropertyMap
-     *
-     * \param[in] section_name
-     * The name of the config section, which it does not know by itself
-     *
-     * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
-     *
-     * \param[in] matrix
-     * The system matrix.
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     * \param[in] precond
-     * The preconditioner. May be \c nullptr.
-     *
-     */
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       * \param[in] precond
+       * The preconditioner. May be \c nullptr.
+       *
+       */
       explicit Richardson(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter,
+        const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("Richardson", section_name, section, precond),
         _system_matrix(matrix),
         _system_filter(filter),
         _omega(1)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
         // Check if we have set omega
         auto omega_p = section->query("omega");
         if(omega_p.second)

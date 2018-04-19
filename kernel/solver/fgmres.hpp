@@ -87,6 +87,8 @@ namespace FEAT
         _system_filter(filter),
         _krylov_dim(krylov_dim)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
         set_inner_res_scale(inner_res_scale);
       }
 
@@ -96,6 +98,9 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
+
         // Set _inner_res_scale by parameter or use default value
         auto inner_res_scale_s = section->query("inner_res_scale", "0.0");
         set_inner_res_scale(DataType(std::stod(inner_res_scale_s)));

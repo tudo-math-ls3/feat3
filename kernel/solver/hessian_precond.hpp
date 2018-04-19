@@ -93,8 +93,8 @@ namespace FEAT
           _filter(filter_),
           _hessian(DT_(0)),
           _inv_hessian(DT_(0))
-          {
-          }
+        {
+        }
 
         /**
          * \brief Empty virtual destructor

@@ -73,6 +73,8 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
     /**
@@ -100,6 +102,8 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /// \copydoc SolverBase::name()

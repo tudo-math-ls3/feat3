@@ -83,6 +83,8 @@ namespace FEAT
         _system_filter(filter),
         _ilu_p(ilu_p)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /**
@@ -102,12 +104,14 @@ namespace FEAT
        *
        */
       explicit PCGNRILU(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass("PCGNRILU", section_name, section),
         _system_matrix(matrix),
         _system_filter(filter),
         _ilu_p(-1)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
         // Check if we have set _p
         auto fill_in_param_p = section->query("fill_in_param");
         if(fill_in_param_p.second)

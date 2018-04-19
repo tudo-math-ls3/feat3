@@ -136,6 +136,14 @@ namespace FEAT
         }
 
         /**
+         * \brief Returns the functional's communicator
+         */
+        const Dist::Comm* get_comm() const
+        {
+          return _row_gate != nullptr ? _row_gate->get_comm() : nullptr;
+        }
+
+        /**
          * \brief Get the number of times compute_func() was called
          *
          * \returns The number of functional evaluations

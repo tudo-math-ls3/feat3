@@ -95,6 +95,8 @@ namespace FEAT
         _shadow_space_setup(false),
         _random(true)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       explicit IDRS(const String& section_name, PropertyMap* section,
@@ -105,6 +107,8 @@ namespace FEAT
         _shadow_space_setup(false),
         _random(true)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
         // Check if we have set _krylov_dim
         auto krylov_dim_p = section->query("krylov_dim");
         if(krylov_dim_p.second)

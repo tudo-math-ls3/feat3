@@ -66,6 +66,8 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /**
@@ -88,12 +90,14 @@ namespace FEAT
        *
        */
       explicit PCR(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter,
+        const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("PCR", section_name, section, precond),
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       virtual String name() const override

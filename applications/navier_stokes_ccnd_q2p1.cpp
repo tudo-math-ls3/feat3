@@ -947,8 +947,7 @@ namespace NvSCCNDQ2P1dc
     }
 
     // solve Stokes system
-    if(comm.rank() == 0)
-      solver->set_plot_mode(Solver::PlotMode::iter);
+    solver->set_plot_mode(Solver::PlotMode::iter);
     if(biters)
     {
       solver->set_min_iter(iters.front());

@@ -704,11 +704,8 @@ namespace Tutorial06
     // And finally, we use the Schwarz preconditioner in our (global) PCG solver:
     auto solver = Solver::new_pcg(matrix, filter, schwarz);
 
-    // Enable the convergence plot on rank 0.
-    if(comm.rank() == 0)
-    {
-      solver->set_plot_mode(Solver::PlotMode::iter);
-    }
+    // Enable the convergence plot.
+    solver->set_plot_mode(Solver::PlotMode::iter);
 
     // The rest of the solver step is identical to the previous tutorials:
 

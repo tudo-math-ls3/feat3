@@ -92,6 +92,8 @@ namespace FEAT
         _precond_l(precond_l),
         _precond_r(precond_r)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /**
@@ -113,7 +115,7 @@ namespace FEAT
        * \p precond_l and \p precond_r may point to the same object.
        */
       explicit PCGNR(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter,
+        const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond_l = nullptr,
         std::shared_ptr<PrecondType> precond_r = nullptr) :
         BaseClass("PCGNR", section_name, section),
@@ -122,6 +124,8 @@ namespace FEAT
         _precond_l(precond_l),
         _precond_r(precond_r)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       virtual String name() const override
