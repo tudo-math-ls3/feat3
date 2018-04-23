@@ -107,20 +107,17 @@ namespace FEAT
         _max_ev(DataType(0)),
         _fraction_min_ev(DataType(0.5)),
         _fraction_max_ev(DataType(0.8))
-        {
-          // set communicator by system matrix
-          this->_set_comm_by_matrix(matrix);
-          auto fmin_p = section->query("fraction_min_ev");
-          if(fmin_p.second)
-          {
-            set_fraction_min_ev(DataType(std::stod(fmin_p.first)));
-          }
-          auto fmax_p = section->query("fraction_max_ev");
-          if(fmax_p.second)
-          {
-            set_fraction_max_ev(DataType(std::stod(fmax_p.first)));
-          }
-        }
+      {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
+        auto fmin_p = section->query("fraction_min_ev");
+        if(fmin_p.second && !fmin_p.first.parse(this->_fraction_min_ev))
+          throw ParseError(section_name + ".fraction_min_ev", fmin_p.first, "a float");
+
+        auto fmax_p = section->query("fraction_max_ev");
+        if(fmax_p.second && !fmax_p.first.parse(this->_fraction_max_ev))
+          throw ParseError(section_name + ".fraction_max_ev", fmax_p.first, "a float");
+      }
 
       /**
        * \brief Empty virtual destructor
@@ -209,15 +206,14 @@ namespace FEAT
       {
         // save defect
         this->_vec_def.copy(vec_def);
-        //this->_system_filter.filter_def(this->_vec_def);
 
         // clear solution vector
         vec_cor.format();
 
         // apply
-        Status st(_apply_intern(vec_cor, vec_def));
-        this->plot_summary(st);
-        return st;
+        this->_status = _apply_intern(vec_cor, vec_def);
+        this->plot_summary();
+        return this->_status;
       }
 
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -227,9 +223,9 @@ namespace FEAT
         this->_system_filter.filter_def(this->_vec_def);
 
         // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        this->_status = _apply_intern(vec_sol, vec_rhs);
+        this->plot_summary();
+        return this->_status;
       }
 
     protected:

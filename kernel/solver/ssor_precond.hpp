@@ -100,12 +100,9 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        // Check if we have set _omega
         auto omega_p = section->query("omega");
-        if(omega_p.second)
-        {
-          set_omega(DataType(std::stod(omega_p.first)));
-        }
+        if(omega_p.second && !omega_p.first.parse(this->_omega))
+          throw ParseError(section_name + ".omega", omega_p.first, "a positive float");
       }
 
       /// Returns the name of the solver.

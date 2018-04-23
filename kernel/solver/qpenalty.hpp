@@ -190,9 +190,9 @@ namespace FEAT
           vec_cor.format();
 
           // apply
-          Status st(_apply_intern(vec_cor, vec_def));
-          this->plot_summary(st);
-          return st;
+          this->_status = _apply_intern(vec_cor, vec_def);
+          this->plot_summary();
+          return this->_status;
         }
 
         /// \copydoc IterativeSolver::correct()
@@ -201,9 +201,9 @@ namespace FEAT
           _functional.set_penalty_param(_initial_penalty_param);
 
           // apply
-          Status st(_apply_intern(vec_sol, vec_rhs));
-          this->plot_summary(st);
-          return st;
+          this->_status = _apply_intern(vec_sol, vec_rhs);
+          this->plot_summary();
+          return this->_status;
         }
 
       protected:
@@ -260,11 +260,7 @@ namespace FEAT
                 + " / " + stringify_fp_sci(DataType(0.5)*Math::sqr(this->_def_cur))
                 + " : " + stringify_fp_sci(penalty_param);
 
-              // print message line via comm (if available)
-              if(this->_comm != nullptr)
-                this->_comm->print(msg);
-              else
-                std::cout << msg << std::endl;
+              this->_print_line(msg);
             }
 
             // ensure that the defect is neither NaN nor infinity
@@ -351,11 +347,7 @@ namespace FEAT
             +  ": " + stringify(0).pad_front(this->_iter_digits)
             + " : " + stringify_fp_sci(this->_def_init);
 
-          // print message line via comm (if available)
-          if(this->_comm != nullptr)
-            this->_comm->print(msg);
-          else
-            std::cout << msg << std::endl;
+          this->_print_line(msg);
         }
 
         // Ensure that the defect is neither NaN nor infinity

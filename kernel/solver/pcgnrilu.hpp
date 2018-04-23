@@ -112,17 +112,10 @@ namespace FEAT
       {
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
-        // Check if we have set _p
+
         auto fill_in_param_p = section->query("fill_in_param");
-        if(fill_in_param_p.second)
-        {
-          set_fill_in_param(int(std::stoi(fill_in_param_p.first)));
-        }
-        else
-        {
-          throw InternalError(__func__,__FILE__,__LINE__,
-          name()+" config section is missing the mandatory fill_in_param key!");
-        }
+        if(fill_in_param_p.second && !fill_in_param_p.first.parse(_ilu_p))
+          throw ParseError(section_name + ".fill_in_param", fill_in_param_p.first, "a non-negative integer");
       }
 
       /**
@@ -200,10 +193,14 @@ namespace FEAT
         // clear solution vector
         vec_cor.format();
 
-        // apply
-        Status st(_apply_intern(vec_cor, vec_def));
-        this->plot_summary(st);
-        return st;
+        // apply solver
+        this->_status = _apply_intern(vec_cor);
+
+        // plot summary
+        this->plot_summary();
+
+        // return status
+        return this->_status;
       }
 
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -212,10 +209,14 @@ namespace FEAT
         this->_system_matrix.apply(this->_vec_r, vec_sol, vec_rhs, -DataType(1));
         this->_system_filter.filter_def(this->_vec_r);
 
-        // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        // apply solver
+        this->_status = _apply_intern(vec_sol);
+
+        // plot summary
+        this->plot_summary();
+
+        // return status
+        return this->_status;
       }
 
     protected:
@@ -241,7 +242,7 @@ namespace FEAT
         }
       }
 
-      virtual Status _apply_intern(VectorType& vec_x, const VectorType& DOXY(vec_b))
+      virtual Status _apply_intern(VectorType& vec_x)
       {
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
 

@@ -102,24 +102,19 @@ namespace FEAT
         this->_set_comm_by_matrix(matrix);
 
         // Set _inner_res_scale by parameter or use default value
-        auto inner_res_scale_s = section->query("inner_res_scale", "0.0");
-        set_inner_res_scale(DataType(std::stod(inner_res_scale_s)));
+        auto inner_res_scale_p = section->query("inner_res_scale");
+        if(inner_res_scale_p.second && (!inner_res_scale_p.first.parse(this->_inner_res_scale) || (this->_inner_res_scale < DataType(0))))
+          throw ParseError(section_name + ".inner_res_scale", inner_res_scale_p.first, "a non-negative float");
 
         // Check if we have set _krylov_vim
         auto krylov_dim_p = section->query("krylov_dim");
-        if(krylov_dim_p.second)
-        {
-          set_krylov_dim(Index(std::stoul(krylov_dim_p.first)));
-          if  (this->_plot_name == "FGMRES")
-          {
-            this->set_plot_name("FGMRES("+stringify(_krylov_dim)+")");
-          }
-        }
-        else
-        {
-          throw InternalError(__func__,__FILE__,__LINE__,
-          "FGMRES config section is missing the mandatory krylov_dim!");
-        }
+        if(!krylov_dim_p.second)
+          throw ParseError("FGMRES config section is missing the mandatory krylov_dim!");
+
+        if(!krylov_dim_p.first.parse(this->_krylov_dim) || (this->_krylov_dim <= Index(0)))
+          throw ParseError(section_name + ".krylov_dim", krylov_dim_p.first, "a positive integer");
+
+        this->set_plot_name("FGMRES("+stringify(_krylov_dim)+")");
       }
 
       /**
@@ -195,15 +190,14 @@ namespace FEAT
       {
         // save input rhs vector as initial defect
         this->_vec_v.at(0).copy(vec_rhs);
-        //this->_system_filter.filter_def(this->_vec_v.at(0));
 
         // clear solution vector
         vec_sol.format();
 
         // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        this->_status = _apply_intern(vec_sol, vec_rhs);
+        this->plot_summary();
+        return this->_status;
       }
 
       /// \copydoc SolverBase::correct()
@@ -214,9 +208,9 @@ namespace FEAT
         this->_system_filter.filter_def(this->_vec_v.at(0));
 
         // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        this->_status = _apply_intern(vec_sol, vec_rhs);
+        this->plot_summary();
+        return this->_status;
       }
 
     protected:
@@ -324,9 +318,10 @@ namespace FEAT
               // plot?
               if(this->_plot_iter())
               {
-                std::cout << this->_plot_name
-                  <<  "* " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-                  << " : " << stringify_fp_sci(this->_def_cur) << std::endl;
+                String msg = this->_plot_name
+                  +  "* " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+                  + " : " + stringify_fp_sci(this->_def_cur);
+                this->_print_line(msg);
               }
             }
           }

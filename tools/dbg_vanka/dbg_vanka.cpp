@@ -259,7 +259,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   case Solver::VankaType::block_full_add:  std::cout << "BFA: "; break;
   }
   std::cout
-    << stringify(solver->get_conv_rate()).pad_front(17) << " "
+    << stringify(solver->calc_convergence_rate()).pad_front(17) << " "
     << symbo_time << " "
     << numer_time << " "
     << solve_time << " "

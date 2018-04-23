@@ -176,36 +176,24 @@ namespace FEAT
         {
         }
 
-        /**
-         * \brief Plot a summary of the last solver run
-         */
-        virtual void plot_summary(const Status st) const override
+        virtual String get_summary() const override
         {
-          // Print solver summary
-          if(this->_plot_summary())
-          {
-            String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
-                +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
-                + stringify(_functional.get_num_grad_evals()) + " (grad) "
-                + stringify(_functional.get_num_hess_evals()) + " (hess)"
-                +" last step: "+stringify_fp_sci(_steplength)+"\n");
-            msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_init)
-              + " -> "+stringify_fp_sci(_fval)
-              + ", factor "+stringify_fp_sci(_fval/_fval_init)
-              + ", last reduction "+stringify_fp_sci(_fval_prev - _fval)+"\n";
-            msg += this->get_plot_name()  +": grad: "+stringify_fp_sci(this->_def_init)
-              + " -> "+stringify_fp_sci(this->_def_cur)
-              + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+          String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())
+              +" ("+ stringify(this->get_status())+")"
+              +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
+              + stringify(_functional.get_num_grad_evals()) + " (grad) "
+              + stringify(_functional.get_num_hess_evals()) + " (hess)"
+              +" last step: "+stringify_fp_sci(_steplength)+"\n");
+          msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_init)
+            + " -> "+stringify_fp_sci(_fval)
+            + ", factor "+stringify_fp_sci(_fval/_fval_init)
+            + ", last reduction "+stringify_fp_sci(_fval_prev - _fval)+"\n";
+          msg += this->get_plot_name()  +": grad: "+stringify_fp_sci(this->_def_init)
+            + " -> "+stringify_fp_sci(this->_def_cur)
+            + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
 
-            // print message line via comm (if available)
-            if(this->_comm != nullptr)
-              this->_comm->print(msg);
-            else
-              std::cout << msg << std::endl;
-          }
-
+          return msg;
         }
-
 
         /**
          * \brief Gets the tolerance for function value improvement
@@ -297,11 +285,7 @@ namespace FEAT
               + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
               + " : " + stringify_fp_sci(this->_fval);
 
-            // print message line via comm (if available)
-            if(this->_comm != nullptr)
-              this->_comm->print(msg);
-            else
-              std::cout << msg << std::endl;
+            this->_print_line(msg);
           }
 
           // Ensure that the initial fval and defect are neither NaN nor infinity
@@ -366,11 +350,7 @@ namespace FEAT
               + " : " + stringify_fp_sci(this->_steplength);
 
             // print message line via comm (if available)
-            if(this->_comm != nullptr)
-              this->_comm->print(msg);
-            else
-              std::cout << msg << std::endl;
-
+            this->_print_line(msg);
           }
 
           // ensure that the defect is neither NaN nor infinity

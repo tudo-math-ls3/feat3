@@ -143,15 +143,18 @@ namespace FEAT
       {
         // save defect
         this->_vec_r.copy(vec_def);
-        //this->_system_filter.filter_def(this->_vec_r);
 
         // clear solution vector
         vec_cor.format();
 
-        // apply
-        Status st(_apply_intern(vec_cor, vec_def));
-        this->plot_summary(st);
-        return st;
+        // apply solver
+        this->_status = _apply_intern(vec_cor);
+
+        // plot summary
+        this->plot_summary();
+
+        // return status
+        return this->_status;
       }
 
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -160,14 +163,18 @@ namespace FEAT
         this->_system_matrix.apply(this->_vec_r, vec_sol, vec_rhs, -DataType(1));
         this->_system_filter.filter_def(this->_vec_r);
 
-        // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        // apply solver
+        this->_status = _apply_intern(vec_sol);
+
+        // plot summary
+        this->plot_summary();
+
+        // return status
+        return this->_status;
       }
 
     protected:
-      virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
+      virtual Status _apply_intern(VectorType& vec_sol)
       {
         IterationStats pre_iter(*this);
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));

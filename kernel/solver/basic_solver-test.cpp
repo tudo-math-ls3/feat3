@@ -63,6 +63,11 @@ public:
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
+    // set solver name and plot summary
+    std::cout << std::endl;
+    solver.set_plot_name(name);
+    solver.set_plot_mode(PlotMode::summary);
+
     // initialise solver
     solver.init();
 
@@ -288,6 +293,11 @@ public:
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
+    // set solver name and plot summary
+    std::cout << std::endl;
+    solver.set_plot_name(name);
+    solver.set_plot_mode(PlotMode::summary);
+
     // initialise solver
     solver.init();
 
@@ -507,6 +517,11 @@ public:
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
+    // set solver name and plot summary
+    std::cout << std::endl;
+    solver.set_plot_name(name);
+    solver.set_plot_mode(PlotMode::summary);
+
     // initialise solver
     solver.init();
 
@@ -605,6 +620,11 @@ public:
   void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, const Index ref_iters, const Index iter_tol = 2u) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
+
+    // set solver name and plot summary
+    std::cout << std::endl;
+    solver.set_plot_name(name);
+    solver.set_plot_mode(PlotMode::summary);
 
     // initialise solver
     solver.init();

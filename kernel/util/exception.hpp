@@ -118,6 +118,46 @@ namespace FEAT
 #define INTERNAL_ERROR(msg) FEAT::InternalError(__func__, __FILE__, __LINE__, msg)
 
   /**
+   * \brief Class for parser related errors
+   */
+  class ParseError :
+    public Exception
+  {
+  public:
+    /**
+     * \brief Constructor.
+     *
+     * \param[in] message_in
+     * A short error message.
+     */
+    explicit ParseError(const String& message_in) :
+      Exception("ParseError: " + message_in)
+    {
+    }
+
+    /**
+     * \brief Constructor
+     *
+     * \param[in] name
+     * The name of the entry that was to be parsed.
+     *
+     * \param[in] gotten
+     * The string that was meant to be parsed.
+     *
+     * \param[in] expect
+     * What was expected instead, e.g. "a non-negative integer"
+     */
+    explicit ParseError(const String& name, const String& got, const String& expect) :
+      Exception("ParseError: " + name + ", got " + got + ", expected " + expect)
+    {
+    }
+
+    virtual ~ParseError() throw()
+    {
+    }
+  }; // class ParseError
+
+  /**
    * \brief Base class for file related errors
    * \author Peter Zajac
    */

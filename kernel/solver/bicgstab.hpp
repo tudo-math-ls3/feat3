@@ -36,15 +36,20 @@ namespace FEAT
       }
     }
 
-    inline void operator<<(BiCGStabPreconVariant& precon_variant, const String& precon_variant_name)
+    inline std::istream& operator>>(std::istream& is, BiCGStabPreconVariant& precon_variant)
     {
-      if(precon_variant_name == "left")
+      String s;
+      if((is >> s).fail())
+        return is;
+
+      if(s.compare_no_case("left") == 0)
         precon_variant = BiCGStabPreconVariant::left;
-      else if(precon_variant_name == "right")
+      else if(s.compare_no_case("right") == 0)
         precon_variant = BiCGStabPreconVariant::right;
       else
-        throw InternalError(__func__, __FILE__, __LINE__, "Unknown BiCGStabPreconVariant identifier string "
-            +precon_variant_name);
+        is.setstate(std::ios_base::failbit);
+
+      return is;
     }
 
     /// \endcond
@@ -217,12 +222,8 @@ namespace FEAT
           this->_set_comm_by_matrix(matrix);
           // Check if we have set _p_variant
           auto p_variant_p = section->query("precon_variant");
-          if(p_variant_p.second)
-          {
-            BiCGStabPreconVariant precon_variant;
-            precon_variant << p_variant_p.first;
-            set_precon_variant(precon_variant);
-          }
+          if(p_variant_p.second && !p_variant_p.first.parse(this->_precon_variant))
+            throw ParseError(section_name + ".precon_variant", p_variant_p.first, "one of: left, right");
         }
 
         /// \copydoc SolverBase::name()
@@ -266,12 +267,14 @@ namespace FEAT
           this->_system_matrix.apply(this->_vec_r, vec_sol, vec_rhs, -DataType(1));
           this->_system_filter.filter_def(this->_vec_r);
 
-          // apply
-          Status st(_apply_intern(vec_sol, vec_rhs));
+          // apply solver
+          this->_status = _apply_intern(vec_sol, vec_rhs);
 
-          this->plot_summary(st);
+          // plot summary
+          this->plot_summary();
 
-          return st;
+          // return status
+          return this->_status;
         }
 
         /// \copydoc SolverBase::apply()
@@ -279,16 +282,18 @@ namespace FEAT
         {
           // save rhs vector as initial defect
           this->_vec_r.copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_r);
 
           // format solution vector
           vec_cor.format();
 
-          Status st(_apply_intern(vec_cor, vec_def));
+          // apply solver
+          this->_status = _apply_intern(vec_cor, vec_def);
 
-          this->plot_summary(st);
+          // plot summary
+          this->plot_summary();
 
-          return st;
+          // return status
+          return this->_status;
         }
 
 
@@ -432,16 +437,12 @@ namespace FEAT
               if(status_half != Status::progress)
               {
                 ++this->_num_iter;
+                this->_def_prev = def_old;
+
                 // plot?
                 if(this->_plot_iter())
-                {
-                  std::cout << this->_plot_name
-                  <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-                  << " : " << stringify_fp_sci(this->_def_cur)
-                  << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-                  << " / " << stringify_fp_fix(this->_def_cur / def_old)
-                  << std::endl;
-                }
+                  this->_plot_iter_line(this->_num_iter, this->_def_cur, def_old);
+
                 stat.destroy();
                 Statistics::add_solver_expression(
                   std::make_shared<ExpressionEndSolve>(this->name(), status_half, this->get_num_iter()));

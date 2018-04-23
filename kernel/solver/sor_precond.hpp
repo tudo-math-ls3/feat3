@@ -84,22 +84,22 @@ namespace FEAT
         }
       }
 
-    /**
-     * \brief Constructor using a PropertyMap
-     *
-     * \param[in] section_name
-     * The name of the config section, which it does not know by itself
-     *
-     * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
-     *
-     * \param[in] matrix
-     * The system matrix.
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     */
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       */
       explicit SORPrecond(const String& section_name, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
@@ -112,12 +112,9 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        // Check if we have set _krylov_vim
         auto omega_p = section->query("omega");
-        if(omega_p.second)
-        {
-          set_omega(DataType(std::stod(omega_p.first)));
-        }
+        if(omega_p.second && !omega_p.first.parse(this->_omega))
+          throw ParseError(section_name + ".omega", omega_p.first, "a positive float");
       }
 
       /// Returns the name of the solver.

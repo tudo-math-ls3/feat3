@@ -42,36 +42,29 @@ namespace FEAT
       {
       }
 
-    /**
-     * \brief Constructor using a PropertyMap
-     *
-     * \param[in] section_name
-     * The name of the config section, which it does not know by itself
-     *
-     * \param[in] section
-     * A pointer to the PropertyMap section configuring this solver
-     *
-     * \param[in] filter
-     * The system filter.
-     *
-     */
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       */
       explicit ScalePrecond(const String& section_name, PropertyMap* section,
-      const Filter_& filter) :
+        const Filter_& filter) :
         BaseClass(section_name, section),
         _filter(filter),
         _omega(0)
       {
         // Check if we have set _krylov_vim
         auto omega_p = section->query("omega");
-        if(omega_p.second)
-        {
-          set_omega(DataType(std::stod(omega_p.first)));
-        }
-        else
-        {
-          throw InternalError(__func__,__FILE__,__LINE__,
-          name() +" config section is missing the mandatory omega key!");
-        }
+        if(omega_p.second && !omega_p.first.parse(this->_omega))
+          throw ParseError(section_name + ".omega", omega_p.first, "a positive float");
       }
 
       /**

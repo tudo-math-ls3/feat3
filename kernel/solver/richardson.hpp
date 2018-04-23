@@ -156,15 +156,14 @@ namespace FEAT
       {
         // save defect
         this->_vec_def.copy(vec_def);
-        //this->_system_filter.filter_def(this->_vec_def);
 
         // clear solution vector
         vec_cor.format();
 
         // apply
-        Status st(_apply_intern(vec_cor, vec_def));
-        this->plot_summary(st);
-        return st;
+        this->_status = _apply_intern(vec_cor, vec_def);
+        this->plot_summary();
+        return this->_status;
       }
 
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -174,9 +173,9 @@ namespace FEAT
         this->_system_filter.filter_def(this->_vec_def);
 
         // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        this->_status = _apply_intern(vec_sol, vec_rhs);
+        this->plot_summary();
+        return this->_status;
       }
 
     protected:

@@ -37,15 +37,20 @@ namespace FEAT
       }
     }
 
-    inline void operator<<(BiCGStabLPreconVariant& precon_variant, const String& precon_variant_name)
+    inline std::istream& operator>>(std::istream& is, BiCGStabLPreconVariant& precon_variant)
     {
-      if(precon_variant_name == "left")
+      String s;
+      if((is >> s).fail())
+        return is;
+
+      if(s.compare_no_case("left") == 0)
         precon_variant = BiCGStabLPreconVariant::left;
-      else if(precon_variant_name == "right")
+      else if(s.compare_no_case("right") == 0)
         precon_variant = BiCGStabLPreconVariant::right;
       else
-        throw InternalError(__func__, __FILE__, __LINE__, "Unknown BiCGStabLPreconVariant identifier string "
-            +precon_variant_name);
+        is.setstate(std::ios_base::failbit);
+
+      return is;
     }
 
     /// \endcond
@@ -115,7 +120,7 @@ namespace FEAT
         /// vector 'list' for the algorithm (size = l+1);
         std::vector<VectorType> _vec_uj_hat;
 
-        /// vector 'list' for the algorithm (size = l+1); r[0] is the residual vector of the preconitioned system
+        /// vector 'list' for the algorithm (size = l+1); r[0] is the residual vector of the preconditioned system
         std::vector<VectorType> _vec_rj_hat;
 
         /// Precondition from left or right?
@@ -194,28 +199,18 @@ namespace FEAT
           this->_set_comm_by_matrix(matrix);
           // Check if we have set _p_variant
           auto p_variant_p = section->query("precon_variant");
-          if(p_variant_p.second)
-          {
-            BiCGStabLPreconVariant precon_variant;
-            precon_variant << p_variant_p.first;
-            set_precon_variant(precon_variant);
-          }
+          if(p_variant_p.second && !p_variant_p.first.parse(this->_precon_variant))
+            throw ParseError(section_name + ".precon_variant", p_variant_p.first, "one of: left, right");
 
           //Check if we have set the solver parameter _l
           std::pair<String , bool> l_pair = section->query("polynomial_degree");
 
           int l_pm = 2;                                                 //use default l, if the parameter is not given
-          if (l_pair.second)
-          {
-            l_pair.first.trim_me();
+          if (l_pair.second && (!l_pair.first.parse(l_pm) || (l_pm <= 0)))
+            throw ParseError(section_name + ".polynomial_degree", l_pair.first, "a positive integer");
 
-            l_pm = std::stoi(l_pair.first);
-
-            XASSERTM(l_pm > 0, "bicgstabl polynomial degree must be greather than zero!");
-          }
           this->_l = l_pm;
-          if(this->_plot_name == "BiCGStabL")
-            this->set_plot_name("BiCGStab(" + stringify(_l) + ")");
+          this->set_plot_name("BiCGStab(" + stringify(_l) + ")");
         }
 
         /// \copydoc SolverBase::name()
@@ -264,12 +259,14 @@ namespace FEAT
           this->_system_matrix.apply(this->_vec_rj_hat.at(0), vec_sol, vec_rhs, -DataType(1));
           this->_system_filter.filter_def(this->_vec_rj_hat.at(0));
 
-          // apply
-          Status st(_apply_intern(vec_sol, vec_rhs));
+          // apply solver
+          this->_status = _apply_intern(vec_sol, vec_rhs);
 
-          this->plot_summary(st);
+          // plot summary
+          this->plot_summary();
 
-          return st;
+          // return status
+          return this->_status;
         }
 
         /// \copydoc SolverBase::apply()
@@ -277,16 +274,18 @@ namespace FEAT
         {
           // save rhs vector as initial defect
           this->_vec_rj_hat.at(0).copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_rj_hat[0]);
 
           // format solution vector
           vec_cor.format();
 
-          Status st(_apply_intern(vec_cor, vec_def));
+          // apply solver
+          this->_status = _apply_intern(vec_cor, vec_def);
 
-          this->plot_summary(st);
+          // plot summary
+          this->plot_summary();
 
-          return st;
+          // return status
+          return this->_status;
         }
 
 

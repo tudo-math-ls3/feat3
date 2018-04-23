@@ -109,21 +109,16 @@ namespace FEAT
       {
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
-        // Check if we have set _krylov_dim
+
+        // Check if we have set _krylov_vim
         auto krylov_dim_p = section->query("krylov_dim");
-        if(krylov_dim_p.second)
-        {
-          set_krylov_dim(Index(std::stoul(krylov_dim_p.first)));
-          if  (this->_plot_name == "IDRS")
-          {
-            this->set_plot_name("IDR("+stringify(_krylov_dim)+")");
-          }
-        }
-        else
-        {
-          throw InternalError(__func__,__FILE__,__LINE__,
-          "IDRS config section is missing the mandatory krylov_dim!");
-        }
+        if(!krylov_dim_p.second)
+          throw ParseError("IDRS config section is missing the mandatory krylov_dim!");
+
+        if(!krylov_dim_p.first.parse(this->_krylov_dim) || (this->_krylov_dim <= Index(0)))
+          throw ParseError(section_name + ".krylov_dim", krylov_dim_p.first, "a positive integer");
+
+        this->set_plot_name("IDRS("+stringify(_krylov_dim)+")");
       }
 
       /**
@@ -198,15 +193,18 @@ namespace FEAT
       {
         // save input rhs vector as initial defect
         this->_vec_res.copy(vec_rhs);
-        //this->_system_filter.filter_def(this->_vec_v.at(0));
 
         // clear solution vector
         vec_sol.format();
 
-        // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        // apply solver
+        this->_status = _apply_intern(vec_sol, vec_rhs);
+
+        // plot summary
+        this->plot_summary();
+
+        // return status
+        return this->_status;
       }
 
       /// \copydoc SolverBase::correct()
@@ -216,10 +214,14 @@ namespace FEAT
         this->_system_matrix.apply(this->_vec_res, vec_sol, vec_rhs, -DataType(1));
         this->_system_filter.filter_def(this->_vec_res);
 
-        // apply
-        Status st(_apply_intern(vec_sol, vec_rhs));
-        this->plot_summary(st);
-        return st;
+        // apply solver
+        this->_status = _apply_intern(vec_sol, vec_rhs);
+
+        // plot summary
+        this->plot_summary();
+
+        // return status
+        return this->_status;
       }
 
       /**

@@ -92,23 +92,16 @@ namespace FEAT
        * A shared pointer to a new JacobiPrecond object.
        */
       explicit JacobiPrecond(const String& section_name, PropertyMap* section,
-      const MatrixType& matrix, const FilterType& filter) :
+        const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _omega(1)
-        {
-          auto omega_p = section->query("omega");
-          if(omega_p.second)
-          {
-            set_omega(DataType(std::stod(omega_p.first)));
-          }
-          else
-          {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            name()+" config section is missing the mandatory omega key!");
-          }
-        }
+      {
+        auto omega_p = section->query("omega");
+        if(omega_p.second && (!omega_p.first.parse(this->_omega) || (this->_omega <= DataType(0))))
+          throw ParseError(section_name + ".omega", omega_p.first, "a positive float");
+      }
 
       /**
        * \brief Empty virtual destructor

@@ -1121,17 +1121,9 @@ namespace FEAT
         _filter(filter),
         _p(-1)
       {
-        // Check for _p
         auto fill_in_param_p = section->query("fill_in_param");
-        if(fill_in_param_p.second)
-        {
-          _p = std::stoi(fill_in_param_p.first);
-        }
-        else
-        {
-          throw InternalError(__func__,__FILE__,__LINE__,
-          name() + "config section "+section_name+" is missing the mandatory fill_in_param!");
-        }
+        if(fill_in_param_p.second && !fill_in_param_p.first.parse(_p))
+          throw ParseError(section_name + ".fill_in_param", fill_in_param_p.first, "a non-negative integer");
       }
 
       /**
@@ -1266,17 +1258,9 @@ namespace FEAT
         _filter(filter),
         _p(-1)
       {
-        // Check for _p
         auto fill_in_param_p = section->query("fill_in_param");
-        if(fill_in_param_p.second)
-        {
-          _p = std::stoi(fill_in_param_p.first);
-        }
-        else
-        {
-          throw InternalError(__func__,__FILE__,__LINE__,
-          name() + "config section "+section_name+" is missing the mandatory fill_in_param!");
-        }
+        if(fill_in_param_p.second && !fill_in_param_p.first.parse(_p))
+          throw ParseError(section_name + ".fill_in_param", fill_in_param_p.first, "a non-negative integer");
       }
 
       /**

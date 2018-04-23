@@ -148,9 +148,9 @@ namespace FEAT
           this->_functional.prepare(vec_cor, this->_filter);
 
           // apply
-          Status st(_apply_intern(vec_cor, vec_dir));
-          this->plot_summary(st);
-          return st;
+          this->_status = _apply_intern(vec_cor, vec_dir);
+          this->plot_summary();
+          return this->_status;
         }
 
         /**
@@ -169,9 +169,9 @@ namespace FEAT
           this->_functional.prepare(vec_sol, this->_filter);
 
           // apply
-          Status st(_apply_intern(vec_sol, vec_dir));
-          this->plot_summary(st);
-          return st;
+          this->_status = _apply_intern(vec_sol, vec_dir);
+          this->plot_summary();
+          return this->_status;
         }
 
       protected:

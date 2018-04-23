@@ -207,29 +207,21 @@ namespace FEAT
           }
         }
 
-        /**
-         * \brief Plot a summary of the last solver run
-         */
-        virtual void plot_summary(const Status st) const override
+        virtual String get_summary() const override
         {
-          // Print solver summary
-          if(this->_plot_summary())
-          {
-            Dist::Comm comm_world(Dist::Comm::world());
-
-            String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())+" ("+ stringify(st)+")"
-                +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
-                + stringify(_functional.get_num_grad_evals()) + " (grad) "
-                + stringify(_functional.get_num_hess_evals()) + " (hess)"
-                +" last step: "+stringify_fp_sci(_alpha_min)+"\n");
-            msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_0)
-              + " -> "+stringify_fp_sci(_fval_min)
-              + ", factor "+stringify_fp_sci(_fval_min/_fval_0)+"\n";
-            msg += this->get_plot_name()  +": <dir, grad>: "+stringify_fp_sci(this->_def_init)
-              + " -> "+stringify_fp_sci(this->_def_cur)
-              + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
-            comm_world.print(msg);
-          }
+          String msg(this->get_plot_name()+ ": its: "+stringify(this->get_num_iter())
+              +" ("+ stringify(this->get_status())+")"
+              +", evals: "+stringify(_functional.get_num_func_evals())+" (func) "
+              + stringify(_functional.get_num_grad_evals()) + " (grad) "
+              + stringify(_functional.get_num_hess_evals()) + " (hess)"
+              +" last step: "+stringify_fp_sci(_alpha_min)+"\n");
+          msg +=this->get_plot_name()+": fval: "+stringify_fp_sci(_fval_0)
+            + " -> "+stringify_fp_sci(_fval_min)
+            + ", factor "+stringify_fp_sci(_fval_min/_fval_0)+"\n";
+          msg += this->get_plot_name()  +": <dir, grad>: "+stringify_fp_sci(this->_def_init)
+            + " -> "+stringify_fp_sci(this->_def_cur)
+            + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
+          return msg;
         }
 
         /**
@@ -502,11 +494,12 @@ namespace FEAT
           // plot?
           if(this->_plot_iter())
           {
-            std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_init)
-            << " : " << stringify_fp_sci(this->_fval_0) << ", ||dir|| = " << stringify_fp_sci(this->_norm_dir)
-            << std::endl;
+            String msg = this->_plot_name
+              +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+              + " : " + stringify_fp_sci(this->_def_init)
+              + " : " + stringify_fp_sci(this->_fval_0)
+              + ", ||dir|| = " + stringify_fp_sci(this->_norm_dir);
+            this->_print_line(msg);
           }
 
           if(!Math::isfinite(this->_fval_0) || !Math::isfinite(this->_delta_0) || !Math::isfinite(this->_norm_dir))
@@ -557,12 +550,12 @@ namespace FEAT
           // plot?
           if(this->_plot_iter())
           {
-            std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << " : " << stringify_fp_sci(fval) << " : " << stringify_fp_sci(alpha)
-            << std::endl;
+            String msg = this->_plot_name
+              +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+              + " : " + stringify_fp_sci(this->_def_cur)
+              + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
+              + " : " + stringify_fp_sci(fval) + " : " + stringify_fp_sci(alpha);
+            this->_print_line(msg);
           }
 
           // ensure that the defect is neither NaN nor infinity

@@ -77,19 +77,24 @@ namespace FEAT
       }
     }
 
-    inline void operator<<(PlotMode& mode, const String& mode_name)
+    inline std::istream& operator>>(std::istream& is, PlotMode& mode)
     {
-        if(mode_name == "none")
-          mode = PlotMode::none;
-        else if(mode_name == "iter")
-          mode = PlotMode::iter;
-        else if(mode_name == "summary")
-          mode = PlotMode::summary;
-        else if(mode_name == "all")
-          mode = PlotMode::all;
-        else
-          throw InternalError(__func__, __FILE__, __LINE__, "Unknown PlotMode identifier string "
-              +mode_name);
+      String s;
+      if((is >> s).fail())
+        return is;
+
+      if(s.compare_no_case("none") == 0)
+        mode = PlotMode::none;
+      else if(s.compare_no_case("iter") == 0)
+        mode = PlotMode::iter;
+      else if(s.compare_no_case("summary") == 0)
+        mode = PlotMode::summary;
+      else if(s.compare_no_case("all") == 0)
+        mode = PlotMode::all;
+      else
+        is.setstate(std::ios_base::failbit);
+
+      return is;
     }
     /// \endcond
 
@@ -121,6 +126,8 @@ namespace FEAT
       const Dist::Comm* _comm;
       /// name of the solver in plots
       String _plot_name;
+      /// current status of the solver
+      Status _status;
       /// relative tolerance parameter
       DataType _tol_rel;
       /// relative tolerance parameter
@@ -145,6 +152,8 @@ namespace FEAT
       DataType _def_init;
       /// current defect
       DataType _def_cur;
+      /// previous iteration defect
+      DataType _def_prev;
       /// iteration count digits for plotting
       Index _iter_digits;
       /// whether to plot something
@@ -174,6 +183,7 @@ namespace FEAT
         BaseClass(),
         _comm(nullptr),
         _plot_name(plot_name),
+        _status(Status::undefined),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
         _div_rel(DataType(1) / Math::eps<DataType>()),
@@ -186,13 +196,10 @@ namespace FEAT
         _num_stag_iter(0),
         _def_init(0),
         _def_cur(0),
+        _def_prev(0),
         _iter_digits(Math::ilog10(_max_iter)),
         _plot_mode(PlotMode::none),
-#ifdef FEAT_HAVE_MPI
-        _skip_def_calc(false) // not allowed as this may cause deadlocks
-#else
-        _skip_def_calc(true) // no potential problem in non-MPI builds
-#endif
+        _skip_def_calc(true)
       {
       }
 
@@ -210,111 +217,47 @@ namespace FEAT
        *
        */
       explicit IterativeSolver(const String& plot_name, const String& section_name, PropertyMap* section) :
-        BaseClass(section_name, section),
-        _comm(nullptr),
-        _plot_name(plot_name),
-        _tol_rel(Math::sqrt(Math::eps<DataType>())),
-        _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
-        _div_rel(DataType(1) / Math::eps<DataType>()),
-        _div_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
-        _stag_rate(DataType(0.95)),
-        _min_iter(0),
-        _max_iter(100),
-        _num_iter(0),
-        _min_stag_iter(0),
-        _num_stag_iter(0),
-        _def_init(0),
-        _def_cur(0),
-        _iter_digits(Math::ilog10(_max_iter)),
-        _plot_mode(PlotMode::none),
-#ifdef FEAT_HAVE_MPI
-        _skip_def_calc(false) // not allowed as this may cause deadlocks
-#else
-        _skip_def_calc(true) // no potential problem in non-MPI builds
-#endif
+        IterativeSolver(plot_name)
       {
         auto plot_mode_p = section->get_entry("plot_mode");
-        if (plot_mode_p.second)
-        {
-          PlotMode plot_mode;
-          plot_mode << plot_mode_p.first;
-          set_plot_mode(plot_mode);
-        }
+        if (plot_mode_p.second && !plot_mode_p.first.parse(this->_plot_mode))
+          throw ParseError(section_name + ".plot_mode", plot_mode_p.first, "one of: none, iter, summary, all");
 
         auto plot_name_p = section->get_entry("plot_name");
         if (plot_name_p.second)
-        {
-          set_plot_name(plot_name_p.first);
-        }
+          this->_plot_name = plot_name_p.first;
 
         auto tol_abs_p = section->get_entry("tol_abs");
-        if (tol_abs_p.second)
-          set_tol_abs(DataType(std::stod(tol_abs_p.first)));
+        if (tol_abs_p.second && !tol_abs_p.first.parse(this->_tol_abs))
+          throw ParseError(section_name + ".tol_abs", tol_abs_p.first, "a floating point number");
 
         auto tol_rel_p = section->get_entry("tol_rel");
-        if (tol_rel_p.second)
-          set_tol_rel(DataType(std::stod(tol_rel_p.first)));
+        if (tol_rel_p.second && !tol_rel_p.first.parse(this->_tol_rel))
+          throw ParseError(section_name + ".tol_rel", tol_rel_p.first, "a floating point number");
 
         auto div_abs_p = section->get_entry("div_abs");
-        if (div_abs_p.second)
-          set_div_abs(DataType(std::stod(div_abs_p.first)));
+        if (div_abs_p.second && !div_abs_p.first.parse(this->_div_abs))
+          throw ParseError(section_name + ".div_abs", div_abs_p.first, "a floating point number");
 
         auto div_rel_p = section->get_entry("div_rel");
-        if (div_rel_p.second)
-          set_div_rel(DataType(std::stod(div_rel_p.first)));
+        if (div_rel_p.second && !div_rel_p.first.parse(this->_div_rel))
+          throw ParseError(section_name + ".div_rel", div_rel_p.first, "a floating point number");
 
         auto stag_rate_p = section->get_entry("stag_rate");
-        if (stag_rate_p.second)
-          set_stag_rate(DataType(std::stod(stag_rate_p.first)));
+        if (stag_rate_p.second && !stag_rate_p.first.parse(this->_stag_rate))
+          throw ParseError(section_name + ".stag_rate", stag_rate_p.first, "a floating point number in range [0,1)");
 
         auto max_iter_p = section->get_entry("max_iter");
-        if (max_iter_p.second)
-          set_max_iter(Index(std::stoul(max_iter_p.first)));
+        if (max_iter_p.second && !max_iter_p.first.parse(this->_max_iter))
+          throw ParseError(section_name + ".max_iter", max_iter_p.first, "an integer >= 0");
 
         auto min_iter_p = section->get_entry("min_iter");
-        if (min_iter_p.second)
-          set_min_iter(Index(std::stoul(min_iter_p.first)));
+        if (min_iter_p.second && !min_iter_p.first.parse(this->_min_iter))
+          throw ParseError(section_name + ".min_iter", min_iter_p.first, "an integer >= 0");
 
         auto min_stag_iter_p = section->get_entry("min_stag_iter");
-        if (min_stag_iter_p.second)
-          set_min_stag_iter(Index(std::stoul(min_stag_iter_p.first)));
-
-      }
-
-      /**
-       * \brief Sets the communicator for the solver directly.
-       *
-       * \param[in] comm
-       * A pointer to the communicator that is to be used by the solver.
-       */
-      void _set_comm(const Dist::Comm* comm)
-      {
-        this->_comm = comm;
-      }
-
-      /**
-       * \brief Sets the communicator for the solver from a matrix.
-       *
-       * \param[in] matrix
-       * A reference to a matrix. If 'Matrix_' is a 'Global::Matrix',
-       * then the communicator of the matrix gate is taken.
-       */
-      template<typename Matrix_>
-      void _set_comm_by_matrix(const Matrix_& matrix)
-      {
-        this->_comm = Intern::get_mat_comm(matrix, nullptr);
-      }
-
-      /**
-       * \brief Sets the communicator for the solver from a vector.
-       *
-       * \param[in] vector
-       * A reference to a vector. If 'Vector_' is a 'Global::Vector',
-       * then the communicator of the vector gate is taken.
-       */
-      void _set_comm_by_vector(const Vector_& vector)
-      {
-        this->_comm = Intern::get_vec_comm(vector, nullptr);
+        if (min_stag_iter_p.second && !min_stag_iter_p.first.parse(this->_min_stag_iter))
+          throw ParseError(section_name + ".min_stag_iter", min_stag_iter_p.first, "an integer >= 0");
       }
 
     public:
@@ -441,7 +384,7 @@ namespace FEAT
        * \brief Sets the plot mode of the solver.
        *
        * \param[in] plot_mode
-       * If set to anything but PlotMode::none, the solver will print information to std::cout
+       * The desired plot mode
        */
       void set_plot_mode(const PlotMode plot_mode)
       {
@@ -496,18 +439,65 @@ namespace FEAT
         return _def_cur;
       }
 
-      /// Returns the overall convergence rate.
-      DataType get_conv_rate() const
+      /// Returns the status
+      Status get_status() const
+      {
+        return _status;
+      }
+
+      /// Computes the overall convergence rate: (defect_final / defect_initial) ^ (1 / #iter)
+      DataType calc_convergence_rate() const
       {
         // no iterations performed?
         if(_num_iter <= Index(0))
           return DataType(0);
+
         // initial defect zero?
         if(_def_init < Math::eps<DataType>())
           return DataType(0);
 
         // compute convergence rate: (def_final / def_initial) ^ (1 / #iter)
         return Math::pow(_def_cur / _def_init, DataType(1) / DataType(_num_iter));
+      }
+
+      /// Computes the overall defect reduction factor: (defect_final / defect_inital)
+      DataType calc_defect_reduction() const
+      {
+        // avoid division by zero
+        if(this->_def_init <= Math::abs(this->_def_cur * Math::eps<DataType>()))
+          return DataType(0);
+
+        // compute defect reduction (def_final / def_inital)
+        return this->_def_cur / this->_def_init;
+      }
+
+      /**
+       * \brief Returns a summary string
+       */
+      virtual String get_summary() const
+      {
+        String msg;
+        msg += String(  "Name............: ") + this->get_plot_name();
+        msg += String("\nStatus..........: ") + stringify(this->get_status());
+        msg += String("\nIterations......: ") + stringify(this->get_num_iter());
+        msg += String("\nInitial Defect..: ") + stringify_fp_sci(this->get_def_initial());
+        msg += String("\nFinal Defect....: ") + stringify_fp_sci(this->get_def_final());
+        msg += String("\nDefect Reduction: ") + stringify_fp_sci(this->calc_defect_reduction());
+        msg += String("\nConvergence Rate: ") + stringify_fp_fix(this->calc_convergence_rate());
+
+        return msg;
+      }
+
+      /**
+       * \brief Plot a summary of the last solver run
+       */
+      virtual void plot_summary() const
+      {
+        // Print solver summary
+        if(!_plot_summary())
+          return;
+
+        this->_print_line(this->get_summary());
       }
 
       /**
@@ -534,6 +524,42 @@ namespace FEAT
 
     protected:
       /**
+       * \brief Sets the communicator for the solver directly.
+       *
+       * \param[in] comm
+       * A pointer to the communicator that is to be used by the solver.
+       */
+      void _set_comm(const Dist::Comm* comm)
+      {
+        this->_comm = comm;
+      }
+
+      /**
+       * \brief Sets the communicator for the solver from a matrix.
+       *
+       * \param[in] matrix
+       * A reference to a matrix. If 'Matrix_' is a 'Global::Matrix',
+       * then the communicator of the matrix gate is taken.
+       */
+      template<typename Matrix_>
+      void _set_comm_by_matrix(const Matrix_& matrix)
+      {
+        this->_comm = Intern::get_mat_comm(matrix, nullptr);
+      }
+
+      /**
+       * \brief Sets the communicator for the solver from a vector.
+       *
+       * \param[in] vector
+       * A reference to a vector. If 'Vector_' is a 'Global::Vector',
+       * then the communicator of the vector gate is taken.
+       */
+      void _set_comm_by_vector(const Vector_& vector)
+      {
+        this->_comm = Intern::get_vec_comm(vector, nullptr);
+      }
+
+      /**
        * \brief Computes the defect norm.
        *
        * \param[in] vec_def
@@ -545,28 +571,6 @@ namespace FEAT
       virtual DataType _calc_def_norm(const VectorType& vec_def, const VectorType& DOXY(vec_sol))
       {
         return vec_def.norm2();
-      }
-
-      /**
-       * \brief Plot a summary of the last solver run
-       *
-       */
-      virtual void plot_summary(const Status st) const
-      {
-        // Print solver summary
-        if(!_plot_summary())
-          return;
-
-        String msg;
-        msg += this->get_plot_name() + ": its:  " +stringify(this->get_num_iter()) +" (" + stringify(st) + ")\n";
-        msg += this->get_plot_name() + ": defect norm: "+stringify_fp_sci(this->_def_init)
-          + " -> "+stringify_fp_sci(this->_def_cur)
-          + ", factor " +stringify_fp_sci(this->_def_cur/this->_def_init);
-
-        if(_comm != nullptr)
-          _comm->print(msg);
-        else
-          std::cout << msg << std::endl;
       }
 
       /**
@@ -590,6 +594,60 @@ namespace FEAT
       }
 
       /**
+       * \brief Progress iteration?
+       *
+       * \returns \c true if the solver should process, otherwise \c false.
+       */
+      bool _progress() const
+      {
+        return this->_status == Status::progress;
+      }
+
+      /**
+       * \brief Prints a line.
+       *
+       * \param[in] line
+       * The line to be printed.
+       */
+      void _print_line(const String& line) const
+      {
+        // print message line via comm (if available)
+        if(_comm != nullptr)
+          _comm->print(line);
+        else
+          std::cout << line << std::endl;
+      }
+
+      /**
+       * \brief Plots an iteration line.
+       *
+       * \param[in] num_iter
+       * Current number of iterations; usually = this->_num_iter.
+       *
+       * \param[in] def_cur
+       * Current defect norm; usually = this->_def_cur.
+       *
+       * \param[in] def_prev
+       * Previous defect norm; usually = this->_def_prev.
+       */
+      virtual void _plot_iter_line(Index num_iter, DataType def_cur, DataType def_prev)
+      {
+        // compose message line
+        String msg = this->_plot_name
+          +  ": " + stringify(num_iter).pad_front(this->_iter_digits)
+          + " : " + stringify_fp_sci(def_cur);
+
+        // not first iteration?
+        if(num_iter > Index(0))
+        {
+          msg += " / " + stringify_fp_sci(def_cur / this->_def_init);
+          msg += " / " + stringify_fp_fix(def_cur / def_prev);
+        }
+
+        this->_print_line(msg);
+      }
+
+      /**
        * \brief Internal function: sets the initial defect vector
        *
        * \param[in] vec_def
@@ -599,30 +657,19 @@ namespace FEAT
        * The current solution vector approximation.
        *
        * \returns
-       * A Status code.
+       * The updated Status code.
        */
       virtual Status _set_initial_defect(const VectorType& vec_def, const VectorType& vec_sol)
       {
         // store new defect
-        this->_def_init = this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+        this->_def_init = this->_def_cur = this->_def_prev = this->_calc_def_norm(vec_def, vec_sol);
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
-        // plot?
+        // plot iteration line?
         if(this->_plot_iter())
-        {
-          // compose message line
-          String msg = this->_plot_name
-            +  ": " + stringify(0).pad_front(this->_iter_digits)
-            + " : " + stringify_fp_sci(this->_def_init);
-
-          // print message line via comm (if available)
-          if(_comm != nullptr)
-            _comm->print(msg);
-          else
-            std::cout << msg << std::endl;
-        }
+          this->_plot_iter_line(Index(0), this->_def_init, this->_def_init);
 
         // ensure that the defect is neither NaN nor infinity
         if(!Math::isfinite(this->_def_init))
@@ -631,6 +678,72 @@ namespace FEAT
         // check if the initial defect is zero; we test against eps^2 here
         if(this->_def_init <= Math::sqr(Math::eps<DataType>()))
           return Status::success;
+
+        // continue iterating
+        return Status::progress;
+      }
+
+      /**
+       * \brief Internal function: analyse the current defect
+       *
+       * \note
+       * This function is called by _set_new_defect() and _update_defect().
+       *
+       * \param[in] num_iter
+       * Current number of iterations; usually = this->_num_iter.
+       *
+       * \param[in] def_cur
+       * Current defect norm; usually = this->_def_cur.
+       *
+       * \param[in] def_prev
+       * Previous defect norm; usually = this->_def_prev.
+       *
+       * \param[in] check_stag
+       * Specifies whether to check (and update) the stagnation criterion.
+       * This is typically set to \c false if one wants to check anything
+       * else than the 'true' next defect norm.
+       *
+       * \returns
+       * The updated status code.
+       */
+      virtual Status _analyse_defect(Index num_iter, DataType def_cur, DataType def_prev, bool check_stag)
+      {
+        // ensure that the defect is neither NaN nor infinity
+        if(!Math::isfinite(def_cur))
+          return Status::aborted;
+
+        // is diverged?
+        if(this->is_diverged(def_cur))
+          return Status::diverged;
+
+        // minimum number of iterations performed?
+        if(num_iter < this->_min_iter)
+          return Status::progress;
+
+        // is converged?
+        if(this->is_converged(def_cur))
+          return Status::success;
+
+        // maximum number of iterations performed?
+        if(num_iter >= this->_max_iter)
+          return Status::max_iter;
+
+        // check for stagnation?
+        if(check_stag && (this->_min_stag_iter > Index(0)))
+        {
+          // did this iteration stagnate?
+          if(def_cur >= this->_stag_rate * def_prev)
+          {
+            // increment stagnation count
+            if(++this->_num_stag_iter >= this->_min_stag_iter)
+              return Status::stagnated;
+          }
+          else
+          {
+            // this iteration did not stagnate
+            this->_num_stag_iter = Index(0);
+          }
+        }
 
         // continue iterating
         return Status::progress;
@@ -649,21 +762,21 @@ namespace FEAT
        * The current solution vector approximation.
        *
        * \returns
-       * A Status code.
+       * The updated Status code.
        */
       virtual Status _set_new_defect(const VectorType& vec_def, const VectorType& vec_sol)
       {
         // increase iteration count
         ++this->_num_iter;
 
+        // store previous defect
+        this->_def_prev = this->_def_cur;
+
         // first, let's see if we have to compute the defect at all
         bool calc_def = !_skip_def_calc;
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
         calc_def = calc_def || (this->_plot_iter());
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
-
-        // save previous defect
-        const DataType def_old = this->_def_cur;
 
         // compute new defect
         if(calc_def)
@@ -672,62 +785,12 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
         }
 
-        // plot?
+        // plot defect?
         if(this->_plot_iter())
-        {
-          // compose message line
-          String msg = this->_plot_name
-            +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
-            + " : " + stringify_fp_sci(this->_def_cur)
-            + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
-            + " / " + stringify_fp_fix(this->_def_cur / def_old);
+          this->_plot_iter_line(this->_num_iter, this->_def_cur, this->_def_prev);
 
-          // print message line via comm (if available)
-          if(_comm != nullptr)
-            _comm->print(msg);
-          else
-            std::cout << msg << std::endl;
-        }
-
-        // ensure that the defect is neither NaN nor infinity
-        if(!Math::isfinite(this->_def_cur))
-          return Status::aborted;
-
-        // is diverged?
-        if(this->is_diverged())
-          return Status::diverged;
-
-        // minimum number of iterations performed?
-        if(this->_num_iter < this->_min_iter)
-          return Status::progress;
-
-        // is converged?
-        if(this->is_converged())
-          return Status::success;
-
-        // maximum number of iterations performed?
-        if(this->_num_iter >= this->_max_iter)
-          return Status::max_iter;
-
-        // check for stagnation?
-        if(this->_min_stag_iter > Index(0))
-        {
-          // did this iteration stagnate?
-          if(this->_def_cur >= this->_stag_rate * def_old)
-          {
-            // increment stagnation count
-            if(++this->_num_stag_iter >= this->_min_stag_iter)
-              return Status::stagnated;
-          }
-          else
-          {
-            // this iteration did not stagnate
-            this->_num_stag_iter = Index(0);
-          }
-        }
-
-        // continue iterating
-        return Status::progress;
+        // analyse defect
+        return this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
       }
 
       /**
@@ -740,7 +803,7 @@ namespace FEAT
        * The new defect norm.
        *
        * \returns
-       * A Status code.
+       * The updated Status code.
        *
        * \note This function is preferred over _set_new_defect when using asynchronous mpi operations.
        */
@@ -749,69 +812,19 @@ namespace FEAT
         // increase iteration count
         ++this->_num_iter;
 
-        // save previous defect
-        const DataType def_old = this->_def_cur;
+        // store previous defect
+        this->_def_prev = this->_def_cur;
 
+        // update current defect
         this->_def_cur = def_cur_norm;
-
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
 
-        // plot?
+        // plot defect?
         if(this->_plot_iter())
-        {
-          // compose message line
-          String msg = this->_plot_name
-            +  ": " + stringify(this->_num_iter).pad_front(this->_iter_digits)
-            + " : " + stringify_fp_sci(this->_def_cur)
-            + " / " + stringify_fp_sci(this->_def_cur / this->_def_init)
-            + " / " + stringify_fp_fix(this->_def_cur / def_old);
+          this->_plot_iter_line(this->_num_iter, this->_def_cur, this->_def_prev);
 
-          // print message line via comm (if available)
-          if(_comm != nullptr)
-            _comm->print(msg);
-          else
-            std::cout << msg << std::endl;
-        }
-
-        // ensure that the defect is neither NaN nor infinity
-        if(!Math::isfinite(this->_def_cur))
-          return Status::aborted;
-
-        // is diverged?
-        if(this->is_diverged())
-          return Status::diverged;
-
-        // minimum number of iterations performed?
-        if(this->_num_iter < this->_min_iter)
-          return Status::progress;
-
-        // is converged?
-        if(this->is_converged())
-          return Status::success;
-
-        // maximum number of iterations performed?
-        if(this->_num_iter >= this->_max_iter)
-          return Status::max_iter;
-
-        // check for stagnation?
-        if(this->_min_stag_iter > Index(0))
-        {
-          // did this iteration stagnate?
-          if(this->_def_cur >= this->_stag_rate * def_old)
-          {
-            // increment stagnation count
-            if(++this->_num_stag_iter >= this->_min_stag_iter)
-              return Status::stagnated;
-          }
-          else
-          {
-            // this iteration did not stagnate
-            this->_num_stag_iter = Index(0);
-          }
-        }
-
-        // continue iterating
-        return Status::progress;
+        // analyse defect
+        return this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
       }
     }; // class IterativeSolver
 
@@ -822,12 +835,12 @@ namespace FEAT
       typename Vector_,
       typename Matrix_,
       typename Filter_>
-      inline Status solve(
-        IterativeSolver<Vector_>& solver,
-        Vector_& vec_sol,
-        const Vector_& vec_rhs,
-        const Matrix_& DOXY(matrix),
-        const Filter_& DOXY(filter))
+    inline Status solve(
+      IterativeSolver<Vector_>& solver,
+      Vector_& vec_sol,
+      const Vector_& vec_rhs,
+      const Matrix_& DOXY(matrix),
+      const Filter_& DOXY(filter))
     {
       // simply call the 'correct' method
       return solver.correct(vec_sol, vec_rhs);
@@ -894,7 +907,7 @@ namespace FEAT
        * A pointer to the preconditioner. May be nullptr.
        */
       explicit PreconditionedIterativeSolver(const String& plot_name, const String& section_name,
-      PropertyMap* section, std::shared_ptr<PrecondType> precond = nullptr) :
+        PropertyMap* section, std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass(plot_name, section_name, section),
         _precond(precond)
       {
