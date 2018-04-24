@@ -5,11 +5,25 @@
 // includes, FEAT
 #include <kernel/cubature/factory_wrapper.hpp>
 #include <kernel/cubature/auto_alias.hpp>
+#include <kernel/util/exception.hpp>
 
 namespace FEAT
 {
   namespace Cubature
   {
+    class UnknownRule :
+      public Exception
+    {
+    public:
+      explicit UnknownRule(const String & rule, const String& shape) :
+        Exception(String("Unknown cubature rule '") + rule + "' for shape " + shape)
+      {
+      }
+      virtual ~UnknownRule() throw()
+      {
+      }
+    };
+
     class DynamicFactory
     {
     private:
@@ -34,6 +48,13 @@ namespace FEAT
       {
         _name = other._name;
         return *this;
+      }
+
+      template<typename Shape_, typename Weight_, typename Coord_, typename Point_>
+      void create_throw(Rule<Shape_, Weight_, Coord_, Point_>& rule) const
+      {
+        if(!create(rule, _name))
+          throw UnknownRule(_name, Shape_::name());
       }
 
       template<typename Shape_, typename Weight_, typename Coord_, typename Point_>

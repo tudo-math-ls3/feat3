@@ -75,7 +75,7 @@ namespace FEAT
         _weights(nullptr),
         _points(nullptr)
       {
-        factory.create(*this);
+        factory.create_throw(*this);
       }
 
       /// move ctor
