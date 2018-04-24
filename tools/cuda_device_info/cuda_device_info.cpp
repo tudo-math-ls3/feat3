@@ -53,7 +53,7 @@ int main (int /*argc*/, char** /*argv*/)
     // print out device name and compute capabilities
     std::cout << "Device " << idevice << ": " << prop.name;
     std::cout << " (cc " << prop.major << "." << prop.minor << ")" << std::endl;
-    std::cout << "Important: compile all future codes with \"nvcc -arch=sm_";
+    std::cout << "Important: configure all future builds with \" --cuda_arch=sm_";
     std::cout << prop.major << prop.minor << "\" on this machine." << std::endl;
   }
   return 0;
