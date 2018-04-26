@@ -510,19 +510,25 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point) const
+        ValueType value(const PointType& point) const
         {
+          ValueType val;
           Intern::StaticFunctionWrapper<Function_, DataType, domain_dim, can_value_>::eval(val, point);
+          return val;
         }
 
-        void gradient(GradientType& grad, const PointType& point) const
+        GradientType gradient(const PointType& point) const
         {
+          GradientType grad;
           Intern::StaticFunctionWrapper<Function_, DataType, domain_dim, can_grad_>::grad(grad, point);
+          return grad;
         }
 
-        void hessian(HessianType& hess, const PointType& point) const
+        HessianType hessian(const PointType& point) const
         {
+          HessianType hess;
           Intern::StaticFunctionWrapper<Function_, DataType, domain_dim, can_hess_>::hess(hess, point);
+          return hess;
         }
       }; // class StaticWrapperFunction::Evaluator<...>
     }; // class StaticWrapperFunction

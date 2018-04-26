@@ -164,13 +164,13 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
           // copy our image point into a Tiny::Vector<double>
           Tiny::Vector<double, dim_> v(point);
 
           // evaluate the parser
-          val = ValueType(_parser.Eval(v.v));
+          return ValueType(_parser.Eval(v.v));
         }
       }; // class ParsedFunction::Evaluator<...>
     }; // class ParsedFunction

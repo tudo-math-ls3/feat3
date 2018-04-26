@@ -412,7 +412,7 @@ namespace FEAT
        * The matrix for the product.
        *
        * \param[in] x
-       * The (right) multiplicant vector for the product.
+       * The (right) multiplicand vector for the product.
        *
        * \returns \p *this
        */
@@ -438,7 +438,7 @@ namespace FEAT
        * \f[ y^\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \f]
        *
        * \param[in] x
-       * The (left) multiplicant vector for the product.
+       * The (left) multiplicand vector for the product.
        *
        * \param[in] a
        * The matrix for the product.
@@ -470,7 +470,7 @@ namespace FEAT
        * The matrix for the product.
        *
        * \param[in] x
-       * The (right) multiplicant vector for the product.
+       * The (right) multiplicand vector for the product.
        *
        * \param[in] alpha
        * The scaling parameter for the product.
@@ -498,7 +498,7 @@ namespace FEAT
        * \f[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \f]
        *
        * \param[in] x
-       * The (left) multiplicant vector for the product.
+       * The (left) multiplicand vector for the product.
        *
        * \param[in] a
        * The matrix for the product.
@@ -544,6 +544,14 @@ namespace FEAT
       ValueType norm_euclid() const
       {
         return Math::sqrt(norm_euclid_sqr());
+      }
+
+      /**
+       * \brief Returns a null-vector.
+       */
+      static Vector null()
+      {
+        return Vector(DataType(0));
       }
 
       /**
@@ -1055,7 +1063,7 @@ namespace FEAT
        * The left muliplicant vector of size \p m_.
        *
        * \param[in] y
-       * The right multiplicant vector of size \p n_.
+       * The right multiplicand vector of size \p n_.
        *
        * \returns
        * The scalar product of \p x and \p y with this matrix.
@@ -1078,10 +1086,10 @@ namespace FEAT
        * \f[ a_{ij} \leftarrow a_{ij} + \alpha x_i y_j \f]
        *
        * \param[in] x
-       * The left multiplicant vector of size \p m_.
+       * The left multiplicand vector of size \p m_.
        *
        * \param[in] y
-       * The right multiplicant vector of size \p n_.
+       * The right multiplicand vector of size \p n_.
        *
        * \param[in] alpha
        * The scaling factor for the outer product.
@@ -1111,10 +1119,10 @@ namespace FEAT
        * \f[ a_{ij} \leftarrow x_i y_j \f]
        *
        * \param[in] x
-       * The left multiplicant vector of size \p m_.
+       * The left multiplicand vector of size \p m_.
        *
        * \param[in] y
-       * The right multiplicant vector of size \p n_.
+       * The right multiplicand vector of size \p n_.
        *
        * \returns \c *this
        */
@@ -1178,10 +1186,10 @@ namespace FEAT
        * \f[ C\leftarrow C + \alpha A\cdot B \f]
        *
        * \param[in] a
-       * The left m-by-l multiplicant matrix.
+       * The left m-by-l multiplicand matrix.
        *
        * \param[in] b
-       * The right l-by-n multiplicant matrix.
+       * The right l-by-n multiplicand matrix.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1217,10 +1225,10 @@ namespace FEAT
        * \f[ C\leftarrow A\cdot B \f]
        *
        * \param[in] a
-       * The left m-by-l multiplicant matrix.
+       * The left m-by-l multiplicand matrix.
        *
        * \param[in] b
-       * The right l-by-n multiplicant matrix.
+       * The right l-by-n multiplicand matrix.
        *
        * \returns \p *this
        */
@@ -1239,13 +1247,13 @@ namespace FEAT
        *   \f[ C \leftarrow C + \alpha B^\top\cdot A\cdot D\f]
        *
        * \param[in] a
-       * The inner k-by-l multiplicant matrix.
+       * The inner k-by-l multiplicand matrix.
        *
        * \param[in] b
-       * The left k-by-m multiplicant matrix.
+       * The left k-by-m multiplicand matrix.
        *
        * \param[in] d
-       * The right l-by-n multiplicant matrix.
+       * The right l-by-n multiplicand matrix.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1287,13 +1295,13 @@ namespace FEAT
        *   \f[ C \leftarrow B^\top\cdot A\cdot D\f]
        *
        * \param[in] a
-       * The inner k-by-l multiplicant matrix.
+       * The inner k-by-l multiplicand matrix.
        *
        * \param[in] b
-       * The left k-by-m multiplicant matrix.
+       * The left k-by-m multiplicand matrix.
        *
        * \param[in] d
-       * The right l-by-n multiplicant matrix.
+       * The right l-by-n multiplicand matrix.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1321,10 +1329,10 @@ namespace FEAT
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
        * \param[in] x
-       * The l-size vector that serves as a left multiplicant.
+       * The l-size vector that serves as a left multiplicand.
        *
        * \param[in] t
-       * The l-by-m-by-n tensor that serves as a right multiplicant.
+       * The l-by-m-by-n tensor that serves as a right multiplicand.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1362,10 +1370,10 @@ namespace FEAT
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
        * \param[in] x
-       * The l-size vector that serves as a left multiplicant.
+       * The l-size vector that serves as a left multiplicand.
        *
        * \param[in] t
-       * The l-by-m-by-n tensor that serves as a right multiplicant.
+       * The l-by-m-by-n tensor that serves as a right multiplicand.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1444,6 +1452,14 @@ namespace FEAT
         v[2][1] = cp*sr;
         v[2][2] = cp*cr;
         return *this;
+      }
+
+      /**
+       * \brief Returns a null-matrix.
+       */
+      static Matrix null()
+      {
+        return Matrix(DataType(0));
       }
 
       /**
@@ -1789,10 +1805,10 @@ namespace FEAT
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
        * \param[in] a
-       * The l-by-k matrix that serves as the left multiplicant.
+       * The l-by-k matrix that serves as the left multiplicand.
        *
        * \param[in] t
-       * The k-by-m-by-n tensor that serves as the right multiplicant.
+       * The k-by-m-by-n tensor that serves as the right multiplicand.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1834,13 +1850,13 @@ namespace FEAT
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
        * \param[in] t
-       * The l-by-m'-by-n' tensor that serves as the inner multiplicant.
+       * The l-by-m'-by-n' tensor that serves as the inner multiplicand.
        *
        * \param[in] b
-       * The m'-by-m matrix that serves as the left multiplicant.
+       * The m'-by-m matrix that serves as the left multiplicand.
        *
        * \param[in] d
-       * The n'-by-n matrix that serves as the right multiplicant.
+       * The n'-by-n matrix that serves as the right multiplicand.
        *
        * \param[in] alpha
        * A scaling factor for the product.
@@ -1876,6 +1892,52 @@ namespace FEAT
           }
         }
         return *this;
+      }
+
+      /**
+       * \brief Adds the result of a vector-matrix outer product onto this tensor.
+       *
+       * Let \e K denote this tensor, \e x the input vector and \e A the input matrix, then this operation computes:
+       * \f[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+       *     \alpha x_h A_{ij}\f]
+       *
+       * \note This function is used for the computation of vector-valued hessian tensors.
+       *
+       * \param[in] x
+       * The l-length vector that serves as the left multiplicand.
+       *
+       * \param[in] a
+       * The m-by-n matrix that serves as the right multiplicand.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
+      template<int slx_, int sma_, int sna_>
+      Tensor3& add_vec_mat_outer_product(
+        const Vector<T_, l_, slx_>& x,
+        const Matrix<T_, m_, n_, sma_, sna_>& a,
+        DataType alpha = DataType(1))
+      {
+        for(int h(0); h < l_; ++h)
+        {
+          for(int i(0); i < m_; ++i)
+          {
+            for(int j(0); j < n_; ++j)
+            {
+              operator()(h,i,j) += alpha * x(h) * a(i, j);
+            }
+          }
+        }
+        return *this;
+      }
+      /**
+       * \brief Returns a null-tensor.
+       */
+      static Tensor3 null()
+      {
+        return Tensor3(DataType(0));
       }
     }; // class Tensor3<...>
 

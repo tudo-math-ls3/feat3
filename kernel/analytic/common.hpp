@@ -719,20 +719,19 @@ namespace FEAT
           {
           }
 
-
-          void value(ValueType& val, const PointType& DOXY(point))
+          ValueType value(const PointType& DOXY(point))
           {
-            val = _value;
+            return _value;
           }
 
-          void gradient(GradientType& grad, const PointType& DOXY(point))
+          GradientType gradient(const PointType& DOXY(point))
           {
-            grad = DataType(0);
+            return GradientType::null();
           }
 
-          void hessian(HessianType& hess, const PointType& DOXY(point))
+          HessianType hessian(const PointType& DOXY(point))
           {
-            hess = DataType(0);
+            return HessianType::null();
           }
         }; // class ConstantFunction::Evaluator<...>
 
@@ -805,43 +804,42 @@ namespace FEAT
           {
           }
 
-          void value(ValueType& val, const PointType& point) const
+          ValueType value(const PointType& point) const
           {
-            val = (point - _origin).norm_euclid();
+            return (point - _origin).norm_euclid();
           }
 
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
             DataType norm (DataType(0));
             this->value(norm, point);
 
-            grad.format();
-            if(norm > Math::eps<DataType>())
-            {
-              grad = (DataType(1) / norm) * (point - _origin);
-            }
+            if(norm < Math::eps<DataType>())
+              return GradientType::null();
+
+            return (DataType(1) / norm) * (point - _origin);
           }
 
-          void hessian(HessianType& hess, const PointType& point) const
+          HessianType hessian(const PointType& point) const
           {
             DataType norm (DataType(0));
             this->value(norm, point);
+            if(norm < Math::eps<DataType>())
+              return HessianType::null();
 
-            hess.format();
-            if(norm > Math::eps<DataType>())
+            HessianType hess;
+            norm = DataType(1)/norm;
+            DataType denom = Math::sqr(norm)*norm;
+
+            for(Index i(0); i < dim_; ++i)
             {
-              norm = DataType(1)/norm;
-              DataType denom = Math::sqr(norm)*norm;
-
-              for(Index i(0); i < dim_; ++i)
+              hess[i][i] = norm;
+              for(Index j(0); j < dim_; ++i)
               {
-                hess[i][i] = norm;
-                for(Index j(0); j < dim_; ++i)
-                {
-                  hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
-                }
+                hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
               }
             }
+            return hess;
           }
         }; // class DistanceFunction::Evaluator<...>
 
@@ -925,28 +923,27 @@ namespace FEAT
           {
           }
 
-          void value(ValueType& val, const PointType& point) const
+          ValueType value(const PointType& point) const
           {
-            val = _a + _b*(point - _origin).norm_euclid();
+            return _a + _b*(point - _origin).norm_euclid();
           }
 
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
-            grad.format();
             DataType norm ((point - _origin).norm_euclid());
+            if(norm < Math::eps<DataType>())
+              return GradientType::null();
 
-            if(norm <= Math::eps<DataType>())
-              return;
-
-            grad = (_b / norm) * (point - _origin);
+            return (_b / norm) * (point - _origin);
           }
 
-          void hessian(HessianType& hess, const PointType& point) const
+          HessianType hessian(const PointType& point) const
           {
-            DataType norm (DataType(0));
-            this->value(norm, point);
+            DataType norm = this->value(point);
             if(norm <= Math::eps<DataType>())
-              return;
+              return HessianType::null();
+
+            HessianType hess;
 
             norm = DataType(1)/norm;
             DataType denom = Math::sqr(_b)*Math::sqr(norm)*norm;
@@ -959,6 +956,8 @@ namespace FEAT
                 hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
               }
             }
+
+            return hess;
           }
         }; // class DistanceFunctionSD::Evaluator<...>
 
@@ -1046,21 +1045,21 @@ namespace FEAT
           {
           }
 
-          void value(ValueType& val, const PointType& point) const
+          ValueType value(const PointType& point) const
           {
-            val = _b * (point[component_] - _origin[component_]);
+            return _b * (point[component_] - _origin[component_]);
           }
 
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
-            grad.format();
-            DataType norm (DataType(0));
-            this->value(norm, point);
+            DataType norm = this->value(norm, point);
+            if(norm < Math::eps<DataType>())
+              return GradientType::null();
 
-            if(norm > Math::eps<DataType>())
-            {
-              grad[component_] = _b;
-            }
+            GradientType grad;
+            grad.format();
+            grad[component_] = _b;
+            return grad;
           }
         }; // class PlaneDistanceFunctionSD::Evaluator<...>
 
@@ -1156,43 +1155,38 @@ namespace FEAT
           explicit Evaluator(const MinOfTwoFunctions& function) :
             _f1_eval(function._f1),
             _f2_eval(function._f2)
-            {
-            }
-
-          void value(ValueType& val, const PointType& point) const
           {
-            ValueType val1, val2;
-            _f1_eval.value(val1, point);
-            _f2_eval.value(val2, point);
-            val = Math::min(val1, val2);
           }
 
-          void gradient(GradientType& grad, const PointType& point) const
+          ValueType value(const PointType& point) const
           {
-            ValueType val1, val2;
-            _f1_eval.value(val1, point);
-            _f2_eval.value(val2, point);
-
-            if(Math::abs(val1-val2) < Math::eps<DataType>())
-              grad.format();
-            else if(val1 < val2)
-              _f1_eval.gradient(grad, point);
-            else
-              _f2_eval.gradient(grad, point);
+            return Math::min(_f1_eval.value(point), _f2_eval.value(point));
           }
 
-          void hessian(HessianType& hess, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
-            ValueType val1, val2;
-            _f1_eval.value(val1, point);
-            _f2_eval.value(val2, point);
+            ValueType val1 = _f1_eval.value(val1, point);
+            ValueType val2 = _f2_eval.value(val2, point);
 
             if(Math::abs(val1-val2) < Math::eps<DataType>())
-              hess.format();
+              return GradientType::null();
             else if(val1 < val2)
-              _f1_eval.hessian(hess, point);
+              return _f1_eval.gradient(point);
             else
-              _f2_eval.hessian(hess, point);
+              return _f2_eval.gradient(point);
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            ValueType val1 = _f1_eval.value(val1, point);
+            ValueType val2 = _f2_eval.value(val2, point);
+
+            if(Math::abs(val1-val2) < Math::eps<DataType>())
+              return HessianType::null();
+            else if(val1 < val2)
+              return _f1_eval.hessian(point);
+            else
+              return _f2_eval.hessian(point);
           }
         }; // class MinOfTwoFunctions::Evaluator<...>
 
@@ -1520,7 +1514,7 @@ namespace FEAT
               _coeff.push_back(DataType(*it));
           }
 
-          void value(ValueType& val, const PointType& point) const
+          ValueType value(const PointType& point) const
           {
             // evaluate polynomial via horner scheme
             DataType x = point[0];
@@ -1528,15 +1522,14 @@ namespace FEAT
             for(std::size_t k(_coeff.size()); k > std::size_t(0); )
               y = x * y + _coeff[--k];
 
-            val = y;
+            return y;
           }
 
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
-            grad.format();
             std::size_t k = _coeff.size();
             if(k <= std::size_t(0))
-              return;
+              return GradientType::null();
 
             // evaluate polynomial via horner scheme
             DataType x = point[0];
@@ -1544,15 +1537,14 @@ namespace FEAT
             for( ; (--k) > std::size_t(0); )
               y = x * y + (_coeff[k] * DataType(k));
 
-            grad[0] = y;
+            return GradientType(y);
           }
 
-          void hessian(HessianType& hess, const PointType& point) const
+          HessianType hessian(const PointType& point) const
           {
-            hess.format();
             std::size_t k = _coeff.size();
             if(k <= std::size_t(1))
-              return;
+              return HessianType::null();
 
             // evaluate polynomial via horner scheme
             DataType x = point[0];
@@ -1560,7 +1552,7 @@ namespace FEAT
             for( ; (--k) > std::size_t(1); )
               y = x * y + (_coeff[k] * DataType(k*(k-1)));
 
-            hess[0][0] = y;
+            return HessianType(y);
           }
         }; // class PolynomialFunction1D::Evaluator
 
@@ -2058,6 +2050,8 @@ namespace FEAT
         static constexpr int domain_dim = 2;
         typedef Analytic::Image::Scalar ImageType;
         static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
 
         using ParProfileBase::ParProfileBase;
 
@@ -2069,6 +2063,8 @@ namespace FEAT
           typedef typename Traits_::DataType DataType;
           typedef typename Traits_::PointType PointType;
           typedef typename Traits_::ValueType ValueType;
+          typedef typename Traits_::GradientType GradientType;
+          typedef typename Traits_::HessianType HessianType;
 
           PointType _vo, _ve;
           DataType _den, _vmax;
@@ -2084,12 +2080,41 @@ namespace FEAT
             _vmax = DataType(function._vmax);
           }
 
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
             // project point onto line segment
-            DataType x = Math::clamp(Tiny::dot(point - _vo, _ve) * _den, DataType(0), DataType(1));
+            const DataType x = Math::clamp(Tiny::dot(point - _vo, _ve) * _den, DataType(0), DataType(1));
             // compute function value
-            val = _vmax * DataType(4) * x * (DataType(1) - x);
+            return _vmax * DataType(4) * x * (DataType(1) - x);
+          }
+
+          GradientType gradient(const PointType& point)
+          {
+            // project point onto line segment
+            const DataType x = Tiny::dot(point - _vo, _ve) * _den;
+
+            // Note: the gradient has a singularity at x=0 and x=1
+            if((x < DataType(0)) || (x > DataType(1)))
+              return GradientType::null();
+
+            return (_vmax * _den * DataType(4) * (DataType(1) - DataType(2)*x)) * _ve;
+          }
+
+          HessianType hessian(const PointType& point)
+          {
+            // project point onto line segment
+            const DataType x = Tiny::dot(point - _vo, _ve) * _den;
+
+            // Note: the hessian has a singularity at x=0 and x=1
+            if((x < DataType(0)) || (x > DataType(1)))
+              return HessianType::null();
+
+            HessianType hess;
+            const DataType v = -DataType(8) * _vmax * _den * _den;
+            hess[0][0] = v * _ve[0] * _ve[0];
+            hess[0][1] = hess[1][0] = v * _ve[0] * _ve[1];
+            hess[1][1] = v * _ve[1] * _ve[1];
+            return hess;
           }
         };
       }; // class ParProfileScalar
@@ -2109,6 +2134,8 @@ namespace FEAT
         static constexpr int domain_dim = 2;
         typedef Analytic::Image::Vector<2> ImageType;
         static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
 
         using ParProfileBase::ParProfileBase;
 
@@ -2120,6 +2147,8 @@ namespace FEAT
           typedef typename Traits_::DataType DataType;
           typedef typename Traits_::PointType PointType;
           typedef typename Traits_::ValueType ValueType;
+          typedef typename Traits_::GradientType GradientType;
+          typedef typename Traits_::HessianType HessianType;
 
           PointType _vo, _ve, _vn;
           DataType _den, _vmax;
@@ -2138,45 +2167,85 @@ namespace FEAT
             _vmax = DataType(function._vmax);
           }
 
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
             // project point onto line segment
-            DataType x = Math::clamp(Tiny::dot(point - _vo, _ve) * _den, DataType(0), DataType(1));
+            const DataType x = Math::clamp(Tiny::dot(point - _vo, _ve) * _den, DataType(0), DataType(1));
             // compute function value
-            DataType v = _vmax * DataType(4) * x * (DataType(1) - x);
+            const DataType v = _vmax * DataType(4) * x * (DataType(1) - x);
+            ValueType val;
             val[0] = _vn[0] * v;
             val[1] = _vn[1] * v;
+            return val;
+          }
+
+          GradientType gradient(const PointType& point)
+          {
+            // project point onto line segment
+            const DataType x = Tiny::dot(point - _vo, _ve) * _den;
+
+            // Note: the gradient has a singularity at x=0 and x=1
+            if((x < DataType(0)) || (x > DataType(1)))
+              return GradientType::null();
+
+            const DataType v = _vmax * _den * DataType(4) * (DataType(1) - DataType(2)*x);
+            GradientType grad;
+            grad(0,0) =  v * _vn[0] * _ve[0];
+            grad(0,1) =  v * _vn[0] * _ve[1];
+            grad(1,0) =  v * _vn[1] * _ve[0];
+            grad(1,1) =  v * _vn[1] * _ve[1];
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point)
+          {
+            // project point onto line segment
+            const DataType x = Tiny::dot(point - _vo, _ve) * _den;
+
+            // Note: the hessian has a singularity at x=0 and x=1
+            if((x < DataType(0)) || (x > DataType(1)))
+              return HessianType::null();
+
+            const DataType v = -DataType(8) * _vmax * _den * _den;
+            HessianType hess;
+            hess(0,0,0) = v * _vn[0] * _ve[0] * _ve[0];
+            hess(0,1,1) = v * _vn[0] * _ve[1] * _ve[1];
+            hess(0,1,0) = hess(0,0,1) = v * _vn[0] * _ve[0] * _ve[1];
+            hess(1,1,0) = hess(1,0,1) = v * _vn[1] * _ve[0] * _ve[1];
+            hess(1,0,0) = v * _vn[1] * _ve[0] * _ve[0];
+            hess(1,1,1) = v * _vn[1] * _ve[1] * _ve[1];
+            return hess;
           }
         };
       }; // class ParProfileVector
 
       template<typename DT_>
-        class ExpScalarStatic
+      class ExpScalarStatic
+      {
+      public:
+        static constexpr DT_ p = DT_(10);
+
+        static DT_ eval(DT_ x)
         {
-          public:
-            static constexpr DT_ p = DT_(10);
+          return (Math::exp(p) - Math::exp(p*x*x)) / (Math::exp(p) - DT_(1));
+        }
 
-            static DT_ eval(DT_ x)
-            {
-              return (Math::exp(p) - Math::exp(p*x*x)) / (Math::exp(p) - DT_(1));
-            }
+        static DT_ der_x(DT_ x)
+        {
+          return -DT_(2)*p*x*Math::exp(p*x*x)/(Math::exp(p)-DT_(1));
+        }
 
-            static DT_ der_x(DT_ x)
-            {
-              return -DT_(2)*p*x*Math::exp(p*x*x)/(Math::exp(p)-DT_(1));
-            }
-
-            static DT_ der_xx(DT_ x)
-            {
-              return -DT_(2)*p*Math::exp(p*x*x)*(DT_(2)*p*x*x+DT_(1))/(Math::exp(p)-DT_(1));
-            }
-        };
+        static DT_ der_xx(DT_ x)
+        {
+          return -DT_(2)*p*Math::exp(p*x*x)*(DT_(2)*p*x*x+DT_(1))/(Math::exp(p)-DT_(1));
+        }
+      };
 
       template<typename DataType_>
-        using ExpStatic = Analytic::Common::TensorStatic<ExpScalarStatic<DataType_>, DataType_>;
+      using ExpStatic = Analytic::Common::TensorStatic<ExpScalarStatic<DataType_>, DataType_>;
 
       template<int dim_>
-        using ExpFunction = Analytic::StaticWrapperFunction<dim_, ExpStatic, true, true, true>;
+      using ExpFunction = Analytic::StaticWrapperFunction<dim_, ExpStatic, true, true, true>;
 
       /**
        * \brief Velocity field for a rigid body rotation in the x,y plane
@@ -2237,62 +2306,32 @@ namespace FEAT
           const PointType& _origin;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const XYPlaneRotation& function) :
             _angular_velocity(function._angular_velocity),
             _origin(function._origin)
           {
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
-            val.format();
+            ValueType val;
             val[0] = _angular_velocity*(-(point[1] - _origin[1]));
             val[1] = _angular_velocity*( (point[0] - _origin[0]));
+            return val;
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& DOXY(point)) const
+          GradientType gradient(const PointType& DOXY(point)) const
           {
+            GradientType grad;
             grad.format();
-            grad[0][1] = -DataType(1);
-            grad[1][0] = DataType(1);
+            grad[0][1] = -_angular_velocity;
+            grad[1][0] = _angular_velocity;
+            return grad;
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
 
         }; // class XYPlaneRotation::Evaluator<...>
@@ -2384,12 +2423,6 @@ namespace FEAT
           const std::vector<Tiny::Vector<DataType, 2>>& _zeros;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const YZPlaneParabolic& function) :
             _fac(function._amplitude),
             _zeros(function._zeros)
@@ -2403,17 +2436,9 @@ namespace FEAT
             }
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
+            ValueType val;
             val.format();
             val(0) = _fac;
 
@@ -2421,38 +2446,24 @@ namespace FEAT
             {
               val(0) *= (point[d] - _zeros.at(d-1)[0])*(_zeros.at(d-1)[1] - point[d]);
             }
+
+            return val;
           }
 
-          /**
-           * \brief Computes the gradient
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
+            GradientType grad;
             grad.format();
             for(int d(1); d < domain_dim; ++d)
             {
               grad[d][0] = _fac[d]*(_zeros.at(d-1)[0] + _zeros.at(d-1)[1] - DataType(2)*point(d));
             }
+            return grad;
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
 
         }; // class YZPlaneParabolic::Evaluator<...>
@@ -2557,12 +2568,6 @@ namespace FEAT
           const DataType _t;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const SinYT0& function) :
             _t(function._t)
 
@@ -2570,48 +2575,25 @@ namespace FEAT
             XASSERT(_t >= DataType(0));
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
+            ValueType val;
             val.format();
             val(0) = Math::sin(_t*point[1]);
+            return val;
           }
 
-          /**
-           * \brief Computes the gradient
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
+            GradientType grad;
             grad.format();
             grad[0][1] = _t*Math::cos(_t*point[1]);
+            return grad;
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
 
         }; // class SinYT0::Evaluator<...>
@@ -2688,12 +2670,6 @@ namespace FEAT
           const DataType _fac;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const SinYT0StokesRhs& function) :
             _t(function._t),
             _fac(DataType(1)/function._reynolds)
@@ -2702,47 +2678,22 @@ namespace FEAT
             XASSERT(_t >= DataType(0));
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
+            ValueType val;
             val.format();
             val(0) = point[1]*Math::cos(_t*point[1]) + _fac*Math::sqr(_t)*Math::sin(point[1]*_t);
+            return val;
           }
 
-          /**
-           * \brief Computes the gradient
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& DOXY(point)) const
+          GradientType gradient(const PointType& DOXY(point)) const
           {
-            grad.format();
+            return GradientType::null();
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
 
         }; // class SinYT0StokesRhs::Evaluator<...>
@@ -2822,12 +2773,6 @@ namespace FEAT
           const DataType _t;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const GuermondStokesSolPressure& function) :
             _t(function._t)
 
@@ -2835,53 +2780,28 @@ namespace FEAT
             XASSERT(_t >= DataType(0));
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value( const PointType& point)
           {
+            ValueType val;
             val = Math::sin(point[0] - point[1] + _t);
             // To make it mean value 0 on [0,1]x[0,1]
             val -= (DataType(2)*Math::sin(_t) - Math::sin(DataType(1)+_t) - Math::sin(-DataType(1) + _t));
+            return val;
           }
 
-          /**
-           * \brief Computes the gradient
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
+            GradientType grad;
             grad.format();
-
             grad[0] = Math::cos(point[0] - point[1] + _t);
             grad[1] = -grad[0];
+            return grad;
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
-
         }; // class GuermondStokesSolPressure::Evaluator<...>
 
       private:
@@ -2956,46 +2876,24 @@ namespace FEAT
           const DataType _t;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const GuermondStokesSol& function) :
             _t(function._t)
-
           {
             XASSERT(_t >= DataType(0));
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
+            ValueType val;
             val.format();
             val(0) = Math::sin(point[0] + _t)*Math::sin(point[1] + _t);
             val(1) = Math::cos(point[0] + _t)*Math::cos(point[1] + _t);
+            return val;
           }
 
-          /**
-           * \brief Computes the gradient
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& point) const
+          GradientType gradient(const PointType& point) const
           {
+            GradientType grad;
             grad.format();
 
             grad[0][0] = Math::cos(point[0] + _t)*Math::sin(point[1] + _t);
@@ -3003,20 +2901,12 @@ namespace FEAT
 
             grad[1][0] = -Math::sin(point[0] + _t)*Math::cos(point[1] + _t);
             grad[1][1] = -Math::cos(point[0] + _t)*Math::sin(point[1] + _t);
+            return grad;
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
 
         }; // class GuermondStokesSol::Evaluator<...>
@@ -3093,12 +2983,6 @@ namespace FEAT
           const DataType _fac;
 
         public:
-          /**
-           * \brief Constructor
-           *
-           * \param[in] function
-           * The x,y plane velocity field function
-           */
           explicit Evaluator(const GuermondStokesSolRhs& function) :
             _t(function._t),
             _fac(DataType(1)/function._reynolds)
@@ -3107,17 +2991,9 @@ namespace FEAT
             XASSERT(_t >= DataType(0));
           }
 
-          /**
-           * \brief Computes the value
-           *
-           * \param[out] val
-           * The (vector valued) function value
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void value(ValueType& val, const PointType& point)
+          ValueType value(const PointType& point)
           {
+            ValueType val;
             val.format();
 
             // Stationary
@@ -3128,34 +3004,17 @@ namespace FEAT
               + _fac*DataType(2)*Math::sin(point[0]+_t)*Math::sin(point[1]+_t) + Math::cos(point[0]-point[1]+_t);
             val(1) = -Math::sin(point[0]+_t)*Math::cos(point[1]+_t) - Math::cos(point[0]+_t)*Math::sin(point[1]+_t)
               + _fac*DataType(2)*Math::cos(point[0]+_t)*Math::cos(point[1]+_t) - Math::cos(point[0]-point[1]+_t);
+            return val;
           }
 
-          /**
-           * \brief Computes the gradient
-           *
-           * \param[out] grad
-           * The (matrix valued) gradient
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void gradient(GradientType& grad, const PointType& DOXY(point)) const
+          GradientType gradient(const PointType& DOXY(point)) const
           {
-            grad.format();
+            return GradientType::null();
           }
 
-          /**
-           * \brief Computes the Hessian
-           *
-           * \param[out] hess
-           * The (tensor valued) Hessian
-           *
-           * \param[in] point
-           * The domain point
-           */
-          void hessian(HessianType& hess, const PointType& DOXY(point)) const
+          HessianType hessian(const PointType& DOXY(point)) const
           {
-            hess.format();
+            return HessianType::null();
           }
 
         }; // class GuermondStokesSolRhs::Evaluator<...>

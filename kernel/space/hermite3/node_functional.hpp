@@ -97,10 +97,8 @@ namespace FEAT
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          typename FuncEvalTraits::ValueType func_value;
-          typename FuncEvalTraits::GradientType func_grad;
-          func_eval.value(func_value, trafo_data.img_point);
-          func_eval.gradient(func_grad, trafo_data.img_point);
+          const auto func_value = func_eval.value(trafo_data.img_point);
+          const auto func_grad = func_eval.gradient(trafo_data.img_point);
 
           // set node functional values
           node_data[0] = func_value;
@@ -179,7 +177,7 @@ namespace FEAT
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
         }
       };
 
@@ -254,10 +252,8 @@ namespace FEAT
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          typename FuncEvalTraits::ValueType func_value;
-          typename FuncEvalTraits::GradientType func_grad;
-          func_eval.value(func_value, trafo_data.img_point);
-          func_eval.gradient(func_grad, trafo_data.img_point);
+          const auto func_value = func_eval.value(trafo_data.img_point);
+          const auto func_grad = func_eval.gradient(trafo_data.img_point);
 
           // set node functional values
           node_data[0] = func_value;
@@ -338,12 +334,9 @@ namespace FEAT
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          typename FuncEvalTraits::ValueType func_value;
-          typename FuncEvalTraits::GradientType func_grad;
-          typename FuncEvalTraits::HessianType func_hess;
-          func_eval.value(func_value, trafo_data.img_point);
-          func_eval.gradient(func_grad, trafo_data.img_point);
-          func_eval.hessian(func_hess, trafo_data.img_point);
+          const auto func_value = func_eval.value(trafo_data.img_point);
+          const auto func_grad = func_eval.gradient(trafo_data.img_point);
+          const auto func_hess = func_eval.hessian(trafo_data.img_point);
 
           // set node functional values
           node_data[0] = func_value;

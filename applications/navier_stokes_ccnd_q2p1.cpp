@@ -325,12 +325,14 @@ namespace NvSCCNDQ2P1dc
       {
       }
 
-      void value(ValueType& val, const PointType& point)
+      ValueType value(const PointType& point)
       {
         const DataType y = point[1];
 
-        val.format();
+        ValueType val;
         val[0] = (_vmax * DataType(4) * y * (_d - y)) / _den;
+        val[1] = DataType(0);
+        return val;
       }
     };
   }; // class InflowFunction<2>
@@ -372,13 +374,15 @@ namespace NvSCCNDQ2P1dc
       {
       }
 
-      void value(ValueType& val, const PointType& point)
+      ValueType value(const PointType& point)
       {
         const DataType y = point[1];
         const DataType z = point[2];
 
-        val.format();
+        ValueType val;
         val[0] = (_vmax * DataType(16) * y * (_d - y) * z * (_d - z)) / _den;
+        val[1] = val[2] = DataType(0);
+        return val;
       }
     };
   }; // class InflowFunction

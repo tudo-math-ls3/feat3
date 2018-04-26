@@ -108,7 +108,7 @@ namespace FEAT
           _trafo_eval(trafo_data, _barycentre);
 
           // evaluate function
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
         }
       };
 
@@ -195,7 +195,7 @@ namespace FEAT
           // declare function evaluator
           typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
-          typename FuncEvalTraits::ValueType value(DataType_(0)), tmp;
+          typename FuncEvalTraits::ValueType value(DataType_(0));
           DataType_ mean(DataType_(0));
           TrafoEvalData trafo_data;
 
@@ -203,8 +203,7 @@ namespace FEAT
           for(int i(0); i < _cub_rule.get_num_points(); ++i)
           {
             _trafo_eval(trafo_data, _cub_rule.get_point(i));
-            func_eval.value(tmp, trafo_data.img_point);;
-            value += (_cub_rule.get_weight(i) * trafo_data.jac_det) * tmp;
+            value += (_cub_rule.get_weight(i) * trafo_data.jac_det) * func_eval.value(trafo_data.img_point);
             mean += _cub_rule.get_weight(i) * trafo_data.jac_det;
           }
 

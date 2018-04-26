@@ -80,12 +80,13 @@ namespace FEAT
     {
       typedef DataType_ DataType;
       static constexpr int domain_dim = domain_dim_;
+      static constexpr int image_dim = image_dim_;
 
       typedef Tiny::Vector<DataType_, domain_dim_> PointType;
 
       typedef Tiny::Vector<DataType_, image_dim_> ValueType;
-      typedef Tiny::Matrix<DataType_, domain_dim_, image_dim_> GradientType;
-      typedef Tiny::Tensor3<DataType_, domain_dim_, domain_dim_, image_dim_> HessianType;
+      typedef Tiny::Matrix<DataType_, image_dim_, domain_dim_> GradientType;
+      typedef Tiny::Tensor3<DataType_, image_dim_, domain_dim_, domain_dim_> HessianType;
     };
 
     template<typename DataType_, typename Function_>
@@ -108,7 +109,7 @@ namespace FEAT
     public:
       // Note:
       // The following block is only visible for doxygen. Its contents must be specified
-      // by the dervied classes.
+      // by the derived classes.
 #ifdef DOXYGEN
       /**
        * \brief Specifies the domain dimension of the function.
@@ -131,7 +132,7 @@ namespace FEAT
       static constexpr bool can_value = true | false;
       /// Specifies whether the function's evaluator can compute function gradients.
       static constexpr bool can_grad = true | false;
-      /// Specifies whether the function's evaluator can comptue function hessians.
+      /// Specifies whether the function's evaluator can compute function hessians.
       static constexpr bool can_hess = true | false;
 #else
       static constexpr bool can_value = false;
@@ -181,8 +182,8 @@ namespace FEAT
          * \brief The type of the function gradient.
          *
          * This type specifies the type of the function's gradient:
-         * - If the function is scalar, then ValueType is Tiny::Vector<DataType, domain_dim>.
-         * - If the function is a vector field, the ValueType is Tiny::Matrix<DataType, domain_dim, image_dim>.
+         * - If the function is scalar, then GradientType is Tiny::Vector<DataType, domain_dim>.
+         * - If the function is a vector field, the GradientType is Tiny::Matrix<DataType, image_dim, domain_dim>.
          */
         typedef typename Traits_::GradientType GradientType;
 
@@ -190,8 +191,8 @@ namespace FEAT
          * \brief The type of the function hessian.
          *
          * This type specifies the type of the function's hessian:
-         * - If the function is scalar, then ValueType is Tiny::Matrix<DataType, domain_dim, domain_dim>.
-         * - If the function is a vector field, the ValueType is Tiny::Tensor3<DataType, domain_dim, domain_dim, image_dim>.
+         * - If the function is scalar, then HessianType is Tiny::Matrix<DataType, domain_dim, domain_dim>.
+         * - If the function is a vector field, the HessianType is Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim>.
          */
         typedef typename Traits_::HessianType HessianType;
 
@@ -210,39 +211,39 @@ namespace FEAT
         /**
          * \brief Computes the function value in a given point.
          *
-         * \param[out] val
-         * A reference to a value object which receives the function value.
-         *
          * \param[in] point
          * The point in which the function is to be evaluated.
+         *
+         * \returns
+         * The function value.
          */
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
         }
 
         /**
          * \brief Computes the function gradient in a given point.
          *
-         * \param[out] grad
-         * A reference to a value object which receives the function gradient.
-         *
          * \param[in] point
          * The point in which the function is to be evaluated.
+         *
+         * \returns
+         * The function gradient.
          */
-        void gradient(GradientType& grad, const PointType& point)
+        GradientType gradient(const PointType& point)
         {
         }
 
         /**
          * \brief Computes the function hessian in a given point.
          *
-         * \param[out] hess
-         * A reference to a value object which receives the function hessian.
-         *
          * \param[in] point
          * The point in which the function is to be evaluated.
+         *
+         * \returns
+         * The function hessian.
          */
-        void hessian(HessianType& hess, const PointType& point)
+        HessianType hessian(const PointType& point)
         {
         }
 #endif // DOXYGEN

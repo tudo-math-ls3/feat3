@@ -227,8 +227,8 @@ namespace FEAT
         {
           ++_num_func_evals;
           ++_num_grad_evals;
-          _func_eval.value(fval, _my_state);
-          _func_eval.gradient(_my_grad, _my_state);
+          fval = _func_eval.value(_my_state);
+          _my_grad = _func_eval.gradient(_my_state);
           grad(0, _my_grad);
         }
 
@@ -244,7 +244,7 @@ namespace FEAT
         void apply_hess(VectorTypeL& vec_out, const VectorTypeR& vec_in)
         {
           ++_num_hess_evals;
-          _func_eval.hessian(_my_hess, _my_state);
+          _my_hess = _func_eval.hessian(_my_state);
           vec_out(0, _my_hess*vec_in(0));
         }
 
@@ -257,7 +257,7 @@ namespace FEAT
         void compute_hess(HessianType& mat_out)
         {
           ++_num_hess_evals;
-          _func_eval.hessian(mat_out, _my_state);
+          mat_out = _func_eval.hessian(_my_state);
         }
 
         /**
@@ -269,7 +269,7 @@ namespace FEAT
         void compute_approx_hess(HessianType& mat_out)
         {
           ++_num_hess_evals;
-          _func_eval.hessian(mat_out, _my_state);
+          mat_out = _func_eval.hessian(_my_state);
           for(int i(1); i < mat_out.m; ++i)
           {
             for(int j(0); j < i; ++j)

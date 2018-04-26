@@ -32,6 +32,9 @@ namespace FEAT
     template<typename DataType_, int dim_>
     struct VelocityInfo
     {
+      /// The dimension of the analysed velocity field
+      static constexpr int dim = dim_;
+
       /**
        * \brief Velocity field H0-norm
        *
@@ -109,7 +112,7 @@ namespace FEAT
         };
         for(int i(0); i < dim_; ++i)
         {
-          verr[4+i] = Math::sqr(norm_h0_comp[i]);
+          verr[4+     i] = Math::sqr(norm_h0_comp[i]);
           verr[4+dim_+i] = Math::sqr(norm_h1_comp[i]);
         }
 
@@ -121,7 +124,7 @@ namespace FEAT
         vorticity  = Math::sqrt(verr[3]);
         for(int i(0); i < dim_; ++i)
         {
-          norm_h0_comp[i] = Math::sqrt(verr[4+i]);
+          norm_h0_comp[i] = Math::sqrt(verr[4+     i]);
           norm_h1_comp[i] = Math::sqrt(verr[4+dim_+i]);
         }
       }
@@ -192,20 +195,21 @@ namespace FEAT
     {
     private:
       template<typename DT_, int sm_, int sn_>
-      static DT_ calc_vorticity(const Tiny::Matrix<DT_, 2, 2, sm_, sn_>& ders)
+      static DT_ calc_vorticity(const Tiny::Matrix<DT_, 2, 2, sm_, sn_>& jac)
       {
         // 2D: (dx u2 - dy u1)^2
-        return Math::sqr(ders[0][1] - ders[1][0]);
+        // J_ij = d/d_j f_i ==> (J_01 - J_10)^2
+        return Math::sqr(jac[1][0] - jac[0][1]);
       }
 
       template<typename DT_, int sm_, int sn_>
-      static DT_ calc_vorticity(const Tiny::Matrix<DT_, 3, 3, sm_, sn_>& ders)
+      static DT_ calc_vorticity(const Tiny::Matrix<DT_, 3, 3, sm_, sn_>& jac)
       {
         // 3D: (dy u3 - dz u2)^2 + (dz u1 - dx u3)^2 + (dx u2 - dy u1)
         return
-          Math::sqr(ders[2][1] - ders[1][2]) +
-          Math::sqr(ders[0][2] - ders[2][0]) +
-          Math::sqr(ders[0][1] - ders[1][0]);
+          Math::sqr(jac[2][1] - jac[1][2]) + // dy u3 - dz u2 = J_21 - J_12
+          Math::sqr(jac[0][2] - jac[2][0]) + // dz u1 - dx u3 = J_02 - J_20
+          Math::sqr(jac[1][0] - jac[0][1]);  // dx u2 - dy u1 = J_10 - J_01
       }
       /// \endcond
 
@@ -276,10 +280,10 @@ namespace FEAT
         Tiny::Matrix<DataType_, dim_, SpaceEvaluator::max_local_dofs> basis_val;
 
         // vector field values
-        Tiny::Vector<DataType_, dim_> vals;
+        Tiny::Vector<DataType_, dim_> val;
 
         // vector field derivatives
-        Tiny::Matrix<DataType_, dim_, dim_> ders;
+        Tiny::Matrix<DataType_, dim_, dim_> jac;
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -313,16 +317,18 @@ namespace FEAT
             space_eval(space_data, trafo_data);
 
             // compute basis function values and derivatives
-            vals.format();
-            ders.format();
+            val.format();
+            jac.format();
             for(int i(0); i < num_loc_dofs; ++i)
             {
               for(int bi(0); bi < dim_; ++bi)
               {
-                vals[bi] += basis_val[bi][i] * space_data.phi[i].value;
+                val[bi] += basis_val[bi][i] * space_data.phi[i].value;
+                // J_ij = d/d_j f_i  <==> J = (f_1,...,f_n)^T * (d/d_1, ..., d/d_n)
                 for(int bj(0); bj < dim_; ++bj)
                 {
-                  ders[bi][bj] += basis_val[bi][i] * space_data.phi[i].grad[bj];
+                  // J_ij = d/d_j f_i
+                  jac[bi][bj] += basis_val[bi][i] * space_data.phi[i].grad[bj];
                 }
               }
             }
@@ -334,18 +340,17 @@ namespace FEAT
             for(int i(0); i < dim_; ++i)
             {
               // update H0 component norm
-              info.norm_h0_comp[i] += omega * Math::sqr(vals[i]);
+              info.norm_h0_comp[i] += omega * Math::sqr(val[i]);
 
               // update H1 component norm
-              info.norm_h1_comp[i] += omega * Tiny::dot(ders[i], ders[i]);
-
+              info.norm_h1_comp[i] += omega * Tiny::dot(jac[i], jac[i]);
             }
 
             // update divergence
-            info.divergence += omega * Math::sqr(ders.trace());
+            info.divergence += omega * Math::sqr(jac.trace());
 
             // update vorticity
-            info.vorticity += omega * calc_vorticity(ders);
+            info.vorticity += omega * calc_vorticity(jac);
 
             // continue with next cubature point
           }
@@ -444,11 +449,11 @@ namespace FEAT
         // local velocity values
         Tiny::Vector<Tiny::Vector<DataType, dim_>, SpaceEvaluator::max_local_dofs> basis_val;
 
-        // vector field values
-        Tiny::Vector<DataType_, dim_> vals;
+        // vector field value
+        Tiny::Vector<DataType_, dim_> val;
 
-        // vector field derivatives
-        Tiny::Matrix<DataType_, dim_, dim_> ders;
+        // vector field first derivatives as jacobian matrix
+        Tiny::Matrix<DataType_, dim_, dim_> jac;
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -482,12 +487,13 @@ namespace FEAT
             space_eval(space_data, trafo_data);
 
             // compute basis function values and derivatives
-            vals.format();
-            ders.format();
+            val.format();
+            jac.format();
             for(int i(0); i < num_loc_dofs; ++i)
             {
-              vals.axpy(space_data.phi[i].value, basis_val[i]);
-              ders.add_outer_product(basis_val[i], space_data.phi[i].grad);
+              val.axpy(space_data.phi[i].value, basis_val[i]);
+              // J_ij = d/d_j f_i  <==> J = (f_1,...,f_n)^T * (d/d_1, ..., d/d_n)
+              jac.add_outer_product(basis_val[i], space_data.phi[i].grad);
             }
 
             // compute integration weight
@@ -497,18 +503,17 @@ namespace FEAT
             for(int i(0); i < dim_; ++i)
             {
               // update H0 component norm
-              info.norm_h0_comp[i] += omega * Math::sqr(vals[i]);
+              info.norm_h0_comp[i] += omega * Math::sqr(val[i]);
 
               // update H1 component norm
-              info.norm_h1_comp[i] += omega * Tiny::dot(ders[i], ders[i]);
-
+              info.norm_h1_comp[i] += omega * Tiny::dot(jac[i], jac[i]);
             }
 
             // update divergence
-            info.divergence += omega * Math::sqr(ders.trace());
+            info.divergence += omega * Math::sqr(jac.trace());
 
             // update vorticity
-            info.vorticity += omega * calc_vorticity(ders);
+            info.vorticity += omega * calc_vorticity(jac);
 
             // continue with next cubature point
           }

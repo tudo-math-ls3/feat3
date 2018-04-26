@@ -59,8 +59,6 @@ namespace FEAT
 
         // define the evaluation traits
         typedef Analytic::EvalTraits<DataType, Function_> EvalTraits;
-        typedef typename EvalTraits::ValueType ValueType;
-        typedef typename EvalTraits::PointType PointType;
 
         // create a function evaluator
         typename Function_::template Evaluator<EvalTraits> func_eval(function);
@@ -68,15 +66,8 @@ namespace FEAT
         // loop over all cells of the mesh
         for(Index i(0); i < num_verts; ++i)
         {
-          // convert vertex to point
-          PointType point(vtx[i]);
-
-          // compute function value
-          ValueType value(DataType(0));
-          func_eval.value(value, point);
-
-          // store function value
-          vector(i, value);
+          // compute and store function value
+          vector(i, func_eval.value(vtx[i]));
 
           // continue with next vertex
         }
@@ -205,8 +196,7 @@ namespace FEAT
             trafo_eval(trafo_data, cubature_rule.get_point(k));
 
             // compute function value
-            ValueType val(DataType(0));
-            func_eval.value(val, trafo_data.img_point);
+            ValueType val = func_eval.value(trafo_data.img_point);
 
             // compute weight
             DataType weight(trafo_data.jac_det * cubature_rule.get_weight(k));

@@ -58,14 +58,14 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
-          _func_eval.gradient(val, point);
+          return _func_eval.gradient(point);
         }
 
-        void gradient(GradientType& grad, const PointType& point)
+        GradientType gradient(const PointType& point)
         {
-          _func_eval.hessian(grad, point);
+          return _func_eval.hessian(point);
         }
       };
 
@@ -129,11 +129,9 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
-          typename FuncEvalTraits::GradientType grad;
-          _func_eval.gradient(grad, point);
-          val = grad.trace();
+          return _func_eval.gradient(point).trace();
         }
 
         /// \todo implement gradient
@@ -205,34 +203,42 @@ namespace FEAT
 
         /// 2D vector curl operator
         template<typename T_, int s_, int sm_, int sn_>
-        static void compute(Tiny::Vector<T_, 2, s_>& curl, const Tiny::Matrix<T_, 2, 2, sm_, sn_>& grad)
+        static Tiny::Vector<T_, 2, s_> compute(const Tiny::Matrix<T_, 2, 2, sm_, sn_>& grad)
         {
+          Tiny::Vector<T_, 2, s_> curl;
           curl[0] = -grad[1][0];
           curl[1] = +grad[0][1];
+          return curl;
         }
 
         template<typename T_, int n_, int sm1_, int sn1_, int sl_, int sm_, int sn_>
-        static void compute(Tiny::Matrix<T_, 2, n_, sm1_, sn1_>& curl, const Tiny::Tensor3<T_, 2, 2, n_, sl_, sm_, sn_>& grad)
+        static Tiny::Matrix<T_, 2, n_, sm1_, sn1_> compute(const Tiny::Tensor3<T_, 2, 2, n_, sl_, sm_, sn_>& grad)
         {
+          Tiny::Matrix<T_, 2, n_, sm1_, sn1_> curl;
           curl[0] = -grad[1][0];
           curl[1] = +grad[0][1];
+          return curl;
         }
 
         /// 3D vector curl operator
         template<typename T_, int s_, int sm_, int sn_>
-        static void compute(Tiny::Vector<T_, 3, s_>& curl, const Tiny::Matrix<T_, 3, 3, sm_, sn_>& grad)
+        static Tiny::Vector<T_, 3, s_> compute(const Tiny::Matrix<T_, 3, 3, sm_, sn_>& grad)
         {
+          Tiny::Vector<T_, 3, s_> curl;
           curl[0] = grad[1][2] - grad[2][1];
           curl[1] = grad[2][0] - grad[0][2];
           curl[2] = grad[0][1] - grad[1][0];
+          return curl;
         }
 
         template<typename T_, int n_, int sm1_, int sn1_, int sl_, int sm_, int sn_>
-        static void compute(Tiny::Matrix<T_, 3, n_, sm1_, sn1_>& curl, const Tiny::Tensor3<T_, 3, 3, n_, sl_, sm_, sn_>& grad)
+        static Tiny::Matrix<T_, 3, n_, sm1_, sn1_> compute(const Tiny::Tensor3<T_, 3, 3, n_, sl_, sm_, sn_>& grad)
         {
+          Tiny::Matrix<T_, 3, n_, sm1_, sn1_> curl;
           curl[0] = grad[1][2] - grad[2][1];
           curl[1] = grad[2][0] - grad[0][2];
           curl[2] = grad[0][1] - grad[1][0];
+          return curl;
         }
 
       public:
@@ -241,18 +247,14 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
-          typename FuncEvalTraits::GradientType grad;
-          _func_eval.gradient(grad, point);
-          compute(val, grad);
+          return compute(_func_eval.gradient(point));
         }
 
-        void gradient(GradientType& grad, const PointType& point)
+        GradientType gradient(const PointType& point)
         {
-          typename FuncEvalTraits::HessianType hess;
-          _func_eval.hessian(hess, point);
-          compute(grad, hess);
+          return compute(_func_eval.hessian(point));
         }
       };
 
@@ -312,17 +314,21 @@ namespace FEAT
 
         /// 2D vector curl operator
         template<typename T_, int s_, int sn_>
-        static void compute(Tiny::Vector<T_, 2, s_>& curl, const Tiny::Vector<T_, 2, sn_>& grad)
+        static Tiny::Vector<T_, 2, s_> compute(const Tiny::Vector<T_, 2, sn_>& grad)
         {
+          Tiny::Vector<T_, 2, s_> curl;
           curl[0] = -grad[1];
           curl[1] = +grad[0];
+          return curl;
         }
 
         template<typename T_, int sa_, int sb_, int sm_, int sn_>
-        static void compute(Tiny::Matrix<T_, 2, 2, sa_, sb_>& curl, const Tiny::Matrix<T_, 2, 2, sm_, sn_>& grad)
+        static Tiny::Matrix<T_, 2, 2, sa_, sb_> compute(const Tiny::Matrix<T_, 2, 2, sm_, sn_>& grad)
         {
+          Tiny::Matrix<T_, 2, 2, sa_, sb_> curl;
           curl[0] = -grad[1];
           curl[1] = +grad[0];
+          return curl;
         }
 
       public:
@@ -331,18 +337,14 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
-          typename FuncEvalTraits::GradientType grad;
-          _func_eval.gradient(grad, point);
-          compute(val, grad);
+          return compute(_func_eval.gradient(point));
         }
 
-        void gradient(GradientType& grad, const PointType& point)
+        GradientType gradient(const PointType& point)
         {
-          typename FuncEvalTraits::HessianType hess;
-          _func_eval.hessian(hess, point);
-          compute(grad, hess);
+          return compute(_func_eval.hessian(point));
         }
       };
 

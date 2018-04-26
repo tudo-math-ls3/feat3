@@ -164,8 +164,7 @@ namespace FEAT
             space_eval(space_data, trafo_data);
 
             // compute function value
-            DataType fv(DataType(0));
-            func_eval.value(fv, trafo_data.img_point);
+            DataType fv = func_eval.value(trafo_data.img_point);
 
             // pre-compute integration weight
             DataType omega(trafo_data.jac_det * cubature_rule.get_weight(k));

@@ -18,43 +18,42 @@ namespace FEAT
       template<bool wrap_>
       struct AutoDeriveGradWrapper
       {
-        template<typename Grad_, typename Point_, typename FuncEval_, typename AutoDer_>
-        static void wrap(Grad_& grad, const Point_& point, FuncEval_& func_eval, AutoDer_&)
+        template<typename Point_, typename FuncEval_, typename AutoDer_>
+        static typename AutoDer_::GradientType wrap(const Point_& point, FuncEval_& func_eval, AutoDer_&)
         {
-          func_eval.gradient(grad, point);
+          return func_eval.gradient(point);
         }
       };
 
       template<>
       struct AutoDeriveGradWrapper<false>
       {
-        template<typename Grad_, typename Point_, typename FuncEval_, typename AutoDer_>
-        static void wrap(Grad_& grad, const Point_& point, FuncEval_&, AutoDer_& auto_der)
+        template<typename Point_, typename FuncEval_, typename AutoDer_>
+        static typename AutoDer_::GradientType wrap(const Point_& point, FuncEval_&, AutoDer_& auto_der)
         {
-          auto_der.extrapol_grad(grad, point);
+          return auto_der.extrapol_grad(point);
         }
       };
 
       template<bool wrap_>
       struct AutoDeriveHessWrapper
       {
-        template<typename Hess_, typename Point_, typename FuncEval_, typename AutoDer_>
-        static void wrap(Hess_& hess, const Point_& point, FuncEval_& func_eval, AutoDer_&)
+        template<typename Point_, typename FuncEval_, typename AutoDer_>
+        static typename AutoDer_::HessianType wrap(const Point_& point, FuncEval_& func_eval, AutoDer_&)
         {
-          func_eval.hessian(hess, point);
+          return func_eval.hessian(point);
         }
       };
 
       template<>
       struct AutoDeriveHessWrapper<false>
       {
-        template<typename Hess_, typename Point_, typename FuncEval_, typename AutoDer_>
-        static void wrap(Hess_& hess, const Point_& point, FuncEval_&, AutoDer_& auto_der)
+        template<typename Point_, typename FuncEval_, typename AutoDer_>
+        static typename AutoDer_::HessianType wrap(const Point_& point, FuncEval_&, AutoDer_& auto_der)
         {
-          auto_der.extrapol_hess(hess, point);
+          return auto_der.extrapol_hess(point);
         }
       };
-
     } // namespace Intern
     /// \endcond
 
@@ -146,31 +145,31 @@ namespace FEAT
         {
         }
 
-        void value(ValueType& val, const PointType& point)
+        ValueType value(const PointType& point)
         {
-          _func_eval.value(val, point);
+          return _func_eval.value(point);
         }
 
-        void gradient(GradientType& grad, const PointType& point)
+        GradientType gradient(const PointType& point)
         {
           // Depending on whether the original function can compute gradients,
           // either call the original evaluator's "gradient" function or apply
           // our extrapolation scheme implemented in "extrapol_grad".
-          Intern::AutoDeriveGradWrapper<Function_::can_grad>::wrap(grad, point, _func_eval, *this);
+          return Intern::AutoDeriveGradWrapper<Function_::can_grad>::wrap(point, _func_eval, *this);
         }
 
-        void hessian(HessianType& hess, const PointType& point)
+        HessianType hessian(const PointType& point)
         {
           // Depending on whether the original function can compute hessians,
           // either call the original evaluator's "hessian" function or apply
           // our extrapolation scheme implemented in "extrapol_hess".
-          Intern::AutoDeriveHessWrapper<Function_::can_hess>::wrap(hess, point, _func_eval, *this);
+          return Intern::AutoDeriveHessWrapper<Function_::can_hess>::wrap(point, _func_eval, *this);
         }
 
         /**
          * \brief Computes the gradient by a Richardson extrapolation scheme.
          */
-        void extrapol_grad(GradientType& grad, const PointType& point)
+        GradientType extrapol_grad(const PointType& point)
         {
           // first, create a mutable copy of our point
           PointType v(point);
@@ -207,8 +206,7 @@ namespace FEAT
             if(def <= d)
             {
               // The defect has increased, so we return the previous extrapolation result
-              grad = _grad.front();
-              return;
+              return _grad.front();
             }
 
             // remember current defect
@@ -220,13 +218,13 @@ namespace FEAT
           }
 
           // return our extrapolated gradient
-          grad = _grad.front();
+          return _grad.front();
         }
 
         /**
          * \brief Computes the hessian by a Richardson extrapolation scheme.
          */
-        void extrapol_hess(HessianType& hess, const PointType& point)
+        HessianType extrapol_hess(const PointType& point)
         {
           // first, create a mutable copy of our point
           PointType v(point);
@@ -263,8 +261,7 @@ namespace FEAT
             if(def <= d)
             {
               // The defect has increased, so we return the previous extrapolation result
-              hess = _hess.front();
-              return;
+              return _hess.front();
             }
 
             // remember current defect
@@ -276,7 +273,7 @@ namespace FEAT
           }
 
           // return our extrapolated hessian
-          hess = _hess.front();
+          return _hess.front();
         }
 
       protected:
@@ -324,11 +321,11 @@ namespace FEAT
 
             // evaluate f(v + h*e_i)
             v[i] = vi + h;
-            _func_eval.value(vr, v);
+            vr = _func_eval.value(v);
 
             // evaluate f(v - h*e_i)
             v[i] = vi - h;
-            _func_eval.value(vl, v);
+            vl = _func_eval.value(v);
 
             // compute difference quotient
             x[i] = denom * (vr - vl);
@@ -347,7 +344,7 @@ namespace FEAT
           ValueType vc, vr, vl, vne, vnw, vse, vsw;
 
           // evaluate at point
-          _func_eval.value(vc, v);
+          vc = _func_eval.value(v);
 
           // loop over all dimensions
           for(int i(0); i < domain_dim; ++i)
@@ -357,11 +354,11 @@ namespace FEAT
 
             // eval f(x + h*e_i)
             v[i] = vi + h;
-            _func_eval.value(vr, v);
+            vr = _func_eval.value(v);
 
             // eval f(x-h)
             v[i] = vi - h;
-            _func_eval.value(vl, v);
+            vl = _func_eval.value(v);
 
             // compute difference quotient
             x[i][i] = denom1 * (vr + vl - DataType(2)*vc);
@@ -376,24 +373,24 @@ namespace FEAT
               // north-east: f(v + h*e_i + h*e_j)
               v[i] = vi + h;
               v[j] = vj + h;
-              _func_eval.value(vne, v);
+              vne = _func_eval.value(v);
 
               // north-west: f(v - h*e_i + h*e_j)
               v[i] = vi - h;
               v[j] = vj + h;
-              _func_eval.value(vnw, v);
+              vnw = _func_eval.value(v);
 
               // south-east: f(v + h*e_i - h*e_j)
               v[i] = vi + h;
               v[j] = vj - h;
-              _func_eval.value(vse, v);
+              vse = _func_eval.value(v);
 
               // south-west: f(v - h*e_i - h*e_j)
               v[i] = vi - h;
               v[j] = vj - h;
-              _func_eval.value(vsw, v);
+              vsw = _func_eval.value(v);
 
-              // combinte into difference quotient
+              // combine into difference quotient
               x[i][j] = x[j][i] = denom2 * ((vne + vsw) - (vnw + vse));
 
               // restore coord
@@ -454,10 +451,8 @@ namespace FEAT
        */
       void config_grad_extrapol(DataType_ initial_h, int max_steps)
       {
-        if(initial_h < Math::eps<DataType_>())
-          throw InternalError("Initial h is too small or non-positive!");
-        if(max_steps <= 0)
-          throw InternalError("Invalid maximum extrapolation steps!");
+        XASSERTM(initial_h > Math::eps<DataType_>(), "Initial h is too small or non-positive!");
+        XASSERTM(max_steps > 0, "Invalid maximum extrapolation steps!");
         _init_grad_h = initial_h;
         _max_grad_steps = max_steps;
       }
@@ -477,10 +472,8 @@ namespace FEAT
        */
       void config_hess_extrapol(DataType_ initial_h, int max_steps)
       {
-        if(initial_h < Math::eps<DataType_>())
-          throw InternalError("Initial h is too small or non-positive!");
-        if(max_steps <= 0)
-          throw InternalError("Invalid maximum extrapolation steps!");
+        XASSERTM(initial_h > Math::eps<DataType_>(), "Initial h is too small or non-positive!");
+        XASSERTM(max_steps > 0, "Invalid maximum extrapolation steps!");
          _init_hess_h = initial_h;
         _max_hess_steps = max_steps;
       }

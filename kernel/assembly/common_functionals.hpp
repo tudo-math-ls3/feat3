@@ -82,7 +82,7 @@ namespace FEAT
           void set_point(const TrafoData& tau)
           {
             // evaluate function value
-            _func_eval.value(_func_value, tau.img_point);
+            _func_value = _func_eval.value(tau.img_point);
           }
 
           // copy pasted since Doxygen does not like the operator part in
@@ -184,12 +184,8 @@ namespace FEAT
           /** \copydoc LinearFunctional::Evaluator::set_point() */
           void set_point(const TrafoData& tau)
           {
-            // evaluate function hessian
-            typename AnalyticEvalTraits::HessianType hess;
-            _func_eval.hessian(hess, tau.img_point);
-
-            // compute the hessian's trace (=laplacian)
-            _func_laplace = - hess.trace();
+            // compute the function hessian's trace (=laplacian)
+            _func_laplace = - _func_eval.hessian(tau.img_point).trace();
           }
 
           // copy pasted since Doxygen does not like the operator part in

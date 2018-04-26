@@ -131,7 +131,7 @@ namespace FEAT
           _trafo_eval(trafo_data, _dom_point);
 
           // evaluate function
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
         }
       };
 
@@ -217,7 +217,7 @@ namespace FEAT
             _trafo_eval(trafo_data, dom_point);
 
             // evaluate function
-            func_eval.value(node_data[i], trafo_data.img_point);
+            node_data[i] = func_eval.value(trafo_data.img_point);
           }
         }
       };
@@ -293,10 +293,7 @@ namespace FEAT
           // evaluate center point
           DomainPointType dom_point(DataType_(0));
           _trafo_eval(trafo_data, dom_point);
-          func_eval.value(node_data[0], trafo_data.img_point);
-
-          // create temporary values
-          typename FuncEvalTraits::ValueType value0, value1;
+          node_data[0] = func_eval.value(trafo_data.img_point);
 
           // loop over all nodal points
           for(int i(0); i < shape_dim_; ++i)
@@ -304,15 +301,15 @@ namespace FEAT
             // evaluate domain point #1
             dom_point[i] = DataType_(1);
             _trafo_eval(trafo_data, dom_point);
-            func_eval.value(value0, trafo_data.img_point);
+            const auto value_0 = func_eval.value(trafo_data.img_point);
 
             // evaluate domain point #2
             dom_point[i] = -DataType_(1);
             _trafo_eval(trafo_data, dom_point);
-            func_eval.value(value1, trafo_data.img_point);
+            const auto value_1 = func_eval.value(trafo_data.img_point);
 
             // scale
-            node_data[i+1] = DataType_(0.5) * (value0 - value1);
+            node_data[i+1] = DataType_(0.5) * (value_0 - value_1);
 
             // reset domain point
             dom_point[i] = DataType_(0);

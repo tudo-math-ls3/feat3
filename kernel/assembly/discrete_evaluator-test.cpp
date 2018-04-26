@@ -112,10 +112,8 @@ public:
       VectorValueType vector_value_fe = vector_eval_data.mean_value();
 
       // evaluate the analytic functions
-      ScalarValueType scalar_value_ana;
-      VectorValueType vector_value_ana;
-      scalar_func_eval.value(scalar_value_ana, point);
-      vector_func_eval.value(vector_value_ana, point);
+      ScalarValueType scalar_value_ana = scalar_func_eval.value(point);
+      VectorValueType vector_value_ana = vector_func_eval.value(point);
 
       // compute differences
       ScalarValueType scalar_diff = scalar_value_fe - scalar_value_ana;

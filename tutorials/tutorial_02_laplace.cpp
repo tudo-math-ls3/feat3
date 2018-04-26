@@ -178,37 +178,46 @@ namespace Tutorial02
       {
       }
 
-      // At the beginning of our PringlesFunction class definition, we told the assembler that we are
-      // capable of computing function values, so we have to provide a function for this job.
-      // This function is called 'value'; its first parameter is a reference to the 'value'
-      // object that we have to fill and its second parameter is the point in which we evaluate:
-      void value(ValueType& val, const PointType& point) const
+      // At the beginning of our PringlesFunction class definition, we told the assembler that we
+      // are capable of computing function values, so we have to provide a function for this job.
+      // This function is called 'value', its one and only parameter is the point in which we want
+      // to evaluate and it returns the function value of type 'ValueType', which we have declared
+      // by a typedef a few lines above:
+      ValueType value(const PointType& point) const
       {
         // We can now return the value of our function
         //  u(x,y) = (x - 1/2)^2 - (y - 1/2)^2
-        val = Math::sqr(point[0] - DataType(0.5)) - Math::sqr(point[1] - DataType(0.5));
+        return Math::sqr(point[0] - DataType(0.5)) - Math::sqr(point[1] - DataType(0.5));
       }
 
-      // The next function that we need to supply is the gradient evaluation function:
-      void gradient(GradientType& grad, const PointType& point) const
+      // The next function that we need to supply is the gradient evaluation function, which also
+      // receives the evaluation point and returns the gradient:
+      GradientType gradient(const PointType& point) const
       {
+        // Create a gradient object (which is a vector):
+        GradientType grad;
         // Set the X-derivative of our function:
         // dx u(x,y) =  2*x - 1
         grad[0] =  DataType(2) * point[0] - DataType(1);
         // Set the Y-derivative of our function:
         // dy u(x,y) = -2*y + 1
         grad[1] = -DataType(2) * point[1] + DataType(1);
+        // And finally return the gradient:
+        return grad;
       }
 
       // And finally, one evaluation function for the hessian:
-      void hessian(HessianType& hess, const PointType& /*point*/) const
+      HessianType hessian(const PointType& /*point*/) const
       {
+        // Create a hessian object (which is a matrix):
+        HessianType hess;
         // The mixed derivatives dx dy u are zero
         hess[0][1] = hess[1][0] = DataType(0);
         // The second XX-derivate: dxx u(x,y) =  2
         hess[0][0] =  DataType(2);
         // The second YY-derivate: dyy u(x,y) = -2
         hess[1][1] = -DataType(2);
+        return hess;
       }
     }; // class PringlesFunction::Evaluator<...>
   }; // class PringlesFunction

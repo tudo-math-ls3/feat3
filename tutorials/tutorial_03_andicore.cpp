@@ -350,7 +350,7 @@ namespace Tutorial03
       SolEvaluator _sol_eval;
 
       // Finally, declare a variable that will store the value of the force in the current cubature point:
-      DataType _force_value;
+      ValueType _force_value;
 
     public:
       // And a matching constructor, which receives a reference to the functional object as its
@@ -380,19 +380,14 @@ namespace Tutorial03
         // 3. the reaction   :      c *    u   * psi
 
         // For this task, we need to call the 'value', 'gradient' and 'hessian' functions of the
-        // solution function evaluator (see the PringlesFunction in Tutorial 02), so we first need
-        // to create the objects where the functions can write their values to.
-        // We do this by using the types defined in the AnalyticEvalTraits class which we have
-        // defined above:
-        typename AnalyticEvalTraits::ValueType value(DataType(0));   // function value
-        typename AnalyticEvalTraits::GradientType grad(DataType(0)); // function gradient
-        typename AnalyticEvalTraits::HessianType hess(DataType(0));  // function hessian
-
-        // Now we call the solution function's evaluator to compute these values. For this, we
-        // provide the value object as well as the image point from our trafo data as parameters:
-        _sol_eval.value   (value, tau.img_point);
-        _sol_eval.gradient(grad , tau.img_point);
-        _sol_eval.hessian (hess , tau.img_point);
+        // solution function evaluator (see the PringlesFunction in Tutorial 02), so we need to
+        // obtain the corresponding types of the return values from the AnalyticEvalTraits class,
+        // which we have defined above. All we have to do now is to call the corresponding functions
+        // of the function's evaluator class and supply the image point of our trafo data as the
+        // evaluation point:
+        typename AnalyticEvalTraits::ValueType    value = _sol_eval.value(tau.img_point);
+        typename AnalyticEvalTraits::GradientType grad  = _sol_eval.gradient(tau.img_point);
+        typename AnalyticEvalTraits::HessianType  hess  = _sol_eval.hessian(tau.img_point);
 
         // Finally, we can combine these terms to pre-compute the value of our force
         // functional, so that we just need to multiply by 'psi' later on:

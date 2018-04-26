@@ -95,7 +95,7 @@ namespace FEAT
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
         }
       };
 
@@ -179,7 +179,7 @@ namespace FEAT
             _trafo_eval(trafo_data, dom_point);
 
             // evaluate function
-            func_eval.value(node_data[i], trafo_data.img_point);
+            node_data[i] = func_eval.value(trafo_data.img_point);
           }
         }
       };
@@ -255,12 +255,12 @@ namespace FEAT
           // first nodal point 1/3
           dom_point[0] = DataType(1) / DataType(3);
           _trafo_eval(trafo_data, dom_point);
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
 
           // second nodal point 2/3
           dom_point[0] = DataType(2) / DataType(3);
           _trafo_eval(trafo_data, dom_point);
-          func_eval.value(node_data[1], trafo_data.img_point);
+          node_data[1] = func_eval.value(trafo_data.img_point);
         }
       };
 
@@ -332,7 +332,7 @@ namespace FEAT
           DomainPointType dom_point(DataType_(1) / DataType(3));
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
         }
       };
     } // namespace Lagrange3

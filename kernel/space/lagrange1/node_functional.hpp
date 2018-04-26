@@ -95,7 +95,7 @@ namespace FEAT
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          func_eval.value(node_data[0], trafo_data.img_point);
+          node_data[0] = func_eval.value(trafo_data.img_point);
         }
       };
     } // namespace Lagrange1

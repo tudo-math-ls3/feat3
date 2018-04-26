@@ -47,19 +47,14 @@ namespace FEAT
           )
         {
           // evaluate function value
-          typename AnaTraits_::ValueType value(DataType(0));
-          func_eval.value(value, trafo_data.img_point);
+          typename AnaTraits_::ValueType value = func_eval.value(trafo_data.img_point);
 
-          // test function loop
+          // subtract FE function value
           for(int i(0); i < num_loc_dofs; ++i)
-          {
-            // subtract basis function value
             value -= lvad[i] * space_data.phi[i].value;
-            // continue with next trial function
-          }
 
-          // update result
-          return value * value;
+          // return result
+          return Math::sqr(value);
         }
       };
 
@@ -96,19 +91,14 @@ namespace FEAT
           )
         {
           // evaluate function gradient
-          typename AnaTraits_::GradientType value(DataType(0));
-          func_eval.gradient(value, trafo_data.img_point);
+          typename AnaTraits_::GradientType grad = func_eval.gradient(trafo_data.img_point);
 
-          // test function loop
+          // subtract FE function gradient
           for(int i(0); i < num_loc_dofs; ++i)
-          {
-            // subtract basis function gradient
-            value -= lvad[i] * space_data.phi[i].grad;
-            // continue with next trial function
-          }
+            grad.axpy(-lvad[i], space_data.phi[i].grad);
 
-          // update result
-          return Tiny::dot(value, value);
+          // return result
+          return grad.norm_euclid_sqr();
         }
       };
 
@@ -144,20 +134,15 @@ namespace FEAT
           const int num_loc_dofs
           )
         {
-          // evaluate functor
-          typename AnaTraits_::HessianType value(DataType(0));
-          func_eval.hessian(value, trafo_data.img_point);
+          // evaluate function hessian
+          typename AnaTraits_::HessianType hess = func_eval.hessian(trafo_data.img_point);
 
-          // test function loop
+          // subtract FE function hessian
           for(int i(0); i < num_loc_dofs; ++i)
-          {
-            // subtract basis function gradient
-            value -= lvad[i] * space_data.phi[i].hess;
-            // continue with next trial function
-          }
+            hess.axpy(-lvad[i], space_data.phi[i].hess);
 
-          // update result
-          return value.norm_hessian_sqr();
+          // return result
+          return hess.norm_hessian_sqr();
         }
       };
     } // namespace Intern
@@ -494,9 +479,10 @@ namespace FEAT
       struct VecHelperH0
       {
         typedef typename AsmTraits_::DataType DataType;
+        typedef Tiny::Vector<DataType, AnaTraits_::image_dim> ResultType;
 
         template<typename FuncEval_, typename LocalVec_>
-        static DataType eval(
+        static ResultType eval(
           FuncEval_&,
           const typename AsmTraits_::TrafoEvalData&,
           const typename AsmTraits_::SpaceEvalData&,
@@ -504,7 +490,7 @@ namespace FEAT
           const int
           )
         {
-          return DataType(0);
+          return ResultType::null();
         }
       };
 
@@ -512,9 +498,10 @@ namespace FEAT
       struct VecHelperH0<true, AsmTraits_, AnaTraits_>
       {
         typedef typename AsmTraits_::DataType DataType;
+        typedef Tiny::Vector<DataType, AnaTraits_::image_dim> ResultType;
 
         template<typename FuncEval_, typename LocalVec_>
-        static DataType eval(
+        static ResultType eval(
           FuncEval_& func_eval,
           const typename AsmTraits_::TrafoEvalData& trafo_data,
           const typename AsmTraits_::SpaceEvalData& space_data,
@@ -523,19 +510,18 @@ namespace FEAT
           )
         {
           // evaluate function value
-          typename AnaTraits_::ValueType value(DataType(0));
-          func_eval.value(value, trafo_data.img_point);
+          typename AnaTraits_::ValueType value = func_eval.value(trafo_data.img_point);
 
-          // test function loop
+          // subtract FE function value
           for(int i(0); i < num_loc_dofs; ++i)
-          {
-            // subtract basis function value
-            value -= lvad[i] * space_data.phi[i].value;
-            // continue with next trial function
-          }
+            value.axpy(-space_data.phi[i].value, lvad[i]);
 
-          // update result
-          return value.norm_euclid_sqr();
+          // compute norm of each component
+          ResultType result;
+          for(int k(0); k < AnaTraits_::image_dim; ++k)
+            result[k] = Math::sqr(value[k]);
+
+          return result;
         }
       };
 
@@ -543,9 +529,10 @@ namespace FEAT
       struct VecHelperH1
       {
         typedef typename AsmTraits_::DataType DataType;
+        typedef Tiny::Vector<DataType, AnaTraits_::image_dim> ResultType;
 
         template<typename FuncEval_, typename LocalVec_>
-        static DataType eval(
+        static ResultType eval(
           FuncEval_&,
           const typename AsmTraits_::TrafoEvalData&,
           const typename AsmTraits_::SpaceEvalData&,
@@ -553,7 +540,7 @@ namespace FEAT
           const int
           )
         {
-          return DataType(0);
+          return ResultType::null();
         }
       };
 
@@ -561,9 +548,10 @@ namespace FEAT
       struct VecHelperH1<true, AsmTraits_, AnaTraits_>
       {
         typedef typename AsmTraits_::DataType DataType;
+        typedef Tiny::Vector<DataType, AnaTraits_::image_dim> ResultType;
 
         template<typename FuncEval_, typename LocalVec_>
-        static DataType eval(
+        static ResultType eval(
           FuncEval_& func_eval,
           const typename AsmTraits_::TrafoEvalData& trafo_data,
           const typename AsmTraits_::SpaceEvalData& space_data,
@@ -571,23 +559,19 @@ namespace FEAT
           const int num_loc_dofs
           )
         {
-          // evaluate function gradient
-          typename AnaTraits_::GradientType grad(DataType(0));
-          func_eval.gradient(grad, trafo_data.img_point);
+          // evaluate reference function gradient
+          typename AnaTraits_::GradientType grad = func_eval.gradient(trafo_data.img_point);
 
-          // test function loop
+          // subtract FE function gradient
           for(int i(0); i < num_loc_dofs; ++i)
-          {
-            // subtract basis function gradient
-            for(int d(0); d < AnaTraits_::GradientType::n; ++d)
-            {
-              grad[d] -= space_data.phi[i].grad * lvad[i](d);
-            }
-            // continue with next trial function
-          }
+            grad.add_outer_product(lvad[i], space_data.phi[i].grad, -DataType(1));
 
-          // update result
-          return grad.norm_frobenius_sqr();
+          // compute norm of each component
+          ResultType result;
+          for(int k(0); k < AnaTraits_::image_dim; ++k)
+            result[k] = grad[k].norm_euclid_sqr();
+
+          return result;
         }
       };
 
@@ -595,9 +579,10 @@ namespace FEAT
       struct VecHelperH2
       {
         typedef typename AsmTraits_::DataType DataType;
+        typedef Tiny::Vector<DataType, AnaTraits_::image_dim> ResultType;
 
         template<typename FuncEval_, typename LocalVec_>
-        static DataType eval(
+        static ResultType eval(
           FuncEval_&,
           const typename AsmTraits_::TrafoEvalData&,
           const typename AsmTraits_::SpaceEvalData&,
@@ -605,40 +590,42 @@ namespace FEAT
           const int
           )
         {
-          return DataType(0);
+          return ResultType::null();
         }
       };
 
-      //template<typename AsmTraits_, typename AnaTraits_>
-      //struct VecHelperH2<true, AsmTraits_, AnaTraits_>
-      //{
-      //  typedef typename AsmTraits_::DataType DataType;
+      template<typename AsmTraits_, typename AnaTraits_>
+      struct VecHelperH2<true, AsmTraits_, AnaTraits_>
+      {
+        typedef typename AsmTraits_::DataType DataType;
+        typedef Tiny::Vector<DataType, AnaTraits_::image_dim> ResultType;
 
-      //  template<typename FuncEval_, typename LocalVec_>
-      //  static DataType eval(
-      //    FuncEval_& func_eval,
-      //    const typename AsmTraits_::TrafoEvalData& trafo_data,
-      //    const typename AsmTraits_::SpaceEvalData& space_data,
-      //    const LocalVec_& lvad,
-      //    const int num_loc_dofs
-      //    )
-      //  {
-      //    // evaluate functor
-      //    typename AnaTraits_::HessianType value(DataType(0));
-      //    func_eval.hessian(value, trafo_data.img_point);
+        template<typename FuncEval_, typename LocalVec_>
+        static ResultType eval(
+          FuncEval_& func_eval,
+          const typename AsmTraits_::TrafoEvalData& trafo_data,
+          const typename AsmTraits_::SpaceEvalData& space_data,
+          const LocalVec_& lvad,
+          const int num_loc_dofs
+          )
+        {
+          // evaluate reference function hessian
+          typename AnaTraits_::HessianType hess = func_eval.hessian(trafo_data.img_point);
 
-      //    // test function loop
-      //    for(int i(0); i < num_loc_dofs; ++i)
-      //    {
-      //      // subtract basis function gradient
-      //      value -= lvad[i] * space_data.phi[i].hess;
-      //      // continue with next trial function
-      //    }
+          // subtract FE function hessian
+          for(int i(0); i < num_loc_dofs; ++i)
+          {
+            hess.add_vec_mat_outer_product(lvad[i], space_data.phi[i].hess, -DataType(1));
+          }
 
-      //    // update result
-      //    return value.norm_hessian_sqr();
-      //  }
-      //};
+          // compute norm of each component
+          ResultType result;
+          for(int k(0); k < AnaTraits_::image_dim; ++k)
+            result[k] = hess[k].norm_hessian_sqr();
+
+          return result;
+        }
+      };
     } // namespace Intern
     /// \endcond
 
@@ -648,9 +635,12 @@ namespace FEAT
      * This structure encapsulated the up to three error norms computed by the VectorErrorComputer
      * class template.
      */
-    template<typename DataType_>
+    template<typename DataType_, int dim_>
     struct VectorErrorInfo
     {
+      /// The dimension of the analysed vector field
+      static constexpr int dim = dim_;
+
       /// Specifies whether the H0-error was computed.
       bool have_h0;
       /// Specifies whether the H1-error was computed.
@@ -665,6 +655,28 @@ namespace FEAT
       /// The computed H2-error.
       DataType_ norm_h2;
 
+      /**
+       * \brief Vector field components H0-errors
+       *
+       * This entry contains the H0-errors of all components of the vector field.
+       */
+      Tiny::Vector<DataType_, dim_> norm_h0_comp;
+
+      /**
+       * \brief Vector field components H1-errors
+       *
+       * This entry contains the H1-errors of all components of the vector field.
+       */
+      Tiny::Vector<DataType_, dim_> norm_h1_comp;
+
+      /**
+       * \brief Vector field components H2-errors
+       *
+       * This entry contains the H2-errors of all components of the vector field.
+       */
+      Tiny::Vector<DataType_, dim_> norm_h2_comp;
+
+
       /// standard constructor
       VectorErrorInfo() :
         have_h0(false),
@@ -672,25 +684,31 @@ namespace FEAT
         have_h2(false),
         norm_h0(DataType_(0)),
         norm_h1(DataType_(0)),
-        norm_h2(DataType_(0))
+        norm_h2(DataType_(0)),
+        norm_h0_comp(DataType_(0)),
+        norm_h1_comp(DataType_(0)),
+        norm_h2_comp(DataType_(0))
       {
       }
 
       /// conversion constructor
       template<typename DT2_>
-      VectorErrorInfo(const VectorErrorInfo<DT2_>& other) :
+      VectorErrorInfo(const VectorErrorInfo<DT2_, dim_>& other) :
         have_h0(other.have_h0),
         have_h1(other.have_h1),
         have_h2(other.have_h2),
         norm_h0(DataType_(other.norm_h0)),
         norm_h1(DataType_(other.norm_h1)),
-        norm_h2(DataType_(other.norm_h2))
+        norm_h2(DataType_(other.norm_h2)),
+        norm_h0_comp(other.norm_h0_comp),
+        norm_h1_comp(other.norm_h1_comp),
+        norm_h2_comp(other.norm_h2_comp)
       {
       }
 
       /// conversion assignment operator
       template<typename DT2_>
-      VectorErrorInfo& operator=(const VectorErrorInfo<DT2_>& other)
+      VectorErrorInfo& operator=(const VectorErrorInfo<DT2_, dim_>& other)
       {
         have_h0 = other.have_h0;
         have_h1 = other.have_h1;
@@ -698,6 +716,9 @@ namespace FEAT
         norm_h0 = DataType_(other.norm_h0);
         norm_h1 = DataType_(other.norm_h1);
         norm_h2 = DataType_(other.norm_h2);
+        norm_h0_comp = other.norm_h0_comp;
+        norm_h1_comp = other.norm_h1_comp;
+        norm_h2_comp = other.norm_h2_comp;
       }
 
       /**
@@ -711,18 +732,39 @@ namespace FEAT
        */
       void synchronise(const Dist::Comm& comm)
       {
-        DataType_ verr[3] =
+        DataType_ verr[3+3*dim_] =
         {
           have_h0 ? Math::sqr(norm_h0) : DataType_(0),
           have_h1 ? Math::sqr(norm_h1) : DataType_(0),
           have_h2 ? Math::sqr(norm_h2) : DataType_(0)
         };
+        for(int i(0); i < dim_; ++i)
+        {
+          verr[3+0*dim_+i] = (have_h0 ? Math::sqr(norm_h0_comp[i]) : DataType_(0));
+          verr[3+1*dim_+i] = (have_h0 ? Math::sqr(norm_h1_comp[i]) : DataType_(0));
+          verr[3+2*dim_+i] = (have_h0 ? Math::sqr(norm_h2_comp[i]) : DataType_(0));
+        }
 
-        comm.allreduce(verr, verr, std::size_t(3), Dist::op_sum);
+        comm.allreduce(verr, verr, std::size_t(3*dim+3), Dist::op_sum);
 
-        if(have_h0) norm_h0 = Math::sqrt(verr[0]);
-        if(have_h1) norm_h1 = Math::sqrt(verr[1]);
-        if(have_h2) norm_h2 = Math::sqrt(verr[2]);
+        if(have_h0)
+        {
+          norm_h0 = Math::sqrt(verr[0]);
+          for(int i(0); i < dim_; ++i)
+            norm_h0_comp[i] = Math::sqrt(verr[3+i]);
+        }
+        if(have_h1)
+        {
+          norm_h1 = Math::sqrt(verr[1]);
+          for(int i(0); i < dim_; ++i)
+            norm_h1_comp[i] = Math::sqrt(verr[3+dim_+i]);
+        }
+        if(have_h2)
+        {
+          norm_h2 = Math::sqrt(verr[2]);
+          for(int i(0); i < dim_; ++i)
+            norm_h2_comp[i] = Math::sqrt(verr[3+2*dim_+i]);
+        }
       }
 
       /**
@@ -744,11 +786,26 @@ namespace FEAT
       {
         String s;
         if(have_h0)
-          s += String("H0-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h0, precision) + "\n";
+        {
+          s += String("H0-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h0, precision) + " [";
+          for(int i(0); i < dim_; ++i)
+            (s += " ") += stringify_fp_sci(norm_h0_comp[i], precision);
+          s += " ]\n";
+        }
         if(have_h1)
-          s += String("H1-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h1, precision) + "\n";
+        {
+          s += String("H1-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h1, precision) + " [";
+          for(int i(0); i < dim_; ++i)
+            (s += " ") += stringify_fp_sci(norm_h1_comp[i], precision);
+          s += " ]\n";
+        }
         if(have_h2)
-          s += String("H2-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h2, precision) + "\n";
+        {
+          s += String("H2-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h2, precision) + " [";
+          for(int i(0); i < dim_; ++i)
+            (s += " ") += stringify_fp_sci(norm_h2_comp[i], precision);
+          s += " ]\n";
+        }
         return s;
       }
 
@@ -757,11 +814,26 @@ namespace FEAT
       {
         // print errors
         if(sei.have_h0)
-          os << "H0-Error: " << stringify_fp_sci(sei.norm_h0) << std::endl;
+        {
+          os << "H0-Error: " << stringify_fp_sci(sei.norm_h0) << " [";
+          for(int i(0); i < dim_; ++i)
+            os << " " << stringify_fp_sci(sei.norm_h0_comp[i]);
+          os << " ]" << std::endl;
+        }
         if(sei.have_h1)
+        {
           os << "H1-Error: " << stringify_fp_sci(sei.norm_h1) << std::endl;
+          for(int i(0); i < dim_; ++i)
+            os << " " << stringify_fp_sci(sei.norm_h1_comp[i]);
+          os << " ]" << std::endl;
+        }
         if(sei.have_h2)
+        {
           os << "H2-Error: " << stringify_fp_sci(sei.norm_h2) << std::endl;
+          for(int i(0); i < dim_; ++i)
+            os << " " << stringify_fp_sci(sei.norm_h2_comp[i]);
+          os << " ]" << std::endl;
+        }
         return os;
       }
     }; // struct VectorErrorInfo
@@ -836,7 +908,7 @@ namespace FEAT
         typename Function_,
         typename Space_,
         typename CubatureFactory_>
-      static VectorErrorInfo<typename Vector_::DataType> compute(
+      static VectorErrorInfo<typename Vector_::DataType, Function_::ImageType::scalar_components> compute(
         const Vector_& vector,
         const Function_& function,
         const Space_& space,
@@ -857,7 +929,7 @@ namespace FEAT
         // space type
         typedef Space_ SpaceType;
         /// The domain dim
-        static constexpr int dim = Function_::domain_dim;
+        static constexpr int dim = Function_::ImageType::scalar_components;
         /// We use the scalar assembly traits and just define our own LocalVectorData below
         typedef AsmTraits1
         <
@@ -905,10 +977,10 @@ namespace FEAT
         typename VectorType::GatherAxpy gather_axpy(vector);
 
         // initialise result
-        VectorErrorInfo<DataType> result;
-        result.have_h0 = (max_norm_ >= 0);
-        result.have_h1 = (max_norm_ >= 1);
-        result.have_h2 = (max_norm_ >= 2);
+        VectorErrorInfo<DataType, dim> info;
+        info.have_h0 = (max_norm_ >= 0);
+        info.have_h1 = (max_norm_ >= 1);
+        info.have_h2 = (max_norm_ >= 2);
 
         // H0/H1/H2 helpers
         typedef Intern::VecHelperH0<(max_norm_ >= 0), AsmTraits, AnalyticEvalTraits> VecH0;
@@ -952,9 +1024,9 @@ namespace FEAT
             DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
 
             // update results
-            result.norm_h0 += omega * VecH0::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
-            result.norm_h1 += omega * VecH1::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
-            result.norm_h2 += omega * VecH2::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
+            info.norm_h0_comp.axpy(omega, VecH0::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs));
+            info.norm_h1_comp.axpy(omega, VecH1::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs));
+            info.norm_h2_comp.axpy(omega, VecH2::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs));
 
             // continue with next cubature point
           }
@@ -966,13 +1038,24 @@ namespace FEAT
           // continue with next cell
         }
 
+        // compute the rest
+        for(int i(0); i < dim; ++i)
+        {
+          info.norm_h0 += info.norm_h0_comp[i];
+          info.norm_h1 += info.norm_h1_comp[i];
+          info.norm_h2 += info.norm_h2_comp[i];
+          info.norm_h0_comp[i] = Math::sqrt(info.norm_h0_comp[i]);
+          info.norm_h1_comp[i] = Math::sqrt(info.norm_h1_comp[i]);
+          info.norm_h2_comp[i] = Math::sqrt(info.norm_h2_comp[i]);
+        }
+
         // take square-roots
-        result.norm_h0 = Math::sqrt(result.norm_h0);
-        result.norm_h1 = Math::sqrt(result.norm_h1);
-        result.norm_h2 = Math::sqrt(result.norm_h2);
+        info.norm_h0 = Math::sqrt(info.norm_h0);
+        info.norm_h1 = Math::sqrt(info.norm_h1);
+        info.norm_h2 = Math::sqrt(info.norm_h2);
 
         // okay, that's it
-        return result;
+        return info;
       }
     }; // class VectorErrorComputer
 
