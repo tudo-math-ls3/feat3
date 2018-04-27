@@ -52,11 +52,13 @@ doc/*
 thirdparty/*.gz
 thirdparty/*.tgz
 thirdparty/*.zip
-thirdparty/alglib/*
-thirdparty/fparser/*
-thirdparty/parmetis/*
-thirdparty/SuiteSparse/*
-thirdparty/zlib/*
+thirdparty/alglib
+thirdparty/fparser
+thirdparty/half
+thirdparty/parmetis
+thirdparty/SuiteSparse
+thirdparty/triangle
+thirdparty/zlib
 
 # Ignore Visual Studio symlinks
 build_system/vc14/kernel/
