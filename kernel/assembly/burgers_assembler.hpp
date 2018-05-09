@@ -14,7 +14,7 @@ namespace FEAT
     /**
      * \brief Burgers operator assembly class
      *
-     * This class is responsible for assembling the vector-valued Burgers operator:
+     * This class is responsible for assembling the scalar and vector-valued Burgers operators:
      *
      * \f[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \theta \mathbf{M}(u,\psi)\f]
      *
@@ -31,9 +31,10 @@ namespace FEAT
     class BurgersAssembler
     {
     public:
+      /// the datatype we use here
       typedef DataType_ DataType;
 
-      // specifies whether to use the deformation tensor
+      /// specifies whether to use the deformation tensor
       bool deformation;
 
       /// viscosity parameter: nu
@@ -95,7 +96,7 @@ namespace FEAT
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
         const bool need_conv = (Math::abs(beta) > DataType(0));
-        const bool need_conv_frechet = (frechet_beta > DataType(0));
+        const bool need_conv_frechet = (Math::abs(frechet_beta) > DataType(0));
         const bool need_reac = (Math::abs(theta) > DataType(0));
 
         // define our assembly traits
@@ -297,6 +298,200 @@ namespace FEAT
 
                   // update local matrix
                   local_matrix[i][j].add_scalar_main_diag(value);
+                }
+              }
+            }
+
+            // continue with next cubature point
+          }
+
+          // scatter into matrix
+          scatter_matrix(local_matrix, dof_mapping, dof_mapping, scale);
+
+          // finish dof mapping
+          dof_mapping.finish();
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+        }
+      }
+
+      /**
+       * \brief Assembles the Burgers operator into a scalar matrix.
+       *
+       * \param[in,out] matrix
+       * The scalar matrix to be assembled.
+       *
+       * \param[in] convect
+       * The transport vector for the convection.
+       *
+       * \param[in] space
+       * The velocity space.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
+       *
+       * \param[in] scale
+       * A scaling factor for the matrix to be assembled.
+       */
+      template<typename Matrix_, typename Space_>
+      void assemble_scalar_matrix(
+        Matrix_& matrix,
+        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        const Space_& space,
+        const Cubature::DynamicFactory& cubature_factory,
+        const DataType_ scale = DataType_(1)
+        ) const
+      {
+        // validate matrix and vector dimensions
+        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
+
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef Matrix_ MatrixType;
+
+        // first of all, let's see what we have to assemble
+        const bool need_diff = (Math::abs(nu) > DataType(0));
+        const bool need_conv = (Math::abs(beta) > DataType(0));
+        const bool need_reac = (Math::abs(theta) > DataType(0));
+
+        // deformation tensor is not available for scalar matrices
+        XASSERTM(!deformation, "deformation tensor is not available for scalar matrices");
+        XASSERTM(frechet_beta == DataType(0), "convection Frechet derivative is not available for scalar matrices");
+
+        // define our assembly traits
+        typedef AsmTraits1<DataType_, Space_, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
+
+        // fetch our trafo
+        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create matrix scatter-axpy
+        typename MatrixType::ScatterAxpy scatter_matrix(matrix);
+
+        // create convection gather-axpy
+        typename VectorType::GatherAxpy gather_conv(convect);
+
+        // get maximum number of local dofs
+        static constexpr int max_local_dofs = AsmTraits::max_local_test_dofs;
+
+        // create local matrix data
+        typedef typename AsmTraits::LocalMatrixType LocalMatrixType;
+        LocalMatrixType local_matrix;
+
+        // create local vector data
+        typedef Tiny::Vector<DataType, dim_> VectorValue;
+        typedef Tiny::Vector<VectorValue, max_local_dofs> LocalVectorType;
+
+        // local convection field dofs
+        LocalVectorType local_conv_dofs;
+
+        // our local velocity value
+        Tiny::Vector<DataType, dim_> loc_v;
+        loc_v.format();
+
+        // loop over all cells of the mesh
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+        {
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+
+          // initialise dof-mapping
+          dof_mapping.prepare(cell);
+
+          // fetch number of local dofs
+          const int num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // gather our local convection dofs
+          local_conv_dofs.format();
+          gather_conv(local_conv_dofs, dof_mapping);
+
+          // format our local matrix and vector
+          local_matrix.format();
+
+          // loop over all quadrature points and integrate
+          for(int point(0); point < cubature_rule.get_num_points(); ++point)
+          {
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(point));
+
+            // compute basis function data
+            space_eval(space_data, trafo_data);
+
+            // pre-compute cubature weight
+            const DataType weight = trafo_data.jac_det * cubature_rule.get_weight(point);
+
+            // evaluate convection function and its gradient (if required)
+            if(need_conv)
+            {
+              loc_v.format();
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // update velocity value
+                loc_v.axpy(space_data.phi[i].value, local_conv_dofs[i]);
+              }
+            }
+
+            // assemble diffusion?
+            if(need_diff)
+            {
+              // test function loop
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // trial function loop
+                for(int j(0); j < num_loc_dofs; ++j)
+                {
+                  local_matrix[i][j] += nu * weight * Tiny::dot(space_data.phi[i].grad, space_data.phi[j].grad);
+                }
+              }
+            }
+
+            // assemble convection?
+            if(need_conv)
+            {
+              // test function loop
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // trial function loop
+                for(int j(0); j < num_loc_dofs; ++j)
+                {
+                  local_matrix[i][j] += beta * weight * space_data.phi[i].value * Tiny::dot(loc_v, space_data.phi[j].grad);
+                }
+              }
+            }
+
+            // assemble reaction?
+            if(need_reac)
+            {
+              // test function loop
+              for(int i(0); i < num_loc_dofs; ++i)
+              {
+                // trial function loop
+                for(int j(0); j < num_loc_dofs; ++j)
+                {
+                  local_matrix[i][j] += theta * weight *  space_data.phi[i].value * space_data.phi[j].value;
                 }
               }
             }
