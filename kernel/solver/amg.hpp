@@ -180,7 +180,7 @@ namespace FEAT
         return transfer;
       }
 
-      template <typename InputType_, typename TargetType_,
+      template <typename TargetType_, typename InputType_,
                typename std::enable_if<InputType_::is_global>::type* = nullptr,
                typename std::enable_if<TargetType_::is_global>::type* = nullptr >
       static void _adaptive_clone(TargetType_ & output, const InputType_ & input)
@@ -188,7 +188,7 @@ namespace FEAT
         output = input.clone(LAFEM::CloneMode::Shallow);
       }
 
-      template <typename InputType_, typename TargetType_,
+      template <typename TargetType_, typename InputType_,
                typename std::enable_if<InputType_::is_local>::type* = nullptr,
                typename std::enable_if<TargetType_::is_local>::type* = nullptr >
       static void _adaptive_clone(TargetType_ & output, const InputType_ & input)
@@ -196,7 +196,7 @@ namespace FEAT
         output = input.clone(LAFEM::CloneMode::Shallow);
       }
 
-      template <typename InputType_, typename TargetType_,
+      template <typename TargetType_, typename InputType_,
                typename std::enable_if<InputType_::is_global>::type* = nullptr,
                typename std::enable_if<TargetType_::is_local>::type* = nullptr >
       static void _adaptive_clone(TargetType_ & output, const InputType_ & input)
@@ -219,10 +219,11 @@ namespace FEAT
        * \param[out] transfer_out The transfer operator between the old fine and the new coarse grid level
        * \param[out] gate_out The new coarse grid gate
        */
-        static void new_coarse_level(const SystemMatrix_ & fine_grid_input, const SystemFilter_ & fine_filter_input, const Dist::Comm * comm, double theta,
-            SystemMatrix_ & coarse_grid_out, SystemFilter_ & coarse_filter_out, TransferOperator_ & transfer_out, typename SystemMatrix_::GateRowType * gate_out = nullptr)
+        static void new_coarse_level(const SystemMatrix_ & fine_grid_input, const SystemFilter_ & fine_filter_input,  double theta,
+            SystemMatrix_ & coarse_grid_out, SystemFilter_ & coarse_filter_out, TransferOperator_ & transfer_out,
+            const Dist::Comm * comm, typename GlobalMatrixType::GateRowType * gate_out = nullptr)
         {
-          auto gate_coarse = std::make_shared<typename SystemMatrix_::GateRowType>();
+          auto gate_coarse = std::make_shared<typename GlobalMatrixType::GateRowType>();
           gate_coarse->set_comm(comm);
           const GlobalMatrixType matrix_fine(_make_matrix_global<SystemMatrix_>(fine_grid_input));
           const GlobalFilterType filter_fine(_make_filter_global<SystemFilter_>(fine_filter_input));
@@ -259,7 +260,7 @@ namespace FEAT
           Index rank = (Index)comm->rank();
           for (Index nextrank = 0 ; nextrank < (Index)comm->size() ; ++nextrank)
           {
-            comm->print(stringify(nextrank));
+            //comm->print(stringify(nextrank));
             if (nextrank == rank)
             {
               //first sweep
@@ -570,9 +571,9 @@ namespace FEAT
             gate_out->convert(*gate_coarse);
           }
             GlobalMatrixType matrix_coarse(gate_out, gate_out, local_matrix_coarse.clone(LAFEM::CloneMode::Shallow));
-            _adaptive_clone<SystemMatrix_>(coarse_grid_out, matrix_coarse);
-            _adaptive_clone<SystemFilter_>(coarse_filter_out, gnf);
-            _adaptive_clone<TransferOperator_>(transfer_out, trans);
+            _adaptive_clone(coarse_grid_out, matrix_coarse);
+            _adaptive_clone(coarse_filter_out, gnf);
+            _adaptive_clone(transfer_out, trans);
         }
 
       /**

@@ -24,8 +24,8 @@ Note that the transfer object always resides on the fine level of the two affect
       system_levels.push_back(std::make_shared<SystemLevelType>());
       auto& previous_level = system_levels[system_levels.size() - 2];
       Solver::AMGFactory<typename SystemLevelType::GlobalSystemMatrix, typename SystemLevelType::GlobalSystemFilter, typename SystemLevelType::GlobalSystemTransfer>
-        ::new_coarse_level(previous_level->matrix_sys, previous_level->filter_sys, &comm, 0.8,
-          system_levels.back()->matrix_sys, system_levels.back()->filter_sys, previous_level->transfer_sys, &system_levels.back()->gate_sys);
+        ::new_coarse_level(previous_level->matrix_sys, previous_level->filter_sys, 0.8,
+          system_levels.back()->matrix_sys, system_levels.back()->filter_sys, previous_level->transfer_sys, &comm, &system_levels.back()->gate_sys);
     }
 \endcode
 

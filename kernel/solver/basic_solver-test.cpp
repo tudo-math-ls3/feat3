@@ -27,6 +27,7 @@
 #include <kernel/solver/pcgnr.hpp>
 #include <kernel/solver/pcgnrilu.hpp>
 #include <kernel/solver/idrs.hpp>
+#include <kernel/solver/amg.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -740,5 +741,75 @@ public:
     }
   }
 };
-
 BCSRSolverTest<Mem::Main, double, Index> bcsr_solver_test_main_double_index;
+
+template<
+  template<typename,typename,typename> class ScalarMatrix_,
+  typename MemType_,
+  typename DataType_,
+  typename IndexType_>
+class AMGTest :
+  public FullTaggedTest<MemType_, DataType_, IndexType_>
+{
+public:
+  typedef DataType_ DataType;
+  typedef IndexType_ IndexType;
+  typedef ScalarMatrix_<MemType_, DataType, IndexType> MatrixType;
+  typedef typename MatrixType::VectorTypeR VectorType;
+  typedef UnitFilter<MemType_, DataType, IndexType> FilterType;
+  typedef Transfer<MatrixType> TransferType;
+
+public:
+  AMGTest() :
+    FullTaggedTest<MemType_, DataType, IndexType>("AMGTest-" + MatrixType::name())
+  {
+  }
+
+  virtual ~AMGTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const Index m = 17;
+    const Index d = 2;
+
+    // create a pointstar factory
+    PointstarFactoryFD<DataType, IndexType> psf(m, d);
+
+    // create 5-point star CSR matrix
+    SparseMatrixCSR<Mem::Main, DataType, IndexType> csr_mat(psf.matrix_csr());
+
+    // create a Q2 bubble vector
+    DenseVector<Mem::Main, DataType, IndexType> q2b_vec(psf.vector_q2_bubble());
+
+    // create a UnitFilter
+    FilterType filter(q2b_vec.size());
+
+    // convert to system matrix type
+    MatrixType matrix;
+    matrix.convert(csr_mat);
+
+    // convert bubble vector
+    VectorType vec_ref;
+    vec_ref.convert(q2b_vec);
+
+    // compute rhs vector
+    VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
+    matrix.apply(vec_rhs, vec_ref);
+
+    // initialise sol vector
+    VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
+
+    MatrixType coarse_matrix;
+    FilterType coarse_filter;
+    TransferType transfer;
+    Dist::Comm comm = Dist::Comm::self();
+    AMGFactory<MatrixType, FilterType, TransferType>::new_coarse_level(matrix, filter, 0.8, coarse_matrix, coarse_filter, transfer, &comm);
+    AMGFactory<MatrixType, FilterType, TransferType>::update_coarse_level(matrix, transfer, coarse_matrix);
+
+    //auto solver = Solver::new_pcg(matrix, filter);
+    //test_solver("CG", *solver, vec_sol, vec_ref, vec_rhs, 28);
+  }
+};
+AMGTest<SparseMatrixCSR, Mem::Main, double, unsigned long> amg_csr_generic_double_ulong;
