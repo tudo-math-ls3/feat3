@@ -307,15 +307,16 @@ namespace FEAT
               }
               undecided.clear();
 
-              //second sweep
+              //second sweep, Algorithm 2.6 AmgPhaseII
               //loop over all fine points
-              bool skip;
               for (auto fine_it(fine.begin()) ; fine_it != fine.end() ; )
               {
-                skip = false;
+                bool skip = false;
                 Index i(*fine_it);
                 std::set<Index> c_new;
                 std::set<Index> Si_vs_F;
+
+                //setup Sj_vs_F
                 //loop over all strong influencing points
                 for (auto& depend : depends_on[*fine_it])
                 {
@@ -328,6 +329,7 @@ namespace FEAT
 
                 for (auto& j : Si_vs_F)
                 {
+                  //setup Sj_vs_Si_vs_C
                   std::set<Index> Sj_vs_Si_vs_C;
                   for (auto& k : depends_on[j])
                   {
@@ -336,6 +338,7 @@ namespace FEAT
                       Sj_vs_Si_vs_C.insert(k);
                     }
                   }
+
                   if (Sj_vs_Si_vs_C.size() == 0)
                   {
                     if (c_new.size() != 0)
@@ -343,17 +346,22 @@ namespace FEAT
                       coarse.insert(i);
                       fine_it = fine.erase(fine_it);
                       skip = true;
+                      break; //exit j loop
                     }
                     else
                     {
                       c_new.insert(j);
                     }
                   }
-                  if (skip)
-                    break;
+                }
+                if(c_new.size() == 0)
+                {
+                  ++fine_it;
+                  continue;
                 }
                 if (!skip)
                 {
+                  XASSERT(c_new.size() == 1);
                   coarse.insert(*c_new.begin());
                   if (i != *c_new.begin())
                   {
