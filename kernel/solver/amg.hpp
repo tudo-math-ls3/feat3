@@ -623,7 +623,7 @@ namespace FEAT
           local_matrix_coarse.convert(matrix_coarse_main);
 
           matrix_coarse.local().clone(local_matrix_coarse, LAFEM::CloneMode::Shallow);
-          _adaptive_clone<SystemMatrix_>(coarse_grid_out, matrix_coarse);
+          _adaptive_clone(coarse_grid_out, matrix_coarse);
         }
 
       private:
