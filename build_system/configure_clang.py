@@ -24,6 +24,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
   if major >= 5:
     cxxflags += " -Wcast-qual -Wunused-lambda-capture -Wstrict-prototypes"
 
+  if major >= 6:
+    cxxflags += " -Wtautological-compare"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 
