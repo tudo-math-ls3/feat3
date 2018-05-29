@@ -541,6 +541,31 @@ namespace FEAT
       }
 
       /**
+       * \brief Expand DenseVector to DenseVectorBlocked.
+       *
+       * Inflate the DenseVector to DenseVectorBlocked by filling each complete block with the input scalar vector entry.
+       *
+       * \note The resulting DenseVectorBlocked will have size == DenseVector.size() * BlockSize_.
+       */
+      template <int BlockSize_>
+      DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> inflate_to_blocks()
+      {
+        DenseVector<Mem::Main, DT_, IT_> main;
+        main.convert(*this);
+        DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> result_main(main.size());
+
+        const auto* mp = main.elements();
+        auto* rmp = result_main.template elements<Perspective::native>();
+        for (Index i(0) ; i < main.size() ; ++i)
+        {
+          rmp[i] = typename decltype(result_main)::ValueType(mp[i]);
+        }
+        DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> result;
+        result.convert(result_main);
+        return result;
+      }
+
+      /**
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The vector to be copied (could be of any format; must have same size).
