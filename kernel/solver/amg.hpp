@@ -180,26 +180,26 @@ namespace FEAT
         return transfer;
       }
 
-      template <typename TargetType_, typename InputType_,
-               typename std::enable_if<InputType_::is_global>::type* = nullptr,
-               typename std::enable_if<TargetType_::is_global>::type* = nullptr >
-      static void _adaptive_clone(TargetType_ & output, const InputType_ & input)
+      template <typename TargetType_, typename InputType_>
+      static void _adaptive_clone(TargetType_ & output, const InputType_ & input,
+        typename std::enable_if<InputType_::is_global>::type* = nullptr,
+        typename std::enable_if<TargetType_::is_global>::type* = nullptr)
       {
         output = input.clone(LAFEM::CloneMode::Shallow);
       }
 
-      template <typename TargetType_, typename InputType_,
-               typename std::enable_if<InputType_::is_local>::type* = nullptr,
-               typename std::enable_if<TargetType_::is_local>::type* = nullptr >
-      static void _adaptive_clone(TargetType_ & output, const InputType_ & input)
+      template <typename TargetType_, typename InputType_>
+      static void _adaptive_clone(TargetType_ & output, const InputType_ & input,
+        typename std::enable_if<InputType_::is_local>::type* = nullptr,
+        typename std::enable_if<TargetType_::is_local>::type* = nullptr)
       {
         output = input.clone(LAFEM::CloneMode::Shallow);
       }
 
-      template <typename TargetType_, typename InputType_,
-               typename std::enable_if<InputType_::is_global>::type* = nullptr,
-               typename std::enable_if<TargetType_::is_local>::type* = nullptr >
-      static void _adaptive_clone(TargetType_ & output, const InputType_ & input)
+      template <typename TargetType_, typename InputType_>
+      static void _adaptive_clone(TargetType_ & output, const InputType_ & input,
+        typename std::enable_if<InputType_::is_global>::type* = nullptr,
+        typename std::enable_if<TargetType_::is_local>::type* = nullptr)
       {
         output = input.local().clone(LAFEM::CloneMode::Shallow);
       }
