@@ -243,7 +243,7 @@ namespace FEAT
           std::vector<Index> lambdas(matrix_fine_local.rows(), Index(0));
           for (Index i(0) ; i < matrix_fine_local.rows() ; ++i)
           {
-            lambdas.at(i) = influences[i].size();
+            lambdas.at(i) = Index(influences[i].size());
           }
 
           //designated coarse and fine points and yet undecided
@@ -462,7 +462,7 @@ namespace FEAT
               _interpolate_scalar_matrix_if<!std::is_same<typename LocalTransferOperatorType::MatrixType::ValueType, typename LocalMatrixType::ValueType>::value>
               (matrix_fine_local), coarse, depends_on, vrow_ptr, vcol_ind, vval);
 
-          typename LocalTransferOperatorType::MatrixType::template ContainerTypeByMDI<Mem::Main, DataType, IndexType> prolongation_main(matrix_fine_local.rows(), coarse.size(), vval.size());
+          typename LocalTransferOperatorType::MatrixType::template ContainerTypeByMDI<Mem::Main, DataType, IndexType> prolongation_main(matrix_fine_local.rows(), Index(coarse.size()), Index(vval.size()));
           for (Index i(0) ; i < vrow_ptr.size() ; ++i)
           {
             prolongation_main.row_ptr()[i] = vrow_ptr.at(i);
@@ -498,21 +498,21 @@ namespace FEAT
           GlobalFilterType gnf;
           if (new_filter_entries.size() > 0)
           {
-            typename LocalFilterType::VectorType::template ContainerTypeByMDI<Mem::Main, DataType, Index> uf_values(new_filter_entries.size());
+            typename LocalFilterType::VectorType::template ContainerTypeByMDI<Mem::Main, DataType, Index> uf_values(Index(new_filter_entries.size()));
             uf_values.format(); //can be set to zero, as we are only working on defects and not any actual solution vector
-            LAFEM::DenseVector<Mem::Main, Index, Index> uf_indices(new_filter_entries.size());
+            LAFEM::DenseVector<Mem::Main, Index, Index> uf_indices(Index(new_filter_entries.size()));
             for (Index i(0) ; i < uf_indices.size() ; ++i)
             {
               uf_indices(i, new_filter_entries.at(i));
             }
             //this call would not be valid with a zero sized (but allocated) uf_values vector
-            LocalFilterType uf(coarse.size(), uf_values, uf_indices);
+            LocalFilterType uf(Index(coarse.size()), uf_values, uf_indices);
             GlobalFilterType gnf2(uf.clone(LAFEM::CloneMode::Shallow));
             gnf.convert(gnf2);
           }
           else
           {
-            LocalFilterType uf(coarse.size());
+            LocalFilterType uf(Index(coarse.size()));
             GlobalFilterType gnf2(uf.clone(LAFEM::CloneMode::Shallow));
             gnf.convert(gnf2);
           }
@@ -559,7 +559,7 @@ namespace FEAT
               }
 
               //fill mirror indices
-              gate_coarse->_mirrors.emplace_back(matrix_coarse_main.rows(), mirror_entries.size());
+              gate_coarse->_mirrors.emplace_back(matrix_coarse_main.rows(), Index(mirror_entries.size()));
               auto& coarse_mirror = gate_coarse->_mirrors.back();
               for (Index i(0) ; i < coarse_mirror.num_indices() ; ++i)
               {
@@ -906,7 +906,7 @@ namespace FEAT
                 vval.push_back(omega);
                 vcol_ind.push_back((Index)std::distance(coarse.begin(), coarse.find(*c_it))); //index into coarse vector is index in coarse elements only
               }
-              vrow_ptr.push_back(vrow_ptr.back() + c_i.size());
+              vrow_ptr.push_back(vrow_ptr.back() + Index(c_i.size()));
             }
           }
         }
