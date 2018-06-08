@@ -40,7 +40,7 @@ namespace FEAT
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
-     * This class represents a sparse matrix, that stores its non zero elements in the ELL-C format.\n\n
+     * This class represents a sparse matrix, that stores its non zero elements in the ELL-C format \cite KreutzerHWFB13 .\n\n
      * Data survey: \n
      * _elements[0]: val     - raw non zero number values, stored in ELL-C storage format [val_size]\n
      * _indices[0]:  col_ind - column index per non zero element, stored in same format as val [val_size]\n
