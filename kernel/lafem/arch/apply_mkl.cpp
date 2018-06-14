@@ -29,9 +29,9 @@ void Apply<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, 
   if (r != y)
   {
     MKL_INT one = 1;
-    scopy(&mrows, (float*)y, &one, r, &one);
+    scopy(&mrows, (const float*)y, &one, r, &one);
   }
-  mkl_scsrmv(&trans, &mrows, &mcolumns, (float*)&a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, (float*)&b, r);
+  mkl_scsrmv(&trans, &mrows, &mcolumns, (const float*)&a, matdescra, (const float*) val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const float*)x, (const float*)&b, r);
 }
 
 void Apply<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool transposed)
@@ -51,9 +51,9 @@ void Apply<Mem::Main>::csr_mkl(double * r, const double a, const double * const 
   if (r != y)
   {
     MKL_INT one = 1;
-    dcopy(&mrows, (double*)y, &one, r, &one);
+    dcopy(&mrows, (const double*)y, &one, r, &one);
   }
-  mkl_dcsrmv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, (double*)&b, r);
+  mkl_dcsrmv(&trans, &mrows, &mcolumns, (const double*)&a, matdescra, (const double*)val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const double*)x, (const double*)&b, r);
 }
 
 void Apply<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize)
@@ -71,9 +71,9 @@ void Apply<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x,
   if (r != y)
   {
     MKL_INT one = 1;
-    scopy(&mcopysize, (float*)y, &one, r, &one);
+    scopy(&mcopysize, (const float*)y, &one, r, &one);
   }
-  mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (float*)&a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, (float*)&b, r);
+  mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (const float*)&a, matdescra, (const float*) val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const float*)x, (const float*)&b, r);
 }
 
 void Apply<Mem::Main>::csrb_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize)
@@ -91,9 +91,9 @@ void Apply<Mem::Main>::csrb_mkl(double * r, const double a, const double * const
   if (r != y)
   {
     MKL_INT one = 1;
-    dcopy(&mcopysize, (double*)y, &one, r, &one);
+    dcopy(&mcopysize, (const double*)y, &one, r, &one);
   }
-  mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (double*)&a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, (double*)&b, r);
+  mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (const double*)&a, matdescra, (const double*)val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const double*)x, (const double*)&b, r);
 }
 
 void Apply<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows,
@@ -111,9 +111,9 @@ void Apply<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, 
   if (r != y)
   {
     MKL_INT one = 1;
-    scopy(&mrows, (float*)y, &one, r, &one);
+    scopy(&mrows, (const float*)y, &one, r, &one);
   }
-  mkl_scoomv(&trans, &mrows, &mcolumns, (float*)&a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, (float*)&b, r);
+  mkl_scoomv(&trans, &mrows, &mcolumns, (const float*)&a, matdescra, (const float*)val, (const MKL_INT*)row_ptr, (const MKL_INT*)col_ptr, &ue, (const float*)x, (const float*)&b, r);
 }
 
 void Apply<Mem::Main>::coo_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr,
@@ -131,9 +131,9 @@ void Apply<Mem::Main>::coo_mkl(double * r, const double a, const double * const 
   if (r != y)
   {
     MKL_INT one = 1;
-    dcopy(&mrows, (double*)y, &one, r, &one);
+    dcopy(&mrows, (const double*)y, &one, r, &one);
   }
-  mkl_dcoomv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, (double*)&b, r);
+  mkl_dcoomv(&trans, &mrows, &mcolumns, (const double*)&a, matdescra, (const double*)val, (const MKL_INT*)row_ptr, (const MKL_INT*)col_ptr, &ue, (const double*)x, (const double*)&b, r);
 }
 
 void Apply<Mem::Main>::dense_mkl(float * r, const float alpha, const float beta, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns)
@@ -144,7 +144,7 @@ void Apply<Mem::Main>::dense_mkl(float * r, const float alpha, const float beta,
   if (r != y)
   {
     MKL_INT one = 1;
-    scopy(&mrows, (float*)y, &one, r, &one);
+    scopy(&mrows, (const float*)y, &one, r, &one);
   }
   cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
 }
@@ -157,7 +157,7 @@ void Apply<Mem::Main>::dense_mkl(double * r, const double alpha, const double be
   if (r != y)
   {
     MKL_INT one = 1;
-    dcopy(&mrows, (double*)y, &one, r, &one);
+    dcopy(&mrows, (const double*)y, &one, r, &one);
   }
   cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
 }

@@ -57,7 +57,7 @@ namespace FEAT
         {
 #ifdef FEAT_HAVE_MKL
           if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
-            csrb_mkl(r, a, x, b, y, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
+            csrb_mkl(r, a, x, b, y, val, (const unsigned long*)col_ind, (const unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
           else
             csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
 #else
