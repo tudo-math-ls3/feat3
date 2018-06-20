@@ -218,6 +218,23 @@ namespace FEAT
     }
   }
 
+  void DistFileIO::read_ordered(void* buffer, const std::size_t size, const String& filename, const Dist::Comm& comm)
+  {
+    XASSERT((buffer != nullptr) || (size == std::size_t(0)));
+
+    // open file
+    MPI_Status status;
+    MPI_File file = MPI_FILE_NULL;
+    MPI_File_open(comm.mpi_comm(), filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &file);
+    XASSERTM(file != MPI_FILE_NULL, "failed to open file via MPI_File_open");
+
+    // read buffer via collective
+    MPI_File_read_ordered(file, buffer, int(size), MPI_BYTE, &status);
+
+    // close file
+    MPI_File_close(&file);
+  }
+
   void DistFileIO::write_ordered(const void* buffer, const std::size_t size, const String& filename, const Dist::Comm& comm, bool truncate)
   {
     XASSERT((buffer != nullptr) || (size == std::size_t(0)));
@@ -276,6 +293,28 @@ namespace FEAT
     _write_file(stream, _rankname(pattern, Index(0)), truncate);
   }
 
+  void DistFileIO::read_ordered(void* buffer, const std::size_t size, const String& filename, const Dist::Comm&)
+  {
+    XASSERT((buffer != nullptr) || (size == std::size_t(0)));
+
+    // determine output mode
+    std::ios_base::openmode mode = std::ios_base::in|std::ios_base::binary;
+
+    // open output file
+    std::ifstream ifs(filename, mode);
+    if(!ifs.is_open() || !ifs.good())
+      throw FileNotFound(filename);
+
+    // read buffer
+    if(size > std::size_t(0))
+    {
+      ifs.read(reinterpret_cast<char*>(buffer), std::streamsize(size));
+    }
+
+    // close stream
+    ifs.close();
+  }
+
   void DistFileIO::write_ordered(const void* buffer, const std::size_t size, const String& filename, const Dist::Comm&, bool truncate)
   {
     XASSERT((buffer != nullptr) || (size == std::size_t(0)));
@@ -291,7 +330,10 @@ namespace FEAT
       throw FileNotCreated(filename);
 
     // write buffer
-    ofs.write(reinterpret_cast<const char*>(buffer), std::streamsize(size));
+    if(size > std::size_t(0))
+    {
+      ofs.write(reinterpret_cast<const char*>(buffer), std::streamsize(size));
+    }
 
     // close stream
     ofs.close();

@@ -200,6 +200,31 @@ namespace FEAT
     }
 
     /**
+     * \brief Reads a buffer from a common binary file in rank order.
+     *
+     * \note This function is effectively a wrapper around \b MPI_File_read_ordered.
+     *
+     * \param[out] buffer
+     * A pointer to the binary buffer that is to read into. Must not be \c nullptr.
+     *
+     * \param[in] size
+     * The size of this process's buffer in bytes. May differ on each process.
+     *
+     * \param[in] filename
+     * The name of the common input file. Must be the same on all calling processes.
+     *
+     * \param[in] comm
+     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     */
+    static void read_ordered(void* buffer, const std::size_t size, const String& filename, const Dist::Comm& comm);
+
+    static void read_ordered(void* buffer, const std::size_t size, const String& filename)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      read_ordered(buffer, size, filename, comm);
+    }
+
+    /**
      * \brief Writes a buffer into a common binary file in rank order.
      *
      * This function write a single common binary file, where the individual processes
