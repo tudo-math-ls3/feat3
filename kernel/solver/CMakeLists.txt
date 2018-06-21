@@ -50,6 +50,7 @@ endif(FEAT_HAVE_CUDA)
 
 # list of solver tests
 SET (test_list
+  amg-test
   basic_solver-test
   cusolver-test
   optimiser-test
