@@ -121,6 +121,23 @@ namespace FEAT
         return _gate->sync_1_async(_vector);
       }
 
+      /**
+       * \brief Gets the total number of elements in this vector
+       *
+       * \warning In parallel, this requires communication and is very expensive, so use sparingly!
+       * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
+       *
+       * \returns The number of elements
+       */
+      Index rows() const
+      {
+        // Compute total number of rows
+        auto vec_l = clone();
+        vec_l.format(DataType(1));
+
+        return Index(vec_l.norm2sqr());
+      }
+
       Vector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return Vector(_gate, _vector.clone(mode));

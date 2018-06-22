@@ -151,7 +151,7 @@ namespace FEAT
        * \warning In parallel, this requires communication and is very expensive, so use sparingly!
        * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
        *
-       * \returns The number of colums
+       * \returns The number of rows
        */
       Index rows() const
       {
