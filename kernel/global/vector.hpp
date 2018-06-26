@@ -129,7 +129,7 @@ namespace FEAT
        *
        * \returns The number of elements
        */
-      Index rows() const
+      Index size() const
       {
         // Compute total number of rows
         auto vec_l = clone();
