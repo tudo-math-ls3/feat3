@@ -2,7 +2,7 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/trafo/standard/mapping.hpp>

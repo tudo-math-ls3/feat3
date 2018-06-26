@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_UNIT_CUBE_PATCH_GENERATOR_HPP 1
 
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 

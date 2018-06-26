@@ -2,7 +2,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>

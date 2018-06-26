@@ -249,6 +249,28 @@ namespace FEAT
         return _index_set_holder.template get_index_set<cell_dim_, face_dim_>();
       }
 
+      /// \cond internal
+      IndexSetHolderType& get_index_set_holder()
+      {
+        return _index_set_holder;
+      }
+
+      const IndexSetHolderType& get_index_set_holder() const
+      {
+        return _index_set_holder;
+      }
+
+      IndexSetHolderType* get_topology()
+      {
+        return &_index_set_holder;
+      }
+
+      const IndexSetHolderType* get_topology() const
+      {
+        return &_index_set_holder;
+      }
+      /// \endcond
+
       /**
        * \brief Returns the name of the class.
        * \returns

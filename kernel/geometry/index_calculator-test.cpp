@@ -1,6 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/test_aux/index_calculator_meshes.hpp>
 #include <kernel/geometry/test_aux/tetris_hexa.hpp>
 #include <kernel/geometry/test_aux/standard_tetra.hpp>

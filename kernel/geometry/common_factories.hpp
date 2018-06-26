@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP
-#define KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP 1
+#ifndef KERNEL_GEOMETRY_COMMON_FACTORIES_HPP
+#define KERNEL_GEOMETRY_COMMON_FACTORIES_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/mesh_part.hpp>
@@ -27,7 +27,7 @@ namespace FEAT
     /// \cond internal
     template<typename Coord_>
     class UnitCubeFactory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> >
+      public Factory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> >
     {
       public:
         /// mesh type
@@ -64,7 +64,7 @@ namespace FEAT
 
     template<typename Coord_>
     class UnitCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
+      public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
     {
       public:
         /// shape type
@@ -145,7 +145,7 @@ namespace FEAT
 
     template<typename Coord_>
     class UnitCubeFactory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> >
+      public Factory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> >
     {
       public:
         /// shape type
@@ -288,7 +288,7 @@ namespace FEAT
      */
     template<typename Coord_, int dim_>
     class UnitCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
+      public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
     {
       public:
         /// mesh type
@@ -340,6 +340,56 @@ namespace FEAT
 
     };
     /// \endcond
+
+
+    template<int dim_, typename Coord_>
+    class UnitCubeFactory< StructuredMesh<dim_, dim_, Coord_> > :
+      public Factory< StructuredMesh<dim_, dim_, Coord_> >
+    {
+    public:
+      /// shape type
+      typedef Shape::Hypercube<dim_> ShapeType;
+      /// mesh type
+      typedef StructuredMesh<dim_, dim_, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+
+    protected:
+      const Index _level;
+
+    public:
+      explicit UnitCubeFactory(Index level = Index(0)) :
+        _level(level)
+      {
+      }
+
+      virtual Index get_num_slices(int DOXY(dir)) override
+      {
+        return (Index(1) << _level); // = 2^level in each direction
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        // coordinate scaling factor
+        const Coord_ sc = Coord_(1) / Coord_(Index(1) << _level); // = 2^{-level}
+
+        // number of vertices in each direction
+        const Index nx = (Index(1) << _level) + Index(1); // = 2^level + 1
+
+        // total number of vertices = nx ^ dim
+        const Index nv = vertex_set.get_num_vertices();
+
+        for(Index i(0); i < nv; ++i)
+        {
+          Index k = i;
+          auto& v = vertex_set[i];
+          for(int j(0); j < dim_; ++j, k /= nx)
+          {
+            v[j] = Coord_(k % nx) * sc;
+          }
+        }
+      }
+    };
 
     /**
      * \brief Refine mesh factory
@@ -802,4 +852,4 @@ namespace FEAT
   } // namespace Geometry
 } // namespace FEAT
 
-#endif // KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP
+#endif // KERNEL_GEOMETRY_COMMON_FACTORIES_HPP

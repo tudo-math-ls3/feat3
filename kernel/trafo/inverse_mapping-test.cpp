@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/util/math.hpp>

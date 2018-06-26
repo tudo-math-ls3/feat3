@@ -127,7 +127,7 @@ namespace FEAT
         {
           static constexpr int shape_dim(Shape_::dimension);
           const Index num_cells(mesh.get_num_entities(shape_dim));
-          const IndexSet<Shape::FaceTraits<Shape_, 0>::count> &index_set(mesh.template get_index_set<shape_dim,0>());
+          const auto& index_set(mesh.template get_index_set<shape_dim,0>());
           trg[shape_dim].reserve(num_cells);
           for(Index i(0); i < num_cells; ++i)
           {

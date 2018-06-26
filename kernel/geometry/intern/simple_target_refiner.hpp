@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_INTERN_STANDARD_SUBSET_REFINER_HPP
-#define KERNEL_GEOMETRY_INTERN_STANDARD_SUBSET_REFINER_HPP 1
+#ifndef KERNEL_GEOMETRY_INTERN_SIMPLE_TARGET_REFINER_HPP
+#define KERNEL_GEOMETRY_INTERN_SIMPLE_TARGET_REFINER_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/target_set.hpp>
@@ -17,7 +17,7 @@ namespace FEAT
       template<
         typename Shape_,
         int cell_dim_>
-      struct SubSetRefiner
+      struct SimpleTargetRefiner
       {
         typedef Shape_ ShapeType;
         typedef TargetSet TargetSetType;
@@ -50,7 +50,7 @@ namespace FEAT
         typename Shape_,
         int cell_dim_,
         int shape_dim_ = Shape_::dimension>
-      struct SubSetRefineShapeWrapper
+      struct SimpleTargetRefineShapeWrapper
       {
         typedef Shape_ ShapeType;
         typedef TargetSet TargetSetType;
@@ -63,7 +63,7 @@ namespace FEAT
         {
           // recursive call of SubSetRefineShapeWrapper
           typedef typename Shape::FaceTraits<ShapeType, shape_dim_ - 1>::ShapeType FacetType;
-          Index offset = SubSetRefineShapeWrapper<FacetType, cell_dim_>::refine(
+          Index offset = SimpleTargetRefineShapeWrapper<FacetType, cell_dim_>::refine(
             target_set_out,
             index_offsets,
             target_set_holder_in);
@@ -72,7 +72,7 @@ namespace FEAT
           const TargetSetType& target_set_in = target_set_holder_in.template get_target_set<shape_dim_>();
 
           // call subset refiner
-          SubSetRefiner<ShapeType, cell_dim_>::refine(
+          SimpleTargetRefiner<ShapeType, cell_dim_>::refine(
             target_set_out,
             offset,
             index_offsets,
@@ -87,7 +87,7 @@ namespace FEAT
       template<
         typename Shape_,
         int cell_dim_>
-      struct SubSetRefineShapeWrapper<Shape_, cell_dim_, cell_dim_>
+      struct SimpleTargetRefineShapeWrapper<Shape_, cell_dim_, cell_dim_>
       {
         typedef Shape_ ShapeType;
         typedef TargetSet TargetSetType;
@@ -103,7 +103,7 @@ namespace FEAT
           const TargetSetType& target_set_in = target_set_holder_in.template get_target_set<cell_dim_>();
 
           // call subset refiner
-          SubSetRefiner<ShapeType, cell_dim_>::refine(
+          SimpleTargetRefiner<ShapeType, cell_dim_>::refine(
             target_set_out,
             0,
             index_offsets,
@@ -118,7 +118,7 @@ namespace FEAT
       template<
         typename Shape_,
         int cell_dim_ = Shape_::dimension>
-      struct SubSetRefineWrapper
+      struct SimpleTargetRefineWrapper
       {
         typedef Shape_ ShapeType;
         typedef TargetSet TargetSetType;
@@ -132,7 +132,7 @@ namespace FEAT
           const TargetSetHolderTypeIn& target_set_holder_in)
         {
           // recursive call of SubSetRefineWrapper
-          SubSetRefineWrapper<ShapeType, cell_dim_ - 1>::refine(
+          SimpleTargetRefineWrapper<ShapeType, cell_dim_ - 1>::refine(
             target_set_holder_out,
             num_entities_trg,
             target_set_holder_in);
@@ -145,7 +145,7 @@ namespace FEAT
           TargetSet& target_set_out = target_set_holder_out.template get_target_set<cell_dim_>();
 
           // call shape wrapper
-          SubSetRefineShapeWrapper<ShapeType, cell_dim_>::refine(
+          SimpleTargetRefineShapeWrapper<ShapeType, cell_dim_>::refine(
             target_set_out,
             index_offsets,
             target_set_holder_in);
@@ -153,7 +153,7 @@ namespace FEAT
       };
 
       template<typename Shape_>
-      struct SubSetRefineWrapper<Shape_, 0>
+      struct SimpleTargetRefineWrapper<Shape_, 0>
       {
         typedef Shape_ ShapeType;
         typedef TargetSet TargetSetType;
@@ -174,7 +174,7 @@ namespace FEAT
           TargetSet& target_set_out = target_set_holder_out.template get_target_set<0>();
 
           // call shape wrapper
-          SubSetRefineShapeWrapper<ShapeType, 0>::refine(
+          SimpleTargetRefineShapeWrapper<ShapeType, 0>::refine(
             target_set_out,
             index_offsets,
             target_set_holder_in);
@@ -185,4 +185,4 @@ namespace FEAT
   } // namespace Geometry
 } // namespace FEAT
 
-#endif // KERNEL_GEOMETRY_INTERN_STANDARD_SUBSET_REFINER_HPP
+#endif // KERNEL_GEOMETRY_INTERN_SIMPLE_TARGET_REFINER_HPP

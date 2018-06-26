@@ -2,7 +2,7 @@
 #include <kernel/util/runtime.hpp>                         // for Runtime
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
+#include <kernel/geometry/common_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 #include <kernel/geometry/hit_test_factory.hpp>

@@ -5,7 +5,7 @@
 #include <kernel/space/dof_mapping_renderer.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/util/math.hpp>
 
 using namespace FEAT;

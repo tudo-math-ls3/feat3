@@ -31,7 +31,7 @@ namespace FEAT
     {
       static_assert(num_indices_ > 0, "invalid number of indices");
 
-      /// number of indices per entry
+      /// number of indices per tuple
       static constexpr int num_indices = num_indices_;
 
       /// indices array
@@ -167,13 +167,13 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns a reference to an index vector.
+       * \brief Returns a reference to an index tuple.
        *
        * \param[in] i
-       * The index of the entity whose index vector is to be returned.
+       * The index of the entity whose index tuple is to be returned.
        *
        * \returns
-       * A (const) reference to the index vector of the entity.
+       * A (const) reference to the index tuple of the entity.
        */
       IndexTupleType& operator[](Index i)
       {

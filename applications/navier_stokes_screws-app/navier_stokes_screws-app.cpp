@@ -8,7 +8,7 @@
 #include <kernel/assembly/grad_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>

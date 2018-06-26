@@ -1,4 +1,4 @@
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_eps.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_node.hpp>

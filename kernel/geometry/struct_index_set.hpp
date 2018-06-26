@@ -86,6 +86,43 @@ namespace FEAT
         }
       }; // class ImageIterator
 
+      /**
+       * \brief Index tuple class for structured meshes
+       */
+      class IndexTupleType
+      {
+      public:
+        /// number of indices per tuple
+        static constexpr int num_indices = StructIndexSet::num_indices;
+
+      private:
+        /// pointer to num_slices array of the index-set
+        const Index* _num_slices;
+        /// cell index
+        Index _i;
+
+      public:
+        /// default constructor
+        IndexTupleType() :
+          _num_slices(nullptr),
+          _i(0)
+        {
+        }
+
+        /// constructor
+        explicit IndexTupleType(const Index* num_slices, Index i) :
+          _num_slices(num_slices),
+          _i(i)
+        {
+        }
+
+        /// access operator
+        Index operator[](int j) const
+        {
+          return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(_i, Index(j), _num_slices);
+        }
+      }; // class IndexTupleType
+
     private:
       /// number of slices
       Index _num_slices[shape_dim_];
@@ -145,6 +182,21 @@ namespace FEAT
       Index get_index_bound() const
       {
         return _index_bound;
+      }
+
+      /**
+       * \brief Returns an index tuple.
+       *
+       * \param[in] i
+       * The index of the entity whose index tuple is to be returned.
+       *
+       * \returns
+       * The index tuple of the entity.
+       */
+      IndexTupleType operator[](Index i) const
+      {
+        ASSERT(i < Index(_num_entities));
+        return IndexTupleType(_num_slices, i);
       }
 
       /**

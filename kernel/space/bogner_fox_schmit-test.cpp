@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>

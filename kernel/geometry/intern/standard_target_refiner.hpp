@@ -40,9 +40,10 @@ namespace FEAT
             target_set_out[i] = index_offsets[0] + target_set_in[offset + i];
           }
 
-          return num_verts;;
+          return num_verts;
         }
       };
+
       /**
         * \brief StandardTargetRefiner implementation for Simplex<...> shape: Vertex indices
         *

@@ -12,50 +12,43 @@ namespace FEAT
   namespace Geometry
   {
     /**
-     * \brief BoundaryFactory class template
-     */
-    template<typename Mesh_>
-    class BoundaryFactory DOXY({});
-
-    /**
-     * \brief BoundaryFactory implementation for ConformalMesh
+     * \brief BoundaryFactory implementation
      *
-     * The boundary factory is a MeshPart factory, which creates a MeshPart without topology containing all boundary
-     * faces for a given conformal mesh.
+     * The boundary factory is a MeshPart factory, which creates a MeshPart without
+     * topology containing all boundary faces for a given conformal mesh.
      *
      * \author Peter Zajac
      */
-    template<
-      typename Shape_,
-      int num_coords_,
-      typename Coord_>
-    class BoundaryFactory<ConformalMesh<Shape_, num_coords_, Coord_> > :
-      public Factory<MeshPart<ConformalMesh<Shape_, num_coords_, Coord_>>>
+    template<typename ParentMesh_>
+    class BoundaryFactory :
+      public Factory<MeshPart<ParentMesh_>>
     {
     public:
       /// Our base class
-      typedef Factory<MeshPart<ConformalMesh<Shape_, num_coords_, Coord_>>> BaseClass;
-      /// the input mesh type
-      typedef ConformalMesh<Shape_, num_coords_, Coord_> InputMeshType;
+      typedef Factory<MeshPart<ParentMesh_>> BaseClass;
+      /// the parent mesh type
+      typedef ParentMesh_ ParentMeshType;
       /// The MeshPart type
-      typedef MeshPart<InputMeshType> MeshType;
+      typedef MeshPart<ParentMeshType> MeshType;
+      /// the shape type
+      typedef typename MeshType::ShapeType ShapeType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
     private:
       /// a reference to the input mesh
-      const InputMeshType& _mesh_in;
+      const ParentMeshType& _mesh_in;
       /// a boundary face computer object for the dirty work
-      Intern::BoundaryFaceComputer<Shape_> _face_computer;
+      Intern::BoundaryFaceComputer<ShapeType> _face_computer;
 
     public:
       /**
        * \brief Constructor
        *
        * \param[in] mesh_in
-       * The mesh for which the boundary cellset is to be computed.
+       * The mesh for which the boundary meshpart is to be computed.
        */
-      explicit BoundaryFactory(const InputMeshType& mesh_in) :
+      explicit BoundaryFactory(const ParentMeshType& mesh_in) :
         _mesh_in(mesh_in),
         _face_computer(mesh_in.get_index_set_holder())
       {
@@ -83,7 +76,7 @@ namespace FEAT
         _face_computer.fill_target_sets(target_set_holder);
       }
 
-    }; // BoundaryFactory<ConformalMesh<...>>
+    }; // class BoundaryFactory<...>
   } // namespace Geometry
 } // namespace FEAT
 

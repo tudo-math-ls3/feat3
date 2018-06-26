@@ -1,7 +1,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_file_writer.hpp>

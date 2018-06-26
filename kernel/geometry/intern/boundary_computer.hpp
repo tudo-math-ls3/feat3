@@ -31,17 +31,13 @@ namespace FEAT
         /// a vector of all (cell_dim_-1)-dimensional boundary face indices
         std::vector<Index> _faces;
 
-        void compute(const IndexSetHolder<Shape_>& index_set_holder, const std::vector<Index>& facets)
+        template<typename ParentIndexSetHolder_>
+        void compute(const ParentIndexSetHolder_& index_set_holder, const std::vector<Index>& facets)
         {
           // In this function, we compute all (cell_dim_-1)-dimensional faces of the mesh, which
           // are adjacent to at least one of the boundary facets given in the facets vector.
 
-          // technical typedef mumbo-jumbo
-          typedef typename Shape::FaceTraits<Shape_, shape_dim_-1>::ShapeType FacetType;
-          static constexpr int faces_per_facet = Shape::FaceTraits<FacetType, cell_dim_-1>::count;
-          typedef IndexSet<faces_per_facet> FaceIndexSet;
-
-          const FaceIndexSet& face_index_set = index_set_holder.template get_index_set<shape_dim_-1, cell_dim_-1>();
+          const auto& face_index_set = index_set_holder.template get_index_set<shape_dim_-1, cell_dim_-1>();
 
           // allocate a temporary vector; this stores the number of cells adjacent to each facet
           std::vector<Index> caf(face_index_set.get_index_bound(), Index(0));
@@ -108,18 +104,15 @@ namespace FEAT
         std::vector<Index> _faces;
 
       public:
-        explicit BoundaryFaceComputer(const IndexSetHolder<Shape_>& index_set_holder)
+        template<typename ParentIndexSetHolder_>
+        explicit BoundaryFaceComputer(const ParentIndexSetHolder_& index_set_holder)
         {
           // Phase 1:
           // Compute all facets, i.e. (n-1)-dimensional faces, which reside on the boundary.
           // We do this by computing how many cells are adjacent to a particular facet.
           // If the number of cells is exactly 1, the facet is a boundary facet.
 
-          // technical typedef mumbo-jumbo
-          static constexpr int facets_per_cell = Shape::FaceTraits<Shape_, shape_dim_-1>::count;
-          typedef IndexSet<facets_per_cell> FacetIndexSet;
-
-          const FacetIndexSet& face_index_set = index_set_holder.template get_index_set<shape_dim_, shape_dim_-1>();
+          const auto& face_index_set = index_set_holder.template get_index_set<shape_dim_, shape_dim_-1>();
 
           // allocate a temporary vector; this stores the number of cells adjacent to each facet
           std::vector<Index> caf(face_index_set.get_index_bound(), Index(0));
@@ -182,7 +175,8 @@ namespace FEAT
       class BoundaryFaceComputer<Shape_, shape_dim_, 0>
       {
       protected:
-        void compute(const IndexSetHolder<Shape_>&, const std::vector<Index>&)
+        template<typename ParentIndexSetHolder_>
+        void compute(const ParentIndexSetHolder_&, const std::vector<Index>&)
         {
           // dummy
         }

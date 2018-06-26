@@ -6,7 +6,7 @@
 #include <kernel/analytic/wrappers.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>

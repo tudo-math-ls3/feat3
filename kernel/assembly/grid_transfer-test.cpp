@@ -1,7 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/cro_rav_ran_tur/element.hpp>

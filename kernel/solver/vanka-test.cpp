@@ -1,6 +1,6 @@
 #include <test_system/test_system.hpp>
 
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/unit_cube_patch_generator.hpp>
 #include <kernel/trafo/standard/mapping.hpp>

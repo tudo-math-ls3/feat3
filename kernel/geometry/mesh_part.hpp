@@ -3,34 +3,27 @@
 #define KERNEL_GEOMETRY_MESH_PART_HPP 1
 
 // includes, FEAT
-#include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/geometry/index_calculator.hpp>
 #include <kernel/geometry/attribute_set.hpp>
+#include <kernel/geometry/intern/simple_target_refiner.hpp>
+#include <kernel/geometry/intern/standard_target_refiner.hpp>
+#include <kernel/geometry/intern/structured_target_refiner.hpp>
 #include <kernel/geometry/intern/standard_attrib_refiner.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
-#include <kernel/geometry/intern/standard_subset_refiner.hpp>
-#include <kernel/geometry/intern/standard_target_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
+#include <kernel/geometry/intern/index_set_filler.hpp>
+#include <kernel/geometry/intern/target_set_computer.hpp>
 
+// includes, system
 #include<map>
 
 namespace FEAT
 {
   namespace Geometry
   {
-    /// \cond internal
-    namespace Intern
-    {
-      // Forward declarations
-      template<int, int>
-      struct TargetSetComputer;
-
-      template<int>
-      struct IndexSetFiller;
-    }
-    /// \endcond
-
     /**
      * \brief Class template for partial meshes
      *
@@ -82,33 +75,21 @@ namespace FEAT
      * MeshPart, which is correct in terms of mesh topology, but the MeshPart then no longer represents the set of
      * patch cross points.
      *
+     * \note This template works for both ConformalMesh as well as StructuredMesh meshes.
+     *
+     * \author Jordi Paul
+     * \author Peter Zajac
      */
     template<typename MeshType_>
-    class MeshPart DOXY({});
-
-    /**
-     * \brief MeshPart Implementation for conformal meshes
-     *
-     * \tparam ShapeType_
-     * Shape type of the ConformalMesh this Meshpart refers to.
-     *
-     * \tparam num_coords_
-     * Number of coordinates per vertex
-     *
-     * \tparam Coord_
-     * Data type for vertex coordinates, i.e. double
-     *
-     * \copydoc MeshPart
-     *
-     */
-    template<typename ShapeType_, int num_coords_, typename Coord_>
-    class MeshPart<ConformalMesh<ShapeType_, num_coords_, Coord_>>
+    class MeshPart
     {
       public:
+        /// parent Mesh type
+        typedef MeshType_ MeshType;
         /// Shape type
-        typedef ShapeType_ ShapeType;
-        /// Mesh type
-        typedef ConformalMesh<ShapeType, num_coords_, Coord_> MeshType;
+        typedef typename MeshType::ShapeType ShapeType;
+        /// Topology (aka IndexSetHolder) of parent mesh type
+        typedef typename MeshType::IndexSetHolderType ParentIndexSetHolderType;
         /// Index set holder type
         typedef IndexSetHolder<ShapeType> IndexSetHolderType;
         /// Target set holder type
@@ -477,8 +458,8 @@ namespace FEAT
          * preprocessing only.
          *
          */
-        template<int end_dim_, int current_dim_ = ShapeType_::dimension>
-        void deduct_target_sets_from_bottom(const IndexSetHolderType& parent_ish)
+        template<int end_dim_, int current_dim_ = ShapeType::dimension>
+        void deduct_target_sets_from_bottom(const ParentIndexSetHolderType& parent_ish)
         {
           Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_ish);
 
@@ -504,7 +485,7 @@ namespace FEAT
          *
          */
         template<int end_dim_, int current_dim_ = 0>
-        void deduct_target_sets_from_top(const IndexSetHolderType& parent_ish)
+        void deduct_target_sets_from_top(const ParentIndexSetHolderType& parent_ish)
         {
           Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_ish);
 
@@ -523,16 +504,16 @@ namespace FEAT
          * preprocessing only.
          *
          */
-        void deduct_topology(const IndexSetHolderType& parent_ish)
+        void deduct_topology(const ParentIndexSetHolderType& parent_ish)
         {
           if(_index_set_holder == nullptr)
             _index_set_holder = new IndexSetHolderType(_num_entities);
 
-          Intern::IndexSetFiller<ShapeType_::dimension>::fill_ish(
+          Intern::IndexSetFiller<ShapeType::dimension>::fill_ish(
             *_index_set_holder, _target_set_holder, parent_ish);
 
           // build redundant index sets
-          RedundantIndexSetBuilder<ShapeType_>::compute(*_index_set_holder);
+          RedundantIndexSetBuilder<ShapeType>::compute(*_index_set_holder);
 
         }
     }; // class MeshPart<ConformalMesh<Shape_>>
@@ -602,9 +583,18 @@ namespace FEAT
 
     }; // class Factory<MeshPart<...>>
 
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename ParentMesh_>
+      struct TargetSetRefineParentWrapper;
+    }
+    /// \endcond
+
     /**
      * \brief StandardRefinery implementation for MeshPart
      *
+     * \author Jordi Paul
      * \author Peter Zajac
      */
     template<typename ParentMesh_>
@@ -630,36 +620,38 @@ namespace FEAT
 
       protected:
         /// coarse mesh reference
-        const MeshType& _coarse_mesh;
-        /// coarse parent reference
-        //const ParentType& _parent;
-        const IndexSetHolderType* _parent_topology;
+        const MeshType& _coarse_meshpart;
+        /// coarse parent mesh reference
+        const ParentMesh_* _parent_mesh;
+        /// coarse parent mesh-part reference
+        const MeshType* _parent_meshpart;
         /// number of entities for coarse mesh
         Index _num_entities_coarse[shape_dim + 1];
         /// number of entities for fine mesh
         Index _num_entities_fine[shape_dim + 1];
-        /// number of entities in parent
-        Index _num_entities_parent[shape_dim + 1];
 
       public:
         /**
          * \brief Constructor.
          *
-         * \param[in] coarse_mesh
+         * Use this constructor if the meshpart, which is to be refined, is defined on the
+         * root mesh (and not on another meshpart).
+         *
+         * \param[in] coarse_meshpart
          * A reference to the coarse mesh that is to be refined.
          *
-         * \param[in] parent
+         * \param[in] parent_mesh
          * A reference to the coarse parent mesh.
          */
-        explicit StandardRefinery(const MeshType& coarse_mesh, const ParentMesh_& parent) :
-          _coarse_mesh(coarse_mesh),
-          _parent_topology(parent.get_topology())
+        explicit StandardRefinery(const MeshType& coarse_meshpart, const ParentMesh_& parent_mesh) :
+          _coarse_meshpart(coarse_meshpart),
+          _parent_mesh(&parent_mesh),
+          _parent_meshpart(nullptr)
         {
           // get number of entities in coarse mesh
           for(int i(0); i <= shape_dim; ++i)
           {
-            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
-            _num_entities_parent[i] = parent.get_num_entities(i);
+            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_meshpart.get_num_entities(i);
           }
 
           // calculate number of entities in fine mesh
@@ -669,21 +661,24 @@ namespace FEAT
         /**
          * \brief Constructor.
          *
-         * \param[in] coarse_mesh
+         * Use this constructor if the meshpart, which is to be refined, is defined on
+         * another meshpart (and not on the root mesh).
+         *
+         * \param[in] coarse_meshpart
          * A reference to the coarse mesh that is to be refined.
          *
-         * \param[in] parent
+         * \param[in] parent_meshpart
          * A reference to the coarse parent mesh part.
          */
-        explicit StandardRefinery(const MeshType& coarse_mesh, const MeshPart<ParentMesh_>& parent) :
-          _coarse_mesh(coarse_mesh),
-          _parent_topology(parent.get_topology())
+        explicit StandardRefinery(const MeshType& coarse_meshpart, const MeshPart<ParentMesh_>& parent_meshpart) :
+          _coarse_meshpart(coarse_meshpart),
+          _parent_mesh(nullptr),
+          _parent_meshpart(&parent_meshpart)
         {
           // get number of entities in coarse mesh
           for(int i(0); i <= shape_dim; ++i)
           {
-            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
-            _num_entities_parent[i] = parent.get_num_entities(i);
+            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_meshpart.get_num_entities(i);
           }
 
           // calculate number of entities in fine mesh
@@ -719,26 +714,26 @@ namespace FEAT
         virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
         {
           // Attributes of shape dimension 0 only make sense if we have a mesh topology
-          if(_coarse_mesh.has_topology())
+          if(!_coarse_meshpart.has_topology())
+            return;
+
+          // Iterate over the attributes in the coarse mesh
+          typename MeshType::AttributeSetConstIterator it(_coarse_meshpart.get_mesh_attributes().begin());
+          typename MeshType::AttributeSetConstIterator jt(_coarse_meshpart.get_mesh_attributes().end());
+
+          for(; it != jt; ++it)
           {
-            // Iterate over the attributes in the coarse mesh
-            typename MeshType::AttributeSetConstIterator it(_coarse_mesh.get_mesh_attributes().begin());
-            typename MeshType::AttributeSetConstIterator jt(_coarse_mesh.get_mesh_attributes().end());
+            // Create a new empty attribute of the desired size
+            AttributeType* refined_attribute = new AttributeType(
+              get_num_entities(0), it->second->get_dimension());
 
-            for(; it != jt; ++it)
-            {
-              // Create a new empty attribute of the desired size
-              AttributeType* refined_attribute = new AttributeType(
-                get_num_entities(0), it->second->get_dimension());
+            // Refine the attribute in the coarse mesh and write the result to the new attribute
+            Intern::StandardAttribRefineWrapper<ShapeType, AttributeType>
+              ::refine(*refined_attribute, *(it->second), *_coarse_meshpart.get_topology());
 
-              // Refine the attribute in the coarse mesh and write the result to the new attribute
-              Intern::StandardAttribRefineWrapper<ShapeType, AttributeType>
-                ::refine(*refined_attribute, *(it->second), *_coarse_mesh.get_topology());
-
-              // Add the attribute to the corresponding set
-              if(!(attribute_container.insert(std::make_pair(it->first, refined_attribute))).second)
-                throw InternalError(__func__,__FILE__,__LINE__,"Error refining attribute "+it->first);
-            }
+            // Add the attribute to the corresponding set
+            if(!(attribute_container.insert(std::make_pair(it->first, refined_attribute))).second)
+              throw InternalError(__func__,__FILE__,__LINE__,"Error refining attribute "+it->first);
           }
         }
 
@@ -753,16 +748,14 @@ namespace FEAT
           XASSERT(index_set_holder == nullptr);
 
           // Only create the topology for the refined mesh if the coarse mesh has a topology
-          if(_coarse_mesh.has_topology())
-          {
-            if(index_set_holder != nullptr)
-              delete index_set_holder;
+          if(!_coarse_meshpart.has_topology())
+            return;
 
-            index_set_holder = new IndexSetHolderType(_num_entities_fine);
-            // refine indices
-            Intern::IndexRefineWrapper<ShapeType>
-              ::refine(*index_set_holder, _num_entities_coarse, *_coarse_mesh.get_topology());
-          }
+          index_set_holder = new IndexSetHolderType(_num_entities_fine);
+
+          // refine indices
+          Intern::IndexRefineWrapper<ShapeType>::refine(
+            *index_set_holder, _num_entities_coarse, *_coarse_meshpart.get_topology());
         }
 
         /**
@@ -773,17 +766,23 @@ namespace FEAT
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
-          // refine target indices
-         const IndexSetHolderType* coarse_ish(_coarse_mesh.get_topology());
-
-         // The refinement is different depending on the coarse mesh having a mesh topology
-         if(_coarse_mesh.has_topology())
-           Intern::TargetRefineWrapper<ShapeType>
-             ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder(),
-             *coarse_ish, *_parent_topology);
-         else
-           Intern::SubSetRefineWrapper<ShapeType>
-             ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder());
+          // We have to use a helper class here, because the target set refinement
+          // depends heavily on the underlying mesh type. For this, we first need
+          // to check whether our parent is the root mesh or another mesh-part.
+          if(_parent_mesh != nullptr)
+          {
+            // the parent is the root mesh
+            Intern::TargetSetRefineParentWrapper<ParentMesh_>::fill_target_sets(target_set_holder,
+              _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_mesh);
+          }
+          else if(_parent_meshpart != nullptr)
+          {
+            // the parent is a mesh-part
+            Intern::TargetSetRefineParentWrapper<ParentMesh_>::fill_target_sets(target_set_holder,
+              _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_meshpart);
+          }
+          else
+            throw INTERNAL_ERROR("no parent present");
         }
 
     }; // class StandardRefinery<MeshPart<...>,...>
@@ -792,263 +791,115 @@ namespace FEAT
     namespace Intern
     {
       /**
-       * \brief Wrapper class for filling TargetSetHolder objects
-       *
-       * \tparam end_dim_
-       * Dimension to stop the template recursion at.
-       *
-       * \tparam current_dim_
-       * Dimension for which a new container is filled.
-       *
-       * \author Jordi Paul
-       *
+       * \brief Specialisation for ConformalMesh
        */
-      template<int end_dim_, int current_dim_>
-      struct TargetSetComputer
+      template<typename Shape_, int num_coords_, typename Coord_>
+      struct TargetSetRefineParentWrapper<ConformalMesh<Shape_, num_coords_, Coord_>>
       {
-        /**
-         * \brief Fills a TargetSetHolder from bottom to top using information from an IndexSetHolder
-         *
-         * The IndexSetHolder contains the topology of the parent mesh that the TargetSetHolder refers to.
-         *
-         * \tparam TargetSetHolderType
-         * Type of the TargetSetHolder to be filled.
-         *
-         * \tparam IndexSetHolderType
-         * Type containing mesh topology information.
-         *
-         */
-        template<typename TargetSetHolderType, typename IndexSetHolderType>
-        static void bottom_to_top(TargetSetHolderType& _target_set_holder, const IndexSetHolderType& parent_ish)
+        static constexpr int shape_dim = Shape_::dimension;
+
+        // Note: This functions works for both mesh parents and mesh-part parents.
+        template<typename TargetSetHolderType_, typename IndexSetHolder_, typename Parent_>
+        static void fill_target_sets(
+          TargetSetHolderType_& target_set_holder,
+          const TargetSetHolderType_& coarse_target_set_holder,
+          const IndexSetHolder_* coarse_ish,
+          const Parent_& parent)
         {
-          // Template recursion: Call the lower dimensional version first
-          TargetSetComputer<end_dim_, current_dim_-1>::template bottom_to_top(_target_set_holder, parent_ish);
+          // get number of parent entities
+          Index num_entities_parent[shape_dim+1];
+          for(int i(0); i <= shape_dim; ++i)
+            num_entities_parent[i] = parent.get_num_entities(i);
 
-          typedef typename IndexSetHolderType::template IndexSet<current_dim_, current_dim_-1>::Type ParentIndexSetType;
-
-          // TargetSet to fill
-          TargetSet& my_target_set(_target_set_holder.template get_target_set<current_dim_>());
-
-          // Only do something if the target set is still empty
-          if(my_target_set.get_num_entities() == 0)
+          if(coarse_ish != nullptr)
           {
-            // Lower dimensional target set known to exist
-            TargetSet& ts_below(_target_set_holder.template get_target_set<current_dim_-1>());
-
-            // Indexset for entities of dimension current_dim_-1 at entities of dimension current_dim_
-            const ParentIndexSetType& is_parent_below(parent_ish.template get_index_set<current_dim_, current_dim_-1>());
-            // IndexSet for storing the indices of the MeshPart entities lying at entities of the parent
-            ParentIndexSetType lower_parent_to_mesh_part(Index(is_parent_below.get_num_indices()));
-
-            // For every entity of the parent, this will save whether it is referenced by the TargetSet
-            TargetSet lower_origin_set(is_parent_below.get_index_bound());
-            // and this is the marker for that
-            Index marker(is_parent_below.get_index_bound());
-            for(Index i(0); i < lower_origin_set.get_num_entities(); ++i)
-              lower_origin_set[i] = 0;
-            // Set the values to something bogus for every index present
-            for(Index i(0); i < ts_below.get_num_entities(); ++i)
-              lower_origin_set[ts_below[i]] = marker;
-
-            // Count the number of entities that get added
-            Index num_entities_current_dim(0);
-
-            // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
-            // which is the case if the MeshPart contains all entities of the parent mesh)
-            TargetSet tmp_target_set(is_parent_below.get_num_entities());
-
-            // Check all entities of dimension current_dim_ from the parent
-            for(Index i(0); i < is_parent_below.get_num_entities(); ++i)
-            {
-              bool is_in_mesh_part(true);
-
-              // Check if all entities of dimension current_dim_-1 at entity i are referenced by the TargetSet
-              for(int j(0); j < ParentIndexSetType::num_indices; ++j)
-              {
-                // This is the index in the parent
-                Index parent_index(is_parent_below[i][j]);
-                if(lower_origin_set[parent_index] != marker)
-                  is_in_mesh_part = false;
-              }
-
-              // If all subshapes belonged to the MeshPart, create the new parent mapping
-              if(is_in_mesh_part)
-              {
-                tmp_target_set[num_entities_current_dim] = i;
-                num_entities_current_dim++;
-              }
-            }
-
-            // tmp_target_set possibly has the wrong size, so manually create a correctly sized TargetSet
-            TargetSet new_target_set(num_entities_current_dim);
-            for(Index i(0); i < new_target_set.get_num_entities(); ++i)
-              new_target_set[i] = tmp_target_set[i];
-
-            // Update the information in the TargetSetHolder
-            my_target_set = std::move(new_target_set);
+            // The coarse mesh-part has a topology, so refine the target set to match.
+            // The parent must have a topology, too, which is non-trivial if the
+            // parent is a mesh-part itself.
+            const auto* parent_topo = parent.get_topology();
+            XASSERTM(parent_topo != nullptr, "mesh-part has topology, but parent doesn't");
+            Intern::TargetRefineWrapper<Shape_>::refine(target_set_holder,
+              num_entities_parent, coarse_target_set_holder, *coarse_ish, *parent_topo);
           }
-        } // void bottom_to_top<typename, typename>()
-
-        /**
-         * \brief Fills a TargetSetHolder from top to bottom using information from an IndexSetHolder
-         *
-         * The IndexSetHolder contains the topology of the parent mesh that the TargetSetHolder refers to.
-         *
-         * \tparam TargetSetHolderType
-         * Type of the TargetSetHolder to be filled.
-         *
-         * \tparam IndexSetHolderType
-         * Type containing mesh topology information.
-         *
-         */
-        template<typename TargetSetHolderType, typename IndexSetHolderType>
-        static void top_to_bottom(TargetSetHolderType& _target_set_holder, const IndexSetHolderType& parent_ish)
-        {
-          // Call higher dimensional version first
-          TargetSetComputer<end_dim_, current_dim_+1>::template top_to_bottom(_target_set_holder, parent_ish);
-
-          typedef typename IndexSetHolderType::template IndexSet<current_dim_+1, current_dim_>::Type ParentIndexSetType;
-
-          // TargetSet to fill
-          TargetSet& my_target_set(_target_set_holder.template get_target_set<current_dim_>());
-
-          // Only do something if the target set is still empty
-          if(my_target_set.get_num_entities() == 0)
+          else
           {
-            // Higher dimensional target set known to exist
-            TargetSet& ts_above(_target_set_holder.template get_target_set<current_dim_+1>());
-
-            // Indexset for entities of dimension current_dim_ at entities of dimension current_dim_+1
-            const ParentIndexSetType& is_parent_above(parent_ish.template get_index_set<current_dim_+1, current_dim_>());
-            // IndexSet for storing the indices of the MeshPart entities lying at entities of the parent
-            ParentIndexSetType upper_parent_to_mesh_part(Index(is_parent_above.get_num_indices()));
-
-            // For every entity of current_dim_ of the parent, this will save whether it belongs to an entity of
-            // dimensin current_dim_+1 that is referenced through the TargetSetHolder
-            TargetSet upper_origin_set(is_parent_above.get_index_bound());
-            // And this is the marker for that
-            Index marker(is_parent_above.get_index_bound());
-            for(Index i(0); i < upper_origin_set.get_num_entities(); ++i)
-              upper_origin_set[i] = 0;
-
-            for(Index i(0); i < ts_above.get_num_entities(); ++i)
-            {
-              // Index of the current entity in the parent
-              Index parent_index(ts_above[i]);
-              for(int j(0); j < is_parent_above.get_num_indices(); ++j)
-              {
-                // This is i.e. the global number of local edge j at face parent_index in the parent
-                Index parent_sub_entity_index(is_parent_above(parent_index, j));
-                upper_origin_set[parent_sub_entity_index] = marker;
-              }
-            }
-
-            // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
-            // which is the case if the MeshPart contains all entities of the parent mesh)
-            TargetSet tmp_target_set(is_parent_above.get_index_bound());
-            // Count the number of entities that get added
-            Index num_entities_current_dim(0);
-            for(Index i(0); i < upper_origin_set.get_num_entities(); ++i)
-            {
-              if(upper_origin_set[i] == marker)
-              {
-                tmp_target_set[num_entities_current_dim] = i;
-                num_entities_current_dim++;
-              }
-            }
-
-            // tmp_target_set possibly has the wrong size, so manually create a correctly sized TargetSet
-            TargetSet new_target_set(num_entities_current_dim);
-            for(Index i(0); i < new_target_set.get_num_entities(); ++i)
-              new_target_set[i] = tmp_target_set[i];
-
-            // Update the information in the TargetSetHolder
-            my_target_set = std::move(new_target_set);
+            // The coarse mesh-part does not have a topology, stick to simple refinement
+            Intern::SimpleTargetRefineWrapper<Shape_>::refine(
+              target_set_holder, num_entities_parent, coarse_target_set_holder);
           }
-
         }
-      }; // struct TargetSetComputer<Index, Index>
+      }; // // struct TargetSetRefineParentWrapper<ConformalMesh<...>>
 
       /**
-       * \brief Specialisation as end of template recursion
+       * \brief Specialisation for StructuredMesh
        */
-      template<int end_dim_>
-      struct TargetSetComputer<end_dim_, end_dim_>
+      template<int shape_dim_, int num_coords_, typename Coord_>
+      struct TargetSetRefineParentWrapper<StructuredMesh<shape_dim_, num_coords_, Coord_>>
       {
-        /// \brief End of template recursion: Nothing to do
-        template<typename TargetSetHolderType, typename IndexSetHolderType>
-        static void bottom_to_top(TargetSetHolderType& , const IndexSetHolderType&)
+        typedef Shape::Hypercube<shape_dim_> ShapeType;
+
+        template<typename TargetSetHolderType_, typename IndexSetHolder_>
+        static void fill_target_sets(
+          TargetSetHolderType_& target_set_holder,
+          const TargetSetHolderType_& coarse_target_set_holder,
+          const IndexSetHolder_* coarse_ish,
+          const StructuredMesh<shape_dim_, num_coords_, Coord_>& parent)
         {
-        }
-
-        /// \brief End of template recursion: Nothing to do
-        template<typename TargetSetHolderType, typename IndexSetHolderType>
-        static void top_to_bottom(TargetSetHolderType& , const IndexSetHolderType&)
-        {
-        }
-      }; // struct TargetSetComputer<int>
-
-      /**
-       * \brief Fills a MeshPart's IndexSetHolder by using TargetSet information and the parent's IndexSetHolder
-       *
-       * \tparam dim
-       * Shape dimension of the IndexSet that gets filled.
-       *
-       * This only fills the vertex@shape information and leaves the rest to the RedundantIndexSetBuilder
-       *
-       */
-      template<int dim>
-      struct IndexSetFiller
-      {
-        template<typename IndexSetHolderType, typename TargetSetHolderType, typename ParentIndexSetHolderType>
-        static void fill_ish(IndexSetHolderType& ish, const TargetSetHolderType& tsh, const ParentIndexSetHolderType& parent_ish)
-        {
-          // Recurse down
-          IndexSetFiller<dim-1>::fill_ish(ish, tsh, parent_ish);
-
-          // The MeshPart's vertex@shape set
-          auto& index_set(ish.template get_index_set<dim, 0>());
-          // The Mesh's vertex@shape set
-          auto& index_set_parent(parent_ish.template get_index_set<dim, 0>());
-
-          auto& target_set_vertex(tsh.template get_target_set<0>());
-          auto& target_set_dim(tsh.template get_target_set<dim>());
-
-          // For every vertex in the parent, this will contain its index in the MeshPart
-          Index* inverse_target_map(new Index[index_set_parent.get_index_bound()]);
-
-          // Set every index to something out of range to catch errors
-          for(Index i(0); i < index_set_parent.get_index_bound(); ++i)
-            inverse_target_map[i] = target_set_vertex.get_num_entities() + Index(1);
-
-          for(Index i(0); i < target_set_vertex.get_num_entities(); ++i)
-            inverse_target_map[target_set_vertex[i]] = i;
-
-          // Now we can just iterate over the shapes of the MeshPart
-          for(Index cell(0); cell < target_set_dim.get_num_entities(); ++cell)
+          // get number of coarse/fine parent slices
+          Index num_slices_c[shape_dim_], num_slices_f[shape_dim_];
+          for(int i(0); i < shape_dim_; ++i)
           {
-            // For the shape cell, get its index in the parent. Then get the local vertex' index in the parent and
-            // map that back to the MeshPart with the inverse_target_map. Ez!
-            for(int i(0); i < index_set_parent.get_num_indices(); ++i)
-              index_set[cell][i] = inverse_target_map[index_set_parent[target_set_dim[cell]][i]];
+            num_slices_c[i] = parent.get_num_slices(i);
+            num_slices_f[i] = Index(2) * num_slices_c[i];
           }
 
-          delete[] inverse_target_map;
-
+          if(coarse_ish != nullptr)
+          {
+            throw INTERNAL_ERROR("TargetSetRefineParentWrapper not implemented");
+            //Intern::TargetRefineWrapper<ShapeType>::refine(
+              //target_set_holder, num_entities_parent, coarse_target_set_holder, *coarse_ish, parent_ish);
+          }
+          else
+          {
+            Intern::StructuredTargetRefineWrapper<shape_dim_>::refine_simple(
+              target_set_holder, coarse_target_set_holder, num_slices_c, num_slices_f);
+          }
         }
-      }; // struct IndexSetFiller<int>
 
-      /**
-       * \brief Explicit specialisation as end of template recursion.
-       */
-      template<>
-      struct IndexSetFiller<0>
-      {
-        template<typename IndexSetHolderType, typename TargetSetHolderType, typename ParentIndexSetHolderType>
-        static void fill_ish(IndexSetHolderType& DOXY(ish), const TargetSetHolderType& DOXY(tsh), const ParentIndexSetHolderType& DOXY(parent_ish))
+        // Specialisation for MeshPart<StructuredMesh<...>>
+        // Note: The topology of a MeshPart is always "conforming" (ie "unstructured"),
+        // therefore the implementation is identical to the class template specialisation
+        // for ConformalMesh above.
+        template<typename TargetSetHolderType_, typename IndexSetHolder_>
+        static void fill_target_sets(
+          TargetSetHolderType_& target_set_holder,
+          const TargetSetHolderType_& coarse_target_set_holder,
+          const IndexSetHolder_* coarse_ish,
+          const MeshPart<StructuredMesh<shape_dim_, num_coords_, Coord_>>& parent)
         {
+          // get number of parent entities
+          Index num_entities_parent[shape_dim_+1];
+          for(int i(0); i <= shape_dim_; ++i)
+            num_entities_parent[i] = parent.get_num_entities(i);
+
+          if(coarse_ish != nullptr)
+          {
+            // The coarse mesh-part has a topology, so refine the target set to match.
+            // The parent must have a topology, too, which is non-trivial if the
+            // parent is a mesh-part itself.
+            const auto* parent_topo = parent.get_topology();
+            XASSERTM(parent_topo != nullptr, "mesh-part has topology, but parent doesn't");
+            Intern::TargetRefineWrapper<ShapeType>::refine(target_set_holder,
+              num_entities_parent, coarse_target_set_holder, *coarse_ish, *parent_topo);
+          }
+          else
+          {
+            // The coarse mesh-part does not have a topology, stick to simple refinement
+            Intern::SimpleTargetRefineWrapper<ShapeType>::refine(
+              target_set_holder, num_entities_parent, coarse_target_set_holder);
+          }
         }
-      }; // struct IndexSetFiller<0>
+      }; // struct TargetSetRefineParentWrapper<StructuredMesh<...>>
     } // namespace Intern
     /// \endcond
 

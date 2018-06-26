@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/geometry/shape_convert_factory.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>

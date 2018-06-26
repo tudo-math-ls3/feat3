@@ -8,7 +8,7 @@
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/lafem/dense_vector.hpp>

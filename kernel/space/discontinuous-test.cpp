@@ -2,7 +2,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/util/math.hpp>
 
 using namespace FEAT;

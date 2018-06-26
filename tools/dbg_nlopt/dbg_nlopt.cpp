@@ -3,7 +3,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/analytic/wrappers.hpp>
 #include <kernel/assembly/analytic_projector.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
