@@ -154,10 +154,6 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
     print("Error: no comptabile compiler found nor provided!")
     sys.exit()
 
-  if is_found("nvcc"):
-    buildid_string += "-cuda"
-#TODO suchen nach mkl
-
 # use provided build id
 else:
   #add every parameter to the build id that is no extra_option
