@@ -158,6 +158,8 @@ namespace FEAT
       Index _iter_digits;
       /// whether to plot something
       PlotMode _plot_mode;
+      /// plot output interval
+      Index _plot_interval;
       /// whether to skip defect computation if possible
       bool _skip_def_calc;
 
@@ -199,6 +201,7 @@ namespace FEAT
         _def_prev(0),
         _iter_digits(Math::ilog10(_max_iter)),
         _plot_mode(PlotMode::none),
+        _plot_interval(1),
         _skip_def_calc(true)
       {
       }
@@ -226,6 +229,10 @@ namespace FEAT
         auto plot_name_p = section->get_entry("plot_name");
         if (plot_name_p.second)
           this->_plot_name = plot_name_p.first;
+
+        auto plot_interval_p = section->get_entry("plot_interval");
+        if (plot_interval_p.second && !plot_interval_p.first.parse(this->_plot_interval))
+          throw ParseError(section_name + ".plot_interval", plot_interval_p.first, "an integer >= 0");
 
         auto tol_abs_p = section->get_entry("tol_abs");
         if (tol_abs_p.second && !tol_abs_p.first.parse(this->_tol_abs))
@@ -389,6 +396,16 @@ namespace FEAT
       void set_plot_mode(const PlotMode plot_mode)
       {
         _plot_mode = plot_mode;
+      }
+
+      /**
+       * \brief Sets the interval between two plot outputs, if any.
+       *
+       * \param[in] plot_interval The desired interval of iteration plots
+       */
+      void set_plot_interval(const Index plot_interval)
+      {
+        _plot_interval = plot_interval;
       }
 
       /// Sets the plot name of the solver.
@@ -574,13 +591,13 @@ namespace FEAT
       }
 
       /**
-       * \brief Plot every iteration?
+       * \brief Plot the current iteration?
        *
-       * \returns \c true if the plot mode is set to \c iter or \c all.
+       * \returns \c true if the plot mode is set to \c iter or \c all and the plot interval matches
        */
       bool _plot_iter() const
       {
-        return _plot_mode == PlotMode::iter || _plot_mode == PlotMode::all;
+        return _num_iter % _plot_interval == 0 && (_plot_mode == PlotMode::iter || _plot_mode == PlotMode::all);
       }
 
       /**
