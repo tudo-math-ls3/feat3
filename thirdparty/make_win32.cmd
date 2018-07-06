@@ -77,6 +77,22 @@ if exist "./triangle" (
   echo.
 )
 
+rem ===========================================================================
+echo **************************************************************************
+if exist "./hypre" (
+  call ./vc_internal/make_hypre_vc%VSVER%.cmd dbg x86 serial
+  call ./vc_internal/make_hypre_vc%VSVER%.cmd opt x86 serial
+  if not "%MSMPI_INC%" == "" (
+    call ./vc_internal/make_hypre_vc%VSVER%.cmd dbg x86 mpi
+    call ./vc_internal/make_hypre_vc%VSVER%.cmd opt x86 mpi
+  ) else (
+    echo MPI not found; skipping MPI-based hypre library...
+  )
+) else (
+  echo hypre not found; skipping...
+  echo.
+)
+
 echo **************************************************************************
 
 rem ===========================================================================

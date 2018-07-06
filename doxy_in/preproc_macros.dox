@@ -90,6 +90,10 @@ This macro is defined by the build system if the FEAT kernel has support for hal
 The datatypes name is half_float::half.
 
 <hr>
+\subsection ppm_feat_have_hypre FEAT_HAVE_HYPRE
+This macro is defined by the build system if the FEAT kernel is linked against the HYPRE library.
+
+<hr>
 \subsection ppm_feat_have_metis FEAT_HAVE_METIS
 This macro is defined by the build system if the FEAT kernel is linked against the METIS library.
 

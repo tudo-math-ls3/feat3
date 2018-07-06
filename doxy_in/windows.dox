@@ -89,7 +89,7 @@ following libraries, you will have to perform the following steps:
 
 \subsection windows_thirdparty_alglib ALGLIB
 <c>ALGLIB</c> is a library that is used by FEAT to offer an additional set of linear and non-linear solvers.
-- Lastest tested Version: 3.10.0 (C++ free GPL edition)
+- Lastest tested Version: 3.13.0 (C++ free GPL edition)
 - Download Link: http://www.alglib.net/download.php
 
 <b>Instructions:</b>
@@ -124,16 +124,62 @@ thirdparty
   ...
 \endverbatim
 
+\subsection windows_thirdparty_half half
+<c>half</c> is a header-only library that offers a C++ implementation of the IEEE 754 half-precision data type.
+- Lastest tested Version: 1.12.0 (from 2017-03-06)
+- Download Link: http://half.sourceforge.net/#downloads
+
+<b>Instructions:</b>
+-# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty\\half</c>.
+-# After unpacking, the <c>thirdparty</c> directory should have the following sub-directory structure:
+\verbatim
+thirdparty
+  half
+    include
+  ...
+\endverbatim
+
+\subsection windows_thirdparty_hypre HYPRE
+<c>HYPRE</c> is a library that offers a large set of parallel solvers and preconditioners, most notably the
+<c>BoomerAMG</c> solver/preconditioner.
+- Lastest tested Version: 2.11.2 (from 2017-03-13)
+- Download Link: https://computation.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods/software
+
+\attention
+It is \b highly recommended that you use version 2.11.2 of the HYPRE library even if there is a newer version
+available on the download site. The reason is that you have to apply a patch to the extracted files (see instructions
+below), which may not work if you use another version.
+
+<b>Instructions:</b>
+-# Download the GZ-Archive <b>for version 2.11.2</b> and unpack its contents into the directory <c>thirdparty</c>.
+-# Rename the sub-directory from <c>hypre-2.11.2</c> to <c>hypre</c>.
+-# Execute the Python script <c>vc_patch_hypre.py</c> in the <c>thirdparty</c> directory.\n
+   <b>Note:</b> Without this patch, HYPRE will not compile due to some incorrect preprocessor definitions.
+-# The <c>thirdparty</c> directory should now have the following sub-directory structure:
+\verbatim
+thirdparty
+  hypre
+    AUTOTEST
+    docs
+    src
+  ...
+\endverbatim
+
 \subsection windows_thirdparty_parmetis ParMETIS
 <c>ParMETIS</c> is a library that offers graph partitioning algorithms used by FEAT to compute domain decompositions for
 parallel (i.e. MPI-based) applications.
 - Lastest tested Version: 4.0.3 (from 2013-03-30)
 - Download Link: http://glaros.dtc.umn.edu/gkhome/metis/parmetis/download
 
+\attention
+It is \b highly recommended that you use version 4.0.3 of the ParMETIS library even if there is a newer version
+available on the download site. The reason is that you have to apply a patch to the extracted files (see instructions
+below), which may not work if you use another version.
+
 <b>Instructions:</b>
 -# Download the GZ-Archive and unpack its contents into the directory <c>thirdparty</c>.
 -# Rename the sub-directory from <c>parmetis-4.0.3</c> (or whatever version you have downloaded) to <c>parmetis</c>.
--# Execute the Python script <c>parmetis_patch_win.py</c> in the <c>thirdparty</c> directory.\n
+-# Execute the Python script <c>vc_patch_parmetis.py</c> in the <c>thirdparty</c> directory.\n
    <b>Note:</b> Without this patch, ParMETIS will not compile due to some incorrect preprocessor definitions.
 -# The <c>thirdparty</c> directory should now have the following sub-directory structure:
 \verbatim
@@ -150,7 +196,7 @@ thirdparty
 <c>SuiteSparse</c> is a library collection that offers various algorithms for sparse linear systems. Currently, the
 only component of the <c>SuiteSparse</c> library is <c>UMFPACK</c>, a direct linear solver for CSR matrices, which
 is used by the FEAT::Solver::Umfpack and FEAT::Solver::UmfpackMean classes.
-- Lastest tested Version: 4.5.3
+- Lastest tested Version: 5.2.0 (from 2018-03-15)
 - Download Link: http://faculty.cse.tamu.edu/davis/suitesparse.html
 
 <b>Instructions:</b>

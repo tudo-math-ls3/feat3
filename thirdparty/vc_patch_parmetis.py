@@ -1,4 +1,5 @@
-﻿################################################################################
+#!/usr/bin/env python
+################################################################################
 # ParMETIS 4.0.3 patch for Visual Studio
 # ------------------------------------------------------------------------------
 # This script patches one of the GKlib header files to ensure that the library
@@ -16,8 +17,8 @@ gk_path1i = os.path.join(gk_path,"gk_arch.h.backup")
 gk_path2o = os.path.join(gk_path,"gkregex.c")
 gk_path2i = os.path.join(gk_path,"gkregex.c.backup")
 
-# check whether 'gk_arch.h' exists
-if not os.path.isfile(gk_path1o):
+# check whether ParMETIS is undpacked
+if not os.path.isfile(os.path.join(".","parmetis","include","parmetis.h")):
   print("ERROR: ParMETIS source not found; nothing to patch...")
   sys.exit(1)
 
@@ -27,7 +28,9 @@ if not os.path.isfile(gk_path1i):
 if not os.path.isfile(gk_path2i):
   os.rename(gk_path2o, gk_path2i)
 
+################################################################################
 ##### patch 'gk_arch.h' #####
+print("Patching '%s'..." % gk_path1o)
 
 # open backup file
 fi = open(gk_path1i, "rt")
@@ -56,7 +59,9 @@ for line in fi:
 fo.close()
 fi.close()
 
+################################################################################
 ##### patch 'gkregex.c' #####
+print("Patching '%s'..." % gk_path2o)
 
 # open backup file
 fi = open(gk_path2i, "rt")

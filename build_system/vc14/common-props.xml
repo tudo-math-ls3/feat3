@@ -80,6 +80,16 @@
   <PropertyGroup Condition="Exists('..\..\thirdparty\half\include\half.hpp')">
     <FeatHaveHalfMath>true</FeatHaveHalfMath>
   </PropertyGroup>
+  <!-- Note: There are two builds of HYPRE: a serial one and an MPI-based one -->
+  <!--       We need to check for the one that matches our current FEAT build -->
+  <PropertyGroup Condition="Exists('..\..\lib\hypre.vc14-$(FeatDebugPrefix)-mpi-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+    <!-- MPI-version of hypre exists + FEAT build in MPI mode -->
+    <FeatHaveHypre>true</FeatHaveHypre>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\..\lib\hypre.vc14-$(FeatDebugPrefix)-serial-$(FeatPlatform).lib') And '$(SerialMode)'=='true'">
+    <!-- serial version of hypre exists + FEAT build in serial mode -->
+    <FeatHaveHypre>true</FeatHaveHypre>
+  </PropertyGroup>
   <PropertyGroup Condition="Exists('..\..\lib\metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveMetis>true</FeatHaveMetis>
   </PropertyGroup>
@@ -117,6 +127,10 @@
       Include="FEAT_HAVE_FPARSER" />
     <FeatDef Condition="'$(FeatHaveHalfMath)'=='true'"
       Include="FEAT_HAVE_HALFMATH" />
+    <FeatDef Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='false'"
+      Include="FEAT_HAVE_HYPRE;HYPRE_HAVE_MPI" />
+    <FeatDef Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='true'"
+      Include="FEAT_HAVE_HYPRE;HYPRE_SEQUENTIAL" />
     <FeatDef Condition="'$(FeatHaveMetis)'=='true'"
       Include="FEAT_HAVE_METIS" />
     <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
@@ -143,6 +157,8 @@
       Include="$(FeatRootPath)\thirdparty\fparser;" />
     <FeatIncDir Condition="'$(FeatHaveHalfMath)'=='true'"
       Include="$(FeatRootPath)\thirdparty\half\include;" />
+    <FeatIncDir Condition="'$(FeatHaveHypre)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\hypre\src;$(FeatRootPath)\thirdparty\hypre\src\krylov;$(FeatRootPath)\thirdparty\hypre\src\parcsr_ls;$(FeatRootPath)\thirdparty\hypre\src\utilities;$(FeatRootPath)\thirdparty\hypre\src\seq_mv;$(FeatRootPath)\thirdparty\hypre\src\parcsr_mv;$(FeatRootPath)\thirdparty\hypre\src\IJ_mv;$(FeatRootPath)\thirdparty\hypre\src\multivector;" />
     <FeatIncDir Condition="'$(FeatHaveMetis)'=='true'"
       Include="$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
     <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
@@ -188,6 +204,10 @@
       Include="alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveFParser)'=='true'"
       Include="fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='false'"
+      Include="hypre.vc14-$(FeatDebugPrefix)-mpi-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='true'"
+      Include="hypre.vc14-$(FeatDebugPrefix)-serial-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveMetis)'=='true'"
       Include="metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
