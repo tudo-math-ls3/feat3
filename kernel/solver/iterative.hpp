@@ -128,10 +128,33 @@ namespace FEAT
       String _plot_name;
       /// current status of the solver
       Status _status;
-      /// relative tolerance parameter
+      /**
+       * \brief relative tolerance parameter
+       *
+       * The solver is converged if\n
+       * the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init\n
+       * or\n
+       * the defect is smaller than _tol_abs and also smaller than _tol_abs_low\n
+       * As this might not be a sufficent description, the criterion that is checked is
+       * \f[
+       *   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
+       * \f]
+       * where \f$ r_k \f$ is the defect vector in the current iteration and \f$ r_0 \f$ the initial defect vector.
+       * Both _tol_rel and _tol_abs alone were not sufficent because of one practical case:
+       * If you have already a good initial solution so that the defect is 10^{-3}, it might be
+       * very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8}
+       * anyways. On the other hand, if you have a bad initial solution and your defect
+       * is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori
+       * you do not know the quality of the intial guess.
+       * The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+       * and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
+       * did not gain 8 digits so far then I'm also happy"
+       */
       DataType _tol_rel;
-      /// relative tolerance parameter
+      /// absolute tolerance parameter \copydetails Solver::IterativeSolver::_tol_rel
       DataType _tol_abs;
+      /// absolute tolerance parameter \copydetails Solver::IterativeSolver::_tol_rel
+      DataType _tol_abs_low;
       /// relative divergence parameter
       DataType _div_rel;
       /// absolute divergence parameter
@@ -170,6 +193,7 @@ namespace FEAT
        *
        * - relative tolerance: sqrt(eps) (~1E-8 for double)
        * - absolute tolerance: 1/eps^2 (~1E+32 for double)
+       * - lower absolute tolerance: 0
        * - relative divergence: 1/eps (~1E+16 for double)
        * - absolute divergence: 1/eps^2 (~1E+32 for double)
        * - stagnation rate: 0.95
@@ -188,6 +212,7 @@ namespace FEAT
         _status(Status::undefined),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
+        _tol_abs_low(DataType(0)),
         _div_rel(DataType(1) / Math::eps<DataType>()),
         _div_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
         _stag_rate(DataType(0.95)),
@@ -242,6 +267,10 @@ namespace FEAT
         if (tol_rel_p.second && !tol_rel_p.first.parse(this->_tol_rel))
           throw ParseError(section_name + ".tol_rel", tol_rel_p.first, "a floating point number");
 
+        auto tol_abs_low_p = section->get_entry("tol_abs_low");
+        if (tol_abs_low_p.second && !tol_abs_low_p.first.parse(this->_tol_abs_low))
+          throw ParseError(section_name + ".tol_abs_low", tol_abs_low_p.first, "a floating point number");
+
         auto div_abs_p = section->get_entry("div_abs");
         if (div_abs_p.second && !div_abs_p.first.parse(this->_div_abs))
           throw ParseError(section_name + ".div_abs", div_abs_p.first, "a floating point number");
@@ -280,6 +309,12 @@ namespace FEAT
         _tol_abs = tol_abs;
       }
 
+      /// Sets the lower absolute tolerance for the solver.
+      void set_tol_abs_low(DataType tol_abs_low)
+      {
+        _tol_abs_low = tol_abs_low;
+      }
+
       /// Returns the relative tolerance.
       DataType get_tol_rel() const
       {
@@ -291,6 +326,13 @@ namespace FEAT
       {
         return _tol_abs;
       }
+
+      /// Returns the lower absolute tolerance.
+      DataType get_tol_abs_low() const
+      {
+        return _tol_abs_low;
+      }
+
 
       /// Sets the relative divergence for the solver.
       void set_div_rel(DataType div_rel)
@@ -420,16 +462,29 @@ namespace FEAT
         return _plot_name;
       }
 
-      /// checks for convergence
+      /**
+       * \brief checks for convergence
+       * \details \copydetails Solver::IterativeSolver::_tol_rel
+       *
+       * \returns \c true, if converged, else \c false
+       */
       bool is_converged() const
       {
         return is_converged(_def_cur);
       }
 
-      /// checks for convergence
+      /**
+       * \brief checks for convergence
+       * \details \copydetails Solver::IterativeSolver::_tol_rel
+       *
+       * \param[in] def_cur
+       * The defect that is to be analysed
+       *
+       * \returns \c true, if converged, else \c false
+       */
       bool is_converged(const DataType def_cur) const
       {
-        return (def_cur <= _tol_abs) && (def_cur <= (_tol_rel * _def_init));
+        return (def_cur <= _tol_abs) && ((def_cur <= (_tol_rel * _def_init)) || (def_cur <= _tol_abs_low));
       }
 
       /// checks for divergence

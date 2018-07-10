@@ -51,7 +51,25 @@ namespace FEAT
       const FilterType& _system_filter;
       /// krylov dimension
       Index _krylov_dim;
-      /// inner pseudo-residual scaling factor
+      /** \brief inner pseudo-residual scaling factor
+       *
+       * The GMRES-algorithm can check for convergence at two positions during the iteration:
+       * One is to check the factor \f$q\f$ from the algorithm when building up a the Krylow-spaces (in the inner loop),
+       * the other one is to check the real residuum after the space is built up.
+       * This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor
+       * \f$q\f$ will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means:
+       * If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check
+       * (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.\n
+       * The solution to this problem is this factor: The preconditioned residuum needs to fulfill the usual convergence criterion,
+       * but they are scaled with this factor: Instead of the usual convergence criterion, it has to fulfill the scaled convergence criterion
+       * \f[
+       *   (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
+       * \f]
+       * This means: If you do not know any estimate for the correlation between your preconditioned residuum and the real residuum,
+       * you can just set this factor to zero. This will deactivate this intermediate check and thus result in a few more iterations,
+       * but it is the save variant that will lead to convergence. You should only set it to something else than zero if you really
+       * know what you are doing!
+       */
       DataType _inner_res_scale;
       /// krylov basis vectors
       std::vector<VectorType> _vec_v, _vec_z;
@@ -75,7 +93,7 @@ namespace FEAT
        *
        * \param[in] inner_res_scale
        * The scaling factor for the inner GMRES loop residual.
-       * Set this to zero unless you know what you are doing.
+       * \copydetails _inner_res_scale
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
@@ -300,7 +318,8 @@ namespace FEAT
               if(!(this->_num_iter < this->_min_iter))
               {
                 // did we converge?
-                if((def_cur <= _inner_res_scale * this->_tol_abs) && (def_cur <= _inner_res_scale * (this->_tol_rel * this->_def_init)))
+                if((def_cur <= _inner_res_scale * this->_tol_abs) &&
+                  ((def_cur <= _inner_res_scale * (this->_tol_rel * this->_def_init)) || (def_cur <= _inner_res_scale * this->_tol_abs_low) ))
                   break;
 
                 // maximum number of iterations performed?
