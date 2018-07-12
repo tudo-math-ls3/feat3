@@ -3,7 +3,7 @@ import sys
 from build_system.feat_util import get_output
 from build_system.feat_util import find_exe
 
-def configure_gcc(cpu, buildid, compiler):
+def configure_gcc(cpu, buildid, compiler, restrict_errors):
   version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__GNUC__"])
@@ -17,6 +17,10 @@ def configure_gcc(cpu, buildid, compiler):
 
   cmake_flags = ""
   cxxflags = "-pipe -std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wlogical-op -Wdouble-promotion -Wformat=2"
+
+  if restrict_errors:
+    cxxflags += " -Wfatal-errors"
+
   if (major == 4 and minor >= 9) or major > 4:
     cxxflags += " -fdiagnostics-color=always"
 

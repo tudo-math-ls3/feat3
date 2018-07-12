@@ -1,7 +1,7 @@
 import platform
 from build_system.feat_util import get_output
 
-def configure_clang(cpu, buildid, compiler, system_host_compiler):
+def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_errors):
   version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__clang_major__"])
@@ -14,6 +14,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
     sys.exit(1)
 
   cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic"
+
+  if restrict_errors:
+    cxxflags += " -Wfatal-errors"
 
   if major > 3 or (major == 3 and minor > 6):
     cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"

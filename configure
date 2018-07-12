@@ -222,6 +222,7 @@ cuda_host_compiler = ""
 compiler = ""
 cuda_arch = ""
 cuda_verbose = False
+restrict_errors = False
 
 unused_extra_options = copy.copy(extra_options)
 for option in extra_options:
@@ -309,6 +310,10 @@ for option in extra_options:
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_MPI2_ONLY:BOOL=TRUE"
 
+  if option.startswith("--restrict_errors"):
+    unused_extra_options.remove(option)
+    restrict_errors = True
+
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
 if is_subdirectory(os.getcwd(), sys.argv[0][:-9]):
@@ -346,7 +351,7 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   os.environ["CC"] = "gcc"
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
-  cxxflags_temp, cmake_temp = configure_gcc (cputype, buildid, compiler)
+  cxxflags_temp, cmake_temp = configure_gcc (cputype, buildid, compiler, restrict_errors)
   cxxflags += cxxflags_temp
   cmake_flags += cmake_temp
   if "coverage" in buildid:
@@ -365,7 +370,7 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   os.environ["CC"] = "icc"
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
-  cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler)
+  cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=icc"
 elif "clang" in buildid or "llvm" in buildid:
   if not compiler:
@@ -378,7 +383,7 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CC"] = "clang"
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
-  cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
+  cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
 elif "pgi" in buildid:
   if not compiler:
@@ -390,7 +395,7 @@ elif "pgi" in buildid:
   os.environ["CC"] = "pgcc"
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
-  cxxflags += " " + configure_pgi (cputype, buildid, compiler)
+  cxxflags += " " + configure_pgi (cputype, buildid, compiler, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=pgi"
 else:
   print ("Error: No supported compiler found in build id:")

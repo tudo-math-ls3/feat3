@@ -1,7 +1,7 @@
 import platform
 from build_system.feat_util import get_output
 
-def configure_icc(cpu, buildid, compiler, system_host_compiler):
+def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors):
   version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__INTEL_COMPILER"][0:2])
@@ -14,6 +14,10 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
     sys.exit(1)
 
   cxxflags = "-std=c++11 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304,2305"
+
+  if restrict_errors:
+    cxxflags += " -diag-error-limit1"
+
   if system_host_compiler:
     cxxflags += " -gcc-name=" + system_host_compiler
 
