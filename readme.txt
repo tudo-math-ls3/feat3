@@ -9,20 +9,29 @@ gcc 4.8+ or icc 15+ or clang 3.6+ or MSVC++ 2015+
 Additionally you will need a proper buildsystem, e.g. gnumake.
 
 === BUILDING FEAT ===
+The usual workflow to build FEAT starts with a second independent directory, e.g. called feat-build.
+This is the folder where all binaries and object files during the build process will be stored.
+You need to create it on your own (and not in your FEAT source directory).
+From the newly created feat-build folder, call
+# PATH_TO_FEAT_SOURCE/configure
+to trigger the configuration process with default parameters
+Afterwards
+make all
+
 In its simplest shape, building FEAT is just as easy as
 ./configure
-make all
-This will automagically detect a proper tool/setting setup and build all FEAT components.
+# make all
+will build the FEAT kernel and some sample applications and tutorials in the ./tutorial directory.
 
 './configure help' reveals a lot more configuration possiblities.
 
 === TEST RUN ===
 To check if your system created a correct FEAT binary, you can run a set of unittests with the additional command
-ctest
+# ctest
 
 === DOCUMENATION ===
 A comprehensive doxygen documentation is available in the doc/html folder, after issueing the
-make doc
+# make doc
 command ( do not forget the ./configure command, if not already configured).
 
 The tutorial folder contains some sample applications with extensive in code documentation.
