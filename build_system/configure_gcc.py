@@ -138,6 +138,11 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
         cxxflags += " -march=core-avx2 -mavx2 -m64"
+    elif cpu == "skylake-sp":
+      if platform.system() == "Darwin":
+        cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+      else:
+        cxxflags += " -march=core-avx2 -mavx512cd -m64"
     elif cpu == "kaby-lake":
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"

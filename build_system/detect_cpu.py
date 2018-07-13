@@ -185,6 +185,8 @@ def detect_cpu():
         cputype = "haswell"
       elif model == 79:
         cputype = "broadwell"
+      elif model == 85:
+        cputype = "skylake-sp"
       elif model == 87:
         cputype = "knightslanding"
       elif model == 94:
