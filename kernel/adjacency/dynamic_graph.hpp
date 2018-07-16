@@ -226,6 +226,24 @@ namespace FEAT
       }
 
       /**
+       * \brief Returns the total number of indices.
+       *
+       * \attention
+       * This function has linear runtime in the number of domain nodes!
+       *
+       * \returns The total number of indices in the graph.
+       */
+      Index get_num_indices() const
+      {
+        Index nidx(0);
+        for(Index i(0); i < _num_nodes_domain; ++i)
+        {
+          nidx += Index(_indices[i].size());
+        }
+        return nidx;
+      }
+
+      /**
        * \brief Clears the graph.
        *
        * This function erases all adjacency entries in the graph.
