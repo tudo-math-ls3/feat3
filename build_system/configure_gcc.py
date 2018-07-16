@@ -127,27 +127,27 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=core-avx2 -mavx2 -m64"
+        cxxflags += " -march=haswell -m64"
     elif cpu == "broadwell":
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=core-avx2 -mavx2 -m64"
+        cxxflags += " -march=broadwell -m64"
     elif cpu == "skylake":
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=core-avx2 -mavx2 -m64"
+        cxxflags += " -march=skylake -m64"
     elif cpu == "skylake-sp":
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=core-avx2 -mavx512cd -m64"
+        cxxflags += " -march=skylake-avx512 -m64"
     elif cpu == "kaby-lake":
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=core-avx2 -mavx2 -m64"
+        cxxflags += " -march=skylake -m64" #no special kabylake support, yet
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
