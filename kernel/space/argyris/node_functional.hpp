@@ -136,8 +136,8 @@ namespace FEAT
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
         // declare trafo evaluation data
-        /// \compilerhack PGI does not understand complex template statements
-#ifdef FEAT_COMPILER_PGI
+        /// \compilerhack PGI and Intel(18) do not understand complex template statements
+#if defined(FEAT_COMPILER_PGI) || (defined(FEAT_COMPILER_INTEL) && FEAT_COMPILER_INTEL >= 1800 && FEAT_COMPILER_INTEL < 1900)
         static constexpr TrafoTags trafo_tags = TrafoTags::img_point|TrafoTags::jac_mat;
         typedef typename TrafoEvalType::template ConfigTraits<trafo_tags>::EvalDataType TrafoEvalData;
 #else

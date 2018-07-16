@@ -17,10 +17,18 @@
 #  define FEAT_COMPILER_INTEL __INTEL_COMPILER
 
 // map version to human-readable string
-#  if(__INTEL_COMPILER >= 1600)
-#    define FEAT_COMPILER "Intel C/C++ compiler 16.0 (or newer)"
+#  if(__INTEL_COMPILER >= 2000)
+#    define FEAT_COMPILER "Intel C/C++ compiler 20.x (or newer)"
+#  elif(__INTEL_COMPILER >= 1900)
+#    define FEAT_COMPILER "Intel C/C++ compiler 19.x"
+#  elif(__INTEL_COMPILER >= 1800)
+#    define FEAT_COMPILER "Intel C/C++ compiler 18.x"
+#  elif(__INTEL_COMPILER >= 1700)
+#    define FEAT_COMPILER "Intel C/C++ compiler 17.x"
+#  elif(__INTEL_COMPILER >= 1600)
+#    define FEAT_COMPILER "Intel C/C++ compiler 16.x"
 #  elif(__INTEL_COMPILER >= 1500)
-#    define FEAT_COMPILER "Intel C/C++ compiler 15.0"
+#    define FEAT_COMPILER "Intel C/C++ compiler 15.x"
 #  elif(__INTEL_COMPILER >= 1400)
 #    define FEAT_COMPILER "Intel C/C++ compiler 14.0"
 #  elif(__INTEL_COMPILER >= 1310)
