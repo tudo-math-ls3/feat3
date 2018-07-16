@@ -66,7 +66,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Precision extensions: quadmath, half")
   print ("  Compilation process optimisations: cotire")
   print ("  Compiler optimisation steps: lto")
-  print ("  Third party source code: alglib, fparser, umfpack, parmetis, zlib, half")
+  print ("  Third party source code: alglib, fparser, umfpack, parmetis, zlib, half, hypre")
   print ("Note that you must provide exactly one build mode, one parallelisation mode and one compiler.")
   print ("Note that you cannot combine any build id token with the guess token.")
   print ("Note that cudamemcheck is only active if cuda is activated, too.")

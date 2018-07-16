@@ -135,6 +135,24 @@ if (FEAT_HAVE_ZLIB)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/zlib/zlib-1.2.11/")
 endif(FEAT_HAVE_ZLIB)
 
+if (FEAT_HAVE_TRIANGLE)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/triangle/")
+endif(FEAT_HAVE_TRIANGLE)
+
+if (FEAT_HAVE_HYPRE)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/parcsr_ls/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/utilities/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/seq_mv/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/parcsr_mv/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/IJ_mv/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/multivector/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/krylov/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/distributed_matrix/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/parcsr_block_mv/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/blas/")
+endif(FEAT_HAVE_HYPRE)
+
 
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)

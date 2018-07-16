@@ -55,6 +55,9 @@
 /// Do we have ZLIB support enabled?
 #cmakedefine FEAT_HAVE_ZLIB
 
+/// Do we have HYPRE support enabled?
+#cmakedefine FEAT_HAVE_HYPRE
+
 /// Do we use a compiler wrapper, e.g. ccache or distcc
 #cmakedefine FEAT_USE_COMPILER_WRAPPER
 
