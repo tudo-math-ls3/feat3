@@ -583,8 +583,8 @@ namespace FEAT
         typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
         TrafoFacetEvaluator trafo_facet_eval(trafo);
 
-        /// \compilerhack PGI does not understand complex template statements
-#ifdef FEAT_COMPILER_PGI
+        /// \compilerhack PGI and Intel(18) do not understand complex template statements
+#if defined(FEAT_COMPILER_PGI) || (defined(FEAT_COMPILER_INTEL) && FEAT_COMPILER_INTEL >= 1800 && FEAT_COMPILER_INTEL < 1900)
         static constexpr TrafoTags trafo_facet_eval_tags = TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat;
         typedef typename TrafoFacetEvaluator::template ConfigTraits <trafo_facet_eval_tags>::EvalDataType TrafoFacetEvalData;
 #else
