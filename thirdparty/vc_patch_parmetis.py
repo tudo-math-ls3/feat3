@@ -2,7 +2,7 @@
 ################################################################################
 # ParMETIS 4.0.3 patch for Visual Studio
 # ------------------------------------------------------------------------------
-# This script patches one of the GKlib header files to ensure that the library
+# This script patches two of the GKlib files to ensure that the library
 # can be compiled under Visual Studio 14.
 #
 # \author Peter Zajac

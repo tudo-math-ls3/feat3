@@ -1,6 +1,13 @@
 #!/usr/bin/env python
-# hypre version 2.11.2
-
+################################################################################
+# HYPRE 2.11.2 patch for Visual Studio
+# ------------------------------------------------------------------------------
+# This script generates the required HYPRE config header file and patches
+# a handful of HYPRE header files to ensure that the library can be compiled
+# under Visual Studio 14.
+#
+# \author Peter Zajac
+################################################################################
 import os
 import sys
 
