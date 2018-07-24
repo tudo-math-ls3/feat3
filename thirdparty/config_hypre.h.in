@@ -1,0 +1,11 @@
+// generated from thirdparty/config_hypre.h.in
+#define HYPRE_RELEASE_NAME "hypre"
+#define HYPRE_RELEASE_VERSION "2.11.2"
+#define HYPRE_RELEASE_DATE "2017/03/13"
+#define HYPRE_RELEASE_TIME "00:00:00"
+#define HYPRE_RELEASE_BUGS "hypre-support@llnl.gov"
+#define HYPRE_BIGINT 1
+#define HYPRE_MAXDIM 3
+#define HYPRE_USING_HYPRE_BLAS 1
+#define HYPRE_USING_HYPRE_LAPACK 1
+#define HYPRE_NO_GLOBAL_PARTITION 1
