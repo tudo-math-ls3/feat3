@@ -53,6 +53,7 @@ SET (test_list
   amg-test
   basic_solver-test
   cusolver-test
+  hypre-test
   optimiser-test
   umfpack-test
   vanka-test

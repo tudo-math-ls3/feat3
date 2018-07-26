@@ -644,6 +644,199 @@ namespace FEAT
       }
 
       /**
+       * \brief Generates a FE-style pointstar CSR matrix with Neumann boundaries
+       *
+       * This function generates pointstar matrices in Finite-Element style using
+       * Neumann boundaries.
+       *
+       * \returns
+       * The m^d x m^d FE-stye pointstar matrix with Neumann boundaries.
+       */
+      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr_neumann() const
+      {
+        // create matrix with default values
+        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix = this->matrix_csr();
+
+        // get matrix arrays
+        const IndexType_ m = IndexType_(this->_m);
+        const IndexType_* row_ptr = matrix.row_ptr();
+        const IndexType_* col_idx = matrix.col_ind();
+        DataType_* val = matrix.val();
+
+        // process first vertex line
+        {
+          // process first vertex in first line
+          {
+            const IndexType_ row = 0;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(4);
+              else if(col == row+1)
+                val[k] = DataType_(-1);
+              else if(col == row+m)
+                val[k] = DataType_(-1);
+              else if(col == row+m+1)
+                val[k] = DataType_(-2);
+              else
+                throw 0;
+            }
+          }
+
+          // loop over all inner vertices in first line
+          for(IndexType_ jj(1); jj + 1 < m; ++jj)
+          {
+            // loop over all non-zeros
+            const IndexType_ row = jj;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(8);
+              else if(col+1 == row)
+                val[k] = DataType_(-1);
+              else if(col == row+1)
+                val[k] = DataType_(-1);
+              else
+                val[k] = DataType_(-2);
+            }
+          }
+
+          // process last vertex in first line
+          {
+            const IndexType_ row =  m - 1;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(4);
+              else if(col+1 == row)
+                val[k] = DataType_(-1);
+              else if(col == row+m)
+                val[k] = DataType_(-1);
+              else if(col+1 == row+m)
+                val[k] = DataType_(-2);
+              else
+                throw 0;
+            }
+          }
+        }
+
+        // loop over all inner vertex lines
+        for(IndexType_ ii(1); ii + 1 < m; ++ii)
+        {
+          // process first vertex in line ii
+          {
+            const IndexType_ row = ii*m;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(8);
+              else if(col+m == row)
+                val[k] = DataType_(-1);
+              else if(col == row+m)
+                val[k] = DataType_(-1);
+              else
+                val[k] = DataType_(-2);
+            }
+          }
+
+          // loop over all inner vertices in line ii
+          for(IndexType_ jj(1); jj + 1 < m; ++jj)
+          {
+            // loop over all non-zeros
+            const IndexType_ row = ii*m + jj;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row+1]; ++k)
+              val[k] = DataType_(col_idx[k] == row ? 16 : -2);
+          }
+
+          // process last vertex in line ii
+          {
+            const IndexType_ row = ii*m + m - 1;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(8);
+              else if(col+m == row)
+                val[k] = DataType_(-1);
+              else if(col == row+m)
+                val[k] = DataType_(-1);
+              else
+                val[k] = DataType_(-2);
+            }
+          }
+        }
+
+
+        // process last vertex line
+        {
+          // process first vertex in last line
+          {
+            const IndexType_ row = (m-1)*m;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(4);
+              else if(col == row+1)
+                val[k] = DataType_(-1);
+              else if(col+m == row)
+                val[k] = DataType_(-1);
+              else if(col+m == row+1)
+                val[k] = DataType_(-2);
+              else
+                throw 0;
+            }
+          }
+
+          // loop over all inner vertices in last line
+          for(IndexType_ jj(1); jj + 1 < m; ++jj)
+          {
+            // loop over all non-zeros
+            const IndexType_ row = (m-1)*m + jj;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(8);
+              else if(col+1 == row)
+                val[k] = DataType_(-1);
+              else if(col == row+1)
+                val[k] = DataType_(-1);
+              else
+                val[k] = DataType_(-2);
+            }
+          }
+
+          // process last vertex in last line
+          {
+            const IndexType_ row = (m-1)*m + m - 1;
+            for(IndexType_ k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            {
+              const IndexType_ col = col_idx[k];
+              if(col == row)
+                val[k] = DataType_(4);
+              else if(col+1 == row)
+                val[k] = DataType_(-1);
+              else if(col+m == row)
+                val[k] = DataType_(-1);
+              else if(col+m+1 == row)
+                val[k] = DataType_(-2);
+              else
+                throw 0;
+            }
+          }
+        }
+
+        // return modified matrix
+        return matrix;
+      }
+
+
+      /**
        * \brief Computes the smallest eigenvalue of the FE-style matrix.
        */
       virtual DataType_ lambda_min() const override
