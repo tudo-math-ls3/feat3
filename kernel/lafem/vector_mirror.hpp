@@ -68,6 +68,9 @@ namespace FEAT
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
       using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
 
+      /// ImageIterator for Adjactor interface implementation
+      typedef IT_* ImageIterator;
+
     public:
       /// default constructor
       VectorMirror() :
@@ -494,6 +497,51 @@ namespace FEAT
         LAFEM::Arch::Mirror<MemType>::scatter_svb(
           Index(block_size_), buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
           vector.used_elements(), vector.template elements<Perspective::pod>(), vector.indices(), alpha);
+      }
+
+      friend std::ostream & operator<< (std::ostream & lhs, const VectorMirror & b)
+      {
+        Index n = b.num_indices();
+        const IT_* idx = b.indices();
+
+        lhs << "[";
+        for (Index i(0) ; i < n ; ++i)
+        {
+          lhs << "  " << idx[i];
+        }
+        lhs << "]";
+
+        return lhs;
+      }
+
+      /* ******************************************************************* */
+      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+      /* ******************************************************************* */
+    public:
+      /** \copydoc Adjactor::get_num_nodes_domain() */
+      Index get_num_nodes_domain() const
+      {
+        return this->num_indices();
+      }
+
+      /** \copydoc Adjactor::get_num_nodes_image() */
+      Index get_num_nodes_image() const
+      {
+        return this->size();
+      }
+
+      /** \copydoc Adjactor::image_begin() */
+      ImageIterator image_begin(Index domain_node) const
+      {
+        XASSERTM(domain_node < num_indices(), "Domain node index out of range");
+        return &this->_indices.at(0)[domain_node];
+      }
+
+      /** \copydoc Adjactor::image_end() */
+      ImageIterator image_end(Index domain_node) const
+      {
+        XASSERTM(domain_node < num_indices(), "Domain node index out of range");
+        return &this->_indices.at(0)[domain_node+1];
       }
     }; // class VectorMirror<...>
   } // namespace LAFEM

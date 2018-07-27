@@ -109,6 +109,17 @@ namespace FEAT
       void filter_cor(VectorType& DOXY(vector)) const
       {
       }
+
+      /**
+       * \brief Applies the filter onto a system matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       */
+      template<typename MT_>
+      void filter_mat(MT_& DOXY(matrix)) const
+      {
+      }
     }; // class NoneFilter<...>
 
     /**
@@ -209,6 +220,17 @@ namespace FEAT
        * A reference to the correction vector to be filtered.
        */
       void filter_cor(VectorType& DOXY(vector)) const
+      {
+      }
+
+      /**
+       * \brief Applies the filter onto a system matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       */
+      template<typename MT_>
+      void filter_mat(MT_& DOXY(matrix)) const
       {
       }
     }; // class NoneFilterBlocked<...>

@@ -193,6 +193,14 @@ namespace FEAT
         first().filter_cor(vector);
         rest().filter_cor(vector);
       }
+
+      /** \copydoc UnitFilter::filter_mat() */
+      template<typename Matrix_>
+      void filter_mat(Matrix_& matrix) const
+      {
+        first().filter_mat(matrix);
+        rest().filter_mat(matrix);
+      }
     }; // class FilterChain
 
     /// \cond internal
@@ -315,6 +323,13 @@ namespace FEAT
       void filter_cor(Vector_& vector) const
       {
         first().filter_cor(vector);
+      }
+
+      /** \copydoc UnitFilter::filter_mat() */
+      template<typename Matrix_>
+      void filter_mat(Matrix_& matrix) const
+      {
+        first().filter_mat(matrix);
       }
     }; // class FilterChain
     /// \endcond

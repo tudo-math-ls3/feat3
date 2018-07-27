@@ -213,6 +213,18 @@ namespace FEAT
         // same as sol
         filter_sol(vector);
       }
+
+      /**
+       * \brief Applies the filter onto a system matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       */
+      template<typename MT_>
+      void filter_mat(MT_& DOXY(matrix)) const
+      {
+        // nothing to do here
+      }
     }; // class MeanFilter<...>
   } // namespace LAFEM
 } // namespace FEAT

@@ -31,13 +31,13 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename Matrix_, typename Filter_>
+    template<typename Matrix_, typename Filter_, typename SolverBase_ = Solver::SolverBase<typename Matrix_::VectorTypeL>>
     class HypreSolverBase :
-      public ADPSolverBase<Matrix_, Filter_>
+      public ADPSolverBase<Matrix_, Filter_, SolverBase_>
     {
     public:
       /// our base-class
-      typedef ADPSolverBase<Matrix_, Filter_> BaseClass;
+      typedef ADPSolverBase<Matrix_, Filter_, SolverBase_> BaseClass;
       // the vector type
       typedef typename BaseClass::VectorType VectorType;
 
@@ -85,11 +85,11 @@ namespace FEAT
       void _upload_def(const VectorType& vec_def)
       {
         // upload defect to ADP vector
-        this->_adp_vec_def.upload(vec_def);
+        this->_upload_vec_def(vec_def);
 
         // set HYPRE defect vector values
         HYPRE_IJVectorSetValues(_hypre_vec_def, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(),
-          this->_adp_vec_def.owned().elements());
+          this->_get_vec_def_vals(vec_def));
       }
 
       /**
@@ -114,13 +114,13 @@ namespace FEAT
       {
         // get HYPRE correction vector values
         HYPRE_IJVectorGetValues(_hypre_vec_cor, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(),
-          this->_adp_vec_cor.owned().elements());
+          this->_get_vec_cor_vals(vec_cor));
 
         // download correction from APD vector
-        this->_adp_vec_cor.download(vec_cor);
+        this->_download_vec_cor(vec_cor);
 
         // apply correction filter
-        this->_filter.filter_cor(vec_cor);
+        this->_system_filter.filter_cor(vec_cor);
       }
 
     public:
@@ -141,17 +141,17 @@ namespace FEAT
         const Dist::Comm& comm = *this->_get_comm();
 
         // get dof offset and count
-        const Index dof_offset = this->_alg_dof_parti.get_global_dof_offset();
-        const Index num_owned  = this->_alg_dof_parti.get_num_owned_dofs();
+        const HYPRE_Int dof_offset = HYPRE_Int(this->_get_global_dof_offset());
+        const HYPRE_Int num_owned  = HYPRE_Int(this->_get_num_owned_dofs());
 
         // set up HYPRE dof indices vector
-        _hypre_dof_idx.resize(num_owned);
-        for(Index i(0); i < num_owned; ++i)
-          _hypre_dof_idx[i] = HYPRE_Int(dof_offset + i);
+        _hypre_dof_idx.resize((std::size_t)num_owned);
+        for(HYPRE_Int i(0); i < num_owned; ++i)
+          _hypre_dof_idx[std::size_t(i)] = dof_offset + i;
 
         // get lower and upper DOF bounds
-        const HYPRE_Int ilower = HYPRE_Int(_hypre_dof_idx.front());
-        const HYPRE_Int iupper = HYPRE_Int(_hypre_dof_idx.back());
+        const HYPRE_Int ilower = _hypre_dof_idx.front();
+        const HYPRE_Int iupper = _hypre_dof_idx.back();
 
         // create HYPRE matrix
         HYPRE_IJMatrixCreate(comm.mpi_comm(), ilower, iupper, ilower, iupper, &_hypre_matrix);
@@ -167,36 +167,36 @@ namespace FEAT
         HYPRE_IJVectorInitialize(_hypre_vec_cor);
 
         // get matrix dimensions
-        const Index num_rows = this->_adp_matrix.owned().rows();
-        const Index num_nze = this->_adp_matrix.owned().used_elements();
-
-        XASSERT(num_rows == num_owned);
+        const HYPRE_Int num_nze = HYPRE_Int(this->_get_mat_num_nze());
 
         // get matrix structure arrays
-        const auto* row_ptr_a = this->_adp_matrix.owned().row_ptr();
-        const auto* col_idx_a = this->_adp_matrix.owned().col_ind();
+        const auto* row_ptr_a = this->_get_mat_row_ptr();
+        const auto* col_idx_a = this->_get_mat_col_idx();
 
         // create HYPRE index vectors
-        _hypre_num_nze.resize(num_rows);
-        _hypre_col_idx.resize(num_nze);
+        _hypre_num_nze.resize((std::size_t)num_owned);
+        _hypre_col_idx.resize((std::size_t)num_nze);
 
         // loop over all owned matrix rows
-        for(Index i(0); i < num_rows; ++i)
+        for(HYPRE_Int i(0); i < num_owned; ++i)
         {
-          _hypre_num_nze[i] = HYPRE_Int(row_ptr_a[i+1] - row_ptr_a[i]);
+          _hypre_num_nze[std::size_t(i)] = HYPRE_Int(row_ptr_a[i+1] - row_ptr_a[i]);
         }
-        for(Index i(0); i < num_nze; ++i)
+        for(HYPRE_Int i(0); i < num_nze; ++i)
         {
-          _hypre_col_idx[i] = HYPRE_Int(col_idx_a[i]);
+          _hypre_col_idx[std::size_t(i)] = HYPRE_Int(col_idx_a[i]);
         }
+
+        // vector for initial vector values
+        std::vector<HYPRE_Real> vv((std::size_t)num_owned, 0.0);
 
         // set matrix structure + dummy values
-        HYPRE_IJMatrixSetValues(_hypre_matrix, HYPRE_Int(num_rows), _hypre_num_nze.data(), _hypre_dof_idx.data(),
-          _hypre_col_idx.data(), this->_adp_matrix.owned().val());
+        HYPRE_IJMatrixSetValues(_hypre_matrix, num_owned, _hypre_num_nze.data(), _hypre_dof_idx.data(),
+          _hypre_col_idx.data(), this->_get_mat_vals());
 
         // set vector structures + dummy values
-        HYPRE_IJVectorSetValues(_hypre_vec_def, HYPRE_Int(num_rows), _hypre_dof_idx.data(), this->_adp_vec_def.owned().elements());
-        HYPRE_IJVectorSetValues(_hypre_vec_cor, HYPRE_Int(num_rows), _hypre_dof_idx.data(), this->_adp_vec_cor.owned().elements());
+        HYPRE_IJVectorSetValues(_hypre_vec_def, num_owned, _hypre_dof_idx.data(), vv.data());
+        HYPRE_IJVectorSetValues(_hypre_vec_cor, num_owned, _hypre_dof_idx.data(), vv.data());
 
         // assemble matrix and get ParCSR object pointer
         HYPRE_IJMatrixAssemble(_hypre_matrix);
@@ -221,7 +221,7 @@ namespace FEAT
 
         // update matrix values of HYPRE matrix
         HYPRE_IJMatrixSetValues(_hypre_matrix, HYPRE_Int(_hypre_dof_idx.size()), _hypre_num_nze.data(),
-          _hypre_dof_idx.data(), _hypre_col_idx.data(), this->_adp_matrix.owned().val());
+          _hypre_dof_idx.data(), _hypre_col_idx.data(), this->_get_mat_vals());
       }
 
       /**

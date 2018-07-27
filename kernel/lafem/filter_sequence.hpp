@@ -161,7 +161,7 @@ namespace FEAT
       template<typename Vector_>
       void filter_rhs(Vector_& vector) const
       {
-        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); it++)
+        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); ++it)
           it->second.filter_rhs(vector);
       }
 
@@ -169,7 +169,7 @@ namespace FEAT
       template<typename Vector_>
       void filter_sol(Vector_& vector) const
       {
-        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); it++)
+        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); ++it)
           it->second.filter_sol(vector);
       }
 
@@ -177,7 +177,7 @@ namespace FEAT
       template<typename Vector_>
       void filter_def(Vector_& vector) const
       {
-        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); it++)
+        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); ++it)
           it->second.filter_def(vector);
       }
 
@@ -185,10 +185,17 @@ namespace FEAT
       template<typename Vector_>
       void filter_cor(Vector_& vector) const
       {
-        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); it++)
+        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); ++it)
           it->second.filter_cor(vector);
       }
 
+      /** \copydoc UnitFilter::filter_mat() */
+      template<typename Matrix_>
+      void filter_mat(Matrix_& matrix) const
+      {
+        for(const_iterator it(BaseClass::begin()); it != BaseClass::end(); ++it)
+          it->second.filter_mat(matrix);
+      }
     }; // class FilterSequence
 
   } // namespace LAFEM
