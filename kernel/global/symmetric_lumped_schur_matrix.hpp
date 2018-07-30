@@ -68,6 +68,14 @@ namespace FEAT
       /// The right-vector type for A
       typedef LumpedMatrixA VectorTypeMR;
 
+      /// The row-gate type (used by SFINAE)
+      typedef typename MatrixD::GateRowType GateRowType;
+      /// The column-gate type (used by SFINAE)
+      typedef typename MatrixB::GateColType GateColType;
+
+      static constexpr bool is_global = true;
+      static constexpr bool is_local = false;
+
       /// A = diag(a)
       LumpedMatrixA inv_lumped_matrix_a;
       /// B
@@ -122,6 +130,11 @@ namespace FEAT
        */
       virtual ~SymmetricLumpedSchurMatrix()
       {
+      }
+
+      const Dist::Comm* get_comm() const
+      {
+        return inv_lumped_matrix_a.get_comm();
       }
 
       void update_lumped_a(const LumpedMatrixA& lumped_matrix_a_)
