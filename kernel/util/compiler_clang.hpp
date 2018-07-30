@@ -25,6 +25,7 @@
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
   _Pragma("clang diagnostic ignored \"-Wmismatched-tags\"") \
   _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"") \
+  _Pragma("clang diagnostic ignored \"-Wcast-qual\"") \
   _Pragma("clang diagnostic ignored \"-Wcomma\"")
 #else
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
