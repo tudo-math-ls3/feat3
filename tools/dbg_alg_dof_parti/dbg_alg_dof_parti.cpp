@@ -558,8 +558,8 @@ namespace Tutorial06
     HYPRE_ParVector par_q;
     HYPRE_Solver hypre_solver;
 
-    HYPRE_Int ilower = adp.get_global_dof_offset();
-    HYPRE_Int iupper = ilower + adp.get_num_owned_dofs() - 1;
+    HYPRE_Int ilower = HYPRE_Int(adp.get_global_dof_offset());
+    HYPRE_Int iupper = ilower + HYPRE_Int(adp.get_num_owned_dofs()) - 1;
 
 
     HYPRE_IJMatrixCreate(comm.mpi_comm(), ilower, iupper, ilower, iupper, &hypre_A);
@@ -593,7 +593,8 @@ namespace Tutorial06
     {
       const Index num_rows = adp_matrix.owned().rows();
       const Index num_nze = adp_matrix.owned().used_elements();
-      XASSERT(int(ilower+num_rows) == int(iupper+1));
+      const HYPRE_Int hy_num_dofs = HYPRE_Int(num_rows);
+      XASSERT(ilower+hy_num_dofs == iupper+1);
 
       const DataType* val_a = adp_matrix.owned().val();
       const IndexType* row_ptr_a = adp_matrix.owned().row_ptr();
@@ -605,20 +606,20 @@ namespace Tutorial06
       // loop over all owned matrix rows
       for(Index i(0); i < num_rows; ++i)
       {
-        hy_dofs[i] = adp.get_global_dof_offset() + i;
-        hy_ncols[i] = row_ptr_a[i+1] - row_ptr_a[i];
+        hy_dofs[i] = HYPRE_Int(adp.get_global_dof_offset() + i);
+        hy_ncols[i] = HYPRE_Int(row_ptr_a[i+1] - row_ptr_a[i]);
       }
       for(Index i(0); i < num_nze; ++i)
       {
-        hy_cols[i] = col_idx_a[i];
+        hy_cols[i] = HYPRE_Int(col_idx_a[i]);
       }
 
-      HYPRE_IJMatrixSetValues(hypre_A, num_rows, hy_ncols.data(), hy_dofs.data(), hy_cols.data(), val_a);
-      HYPRE_IJVectorSetValues(hypre_b, num_rows, hy_dofs.data(), adp_vector_b.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_x, num_rows, hy_dofs.data(), adp_vector_x.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_y, num_rows, hy_dofs.data(), adp_vector_x.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_d, num_rows, hy_dofs.data(), adp_vector_x.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_q, num_rows, hy_dofs.data(), adp_vector_x.owned().elements());
+      HYPRE_IJMatrixSetValues(hypre_A, hy_num_dofs, hy_ncols.data(), hy_dofs.data(), hy_cols.data(), val_a);
+      HYPRE_IJVectorSetValues(hypre_b, hy_num_dofs, hy_dofs.data(), adp_vector_b.owned().elements());
+      HYPRE_IJVectorSetValues(hypre_x, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
+      HYPRE_IJVectorSetValues(hypre_y, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
+      HYPRE_IJVectorSetValues(hypre_d, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
+      HYPRE_IJVectorSetValues(hypre_q, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
     }
 
     HYPRE_IJMatrixAssemble(hypre_A);
@@ -819,7 +820,8 @@ namespace Tutorial06
     HYPRE_ParCSRPCGSolve(hypre_solver, parcsr_A, par_b, par_x);
 
     // download solution vector
-    HYPRE_IJVectorGetValues(hypre_x, adp.get_num_owned_dofs(), hy_dofs.data(), adp_vector_y.owned().elements());
+    HYPRE_IJVectorGetValues(hypre_x, HYPRE_Int(adp.get_num_owned_dofs()), hy_dofs.data(),
+      adp_vector_y.owned().elements());
     adp_vector_y.download(vec_sol_hypre);
 
     HYPRE_ParCSRPCGDestroy(hypre_solver);
