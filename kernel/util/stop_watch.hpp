@@ -87,12 +87,12 @@ namespace FEAT
      * See TimeStamp::format_micros() for more information about the formatting options.
      *
      * \param[in] format
-     * Specifies string formating to be used.
+     * Specifies the output string format to be used.
      *
      * \returns
      * The time elapsed between in the stop-watch as a formatted string <code>h:mm:ss.nnn</code>.
      */
-    String elapsed_string(TimeFormat format = TimeFormat::h_m_s_m) const
+    String elapsed_string(TimeFormat format = TimeFormat::s_m) const
     {
       return TimeStamp::format_micros(elapsed_micros(), format);
     }

@@ -181,7 +181,7 @@ namespace FEAT
      * \returns
      * The time elapsed as a formatted string, for example <code>h:m:ss.mmm</code>.
      */
-    static String format_micros(long long micros, TimeFormat format = TimeFormat::h_m_s_m)
+    static String format_micros(long long micros, TimeFormat format = TimeFormat::s_m)
     {
       std::ostringstream oss;
       oss << std::setfill('0');
@@ -247,7 +247,7 @@ namespace FEAT
      * The time elapsed between the time stamps \p before and \c this as a formatted string,
      * for example <code>h:mm:ss.mm</code>.
      */
-    String elapsed_string(const TimeStamp& before, TimeFormat format = TimeFormat::h_m_s_m) const
+    String elapsed_string(const TimeStamp& before, TimeFormat format = TimeFormat::s_m) const
     {
       return format_micros(elapsed_micros(before), format);
     }
@@ -267,7 +267,7 @@ namespace FEAT
      * The time elapsed between this time stamp and now as a formatted string,
      * for example <code>h:mm:ss.mm</code>.
      */
-    String elapsed_string_now(TimeFormat format = TimeFormat::h_m_s_m) const
+    String elapsed_string_now(TimeFormat format = TimeFormat::s_m) const
     {
       return TimeStamp().elapsed_string(*this, format);
     }
