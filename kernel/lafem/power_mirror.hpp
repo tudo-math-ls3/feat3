@@ -159,6 +159,16 @@ namespace FEAT
       }
 
       /**
+       * \brief Checks whether the mirror is empty.
+       *
+       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
+       */
+      bool empty() const
+      {
+        return this->_sub_mirror.empty();
+      }
+
+      /**
        * \brief Computes the required buffer size for a PowerVector.
        *
        * \tparam[in] vector

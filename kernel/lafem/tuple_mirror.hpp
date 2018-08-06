@@ -130,6 +130,16 @@ namespace FEAT
         return _first.bytes() + _rest.bytes();
       }
 
+      /**
+       * \brief Checks whether the mirror is empty.
+       *
+       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
+       */
+      bool empty() const
+      {
+        return _first.empty() && _rest.empty();
+      }
+
       /// \cond internal
       First_& first()
       {
@@ -286,6 +296,10 @@ namespace FEAT
       std::size_t bytes() const
       {
         return _first.bytes();
+      }
+      bool empty() const
+      {
+        return _first.empty();
       }
 
       First_& first()

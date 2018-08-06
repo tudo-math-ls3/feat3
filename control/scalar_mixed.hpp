@@ -289,11 +289,13 @@ namespace FEAT
             // create a system mirror
             SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
 
-            // push mirror into gates
-            gate_velo.push(rank, std::move(mirror_velo));
+            // push mirrors into gates
+            if(!mirror_velo.empty())
+              gate_velo.push(rank, std::move(mirror_velo));
             if(!mirror_pres.empty())
               gate_pres.push(rank, std::move(mirror_pres));
-            gate_sys.push(rank, std::move(mirror_sys));
+            if(!mirror_sys.empty())
+              gate_sys.push(rank, std::move(mirror_sys));
           }
 
           // create local template vectors
