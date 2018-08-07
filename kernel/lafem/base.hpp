@@ -36,6 +36,7 @@ namespace FEAT
       fm_sv,  /**< Binary sparse vector data */
       fm_dvb, /**< Binary block vector data */
       fm_bcsr, /**< Binary block csr data */
+      fm_cscr, /**< Binary cscr data */
       fm_binary /**< Binary format of corresponding container type */
     };
 
@@ -57,6 +58,7 @@ namespace FEAT
     enum class SparseLayoutId
     {
       lt_csr = 0, /**< csr / bcsr layout */
+      lt_cscr, /**< cscr / bcscr layout */
       lt_coo, /**< coo layout */
       lt_ell, /**< ell layout */
       lt_banded /**< arbitrary banded layout */

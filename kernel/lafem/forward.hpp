@@ -40,6 +40,15 @@ namespace FEAT
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixBanded;
 
+    template <typename Mem_, typename DT_, typename IT_>
+    class SparseMatrixCSCR;
+
+    template<typename Mem_, typename DT_, typename IT_>
+    class VectorMirror;
+
+    template<typename Mem_, typename DT_, typename IT_>
+    class MatrixMirror;
+
   } // namespace LAFEM
 } // namespace FEAT
 

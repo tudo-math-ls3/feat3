@@ -16,6 +16,7 @@ if (FEAT_EICKT)
     dense_vector-eickt.cpp
     sparse_vector-eickt.cpp
     sparse_matrix_csr-eickt.cpp
+    sparse_matrix_cscr-eickt.cpp
     sparse_matrix_ell-eickt.cpp
     )
 endif(FEAT_EICKT)
@@ -56,6 +57,7 @@ SET (test_list
   sparse_matrix_banded-test
   sparse_matrix_coo-test
   sparse_matrix_csr-test
+  sparse_matrix_cscr-test
   sparse_matrix_ell-test
   sparse_matrix_bcsr-test
   sparse_vector-test

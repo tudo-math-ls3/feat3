@@ -50,6 +50,14 @@ namespace FEAT
         }
 #endif
 
+        template <typename DT_, typename IT_>
+        static void cscr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+                        const IT_ * const col_ind, const IT_ * const row_ptr, const IT_ * const row_numbers, const Index used_rows, const Index rows, const Index columns,
+                        const Index used_elements, const bool transposed)
+        {
+          cscr_generic(r, a, x, b, y, val, col_ind, row_ptr, row_numbers, used_rows, rows, columns, used_elements, transposed);
+        }
+
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
@@ -141,6 +149,11 @@ namespace FEAT
         static void csr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index, const bool);
 
+        template <typename DT_, typename IT_>
+        static void cscr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+                        const IT_ * const col_ind, const IT_ * const row_ptr, const IT_ * const row_numbers, const Index used_rows,
+                        const Index rows, const Index, const Index, const bool);
+
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
@@ -181,6 +194,11 @@ namespace FEAT
       extern template void Apply<Mem::Main>::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
       extern template void Apply<Mem::Main>::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
       extern template void Apply<Mem::Main>::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+
+      extern template void Apply<Mem::Main>::cscr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply<Mem::Main>::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply<Mem::Main>::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply<Mem::Main>::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
 
       extern template void Apply<Mem::Main>::ell_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
       extern template void Apply<Mem::Main>::ell_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);

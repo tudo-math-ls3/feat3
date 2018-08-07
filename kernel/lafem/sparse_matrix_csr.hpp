@@ -492,7 +492,7 @@ namespace FEAT
                                DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        //todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
+        /// \todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
         XASSERT(col_ind_in.size() > 0);
         XASSERT(val_in.size() > 0);
         XASSERT(row_ptr_in.size() > 0);
@@ -1446,11 +1446,11 @@ namespace FEAT
         ASSERT(row < rows());
         ASSERT(col < columns());
 
-        for (Index i(Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row))) ; i < Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1)) ; ++i)
+        for (Index i(Index(MemoryPool<Mem_>::get_element(this->row_ptr(), row))) ; i < Index(MemoryPool<Mem_>::get_element(this->row_ptr(), row + 1)) ; ++i)
         {
-          if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) == col)
-            return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
-          if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) > col)
+          if (Index(MemoryPool<Mem_>::get_element(this->col_ind(), i)) == col)
+            return MemoryPool<Mem_>::get_element(this->val(), i);
+          if (Index(MemoryPool<Mem_>::get_element(this->col_ind(), i)) > col)
             return zero_element();
         }
         return zero_element();

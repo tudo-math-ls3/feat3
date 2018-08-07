@@ -28,6 +28,13 @@ namespace FEAT
       };
 
       template <>
+      struct LayoutId<SparseLayoutId::lt_cscr>
+      {
+        template<typename Mem_, typename DT_, typename IT_>
+        using MatrixType = SparseMatrixCSCR<Mem_, DT_, IT_>;
+      };
+
+      template <>
       struct LayoutId<SparseLayoutId::lt_coo>
       {
         template<typename Mem_, typename DT_, typename IT_>

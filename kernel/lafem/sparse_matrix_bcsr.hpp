@@ -944,15 +944,15 @@ namespace FEAT
         ASSERT(row < rows());
         ASSERT(col < columns());
 
-        for (Index i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
+        for (Index i(MemoryPool<Mem_>::get_element(this->row_ptr(), row)) ; i < MemoryPool<Mem_>::get_element(row_ptr(), row + 1) ; ++i)
         {
-          if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
+          if (MemoryPool<Mem_>::get_element(this->col_ind(), i) == col)
           {
             Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> t;
-            MemoryPool<Mem_>::download((DT_*)t.v, this->_elements.at(0) + i * Index(BlockHeight_*BlockWidth_), Index(BlockHeight_*BlockWidth_));
+            MemoryPool<Mem_>::download((DT_*)t.v, this->val<Perspective::pod>() + i * Index(BlockHeight_*BlockWidth_), Index(BlockHeight_*BlockWidth_));
             return t;
           }
-          if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > col)
+          if (MemoryPool<Mem_>::get_element(this->col_ind(), i) > col)
             break; //return zero element
         }
 

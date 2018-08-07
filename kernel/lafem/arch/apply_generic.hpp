@@ -58,6 +58,51 @@ namespace FEAT
         }
       }
 
+      template <typename DT_, typename IT_>
+      void Apply<Mem::Main>::cscr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+                                               const IT_ * const col_ind, const IT_ * const row_ptr, const IT_ * const row_numbers,
+                                               const Index used_rows, const Index rows, const Index columns, const Index, const bool transposed)
+      {
+        if (Math::abs(b) < Math::eps<DT_>())
+        {
+          MemoryPool<Mem::Main>::set_memory(r, DT_(0), (transposed?columns:rows));
+        }
+        else if (r != y)
+        {
+          MemoryPool<Mem::Main>::copy(r, y, (transposed?columns:rows));
+        }
+
+        if (transposed)
+        {
+          for (Index col(0) ; col < columns ; ++col)
+          {
+            r[col] = b * r[col];
+          }
+          for (Index nzrow(0) ; nzrow < used_rows ; ++nzrow)
+          {
+            const Index row(row_numbers[nzrow]);
+            for (Index i(row_ptr[nzrow]) ; i < row_ptr[nzrow+1] ; ++i)
+            {
+              r[col_ind[i]] += val[i] * x[row] * a;
+            }
+          }
+        }
+        else
+        {
+          for (Index nzrow(0) ; nzrow < used_rows ; ++nzrow)
+          {
+            const Index row(row_numbers[nzrow]);
+            DT_ sum(0);
+            const IT_ end(row_ptr[nzrow + 1]);
+            for (IT_ i(row_ptr[nzrow]) ; i < end ; ++i)
+            {
+              sum += val[i] * x[col_ind[i]];
+            }
+            r[row] = (sum * a) + (b * r[row]);
+          }
+        }
+      }
+
       template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
       void Apply<Mem::Main>::csrb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                                                 const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
