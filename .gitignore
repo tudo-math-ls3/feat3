@@ -55,6 +55,7 @@ thirdparty/*.zip
 thirdparty/alglib
 thirdparty/fparser
 thirdparty/half
+thirdparty/hypre
 thirdparty/parmetis
 thirdparty/SuiteSparse
 thirdparty/triangle
