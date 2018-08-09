@@ -100,7 +100,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 
 // FEAT-Global includes
-#include <kernel/global/symmetric_lumped_schur_matrix.hpp>
+#include <kernel/global/pmdcdsc_matrix.hpp>
 
 // Misc. FEAT includes
 #include <kernel/util/runtime.hpp>
@@ -596,12 +596,12 @@ namespace NavierStokesPP
     }
 
     // 2D variant
-    // Setup: flow around a cylinder (32 quads)
+    // Setup: flow around a cylinder (64 quads)
     // DFG flow around cylinder benchmark 2D-1, laminar case Re=20
     void setup_fb_c2d_01()
     {
       setup_fb_c2d_aux();
-      mesh_files.push_back("flowbench_c2d_01_quad_32.xml");
+      mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(4);
       tol_rel_a = 0.5;
@@ -618,12 +618,12 @@ namespace NavierStokesPP
     }
 
     // 2D variant
-    // Setup: flow around a cylinder (32 quads)
+    // Setup: flow around a cylinder (64 quads)
     // DFG flow around cylinder benchmark 2D-2, time-periodic case Re=100
     void setup_fb_c2d_02() // (unsteady)
     {
       setup_fb_c2d_aux();
-      mesh_files.push_back("flowbench_c2d_01_quad_32.xml");
+      mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(5);
       vmax = 1.5;
@@ -641,7 +641,7 @@ namespace NavierStokesPP
     void setup_fb_c2d_03() // (unsteady)
     {
       setup_fb_c2d_aux();
-      mesh_files.push_back("flowbench_c2d_01_quad_32.xml");
+      mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
       level_min = level_min_in = Index(0);
       level_max = level_max_in = Index(3);
       tol_rel_a = 0.1;
@@ -1073,18 +1073,11 @@ namespace NavierStokesPP
     // (lumped) pressure mass matrix
     // according to the pressure mass matrix structure, no lumping is required
     GlobalPresMatrix matrix_mass_pres;
-    GlobalPresVector lumped_mass_pres;
+    GlobalPresVector inverse_lumped_mass_pres;
 
-    // lumped velocity mass matrix
-    GlobalVeloVector lumped_mass_velo;
+    // inverse lumped velocity mass matrix
+    GlobalVeloVector inverse_lumped_mass_velo;
 
-    typedef Global::SymmetricLumpedSchurMatrix
-    <
-      GlobalVeloVector,
-      typename BaseClass::GlobalMatrixBlockB,
-      typename BaseClass::GlobalMatrixBlockD,
-      typename BaseClass::GlobalVeloFilter
-    > GlobalSchurMatrix;
 
     // schur matrix
     //
@@ -1095,12 +1088,13 @@ namespace NavierStokesPP
     // matrix_s = matrix_d * inv_lumped_mass_velo * matrix_b
     //
     // (FEAT : inv_lumped_mass_velo = matrix_s.inv_lumped_matrix_a)
+    typedef Global::PMDCDSCMatrix<GlobalMatrixBlockB, GlobalMatrixBlockD> GlobalSchurMatrix;
     GlobalSchurMatrix matrix_s;
 
     NavierStokesBlockedSystemLevel() :
-      lumped_mass_pres(&this->gate_pres),
-      lumped_mass_velo(&this->gate_velo),
-      matrix_s(this->lumped_mass_velo, this->matrix_b, this->matrix_d, this->filter_velo)
+      inverse_lumped_mass_pres(&this->gate_pres),
+      inverse_lumped_mass_velo(&this->gate_velo),
+      matrix_s(this->inverse_lumped_mass_velo, this->matrix_b, this->matrix_d)
     {
     }
 
@@ -1359,22 +1353,23 @@ namespace NavierStokesPP
 
       // assemble lumped velocity mass matrix
       {
-        Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
-        burgers_mat.theta = DataType(1);
-
         auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
-        auto loc_vec_v = loc_mat_a.create_vector_l();
-        loc_vec_v.format();
         loc_mat_a.format();
-        burgers_mat.assemble_matrix(loc_mat_a, loc_vec_v, domain.at(i)->space_velo, cubature);
+        Assembly::Common::IdentityOperatorBlocked<dim> id_op;
+        Assembly::BilinearOperatorAssembler::assemble_block_matrix1(loc_mat_a, id_op, domain.at(i)->space_velo, cubature);
 
-        system_levels.at(i)->lumped_mass_velo = system_levels.at(i)->matrix_a.lump_rows();
+        system_levels.at(i)->inverse_lumped_mass_velo = system_levels.at(i)->matrix_a.lump_rows();
+        system_levels.at(i)->inverse_lumped_mass_velo.component_invert(system_levels.at(i)->inverse_lumped_mass_velo);
+      }
 
-        system_levels.at(i)->matrix_s.update_lumped_a(system_levels.at(i)->lumped_mass_velo);
+      // perform symbolic initialisation of Schur-complement matrix
+      if((i == Index(0)) || cfg.multigrid_s)
+      {
+        system_levels.at(i)->matrix_s.init_symbolic();
       }
     }
 
-    // assemble Schur-matrix on finest level
+    // assemble pressure mass matrix on finest level
     {
       // get the local pressure mass matrix
       auto& loc_mat_pres = system_levels.front()->matrix_mass_pres.local();
@@ -1386,8 +1381,8 @@ namespace NavierStokesPP
       loc_mat_pres.format();
       Assembly::Common::IdentityOperator id_op;
       Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_pres, id_op, domain.front()->space_pres, cubature, DataType(1));
-      system_levels.front()->lumped_mass_pres = system_levels.front()->matrix_mass_pres.lump_rows();
-      system_levels.front()->lumped_mass_pres.component_invert(system_levels.front()->lumped_mass_pres);
+      system_levels.front()->inverse_lumped_mass_pres = system_levels.front()->matrix_mass_pres.lump_rows();
+      system_levels.front()->inverse_lumped_mass_pres.component_invert(system_levels.front()->inverse_lumped_mass_pres);
     }
 
     /* ***************************************************************************************** */
@@ -1440,6 +1435,15 @@ namespace NavierStokesPP
 
         // finally, compile the system filter
         system_levels.at(i)->compile_system_filter();
+
+        // apply velocity filter onto inverse lumped mass matrix
+        fil_loc_v.filter_cor(system_levels.at(i)->inverse_lumped_mass_velo.local());
+
+        // perform numeric initialisation of Schur-complement matrix
+        if((i == Index(0)) || cfg.multigrid_s)
+        {
+          system_levels.at(i)->matrix_s.init_numeric();
+        }
       }
     }
 
@@ -2138,7 +2142,7 @@ namespace NavierStokesPP
 
         // update the pressure part II
         // p = p_old + alpha_d f      (= p_old + alpha_d M_p^(-1) f_p)
-        vec_def_p.component_product(system_levels.front()->lumped_mass_pres, vec_def_p);
+        vec_def_p.component_product(the_system_level.inverse_lumped_mass_pres, vec_def_p);
         vec_sol_p.axpy(vec_def_p,vec_sol_p,cfg.alpha_d);
         filter_p.filter_sol(vec_sol_p);
 
@@ -2151,7 +2155,7 @@ namespace NavierStokesPP
         // tmp = B q
         matrix_b.apply(vec_tmp,vec_q);
         // tmp = M_l^(-1) B q
-        vec_tmp.component_product(matrix_s.inv_lumped_matrix_a, vec_tmp);
+        vec_tmp.component_product(the_system_level.inverse_lumped_mass_velo, vec_tmp);
         // u^l = -k tmp + tilde_u^l = -k M_l^(-1) B q + tilde_u^l
         vec_sol_v.axpy(vec_tmp,vec_conv,-delta_t);
         // apply filter onto solution vector
