@@ -45,7 +45,7 @@ CCache 3.2+
 Ninja 1.6+
 Valgrind 3.10+
 Score-P 1.4.2+
-Intel MKL 15+
+Intel MKL 16+ / 11.3.4+
 
 Alglib, Fparser, Umfpack and Parmetis are downloaded and build automatically, when included in the configure flags.
 
