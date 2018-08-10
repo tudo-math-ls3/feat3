@@ -24,13 +24,12 @@ namespace FEAT
         typedef typename BaseClass::LevelType LevelType;
         typedef typename BaseClass::MeshType MeshType;
         typedef typename BaseClass::AtlasType AtlasType;
+        typedef typename BaseClass::MeshNodeType MeshNodeType;
 
       public:
         explicit UnitCubeDomainControl(const Dist::Comm& comm_, int lvl_max, int lvl_min = -1) :
           BaseClass(comm_)
         {
-          typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
-
           int rank = comm_.rank();
           int nprocs = comm_.size();
 
