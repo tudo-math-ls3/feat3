@@ -195,7 +195,7 @@ namespace FEAT
       template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        if (perspective_ == Perspective::pod && BlockHeight_ != 1)
+        if (perspective_ == Perspective::pod)
           return this->_num_rows * Index(BlockHeight_);
         else
           return this->_num_rows;
@@ -210,7 +210,7 @@ namespace FEAT
       template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        if (perspective_ == Perspective::pod && BlockWidth_ != 1)
+        if (perspective_ == Perspective::pod)
           return this->_num_cols * Index(BlockWidth_);
         else
           return this->_num_cols;
