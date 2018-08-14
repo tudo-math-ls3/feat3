@@ -195,10 +195,17 @@ namespace FEAT
       template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
+        FEAT_DISABLE_WARNINGS
         if (perspective_ == Perspective::pod)
+        {
+          FEAT_RESTORE_WARNINGS
           return this->_num_rows * Index(BlockHeight_);
+        }
         else
+        {
+          FEAT_RESTORE_WARNINGS
           return this->_num_rows;
+        }
       }
 
       /**
@@ -210,10 +217,17 @@ namespace FEAT
       template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
+        FEAT_DISABLE_WARNINGS
         if (perspective_ == Perspective::pod)
+        {
+          FEAT_RESTORE_WARNINGS
           return this->_num_cols * Index(BlockWidth_);
+        }
         else
+        {
+          FEAT_RESTORE_WARNINGS
           return this->_num_cols;
+        }
       }
 
       /**

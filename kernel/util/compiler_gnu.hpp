@@ -38,6 +38,7 @@
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("GCC diagnostic ignored \"-Wundef\"") \
   _Pragma("GCC diagnostic ignored \"-Wparentheses\"") \
+  _Pragma("GCC diagnostic ignored \"-Wduplicated-branches\"") \
   _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")
 
 #define FEAT_RESTORE_WARNINGS _Pragma("GCC diagnostic pop")
