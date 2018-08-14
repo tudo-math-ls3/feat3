@@ -389,7 +389,7 @@ namespace FEAT
 
       Index _get_num_global_dofs() const
       {
-        return _glob_dof_count();
+        return _glob_dof_count;
       }
 
       Index _get_global_dof_offset() const
