@@ -19,8 +19,16 @@
 // define FEAT_COMPILER_GCC
 #  define FEAT_COMPILER_GNU _GCC_VER
 
-#if(__GNUC__ >= 5)
-#  define FEAT_COMPILER "GNU C++ compiler 5.x.x (or newer)"
+#if(__GNUC__ >= 9)
+#  define FEAT_COMPILER "GNU C++ compiler 9.x.x (or newer)"
+#elif(__GNUC__ >= 8)
+#  define FEAT_COMPILER "GNU C++ compiler 8.x.x"
+#elif(__GNUC__ >= 7)
+#  define FEAT_COMPILER "GNU C++ compiler 7.x.x"
+#elif(__GNUC__ >= 6)
+#  define FEAT_COMPILER "GNU C++ compiler 6.x.x"
+#elif(__GNUC__ >= 5)
+#  define FEAT_COMPILER "GNU C++ compiler 5.x.x"
 #elif(__GNUC__ >= 4)
 #  define FEAT_COMPILER "GNU C++ compiler 4.x.x"
 #else
@@ -38,7 +46,6 @@
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("GCC diagnostic ignored \"-Wundef\"") \
   _Pragma("GCC diagnostic ignored \"-Wparentheses\"") \
-  _Pragma("GCC diagnostic ignored \"-Wduplicated-branches\"") \
   _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")
 
 #define FEAT_RESTORE_WARNINGS _Pragma("GCC diagnostic pop")
