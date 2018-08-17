@@ -56,9 +56,12 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags += " -O0 "
 
     cxxflags += " -fdiagnostics-show-option -fno-omit-frame-pointer"
+
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
-    if platform.system() != "Darwin":
+    #do not use stl debug libs with cuda, the unified memory system blows big holes into the memory
+    if platform.system() != "Darwin" and not "cuda" in buildid:
       cxxflags += " -D_GLIBCXX_DEBUG"
+
     cxxflags += " -lpthread -ldl"
     if (major >= 4 and minor >= 9) or major > 4:
       cxxflags += " -fsanitize=undefined"
