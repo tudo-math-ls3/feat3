@@ -807,8 +807,7 @@ namespace FEAT
           // required partitioning level for a-posteriori partitioning.
           // For this, first determine the factor by which the number of elements
           // increases for each refinement:
-          typedef typename MeshType::ShapeType ShapeType;
-          const Index factor = Index(Geometry::Intern::StandardRefinementTraits<ShapeType, ShapeType::dimension>::count);
+          const Index factor = Index(Geometry::Intern::StandardRefinementTraits<typename BaseClass::ShapeType, BaseClass::ShapeType::dimension>::count);
 
           // compute minimum number of elements for a-posteriori partitioning
           const Index min_elems = Index(this->_comm.size()) * Index(_required_elems_per_rank);
