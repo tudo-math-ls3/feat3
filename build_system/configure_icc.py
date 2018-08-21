@@ -29,11 +29,11 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     cxxflags += "  -O0 -debug all -ftrapuv"
 
   elif "opt" in buildid or "fast" in buildid:
-    cxxflags += " -no-prec-div"
+    cxxflags += " -no-prec-div -diag-disable 11074,11076,25464"
     if "lto" in buildid:
-      cxxflags += " -ipo -diag-disable 11074,11076,11000,11001,11006"
+      cxxflags += " -ipo -diag-disable 11000,11001,11006"
     else:
-      cxxflags += " -ip -diag-disable 11074,11076"
+      cxxflags += " -ip"
 
     if "opt" in buildid:
       cxxflags += " -O3"
