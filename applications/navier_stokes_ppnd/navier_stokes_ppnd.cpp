@@ -237,6 +237,9 @@ namespace NavierStokesPP
 
     // -------------------------------
 
+    // use linear extrapolation (with one fixpoint iteration) of u instead a full fixpoint iteration
+    bool no_nonlinear;
+
     // number of fixpoint iterations (for the velocity)
     Index fixpoint_steps;
 
@@ -343,6 +346,7 @@ namespace NavierStokesPP
       time_max(0.0),
       time_steps(0),
       max_time_steps(0),
+      no_nonlinear(true),
       fixpoint_steps(100),
       tol_fix(1E-2),
       multigrid_a(true),
@@ -442,6 +446,7 @@ namespace NavierStokesPP
       if(args.parse("max-time-steps", max_time_steps) < 1)
         max_time_steps = time_steps;
       args.parse("fix-steps", fixpoint_steps);
+      no_nonlinear = (args.check("no-nonlinear") < 0);
       multigrid_a = (args.check("no-multigrid-a") < 0);
       multigrid_s = (args.check("no-multigrid-s") < 0);
       args.parse("max-iter-a", max_iter_a);
@@ -467,7 +472,7 @@ namespace NavierStokesPP
 
       // only 5 time-steps in test mode
       if(test_mode)
-        max_time_steps = 5;
+        max_time_steps = 10;
 
       return true;
     }
@@ -520,8 +525,12 @@ namespace NavierStokesPP
       dump_line(comm, "Delta-t", time_max / time_steps);
        // =======================================================================================
       comm.print("\nSolver Setting:");
-      dump_line(comm, "Fixpoint Iteration", fixpoint_steps);
-      dump_line(comm, "Tol-fixpoint", tol_fix);
+      dump_line(comm, "Iteration", (no_nonlinear ? "Linear Extrapolation" : "Fixpoint"));
+      if (!no_nonlinear)
+      {
+        dump_line(comm, "Fixpoint Iteration", fixpoint_steps);
+        dump_line(comm, "Tol-fixpoint", tol_fix);
+      }
       dump_line(comm, "A: Solver", (multigrid_a ? "Rich-Multigrid" : "Richardson"));
       dump_line(comm, "A: Max-Iter", max_iter_a);
       dump_line(comm, "A: Tol-Rel", tol_rel_a);
@@ -1779,6 +1788,11 @@ namespace NavierStokesPP
       cfg.alpha_d = cfg.theta * delta_t * cfg.nu; // alpha_d <= theta * delta_t * nu  (<= k / Reynolds)
     }
 
+    if (cfg.no_nonlinear == true)
+    {
+      cfg.fixpoint_steps = 1;
+    }
+
     // body forces, pressure difference and flux values
     DataType c_drag(0), c_lift(0), p_diff(0);
     DataType c_drag_time(0), c_lift_time(0);
@@ -1952,8 +1966,17 @@ namespace NavierStokesPP
         // apply RHS filter
         filter_v.filter_rhs(vec_rhs);
 
-        // constant extrapolation of solution in time
-        vec_conv.copy(vec_sol_v);
+        // linear extrapolation of solution in time
+        if((time_step > Index(2)) && (cfg.no_nonlinear))
+        {
+          vec_conv.scale(vec_sol_v_1, DataType(2));
+          vec_conv.axpy(vec_sol_v_2, vec_conv, -DataType(1));
+        }
+        else
+        {
+          // constant extrapolation of solution in time
+          vec_conv.copy(vec_sol_v);
+        }
 
         // Iteration number of solver_a
         Index iter_a(0);
@@ -2414,6 +2437,17 @@ namespace NavierStokesPP
     // are we in test-mode?
     if(cfg.test_mode)
     {
+      // (on rosetyler)
+      // LVL 3 : linear extrapolation
+      // 10 |   0.01000000 |  1 |   92 | 1.674e-08 > 1.640e-09 |   36 | 1.491e-04 | 4.442e-15 |  1.560e-01 | -2.286e-04 |  9.378e-02 |  1.000e-03 |  2.030e-01 |  3.000e-03 | -2.194e-04 | 28.708
+      // LVL 3: full fixpoint iteration
+      // 10 |   0.01000000 |  2 |   49 | 3.527e-06 > 3.387e-08 |   36 | 2.021e-04 | 4.490e-15 |  1.565e-01 | -2.345e-04 |  9.401e-02 |  1.000e-03 |  2.030e-01 |  3.000e-03 | -2.322e-04 | 31.636
+      if ((c_drag < 1.559e-01) && (c_drag > 1.569e-01)
+          && (c_lift > -2.4e-04) && (c_lift < -2.2e-4)
+          && (p_diff < 9.35e-02) && (p_diff > 9.45e-2)
+          && (c_drag_time != 1.00e-03) && (c_lift_time != 3.00e-03))
+            failure = true;
+
       if(failure)
         comm.print(std::cerr, "\nTest-Mode: FAILED");
       else
@@ -2548,6 +2582,7 @@ namespace NavierStokesPP
     args.support("load", "<name> \nLoad a savefile.\n");
     args.support("mesh-file", "<name>\nSpecifies the filename of the input mesh file.\n");
     args.support("mesh-path", "<path>\nSpecifies the path of the directory containing the mesh file.\n");
+    args.support("no-nonlinear", "\n Sets the fixpoint iterations on / off.\n");
     args.support("fix-steps", "<N>\nSets the number of non-linear / fixpoint iterations per time-step.\n");
     args.support("tol-fix", "<eps>\nSets the tolerance of the non-linear / fixpoint iteration.\n");
     args.support("no-multigrid-a", "\nUse no Multigrid-Solver as A-Solver (velocity).\n");
