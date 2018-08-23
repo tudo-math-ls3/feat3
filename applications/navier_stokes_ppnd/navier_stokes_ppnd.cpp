@@ -2165,8 +2165,11 @@ namespace NavierStokesPP
 
         // update the pressure part II
         // p = p_old + alpha_d f      (= p_old + alpha_d M_p^(-1) f_p)
-        vec_def_p.component_product(the_system_level.inverse_lumped_mass_pres, vec_def_p);
-        vec_sol_p.axpy(vec_def_p,vec_sol_p,cfg.alpha_d);
+        if (cfg.alpha_d > 0)
+        {
+          vec_def_p.component_product(the_system_level.inverse_lumped_mass_pres, vec_def_p);
+          vec_sol_p.axpy(vec_def_p,vec_sol_p,cfg.alpha_d);
+        }
         filter_p.filter_sol(vec_sol_p);
 
         //
@@ -2438,15 +2441,29 @@ namespace NavierStokesPP
     if(cfg.test_mode)
     {
       // (on rosetyler)
-      // LVL 3 : linear extrapolation
-      // 10 |   0.01000000 |  1 |   92 | 1.674e-08 > 1.640e-09 |   36 | 1.491e-04 | 4.442e-15 |  1.560e-01 | -2.286e-04 |  9.378e-02 |  1.000e-03 |  2.030e-01 |  3.000e-03 | -2.194e-04 | 28.708
-      // LVL 3: full fixpoint iteration
-      // 10 |   0.01000000 |  2 |   49 | 3.527e-06 > 3.387e-08 |   36 | 2.021e-04 | 4.490e-15 |  1.565e-01 | -2.345e-04 |  9.401e-02 |  1.000e-03 |  2.030e-01 |  3.000e-03 | -2.322e-04 | 31.636
-      if ((c_drag < 1.559e-01) && (c_drag > 1.569e-01)
-          && (c_lift > -2.4e-04) && (c_lift < -2.2e-4)
-          && (p_diff < 9.35e-02) && (p_diff > 9.45e-2)
-          && (c_drag_time != 1.00e-03) && (c_lift_time != 3.00e-03))
-            failure = true;
+      // LVL 1 : linear extrapolation
+      // mpirun -n 12 applications/navier_stokes_ppnd/navier_stokes_ppnd --setup fb-c2d-03 --mesh-path ~/FEAT/feat3/data/meshes/  --level 1 --time-steps 1600  --tol-rel-a 0.99   --test-mode
+      // 10 |   0.05000000 |  1 |    1 | 6.388e-05 > 6.292e-05 |   87 | 1.034e-03 | 5.379e-15 |  3.045e-01 | -6.638e-04 |  1.714e-01 |  1.000e-02 |  3.492e-01 |  5.000e-03 | -4.636e-04 | 0.148
+      // LVL 1: full fixpoint iteration
+      // mpirun -n 12 applications/navier_stokes_ppnd/navier_stokes_ppnd --setup fb-c2d-03 --mesh-path ~/FEAT/feat3/data/meshes/  --level 1 --time-steps 1600  --tol-rel-a 0.99 --test-mode --no-nonlinear --fix-steps 400
+      // 10 |   0.05000000 | 311 |    1 | 7.178e-05 > 7.099e-07 |   84 | 4.511e-03 | 9.428e-15 |  1.839e-01 | -2.967e-04 |  1.066e-01 |  5.000e-03 |  2.082e-01 |  1.000e-02 | -2.905e-04 | 1.085
+
+      if (cfg.no_nonlinear)
+      {
+        if ((c_drag < 3.035e-01) || (c_drag > 3.055e-01)
+              || (c_lift < -6.65e-04) || (c_lift > -6.62e-4)
+              || (p_diff < 1.70e-01) || (p_diff > 1.73e-01)
+              || (c_drag_time != 1.00e-02) || (c_lift_time != 5.00e-03))
+                failure = true;
+      }
+      else
+      {
+        if ((c_drag < 1.82e-01) || (c_drag > 1.85e-01)
+              || (c_lift < -2.97e-04) || (c_lift > -2.96e-4)
+              || (p_diff < 1.00e-01) || (p_diff > 1.10e-01)
+              || (c_drag_time != 5.00e-03) || (c_lift_time != 1.00e-02))
+                failure = true;
+      }
 
       if(failure)
         comm.print(std::cerr, "\nTest-Mode: FAILED");
