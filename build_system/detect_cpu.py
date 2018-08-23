@@ -246,6 +246,9 @@ def detect_cpu():
     elif cpu_family == 17:
       if model == 3:
         cputype = "athlon64x2"
+    elif cpu_family == 23:
+      if model == 1:
+        cputype = "zen"
 
   # TODO insert sparc support here once it has been implemented properly
 
