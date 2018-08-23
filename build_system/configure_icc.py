@@ -42,8 +42,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
 
     if cpu == "unknown":
       # generate code for every simd unit, existing so far
-      cxxflags += " -axCORE-AVX2"
-      print ("Warning: cpu type not detected, using generic sse support instead.")
+      cxxflags += " -axCORE-AVX512"
+      print ("Warning: cpu type not detected, using generic vectorisation support instead.")
 
     # INTEL
     elif cpu == "i486":
@@ -127,8 +127,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     elif cpu == "magnycours":
       cxxflags += " -msse3"
     else:
-      print ("Warning: Detected cpu type not supported by configure_icc.py, using generic sse support instead")
+      print ("Warning: Detected cpu type not supported by configure_icc.py, using generic vectorisation support instead")
       # generate code for every simd unit, existing so far
-      cxxflags += " -axCORE-AVX2"
+      cxxflags += " -axCORE-AVX512"
 
   return cxxflags
