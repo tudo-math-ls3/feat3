@@ -5,6 +5,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of lafem source files
 SET (kernel-solver-list
+  hypre.cpp
   umfpack.cpp
   )
 

@@ -16,9 +16,6 @@ TARGET_LINK_LIBRARIES(cub-list feat)
 ADD_EXECUTABLE(dbg-nlopt dbg_nlopt/dbg_nlopt.cpp)
 TARGET_LINK_LIBRARIES(dbg-nlopt feat)
 
-ADD_EXECUTABLE(dbg-hypre dbg_hypre/dbg_hypre.cpp)
-TARGET_LINK_LIBRARIES(dbg-hypre feat)
-
 ADD_EXECUTABLE(dbg-pmdcdsc dbg_pmdcdsc/dbg_pmdcdsc.cpp)
 TARGET_LINK_LIBRARIES(dbg-pmdcdsc feat)
 

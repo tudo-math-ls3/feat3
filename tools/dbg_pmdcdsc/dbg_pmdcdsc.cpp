@@ -37,86 +37,9 @@
 #include <control/scalar_mixed.hpp>
 #include <control/statistics.hpp>
 
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-#include <HYPRE_krylov.h>
-#endif
-
 namespace PoissonMixed
 {
   using namespace FEAT;
-
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-    template<typename Matrix_, typename Filter_>
-    class HyprePCG :
-      public Solver::HypreSolverBase<Matrix_, Filter_>
-    {
-    public:
-      /// our base-class
-      typedef Solver::HypreSolverBase<Matrix_, Filter_> BaseClass;
-      /// the vector type
-      typedef typename BaseClass::VectorType VectorType;
-
-    protected:
-      /// the HYPRE solver object
-      HYPRE_Solver _precond;
-
-    public:
-      explicit HyprePCG(const Matrix_& matrix, const Filter_& filter) :
-        BaseClass(matrix, filter),
-        _precond(nullptr)
-      {
-      }
-
-      virtual String name() const override
-      {
-        return "HyprePCG";
-      }
-
-      virtual void init_numeric() override
-      {
-        BaseClass::init_numeric();
-
-        // create BoomerAMG preconditioner
-        HYPRE_ParCSRPCGCreate(this->_get_comm()->mpi_comm(), &_precond);
-
-        /// \todo set BoomerAMG parameters
-        HYPRE_PCGSetMaxIter(_precond, 1000); /* max iterations */
-        HYPRE_PCGSetTol(_precond, 1e-5); /* conv. tolerance */
-        HYPRE_PCGSetTwoNorm(_precond, 1); /* use the two norm as the stopping criteria */
-        HYPRE_PCGSetPrintLevel(_precond, 2); /* prints out the iteration info */
-        HYPRE_PCGSetLogging(_precond, 1); /* needed to get run info later */
-
-        // setup BoomerAMG
-        // according to the documentation, the two vectors are ignored by this function
-        HYPRE_ParCSRPCGSetup(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
-      }
-
-      virtual void done_numeric() override
-      {
-        if(_precond != nullptr)
-        {
-          HYPRE_ParCSRPCGDestroy(_precond);
-          _precond = nullptr;
-        }
-      }
-
-      virtual Solver::Status apply(VectorType& vec_cor, const VectorType& vec_def) override
-      {
-        // upload defect vector and format correction
-        this->_upload_def(vec_def);
-        this->_format_cor();
-
-        // apply BoomerAMG preconditioner
-        HYPRE_ParCSRPCGSolve(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
-
-        // download correction
-        this->_download_cor(vec_cor);
-
-        // okay
-        return Solver::Status::success;
-      }
-    }; // class BoomerAMG
-#endif
 
   template<typename DomainLevel_>
   void run(SimpleArgParser& args, Control::Domain::DomainControl<DomainLevel_>& domain)
@@ -282,7 +205,7 @@ namespace PoissonMixed
     /* ***************************************************************************************** */
 
 
-    double time_1 = 0.0, time_2 = 0.0, time_3 = 0.0, time_4 = 0.0;
+    double time_1 = 0.0, time_2 = 0.0;
 
     auto vec_sol_1 = vec_rhs.clone();
     vec_sol_1.format();
@@ -338,68 +261,10 @@ namespace PoissonMixed
       solver->done();
     }
 
-    auto vec_sol_3 = vec_rhs.clone();
-    vec_sol_3.format();
-
-    auto vec_sol_4 = vec_rhs.clone();
-    vec_sol_4.format();
-
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-    if(args.check("pcg") >= 0)
-    {
-      comm.print("\nSolving System using PMDCDSCMatrix and HyprePCG...");
-      auto solver = std::make_shared<HyprePCG<GlobalPMDCDSCMatrix, typename SystemLevelType::GlobalPresFilter>>(matrix_pmdcdsc, the_system_level.filter_pres);
-
-      // enable plotting
-      //solver->set_plot_mode(Solver::PlotMode::all);
-
-      // set tolerance
-      //solver->set_tol_rel(1E-5);
-      //solver->set_max_iter(100);
-
-      // initialise
-      solver->init();
-
-      TimeStamp ts;
-      solver->apply(vec_sol_3, vec_rhs);
-      time_3 = ts.elapsed_now();
-
-      // release solver
-      solver->done();
-    }
-
-    if(args.check("amg") >= 0)
-    {
-      comm.print("\nSolving System using BoomerAMG...");
-      auto precond = Solver::new_boomeramg(matrix_pmdcdsc, the_system_level.filter_pres);
-      auto solver = Solver::new_richardson(matrix_pmdcdsc, the_system_level.filter_pres, 1.0, precond);
-
-      // enable plotting
-      solver->set_plot_mode(Solver::PlotMode::all);
-      solver->set_plot_name("BoomerAMG");
-
-      // set tolerance
-      solver->set_tol_rel(1E-5);
-      solver->set_max_iter(100);
-
-      // initialise
-      solver->init();
-
-      TimeStamp ts;
-      solver->apply(vec_sol_4, vec_rhs);
-      time_4 = ts.elapsed_now();
-
-      // release solver
-      solver->done();
-    }
-#endif // FEAT_HAVE_HYPRE
-
 
     comm.print("");
     comm.print("Old   PCG Solve Time: " + stringify_fp_fix(time_1, 3, 9));
     comm.print("New   PCG Solve Time: " + stringify_fp_fix(time_2, 3, 9));
-    comm.print("HYPRE PCG Solve Time: " + stringify_fp_fix(time_3, 3, 9));
-    comm.print("HYPRE AMG Solve Time: " + stringify_fp_fix(time_4, 3, 9));
     comm.print("Old vs New Speedup..: " + stringify_fp_fix(time_2 > 1E-12*time_1 ? time_1/time_2 : 0.0, 3, 9));
 
     // print timings
@@ -418,19 +283,15 @@ namespace PoissonMixed
         compute(vec_sol_1.local(), sol_func, the_domain_level.space_pres, cubature);
       Assembly::ScalarErrorInfo<DataType> errors_2 = Assembly::ScalarErrorComputer<max_der>::
         compute(vec_sol_2.local(), sol_func, the_domain_level.space_pres, cubature);
-      Assembly::ScalarErrorInfo<DataType> errors_3 = Assembly::ScalarErrorComputer<max_der>::
-        compute(vec_sol_3.local(), sol_func, the_domain_level.space_pres, cubature);
 
       // synchronise all local errors
       errors_1.synchronise(comm);
       errors_2.synchronise(comm);
-      errors_3.synchronise(comm);
 
       // print errors
       comm.print("");
       comm.print(errors_1.format_string());
       comm.print(errors_2.format_string());
-      comm.print(errors_3.format_string());
     }
 
     /* ***************************************************************************************** */
@@ -623,16 +484,14 @@ namespace PoissonMixed
       Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
       // project velocity and pressure
-      typename SystemLevelType::LocalPresVector vtx_sol_1, vtx_sol_2, vtx_sol_3, vtx_rhs;
+      typename SystemLevelType::LocalPresVector vtx_sol_1, vtx_sol_2, vtx_rhs;
       Assembly::DiscreteVertexProjector::project(vtx_sol_1, vec_sol_1.local(), the_domain_level.space_pres);
       Assembly::DiscreteVertexProjector::project(vtx_sol_2, vec_sol_2.local(), the_domain_level.space_pres);
-      Assembly::DiscreteVertexProjector::project(vtx_sol_3, vec_sol_3.local(), the_domain_level.space_pres);
       Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_domain_level.space_pres);
 
       // write velocity
       exporter.add_vertex_scalar("sol_1", vtx_sol_1.elements());
       exporter.add_vertex_scalar("sol_2", vtx_sol_2.elements());
-      exporter.add_vertex_scalar("sol_3", vtx_sol_3.elements());
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file

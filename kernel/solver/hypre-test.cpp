@@ -1,8 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
 
-// Note: Currently, the HYPRE library can only be used in combination with MPI
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
+#if defined(FEAT_HAVE_HYPRE)
 
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/global/gate.hpp>
@@ -276,4 +275,4 @@ public:
 
 HypreTest<Mem::Main, double, Index> hypre_test_main_double_index;
 
-#endif // defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
+#endif // defined(FEAT_HAVE_HYPRE)

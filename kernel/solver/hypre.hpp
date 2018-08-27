@@ -2,22 +2,80 @@
 #ifndef KERNEL_SOLVER_HYPRE_HPP
 #define KERNEL_SOLVER_HYPRE_HPP 1
 
-#if defined(FEAT_HAVE_MPI) && defined(FEAT_HAVE_HYPRE)
-
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/solver/adp_solver_base.hpp>
+
+#if defined(FEAT_HAVE_HYPRE) || defined(DOXYGEN)
 
 // includes, system
 #include <vector>
-
-// includes, HYPRE third-party lib
-#include <HYPRE.h>
-#include <HYPRE_parcsr_ls.h>
 
 namespace FEAT
 {
   namespace Solver
   {
+    /// \cond internal
+    namespace Hypre
+    {
+      /**
+       * \brief Creates a core wrapper object for HYPRE.
+       *
+       * The "core wrapper object", which is returned by this function, is basically a collection
+       * of all HYPRE data structures, which are required to represent a linear system A*x=b, i.e.
+       * a partitioned matrix as well as two vectors.
+       *
+       * \param[in] comm
+       * A pointer to an MPI_Comm object that represents the communicator.
+       * This argument is ignored in non-MPI builds.
+       *
+       * \param[in] dof_offset
+       * The global DOF offset for this process.
+       *
+       * \param[in] num_owned_dofs
+       * The number of global DOFs owned by this process.
+       *
+       * \param[in] row_ptr
+       * The row-pointer array of the partitioned CSR matrix.
+       *
+       * \param[in] col_idx
+       * The column-index array of the partitioned CSR matrix.
+       *
+       * \returns
+       * A pointer to a newly allocated core wrapper object.
+       */
+      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
+        const unsigned int* row_ptr, const unsigned int* col_idx);
+      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
+        const unsigned long* row_ptr, const unsigned long* col_idx);
+      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
+        const unsigned long long* row_ptr, const unsigned long long* col_idx);
+
+      void destroy_core(void* core);
+
+      void set_matrix_values(void* core, const double* vals);
+      void set_vec_cor_values(void* core, const double* vals);
+      void set_vec_def_values(void* core, const double* vals);
+      void get_vec_cor_values(const void* core, double* vals);
+      void get_vec_def_values(const void* core, double* vals);
+
+      // Parasails Wrappers
+      void* create_parasails(void* core, int* iparam, double* dparam);
+      void destroy_parasails(void* solver);
+      void solve_parasails(void* core, void* solver);
+
+      // Euclid Wrappers
+      void* create_euclid(void* core, int* iparam, double* dparam);
+      void destroy_euclid(void* solver);
+      void solve_euclid(void* core, void* solver);
+
+      // BoomerAMG Wrappers
+      void* create_boomeramg(void* core, int* iparam, double* dparam);
+      void destroy_boomeramg(void* solver);
+      void solve_boomeramg(void* core, void* solver);
+    } // namespace Hypre
+    /// \endcond
+
     /**
      * \brief Base-Class for solvers/preconditioners borrowed from HYPRE library
      *
@@ -27,7 +85,7 @@ namespace FEAT
      * takes care of the translation between the system matrix and the ADP data structures.
      *
      * This base-class takes care of allocating, initialising and updating the required
-     * HYPRE matrix and vector objects.
+     * HYPRE matrix and vector objects, which are outsourced into an opaque core wrapper object.
      *
      * \author Peter Zajac
      */
@@ -42,34 +100,12 @@ namespace FEAT
       typedef typename BaseClass::VectorType VectorType;
 
     protected:
-      /// HYPRE global DOF indices array
-      std::vector<HYPRE_Int> _hypre_dof_idx;
-      /// HYPRE number of non-zero entries per row array
-      std::vector<HYPRE_Int> _hypre_num_nze;
-      /// HYPRE column indices array
-      std::vector<HYPRE_Int> _hypre_col_idx;
-
-      // note: the following members are actually pointers
-      /// handle to the HYPRE IJ matrix object
-      HYPRE_IJMatrix _hypre_matrix;
-      /// handles to the HYPRE IJ vector objects
-      HYPRE_IJVector _hypre_vec_def, _hypre_vec_cor;
-      /// HYPRE ParCSRMatrix handle to the system matrix
-      HYPRE_ParCSRMatrix _hypre_parcsr;
-      /// HYPRE ParVector handles to the defect/correction vectors
-      HYPRE_ParVector _hypre_par_def, _hypre_par_cor;
+      /// a pointer to our opaque core wrapper object
+      void* _core;
 
       explicit HypreSolverBase(const Matrix_& matrix, const Filter_& filter) :
         BaseClass(matrix, filter),
-        _hypre_dof_idx(),
-        _hypre_num_nze(),
-        _hypre_col_idx(),
-        _hypre_matrix(nullptr),
-        _hypre_vec_def(nullptr),
-        _hypre_vec_cor(nullptr),
-        _hypre_parcsr(nullptr),
-        _hypre_par_def(nullptr),
-        _hypre_par_cor(nullptr)
+        _core(nullptr)
       {
       }
 
@@ -88,8 +124,7 @@ namespace FEAT
         this->_upload_vec_def(vec_def);
 
         // set HYPRE defect vector values
-        HYPRE_IJVectorSetValues(_hypre_vec_def, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(),
-          this->_get_vec_def_vals(vec_def));
+        Hypre::set_vec_def_values(this->_core, this->_get_vec_def_vals(vec_def));
       }
 
       /**
@@ -98,7 +133,7 @@ namespace FEAT
       void _format_cor()
       {
         // format HYPRE correction vector
-        HYPRE_ParVectorSetConstantValues(_hypre_par_cor, HYPRE_Real(0));
+        Hypre::set_vec_cor_values(this->_core, nullptr);
       }
 
       /**
@@ -113,8 +148,7 @@ namespace FEAT
       void _download_cor(VectorType& vec_cor)
       {
         // get HYPRE correction vector values
-        HYPRE_IJVectorGetValues(_hypre_vec_cor, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(),
-          this->_get_vec_cor_vals(vec_cor));
+        Hypre::get_vec_cor_values(this->_core, this->_get_vec_cor_vals(vec_cor));
 
         // download correction from APD vector
         this->_download_vec_cor(vec_cor);
@@ -137,76 +171,16 @@ namespace FEAT
       {
         BaseClass::init_symbolic();
 
-        // get our gate and our comm
-        const Dist::Comm& comm = *this->_get_comm();
+        XASSERT(this->_core == nullptr);
 
-        // get dof offset and count
-        const HYPRE_Int dof_offset = HYPRE_Int(this->_get_global_dof_offset());
-        const HYPRE_Int num_owned  = HYPRE_Int(this->_get_num_owned_dofs());
-
-        // set up HYPRE dof indices vector
-        _hypre_dof_idx.resize((std::size_t)num_owned);
-        for(HYPRE_Int i(0); i < num_owned; ++i)
-          _hypre_dof_idx[std::size_t(i)] = dof_offset + i;
-
-        // get lower and upper DOF bounds
-        const HYPRE_Int ilower = _hypre_dof_idx.front();
-        const HYPRE_Int iupper = _hypre_dof_idx.back();
-
-        // create HYPRE matrix
-        HYPRE_IJMatrixCreate(comm.mpi_comm(), ilower, iupper, ilower, iupper, &_hypre_matrix);
-        HYPRE_IJMatrixSetObjectType(_hypre_matrix, HYPRE_PARCSR);
-        HYPRE_IJMatrixInitialize(_hypre_matrix);
-
-        // create HYPRE vectors
-        HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &_hypre_vec_def);
-        HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &_hypre_vec_cor);
-        HYPRE_IJVectorSetObjectType(_hypre_vec_def, HYPRE_PARCSR);
-        HYPRE_IJVectorSetObjectType(_hypre_vec_cor, HYPRE_PARCSR);
-        HYPRE_IJVectorInitialize(_hypre_vec_def);
-        HYPRE_IJVectorInitialize(_hypre_vec_cor);
-
-        // get matrix dimensions
-        const HYPRE_Int num_nze = HYPRE_Int(this->_get_mat_num_nze());
-
-        // get matrix structure arrays
-        const auto* row_ptr_a = this->_get_mat_row_ptr();
-        const auto* col_idx_a = this->_get_mat_col_idx();
-
-        // create HYPRE index vectors
-        _hypre_num_nze.resize((std::size_t)num_owned);
-        _hypre_col_idx.resize((std::size_t)num_nze);
-
-        // loop over all owned matrix rows
-        for(HYPRE_Int i(0); i < num_owned; ++i)
-        {
-          _hypre_num_nze[std::size_t(i)] = HYPRE_Int(row_ptr_a[i+1] - row_ptr_a[i]);
-        }
-        for(HYPRE_Int i(0); i < num_nze; ++i)
-        {
-          _hypre_col_idx[std::size_t(i)] = HYPRE_Int(col_idx_a[i]);
-        }
-
-        // vector for initial vector values
-        std::vector<HYPRE_Real> vv((std::size_t)num_owned, 0.0);
-
-        // set matrix structure + dummy values
-        HYPRE_IJMatrixSetValues(_hypre_matrix, num_owned, _hypre_num_nze.data(), _hypre_dof_idx.data(),
-          _hypre_col_idx.data(), this->_get_mat_vals());
-
-        // set vector structures + dummy values
-        HYPRE_IJVectorSetValues(_hypre_vec_def, num_owned, _hypre_dof_idx.data(), vv.data());
-        HYPRE_IJVectorSetValues(_hypre_vec_cor, num_owned, _hypre_dof_idx.data(), vv.data());
-
-        // assemble matrix and get ParCSR object pointer
-        HYPRE_IJMatrixAssemble(_hypre_matrix);
-        HYPRE_IJMatrixGetObject(_hypre_matrix, (void**) &_hypre_parcsr);
-
-        // assemble vectors and get Par object pointers
-        HYPRE_IJVectorAssemble(_hypre_vec_def);
-        HYPRE_IJVectorAssemble(_hypre_vec_cor);
-        HYPRE_IJVectorGetObject(_hypre_vec_def, (void **) &_hypre_par_def);
-        HYPRE_IJVectorGetObject(_hypre_vec_cor, (void **) &_hypre_par_cor);
+        // create our HYPRE core wrapper object
+        this->_core = Hypre::create_core(
+#ifdef FEAT_HAVE_MPI
+          &this->_get_comm()->mpi_comm(),
+#else
+          nullptr, // no communicator for non-MPI builds
+#endif
+          this->_get_global_dof_offset(), this->_get_num_owned_dofs(), this->_get_mat_row_ptr(), this->_get_mat_col_idx());
       }
 
       /**
@@ -219,9 +193,10 @@ namespace FEAT
       {
         BaseClass::init_numeric();
 
+        XASSERT(this->_core != nullptr);
+
         // update matrix values of HYPRE matrix
-        HYPRE_IJMatrixSetValues(_hypre_matrix, HYPRE_Int(_hypre_dof_idx.size()), _hypre_num_nze.data(),
-          _hypre_dof_idx.data(), _hypre_col_idx.data(), this->_get_mat_vals());
+        Hypre::set_matrix_values(this->_core, this->_get_mat_vals());
       }
 
       /**
@@ -232,25 +207,10 @@ namespace FEAT
        */
       virtual void done_symbolic() override
       {
-        // these are just pointers to HYPRE's internal objects
-        _hypre_par_cor = nullptr;
-        _hypre_par_def = nullptr;
-        _hypre_parcsr = nullptr;
+        XASSERT(this->_core != nullptr);
 
-        // destroy HYPRE objects
-        HYPRE_IJVectorDestroy(_hypre_vec_cor);
-        HYPRE_IJVectorDestroy(_hypre_vec_def);
-        HYPRE_IJMatrixDestroy(_hypre_matrix);
-
-        // reset object handles
-        _hypre_vec_cor = nullptr;
-        _hypre_vec_def = nullptr;
-        _hypre_matrix = nullptr;
-
-        // clear index arrays
-        _hypre_col_idx.clear();
-        _hypre_num_nze.clear();
-        _hypre_dof_idx.clear();
+        Hypre::destroy_core(this->_core);
+        this->_core = nullptr;
 
         BaseClass::done_symbolic();
       }
@@ -279,21 +239,50 @@ namespace FEAT
 
     protected:
       /// the HYPRE solver object
-      HYPRE_Solver _precond;
+      void* _solver;
+
+      /// integer parameters:
+      // 0: num levels, third argument for HYPRE_ParaSailsSetParams, default: 1
+      // 1: symmetry, second argument for HYPRE_ParaSailsSetSym, default: 2
+      int _iparam[2];
+
+      /// double parameters:
+      // 0: threshold, second argument for HYPRE_ParaSailsSetParams, default: 0.1
+      // 1: filter, second argument for HYPRE_ParaSailsSetFilter, default: 0.05
+      double _dparam[2];
 
     public:
       explicit ParaSailsPrecond(const Matrix_& matrix, const Filter_& filter) :
         BaseClass(matrix, filter),
-        _precond(nullptr)
+        _solver(nullptr)
       {
+        _iparam[0] = 1;
+        _iparam[1] = 2;
+
+        _dparam[0] = 0.1;
+        _dparam[1] = 0.05;
       }
 
-      explicit ParaSailsPrecond(const String& DOXY(section_name), PropertyMap* DOXY(section),
+      explicit ParaSailsPrecond(const String& section_name, PropertyMap* section,
         const Matrix_& matrix, const Filter_& filter)
          :
         ParaSailsPrecond(matrix, filter)
       {
-        /// \todo parse parameters from property map
+        auto level_p = section->query("level");
+        if(level_p.second && !level_p.first.parse(_iparam[0]))
+          throw ParseError(section_name + ".level", level_p.first, "a non-negative integer");
+
+        auto sym_p = section->query("sym");
+        if(sym_p.second && !sym_p.first.parse(_iparam[1]))
+          throw ParseError(section_name + ".sym", sym_p.first, "a non-negative integer");
+
+        auto thresh_p = section->query("thresh");
+        if(thresh_p.second && !thresh_p.first.parse(_dparam[0]))
+          throw ParseError(section_name + ".thresh", thresh_p.first, "a positive float");
+
+        auto filter_p = section->query("filter");
+        if(filter_p.second && !filter_p.first.parse(_dparam[1]))
+          throw ParseError(section_name + ".filter", filter_p.first, "a positive float");
       }
 
       virtual String name() const override
@@ -306,25 +295,15 @@ namespace FEAT
         BaseClass::init_numeric();
 
         // create ParaSails preconditioner
-        HYPRE_ParaSailsCreate(this->_get_comm()->mpi_comm(), &_precond);
-
-        /// \todo set ParaSails parameters
-        HYPRE_ParaSailsSetParams(_precond, 0.1, 1);
-        HYPRE_ParaSailsSetFilter(_precond, 0.05);
-        HYPRE_ParaSailsSetSym(_precond, 2);
-        //HYPRE_ParaSailsSetLogging(_precond, 3);
-
-        // setup ParaSails
-        // according to the documentation, the two vectors are ignored by this function
-        HYPRE_ParaSailsSetup(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
+        this->_solver = Hypre::create_parasails(this->_core, this->_iparam, this->_dparam);
       }
 
       virtual void done_numeric() override
       {
-        if(_precond != nullptr)
+        if(_solver != nullptr)
         {
-          HYPRE_ParaSailsDestroy(_precond);
-          _precond = nullptr;
+          Hypre::destroy_parasails(_solver);
+          _solver = nullptr;
         }
 
         BaseClass::done_numeric();
@@ -337,7 +316,7 @@ namespace FEAT
         this->_format_cor();
 
         // apply ParaSails preconditioner
-        HYPRE_ParaSailsSolve(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
+        Hypre::solve_parasails(this->_core, this->_solver);
 
         // download correction
         this->_download_cor(vec_cor);
@@ -415,21 +394,37 @@ namespace FEAT
 
     protected:
       /// the HYPRE solver object
-      HYPRE_Solver _precond;
+      void* _solver;
+
+      /// integer parameters:
+      // 0: factorisation level for ILU(k), default: 1
+      int _iparam[1];
+
+      /// double parameters:
+      // 0: drop tolerance for ILU(k), default: 0.0
+      double _dparam[1];
 
     public:
       explicit EuclidPrecond(const Matrix_& matrix, const Filter_& filter) :
         BaseClass(matrix, filter),
-        _precond(nullptr)
+        _solver(nullptr)
       {
+        _iparam[0] = 1;
+        _dparam[0] = 0.0;
       }
 
-      explicit EuclidPrecond(const String& DOXY(section_name), PropertyMap* DOXY(section),
+      explicit EuclidPrecond(const String& section_name, PropertyMap* section,
         const Matrix_& matrix, const Filter_& filter)
          :
         EuclidPrecond(matrix, filter)
       {
-        /// \todo parse parameters from property map
+        auto level_p = section->query("level");
+        if(level_p.second && !level_p.first.parse(_iparam[0]))
+          throw ParseError(section_name + ".level", level_p.first, "a non-negative integer");
+
+        auto drop_p = section->query("drop");
+        if(drop_p.second && !drop_p.first.parse(_dparam[0]))
+          throw ParseError(section_name + ".drop", drop_p.first, "a non-negative float");
       }
 
       virtual String name() const override
@@ -442,21 +437,15 @@ namespace FEAT
         BaseClass::init_numeric();
 
         // create Euclid preconditioner
-        HYPRE_EuclidCreate(this->_get_comm()->mpi_comm(), &_precond);
-
-        /// \todo set Euclid parameters
-
-        // setup Euclid
-        // according to the documentation, the two vectors are ignored by this function
-        HYPRE_EuclidSetup(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
+        this->_solver = Hypre::create_euclid(this->_core, this->_iparam, this->_dparam);
       }
 
       virtual void done_numeric() override
       {
-        if(_precond != nullptr)
+        if(_solver != nullptr)
         {
-          HYPRE_EuclidDestroy(_precond);
-          _precond = nullptr;
+          Hypre::destroy_euclid(_solver);
+          _solver = nullptr;
         }
       }
 
@@ -467,7 +456,7 @@ namespace FEAT
         this->_format_cor();
 
         // apply Euclid preconditioner
-        HYPRE_EuclidSolve(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
+        Hypre::solve_euclid(this->_core, this->_solver);
 
         // download correction
         this->_download_cor(vec_cor);
@@ -543,13 +532,25 @@ namespace FEAT
 
     protected:
       /// the HYPRE solver object
-      HYPRE_Solver _precond;
+      void* _solver;
+
+      /// integer parameters:
+      /// 0: maximum iterations, default: 1
+      int _iparam[1];
+
+      /// double parameters:
+      /// 0: tolerance, default: 0.0
+      double _dparam[1];
 
     public:
       explicit BoomerAMG(const Matrix_& matrix, const Filter_& filter) :
         BaseClass(matrix, filter),
-        _precond(nullptr)
+        _solver(nullptr)
       {
+        // set tolerance to 0 and maximum iterations to 1, so that BoomerAMG
+        // acts as a preconditioner rather than a real iterative solver
+        _iparam[0] = 1;
+        _dparam[0] = 0.0;
       }
 
       explicit BoomerAMG(const String& DOXY(section_name), PropertyMap* DOXY(section),
@@ -570,26 +571,15 @@ namespace FEAT
         BaseClass::init_numeric();
 
         // create BoomerAMG preconditioner
-        HYPRE_BoomerAMGCreate(&_precond);
-
-        /// \todo set BoomerAMG parameters
-
-        // set tolerance to 0 and maximum iterations to 1, so that BoomerAMG
-        // acts as a preconditioner rather than a real iterative solver
-        HYPRE_BoomerAMGSetTol(_precond, 0.0);
-        HYPRE_BoomerAMGSetMaxIter(_precond, 1);
-
-        // setup BoomerAMG
-        // according to the documentation, the two vectors are ignored by this function
-        HYPRE_BoomerAMGSetup(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
+        this->_solver = Hypre::create_boomeramg(this->_core, this->_iparam, this->_dparam);
       }
 
       virtual void done_numeric() override
       {
-        if(_precond != nullptr)
+        if(_solver != nullptr)
         {
-          HYPRE_BoomerAMGDestroy(_precond);
-          _precond = nullptr;
+          Hypre::destroy_boomeramg(_solver);
+          _solver = nullptr;
         }
       }
 
@@ -600,7 +590,7 @@ namespace FEAT
         this->_format_cor();
 
         // apply BoomerAMG preconditioner
-        HYPRE_BoomerAMGSolve(this->_precond, this->_hypre_parcsr, this->_hypre_par_def, this->_hypre_par_cor);
+        Hypre::solve_boomeramg(this->_core, this->_solver);
 
         // download correction
         this->_download_cor(vec_cor);
@@ -657,5 +647,5 @@ namespace FEAT
   } // namespace Solver
 } // namespace FEAT
 
-#endif // defined(FEAT_HAVE_MPI) && defined(FEAT_HAVE_HYPRE)
+#endif // defined(FEAT_HAVE_HYPRE) || defined(DOXYGEN)
 #endif // KERNEL_SOLVER_HYPRE_HPP
