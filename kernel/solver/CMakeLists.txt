@@ -30,6 +30,28 @@ if (FEAT_COTIRE)
 endif (FEAT_COTIRE)
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
+if (FEAT_HAVE_UMFPACK)
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
+endif (FEAT_HAVE_UMFPACK)
+
+if (FEAT_HAVE_HYPRE)
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/parcsr_ls/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/utilities/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/seq_mv/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/parcsr_mv/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/IJ_mv/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/multivector/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/krylov/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/distributed_matrix/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/parcsr_block_mv/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/hypre/hypre-2.11.2/src/blas/")
+endif(FEAT_HAVE_HYPRE)
+
+
+
 if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-solver-cuda
     cusolver.cu
