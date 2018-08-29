@@ -146,6 +146,10 @@ which is included in the GCC compiler since version 4.6.0. If defined, correspon
 for the datatype <code>__float128</code> are supplied.
 
 <hr>
+\subsection ppm_feat_have_superlu_dist FEAT_HAVE_SUPERLU_DIST
+This macro is defined by the build system if the FEAT kernel is linked against the SuperLU_DIST library.
+
+<hr>
 \subsection ppm_feat_have_triangle FEAT_HAVE_TRIANGLE
 This macro is defined by the build system if the FEAT kernel is linked against the triangle library,
 which offers a set of 2D triangular mesh generators.

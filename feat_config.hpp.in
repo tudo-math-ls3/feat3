@@ -78,6 +78,9 @@
 /// Do we have DEATH_HANDLER support enabled?
 #cmakedefine FEAT_HAVE_DEATH_HANDLER
 
+/// Do we have SuperLU support enabled?
+#cmakedefine FEAT_HAVE_SUPERLU_DIST
+
 /// Do we use a compiler wrapper, e.g. ccache or distcc
 #cmakedefine FEAT_USE_COMPILER_WRAPPER
 

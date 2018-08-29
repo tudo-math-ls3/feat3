@@ -195,6 +195,27 @@ thirdparty
   ...
 \endverbatim
 
+\subsection win_vs16_thirdparty_superlu SuperLU / SuperLU_DIST
+<c>SuperLU</c> is a library collection that offers an MPI parallel direct solver for sparse linear systems, which
+is used by the FEAT::Solver::SuperLU class.
+- Lastest tested Version: 7.1.1 (from 2021-10-18)
+- Download Link: https://github.com/xiaoyeli/superlu_dist/releases
+
+<b>Instructions:</b>
+-# Download the ZIP-Archive and unpack its contents into the directory <c>thirdparty</c>.
+-# Rename the sub-directory from <c>superlu_dist-7.1.0</c> (or whatever version you have downloaded) to <c>superlu_dist</c>.
+-# After unpacking, the <c>thirdparty</c> directory should have the following sub-directory structure:
+\verbatim
+thirdparty
+  superlu_dist
+    CLBAS
+    cmake
+    ...
+    SRC
+    TEST
+  ...
+\endverbatim
+
 \subsection win_vs16_thirdparty_suitesparse SuiteSparse (UMFPACK)
 <c>SuiteSparse</c> is a library collection that offers various algorithms for sparse linear systems. Currently, the
 only component of the <c>SuiteSparse</c> library is <c>UMFPACK</c>, a direct linear solver for CSR matrices, which

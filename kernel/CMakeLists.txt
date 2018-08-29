@@ -62,6 +62,10 @@ if (FEAT_HAVE_HYPRE)
   TARGET_LINK_LIBRARIES(feat thirdparty-hypre)
 endif (FEAT_HAVE_HYPRE)
 
+if (FEAT_HAVE_SUPERLU_DIST)
+  TARGET_LINK_LIBRARIES (feat thirdparty-superlu)
+endif(FEAT_HAVE_SUPERLU_DIST)
+
 if (FEAT_HAVE_CGAL)
   target_link_libraries(feat ${Boost_LIBRARIES})
 endif(FEAT_HAVE_CGAL)

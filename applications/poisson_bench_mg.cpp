@@ -40,6 +40,7 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/umfpack.hpp>
+#include <kernel/solver/superlu.hpp>
 #include <kernel/util/dist.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
@@ -263,6 +264,11 @@ namespace PoissonDirichlet
 #else
     const bool umf_cgs = false;
 #endif
+#ifdef FEAT_HAVE_SUPERLU_DIST
+    const bool slu_cgs = !umf_cgs; // use SuperLU if UMFPACK is not used
+#else
+    const bool slu_cgs = false;
+#endif
 
     Index iters = 3; // mg iterations
     Index steps = 4; // smoothing steps
@@ -273,7 +279,7 @@ namespace PoissonDirichlet
     args.parse("cycle", cycle);
 
     comm.print(String("Space........: ") + SpaceType::name());
-    comm.print(String("Coarse Solver: ") + (umf_cgs ? "UMFPACK" : "Jacobi"));
+    comm.print(String("Coarse Solver: ") + (umf_cgs ? "UMFPACK" : (slu_cgs ? "SuperLU" : "Jacobi")));
     comm.print(String("Smooth Steps.: ") + stringify(steps));
     comm.print(String("MG Iterations: ") + stringify(iters));
     comm.print(String("MG Cycle.....: ") + stringify(cycle));
@@ -414,6 +420,14 @@ namespace PoissonDirichlet
         multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
       }
 #endif //  FEAT_HAVE_UMFPACK
+#ifdef FEAT_HAVE_SUPERLU_DIST
+      else if(slu_cgs)
+      {
+        // create SuperLU coarse grid solver
+        auto superlu = Solver::new_superlu(lvl.matrix_sys, lvl.filter_sys);
+        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, superlu);
+      }
+#endif // FEAT_HAVE_SUPERLU_DIST
       else
       {
         auto cgsolver = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 1.0);

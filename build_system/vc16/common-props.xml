@@ -102,6 +102,10 @@
   <PropertyGroup Condition="Exists('..\..\lib\parmetis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
+  <!-- Note: SuperLU_DIST can only be used in combination with MPI -->
+  <PropertyGroup Condition="Exists('..\..\lib\superlu-dist.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+    <FeatHaveSuperLU>true</FeatHaveSuperLU>
+  </PropertyGroup>
   <PropertyGroup Condition="Exists('..\..\lib\triangle.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveTriangle>true</FeatHaveTriangle>
   </PropertyGroup>
@@ -148,6 +152,8 @@
       Include="FEAT_HAVE_METIS" />
     <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
       Include="FEAT_HAVE_PARMETIS" />
+    <FeatDef Condition="'$(FeatHaveSuperLU)'=='true'"
+      Include="FEAT_HAVE_SUPERLU_DIST" />
     <FeatDef Condition="'$(FeatHaveTriangle)'=='true'"
       Include="FEAT_HAVE_TRIANGLE" />
     <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
@@ -180,6 +186,8 @@
       Include="$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
     <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
       Include="$(FeatRootPath)\thirdparty\parmetis\include;" />
+    <FeatIncDir Condition="'$(FeatHaveSuperLU)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\SuperLU_DIST\SRC;" />
     <FeatIncDir Condition="'$(FeatHaveTriangle)'=='true'"
       Include="$(FeatRootPath)\thirdparty\triangle;" />
     <FeatIncDir Condition="'$(FeatHaveUmfpack)'=='true'"
@@ -231,6 +239,8 @@
       Include="metis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
       Include="parmetis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveSuperLU)'=='true'"
+      Include="superlu-dist.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveTriangle)'=='true'"
       Include="triangle.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"

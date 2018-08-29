@@ -114,6 +114,16 @@ if exist "./hypre" (
   echo.
 )
 
+rem ===========================================================================
+echo **************************************************************************
+if exist "./SuperLU_DIST" (
+  call ./vc_internal/make_superlu.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_superlu.cmd vc%VSVER% opt x64
+) else (
+  echo SuperLU_DIST not found; skipping...
+  echo.
+)
+
 echo **************************************************************************
 
 rem ===========================================================================

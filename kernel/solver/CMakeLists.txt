@@ -6,6 +6,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # list of lafem source files
 SET (kernel-solver-list
   hypre.cpp
+  superlu.cpp
   umfpack.cpp
   )
 
@@ -50,6 +51,9 @@ if (FEAT_HAVE_HYPRE)
   SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/blas/")
 endif(FEAT_HAVE_HYPRE)
 
+if (FEAT_HAVE_SUPERLU_DIST)
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUPERLU}/SRC/")
+endif (FEAT_HAVE_SUPERLU_DIST)
 
 
 if (FEAT_HAVE_CUDA)
@@ -79,6 +83,7 @@ SET (test_list
   cusolver-test
   hypre-test
   optimizer-test
+  superlu-test
   umfpack-test
   vanka-test
 )
