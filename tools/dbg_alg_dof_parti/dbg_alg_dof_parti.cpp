@@ -55,13 +55,6 @@
 #include <kernel/solver/schwarz_precond.hpp>               // NEW: for SchwarzPrecond
 #include <kernel/solver/ilu_precond.hpp>                   // NEW: for ILUPrecond
 
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-#include "HYPRE.h"
-#include "HYPRE_krylov.h"
-#include "HYPRE_parcsr_ls.h"
-extern "C" HYPRE_Int HYPRE_ParVectorAxpy ( HYPRE_Complex alpha , HYPRE_ParVector x , HYPRE_ParVector y );
-#endif
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 // We are using FEAT
@@ -529,127 +522,6 @@ namespace Tutorial06
     // compute norm of rhs
     const double norm_b = vec_rhs.norm2();
 
-
-    // ############################################################################################
-    // ############################################################################################
-    // ############################################################################################
-    // ############################################################################################
-    // ############################################################################################
-
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-
-    comm.print(String(100, '#'));
-    comm.print(String(100, '#'));
-    comm.print(String(100, '#'));
-
-    comm.print("Creating Hypre Matrix and Vectors...");
-
-    HYPRE_IJMatrix hypre_A;
-    HYPRE_ParCSRMatrix parcsr_A;
-    HYPRE_IJVector hypre_b;
-    HYPRE_ParVector par_b;
-    HYPRE_IJVector hypre_x;
-    HYPRE_ParVector par_x;
-    HYPRE_IJVector hypre_y;
-    HYPRE_ParVector par_y;
-    HYPRE_IJVector hypre_d;
-    HYPRE_ParVector par_d;
-    HYPRE_IJVector hypre_q;
-    HYPRE_ParVector par_q;
-    HYPRE_Solver hypre_solver;
-
-    HYPRE_Int ilower = HYPRE_Int(adp.get_global_dof_offset());
-    HYPRE_Int iupper = ilower + HYPRE_Int(adp.get_num_owned_dofs()) - 1;
-
-
-    HYPRE_IJMatrixCreate(comm.mpi_comm(), ilower, iupper, ilower, iupper, &hypre_A);
-    HYPRE_IJMatrixSetObjectType(hypre_A, HYPRE_PARCSR);
-    HYPRE_IJMatrixInitialize(hypre_A);
-
-    HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &hypre_b);
-    HYPRE_IJVectorSetObjectType(hypre_b, HYPRE_PARCSR);
-    HYPRE_IJVectorInitialize(hypre_b);
-
-    HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &hypre_x);
-    HYPRE_IJVectorSetObjectType(hypre_x, HYPRE_PARCSR);
-    HYPRE_IJVectorInitialize(hypre_x);
-
-    HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &hypre_y);
-    HYPRE_IJVectorSetObjectType(hypre_y, HYPRE_PARCSR);
-    HYPRE_IJVectorInitialize(hypre_y);
-
-    HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &hypre_d);
-    HYPRE_IJVectorSetObjectType(hypre_d, HYPRE_PARCSR);
-    HYPRE_IJVectorInitialize(hypre_d);
-
-    HYPRE_IJVectorCreate(comm.mpi_comm(), ilower, iupper, &hypre_q);
-    HYPRE_IJVectorSetObjectType(hypre_q, HYPRE_PARCSR);
-    HYPRE_IJVectorInitialize(hypre_q);
-
-
-    std::vector<HYPRE_Int> hy_dofs(adp.get_num_owned_dofs());
-
-
-    {
-      const Index num_rows = adp_matrix.owned().rows();
-      const Index num_nze = adp_matrix.owned().used_elements();
-      const HYPRE_Int hy_num_dofs = HYPRE_Int(num_rows);
-      XASSERT(ilower+hy_num_dofs == iupper+1);
-
-      const DataType* val_a = adp_matrix.owned().val();
-      const IndexType* row_ptr_a = adp_matrix.owned().row_ptr();
-      const IndexType* col_idx_a = adp_matrix.owned().col_ind();
-
-      std::vector<HYPRE_Int> hy_ncols(num_rows);
-      std::vector<HYPRE_Int> hy_cols(num_nze);
-
-      // loop over all owned matrix rows
-      for(Index i(0); i < num_rows; ++i)
-      {
-        hy_dofs[i] = HYPRE_Int(adp.get_global_dof_offset() + i);
-        hy_ncols[i] = HYPRE_Int(row_ptr_a[i+1] - row_ptr_a[i]);
-      }
-      for(Index i(0); i < num_nze; ++i)
-      {
-        hy_cols[i] = HYPRE_Int(col_idx_a[i]);
-      }
-
-      HYPRE_IJMatrixSetValues(hypre_A, hy_num_dofs, hy_ncols.data(), hy_dofs.data(), hy_cols.data(), val_a);
-      HYPRE_IJVectorSetValues(hypre_b, hy_num_dofs, hy_dofs.data(), adp_vector_b.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_x, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_y, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_d, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
-      HYPRE_IJVectorSetValues(hypre_q, hy_num_dofs, hy_dofs.data(), adp_vector_x.owned().elements());
-    }
-
-    HYPRE_IJMatrixAssemble(hypre_A);
-    HYPRE_IJMatrixGetObject(hypre_A, (void**) &parcsr_A);
-
-    HYPRE_IJVectorAssemble(hypre_b);
-    HYPRE_IJVectorGetObject(hypre_b, (void **) &par_b);
-
-    HYPRE_IJVectorAssemble(hypre_x);
-    HYPRE_IJVectorGetObject(hypre_x, (void **) &par_x);
-
-    HYPRE_IJVectorAssemble(hypre_y);
-    HYPRE_IJVectorGetObject(hypre_y, (void **) &par_y);
-
-    HYPRE_IJVectorAssemble(hypre_d);
-    HYPRE_IJVectorGetObject(hypre_d, (void **) &par_d);
-
-    HYPRE_IJVectorAssemble(hypre_q);
-    HYPRE_IJVectorGetObject(hypre_q, (void **) &par_q);
-
-    HYPRE_Real hy_tmp;
-    //HYPRE_Int HYPRE_ParVectorInnerProd( HYPRE_ParVector x , HYPRE_ParVector y , HYPRE_Real *prod );
-    HYPRE_ParVectorInnerProd(par_b, par_b, &hy_tmp);
-    double norm_hy_b = Math::sqrt(hy_tmp);
-
-    comm.print("RHS NORM2 = " + stringify_fp_sci(norm_b) + " | " + stringify_fp_sci(norm_hy_b)
-      + " : " + stringify_fp_sci(norm_b-norm_hy_b));
-
-#endif // defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-
     // ############################################################################################
     // ############################################################################################
     // ############################################################################################
@@ -719,14 +591,6 @@ namespace Tutorial06
     DataType gamma_g = vec_def.dot(vec_def);
     DataType gamma_l = gate.sum(adp_vector_d.owned().dot(adp_vector_d.owned()));
 
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-    HYPRE_ParVectorSetConstantValues(par_x, 0.0);
-    HYPRE_ParVectorCopy(par_b, par_d);
-    HYPRE_ParVectorCopy(par_d, par_y);
-    DataType gamma_h;
-    HYPRE_ParVectorInnerProd(par_d, par_d, &gamma_h);
-#endif
-
     //         "  0: 1.147408e-01 | 1.147408e-01 | 1.147408e-01"
     comm.print(String(100, '*') + "\n>>> PCG\n");
     comm.print("ITS: Global       | AlgDofParti  | Hypre");
@@ -766,18 +630,6 @@ namespace Tutorial06
       DataType defnorm_l = Math::sqrt(gamma_l);
       DataType defnorm_h = 0.0;
 
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-      HYPRE_ParCSRMatrixMatvec(1.0, parcsr_A, par_y, 0.0, par_q);
-      DataType alpha_h;
-      HYPRE_ParVectorInnerProd(par_q, par_y, &alpha_h);
-      alpha_h = gamma_h / alpha_h;
-      HYPRE_ParVectorAxpy (alpha_h, par_y, par_x);
-      HYPRE_ParVectorAxpy (-alpha_h, par_q, par_d);
-      DataType gamma_h2 = gamma_h;
-      HYPRE_ParVectorInnerProd(par_d, par_d, &gamma_h);
-      defnorm_h = Math::sqrt(gamma_h);
-#endif
-
       // print lines
       comm.print(
         stringify(step).pad_front(3) + ": " + stringify_fp_sci(defnorm_g) + " | " +
@@ -789,46 +641,7 @@ namespace Tutorial06
       // compute update direction
       vec_dir.axpy(vec_dir, vec_def, gamma_g / gamma_g2);
       adp_vector_y.owned().axpy(adp_vector_y.owned(), adp_vector_d.owned(), gamma_l / gamma_l2);
-
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-      HYPRE_ParVectorScale(gamma_h/gamma_h2, par_y);
-      HYPRE_ParVectorAxpy (1.0, par_d, par_y);
-#endif
     }
-
-    // ############################################################################################
-    // ############################################################################################
-    // ############################################################################################
-
-#if defined(FEAT_HAVE_HYPRE) && defined(FEAT_HAVE_MPI)
-    comm.print(String(100, '#'));
-
-    comm.print("\nCreating Hypre PCG Solver...");
-
-    //HYPRE_Int HYPRE_ParVectorSetConstantValues ( HYPRE_ParVector vector , HYPRE_Complex value );
-    HYPRE_ParVectorSetConstantValues(par_x, 0.0);
-
-    HYPRE_ParCSRPCGCreate(comm.mpi_comm(), &hypre_solver);
-
-    HYPRE_PCGSetMaxIter(hypre_solver, 100);
-    HYPRE_PCGSetTol(hypre_solver, 1e-8);
-    HYPRE_PCGSetTwoNorm(hypre_solver, 1);
-    HYPRE_PCGSetPrintLevel(hypre_solver, 2);
-    HYPRE_PCGSetLogging(hypre_solver, 1);
-
-    HYPRE_ParCSRPCGSetup(hypre_solver, parcsr_A, par_b, par_x);
-    HYPRE_ParCSRPCGSolve(hypre_solver, parcsr_A, par_b, par_x);
-
-    // download solution vector
-    HYPRE_IJVectorGetValues(hypre_x, HYPRE_Int(adp.get_num_owned_dofs()), hy_dofs.data(),
-      adp_vector_y.owned().elements());
-    adp_vector_y.download(vec_sol_hypre);
-
-    HYPRE_ParCSRPCGDestroy(hypre_solver);
-    HYPRE_IJVectorDestroy(hypre_x);
-    HYPRE_IJVectorDestroy(hypre_b);
-    HYPRE_IJMatrixDestroy(hypre_A);
-#endif
 
     // ############################################################################################
     // ############################################################################################
