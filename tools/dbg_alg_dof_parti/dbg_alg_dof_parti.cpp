@@ -318,7 +318,7 @@ namespace Tutorial06
     for(auto it = neighbour_ranks.begin(); it != neighbour_ranks.end(); ++it)
     {
       const int neighbour_rank = *it;
-      const MeshPartType* neighbour_halo = root_mesh_node->find_halo_mesh_part(neighbour_rank);
+      const MeshPartType* neighbour_halo = root_mesh_node->get_halo(neighbour_rank);
 
       XASSERTM(neighbour_halo != nullptr, "Failed to retrieve neighbour halo!");
       VectorMirrorType neighbour_mirror;

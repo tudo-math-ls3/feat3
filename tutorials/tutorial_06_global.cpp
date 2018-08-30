@@ -419,7 +419,7 @@ namespace Tutorial06
       // but also other important stuff, such as the "halos", which describe the overlap of
       // neighboured patches. For the assembly of the mirror, we need to get the halo mesh-part
       // from the mesh-node first:
-      const MeshPartType* neighbour_halo = root_mesh_node->find_halo_mesh_part(neighbour_rank);
+      const MeshPartType* neighbour_halo = root_mesh_node->get_halo(neighbour_rank);
 
       // Ensure that we have a halo for this neighbour rank:
       XASSERTM(neighbour_halo != nullptr, "Failed to retrieve neighbour halo!");

@@ -293,9 +293,6 @@ namespace FEAT
 
           for(int i(0); i < 4; ++i)
           {
-            // fetch child rank
-            //int child_rank = layer.child_rank(Index(i));
-
             MeshPartType* part = new MeshPartType(num_entities, false);
 
             // manually override target indices
@@ -309,8 +306,7 @@ namespace FEAT
             }
             iq[0] = Index(i);
 
-            //mesh_node->add_mesh_part("_patch:" + stringify(child_rank), part);
-            mesh_node->add_mesh_part("_patch:" + stringify(i), part);
+            mesh_node->add_patch(i, part);
           }
         }
       }; // class HierarchUnitCubeDomainControl<...>
@@ -603,7 +599,7 @@ namespace FEAT
             }
             iq[0] = i;
 
-            mesh_node->add_mesh_part("_patch:" + stringify(i), part);
+            mesh_node->add_patch(i, part);
           }
         }
       }; // class HierarchUnitCubeDomainControl2<...>

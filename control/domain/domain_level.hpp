@@ -84,13 +84,12 @@ namespace FEAT
 
         const PartType* find_halo_part(int rank) const
         {
-          // try to fetch the corresponding mesh part node
-          return this->_mesh_node->find_mesh_part(String("_halo:") + stringify(rank));
+          return this->_mesh_node->get_halo(rank);
         }
 
         const PartType* find_patch_part(int rank) const
         {
-          return this->_mesh_node->find_mesh_part(String("_patch:") + stringify(rank));
+          return this->_mesh_node->get_patch(rank);
         }
       }; // class DomainLevel<...>
 

@@ -641,7 +641,7 @@ namespace FEAT
               int rank(dom_layer.neighbour_rank(i));
 
               // try to find our halo
-              auto* halo = local_functional.get_mesh_node()->find_halo_mesh_part(rank);
+              auto* halo = local_functional.get_mesh_node()->get_halo(rank);
               XASSERTM(halo != nullptr, "Halo not found.");
 
               // assemble the system mirror

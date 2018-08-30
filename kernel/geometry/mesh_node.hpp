@@ -7,11 +7,11 @@
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/macro_factory.hpp>
+#include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/patch_halo_factory.hpp>
 #include <kernel/geometry/patch_mesh_factory.hpp>
 #include <kernel/geometry/patch_meshpart_factory.hpp>
 #include <kernel/geometry/patch_meshpart_splitter.hpp>
-#include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/adjacency/graph.hpp>
 
@@ -240,8 +240,7 @@ namespace FEAT
 
       void set_mesh(MeshType* mesh)
       {
-        if(_mesh != nullptr)
-          throw InternalError(__func__, __FILE__, __LINE__, "Mesh node already has a mesh");
+        XASSERTM(_mesh == nullptr, "Mesh node already has a mesh");
         _mesh = mesh;
       }
 
@@ -290,11 +289,10 @@ namespace FEAT
       {
         if(mesh_part_node != nullptr)
         {
-          if(_mesh_part_nodes.insert(
-            std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart_name, chart))).second)
-            {
-              return mesh_part_node;
-            }
+          if(_mesh_part_nodes.emplace(part_name, MeshPartNodeBin(mesh_part_node, chart_name, chart)).second)
+          {
+            return mesh_part_node;
+          }
         }
         return nullptr;
       }
@@ -329,6 +327,7 @@ namespace FEAT
 
         return part_node;
       }
+
       /**
        * \brief Sets the chart for a particular mesh part.
        *
@@ -552,7 +551,7 @@ namespace FEAT
        */
       void refine_children(MeshNode& refined_node) const
       {
-        // refine mesh_partes
+        // refine mesh parts
         refine_mesh_parts(refined_node);
       }
 
@@ -572,7 +571,6 @@ namespace FEAT
           refined_node.add_mesh_part_node(it->first, it->second.node->refine(*_mesh), it->second.chart_name, it->second.chart);
         }
       }
-
     }; // class MeshNode
 
     /* ***************************************************************************************** */
@@ -710,6 +708,10 @@ namespace FEAT
     protected:
       /// our atlas
       MeshAtlasType* _atlas;
+      /// a map of our halo mesh-parts
+      std::map<int, MeshPartType*> _halos;
+      /// a map of our patch mesh-parts
+      std::map<int, MeshPartType*> _patches;
 
     public:
       /**
@@ -723,7 +725,9 @@ namespace FEAT
        */
       explicit RootMeshNode(MeshType* mesh, MeshAtlasType* atlas = nullptr) :
         BaseClass(mesh),
-        _atlas(atlas)
+        _atlas(atlas),
+        _halos(),
+        _patches()
       {
       }
 
@@ -735,11 +739,102 @@ namespace FEAT
        */
       virtual ~RootMeshNode()
       {
+        for(auto& x : _patches)
+          delete x.second;
+        for(auto& x : _halos)
+          delete x.second;
       }
 
       const MeshAtlasType* get_atlas() const
       {
         return _atlas;
+      }
+
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        std::size_t s = BaseClass::bytes();
+        for(const auto& x : _halos)
+          s += x.second->bytes();
+        for(const auto& x : _patches)
+          s += x.second->bytes();
+        return s;
+      }
+
+      void add_halo(int rank, MeshPartType* halo_part)
+      {
+        XASSERT(halo_part != nullptr);
+        _halos.emplace(rank, halo_part);
+      }
+
+      const MeshPartType* get_halo(int rank) const
+      {
+        auto it = _halos.find(rank);
+        return (it != _halos.end() ? it->second : nullptr);
+      }
+
+      const std::map<int, MeshPartType*>& get_halo_map() const
+      {
+        return this->_halos;
+      }
+
+      void clear_halos()
+      {
+        for(auto& x : _halos)
+          delete x.second;
+        _halos.clear();
+      }
+
+      /**
+       * \brief Renames the halo meshparts.
+       *
+       * This function can be used to rename the halo meshparts when the rank ordering in the
+       * communicator has changed.
+       *
+       * \param[in] ranks
+       * An map of oldrank-newrank pairs.
+       */
+      void rename_halos(const std::map<int,int>& ranks)
+      {
+        if(ranks.empty())
+          return;
+
+        std::map<int, MeshPartType*> new_halos;
+
+        for(auto& v : _halos)
+        {
+          auto it = ranks.find(v.first);
+          if(it == ranks.end())
+            new_halos.emplace(v.first, v.second);
+          else
+            new_halos.emplace(it->second, v.second);
+        }
+
+        _halos = std::move(new_halos);
+      }
+
+      void add_patch(int rank, MeshPartType* patch_part)
+      {
+        XASSERT(patch_part != nullptr);
+        _patches.emplace(rank, patch_part);
+      }
+
+      const MeshPartType* get_patch(int rank) const
+      {
+        auto it = _patches.find(rank);
+        return (it != _patches.end() ? it->second : nullptr);
+      }
+
+      const std::map<int, MeshPartType*>& get_patch_map() const
+      {
+        return this->_patches;
+      }
+
+      void clear_patches()
+      {
+        for(auto& x : _patches)
+          delete x.second;
+        _patches.clear();
       }
 
       /**
@@ -788,6 +883,20 @@ namespace FEAT
         // refine our children
         this->refine_children(*fine_node);
 
+        // refine our halos
+        for(const auto& v : _halos)
+        {
+          StandardRefinery<MeshPartType> halo_refinery(*v.second, *this->_mesh);
+          fine_node->add_halo(v.first, new MeshPartType(halo_refinery));
+        }
+
+        // refine our patch mesh-parts
+        for(const auto& v : _patches)
+        {
+          StandardRefinery<MeshPartType> patch_refinery(*v.second, *this->_mesh);
+          fine_node->add_patch(v.first, new MeshPartType(patch_refinery));
+        }
+
         // adapt by chart?
         if((adapt_mode & AdaptMode::chart) != AdaptMode::none)
         {
@@ -802,45 +911,6 @@ namespace FEAT
 
         // okay
         return fine_node;
-      }
-
-      /**
-       * \brief Searches this container for a halo meshpart
-       *
-       * \param[in] rank
-       * The rank of the neighbour for which the halo is to be found.
-       *
-       * \returns
-       * A (const) pointer to the halo meshpart or \c nullptr, if no such meshpart was found.
-       */
-      MeshPartType* find_halo_mesh_part(int rank)
-      {
-        return this->find_mesh_part(String("_halo:") + stringify(rank));
-      }
-
-      /** \copydoc find_halo_mesh_part() */
-      const MeshPartType* find_halo_mesh_part(int rank) const
-      {
-        return this->find_mesh_part(String("_halo:") + stringify(rank));
-      }
-
-      /**
-       * \brief Renames the halo meshparts.
-       *
-       * This function can be used to rename the halo meshparts when the rank ordering in the
-       * communicator has changed.
-       *
-       * \param[in] ranks
-       * An map of oldrank-newrank pairs.
-       */
-      void rename_halos(const std::map<int,int>& ranks)
-      {
-        std::map<String,String> names;
-        for(auto& v : ranks)
-        {
-          names.emplace(String("_halo:") + stringify(v.first), String("_halo:") + stringify(v.second));
-        }
-        this->rename_mesh_parts(names);
       }
 
       /**
@@ -916,8 +986,8 @@ namespace FEAT
           patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
             base_root_mesh->get_index_set_holder());
 
-          /// \todo really add to this mesh node?
-          this->add_mesh_part(String("_patch:") + stringify(rank), patch_mesh_part);
+          // add this to out patch map
+          this->add_patch(rank, patch_mesh_part);
         }
 
         // Step 3: Create root mesh of partition by using PatchMeshFactory
@@ -976,11 +1046,8 @@ namespace FEAT
             // build halo
             halo_factory.build(Index(*it));
 
-            // create halo mesh part
-            MeshPartType* halo_part = new MeshPartType(halo_factory);
-
-            // insert into patch mesh node
-            patch_node->add_mesh_part(String("_halo:") + stringify(*it), halo_part);
+            // create halo mesh part and add to our map
+            patch_node->add_halo(*it, new MeshPartType(halo_factory));
           }
         }
 
@@ -1024,7 +1091,7 @@ namespace FEAT
           this->get_mesh()->get_index_set_holder());
 
         // add patch meshpart to this node
-        this->add_mesh_part(String("_patch:") + stringify(rank), patch_mesh_part);
+        this->add_patch(rank, patch_mesh_part);
       }
 
       /**
