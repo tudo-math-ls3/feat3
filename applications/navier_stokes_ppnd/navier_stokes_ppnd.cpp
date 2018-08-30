@@ -43,29 +43,27 @@
 // bench 1: RE = 20;
 // bench 2: RE = 100;
 // bench 3: RE in [0,100]; (time dependent)
-// --setup fb_c2d_01
-// --setup fb_c2d_02
-// --setup fb_c2d_03
+// --setup fb-c2d-01
+// --setup fb-c2d-02
+// --setup fb-c2d-03
 //
 // launch flow around cylinder 3D benchmark:
-// --setup fb_c3d_01
-// --setup fb_c3d_02
-// --setup fb_c3d_03
+// --setup fb-c3d-01
+// --setup fb-c3d-02
+// --setup fb-c3d-03
 //
 // Moreover, this application can be configured by specifying further options, which can
 // be used to define new (non-preconfigured) problems or override the pre-defined settings.
 //
 // IMPORTANT #1:
-// In any case, you will need to specify the path to the mesh directory, as the application
-// will fail to find the required mesh-file otherwise. You can either use the '--mesh-path'
-// option (see below) for this or you can specify the mesh-path by defining the
-// "FEAT3_PATH_MESHES" environment variable to point to the "data/meshes" directory of
-// your FEAT3 checkout.
+// In any case, you will need to specify the path to the mesh directory by using the
+// '--mesh-path <directory>' option (see below), as the application will fail to find
+// the required mesh-files otherwise.
 //
 // IMPORTANT #2:
 // It is not necessary to demand a high accuracy for the velocity solver.
 // Instead of increasing the accuracy of solver_a, it's better to increase
-// the number of nonliner / fixpoint iterations.
+// the number of nonlinear / fixpoint iterations.
 // It may be necessary to increase the number of time-steps in some cases,
 // as the non-linear solver may run amok otherwise...
 //
@@ -120,6 +118,7 @@
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/umfpack.hpp>
 
 // FEAT-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>
@@ -177,11 +176,11 @@ namespace NavierStokesPP
     /// names of the mesh files
     std::deque<String> mesh_files;
 
-    /// minimum and maximum levels (as configured)
-    Index level_min_in, level_max_in;
+    /// minimum, medium maximum levels (as configured)
+    int level_min_in, level_med_in, level_max_in;
 
-    /// minimum and maximum levels (after partitioning)
-    Index level_min, level_max;
+    /// minimum, medium and maximum levels (after partitioning)
+    int level_min, level_med, level_max;
 
     /// base-name of VTK files
     String vtk_name;
@@ -285,6 +284,9 @@ namespace NavierStokesPP
     // damping parameter for pressure smoother
     Real smooth_damp_s;
 
+    // use UMFPACK as coarse grid solver?
+    bool coarse_umfpack_s;
+
     // -------------------------------
 
     // alpha for the velocity mass matrix
@@ -301,12 +303,12 @@ namespace NavierStokesPP
     Real alpha_r;
     Real alpha_d;
 
-    // use fractional-step-theta-sheme ?
+    // use fractional-step-theta-scheme ?
     bool fractional;
 
     // theta for the theta-scheme
     //
-    // 1.0 = Backward-Eurler
+    // 1.0 = Backward-Euler
     // 0.5 = Crank-Nicolson
     Real theta;
 
@@ -330,9 +332,11 @@ namespace NavierStokesPP
   public :
     // the default configuration
     Config() :
-      level_min_in(1),
+      level_min_in(0),
+      level_med_in(-1),
       level_max_in(0),
-      level_min(1),
+      level_min(0),
+      level_med(-1),
       level_max(0),
       vtk_step(0),
       save_step(0),
@@ -359,6 +363,7 @@ namespace NavierStokesPP
       tol_abs_s(1E-14),
       smooth_steps_s(4),
       smooth_damp_s(1.0),
+      coarse_umfpack_s(false),
       alpha(1.0),                 // non-stationary: alpha = 1, stationary: alpha = 0
       alpha_r(1.0),               // non-stationary: alpha_r <= 1, stationary: alpha_r = 0; (alpha_r = 1, if the preconditioner is exact)
       alpha_d(-1.0),              // non-stationary: alpha_d <= theta * nu * delta_t, stationary: alpha <= nu
@@ -373,10 +378,9 @@ namespace NavierStokesPP
       residual_lift(1E-32),       // deactivation of the stopping criteria
       residual_lift2(1E-32)       // deactivation of the stopping criteria
     {
-      // default mesh part
-      const char* mpath = getenv("FEAT3_PATH_MESHES");
-      if(mpath != nullptr)
-        mesh_path = mpath;
+#ifdef FEAT_HAVE_UMFPACK
+      coarse_umfpack_s = true;
+#endif
     }
 
     bool parse_args(SimpleArgParser& args)
@@ -385,7 +389,7 @@ namespace NavierStokesPP
 
       String s;
 
-      // use a defalut setup (like flow around the cylinder benchmark)
+      // use a default setup (like flow around the cylinder benchmark)
       if ((args.parse("setup", s) > 0) && load.empty())
       {
         if(s.compare_no_case("square") == 0)
@@ -429,7 +433,7 @@ namespace NavierStokesPP
       if(args.parse("vtk", vtk_name, vtk_step) == 1)
         vtk_step = 1;  // vtk-name given, but not vtk-step, so set to 1
       if(args.parse("save", save_file, save_step) == 1)
-        save_step = 1; // save-name given, but not vtk-step, so set to 1
+        save_step = 1; // save-name given, but not save-step, so set to 1
       args.parse("nu", nu);
       if (load.empty())
       {
@@ -449,6 +453,9 @@ namespace NavierStokesPP
       no_nonlinear = (args.check("no-nonlinear") < 0);
       multigrid_a = (args.check("no-multigrid-a") < 0);
       multigrid_s = (args.check("no-multigrid-s") < 0);
+#ifdef FEAT_HAVE_UMFPACK
+      coarse_umfpack_s = (args.check("no-umfpack-s") < 0);
+#endif
       args.parse("max-iter-a", max_iter_a);
       args.parse("tol-rel-a", tol_rel_a);
       args.parse("smooth-a", smooth_steps_a);
@@ -470,7 +477,7 @@ namespace NavierStokesPP
       args.parse("residual-lift", residual_lift);
       args.parse("residual-lift2", residual_lift2);
 
-      // only 5 time-steps in test mode
+      // only 10 time-steps in test mode
       if(test_mode)
         max_time_steps = 10;
 
@@ -486,6 +493,7 @@ namespace NavierStokesPP
       dump_line(comm, "Mesh Path", mesh_path);
       dump_line(comm, "Mesh Files", mesh_files);
       dump_line(comm, "Level-Min", stringify(level_min) + " [" + stringify(level_min_in) + "]");
+      dump_line(comm, "Level-Med", stringify(level_med) + " [" + stringify(level_med_in) + "]");
       dump_line(comm, "Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
       dump_line(comm, "VTK-Name", vtk_name);
       dump_line(comm, "VTK-Step", vtk_step);
@@ -541,6 +549,8 @@ namespace NavierStokesPP
       dump_line(comm, "S: Tol-Abs", tol_abs_s);
       dump_line(comm, "S: Smooth Steps", smooth_steps_s);
       dump_line(comm, "S: Smooth Damp", smooth_damp_s);
+      dump_line(comm, "S: Coarse Solver", (coarse_umfpack_s ? "UMFPACK" : "Richardson-Jacobi"));
+
       dump_line(comm, "Residual", residual);
       if (flowbench_c2d)
       {
@@ -561,8 +571,8 @@ namespace NavierStokesPP
       part_names_in.push_back("bnd:b");   // bottom
       part_names_in.push_back("bnd:l");   // left
       part_names_out.push_back("bnd:r");  // right
-      level_min = level_min_in = Index(1);
-      level_max = level_max_in = Index(4);
+      level_min = level_min_in = 1;
+      level_max = level_max_in = 4;
       nu = 1E-3;
       vmax = 0.3;
       time_max = 2.0;
@@ -581,8 +591,9 @@ namespace NavierStokesPP
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
       part_names_no.push_back("bnd:b");  // bottom
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(6);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 6;
       nu = 1E-3;
       vmax = 1.0;
       time_max = 7.0;
@@ -611,8 +622,9 @@ namespace NavierStokesPP
     {
       setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(4);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 4;
       tol_rel_a = 0.5;
       smooth_steps_a = 1;
       smooth_damp_a = 0.01;
@@ -633,8 +645,9 @@ namespace NavierStokesPP
     {
       setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(5);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 5;
       vmax = 1.5;
       theta = 0.5;                           // Crank-Nicolson-Scheme
       time_max = 0.35;
@@ -651,8 +664,9 @@ namespace NavierStokesPP
     {
       setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(3);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 3;
       tol_rel_a = 0.1;
       smooth_steps_a = 0;
       smooth_damp_a = 0.01;
@@ -680,8 +694,9 @@ namespace NavierStokesPP
       part_names_no.push_back("bnd:b");  // bottom
       part_names_no.push_back("bnd:f");  // front
       part_names_no.push_back("bnd:n");  // verso
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(5);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 5;
       nu = 1E-3;
       vmax = 0.45;
       time_max = 3.0;
@@ -706,8 +721,9 @@ namespace NavierStokesPP
       time_steps = max_time_steps = 10000;
       flowbench_c2d = true;
       mesh_files.push_back("flowbench_c3d_01_hexa_128.xml");
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(3);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 3;
       flowbench_1 = true;
     }
 
@@ -732,8 +748,9 @@ namespace NavierStokesPP
       time_steps = max_time_steps = 140;     // delta_t = 1/400
       flowbench_c2d = true;
       mesh_files.push_back("flowbench_c3d_01_hexa_128.xml");
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(3);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 3;
       flowbench_2 = true;
     }
 
@@ -754,8 +771,9 @@ namespace NavierStokesPP
       time_max = 8.0;
       flowbench_c2d = true;
       mesh_files.push_back("flowbench_c3d_01_hexa_128.xml");
-      level_min = level_min_in = Index(0);
-      level_max = level_max_in = Index(3);
+      level_min = level_min_in = 0;
+      level_med = level_med_in = 0;
+      level_max = level_max_in = 3;
       time_steps = max_time_steps = 12800;
       flowbench_3 = true;
       tol_rel_a = 0.1;
@@ -1117,20 +1135,15 @@ namespace NavierStokesPP
 
     // the number of processes (mpi)
     processes = std::stoi(savefile.get_entry("processes").first);
-    // convert string to 'FEAT::Index' (aka 'unsigned long')
-    Index i_max = std::stoul(savefile.get_entry("cfg.part_names_in_size").first, NULL, 0);
-    for (Index i=0;i < i_max;i++)
-      cfg.part_names_in.push_back(savefile.get_entry("cfg.part_names_in_" + stringify(i)).first);
-    i_max = std::stoul(savefile.get_entry("cfg.part_names_out_size").first, NULL, 0);
-    for (Index i=0;i < i_max;i++)
-      cfg.part_names_out.push_back(savefile.get_entry("cfg.part_names_out_" + stringify(i)).first);
-    i_max = std::stoul(savefile.get_entry("cfg.part_names_no_size").first, NULL, 0);
-    for (Index i=0;i < i_max;i++)
-      cfg.part_names_no.push_back(savefile.get_entry("cfg.part_names_no_" + stringify(i)).first);
-    cfg.level_min_in = std::stoul(savefile.get_entry("cfg.level_min_in").first, NULL, 0);
-    cfg.level_max_in = std::stoul(savefile.get_entry("cfg.level_max_in").first, NULL, 0);
-    cfg.level_min = std::stoul(savefile.get_entry("cfg.level_min").first, NULL, 0);
-    cfg.level_max = std::stoul(savefile.get_entry("cfg.level_max").first, NULL, 0);
+    savefile.get_entry("cfg.part_names_in").first.split_by_charset(cfg.part_names_in);
+    savefile.get_entry("cfg.part_names_out").first.split_by_charset(cfg.part_names_out);
+    savefile.get_entry("cfg.part_names_no").first.split_by_charset(cfg.part_names_no);
+    cfg.level_min_in = std::stoi(savefile.get_entry("cfg.level_min_in").first, NULL, 0);
+    cfg.level_med_in = std::stoi(savefile.get_entry("cfg.level_med_in").first, NULL, 0);
+    cfg.level_max_in = std::stoi(savefile.get_entry("cfg.level_max_in").first, NULL, 0);
+    cfg.level_min = std::stoi(savefile.get_entry("cfg.level_min").first, NULL, 0);
+    cfg.level_med = std::stoi(savefile.get_entry("cfg.level_med").first, NULL, 0);
+    cfg.level_max = std::stoi(savefile.get_entry("cfg.level_max").first, NULL, 0);
     cfg.vtk_step = std::stoul(savefile.get_entry("cfg.vtk_step").first, NULL, 0);
     cfg.vtk_name = savefile.get_entry("cfg.vtk_name").first;
     cfg.save_step = std::stoul(savefile.get_entry("cfg.save_step").first, NULL, 0);
@@ -1184,9 +1197,7 @@ namespace NavierStokesPP
     cfg.residual_lift = std::stod(savefile.get_entry("cfg.residual_lift").first);
     cfg.residual_lift2 = std::stod(savefile.get_entry("cfg.residual_lift2").first);
     cfg.mesh_path = savefile.get_entry("cfg.mesh_path").first;
-    i_max = std::stoul(savefile.get_entry("cfg.mesh_files_size").first, NULL, 0);
-    for (Index i=0;i < i_max;i++)
-      cfg.mesh_files.push_back(savefile.get_entry("cfg.mesh_files_" + stringify(i)).first);
+    savefile.get_entry("cfg.mesh_files").first.split_by_charset(cfg.mesh_files);
   }
 
   // load the data from the save state
@@ -1211,22 +1222,18 @@ namespace NavierStokesPP
     savefile.add_entry("processes",stringify_fp_sci(processes,8),true);
     savefile.add_entry("time_step",stringify_fp_sci(time_step,8),true);
 
-    savefile.add_entry("cfg.part_names_in_size",stringify(cfg.part_names_in.size()),true);
-    for (Index i=0;i < cfg.part_names_in.size();i++)
-      savefile.add_entry("cfg.part_names_in_"+ stringify(i),cfg.part_names_in[i],true);
-    savefile.add_entry("cfg.part_names_out_size",stringify(cfg.part_names_out.size()),true);
-    for (Index i=0;i < cfg.part_names_out.size();i++)
-      savefile.add_entry("cfg.part_names_out_"+ stringify(i),cfg.part_names_out[i],true);
-    savefile.add_entry("cfg.part_names_no_size",stringify(cfg.part_names_no.size()),true);
-    for (Index i=0;i < cfg.part_names_no.size();i++)
-      savefile.add_entry("cfg.part_names_no_"+ stringify(i),cfg.part_names_no[i],true);
-    savefile.add_entry("cfg.level_min_in",stringify_fp_sci(cfg.level_min_in,8),true);
-    savefile.add_entry("cfg.level_max_in",stringify_fp_sci(cfg.level_max_in,8),true);
-    savefile.add_entry("cfg.level_min",stringify_fp_sci(cfg.level_min,8),true);
-    savefile.add_entry("cfg.level_max",stringify_fp_sci(cfg.level_max,8),true);
-    savefile.add_entry("cfg.vtk_step",stringify_fp_sci(cfg.vtk_step,8),true);
+    savefile.add_entry("cfg.part_names_in",stringify_join(cfg.part_names_in, " "),true);
+    savefile.add_entry("cfg.part_names_out",stringify_join(cfg.part_names_out, " "),true);
+    savefile.add_entry("cfg.part_names_no",stringify_join(cfg.part_names_no, " "),true);
+    savefile.add_entry("cfg.level_min_in",stringify(cfg.level_min_in),true);
+    savefile.add_entry("cfg.level_med_in",stringify(cfg.level_med_in),true);
+    savefile.add_entry("cfg.level_max_in",stringify(cfg.level_max_in),true);
+    savefile.add_entry("cfg.level_min",stringify(cfg.level_min),true);
+    savefile.add_entry("cfg.level_med",stringify(cfg.level_med),true);
+    savefile.add_entry("cfg.level_max",stringify(cfg.level_max),true);
+    savefile.add_entry("cfg.vtk_step",stringify(cfg.vtk_step),true);
     savefile.add_entry("cfg.vtk_name",cfg.vtk_name,true);
-    savefile.add_entry("cfg.save_step",stringify_fp_sci(cfg.save_step,8),true);
+    savefile.add_entry("cfg.save_step",stringify(cfg.save_step),true);
     savefile.add_entry("cfg.flowbench_c2d",stringify(cfg.flowbench_c2d),true);
     savefile.add_entry("cfg.flowbench_1",stringify(cfg.flowbench_1),true);
     savefile.add_entry("cfg.flowbench_2",stringify(cfg.flowbench_2),true);
@@ -1235,19 +1242,19 @@ namespace NavierStokesPP
     savefile.add_entry("cfg.nu",stringify_fp_sci(cfg.nu,8),true);
     savefile.add_entry("cfg.vmax",stringify_fp_sci(cfg.vmax,8),true);
     savefile.add_entry("cfg.time_max",stringify_fp_sci(cfg.time_max,8),true);
-    savefile.add_entry("cfg.time_steps",stringify_fp_sci(cfg.time_steps,8),true);
-    savefile.add_entry("cfg.max_time_steps",stringify_fp_sci(cfg.max_time_steps,8),true);
-    savefile.add_entry("cfg.fixpoint_steps",stringify_fp_sci(cfg.fixpoint_steps,8),true);
+    savefile.add_entry("cfg.time_steps",stringify(cfg.time_steps),true);
+    savefile.add_entry("cfg.max_time_steps",stringify(cfg.max_time_steps),true);
+    savefile.add_entry("cfg.fixpoint_steps",stringify(cfg.fixpoint_steps),true);
     savefile.add_entry("cfg.tol_fix",stringify_fp_sci(cfg.tol_fix,8),true);
     savefile.add_entry("cfg.multigrid_a",stringify(cfg.multigrid_a),true);
     savefile.add_entry("cfg.multigrid_s",stringify(cfg.multigrid_s),true);
-    savefile.add_entry("cfg.max_iter_a",stringify_fp_sci(cfg.max_iter_a,8),true);
+    savefile.add_entry("cfg.max_iter_a",stringify(cfg.max_iter_a),true);
     savefile.add_entry("cfg.tol_rel_a",stringify_fp_sci(cfg.tol_rel_a,8),true);
-    savefile.add_entry("cfg.smooth_steps_a",stringify_fp_sci(cfg.smooth_steps_a,8),true);
+    savefile.add_entry("cfg.smooth_steps_a",stringify(cfg.smooth_steps_a),true);
     savefile.add_entry("cfg.smooth_damp_a",stringify_fp_sci(cfg.smooth_damp_a,8),true);
-    savefile.add_entry("cfg.max_iter_s",stringify_fp_sci(cfg.max_iter_s,8),true);
+    savefile.add_entry("cfg.max_iter_s",stringify(cfg.max_iter_s),true);
     savefile.add_entry("cfg.tol_abs_s",stringify_fp_sci(cfg.tol_abs_s,8),true);
-    savefile.add_entry("cfg.smooth_steps_s",stringify_fp_sci(cfg.smooth_steps_s,8),true);
+    savefile.add_entry("cfg.smooth_steps_s",stringify(cfg.smooth_steps_s),true);
     savefile.add_entry("cfg.smooth_damp_s",stringify_fp_sci(cfg.smooth_damp_s,8),true);
     savefile.add_entry("cfg.alpha",stringify_fp_sci(cfg.alpha,8),true);
     savefile.add_entry("cfg.alpha_r",stringify_fp_sci(cfg.alpha_r,8),true);
@@ -1263,9 +1270,7 @@ namespace NavierStokesPP
     savefile.add_entry("cfg.residual_lift",stringify_fp_sci(cfg.residual_lift,8),true);
     savefile.add_entry("cfg.residual_lift2",stringify_fp_sci(cfg.residual_lift2,8),true);
     savefile.add_entry("cfg.mesh_path",cfg.mesh_path,true);
-    savefile.add_entry("cfg.mesh_files_size",stringify(cfg.mesh_files.size()),true);
-    for (Index i=0;i < cfg.mesh_files.size();i++)
-      savefile.add_entry("cfg.mesh_files_"+ stringify(i),cfg.mesh_files[i],true);
+    savefile.add_entry("cfg.mesh_files",stringify_join(cfg.mesh_files, " "),true);
 
     savefile.add_entry("c_drag_old",stringify_fp_sci(c_drag_old,8),true);
     savefile.add_entry("c_lift_old",stringify_fp_sci(c_lift_old,8),true);
@@ -1596,6 +1601,14 @@ namespace NavierStokesPP
           multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, lvl.transfer_pres,
             smoother, smoother, smoother);
         }
+#ifdef FEAT_HAVE_UMFPACK
+        else if(cfg.coarse_umfpack_s)
+        {
+          auto umf = Solver::new_umfpack(lvl.matrix_s.get_local_schur_matrix());
+          auto cgs = Solver::new_schwarz_precond(umf, lvl.filter_pres);
+          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, cgs);
+        }
+#endif // FEAT_HAVE_UMFPACK
         else
         {
           // coarse grid solver
@@ -1863,14 +1876,14 @@ namespace NavierStokesPP
 
         if (cfg.fractional)
         {
-         // Choose theta such that the scheme is of second order. See Turek book, page 151.
-         DataType theta(DataType(1.0) - Math::sqrt(2.0) / DataType(2.0));
-         DataType thetas(DataType(1.0) - DataType(2.0) * theta);                                      // thetas stands for \theta'
-         DataType alpha_t((DataType(1.0) - DataType(2.0) * theta) / (DataType(1.0) - theta));         // => all coefficient matrices will be the same in all substeps.
-         DataType beta_t(DataType(1.0) - alpha_t);
-         DataType theta1(0),theta2(0),theta3(0),theta4(0);
+          // Choose theta such that the scheme is of second order. See Turek book, page 151.
+          DataType theta(DataType(1.0) - Math::sqrt(2.0) / DataType(2.0));
+          DataType thetas(DataType(1.0) - DataType(2.0) * theta);                                      // thetas stands for \theta'
+          DataType alpha_t((DataType(1.0) - DataType(2.0) * theta) / (DataType(1.0) - theta));         // => all coefficient matrices will be the same in all substeps.
+          DataType beta_t(DataType(1.0) - alpha_t);
+          DataType theta1(0),theta2(0),theta3(0),theta4(0);
 
-         switch (fractional)
+          switch (fractional)
           {
             case 1:
               // Fractional-step-theta-scheme
@@ -2098,7 +2111,7 @@ namespace NavierStokesPP
           // apply filter onto solution vector
           filter_v.filter_sol(vec_conv);
 
-          // consol output
+          // console output
           if ((nonlin_step <= cfg.fixpoint_steps) && (nonlin_step > 0))
           {
             comm.print(line);
@@ -2111,7 +2124,7 @@ namespace NavierStokesPP
           break;
 
         //
-        // calulate the right hand side for the Pressure-Poisson-Problem
+        // calculate the right hand side for the Pressure-Poisson-Problem
         //
         // Algorithm : f_p = 1/k B^T tilde_u^l
         // FEAT : f = 1/delta_t D tilde_u
@@ -2523,16 +2536,18 @@ namespace NavierStokesPP
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
-    typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
+    typedef Space::Discontinuous::ElementP1<TrafoType> SpacePresType;
     typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
-    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, false);
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
 
     // parse arguments and set levels
     domain.parse_args(args);
     if ((args.check("level") > 0) && cfg.load.empty())
       domain.set_desired_levels(args.query("level")->second);
+    else if(cfg.level_med_in >= 0)
+      domain.set_desired_levels(cfg.level_max_in, cfg.level_med_in, cfg.level_min_in);
     else
-      domain.set_desired_levels(int(cfg.level_max_in), int(cfg.level_min_in));
+      domain.set_desired_levels(cfg.level_max_in, cfg.level_min_in);
 
     domain.create(cfg.mesh_files, cfg.mesh_path);
 
@@ -2542,11 +2557,17 @@ namespace NavierStokesPP
     // store levels after partitioning
     if (cfg.load.empty())
     {
-      cfg.level_max_in = Index(domain.get_desired_level_max());
-      cfg.level_min_in = Index(domain.get_desired_level_min());
-      cfg.level_max = Index(domain.max_level_index());
-      cfg.level_min = Index(domain.min_level_index());
+      cfg.level_max_in = domain.get_desired_level_max();
+      cfg.level_med_in = domain.get_desired_level_med();
+      cfg.level_min_in = domain.get_desired_level_min();
+      cfg.level_max = domain.max_level_index();
+      cfg.level_med = domain.med_level_index();
+      cfg.level_min = domain.min_level_index();
     }
+
+    // ensure that we do not use UMFPACK if we have more than 1 coarse mesh processes
+    if(domain.back_layer().comm().size() > 1)
+      cfg.coarse_umfpack_s = false;
 
     // dump our configuration
     cfg.dump(comm);
@@ -2572,10 +2593,10 @@ namespace NavierStokesPP
     args.support("setup", "<config>\nLoads a pre-defined configuration:\n"
       "square      Poiseuille-Flow on Unit-Square\n"
       "nozzle      Jet-Flow through Nozzle domain\n"
-      "fb_c2d_00   Nonsteady Flow Around A Cylinder (bench1 mesh)\n"
-      "fb_c2d_01   Nonsteady Flow Around A Cylinder (32 quad mesh)\n"
-      "fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)\n"
-      "fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)\n"
+      "fb-c2d-00   Nonsteady Flow Around A Cylinder (bench1 mesh)\n"
+      "fb-c2d-01   Nonsteady Flow Around A Cylinder (32 quad mesh)\n"
+      "fb-c2d-02   Nonsteady Flow Around A Cylinder (48 quad mesh)\n"
+      "fb-c2d-03   Nonsteady Flow Around A Cylinder (64 quad mesh)\n"
     );
     args.support("alpha", "<alpha>\nSets the scale parameter alpha.\nThis scale the velocity mass matrix.\nDefault = 1\n");
     args.support("alpha-r", "<alpha_r>\nSets the scale parameter alpha-r (used in pressure update).\n");
@@ -2583,7 +2604,7 @@ namespace NavierStokesPP
     args.support("deformation", "\nUse deformation tensor instead of gradient tensor.\n");
     args.support("flowbench","\nEnables the computation of 'flow around a cylinder' post-processing\nquantities such as drag, lift, etc.\n");
     args.support("nu", "<nu>\nSets the viscosity parameter for the velocity.\n");
-    args.support("fractional", "\nUse the fractional-step-theta-scheme instead of the theta-sheme.\nDefault = false\n");
+    args.support("fractional", "\nUse the fractional-step-theta-scheme instead of the theta-scheme.\nDefault = false\n");
     args.support("theta", "<theta>\nSets the parameter theta.\n1 for Backward Euler, 0.5 for Crank-Nicolson...\nDefault = 1\n");
     args.support("res-fix", "<eps>\nSets the residual for the nonlinear / fixpoint iteration.\n");
     args.support("time-max", "<T_max>\nSets the maximum simulation time T_max.\n");
@@ -2593,7 +2614,7 @@ namespace NavierStokesPP
     args.support("part-out", "<names...>\nSpecifies the names of the outflow mesh-parts.\n");
     args.support("part-no", "<names...>\nSpecifies the names of the noflow mesh-parts.\n");
     args.support("vmax", "<v_max>\nSpecifies the maximum inflow velocity.\n");
-    args.support("level", "<max> [<min>]\nSets the maximum and minimum mesh refinement levels.\n");
+    args.support("level", "<max> [[<med>] <min>]\nSets the maximum, medium and minimum mesh refinement levels.\n");
     args.support("vtk", "<name> [<step>]\nSets the name for VTK output and the time-stepping for the output (optional).\n");
     args.support("save", "<name> [<step>]\nSets the name for savefile and the time-stepping for the output (optional).\n");
     args.support("load", "<name> \nLoad a savefile.\n");
@@ -2604,6 +2625,7 @@ namespace NavierStokesPP
     args.support("tol-fix", "<eps>\nSets the tolerance of the non-linear / fixpoint iteration.\n");
     args.support("no-multigrid-a", "\nUse no Multigrid-Solver as A-Solver (velocity).\n");
     args.support("no-multigrid-s", "\nUse PCG-Jacobi instead of Multigrid as S-Solver (pressure).\n");
+    args.support("no-umfpack-s", "\nUse Richardson-Jacobi instead of UMFPACK as S-Coarse-Grid-Solver.\n");
     args.support("max-iter-a", "<N>\nSets the maximal number of iteration for the A-Solver (velocity).\nDefault: 1E-5\n");
     args.support("tol-rel-a", "<eps>\nSets the relative tolerance for the A-Solver (velocity).\nDefault: 1E-5\n");
     args.support("smooth-a", "<N>\nSets the number of smoothing steps for the A-Solver (velocity).\nDefault: 4\n");
@@ -2614,11 +2636,11 @@ namespace NavierStokesPP
     args.support("damp-s", "<omega>\nSets the smoother damping parameter for the S-Solver (pressure).\nDefault: 0.5\n");
     args.support("test-mode", "\nRuns the application in regression test mode.\n");
     args.support("chorin", "\nUse Chorn mode.\nDefault = false\n");
-    args.support("residual", "<eps>\nSet the global residual (stopping criteria).\nDefalut: 1E-32 (off)\n");
-    args.support("residual_drag", "<eps>\nSet the drag-residual (stopping criteria).\nDefalut: 1E-32 (off)\n");
-    args.support("residual_drag2", "<eps>\nSet the drag-time-residual (stopping criteria).\nDefalut: 1E-32 (off)\n");
-    args.support("residual_lift", "<eps>\nSet the lift-residual (stopping criteria).\nDefalut: 1E-32 (off)\n");
-    args.support("residual_lift2", "<eps>\nSet the lift-time-residual (stopping criteria).\nDefalut: 1E-32 (off)\n");
+    args.support("residual", "<eps>\nSet the global residual (stopping criteria).\nDefault: 1E-32 (off)\n");
+    args.support("residual_drag", "<eps>\nSet the drag-residual (stopping criteria).\nDefault: 1E-32 (off)\n");
+    args.support("residual_drag2", "<eps>\nSet the drag-time-residual (stopping criteria).\nDefault: 1E-32 (off)\n");
+    args.support("residual_lift", "<eps>\nSet the lift-residual (stopping criteria).\nDefault: 1E-32 (off)\n");
+    args.support("residual_lift2", "<eps>\nSet the lift-time-residual (stopping criteria).\nDefault: 1E-32 (off)\n");
 
     // no arguments given?
     if((argc <= 1) || (args.check("help") >= 0))
@@ -2629,10 +2651,10 @@ namespace NavierStokesPP
       comm.print("option '--setup <config>', where <config> may be one of:\n");
       comm.print("  square      Poiseuille-Flow on Unit-Square");
       comm.print("  nozzle      Jet-Flow through Nozzle domain");
-      comm.print("  fb_c2d_00   Nonsteady Flow Around A Cylinder (bench1 mesh)");
-      comm.print("  fb_c2d_01   Nonsteady Flow Around A Cylinder (32 quad mesh)");
-      comm.print("  fb_c2d_02   Nonsteady Flow Around A Cylinder (48 quad mesh)");
-      comm.print("  fb_c2d_03   Nonsteady Flow Around A Cylinder (64 quad mesh)");
+      comm.print("  fb-c2d-00   Nonsteady Flow Around A Cylinder (bench1 mesh)");
+      comm.print("  fb-c2d-01   Nonsteady Flow Around A Cylinder (32 quad mesh)");
+      comm.print("  fb-c2d-02   Nonsteady Flow Around A Cylinder (48 quad mesh)");
+      comm.print("  fb-c2d-03   Nonsteady Flow Around A Cylinder (64 quad mesh)");
       comm.print("This will pre-configure this application to solve one of the");
       comm.print("above problems. Note that you can further adjust the configuration");
       comm.print("by specifying additional options to override the default problem");
