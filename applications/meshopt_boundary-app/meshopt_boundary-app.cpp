@@ -184,7 +184,7 @@ struct MeshoptBoundaryApp
     TimeStamp at;
 
     // Create domain control
-    DomCtrl dom_ctrl(comm);
+    DomCtrl dom_ctrl(comm, false);
     dom_ctrl.parse_property_map(*domain_control_settings_section);
     dom_ctrl.set_desired_levels(lvl_max, lvl_min);
     dom_ctrl.create(mesh_file_reader);

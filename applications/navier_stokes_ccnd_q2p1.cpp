@@ -1432,9 +1432,8 @@ namespace NvSCCNDQ2P1dc
     comm.print(domain.get_chosen_parti_info());
 
     // plot our levels
-    comm.print("LEVEL-MAX: " + stringify(domain.max_level_index()) + " [" + stringify(domain.get_desired_level_max()) + "]");
-    comm.print("LEVEL-MED: " + stringify(domain.med_level_index()) + " [" + stringify(domain.get_desired_level_med()) + "]");
-    comm.print("LEVEL-MIN: " + stringify(domain.min_level_index()) + " [" + stringify(domain.get_desired_level_min()) + "]");
+    comm.print("Desired Levels: " + domain.format_desired_levels());
+    comm.print("Chosen  Levels: " + domain.format_chosen_levels());
 
     // run our application
     run(args, domain);

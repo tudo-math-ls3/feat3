@@ -383,11 +383,13 @@ namespace FEAT
         std::deque<std::shared_ptr<LayerType>> _layers;
         std::deque<std::deque<std::shared_ptr<LevelType>>> _layer_levels;
         std::deque<VirtLevelType> _virt_levels;
+        std::size_t _num_global_layers;
         std::size_t _virt_size;
 
       public:
         explicit DomainControl(const Dist::Comm& comm_) :
           _comm(comm_),
+          _num_global_layers(0u),
           _virt_size(0u)
         {
         }
@@ -436,9 +438,14 @@ namespace FEAT
           return s;
         }
 
-        Index num_layers() const
+        std::size_t num_local_layers() const
         {
-          return Index(_layers.size());
+          return _layers.size();
+        }
+
+        std::size_t num_global_layers() const
+        {
+          return _num_global_layers;
         }
 
         void push_layer(std::shared_ptr<LayerType> layer)
@@ -564,6 +571,13 @@ namespace FEAT
 
         void compile_virtual_levels()
         {
+          // get number of layers of this process
+          std::size_t my_num_layers = _layers.size();
+
+          // get global maximum of all layer sizes
+          _comm.allreduce(&my_num_layers, &_num_global_layers, std::size_t(1), Dist::op_max);
+
+          // clear virtual levels
           _virt_levels.clear();
 
           // push the finest level
@@ -572,8 +586,11 @@ namespace FEAT
           // loop over all layers, front to back
           for(std::size_t ilay(0); ilay < _layers.size(); ++ilay)
           {
-            auto& layer = _layers.at(ilay);
-            auto& laylevs = _layer_levels.at(ilay);
+            // get the current layer
+            std::shared_ptr<LayerType>& layer = _layers.at(ilay);
+
+            // get the deque of the current layer's levels
+            std::deque<std::shared_ptr<LevelType>>& laylevs = _layer_levels.at(ilay);
 
             // the front level has already been added
             if(laylevs.size() <= std::size_t(1))

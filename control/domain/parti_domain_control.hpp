@@ -52,7 +52,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Partitioned Domain Control
+       * \brief Recursively Partitioned Domain Control
        *
        * \todo document this
        *
@@ -75,6 +75,53 @@ namespace FEAT
         typedef typename BaseClass::AtlasType AtlasType;
         /// our root mesh node type
         typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
+        /// our mesh-part type
+        typedef typename LevelType::PartType MeshPartType;
+
+      protected:
+        /**
+         * \brief Ancestor info class
+         */
+        class Ancestor
+        {
+        public:
+          /// the index of the layer that this ancestor object belongs to
+          int layer;
+          /// the index of the parent layer or -1, if this process is not part of the parent layer
+          int layer_p;
+          /// the number of processors that participate in this layer
+          int num_procs;
+          /// the number of partitions for each patch of the parent layer
+          int num_parts;
+          /// the desired minimum and maximum refinement levels for this layer
+          int desired_level_max, desired_level_min;
+
+          int progeny_group, progeny_child;
+          int progeny_first, progeny_count;
+          Dist::Comm progeny_comm;
+
+          /// a string containing some information about the chosen partitioning
+          String parti_info;
+          /// the refinement level on which the patch is to be partitioned
+          int parti_level;
+          /// specifies whether the chosen partitioning is an a-priori partitioning strategy
+          bool parti_apriori;
+          /// this is the actual elements-at-rank partitioning graph
+          Adjacency::Graph parti_graph;
+
+          Ancestor() :
+            layer(0), layer_p(0), num_procs(0), num_parts(0),
+            desired_level_max(0), desired_level_min(0),
+            progeny_group(0), progeny_child(0),
+            progeny_first(0), progeny_count(0),
+            progeny_comm(),
+            parti_info(),
+            parti_level(0),
+            parti_apriori(false),
+            parti_graph()
+          {
+          }
+        }; // class Ancestor
 
       protected:
         /// specifies whether the domain control was already created
@@ -95,17 +142,14 @@ namespace FEAT
         /// allow naive partitioner?
         bool _allow_parti_naive;
 
-        /// support double layered hierarchy?
-        bool _support_double_layered;
-        /// desire double layered hierarchy?
-        bool _desired_double_layered;
+        /// support multi-layered hierarchy?
+        bool _support_multi_layered;
 
-        /// desired maximum level
-        int _desired_level_max;
-        /// desired median level (double layered only)
-        int _desired_level_med;
-        /// desired minimum level
-        int _desired_level_min;
+        /// desired level deque
+        std::deque<std::pair<int,int>> _desired_levels;
+
+        /// chosen level deque
+        std::deque<std::pair<int,int>> _chosen_levels;
 
         /// required partition name for extern partitioning
         std::deque<String> _extern_parti_names;
@@ -116,26 +160,20 @@ namespace FEAT
         /// time for genetic partitioner mutation
         double _genetic_time_mutate;
 
-        /// information about the chosen partitioning
-        String _chosen_parti_info;
-        /// the chosen partitioning level
-        int _chosen_parti_level;
-        /// whether an a-priori partitioning was chosen
-        bool _chosen_parti_apriori;
-        /// the chosen partitioning graph (aka "elems-at-rank")
-        Adjacency::Graph _chosen_parti_graph;
+        /// the partition ancestry deque
+        std::deque<Ancestor> _ancestry;
 
       public:
         /**
          * \brief Constructor
          *
          * \param[in] comm
-         * The communicator to be used.
+         * The main communicator to be used.
          *
-         * \param[in] support_double_layered
-         * Specifies whether the controller is allowed to create double-layered hierarchies.
+         * \param[in] support_multi_layered
+         * Specifies whether the controller is allowed to create multi-layered hierarchies.
          */
-        explicit PartiDomainControl(const Dist::Comm& comm_, bool support_double_layered = false) :
+        explicit PartiDomainControl(const Dist::Comm& comm_, bool support_multi_layered) :
           BaseClass(comm_),
           _was_created(false),
           _adapt_mode(Geometry::AdaptMode::chart),
@@ -144,19 +182,11 @@ namespace FEAT
           _allow_parti_metis(false),
           _allow_parti_genetic(false), // this one is exotic
           _allow_parti_naive(true),
-          _support_double_layered(support_double_layered),
-          _desired_double_layered(false),
-          _desired_level_max(-1),
-          _desired_level_med(-1),
-          _desired_level_min(-1),
+          _support_multi_layered(support_multi_layered),
+          _desired_levels(),
           _extern_parti_names(),
           _required_elems_per_rank(1),
-          _genetic_time_init(1.0),
-          _genetic_time_mutate(1.0),
-          _chosen_parti_info(),
-          _chosen_parti_level(-1),
-          _chosen_parti_apriori(false),
-          _chosen_parti_graph()
+          _ancestry()
         {
         }
 
@@ -336,40 +366,79 @@ namespace FEAT
          * \brief Sets the desired levels for the partitioned hierarchy.
          *
          * \param[in] slvls
-         * A deque of strings containing the desired levels.
+         * A string containing the list of desired levels.
          */
-        void set_desired_levels(const std::deque<String>& slvls)
+        void set_desired_levels(const String& slvls)
         {
-          // parse all strings into ints
-          std::deque<int> ilvls(slvls.size(), 0);
-          for(std::size_t i(0); i < slvls.size(); ++i)
-          {
-            if(!slvls.at(i).parse(ilvls.at(i)))
-              throw InternalError(__func__, __FILE__, __LINE__, "Failed to parse level '" + slvls.at(i) + "'");
-          }
-
-          // okay
-          set_desired_levels(ilvls);
+          std::deque<String> sl;
+          slvls.split_by_charset(sl);
+          set_desired_levels(sl);
         }
 
         /**
          * \brief Sets the desired levels for the partitioned hierarchy.
          *
-         * \param[in] ilvls
-         * A deque containing the desired levels.
+         * \param[in] slvls
+         * A deque of strings containing the desired levels.
+         *
+         * Each entry of the deque is supposed to be in the format <c>level:nprocs</c>.
          */
-        void set_desired_levels(const std::deque<int>& lvls)
+        void set_desired_levels(const std::deque<String>& slvls)
         {
-          if(lvls.empty())
-            throw InternalError(__func__, __FILE__, __LINE__, "Failed to set empty levels");
-          else if(lvls.size() == std::size_t(1))
-            set_desired_levels(lvls.front());
-          else if(lvls.size() == std::size_t(2))
-            set_desired_levels(lvls.front(), lvls.back());
-          else if((lvls.size() == std::size_t(3)) && _support_double_layered)
-            set_desired_levels(lvls.front(), lvls.at(1u), lvls.back());
-          else
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid number of levels specified");
+          const int nranks = this->_comm.size();
+          std::deque<String> sv;
+
+          for(std::size_t i(0); i < slvls.size(); ++i)
+          {
+            int ilvl = -1, nprocs = -1;
+            slvls.at(i).split_by_charset(sv, ":");
+
+            if((sv.size() < std::size_t(1)) || (sv.size() > std::size_t(2)))
+              throw INTERNAL_ERROR("Invalid input format: '" + slvls.at(i) + "', expected 'level:patches'");
+
+            if(!sv.front().parse(ilvl))
+              throw INTERNAL_ERROR("Failed to parse level index: '" + slvls.at(i) + "'");
+            if((sv.size() > std::size_t(1)) && !sv.back().parse(nprocs))
+              throw INTERNAL_ERROR("Failed to parse process count: '" + slvls.at(i) + "'");
+
+            // level must be non-negative
+            if(ilvl < 0)
+              throw INTERNAL_ERROR("Invalid negative level index: '" + slvls.at(i) + "'");
+
+            // first level index?
+            if(i == std::size_t(0))
+            {
+              if((nprocs >= 0) && (nprocs != this->_comm.size()))
+                throw INTERNAL_ERROR("Invalid number of processes for global level: '" + slvls.at(i) +
+                  "', expected " + stringify(this->_comm.size()) + " but got " + stringify(nprocs));
+              _desired_levels.push_back(std::make_pair(ilvl, nranks));
+              continue;
+            }
+
+            // make sure the level is non-ascending
+            if(_desired_levels.back().first < ilvl)
+              throw INTERNAL_ERROR("Invalid non-descending level index: '" + slvls.at(i) +
+                "', expected <= " + stringify(_desired_levels.back().first) + " but got " + stringify(ilvl));
+
+            // make sure process count is valid
+            if((i + 1) == slvls.size())
+              nprocs = 0;
+            else
+            {
+              // the process count must be descending
+              if(_desired_levels.back().second <= nprocs)
+                throw INTERNAL_ERROR("Invalid non-descending process count: '" + slvls.at(i) +
+                  "', expected < " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
+
+              // the previous process count must be a multiple
+              if(_desired_levels.back().second % nprocs != 0)
+                throw INTERNAL_ERROR("Invalid indivisible process count: '" + slvls.at(i) +
+                  "', expected a divisor of " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
+            }
+
+            // push the level-proc pair
+            _desired_levels.push_back(std::make_pair(ilvl, nprocs));
+          }
         }
 
         /**
@@ -385,16 +454,18 @@ namespace FEAT
         void set_desired_levels(int lvl_max, int lvl_min = -1)
         {
           // single-layered hierarchy
-          _desired_double_layered = false;
-          _desired_level_max = lvl_max;
-          _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_max + lvl_min + 1);
+          int _desired_level_max = lvl_max;
+          int _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_max + lvl_min + 1);
 
           if(_desired_level_max < 0)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-max");
+            throw INTERNAL_ERROR("Invalid level-max");
           if(_desired_level_min < 0)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-min");
+            throw INTERNAL_ERROR("Invalid level-min");
           if(_desired_level_max < _desired_level_min)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-min/max combination");
+            throw INTERNAL_ERROR("Invalid level-min/max combination");
+
+          _desired_levels.emplace_back(std::make_pair(_desired_level_max, this->_comm.size()));
+          _desired_levels.emplace_back(std::make_pair(_desired_level_min, 0));
         }
 
         /**
@@ -413,60 +484,91 @@ namespace FEAT
          */
         void set_desired_levels(int lvl_max, int lvl_med, int lvl_min)
         {
-          // support double layered hierarchy?
-          if(!_support_double_layered)
-            throw InternalError(__func__, __FILE__, __LINE__, "double-layered hierarchy not supported");
-
           // double-layered hierarchy
-          _desired_double_layered = true;
-          _desired_level_max = lvl_max;
-          _desired_level_med = (lvl_med >= 0 ? lvl_med : lvl_max + lvl_med + 1);
-          _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_med + lvl_min + 1);
+          int _desired_level_max = lvl_max;
+          int _desired_level_med = (lvl_med >= 0 ? lvl_med : lvl_max + lvl_med + 1);
+          int _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_med + lvl_min + 1);
 
           if(_desired_level_max < 0)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-max");
+            throw INTERNAL_ERROR("Invalid level-max");
           if(_desired_level_med < 0)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-med");
+            throw INTERNAL_ERROR("Invalid level-med");
           if(_desired_level_min < 0)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-min");
+            throw INTERNAL_ERROR("Invalid level-min");
 
           // level_max must be strictly greater than level_med
           if(_desired_level_max <= _desired_level_med)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-max/med combination");
+            throw INTERNAL_ERROR("Invalid level-max/med combination");
 
           // level_med must be greater or equal level_min
           if(_desired_level_med < _desired_level_min)
-            throw InternalError(__func__, __FILE__, __LINE__, "Invalid level-med/min combination");
+            throw INTERNAL_ERROR("Invalid level-med/min combination");
+
+          _desired_levels.emplace_back(std::make_pair(_desired_level_max, this->_comm.size()));
+          _desired_levels.emplace_back(std::make_pair(_desired_level_med, 1));
+          _desired_levels.emplace_back(std::make_pair(_desired_level_min, 0));
         }
 
         /**
-         * \brief Returns The desired maximum refinement level
+         * \brief Returns the desired maximum refinement level
          *
          * \returns The desired maximum refinement level
          */
         int get_desired_level_max() const
         {
-          return _desired_level_max;
+          return _desired_levels.front().first;
         }
 
         /**
-         * \brief Returns The desired median refinement level
-         *
-         * \returns The desired median refinement level
-         */
-        int get_desired_level_med() const
-        {
-          return _desired_level_med;
-        }
-
-        /**
-         * \brief Returns The desired minimum refinement level
+         * \brief Returns the desired minimum refinement level
          *
          * \returns The desired minimum refinement level
          */
         int get_desired_level_min() const
         {
-          return _desired_level_min;
+          return _desired_levels.back().first;
+        }
+
+        /**
+         * \brief Returns the desired levels formatted as a parsable string.
+         *
+         * The string returned by this function can be parsed by the set_desired_levels() function.
+         *
+         * \returns The desired levels formatted as a parsable string.
+         */
+        String format_desired_levels() const
+        {
+          String s;
+          for(std::size_t i(0); (i + 1) < _desired_levels.size(); ++i)
+          {
+            s += stringify(_desired_levels.at(i).first);
+            s += ":";
+            s += stringify(_desired_levels.at(i).second);
+            s += "  ";
+          }
+          s += stringify(_desired_levels.back().first);
+          return s;
+        }
+
+        /**
+         * \brief Returns the chosen levels formatted as a parsable string.
+         *
+         * The string returned by this function can be parsed by the set_desired_levels() function.
+         *
+         * \returns The chosen levels formatted as a parsable string.
+         */
+        String format_chosen_levels() const
+        {
+          String s;
+          for(std::size_t i(0); (i + 1) < _chosen_levels.size(); ++i)
+          {
+            s += stringify(_chosen_levels.at(i).first);
+            s += ":";
+            s += stringify(_chosen_levels.at(i).second);
+            s += "  ";
+          }
+          s += stringify(_chosen_levels.back().first);
+          return s;
         }
 
         /**
@@ -475,18 +577,51 @@ namespace FEAT
          * \note
          * This function only returns something useful after the #create()
          * function has been called.
+         *
+         * \note
+         * In the case of a multi-layered recursive partitioning, the returned string is
+         * a multi-line string containing the partitioning info for each recursive layer
+         * in a separate line.
          */
         String get_chosen_parti_info() const
         {
-          return _chosen_parti_info;
+          String s;
+
+          for(auto it = this->_ancestry.rbegin(); it != this->_ancestry.rend(); ++it)
+          {
+            if(it != this->_ancestry.rbegin())
+              s += "\n";
+            s += it->parti_info;
+            s += " on level ";
+            s += stringify(it->parti_level);
+            s += " for ";
+            s += stringify(it->num_parts);
+            s += " patches on ";
+            s += stringify(it->num_procs);
+            s += " processes";
+          }
+
+          return s;
         }
 
         /**
-         * \brief Returns the level on which the base mesh was partitioned.
+         * \brief Returns the deque of desired refinement levels.
+         *
+         * \returns The deque of desired refinement levels.
          */
-        int get_chosen_parti_level() const
+        const std::deque<std::pair<int, int>> get_desired_levels() const
         {
-          return _chosen_parti_level;
+          return this->_desired_levels;
+        }
+
+        /**
+         * \brief Returns the deque of chosen refinement levels.
+         *
+         * \returns The deque of chosen refinement levels.
+         */
+        const std::deque<std::pair<int, int>> get_chosen_levels() const
+        {
+          return this->_chosen_levels;
         }
 
         /**
@@ -538,11 +673,11 @@ namespace FEAT
             // We've got just one process, so it's a simple choice:
             this->_create_single_process(base_mesh_node);
           }
-          else if(_support_double_layered && _desired_double_layered)
+          else if(_support_multi_layered && (_desired_levels.size() > std::size_t(2)))
           {
-            // The application supports double-layered domain controls and
-            // the user wants that, so create a double-layered one:
-            this->_create_double_layered(base_mesh_node);
+            // The application supports multi-layered domain controls and
+            // the user wants that, so create a multi-layered one:
+            this->_create_multi_layered(base_mesh_node);
           }
           else
           {
@@ -557,7 +692,7 @@ namespace FEAT
 #endif // FEAT_HAVE_MPI
 
           // cleanup
-          this->_post_create_cleanup();
+          _parti_set.clear();
 
           // finally, compile virtual levels
           this->compile_virtual_levels();
@@ -569,7 +704,80 @@ namespace FEAT
           _was_created = true;
         }
 
+        /**
+         * \brief Debugging function: Returns a string containing encoded ancestry information
+         */
+        String dump_ancestry() const
+        {
+          String s;
+          for(auto it = this->_ancestry.begin(); it != this->_ancestry.end(); ++it)
+          {
+            if(it != this->_ancestry.begin())
+              s += " | ";
+            s += stringify((*it).num_procs);
+            s += ":";
+            s += stringify((*it).num_parts);
+            s += "[";
+            s += stringify((*it).progeny_group).pad_front(2);
+            s += "+";
+            s += stringify((*it).progeny_child);
+            s += ":";
+            s += stringify((*it).progeny_first).pad_front(2);
+            s += "+";
+            s += stringify((*it).progeny_count);
+            s += "]";
+            s += "(";
+            s += stringify((*it).desired_level_max);
+            s += ":";
+            s += stringify((*it).desired_level_min);
+            s += ")";
+            s += ((*it).layer >= 0 ? "*" : " ");
+            s += ((*it).layer_p >= 0 ? ">" : " ");
+          }
+          return s;
+        }
+
       protected:
+        /**
+         * \brief Creates the ancestry for a single layer (or a single process)
+         */
+        void _create_ancestry_single()
+        {
+          // for more than 2 desired levels, call _create_ancestry_scattered
+          XASSERTM(this->_desired_levels.size() <= std::size_t(2), "multi-layered control is desired here");
+
+          // allocate and create ancestry
+          this->_ancestry.resize(std::size_t(1));
+          Ancestor& ancestor = this->_ancestry.front();
+
+          // set the layer index to 0
+          ancestor.layer = 0;
+
+          // set the parent layer index to -1
+          ancestor.layer_p = -1;
+
+          // set the total number of processes for this layer
+          ancestor.num_procs = this->_comm.size();
+
+          // set the total number of partitions per progeny group
+          ancestor.num_parts = this->_comm.size();
+
+          // set desired maximum level
+          ancestor.desired_level_max = this->_desired_levels.front().first;
+
+          // set desired minimum level (may be = level_max)
+          ancestor.desired_level_min = this->_desired_levels.back().first;
+
+          // set the progeny group
+          ancestor.progeny_group = 0;
+          ancestor.progeny_child = this->_comm.rank();
+
+          // create the progeny communicator
+          ancestor.progeny_count = this->_comm.size();
+          ancestor.progeny_first = 0;
+          ancestor.progeny_comm = this->_comm.comm_dup();
+        }
+
         /**
          * \brief Creates a single-layered mesh hierarchy for a single process.
          *
@@ -581,16 +789,24 @@ namespace FEAT
           // create and push single layer
           this->push_layer(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
 
+          // create single ancestry
+          this->_create_ancestry_single();
+          Ancestor& ancestor = this->_ancestry.front();
+
           // refine up to desired minimum level
           int lvl = 0;
-          for(; lvl < this->_desired_level_min; ++lvl)
+          for(; lvl < ancestor.desired_level_min; ++lvl)
           {
             // refine the patch mesh
             base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
           }
 
+          // save chosen minimum level if it is not equal to the desired maximum level
+          if(lvl < ancestor.desired_level_max)
+            this->_chosen_levels.push_front(std::make_pair(lvl, 0));
+
           // refine up to maximum level and push to control
-          for(; lvl < this->_desired_level_max; ++lvl)
+          for(; lvl < ancestor.desired_level_max; ++lvl)
           {
             // push this level
             this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
@@ -599,9 +815,18 @@ namespace FEAT
             base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
           }
 
+          // save chosen maximum level
+          this->_chosen_levels.push_front(std::make_pair(lvl, 1));
+
           // push finest level
           this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
         }
+
+
+        // Note: all following member functions are only required for parallel builds,
+        // so we enclose them in the following #if-block to reduce compile times.
+
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
 
         /**
          * \brief Creates a single-layered mesh hierarchy.
@@ -611,48 +836,52 @@ namespace FEAT
          */
         void _create_single_layered(std::shared_ptr<MeshNodeType> base_mesh_node)
         {
-          // get my rank and the number of procs
-          const int rank = this->_comm.rank();
-          //const int nprocs = this->_comm.size();
-
           // create and push single layer
           std::shared_ptr<LayerType> layer = std::make_shared<LayerType>(this->_comm.comm_dup(), 0);
           this->push_layer(layer);
 
+          // create single-layered ancestry
+          this->_create_ancestry_single();
+          Ancestor& ancestor = this->_ancestry.front();
+
           // choose a partitioning strategy
-          this->_check_parti(*base_mesh_node);
+          this->_check_parti(ancestor, *base_mesh_node, true);
 
           // refine up to chosen partition level
           int lvl = 0;
-          for(; lvl < this->_chosen_parti_level; ++lvl)
+          for(; lvl < ancestor.parti_level; ++lvl)
           {
             // refine the base mesh
             base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
           }
 
           // apply partitioner
-          if(!this->_apply_parti(*base_mesh_node))
+          if(!this->_apply_parti(ancestor, *base_mesh_node))
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "Failed to find a suitable partitioning");
+            throw INTERNAL_ERROR("Failed to find a suitable partitioning");
           }
 
           // extract our patch
           std::vector<int> neighbour_ranks;
           std::shared_ptr<MeshNodeType> patch_mesh_node(
-            base_mesh_node->extract_patch(neighbour_ranks, this->_chosen_parti_graph, rank));
+            base_mesh_node->extract_patch(neighbour_ranks, ancestor.parti_graph, this->_comm.rank()));
 
-          // set our neighbour ranks of our child layer
+          // set the neighbour ranks of our child layer
           layer->set_neighbour_ranks(neighbour_ranks);
 
           // refine up to minimum level
-          for(; lvl < this->_desired_level_min; ++lvl)
+          for(; lvl < ancestor.desired_level_min; ++lvl)
           {
             // refine the patch mesh
             patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
           }
 
+          // save chosen minimum level
+          if(lvl < ancestor.desired_level_max)
+            this->_chosen_levels.push_front(std::make_pair(lvl, 0));
+
           // refine up to maximum level
-          for(; lvl < this->_desired_level_max; ++lvl)
+          for(; lvl < ancestor.desired_level_max; ++lvl)
           {
             // push this level
             this->push_level_front(0, std::make_shared<LevelType>(lvl, patch_mesh_node));
@@ -661,120 +890,612 @@ namespace FEAT
             patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
           }
 
+          // save chosen maximum level
+          this->_chosen_levels.push_front(std::make_pair(lvl, this->_comm.size()));
+
           // push finest level
           this->push_level_front(0, std::make_shared<LevelType>(lvl, patch_mesh_node));
         }
 
         /**
-         * \brief Creates a double-layered mesh hierarchy.
+         * \brief Creates the layers for a multi-layered domain control in a scattered fashion.
+         */
+        void _create_multi_layers_scattered()
+        {
+          // create and push global layer
+          this->push_layer(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
+
+          // loop over all desired layers
+          for(std::size_t ilay(1u); (ilay+1u) < this->_desired_levels.size(); ++ilay)
+          {
+            // get child layer
+            std::shared_ptr<LayerType> layer_c = this->_layers.back();
+
+            // get child layer communicator
+            const Dist::Comm& comm_c = layer_c->comm();
+
+            // get number of processes in child comm
+            const int nprocs_c = comm_c.size();
+
+            // get desired number of processes for parent comm
+            const int nprocs_p = this->_desired_levels.at(ilay).second;
+            XASSERT(nprocs_p < nprocs_c);
+            XASSERT(nprocs_p > 0);
+            XASSERT(nprocs_c % nprocs_p == 0); // same number of children for each parent
+
+            // compute number of siblings = children per parent
+            const int num_sibs = nprocs_c / nprocs_p;
+
+            // get my rank in child comm
+            const int my_rank_c = comm_c.rank();
+
+            // compute my parent's rank in child comm
+            const int parent_rank_c = (my_rank_c / num_sibs) * num_sibs;
+
+            // create our sibling communicator and set the parent rank
+            layer_c->set_parent(comm_c.comm_create_range_incl(num_sibs, parent_rank_c), 0);
+
+            // next, create the actual parent communicator
+            Dist::Comm comm_p = comm_c.comm_create_range_incl(nprocs_p, 0, num_sibs);
+
+            // Are we the parent?
+            if(parent_rank_c == my_rank_c)
+            {
+              // make sure we have a valid communicator
+              XASSERT(!comm_p.is_null());
+
+              // push the parent layer
+              this->push_layer(std::make_shared<LayerType>(std::move(comm_p), int(ilay)));
+            }
+            else
+            {
+              // We are not a parent, so we must have received a null communicator
+              XASSERT(comm_p.is_null());
+
+              // Exit the loop, as we are not part of the party anymore...
+              break;
+            }
+          }
+        }
+
+        /**
+         * \brief Creates the layers for a multi-layered domain control in a scattered fashion.
+         */
+        void _create_ancestry_scattered()
+        {
+          // the layers must have been created already
+          XASSERT(!this->_layers.empty());
+
+          // create a deque with the number of processes for each layer
+          std::deque<int> num_procs;
+          for(auto it = this->_desired_levels.begin(); it != this->_desired_levels.end(); ++it)
+          {
+            if(it->second > 1)
+              num_procs.push_back(it->second);
+          }
+          // manually add the base-layer
+          num_procs.push_back(1);
+
+          // allocate and create ancestry
+          this->_ancestry.resize(num_procs.size()-std::size_t(1));
+
+          // set up the ancestry
+          const int main_rank = this->_comm.rank();
+          const int main_size = this->_comm.size();
+          for(std::size_t i(0); i < this->_ancestry.size(); ++i)
+          {
+            // get our ancestor info
+            Ancestor& ancestor = this->_ancestry.at(i);
+
+            // set the layer index (or -1, if this process is not part of that layer)
+            ancestor.layer = (i < this->_layers.size() ? int(i) : -1);
+
+            // set the parent layer index (or -1, if this process is not in the parent layer)
+            ancestor.layer_p = ((i+1u) < this->_layers.size() ? int(i)+1 : -1);
+
+            // set the total number of processes for this layer
+            ancestor.num_procs = num_procs.at(i);
+
+            // set the total number of partitions per progeny group
+            ancestor.num_parts = num_procs.at(i) / num_procs.at(i+1u);
+
+            // set desired maximum level
+            XASSERT(i < this->_desired_levels.size());
+            ancestor.desired_level_max = this->_desired_levels.at(i).first;
+
+            // set desired minimum level
+            if((i+1u) < this->_desired_levels.size())
+              ancestor.desired_level_min = this->_desired_levels.at(i+1).first;
+            else
+              ancestor.desired_level_min = ancestor.desired_level_max;
+
+            // set the progeny group
+            ancestor.progeny_group = ((main_rank * num_procs.at(i+1u)) / main_size) * ancestor.num_parts;
+            ancestor.progeny_child = ((main_rank * num_procs.at(i)) / main_size) % ancestor.num_parts;
+
+            // create the progeny communicator
+            ancestor.progeny_count = main_size / num_procs.at(i+1u);
+            ancestor.progeny_first = (main_rank / ancestor.progeny_count) * ancestor.progeny_count;
+            ancestor.progeny_comm = this->_comm.comm_create_range_incl(ancestor.progeny_count, ancestor.progeny_first);
+          }
+        }
+
+        /**
+         * \brief Creates a multi-layered mesh hierarchy.
          *
          * \param[in] base_mesh_node
          * The base-mesh node from which the hierarchy is to be derived from.
          */
-        void _create_double_layered(std::shared_ptr<MeshNodeType> base_mesh_node)
+        void _create_multi_layered(std::shared_ptr<MeshNodeType> base_mesh_node)
         {
-          // get my rank and the number of procs
-          const int rank = this->_comm.rank();
-          const int nprocs = this->_comm.size();
+          // create layers
+          this->_create_multi_layers_scattered();
 
-          // is this the parent process?
-          const bool is_parent = (rank == 0);
+          // create ancestry
+          this->_create_ancestry_scattered();
 
-          // create first layer (child)
-          std::shared_ptr<LayerType> layer_c = std::make_shared<LayerType>(this->_comm.comm_dup(), 0);
-
-          // set parent and sibling comm - that's the same as the child comm here
-          layer_c->set_parent(this->_comm.comm_dup(), 0);
-
-          // push the first layer
-          this->push_layer(layer_c);
-
-          // is this the parent process?
-          if(is_parent)
-          {
-            // create and push second layer (parent)
-            this->push_layer(std::make_shared<LayerType>(Dist::Comm::self(), 1));
-          }
-
-          // choose a partitioning strategy
-          this->_check_parti(*base_mesh_node);
-
-          // refine up to chosen partitioning level
+          // we start counting at level 0
           int lvl = 0;
-          for(; lvl < this->_chosen_parti_level; ++lvl)
+
+          // loop over all global layers in reverse order (coarse to fine)
+          for(std::size_t slayer = this->_ancestry.size(); slayer > std::size_t(0); )
           {
-            // push base-mesh into second layer if desired
-            if(is_parent && (lvl >= this->_desired_level_min))
+            // is this the base-mesh layer aka the 1-process layer?
+            const bool is_base_layer = (slayer == this->_ancestry.size());
+
+            --slayer;
+
+            // get the ancestor object
+            Ancestor& ancestor = this->_ancestry.at(slayer);
+
+            // determine the minimum desired level of our parent layer
+            int parent_min_lvl = -1;
+            if(!is_base_layer)
+              parent_min_lvl = this->_chosen_levels.front().first;
+            else if(_ancestry.size()+1u < _desired_levels.size())
+              parent_min_lvl = this->_desired_levels.back().first;
+
+            // check available partitioning strategies
+            this->_check_parti(ancestor, *base_mesh_node, is_base_layer);
+
+            // the check_parti function returns the partitioning level w.r.t. the current
+            // level (which may be > 0), so we have to compensate that by adding our current level:
+            ancestor.parti_level += lvl;
+
+            // Note: each progeny group within the main communicator may have chosen a different
+            // partitioning level at this point. We will compensate this by adjusting the minimum
+            // refinement level of the child layer after the partitioning step below.
+
+            // refine up to the chosen partitioning level
+            for(; lvl < ancestor.parti_level; ++lvl)
             {
-              this->push_level_front(1, std::make_shared<LevelType>(lvl, base_mesh_node));
-            }
-
-            // refine the base mesh
-            base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
-          }
-
-          // apply partitioner
-          if(!this->_apply_parti(*base_mesh_node))
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "Failed to find a suitable partitioning");
-          }
-
-          // extract our patch
-          std::vector<int> neighbour_ranks;
-          std::shared_ptr<MeshNodeType> patch_mesh_node(
-            base_mesh_node->extract_patch(neighbour_ranks, this->_chosen_parti_graph, rank));
-
-          // create child patch mesh-parts on parent process
-          if(is_parent)
-          {
-            // Note: patch mesh-part for rank = 0 was already created by 'extract_patch' call
-            for(int i(1); i < nprocs; ++i)
-            {
-              base_mesh_node->create_patch_meshpart(this->_chosen_parti_graph, i);
-            }
-          }
-
-          // set our neighbour ranks of our child layer
-          layer_c->set_neighbour_ranks(neighbour_ranks);
-
-          // refine up to desired median level (if necessary)
-          for(; lvl < this->_desired_level_med; ++lvl)
-          {
-            // parent process?
-            if(is_parent)
-            {
-              // push base-mesh into second layer if desired
-              if(lvl >= this->_desired_level_min)
+              // push the base mesh into our parent layer if desired
+              if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
               {
-                this->push_level_front(1, std::make_shared<LevelType>(lvl, base_mesh_node));
+                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, base_mesh_node));
               }
 
-              // refine the base mesh
+              // refine the base-mesh node
               base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
             }
 
-            // refine the patch mesh
-            patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
+            // we're now at the partitioning level, so apply the partitioner
+            if(!this->_apply_parti(ancestor, *base_mesh_node))
+            {
+              throw INTERNAL_ERROR("Failed to find a suitable partitioning");
+            }
+
+            // extract our patch
+            std::vector<int> neighbour_ranks;
+            std::shared_ptr<MeshNodeType> patch_mesh_node(
+              base_mesh_node->extract_patch(neighbour_ranks, ancestor.parti_graph, ancestor.progeny_child));
+
+            // translate neighbour ranks by progeny group to obtain the neighbour ranks
+            // w.r.t. this layer's communicator
+            {
+              std::map<int,int> halo_map;
+              for(auto& i : neighbour_ranks)
+              {
+                int old_i(i);
+                halo_map.emplace(old_i, i += ancestor.progeny_group);
+              }
+              patch_mesh_node->rename_halos(halo_map);
+            }
+
+            // does this process participate in the parent layer?
+            if(ancestor.layer_p >= 0)
+            {
+              // Note: patch mesh-part for rank = 0 was already created by 'extract_patch' call
+              for(int i(1); i < ancestor.num_parts; ++i)
+              {
+                base_mesh_node->create_patch_meshpart(ancestor.parti_graph, i);
+              }
+            }
+
+            // make sure we choose the same minimum level for all processes, because we may
+            // have chosen different partitioning levels for each patch
+            int global_level_min = Math::max(ancestor.desired_level_min, ancestor.parti_level);
+            this->_comm.allreduce(&global_level_min, &global_level_min, std::size_t(1), Dist::op_max);
+
+            // make sure our minimum level is greater than the minimum level of the previous layer,
+            // because each layer must contain at least one non-ghost level
+            if(!is_base_layer)
+              global_level_min = Math::max(global_level_min, this->_chosen_levels.front().first+1);
+
+            // refine up to desired minimum level of this layer
+            for(; lvl < global_level_min; ++lvl)
+            {
+              // refine the base mesh node
+              std::shared_ptr<MeshNodeType> coarse_mesh_node = base_mesh_node;
+              base_mesh_node = std::shared_ptr<MeshNodeType>(coarse_mesh_node->refine(this->_adapt_mode));
+
+              // push base mesh to parent layer if desired
+              if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
+              {
+                // clear patches before pushing this node as they are redundant here
+                coarse_mesh_node->clear_patches();
+                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, coarse_mesh_node));
+              }
+
+              // refine the patch mesh
+              patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
+            }
+
+            // split the halos of our base-mesh and compute the halos of our patches from that
+            this->_split_basemesh_halos(ancestor, *base_mesh_node, *patch_mesh_node, neighbour_ranks);
+
+            // does this process participate in the child layer?
+            if(ancestor.layer >= 0)
+            {
+              // set the neighbour ranks in our child layer
+              this->_layers.at(std::size_t(ancestor.layer))->set_neighbour_ranks(neighbour_ranks);
+            }
+
+            // set chosen minimum level for this layer
+            if(!is_base_layer)
+              this->_chosen_levels.push_front(std::make_pair(lvl, this->_ancestry.at(slayer+1u).num_procs));
+            else if(parent_min_lvl < 0)
+              this->_chosen_levels.push_front(std::make_pair(lvl, 0));
+            else
+            {
+              this->_chosen_levels.push_front(std::make_pair(parent_min_lvl, 0));
+              this->_chosen_levels.push_front(std::make_pair(lvl, 1));
+            }
+
+            // push the finest base-mesh
+            if(ancestor.layer_p >= 0)
+            {
+              this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, base_mesh_node));
+            }
+
+            // continue with the next layer
+            base_mesh_node = patch_mesh_node;
           }
 
-          // push the finest base-mesh
-          if(is_parent)
-          {
-            this->push_level_front(1, std::make_shared<LevelType>(lvl, base_mesh_node));
-          }
+          // get the desired maximum level
+          // if we have more than one layer, make sure that the finest one contains at
+          // least one level, as otherwise the finest global level would be a ghost level
+          int desired_level_max = Math::max(this->_ancestry.front().desired_level_max, lvl+1);
 
-          // refine up to maximum level
-          for(; lvl < this->_desired_level_max; ++lvl)
+          for(; lvl < desired_level_max; ++lvl)
           {
             // push patch mesh to this level
-            this->push_level_front(0, std::make_shared<LevelType>(lvl, patch_mesh_node));
+            this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
 
             // refine the patch mesh
-            patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
+            base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
           }
 
           // push finest level
-          this->push_level_front(0, std::make_shared<LevelType>(lvl, patch_mesh_node));
+          this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
+
+          // set chosen maximum level for finest layer
+          this->_chosen_levels.push_front(std::make_pair(lvl, this->_comm.size()));
+        }
+
+        /**
+         * \brief Splits the base-mesh halos and computes the inter-patch-mesh halos.
+         *
+         * This is where the magic happens in the case of the multi-layered hierarchy.
+         *
+         * \param[in] ancestor
+         * The ancestor object for the current layer.
+         *
+         * \param[in] base_mesh_node
+         * The base-mesh node that has been partitioned and whose halos are to be split.
+         *
+         * \param[inout] patch_mesh_node
+         * The patch-mesh node that represents the partition whose halos are to be computed.
+         *
+         * \param[inout] neigbour_ranks
+         * The vector that receives the ranks of the new neighbours that derive from halo splitting.
+         */
+        void _split_basemesh_halos(
+          const Ancestor& ancestor,
+          const MeshNodeType& base_mesh_node,
+          MeshNodeType& patch_mesh_node,
+          std::vector<int>& neighbour_ranks)
+        {
+          // get the map of the base-mesh halos
+          const std::map<int, MeshPartType*>& base_halo_map = base_mesh_node.get_halo_map();
+
+          // if the base mesh has no halos, then we can jump out of here
+          if(base_halo_map.empty())
+            return;
+
+          // get number of halos
+          const std::size_t num_halos = base_halo_map.size();
+
+          // create a halo splitter
+          Geometry::PatchHaloSplitter<MeshType> halo_splitter(*base_mesh_node.get_mesh(),
+            *base_mesh_node.get_patch(ancestor.progeny_child));
+
+          // add each base-mesh halo to our halo splitter and store the resulting split data size
+          std::vector<int> halo_ranks;
+          std::vector<std::size_t> halo_sizes;
+          for(auto it = base_halo_map.begin(); it != base_halo_map.end(); ++it)
+          {
+            // store halo rank
+            halo_ranks.push_back(it->first);
+
+            // try to split the halo and store the resulting data size
+            halo_sizes.push_back(halo_splitter.add_halo(it->first, *it->second));
+          }
+
+          // This vector will receive the split halo data from all our potential neighbour processes
+          std::vector<Index> halo_recv_data;
+          std::vector<std::vector<Index>> halo_send_data;
+
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+          // PHASE I: collect halo data from our siblings
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+          if(ancestor.layer >= 0)
+          {
+            XASSERT(this->_layers.size() > std::size_t(ancestor.layer));
+            const LayerType& layer = *this->_layers.at(std::size_t(ancestor.layer));
+            const Dist::Comm& sibling_comm = *layer.sibling_comm_ptr();
+            XASSERT(!sibling_comm.is_null());
+            const std::size_t num_sibls = std::size_t(sibling_comm.size());
+
+            // get the rank of this process in various communicators
+            const int sibl_rank = sibling_comm.rank();
+            const int layer_rank = layer.comm().rank();
+
+            // gather halo infos of all siblings at sibling rank 0
+            std::vector<std::size_t> sibl_halo_sizes(sibl_rank == 0 ? num_halos*num_sibls : 0u);
+            sibling_comm.gather(halo_sizes.data(), halo_sizes.size(), sibl_halo_sizes.data(), halo_sizes.size(), 0);
+
+            if(sibl_rank > 0)
+            {
+              std::vector<std::vector<Index>> halo_split_data(num_halos);
+              Dist::RequestVector send_reqs(num_halos);
+
+              // serialise all split halos
+              for(std::size_t i(0); i < num_halos; ++i)
+              {
+                // skip empty halos
+                if(halo_sizes.at(i) == Index(0))
+                  continue;
+
+                // serialise split halo data
+                halo_split_data.at(i) = halo_splitter.serialise_split_halo(halo_ranks[i], layer_rank);
+                XASSERT(halo_split_data.at(i).size() == halo_sizes.at(i));
+
+                // send split data over to our parent process
+                send_reqs[i] = sibling_comm.isend(halo_split_data.at(i).data(), halo_sizes.at(i), 0);
+              }
+
+              // wait for all pending sends to finish
+              send_reqs.wait_all();
+            }
+            else // if(sibl_rank == 0)
+            {
+              halo_send_data.resize(num_halos);
+
+              // compute halo send data sizes
+              for(std::size_t i(0); i < num_halos; ++i)
+              {
+                // determine the number of child processes for this halo
+                // as well as the required send buffer size
+                Index num_halo_childs = 0u;
+                std::size_t buffer_size = 0u, offset = 0u;
+                for(std::size_t j(0); j < num_sibls; ++j)
+                {
+                  // update required buffer size
+                  buffer_size += sibl_halo_sizes.at(j*num_halos + i);
+
+                  // this sibling is a child if its split halo is not empty
+                  if(sibl_halo_sizes.at(j*num_halos + i) > std::size_t(0))
+                    ++num_halo_childs;
+                }
+
+                // increase buffer size to store child data offsets
+                buffer_size += num_halo_childs + Index(1);
+
+                // allocate send buffer and get a pointer to its data array
+                halo_send_data.at(i).resize(buffer_size);
+                Index* halo_buffer = halo_send_data.at(i).data();
+
+                // store child count as first entry of buffer
+                halo_buffer[0u] = num_halo_childs;
+
+                // initialise offset for first child
+                offset = num_halo_childs + Index(1);
+                Index coi = 0u; // child offset index
+
+                // collect my own split halo
+                if(sibl_halo_sizes.at(i) > Index(0))
+                {
+                  std::vector<Index> my_data(halo_splitter.serialise_split_halo(halo_ranks[i], layer_rank));
+                  std::size_t data_size = sibl_halo_sizes.at(i);
+                  halo_buffer[++coi] = Index(offset);
+                  for(std::size_t k(0); k < data_size; ++k)
+                    halo_buffer[offset+k] = my_data[k];
+                  offset += my_data.size();
+                }
+
+                Dist::RequestVector sibl_recv_reqs(num_sibls);
+
+                // collect the other siblings
+                for(std::size_t j(1); j < num_sibls; ++j)
+                {
+                  // skips all sibling with empty halos
+                  std::size_t data_size = sibl_halo_sizes.at(j*num_halos + i);
+                  if(data_size == std::size_t(0))
+                    continue;
+                  XASSERT(offset+data_size <= buffer_size);
+
+                  // store offset for this child
+                  halo_buffer[++coi] = Index(offset);
+
+                  // receive serialised data from this sibling
+                  sibl_recv_reqs[j] = sibling_comm.irecv(&halo_buffer[offset], data_size, int(j));
+                  offset += data_size;
+                }
+                XASSERT(offset == buffer_size);
+
+                // wait for all pending receives to finish
+                sibl_recv_reqs.wait_all();
+              }
+            }
+          } // if(ancestor.layer >= 0)
+
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+          // PHASE II: exchange split halos over parent layer communicator
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+
+          if(ancestor.layer_p >= 0)
+          {
+            XASSERT(!halo_send_data.empty());
+
+            // get the parent layer communicator
+            const Dist::Comm& parent_comm = this->_layers.at(std::size_t(ancestor.layer_p))->comm();
+
+            std::vector<std::size_t> halo_recv_sizes(num_halos), halo_send_sizes(num_halos);
+            Dist::RequestVector halo_recv_reqs(num_halos), halo_send_reqs(num_halos);
+
+            // exchange halo send data sizes
+            for(std::size_t i(0); i < num_halos; ++i)
+            {
+              // get halo send size
+              halo_send_sizes.at(i) = halo_send_data.at(i).size();
+
+              // post receive requests
+              halo_recv_reqs[i] = parent_comm.irecv(&halo_recv_sizes[i], std::size_t(1), halo_ranks[i]);
+
+              // post send requests
+              halo_send_reqs[i] = parent_comm.isend(&halo_send_sizes[i], std::size_t(1), halo_ranks[i]);
+            }
+
+            // wait for sends and receives to finish
+            halo_recv_reqs.wait_all();
+            halo_send_reqs.wait_all();
+
+            // compute total receive buffer size
+            std::size_t recv_buf_size = num_halos + std::size_t(1);
+            for(std::size_t i(0); i < num_halos; ++i)
+              recv_buf_size += halo_recv_sizes[i];
+
+            // allocate receive buffer
+            halo_recv_data.resize(recv_buf_size);
+
+            // set up receive data pointers
+            halo_recv_data[0] = Index(num_halos) + Index(1);
+            for(std::size_t i(0); i < num_halos; ++i)
+              halo_recv_data[i+1u] = Index(halo_recv_data[i] + halo_recv_sizes[i]);
+
+            // allocate receive buffers and post receives
+            for(std::size_t i(0); i < num_halos; ++i)
+            {
+              // resize buffer and post receive
+              halo_recv_reqs[i] = parent_comm.irecv(&halo_recv_data[halo_recv_data[i]], halo_recv_sizes.at(i), halo_ranks[i]);
+
+              // post send of actual halo buffer
+              halo_send_reqs[i] = parent_comm.isend(halo_send_data.at(i).data(), halo_send_sizes.at(i), halo_ranks[i]);
+            }
+
+            // wait for sends and receives to finish
+            halo_recv_reqs.wait_all();
+            halo_send_reqs.wait_all();
+          } // if(ancestor.layer_p >= 0)
+
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+          // PHASE III: broadcast halo receive data over progeny comm
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+
+          {
+            // broadcast receive buffer size
+            std::size_t recv_data_size = halo_recv_data.size();
+            ancestor.progeny_comm.bcast(&recv_data_size, std::size_t(1), 0);
+
+            // allocate buffer
+            if(ancestor.progeny_comm.rank() != 0)
+            {
+              XASSERT(halo_recv_data.empty()); // should be empty until now
+              halo_recv_data.resize(recv_data_size);
+            }
+            else
+            {
+              XASSERT(!halo_recv_data.empty()); // must not be empty
+            }
+
+            // broadcast buffer
+            ancestor.progeny_comm.bcast(halo_recv_data.data(), recv_data_size, 0);
+          }
+
+          /*{
+            String s;
+            for(std::size_t i(0); i < num_halos; ++i)
+            {
+              s += stringify(halo_ranks[i]);
+              s += " >";
+              for(Index j(halo_recv_data[i]); j < halo_recv_data[i+1]; ++j)
+                (s += " ") += stringify(halo_recv_data[j]);
+              s += "\n";
+            }
+            this->_comm.allprint(s);
+          }*/
+
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+          // PHASE IV: intersect received halo splits
+          /* ******************************************************************************************************* */
+          /* ******************************************************************************************************* */
+
+          for(std::size_t i(0); i < num_halos; ++i)
+          {
+            // get the offset of the first date for this halo
+            const Index offset = halo_recv_data.at(i);
+
+            // get the number of child processes for this halo
+            const Index num_childs = halo_recv_data.at(offset);
+
+            // loop over all child processes
+            for(Index j(0); j < num_childs; ++j)
+            {
+              // compute the offset of this child's data within the large buffer
+              const Index buffer_offset = offset + halo_recv_data.at(offset+j+1u);
+
+              // intersect with our other halo
+              if(!halo_splitter.intersect_split_halo(halo_ranks[i], halo_recv_data, buffer_offset))
+                continue; // no intersection
+
+              // get the new neighbour's rank
+              const int neighbour_rank = int(halo_recv_data.at(buffer_offset));
+
+              // add the new neighbour to our list
+              neighbour_ranks.push_back(neighbour_rank);
+
+              // create new mesh-part
+              patch_mesh_node.add_halo(neighbour_rank, new MeshPartType(halo_splitter));
+            }
+          }
         }
 
         /**
@@ -782,25 +1503,33 @@ namespace FEAT
          *
          * This function examines the given base mesh and checks whether
          * one of the a-priori partitioning strategies (extern or 2-level)
-         * yields a valid partitioning for the given number of processes.
+         * yields a valid partitioning for the given number of partitions.
          * If so, the corresponding partitioning level and graph are stored
-         * in _chosen_parti_level and _chosen_parti_graph.
+         * in ancestor.parti_level and ancestor.parti_graph.
          * If not, this function determines how often the base-mesh has to be
          * refined until its has enough cells so that one of the a-posteriori
          * partitioners can be applied.
          *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
+         *
          * \param[in] base_mesh_node
          * The base-mesh node that is to be partitioned.
+         *
+         * \param[in] check_extern
+         * Set to \c true, if #base_mesh_node is the mesh node that corresponds to the input file's mesh
+         * and therefore extern partitioning is a valid option, or set to \c false in any other case.
          *
          * \returns
          * \c true, if an a-priori partitioning was found, otherwise \c false.
          */
-        bool _check_parti(const MeshNodeType& base_mesh_node)
+        bool _check_parti(Ancestor& ancestor, const MeshNodeType& mesh_node, bool check_extern)
         {
           // Try to find an appropriate a-priori partitioning first:
-          if(this->_allow_parti_extern && this->_check_parti_extern())
+          if(check_extern && this->_check_parti_extern(ancestor))
             return true;
-          if(this->_allow_parti_2level && this->_check_parti_2level(base_mesh_node))
+
+          if(this->_check_parti_2level(ancestor, mesh_node))
             return true;
 
           // No a-priori partitioning found, so we need to determine the
@@ -810,10 +1539,10 @@ namespace FEAT
           const Index factor = Index(Geometry::Intern::StandardRefinementTraits<typename BaseClass::ShapeType, BaseClass::ShapeType::dimension>::count);
 
           // compute minimum number of elements for a-posteriori partitioning
-          const Index min_elems = Index(this->_comm.size()) * Index(_required_elems_per_rank);
+          const Index min_elems = Index(ancestor.num_parts) * Index(_required_elems_per_rank);
 
           // Okay, get the number of elements on base-mesh level 0
-          Index num_elems = base_mesh_node.get_mesh()->get_num_elements();
+          Index num_elems = mesh_node.get_mesh()->get_num_elements();
 
           // compute refinement level on which we have enough elements
           int level = 0;
@@ -822,8 +1551,8 @@ namespace FEAT
             num_elems *= factor;
           }
 
-          // finally, the user may have chosen a greater level for partitioning:
-          this->_chosen_parti_level = Math::max(this->_chosen_parti_level, level);
+          // finally, the user may have ancestor a greater level for partitioning:
+          ancestor.parti_level = Math::max(ancestor.parti_level, level);
 
           // No a-priori partitioning; try a-posteriori partitioner later
           return false;
@@ -832,28 +1561,31 @@ namespace FEAT
         /**
          * \brief Applies an a-posteriori partitioner.
          *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
+         *
          * \param[in] base_mesh_node
          * The base-mesh node that is to be partitioned.
          *
          * \returns
          * \c true, if the base-mesh was partitioned, otherwise \c false.
          */
-        bool _apply_parti(/*const*/ MeshNodeType& base_mesh_node)
+        bool _apply_parti(Ancestor& ancestor, /*const*/ MeshNodeType& base_mesh_node)
         {
           // First of all, check whether an a-priori partitioning was selected;
           // if so, then we do not have to apply any a-posteriori partitioner
-          if(this->_chosen_parti_apriori)
+          if(ancestor.parti_apriori)
             return true;
 
           // ensure that the mesh has enough elements
-          XASSERT(this->_comm.size() <= int(base_mesh_node.get_mesh()->get_num_elements()));
+          XASSERT(ancestor.num_parts <= int(base_mesh_node.get_mesh()->get_num_elements()));
 
           // try the various a-posteriori partitioners
-          if(this->_allow_parti_metis && this->_apply_parti_metis(base_mesh_node))
+          if(this->_apply_parti_metis(ancestor, base_mesh_node))
             return true;
-          if(this->_allow_parti_genetic && this->_apply_parti_genetic(base_mesh_node))
-            return true;
-          if(this->_allow_parti_naive && this->_apply_parti_naive(base_mesh_node))
+          //if(this->_apply_parti_genetic(ancestor, mesh_node))
+            //return true;
+          if(this->_apply_parti_naive(ancestor, base_mesh_node))
             return true;
 
           // we should not arrive here...
@@ -863,29 +1595,36 @@ namespace FEAT
         /**
          * \brief Checks whether an extern partition is given
          *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
+         *
          * \returns
          * \c true, if an extern partition is given, otherwise \c false.
          */
-        bool _check_parti_extern()
+        bool _check_parti_extern(Ancestor& ancestor)
         {
-          const int num_procs = this->_comm.size();
+          // is this even allowed?
+          if(!this->_allow_parti_extern)
+            return false;
 
           // check whether we have a suitable partition
-          const Geometry::Partition* part = this->_parti_set.find_partition(num_procs, _extern_parti_names);
+          const Geometry::Partition* part = this->_parti_set.find_partition(ancestor.num_parts, _extern_parti_names);
           if(part == nullptr)
             return false;
 
-          // found a valid extern partitioning
-          this->_chosen_parti_apriori = true;
-          this->_chosen_parti_info = String("Found extern partition '") + part->get_name() +
-            "' on level " + stringify(part->get_level());
-          this->_chosen_parti_level = part->get_level();
-          this->_chosen_parti_graph = part->get_patches().clone();
+          // set our ancestor partitioning
+          ancestor.parti_apriori = true;
+          ancestor.parti_info = String("Found extern partition '") + part->get_name() + "'";
+          ancestor.parti_level = part->get_level();
+          ancestor.parti_graph = part->get_patches().clone();
           return true;
         }
 
         /**
          * \brief Checks whether the 2-level partitioner can be applied.
+         *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
          *
          * \param[in] base_mesh_node
          * The base-mesh node that is to be partitioned.
@@ -893,27 +1632,32 @@ namespace FEAT
          * \returns
          * \c true, if the 2-level partitioner can be applied, otherwise \c false.
          */
-        bool _check_parti_2level(const MeshNodeType& base_mesh_node)
+        bool _check_parti_2level(Ancestor& ancestor, const MeshNodeType& base_mesh_node)
         {
-          const Index num_procs = Index(this->_comm.size());
+          // is this even allowed?
+          if(!this->_allow_parti_2level)
+            return false;
 
           // create a 2-level partitioner
-          Geometry::Parti2Lvl<MeshType> partitioner(*base_mesh_node.get_mesh(), num_procs);
+          Geometry::Parti2Lvl<MeshType> partitioner(*base_mesh_node.get_mesh(), Index(ancestor.num_parts));
 
           // successful?
           if(!partitioner.success())
             return false;
 
           // found a valid 2-level partitioning
-          this->_chosen_parti_apriori = true;
-          this->_chosen_parti_info = String("Found 2-level partition on level ") + stringify(partitioner.parti_level());
-          this->_chosen_parti_level = int(partitioner.parti_level());
-          this->_chosen_parti_graph = partitioner.build_elems_at_rank();
+          ancestor.parti_apriori = true;
+          ancestor.parti_info = String("Found 2-level partition");
+          ancestor.parti_level = int(partitioner.parti_level());
+          ancestor.parti_graph = partitioner.build_elems_at_rank();
           return true;
         }
 
         /**
          * \brief Applies the METIS partitioner onto the base-mesh.
+         *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
          *
          * \param[in] base_mesh_node
          * The base-mesh node that is to be partitioned.
@@ -921,97 +1665,66 @@ namespace FEAT
          * \returns
          * \c true, if METIS was applied successfully, otherwise \c false.
          */
-        bool _apply_parti_metis(const MeshNodeType& base_mesh_node)
+        bool _apply_parti_metis(Ancestor& ancestor, const MeshNodeType& base_mesh_node)
         {
-#ifdef FEAT_HAVE_PARMETIS
-          Index nprocs = Index(this->_comm.size());
+#if defined(FEAT_HAVE_METIS) || defined(FEAT_HAVE_PARMETIS)
+          // is this even allowed?
+          if(!this->_allow_parti_metis)
+            return false;
 
           // build element adjacency graph
           // connectivity by facets
-          /// \todo use centralised method for adj graph retrieval
-          /// \todo does any partitioner need self-adjacencies? -> remove it in creation
+          /// \todo dirk: use centralised method for adj graph retrieval
+          /// \todo dirk: does any partitioner need self-adjacencies? -> remove it in creation
+          ///       peter: yes, other partitioners need self-adjacencies
           const auto dimension = MeshNodeType::MeshType::ShapeType::dimension;
           Adjacency::Graph facets_at_elem(Adjacency::RenderType::as_is, base_mesh_node.get_mesh()->template get_index_set<dimension, dimension-1>());
           Adjacency::Graph elems_at_facet(Adjacency::RenderType::transpose, facets_at_elem);
           Adjacency::Graph adj_graph = Adjacency::Graph(Adjacency::RenderType::injectify, facets_at_elem, elems_at_facet);
 
           // create a metis partitioner
-          Geometry::PartiMetis<MeshType> partitioner(adj_graph, nprocs);
+          Geometry::PartiMetis<MeshType> partitioner(adj_graph, Index(ancestor.num_parts));
 
           // create elems-at-rank graph
-          this->_chosen_parti_graph = partitioner.build_elems_at_rank();
-
-          // verify that each process has at least one element
-          {
-            const Index* ptr = this->_chosen_parti_graph.get_domain_ptr();
-            for(Index i(0); i < this->_chosen_parti_graph.get_num_nodes_domain(); ++i)
-            {
-              if(ptr[i] == ptr[i+1])
-              {
-                this->_chosen_parti_info = String("ERROR: Process ") + stringify(i) + " received empty patch from METIS";
-                return false;
-              }
-            }
-          }
+          ancestor.parti_graph = partitioner.build_elems_at_rank();
 
           // set info string
-          this->_chosen_parti_info = String("Applied METIS partitioner on level ") + stringify(this->_chosen_parti_level);
+          ancestor.parti_info = String("Applied METIS partitioner");
 
           // okay
           return true;
-#else // not FEAT_HAVE_PARMETIS
+#else
+          (void)ancestor;
           (void)base_mesh_node;
           return false;
-#endif // FEAT_HAVE_PARMETIS
-        }
-
-        /**
-         * \brief Applies the genetic partitioner onto the base-mesh.
-         *
-         * \param[in] base_mesh_node
-         * The base-mesh node that is to be partitioned.
-         *
-         * \returns
-         * \c true.
-         */
-        bool _apply_parti_genetic(/*const*/ MeshNodeType& base_mesh_node)
-        {
-          // create a genetic partitioner
-          Geometry::PartiIterative<MeshType> partitioner(
-            *base_mesh_node.get_mesh(),
-            this->_comm,
-            this->_genetic_time_init,
-            this->_genetic_time_mutate);
-
-          // create elems-at-rank graph
-          this->_chosen_parti_graph = partitioner.build_elems_at_rank();
-
-          // set info string
-          this->_chosen_parti_info = String("Applied genetic partitioner on level ") + stringify(this->_chosen_parti_level);
-
-          // okay
-          return true;
+#endif // defined(FEAT_HAVE_METIS) || defined(FEAT_HAVE_PARMETIS)
         }
 
         /**
          * \brief Applies the naive partitioner onto the base-mesh.
          *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
+         *
          * \param[in] base_mesh_node
          * The base-mesh node that is to be partitioned.
          *
          * \returns
-         * \c true.
+         * \c true, if a naive partition was created successfully, otherwise \c false.
          */
-        bool _apply_parti_naive(const MeshNodeType& base_mesh_node)
+        bool _apply_parti_naive(Ancestor& ancestor, const MeshNodeType& mesh_node)
         {
-          const Index num_parts = Index(this->_comm.size());
-          const Index num_elems = base_mesh_node.get_mesh()->get_num_elements();
+          if(!this->_allow_parti_naive)
+            return false;
+
+          const Index num_parts = Index(ancestor.num_parts);
+          const Index num_elems = mesh_node.get_mesh()->get_num_elements();
           XASSERTM(num_parts <= num_elems, "Base-Mesh does not have enough elements");
 
           // create elems-at-rank graph
-          this->_chosen_parti_graph = Adjacency::Graph(num_parts, num_elems, num_elems);
-          Index* ptr = this->_chosen_parti_graph.get_domain_ptr();
-          Index* idx = this->_chosen_parti_graph.get_image_idx();
+          ancestor.parti_graph = Adjacency::Graph(num_parts, num_elems, num_elems);
+          Index* ptr = ancestor.parti_graph.get_domain_ptr();
+          Index* idx = ancestor.parti_graph.get_image_idx();
           ptr[0] = Index(0);
           for(Index i(1); i < num_parts; ++i)
             ptr[i] = (i*num_elems) / num_parts;
@@ -1020,23 +1733,12 @@ namespace FEAT
             idx[j] = j;
 
           // set info string
-          this->_chosen_parti_info = String("Applied naive partitioner on level ") + stringify(this->_chosen_parti_level);
+          ancestor.parti_info = String("Applied naive partitioner");
 
           // okay
           return true;
         }
-
-        /**
-         * \brief Cleans up after creation.
-         *
-         * This function releases some internal data which is not required
-         * anymore once the domain control has been created.
-         */
-        void _post_create_cleanup()
-        {
-          // clear partition set
-          _parti_set.clear();
-        }
+#endif // defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       }; // class PartiDomainControl<...>
     } // namespace Domain
   } // namespace Control

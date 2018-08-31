@@ -9,6 +9,7 @@
 #include <kernel/geometry/macro_factory.hpp>
 #include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/patch_halo_factory.hpp>
+#include <kernel/geometry/patch_halo_splitter.hpp>
 #include <kernel/geometry/patch_mesh_factory.hpp>
 #include <kernel/geometry/patch_meshpart_factory.hpp>
 #include <kernel/geometry/patch_meshpart_splitter.hpp>

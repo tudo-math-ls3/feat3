@@ -244,7 +244,7 @@ if (FEAT_HAVE_MPI)
     --build-target navier_stokes_ccnd_q2p1
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/navier_stokes_ccnd_q2p1 --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 3 0 0 --test-mode ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/navier_stokes_ccnd_q2p1 --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 3 0:1 0 --test-mode ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST navier_stokes_ccnd_q2p1_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST navier_stokes_ccnd_q2p1_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAT_HAVE_MPI)

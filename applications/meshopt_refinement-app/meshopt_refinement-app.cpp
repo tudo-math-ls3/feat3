@@ -167,7 +167,7 @@ struct MeshoptRefinementApp
     TimeStamp at;
 
     // Create domain control
-    DomCtrl dom_ctrl(comm);
+    DomCtrl dom_ctrl(comm, false);
     dom_ctrl.set_adapt_mode(refinement_adapt_mode);
     dom_ctrl.parse_property_map(*domain_control_settings_section);
     dom_ctrl.set_desired_levels(lvl_max, lvl_min);

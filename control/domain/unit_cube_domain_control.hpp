@@ -537,8 +537,6 @@ namespace FEAT
 
         void _create_layers(const std::deque<int>& lyrs)
         {
-          //if(this->_comm.rank() == 0) __debugbreak();
-
           // create main layer
           this->_layers.push_back(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
 
@@ -599,7 +597,7 @@ namespace FEAT
             }
             iq[0] = i;
 
-            mesh_node->add_patch(i, part);
+            mesh_node->add_patch(int(i), part);
           }
         }
       }; // class HierarchUnitCubeDomainControl2<...>

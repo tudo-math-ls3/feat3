@@ -177,10 +177,10 @@ namespace NavierStokesPP
     std::deque<String> mesh_files;
 
     /// minimum, medium maximum levels (as configured)
-    int level_min_in, level_med_in, level_max_in;
+    String levels_in;
 
     /// minimum, medium and maximum levels (after partitioning)
-    int level_min, level_med, level_max;
+    String levels;
 
     /// base-name of VTK files
     String vtk_name;
@@ -332,12 +332,8 @@ namespace NavierStokesPP
   public :
     // the default configuration
     Config() :
-      level_min_in(0),
-      level_med_in(-1),
-      level_max_in(0),
-      level_min(0),
-      level_med(-1),
-      level_max(0),
+      levels_in(),
+      levels(),
       vtk_step(0),
       save_step(0),
       flowbench_c2d(false),
@@ -492,9 +488,8 @@ namespace NavierStokesPP
       comm.print("\nGeneral Setting:");
       dump_line(comm, "Mesh Path", mesh_path);
       dump_line(comm, "Mesh Files", mesh_files);
-      dump_line(comm, "Level-Min", stringify(level_min) + " [" + stringify(level_min_in) + "]");
-      dump_line(comm, "Level-Med", stringify(level_med) + " [" + stringify(level_med_in) + "]");
-      dump_line(comm, "Level-Max", stringify(level_max) + " [" + stringify(level_max_in) + "]");
+      dump_line(comm, "Desired Levels", levels_in);
+      dump_line(comm, "Chosen Levels", levels);
       dump_line(comm, "VTK-Name", vtk_name);
       dump_line(comm, "VTK-Step", vtk_step);
       dump_line(comm, "Save-File", save_file);
@@ -571,8 +566,7 @@ namespace NavierStokesPP
       part_names_in.push_back("bnd:b");   // bottom
       part_names_in.push_back("bnd:l");   // left
       part_names_out.push_back("bnd:r");  // right
-      level_min = level_min_in = 1;
-      level_max = level_max_in = 4;
+      levels_in = "4 1";
       nu = 1E-3;
       vmax = 0.3;
       time_max = 2.0;
@@ -591,9 +585,7 @@ namespace NavierStokesPP
       part_names_out.push_back("bnd:r"); // right
       part_names_no.push_back("bnd:t");  // top
       part_names_no.push_back("bnd:b");  // bottom
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 6;
+      levels_in = "6 0";
       nu = 1E-3;
       vmax = 1.0;
       time_max = 7.0;
@@ -622,9 +614,7 @@ namespace NavierStokesPP
     {
       setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 4;
+      levels_in = "4 0";
       tol_rel_a = 0.5;
       smooth_steps_a = 1;
       smooth_damp_a = 0.01;
@@ -645,9 +635,7 @@ namespace NavierStokesPP
     {
       setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 5;
+      levels_in = "5 0";
       vmax = 1.5;
       theta = 0.5;                           // Crank-Nicolson-Scheme
       time_max = 0.35;
@@ -664,9 +652,7 @@ namespace NavierStokesPP
     {
       setup_fb_c2d_aux();
       mesh_files.push_back("flowbench_c2d_03_quad_64.xml");
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 3;
+      levels_in = "3 0";
       tol_rel_a = 0.1;
       smooth_steps_a = 0;
       smooth_damp_a = 0.01;
@@ -694,9 +680,7 @@ namespace NavierStokesPP
       part_names_no.push_back("bnd:b");  // bottom
       part_names_no.push_back("bnd:f");  // front
       part_names_no.push_back("bnd:n");  // verso
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 5;
+      levels_in = "5 0";
       nu = 1E-3;
       vmax = 0.45;
       time_max = 3.0;
@@ -721,9 +705,7 @@ namespace NavierStokesPP
       time_steps = max_time_steps = 10000;
       flowbench_c2d = true;
       mesh_files.push_back("flowbench_c3d_01_hexa_128.xml");
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 3;
+      levels_in = "3 0";
       flowbench_1 = true;
     }
 
@@ -748,9 +730,7 @@ namespace NavierStokesPP
       time_steps = max_time_steps = 140;     // delta_t = 1/400
       flowbench_c2d = true;
       mesh_files.push_back("flowbench_c3d_01_hexa_128.xml");
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 3;
+      levels_in = "3 0";
       flowbench_2 = true;
     }
 
@@ -771,9 +751,7 @@ namespace NavierStokesPP
       time_max = 8.0;
       flowbench_c2d = true;
       mesh_files.push_back("flowbench_c3d_01_hexa_128.xml");
-      level_min = level_min_in = 0;
-      level_med = level_med_in = 0;
-      level_max = level_max_in = 3;
+      levels_in = "3 0";
       time_steps = max_time_steps = 12800;
       flowbench_3 = true;
       tol_rel_a = 0.1;
@@ -1138,12 +1116,8 @@ namespace NavierStokesPP
     savefile.get_entry("cfg.part_names_in").first.split_by_charset(cfg.part_names_in);
     savefile.get_entry("cfg.part_names_out").first.split_by_charset(cfg.part_names_out);
     savefile.get_entry("cfg.part_names_no").first.split_by_charset(cfg.part_names_no);
-    cfg.level_min_in = std::stoi(savefile.get_entry("cfg.level_min_in").first, NULL, 0);
-    cfg.level_med_in = std::stoi(savefile.get_entry("cfg.level_med_in").first, NULL, 0);
-    cfg.level_max_in = std::stoi(savefile.get_entry("cfg.level_max_in").first, NULL, 0);
-    cfg.level_min = std::stoi(savefile.get_entry("cfg.level_min").first, NULL, 0);
-    cfg.level_med = std::stoi(savefile.get_entry("cfg.level_med").first, NULL, 0);
-    cfg.level_max = std::stoi(savefile.get_entry("cfg.level_max").first, NULL, 0);
+    cfg.levels_in = savefile.get_entry("cfg.levels_in").first;
+    cfg.levels = savefile.get_entry("cfg.levels").first;
     cfg.vtk_step = std::stoul(savefile.get_entry("cfg.vtk_step").first, NULL, 0);
     cfg.vtk_name = savefile.get_entry("cfg.vtk_name").first;
     cfg.save_step = std::stoul(savefile.get_entry("cfg.save_step").first, NULL, 0);
@@ -1225,12 +1199,8 @@ namespace NavierStokesPP
     savefile.add_entry("cfg.part_names_in",stringify_join(cfg.part_names_in, " "),true);
     savefile.add_entry("cfg.part_names_out",stringify_join(cfg.part_names_out, " "),true);
     savefile.add_entry("cfg.part_names_no",stringify_join(cfg.part_names_no, " "),true);
-    savefile.add_entry("cfg.level_min_in",stringify(cfg.level_min_in),true);
-    savefile.add_entry("cfg.level_med_in",stringify(cfg.level_med_in),true);
-    savefile.add_entry("cfg.level_max_in",stringify(cfg.level_max_in),true);
-    savefile.add_entry("cfg.level_min",stringify(cfg.level_min),true);
-    savefile.add_entry("cfg.level_med",stringify(cfg.level_med),true);
-    savefile.add_entry("cfg.level_max",stringify(cfg.level_max),true);
+    savefile.add_entry("cfg.levels_in",stringify(cfg.levels_in),true);
+    savefile.add_entry("cfg.levels",stringify(cfg.levels),true);
     savefile.add_entry("cfg.vtk_step",stringify(cfg.vtk_step),true);
     savefile.add_entry("cfg.vtk_name",cfg.vtk_name,true);
     savefile.add_entry("cfg.save_step",stringify(cfg.save_step),true);
@@ -2544,10 +2514,8 @@ namespace NavierStokesPP
     domain.parse_args(args);
     if ((args.check("level") > 0) && cfg.load.empty())
       domain.set_desired_levels(args.query("level")->second);
-    else if(cfg.level_med_in >= 0)
-      domain.set_desired_levels(cfg.level_max_in, cfg.level_med_in, cfg.level_min_in);
     else
-      domain.set_desired_levels(cfg.level_max_in, cfg.level_min_in);
+      domain.set_desired_levels(cfg.levels);
 
     domain.create(cfg.mesh_files, cfg.mesh_path);
 
@@ -2557,12 +2525,8 @@ namespace NavierStokesPP
     // store levels after partitioning
     if (cfg.load.empty())
     {
-      cfg.level_max_in = domain.get_desired_level_max();
-      cfg.level_med_in = domain.get_desired_level_med();
-      cfg.level_min_in = domain.get_desired_level_min();
-      cfg.level_max = domain.max_level_index();
-      cfg.level_med = domain.med_level_index();
-      cfg.level_min = domain.min_level_index();
+      cfg.levels_in = domain.format_desired_levels();
+      cfg.levels = domain.format_chosen_levels();
     }
 
     // ensure that we do not use UMFPACK if we have more than 1 coarse mesh processes

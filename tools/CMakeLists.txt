@@ -19,6 +19,9 @@ TARGET_LINK_LIBRARIES(dbg-nlopt feat)
 ADD_EXECUTABLE(dbg-pmdcdsc dbg_pmdcdsc/dbg_pmdcdsc.cpp)
 TARGET_LINK_LIBRARIES(dbg-pmdcdsc feat)
 
+ADD_EXECUTABLE(dbg-recursive-parti dbg_recursive_parti/dbg_recursive_parti.cpp)
+TARGET_LINK_LIBRARIES(dbg-recursive-parti feat)
+
 ADD_EXECUTABLE(dbg-trace-1 dbg_trace/dbg_trace_1.cpp)
 TARGET_LINK_LIBRARIES(dbg-trace-1 feat)
 

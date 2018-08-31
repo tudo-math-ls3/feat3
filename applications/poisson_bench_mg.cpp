@@ -18,6 +18,7 @@
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
@@ -37,6 +38,7 @@
 #include <kernel/util/dist.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
+#include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
 
@@ -486,49 +488,126 @@ namespace PoissonDirichlet
     comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
   }
 
-  template<template<typename> class TSpace_>
-  void run_space(Dist::Comm& comm, SimpleArgParser& args)
+  template<template<typename> class TSpace_, typename Shape_>
+  void run_reader(Dist::Comm& comm, SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader)
   {
-    // define our mesh type
-    typedef Shape::Hypercube<2> ShapeType;
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    // define our types
+    typedef Geometry::ConformalMesh<Shape_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef TSpace_<TrafoType> SpaceType;
 
-    // create a time-stamp
-    TimeStamp time_stamp;
-
     // let's create our domain
+    comm.print("Using PartiDomainControl as domain controller");
+
+    TimeStamp time_stamp;
 
     // create our domain control
     typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-    Control::Domain::HierarchUnitCubeDomainControl2<DomainLevelType> domain(comm, args.query("level")->second);
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
+
+    domain.set_desired_levels(args.query("level")->second);
+
+    domain.create(mesh_reader);
+
+    Statistics::toe_partition = time_stamp.elapsed_now();
+
+    comm.print("\nDesired Levels: " + domain.format_desired_levels());
+    comm.print(  "Chosen  Levels: " + domain.format_chosen_levels());
+
+    comm.print("\nChosen Partitioning Info:\n" + domain.get_chosen_parti_info());
+
+    // dump domain info if desired
+    if(args.check("dump") >= 0)
+    {
+      comm.print("\nDomain Ancestry:");
+      comm.allprint(domain.dump_ancestry());
+      comm.print("\nDomain Layers:");
+      comm.allprint(domain.dump_layers());
+      comm.print("\nDomain Layer Levels:");
+      comm.allprint(domain.dump_layer_levels());
+      comm.print("\nDomain Virtual Levels:");
+      comm.allprint(domain.dump_virt_levels());
+    }
+
+    // run our application
+    run(args, domain);
+  }
+
+  template<template<typename> class TSpace_>
+  void run_factory(Dist::Comm& comm, SimpleArgParser& args)
+  {
+    // define our types
+    typedef Geometry::ConformalMesh<Shape::Quadrilateral> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef TSpace_<TrafoType> SpaceType;
+
+    // let's create our domain
+    comm.print("Using HierarchUnitCubeDomainControl2 as domain controller");
+
+    /// \todo translate level parameters
+    std::deque<String> slevels = args.query("level")->second;
+
+    TimeStamp time_stamp;
+
+    // create our domain control
+    typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
+    Control::Domain::HierarchUnitCubeDomainControl2<DomainLevelType> domain(comm, slevels);
 
     Statistics::toe_partition = time_stamp.elapsed_now();
 
     {
       std::deque<std::pair<int,int>> ilvs = domain.get_level_indices();
-      auto it = ilvs.begin();
-      String slvls("Levels: ");
-      ((slvls += stringify(it->first)) += ":") += stringify(it->second);
-      for(++it; it != ilvs.end(); ++it)
-        (((slvls += ", ") += stringify(it->first)) += ":") += stringify(it->second);
+      String slvls("Chosen Levels: ");
+      for(auto it = ilvs.begin(); it != ilvs.end(); ++it)
+        (((slvls += "  ") += stringify(it->first)) += ":") += stringify(it->second);
       comm.print(slvls);
     }
 
     // dump domain info if desired
     if(args.check("dump") >= 0)
     {
+      comm.print("\nDomain Layers:");
       comm.allprint(domain.dump_layers());
+      comm.print("\nDomain Layer Levels:");
       comm.allprint(domain.dump_layer_levels());
+      comm.print("\nDomain Virtual Levels:");
       comm.allprint(domain.dump_virt_levels());
     }
 
     // run our application
     run(args, domain);
+  }
 
-    // print elapsed runtime
-    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+  template<template<typename> class TSpace_>
+  void run_tspace(Dist::Comm& comm, SimpleArgParser& args)
+  {
+    // no mesh-file given?
+    if(args.check("mesh") < 0)
+    {
+      // run the factory version
+      run_factory<TSpace_>(comm, args);
+      return;
+    }
+
+    // Our mesh file reader
+    Geometry::MeshFileReader mesh_reader;
+
+    // read in the mesh files
+    mesh_reader.add_mesh_files(comm, args.query("mesh")->second);
+
+    // read the mesh file root markups
+    mesh_reader.read_root_markup();
+    String mesh_type = mesh_reader.get_meshtype_string();
+
+    // run the corresponding version
+    if(mesh_type == "conformal:hypercube:2:2") run_reader<TSpace_, Shape::Hypercube<2>>(comm, args, mesh_reader); else
+    if(mesh_type == "conformal:hypercube:3:3") run_reader<TSpace_, Shape::Hypercube<3>>(comm, args, mesh_reader); else
+    //if(mesh_type == "conformal:simplex:2:2")   run_reader<TSpace_, Shape::Simplex<2>>  (comm, args, mesh_reader); else
+    //if(mesh_type == "conformal:simplex:3:3")   run_reader<TSpace_, Shape::Simplex<3>>  (comm, args, mesh_reader); else
+    {
+      comm.print(std::cerr, "ERROR: unsupported mesh type '" + mesh_type + "'");
+      FEAT::Runtime::abort();
+    }
   }
 
   void main(int argc, char* argv [])
@@ -553,6 +632,7 @@ namespace PoissonDirichlet
     SimpleArgParser args(argc, argv);
 
     // check command line arguments
+    args.support("mesh");
     args.support("level");
     args.support("dump");
     args.support("iters");
@@ -575,21 +655,25 @@ namespace PoissonDirichlet
       FEAT::Runtime::abort();
     }
 
+
+    // create a time-stamp
+    TimeStamp time_stamp;
+
+    // parse our space degree
     int space_degree = 1;
     args.parse("space", space_degree);
-
     switch(space_degree)
     {
     case 1:
-      run_space<Space::Lagrange1::Element>(comm, args);
+      run_tspace<Space::Lagrange1::Element>(comm, args);
       break;
 
     case 2:
-      run_space<Space::Lagrange2::Element>(comm, args);
+      run_tspace<Space::Lagrange2::Element>(comm, args);
       break;
 
     case 3:
-      run_space<Space::Lagrange3::Element>(comm, args);
+      run_tspace<Space::Lagrange3::Element>(comm, args);
       break;
 
     default:
@@ -597,6 +681,10 @@ namespace PoissonDirichlet
       FEAT::Runtime::abort();
       return;
     }
+
+    // print elapsed runtime
+    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+
     comm.print(String(100u, '#'));
   }
 } // namespace PoissonDirichlet
