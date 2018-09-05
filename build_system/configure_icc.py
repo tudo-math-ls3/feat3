@@ -126,6 +126,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -msse3"
     elif cpu == "magnycours":
       cxxflags += " -msse3"
+    elif cpu == "zen":
+      cxxflags += " " # not really supported by intel
     else:
       print ("Warning: Detected cpu type not supported by configure_icc.py, using generic vectorisation support instead")
       # generate code for every simd unit, existing so far
