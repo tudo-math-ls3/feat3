@@ -423,6 +423,11 @@ namespace FEAT
       return Comm(MPI_COMM_SELF);
     }
 
+    Comm Comm::null()
+    {
+      return Comm(MPI_COMM_NULL);
+    }
+
     bool Comm::is_world() const
     {
       return (comm == MPI_COMM_WORLD);
@@ -608,14 +613,16 @@ namespace FEAT
 
     void Comm::reduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op, int root) const
     {
-      MPI_Reduce(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, root, comm);
+      // MPI_IN_PLACE is only allowed on root process
+      MPI_Reduce((sendbuf == recvbuf) && (_rank == root) ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, root, comm);
     }
 
 #if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ireduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Ireduce(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, root, comm, &req);
+      // MPI_IN_PLACE is only allowed on root process
+      MPI_Ireduce((sendbuf == recvbuf) && (_rank == root) ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, root, comm, &req);
       return Request(req);
     }
 #endif
@@ -1039,6 +1046,11 @@ namespace FEAT
     Comm Comm::self()
     {
       return Comm(1);
+    }
+
+    Comm Comm::null()
+    {
+      return Comm();
     }
 
     bool Comm::is_null() const

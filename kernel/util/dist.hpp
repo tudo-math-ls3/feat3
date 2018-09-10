@@ -1452,6 +1452,11 @@ namespace FEAT
       static Comm self();
 
       /**
+       * \brief Returns a null communicator.
+       */
+      static Comm null();
+
+      /**
        * \brief Checks whether this communicator is the world communicator.
        *
        * \returns \c true, if this communicator represents \c MPI_COMM_WORLD, otherwise \c false.
@@ -1997,7 +2002,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2024,7 +2029,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] root
        * The rank of the root process that is gathering the data.
@@ -2053,7 +2058,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2084,7 +2089,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] root
        * The rank of the root process that is gathering the data.
@@ -2108,7 +2113,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[in] sendtype
        * A reference to the Datatype object representing the send buffer contents.
@@ -2138,7 +2143,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
        * The receive buffer for the operation.
@@ -2164,7 +2169,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[in] sendtype
        * A reference to the Datatype object representing the send buffer contents.
@@ -2198,7 +2203,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
        * The receive buffer for the operation.
@@ -2237,7 +2242,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2261,7 +2266,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \see \cite MPI31 Section 5.7, page 165
        */
@@ -2287,7 +2292,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2315,7 +2320,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \returns A request object for the operation.
        *
@@ -2400,7 +2405,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[in] sendtype
        * A reference to the Datatype object representing the send buffer contents.
@@ -2427,13 +2432,13 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \see \cite MPI31 Section 5.8, page 168
        */
@@ -2450,7 +2455,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[in] sendtype
        * A reference to the Datatype object representing the send buffer contents.
@@ -2459,7 +2464,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2481,13 +2486,13 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcount
-       * The size of the send buffer in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
        * The receive buffer for the operation.
        *
        * \param[in] recvcount
-       * The size of the receive buffer in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \returns A request object for the operation.
        *
@@ -2512,7 +2517,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcounts
-       * The sizes of the send buffers in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[in] sdispls
        * The displacements of the send buffers in datatype objects.
@@ -2524,7 +2529,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcounts
-       * The sizes of the receive buffers in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] rdispls
        * The displacements of the receive buffers in datatype objects.
@@ -2549,7 +2554,7 @@ namespace FEAT
        * The send buffer for the operation.
        *
        * \param[in] sendcounts
-       * The sizes of the send buffers in datatype objects.
+       * The number of datatype objects send to \e each process.
        *
        * \param[in] sdispls
        * The displacements of the send buffers in datatype objects.
@@ -2558,7 +2563,7 @@ namespace FEAT
        * The receive buffer for the operation.
        *
        * \param[in] recvcounts
-       * The sizes of the receive buffers in datatype objects.
+       * The number of datatype objects received from \e each process.
        *
        * \param[in] rdispls
        * The displacements of the receive buffers in datatype objects.
