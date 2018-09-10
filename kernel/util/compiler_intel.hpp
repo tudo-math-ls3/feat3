@@ -62,6 +62,7 @@
 #  define FEAT_DISABLE_WARNINGS _Pragma("warning(push,0)") \
     _Pragma("warning(disable:177)") \
     _Pragma("warning(disable:2259)") \
+    _Pragma("warning(disable:1478)") \
     _Pragma("warning(disable:858)")
 
 #  define FEAT_RESTORE_WARNINGS _Pragma("warning(pop)")

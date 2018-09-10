@@ -109,6 +109,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Set mpi c++ compiler wrapper to xyz")
   print ("--mpi2_only")
   print ("  Use only MPI 2 operations")
+  print ("--mkl_sparse_executor")
+  print ("  Use the intel mkl sparse executor interface")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
@@ -309,6 +311,10 @@ for option in extra_options:
   if option.startswith("--mpi2_only"):
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_MPI2_ONLY:BOOL=TRUE"
+
+  if option.startswith("--mkl_sparse_executor"):
+    unused_extra_options.remove(option)
+    cmake_flags += " -DFEAT_USE_MKL_SPARSE_EXECUTOR:BOOL=TRUE"
 
   if option.startswith("--restrict_errors"):
     unused_extra_options.remove(option)

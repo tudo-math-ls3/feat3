@@ -209,6 +209,11 @@ This macro is defined if the command line option <code>\--mpi_thread_multiple</c
 This macro can be defined to restrict mpi operations to version MPI 2.
 
 <hr>
+\subsection ppm_feat_mkl_sparse_executor FEAT_USE_MKL_SPARSE_EXECUTOR
+
+Use the new intel mkl sparse executor interface for sparse matrix vector products.
+
+<hr>
 \subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
 This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
 
