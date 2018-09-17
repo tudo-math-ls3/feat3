@@ -23,7 +23,7 @@ namespace FEAT
     {
       struct PartiIterativeItem
       {
-        Index rank; //to which center does this cell belong
+        Index patch; //to which center does this cell belong
         Index distance; //distance to the nearest center
 
         PartiIterativeItem() :
@@ -33,7 +33,7 @@ namespace FEAT
       };
 
       template<typename Shape_, int num_coords_, typename Coord_>
-        std::vector<Index> parti_iterative_distance(Index start, ConformalMesh<Shape_, num_coords_, Coord_> & mesh, Index num_ranks)
+        std::vector<Index> parti_iterative_distance(Index start, ConformalMesh<Shape_, num_coords_, Coord_> & mesh, Index num_patches)
         {
         typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         static constexpr int facet_dim = MeshType::shape_dim-1;
@@ -57,7 +57,7 @@ namespace FEAT
 
         Index exploration_threshold = Math::max(
             Index(Math::pow(double(num_elems), double(1) / double(MeshType::shape_dim)) + 1),
-            num_elems / num_ranks);
+            num_elems / num_patches);
         exploration_threshold = Math::max(exploration_threshold, Index(2));
 
 
@@ -100,22 +100,20 @@ namespace FEAT
         typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         /// our mesh
         MeshType& _mesh;
+        /// number of desired patches
+        const Index _num_patches;
         /// number of elements in input mesh
         const Index _num_elems;
-        /// number of desired ranks/patches
-        const Index _num_ranks;
-        /// Mapping of ranks to cells assigned to each rank
-        std::vector<std::set<Index>> _cells_per_rank;
-        /// List of cluster centers: cell id for each rank
+        /// Mapping of patches to cells assigned to each patch
+        std::vector<std::set<Index>> _cells_per_patch;
+        /// List of cluster centers: cell id for each patch
         std::set<Index> _centers;
-        /// Our communicator
-        const Dist::Comm & _comm;
-        /// List of boundary cells per rank
+        /// List of boundary cells per patch
         std::vector<std::set<Index>> _boundary_cells;
-        /// mapping of cell to rank number
-        std::vector<Index> _rank_per_cell;
-        /// boundary size per rank, must be updated via update_boundary_size method
-        std::vector<Index> _boundary_size_per_rank;
+        /// mapping of cell to patch number
+        std::vector<Index> _patch_per_cell;
+        /// boundary size per patch, must be updated via update_boundary_size method
+        std::vector<Index> _boundary_size_per_patch;
 
         public:
 
@@ -125,21 +123,20 @@ namespace FEAT
          * \param[in] mesh
          * The mesh that is to be partitioned (on some refined level)
          *
-         * \param[in] num_ranks
-         * The desired number of ranks.
+         * \param[in] num_patches
+         * The number of desired patches
          */
-        explicit PartiIterativeIndividual(MeshType& mesh, const Dist::Comm & comm, Random & rng) :
+        explicit PartiIterativeIndividual(MeshType& mesh, Random & rng, Index num_patches) :
           _mesh(mesh),
+          _num_patches(num_patches),
           _num_elems(mesh.get_num_elements()),
-          _num_ranks(Index(comm.size())),
-          _cells_per_rank(_num_ranks),
-          _comm(comm),
-          _boundary_cells(_num_ranks),
-          _rank_per_cell(_num_elems),
-          _boundary_size_per_rank(_num_ranks)
+          _cells_per_patch(_num_patches),
+          _boundary_cells(_num_patches),
+          _patch_per_cell(_num_elems),
+          _boundary_size_per_patch(_num_patches)
         {
-          XASSERT(_num_ranks > Index(0));
-          XASSERT(_num_elems >= _num_ranks);
+          XASSERT(_num_patches > Index(0));
+          XASSERT(_num_elems >= _num_patches);
 
           // List of cells with informations regarding the partitioning layout
           std::vector<Intern::PartiIterativeItem> items(_num_elems);
@@ -149,25 +146,25 @@ namespace FEAT
           {
             bad_centers = false;
 
-            // find randomly num_ranks different cells as cluster centers
-            while(_centers.size() < _num_ranks)
+            // find randomly num_patches different cells as cluster centers
+            while(_centers.size() < _num_patches)
             {
               Index cell = rng(Index(0), _num_elems - 1);
               if (_centers.count(cell) == 0)
                 _centers.insert(cell);
             }
 
-            // create distance list from each center and assign items the distance and rank of the nearest center
+            // create distance list from each center and assign items the distance and patch of the nearest center
             auto center_iterator = _centers.begin();
-            for (Index rank(0) ; rank < _num_ranks ; ++rank, ++center_iterator)
+            for (Index patch(0) ; patch < _num_patches ; ++patch, ++center_iterator)
             {
-              auto distance_list = Intern::parti_iterative_distance(*center_iterator, mesh, _num_ranks);
+              auto distance_list = Intern::parti_iterative_distance(*center_iterator, mesh, _num_patches);
               for (Index node(0) ; node < _num_elems ; ++node)
               {
                 if(distance_list.at(node) < items.at(node).distance)
                 {
                   items.at(node).distance = distance_list.at(node);
-                  items.at(node).rank = rank;
+                  items.at(node).patch = patch;
                 }
               }
             }
@@ -181,15 +178,15 @@ namespace FEAT
 
           for (Index i(0) ; i < _num_elems ; ++i)
           {
-            _cells_per_rank.at(items.at(i).rank).insert(i);
+            _cells_per_patch.at(items.at(i).patch).insert(i);
           }
 
-          //setup cell->rank mapping
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          //setup cell->patch mapping
+          for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
-            for (auto cell : _cells_per_rank.at(rank))
+            for (auto cell : _cells_per_patch.at(patch))
             {
-              _rank_per_cell.at(cell) = rank;
+              _patch_per_cell.at(cell) = patch;
             }
           }
 
@@ -200,17 +197,17 @@ namespace FEAT
           auto& neighbours = mesh.get_neighbours();
 
           //setup boundary cells
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
-            for (auto cell : _cells_per_rank.at(rank))
+            for (auto cell : _cells_per_patch.at(patch))
             {
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
                 Index other_cell(neighbours[cell][j]);
                 // if neighbour exists and is not in our own patch
-                if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != rank)
+                if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != patch)
                 {
-                  _boundary_cells.at(rank).insert(cell);
+                  _boundary_cells.at(patch).insert(cell);
                 }
               }
             }
@@ -218,7 +215,7 @@ namespace FEAT
 
           update_boundary_size();
 
-          //TODO anzahl nachbar ranks fuer fitness noetig ???
+          //TODO anzahl nachbar patches fuer fitness noetig ???
         }
 
         /// mutate individuum - let cells switch to smaller patches
@@ -236,70 +233,70 @@ namespace FEAT
           {
             ++tries;
 
-            Index rank(rng(Index(0), _num_ranks - 1));
-            if (_boundary_cells.at(rank).size() == 0)
+            Index patch(rng(Index(0), _num_patches - 1));
+            if (_boundary_cells.at(patch).size() == 0)
               continue;
-            if (_cells_per_rank.at(rank).size() == 1)
+            if (_cells_per_patch.at(patch).size() == 1)
               continue;
 
-            Index rng_cell_idx = rng(Index(0), Index(_boundary_cells.at(rank).size() - 1));
+            Index rng_cell_idx = rng(Index(0), Index(_boundary_cells.at(patch).size() - 1));
             Index counter(0);
-            Index cell(*(_boundary_cells.at(rank).begin()));
+            Index cell(*(_boundary_cells.at(patch).begin()));
             //choose cell randomly from current boundary set
             /// \todo make it more efficient
-            for (auto it(_boundary_cells.at(rank).begin()) ; counter != rng_cell_idx ; ++counter, ++it)
+            for (auto it(_boundary_cells.at(patch).begin()) ; counter != rng_cell_idx ; ++counter, ++it)
             {
               cell = *it;
             }
 
             // list of neighbour cells in other patches
-            std::list<Index> trans_rank_neighbours;
+            std::list<Index> trans_patch_neighbours;
             for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
             {
               Index other_cell(neighbours[cell][j]);
               // if neighbour exists and is not in our own patch
-              if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != rank)
+              if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != patch)
               {
-                trans_rank_neighbours.push_back(other_cell);
+                trans_patch_neighbours.push_back(other_cell);
               }
             }
 
             //check if any neighbour has a smaller patch
-            Index smallest_rank(rank);
-            Index smallest_size = Index(_cells_per_rank.at(rank).size());
-            for (auto neighbour : trans_rank_neighbours)
+            Index smallest_patch(patch);
+            Index smallest_size = Index(_cells_per_patch.at(patch).size());
+            for (auto neighbour : trans_patch_neighbours)
             {
-              if (_cells_per_rank.at(_rank_per_cell.at(neighbour)).size() < smallest_size)
+              if (_cells_per_patch.at(_patch_per_cell.at(neighbour)).size() < smallest_size)
               {
-                smallest_size = Index(_cells_per_rank.at(_rank_per_cell.at(neighbour)).size());
-                smallest_rank = _rank_per_cell.at(neighbour);
+                smallest_size = Index(_cells_per_patch.at(_patch_per_cell.at(neighbour)).size());
+                smallest_patch = _patch_per_cell.at(neighbour);
               }
             }
 
-            if (smallest_rank == rank)
+            if (smallest_patch == patch)
               continue;
 
-            //build up list of neighbours in the same (old) rank
-            std::list<Index> in_rank_neighbours;
+            //build up list of neighbours in the same (old) patch
+            std::list<Index> in_patch_neighbours;
             for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
             {
               Index other_cell(neighbours[cell][j]);
               // if neighbour exists and is in our own patch
-              if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) == rank)
+              if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) == patch)
               {
-                in_rank_neighbours.push_back(other_cell);
+                in_patch_neighbours.push_back(other_cell);
               }
             }
             //check if we would isolate one of our neighbours completly and abort
-            //i.e. our neighbour from the same rank has only us as a link to its patch
+            //i.e. our neighbour from the same patch has only us as a link to its patch
             bool neighbour_missing = false;
-            for (auto neighbour : in_rank_neighbours)
+            for (auto neighbour : in_patch_neighbours)
             {
               bool other_neighbour = false;
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
                 Index other_cell(neighbours[neighbour][j]);
-                if (other_cell != ~Index(0) && other_cell != cell && _rank_per_cell.at(other_cell) == rank)
+                if (other_cell != ~Index(0) && other_cell != cell && _patch_per_cell.at(other_cell) == patch)
                 {
                   other_neighbour = true;
                   break;
@@ -311,27 +308,27 @@ namespace FEAT
             if (neighbour_missing)
               continue;
 
-            //found new rank for our cell, update structures
-            _rank_per_cell.at(cell) = smallest_rank;
-            XASSERT(_cells_per_rank.at(rank).count(cell) > 0);
-            _cells_per_rank.at(rank).erase(cell);
-            _cells_per_rank.at(smallest_rank).insert(cell);
-            XASSERT(_boundary_cells.at(rank).count(cell) > 0);
-            _boundary_cells.at(rank).erase(cell);
-            _boundary_cells.at(smallest_rank).insert(cell);
+            //found new patch for our cell, update structures
+            _patch_per_cell.at(cell) = smallest_patch;
+            XASSERT(_cells_per_patch.at(patch).count(cell) > 0);
+            _cells_per_patch.at(patch).erase(cell);
+            _cells_per_patch.at(smallest_patch).insert(cell);
+            XASSERT(_boundary_cells.at(patch).count(cell) > 0);
+            _boundary_cells.at(patch).erase(cell);
+            _boundary_cells.at(smallest_patch).insert(cell);
 
-            //update neighbour cells in other rank if they loose their boundary property due to our patch switch
-            for (auto neighbour : trans_rank_neighbours)
+            //update neighbour cells in other patch if they loose their boundary property due to our patch switch
+            for (auto neighbour : trans_patch_neighbours)
             {
-              //update only cells in common new rank
-              if (_rank_per_cell.at(neighbour) != smallest_rank)
+              //update only cells in common new patch
+              if (_patch_per_cell.at(neighbour) != smallest_patch)
                 continue;
 
               bool boundary(false);
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
                 Index other_cell(neighbours[neighbour][j]);
-                if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != smallest_rank)
+                if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != smallest_patch)
                 {
                   boundary = true;
                   break;
@@ -339,13 +336,13 @@ namespace FEAT
               }
 
               if (! boundary)
-                _boundary_cells.at(smallest_rank).erase(neighbour);
+                _boundary_cells.at(smallest_patch).erase(neighbour);
             }
 
-            //update our own ranks neighbours to become a boundary cell
-            for (auto neighbour : in_rank_neighbours)
+            //update our own patchs neighbours to become a boundary cell
+            for (auto neighbour : in_patch_neighbours)
             {
-              _boundary_cells.at(rank).insert(neighbour);
+              _boundary_cells.at(patch).insert(neighbour);
             }
 
             //we mutate successfully
@@ -354,55 +351,55 @@ namespace FEAT
           update_boundary_size();
         }
 
-        /// update boundary size per rank from _boundary_cells structure
+        /// update boundary size per patch from _boundary_cells structure
         void update_boundary_size()
         {
           static constexpr int facet_dim = MeshType::shape_dim-1;
           const auto& facet_idx = _mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
           auto& neighbours = _mesh.get_neighbours();
 
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
             Index sum(0);
-            for (auto cell : _boundary_cells.at(rank))
+            for (auto cell : _boundary_cells.at(patch))
             {
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
                 Index other_cell(neighbours[cell][j]);
-                if (other_cell != ~Index(0) && _rank_per_cell.at(other_cell) != rank)
+                if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != patch)
                 {
                   ++sum;
                 }
               }
             }
-            _boundary_size_per_rank.at(rank) = sum;
+            _boundary_size_per_patch.at(patch) = sum;
           }
         }
 
         Index get_boundary_size() const
         {
           Index sum(0);
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
-            sum += get_boundary_size(rank);
+            sum += get_boundary_size(patch);
           }
           return sum;
         }
 
-        Index get_boundary_size(Index rank) const
+        Index get_boundary_size(Index patch) const
         {
-          return _boundary_size_per_rank.at(rank);
+          return _boundary_size_per_patch.at(patch);
         }
 
         Index get_boundary_deviation() const
         {
           Index min(std::numeric_limits<Index>::max());
           Index max(0);
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
-            Index ranks_boundary_size(get_boundary_size(rank));
-            min = Math::min(ranks_boundary_size, min);
-            max = Math::max(ranks_boundary_size, max);
+            Index patches_boundary_size(get_boundary_size(patch));
+            min = Math::min(patches_boundary_size, min);
+            max = Math::max(patches_boundary_size, max);
           }
           return max - min;
         }
@@ -411,10 +408,10 @@ namespace FEAT
         {
           Index min(std::numeric_limits<Index>::max());
           Index max(0);
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
-            min = Math::min(Index(_cells_per_rank.at(rank).size()), min);
-            max = Math::max(Index(_cells_per_rank.at(rank).size()), max);
+            min = Math::min(Index(_cells_per_patch.at(patch).size()), min);
+            max = Math::max(Index(_cells_per_patch.at(patch).size()), max);
           }
           return max - min;
         }
@@ -450,9 +447,9 @@ namespace FEAT
      * \brief Iterative-Partitioner class template specialisation for ConformalMesh
      *
      * The basic usage of this class is as follows:
-     * -# Refine the mesh until it contains at least num_rank cells.
+     * -# Refine the mesh until it contains at least num_patches cells.
      * -# Create an object of this class and pass the to-be-partitioned mesh as well
-     *    as the desired number of ranks/patches to the constructor.
+     *    as the desired number of patches and the available number of ranks in a communicator to the constructor.
      * -# Create the Elements-At-Rank graph using the #build_elems_at_rank() function.
      *
      * \author Dirk Ribbrock
@@ -463,12 +460,14 @@ namespace FEAT
       private:
         /// number of elements in input mesh
         const Index _num_elems;
-        /// number of desired ranks/patches
+        /// number of usable ranks
         const Index _num_ranks;
         /// Our communicator
         const Dist::Comm & _comm;
         /// Our population
         std::list<Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_>> _population;
+        /// number of desired patches
+        const Index _num_patches;
 
       public:
       /// our mesh type
@@ -489,10 +488,11 @@ namespace FEAT
        * \param[in] time_mutate
        * The amount of seconds to be used for partitioning optimisation via patch mutation.
        */
-      explicit PartiIterative(MeshType& mesh, const Dist::Comm & comm, double time_init, double time_mutate) :
+      explicit PartiIterative(MeshType& mesh, const Dist::Comm & comm, Index num_patches, double time_init, double time_mutate) :
         _num_elems(mesh.get_num_elements()),
         _num_ranks(Index(comm.size())),
-        _comm(comm)
+        _comm(comm),
+        _num_patches(num_patches)
       {
         Random::SeedType seed(Random::SeedType(time(nullptr)));
         Random rng(seed + Random::SeedType(comm.rank()));
@@ -500,7 +500,7 @@ namespace FEAT
         mesh.fill_neighbours();
 
         {
-          Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, _comm, rng);
+          Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, rng, _num_patches);
           _population.push_back(indi);
         }
 
@@ -509,7 +509,7 @@ namespace FEAT
         {
           for (Index i(0) ; i < 10 ; ++i)
           {
-            Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, _comm, rng);
+            Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, rng, _num_patches);
             _population.push_back(indi);
           }
           _population.sort(Geometry::Intern::parti_iterative_compare_cell_deviation_simple<typename decltype(_population)::value_type>);
@@ -599,38 +599,38 @@ namespace FEAT
         if (_rank == (int)lowest_rank)
         {
           //std::cout<<"selected: " << _population.front().get_cell_deviation()<<" " <<_population.front().get_boundary_deviation()<<" " << _population.front().get_boundary_size()<<std::endl;
-          Adjacency::Graph graph(_num_ranks, _num_elems, _num_elems);
+          Adjacency::Graph graph(_num_patches, _num_elems, _num_elems);
           Index* ptr = graph.get_domain_ptr();
           Index* idx = graph.get_image_idx();
 
           // build pointer array
           ptr[0] = 0;
-          for(Index i(0); i < _num_ranks; ++i)
+          for(Index i(0); i < _num_patches; ++i)
           {
-            ptr[i+1] = Index(indi._cells_per_rank.at(i).size()) + ptr[i];
+            ptr[i+1] = Index(indi._cells_per_patch.at(i).size()) + ptr[i];
           }
 
           // build index array
           Index counter(0);
-          for (Index rank(0) ; rank < _num_ranks ; ++rank)
+          for (Index rank(0) ; rank < _num_patches ; ++rank)
           {
-            for (auto cell : indi._cells_per_rank.at(rank))
+            for (auto cell : indi._cells_per_patch.at(rank))
             {
               idx[counter] = cell;
               ++counter;
             }
           }
-          _comm.bcast(graph.get_domain_ptr(), _num_ranks + 1, _rank);
+          _comm.bcast(graph.get_domain_ptr(), _num_patches + 1, _rank);
           _comm.bcast(graph.get_image_idx(), _num_elems, _rank);
           return graph;
         }
         else
         {
-          Index * domain_ptr = new Index[_num_ranks + 1];
-          _comm.bcast(domain_ptr, _num_ranks + 1, (int)lowest_rank);
+          Index * domain_ptr = new Index[_num_patches + 1];
+          _comm.bcast(domain_ptr, _num_patches + 1, (int)lowest_rank);
           Index * image_idx = new Index[_num_elems];
           _comm.bcast(image_idx, _num_elems, (int)lowest_rank);
-          Adjacency::Graph graph(_num_ranks, _num_elems, _num_elems, domain_ptr, image_idx);
+          Adjacency::Graph graph(_num_patches, _num_elems, _num_elems, domain_ptr, image_idx);
           delete[] domain_ptr;
           delete[] image_idx;
           return graph;

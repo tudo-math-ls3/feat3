@@ -1583,8 +1583,8 @@ namespace FEAT
           // try the various a-posteriori partitioners
           if(this->_apply_parti_metis(ancestor, base_mesh_node))
             return true;
-          //if(this->_apply_parti_genetic(ancestor, mesh_node))
-            //return true;
+          if(this->_apply_parti_genetic(ancestor, base_mesh_node))
+            return true;
           if(this->_apply_parti_naive(ancestor, base_mesh_node))
             return true;
 
@@ -1698,6 +1698,35 @@ namespace FEAT
           (void)base_mesh_node;
           return false;
 #endif // defined(FEAT_HAVE_METIS) || defined(FEAT_HAVE_PARMETIS)
+        }
+
+        /**
+         * \brief Applies the genetic partitioner onto the base-mesh.
+         *
+         * \param[in] base_mesh_node
+         * The base-mesh node that is to be partitioned.
+         *
+         * \returns
+         * \c true.
+         */
+        bool _apply_parti_genetic(Ancestor& ancestor, /*const*/ MeshNodeType& base_mesh_node)
+        {
+          // create a genetic partitioner
+          Geometry::PartiIterative<MeshType> partitioner(
+            *base_mesh_node.get_mesh(),
+            ancestor.progeny_comm,
+            (Index)ancestor.num_parts,
+            this->_genetic_time_init,
+            this->_genetic_time_mutate);
+
+          // create elems-at-rank graph
+          ancestor.parti_graph = partitioner.build_elems_at_rank();
+
+          // set info string
+          ancestor.parti_info = String("Applied genetic partitioner");
+
+          // okay
+          return true;
         }
 
         /**
