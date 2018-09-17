@@ -52,6 +52,7 @@ namespace DbgRecursiveParti
     typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
     Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
 
+    domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
 
     domain.create(mesh_reader);
@@ -108,6 +109,7 @@ namespace DbgRecursiveParti
     SimpleArgParser args(argc, argv);
 
     // check command line arguments
+    Control::Domain::add_supported_pdc_args(args);
     args.support("debug");
     args.support("mesh");
     args.support("level");
