@@ -1711,6 +1711,10 @@ namespace FEAT
          */
         bool _apply_parti_genetic(Ancestor& ancestor, /*const*/ MeshNodeType& base_mesh_node)
         {
+          // is this even allowed?
+          if(!this->_allow_parti_genetic)
+            return false;
+
           // create a genetic partitioner
           Geometry::PartiIterative<MeshType> partitioner(
             *base_mesh_node.get_mesh(),
@@ -1743,6 +1747,7 @@ namespace FEAT
          */
         bool _apply_parti_naive(Ancestor& ancestor, const MeshNodeType& mesh_node)
         {
+          // is this even allowed?
           if(!this->_allow_parti_naive)
             return false;
 
