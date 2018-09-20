@@ -61,6 +61,9 @@ TARGET_LINK_LIBRARIES (mtx2tga feat)
 ADD_EXECUTABLE(resort-matrix io/resort_matrix.cpp)
 TARGET_LINK_LIBRARIES (resort-matrix feat)
 
+ADD_EXECUTABLE(tri2mesh io/tri_to_mesh.cpp)
+TARGET_LINK_LIBRARIES (tri2mesh feat)
+
 ADD_EXECUTABLE(mpi-info mpi_info/mpi_info.cpp)
 TARGET_LINK_LIBRARIES(mpi-info feat)
 
