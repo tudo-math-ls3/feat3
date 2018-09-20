@@ -17,6 +17,7 @@
 #include <kernel/adjacency/graph.hpp>
 
 // includes, STL
+#include <set>
 #include <map>
 #include <deque>
 #include <vector>
@@ -947,16 +948,52 @@ namespace FEAT
         // validate element count
         XASSERTM(num_elems == base_root_mesh->get_num_elements(), "mesh vs partition: element count mismatch");
 
+        // transpose the partitioning graph here, as we will need it multiple times
+        const Adjacency::Graph ranks_at_elem(Adjacency::RenderType::transpose, elems_at_rank);
+
         // Step 1: compute neighbour ranks
         {
           // get vertices-at-element
           const auto& verts_at_elem = base_root_mesh->template get_index_set<MeshType::shape_dim, 0>();
 
-          // build vertices-at-rank
-          Adjacency::Graph verts_at_rank(Adjacency::RenderType::injectify, elems_at_rank, verts_at_elem);
+          // Note:
+          // In the following, we are building the ranks-at-rank adjacency graph in an apparently
+          // cumbersome manner in five steps (including the ranks-at-elem graph assembly above).
+          // Let "R>E" be the elements-at-rank graph, that is given as a parameter to this function,
+          // and let "E>V" be the vertices-at-element graph, then we perform the following steps:
+          //
+          // 1: compute ranks-at-element by transposition:   E>R := (R>E)^T
+          // 2: compute elements-at-vertex by transposition: V>E := (E>V)^T
+          // 3: compute ranks-at-vertex by composition:      V>R := (V>E) * (E>R)
+          // 4: compute vertices-at-rank by transposition:   R>V := (V>R)^T
+          // 5: compute ranks-at-rank by composition:        R>R := (R>V) * (V>R)
+          //
+          // As said before, this looks as if it is more complicated than it has to be, because
+          // one might also try the following three-step approach (which was, in fact, implemented
+          // here before):
+          //
+          // 1. compute vertices-at-rank by composition:     R>V := (R>E) * (E>V)
+          // 2. compute ranks-at-vertex by transposition:    V>R := (R>V)^T
+          // 3: compute ranks-at-rank by composition:        R>R := (R>V) * (V>R)
+          //
+          // The million dollar question is: why don't use the 3-step approach?
+          // Answer: Assume that we have N elements in the base-mesh and P processes, then it
+          // can be shown that the first step "R>V := (R>E) * (E>V)" has a runtime of O(N^2/P),
+          // which results in quadratic runtime in N unless N = O(P). So the practically important
+          // scenario of "many elements on few processors" lead to this bottleneck. However, it is
+          // worth mentioning that the 3-step approach has linear runtime in the case N = O(P).
+          // On the other hand, the 5-step approach implemented here can be shown to have
+          // linear runtime in both N and P in any relevant case, which is the reason why it
+          // was chosen here.
 
-          // transpose and build ranks-at-rank (via vertices)
-          Adjacency::Graph ranks_at_vert(Adjacency::RenderType::transpose, verts_at_rank);
+          // build elements-at-vertex graph
+          Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+
+          // build ranks-at-vertex graph and transpose it
+          Adjacency::Graph ranks_at_vert(Adjacency::RenderType::injectify, elems_at_vert, ranks_at_elem);
+          Adjacency::Graph verts_at_rank(Adjacency::RenderType::transpose, ranks_at_vert);
+
+          // build ranks-at-rank (via vertices) graph
           Adjacency::Graph ranks_at_rank(Adjacency::RenderType::injectify, verts_at_rank, ranks_at_vert);
 
           // build comm neighbour ranks vector
@@ -1039,7 +1076,7 @@ namespace FEAT
         // Step 6: Create halos
         {
           // create halo factory
-          PatchHaloFactory<MeshType> halo_factory(elems_at_rank, *base_root_mesh, *patch_mesh_part);
+          PatchHaloFactory<MeshType> halo_factory(ranks_at_elem, *base_root_mesh, *patch_mesh_part);
 
           // loop over all comm ranks
           for(auto it = comm_ranks.begin(); it != comm_ranks.end(); ++it)

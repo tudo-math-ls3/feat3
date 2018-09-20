@@ -22,17 +22,17 @@ namespace FEAT
 
       public:
         const TargetSet& _target_face;
-        Adjacency::Graph _faces_at_elem;
+        Adjacency::Graph _elem_at_face;
         std::vector<Index> _indices;
 
       public:
         explicit PatchHaloBuild(const TargetSetHolder<Shape_>& tsh, const IndexSetHolder<Shape_>& ish) :
           _target_face(tsh.template get_target_set<face_dim>()),
-          _faces_at_elem(Adjacency::RenderType::as_is, ish.template get_index_set<Shape_::dimension, face_dim>())
+          _elem_at_face(Adjacency::RenderType::transpose, ish.template get_index_set<Shape_::dimension, face_dim>())
         {
         }
 
-        void build(const Index halo_rank, const Adjacency::Graph& elems_at_rank)
+        void build(const Index halo_rank, const Adjacency::Graph& ranks_at_elem)
         {
           _indices.clear();
 
@@ -43,7 +43,7 @@ namespace FEAT
             const Index base_face = _target_face[face];
 
             // check whether one of them has our desired rank
-            if(_has_face_rank(base_face, halo_rank, elems_at_rank))
+            if(_has_face_rank(base_face, halo_rank, ranks_at_elem))
             {
               _indices.push_back(face);
             }
@@ -65,20 +65,20 @@ namespace FEAT
         }
 
       private:
-        bool _has_face_rank(const Index base_face, const Index halo_rank, const Adjacency::Graph& elems_at_rank)
+        bool _has_face_rank(const Index base_face, const Index halo_rank, const Adjacency::Graph& ranks_at_elem)
         {
-          // loop over all elements adjacent to this halo rank
-          const Index* jb = elems_at_rank.image_begin(halo_rank);
-          const Index* je = elems_at_rank.image_end(halo_rank);
-          for(const Index* jj(jb); jj != je; ++jj)
+          // loop over all elements adjacent to that face and
+          const Index *ib = _elem_at_face.image_begin(base_face);
+          const Index *ie = _elem_at_face.image_end(base_face);
+          for(const Index* ii(ib); ii != ie; ++ii)
           {
-            // now loop over all faces adjacent to that element
-            const Index* ib = _faces_at_elem.image_begin(*jj);
-            const Index* ie = _faces_at_elem.image_end(*jj);
-            for(const Index* ii(ib); ii != ie; ++ii)
+            // now loop over all ranks of this element
+            const Index* jb = ranks_at_elem.image_begin(*ii);
+            const Index* je = ranks_at_elem.image_end(*ii);
+            for(const Index* jj(jb); jj != je; ++jj)
             {
-              // is that our face?
-              if(*ii == base_face)
+              // check rank
+              if(*jj == halo_rank)
                 return true;
             }
           }
@@ -100,7 +100,7 @@ namespace FEAT
         {
         }
 
-        void build(const Index halo_rank, const Adjacency::Graph& elems_at_rank)
+        void build(const Index halo_rank, const Adjacency::Graph& ranks_at_elem)
         {
           _indices.clear();
 
@@ -110,12 +110,13 @@ namespace FEAT
             // get index of base-mesh face
             const Index base_elem = _target_face[elem];
 
-            // loop over all elements adjacent to this halo rank
-            const Index* jb = elems_at_rank.image_begin(halo_rank);
-            const Index* je = elems_at_rank.image_end(halo_rank);
+            // now loop over all ranks of this element
+            const Index* jb = ranks_at_elem.image_begin(base_elem);
+            const Index* je = ranks_at_elem.image_end(base_elem);
             for(const Index* jj(jb); jj != je; ++jj)
             {
-              if(*jj == base_elem)
+              // check rank
+              if(*jj == halo_rank)
               {
                 _indices.push_back(elem);
                 break;
@@ -156,10 +157,10 @@ namespace FEAT
         {
         }
 
-        void build(const Index halo_rank, const Adjacency::Graph& elems_at_rank)
+        void build(const Index halo_rank, const Adjacency::Graph& ranks_at_elem)
         {
-          BaseClass::build(halo_rank, elems_at_rank);
-          _hbuild.build(halo_rank, elems_at_rank);
+          BaseClass::build(halo_rank, ranks_at_elem);
+          _hbuild.build(halo_rank, ranks_at_elem);
         }
 
         Index get_num_entities(int dim) const
@@ -191,9 +192,9 @@ namespace FEAT
         {
         }
 
-        void build(const Index halo_rank, const Adjacency::Graph& elems_at_rank)
+        void build(const Index halo_rank, const Adjacency::Graph& ranks_at_elem)
         {
-          _hbuild.build(halo_rank, elems_at_rank);
+          _hbuild.build(halo_rank, ranks_at_elem);
         }
 
         Index get_num_entities(int dim) const
@@ -213,6 +214,16 @@ namespace FEAT
     template<typename Mesh_>
     class PatchHaloFactory;
 
+    /**
+     * \brief Factory for creating halo mesh-parts between neighbour patches on a base-mesh.
+     *
+     * Note to self:
+     * Do *NOT* switch this class from "ranks-at-elem" version back to "elems-at-rank" version,
+     * because then the complexity of the PatchHaloBuild::build() function will have quadratic
+     * runtime in the "many elements, few processes" case then.
+     *
+     * \author Peter Zajac
+     */
     template<typename Shape_, int num_coords_, typename Coord_>
     class PatchHaloFactory<Geometry::ConformalMesh<Shape_, num_coords_, Coord_>> :
       public Factory<MeshPart<Geometry::ConformalMesh<Shape_, num_coords_, Coord_>>>
@@ -234,7 +245,7 @@ namespace FEAT
       typedef typename MeshPartType::TargetSetHolderType TargetSetHolderType;
 
     protected:
-      const Adjacency::Graph& _elems_at_rank;
+      const Adjacency::Graph& _ranks_at_elem;
       const MeshType& _base_mesh;
       const MeshPartType& _patch_mesh_part;
       Index _cur_halo_rank;
@@ -242,11 +253,9 @@ namespace FEAT
 
     public:
       explicit PatchHaloFactory(
-        const Adjacency::Graph& elems_at_rank,
-        const MeshType& base_mesh,
-        const MeshPartType& patch_mesh_part)
-         :
-        _elems_at_rank(elems_at_rank),
+        const Adjacency::Graph& ranks_at_elem, const MeshType& base_mesh,
+        const MeshPartType& patch_mesh_part) :
+        _ranks_at_elem(ranks_at_elem),
         _base_mesh(base_mesh),
         _patch_mesh_part(patch_mesh_part),
         _cur_halo_rank(0),
@@ -260,7 +269,7 @@ namespace FEAT
 
       void build(Index halo_rank)
       {
-        _halo_wrapper.build(halo_rank, _elems_at_rank);
+        _halo_wrapper.build(halo_rank, _ranks_at_elem);
       }
 
       /* *************************************************************************************** */
