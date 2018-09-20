@@ -370,8 +370,8 @@ namespace FEAT
       template<typename RootMesh_>
       void write(
         const RootMeshNode<RootMesh_>* mesh_node,
-        const MeshAtlas<RootMesh_>* mesh_atlas,
-        const PartitionSet* part_set,
+        const MeshAtlas<RootMesh_>* mesh_atlas = nullptr,
+        const PartitionSet* part_set = nullptr,
         bool skip_internal_meshparts = true)
       {
         const RootMesh_* root_mesh(nullptr);
