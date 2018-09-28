@@ -44,6 +44,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     if major >= 5:
       cxxflags += " -fsanitize=pointer-overflow -fsanitize=nullability"
 
+    if major >= 7:
+      cxxflags += " -fsanitize=implicit-conversion"
+
     cxxflags += " -ftemplate-backtrace-limit=0 -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     if platform.system() != "Darwin":
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
