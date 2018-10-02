@@ -182,6 +182,9 @@ namespace FEAT
         this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_rows() + 1));
         this->_indices_size.push_back(_used_rows() + 1);
 
+        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_rows()));
+        this->_indices_size.push_back(_used_rows());
+
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
       }

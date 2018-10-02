@@ -9,6 +9,7 @@
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/sparse_matrix_cscr.hpp>
 #include <kernel/util/stop_watch.hpp>
 
 #include <vector>
@@ -67,6 +68,7 @@ namespace FEAT
       typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, 1> LocalMatrixTypeB;
       typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 1, dim> LocalMatrixTypeD;
       typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixTypeS;
+      typedef LAFEM::SparseMatrixCSCR<MemType, DataType, IndexType> NeighMatrixTypeS;
 
       typedef Global::Matrix<LocalMatrixTypeB, MirrorTypeV, MirrorTypeP> GlobalMatrixTypeB;
       typedef Global::Matrix<LocalMatrixTypeD, MirrorTypeP, MirrorTypeV> GlobalMatrixTypeD;
@@ -156,7 +158,7 @@ namespace FEAT
       /**
        * \brief B-matrix data mirrors
        *
-       * For each neighbour process, this mirror stores the indices of all B-matrix entries
+       * For each neighbour process, this vector stores the indices of all B-matrix entries
        * that have to be send to that particular neighbour process, so that it can pre-compute
        * its neighbour Schur-complement matrix during numeric initialisation.
        */
@@ -165,7 +167,7 @@ namespace FEAT
       /**
        * \brief Neighbour B-matrix adjacency graphs
        *
-       * For each neighbour process, this mirror stores the adjacency graph of the neighbour's
+       * For each neighbour process, this vector stores the adjacency graph of the neighbour's
        * B-matrix restricted to the pressure DOFs that this particular neighbour send to us.
        */
       std::vector<Adjacency::Graph> _neighbour_graphs;
@@ -173,11 +175,11 @@ namespace FEAT
       /**
        * \brief Pre-multiplied neighbour Schur-complement matrices
        *
-       * For each neighbour process, this mirror stores the pre-multiplied Schur-complement
+       * For each neighbour process, this vector stores the pre-multiplied Schur-complement
        * matrix (D*A*B_k), where B_k is the part of the neighbour's B-matrix, whose rows
        * correlate to the velocity DOFs shared by this process and the neighbour process.
        */
-      std::vector<LocalMatrixTypeS> _neighbour_matrices;
+      std::vector<NeighMatrixTypeS> _neighbour_matrices;
 
       /// total symbolic/numeric init time
       StopWatch watch_init_symbolic;
@@ -581,7 +583,7 @@ namespace FEAT
           graph_s.sort_indices();
 
           // allocate Schur-matrix
-          this->_neighbour_matrices.at(i) = LocalMatrixTypeS(graph_s);
+          this->_neighbour_matrices.at(i) = _asm_neighbour_matrix_from_graph(graph_s);
 
           watch_init_sym_neighbour_s.stop();
         }
@@ -773,9 +775,11 @@ namespace FEAT
         for(const auto& x : _neighbour_matrices)
         {
           num_nzes += x.used_elements();
+          const Index used_rows = x.used_rows();
           const IndexType* row_ptr_x = x.row_ptr();
-          for(Index i(0); i  < num_rows; ++i)
-            row_aux[i] += (row_ptr_x[i+1] - row_ptr_x[i]);
+          const IndexType* row_idx_x = x.row_numbers();
+          for(Index i(0); i < used_rows; ++i)
+            row_aux[row_idx_x[i]] += (row_ptr_x[i+1] - row_ptr_x[i]);
         }
 
         // allocate our matrix
@@ -817,15 +821,16 @@ namespace FEAT
         for(auto it = neigh_map_l.begin(); it != neigh_map_l.end(); ++it)
         {
           std::size_t ineigh = it->second;
+          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
           const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
           const IndexType* col_idx_x = _neighbour_matrices.at(ineigh).col_ind();
           const IndexType* dof_idx_x = recv_dofs.at(ineigh).data();
-          for(Index i(0); i < num_rows; ++i)
+          for(Index i(0); i < used_rows; ++i)
           {
-            IndexType k = row_aux[i];
+            IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
               col_idx_g[k] = dof_idx_x[col_idx_x[j]];
-            row_aux[i] = k;
           }
         }
 
@@ -842,15 +847,16 @@ namespace FEAT
         for(auto it = neigh_map_h.begin(); it != neigh_map_h.end(); ++it)
         {
           std::size_t ineigh = it->second;
+          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
           const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
           const IndexType* col_idx_x = _neighbour_matrices.at(ineigh).col_ind();
           const IndexType* dof_idx_x = recv_dofs.at(ineigh).data();
-          for(Index i(0); i < num_rows; ++i)
+          for(Index i(0); i < used_rows; ++i)
           {
-            IndexType k = row_aux[i];
+            IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
               col_idx_g[k] = dof_idx_x[col_idx_x[j]];
-            row_aux[i] = k;
           }
         }
 
@@ -923,14 +929,15 @@ namespace FEAT
         for(auto it = neigh_map_l.begin(); it != neigh_map_l.end(); ++it)
         {
           std::size_t ineigh = it->second;
+          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
           const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
           const DataType* val_x = _neighbour_matrices.at(ineigh).val();
-          for(Index i(0); i < num_rows; ++i)
+          for(Index i(0); i < used_rows; ++i)
           {
-            IndexType k = row_aux[i];
+            IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
               val_g[k] = val_x[j];
-            row_aux[i] = k;
           }
         }
 
@@ -947,14 +954,15 @@ namespace FEAT
         for(auto it = neigh_map_h.begin(); it != neigh_map_h.end(); ++it)
         {
           std::size_t ineigh = it->second;
+          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
           const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
           const DataType* val_x = _neighbour_matrices.at(ineigh).val();
-          for(Index i(0); i < num_rows; ++i)
+          for(Index i(0); i < used_rows; ++i)
           {
-            IndexType k = row_aux[i];
+            IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
               val_g[k] = val_x[j];
-            row_aux[i] = k;
           }
         }
 
@@ -991,6 +999,53 @@ namespace FEAT
         else
           s += "    --- ]\n";
         return s;
+      }
+
+      /**
+       * \brief Auxiliary function: assembles a reduced neighbour matrix from a graph
+       */
+      static NeighMatrixTypeS _asm_neighbour_matrix_from_graph(const Adjacency::Graph& graph)
+      {
+        // get number of rows, columns and indices
+        const Index num_rows = graph.get_num_nodes_domain();
+        const Index num_cols = graph.get_num_nodes_image();
+        const Index num_nzes = graph.get_num_indices();
+
+        // get graph arrays
+        const Index* dom_ptr = graph.get_domain_ptr();
+        const Index* img_idx = graph.get_image_idx();
+
+        // count number of non-empty rows
+        Index num_nzrs = Index(0);
+        for(Index i(0); i < num_rows; ++i)
+        {
+          num_nzrs += Index(dom_ptr[i] < dom_ptr[i+1] ? 1 : 0);
+        }
+
+        // allocate output matrix
+        NeighMatrixTypeS matrix(num_rows, num_cols, num_nzes, num_nzrs);
+
+        // get matrix arrays
+        IndexType* row_ptr = matrix.row_ptr();
+        IndexType* row_idx = matrix.row_numbers();
+        IndexType* col_idx = matrix.col_ind();
+
+        // fill arrays
+        row_ptr[0] = IndexType(dom_ptr[0]);
+        for(Index i(0), j(0); i < num_rows; ++i)
+        {
+          if(dom_ptr[i] < dom_ptr[i + 1])
+          {
+            ASSERT(j < num_nzrs);
+            row_idx[  j] = IndexType(i);
+            row_ptr[++j] = IndexType(dom_ptr[i+1]);
+          }
+        }
+
+        for(Index k(0); k < num_nzes; ++k)
+          col_idx[k] = IndexType(img_idx[k]);
+
+        return matrix;
       }
 
       /**
@@ -1348,7 +1403,7 @@ namespace FEAT
        * \param[in] buffer_b
        * A buffer vector containing the data array of the matrix B_k.
        */
-      static void _asm_neighbour_schur_matrix(LocalMatrixTypeS& s, const LocalMatrixTypeB& da,
+      static void _asm_neighbour_schur_matrix(NeighMatrixTypeS& s, const LocalMatrixTypeB& da,
         const MirrorTypeV& mirror_v, const Adjacency::Graph& graph_b, const BufferVectorType& buffer_b)
       {
         // validate matrix dimensions
@@ -1361,7 +1416,9 @@ namespace FEAT
         // fetch matrix arrays:
         DataType* data_s = s.val();
         const IndexType* row_ptr_s = s.row_ptr();
+        const IndexType* row_idx_s = s.row_numbers();
         const IndexType* col_idx_s = s.col_ind();
+        const Index used_rows_s = s.used_rows();
 
         // we use CSR for (D*A)^T here, which is effectively a CSC storage of (D*A),
         // thus rows and columns swap their meaning here
@@ -1383,15 +1440,26 @@ namespace FEAT
           const Index k = mir_idx[l];
 
           // loop over all columns k of D
-          for(Index ik(col_ptr_da[k]); ik < col_ptr_da[k + 1]; ++ik)
+          for(Index ik(col_ptr_da[k]), si(0); (ik < col_ptr_da[k + 1]) && (si < used_rows_s); )
           {
-            // get the row index i of D_ik
-            const Index i = row_idx_da[ik];
+            // check if we have found a common row of S and the k-th column of D
+            if(row_idx_da[ik] < row_idx_s[si])
+            {
+              // row i exists in column k of D, but not in matrix S
+              ++ik;
+              continue;
+            }
+            if(row_idx_s[si] < row_idx_da[ik])
+            {
+              // row i exists in matrix S, but not in column k of D
+              ++si;
+              continue;
+            }
 
             //   S_i. += (D_ik * A_kk) * B_l.
-            for(IndexType ij(row_ptr_s[i]), kj(dom_ptr_b[l]); kj < dom_ptr_b[l+1]; ++ij)
+            for(IndexType ij(row_ptr_s[si]), kj(dom_ptr_b[l]); kj < dom_ptr_b[l+1]; ++ij)
             {
-              ASSERT(ij < row_ptr_s[i+1]);
+              ASSERT(ij < row_ptr_s[si+1]);
               ASSERT(col_idx_s[ij] <= img_idx_b[kj]);
               if(col_idx_s[ij] == img_idx_b[kj])
               {
@@ -1399,6 +1467,10 @@ namespace FEAT
                 ++kj;
               }
             }
+
+            // okay, continue with next row of S and D
+            ++ik;
+            ++si;
           }
         }
       }
@@ -1469,7 +1541,7 @@ namespace FEAT
           this->_matrix_s.apply(r, x, y, alpha);
         watch_apply_matrix_loc.stop();
 
-        // process receives and mulitply by neighbour schur matrices
+        // process receives and multiply by neighbour schur matrices
         for(std::size_t i; recv_reqs.wait_any(i); )
         {
           watch_apply_neighbour_s.start();
