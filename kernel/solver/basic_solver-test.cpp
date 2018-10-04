@@ -538,7 +538,7 @@ public:
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     DataType d = vec_sol.norm2sqr();
     TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 3);
   }
 
   virtual void run() const override
