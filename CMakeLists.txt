@@ -96,7 +96,7 @@ endif (FEAT_HAVE_MPI)
 
 if (FEAT_VALGRIND)
   find_program(VALGRIND_EXE valgrind)
-  set (VALGRIND_EXE ${VALGRIND_EXE} --fullpath-after=${FEAT_SOURCE_DIR} --leak-check=full --partial-loads-ok=yes)
+  set (VALGRIND_EXE ${VALGRIND_EXE} -v --suppressions=${FEAT_SOURCE_DIR}/valgrind.supp --fullpath-after=${FEAT_SOURCE_DIR} --leak-check=full --partial-loads-ok=yes)
   #--track-origins=yes
   #--keep-stacktraces=alloc-and-free
 endif (FEAT_VALGRIND)
