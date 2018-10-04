@@ -380,6 +380,64 @@ namespace FEAT
       /**
        * \brief Constructor
        *
+       * \param[in] graph The graph to create the matrix from
+       *
+       * Creates a CSCR matrix based on a given adjacency graph, representing the sparsity pattern.
+       */
+      explicit SparseMatrixCSCR(const Adjacency::Graph & graph) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        // get number of rows, columns and indices
+        Index num_rows = graph.get_num_nodes_domain();
+        Index num_cols = graph.get_num_nodes_image();
+        Index num_nzes = graph.get_num_indices();
+
+        if (num_nzes == 0)
+        {
+          this->assign(SparseMatrixCSCR(num_rows, num_cols));
+          return;
+        }
+
+        // get graph arrays
+        const Index* dom_ptr = graph.get_domain_ptr();
+        const Index* img_idx = graph.get_image_idx();
+
+        // count number of non-empty rows
+        Index num_nzrs = Index(0);
+        for(Index i(0); i < num_rows; ++i)
+        {
+          num_nzrs += Index(dom_ptr[i] < dom_ptr[i+1] ? 1 : 0);
+        }
+
+        // allocate output matrix
+        SparseMatrixCSCR<Mem::Main, DT_, IT_> matrix(num_rows, num_cols, num_nzes, num_nzrs);
+
+        // get matrix arrays
+        IndexType* trow_ptr = matrix.row_ptr();
+        IndexType* trow_idx = matrix.row_numbers();
+        IndexType* tcol_idx = matrix.col_ind();
+
+        // fill arrays
+        trow_ptr[0] = IndexType(dom_ptr[0]);
+        for(Index i(0), j(0); i < num_rows; ++i)
+        {
+          if(dom_ptr[i] < dom_ptr[i + 1])
+          {
+            ASSERT(j < num_nzrs);
+            trow_idx[  j] = IndexType(i);
+            trow_ptr[++j] = IndexType(dom_ptr[i+1]);
+          }
+        }
+
+        for(Index k(0); k < num_nzes; ++k)
+          tcol_idx[k] = IndexType(img_idx[k]);
+
+        this->convert(matrix);
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] input A std::vector, containing the byte array.
        *
        * Creates a matrix from the given byte array.

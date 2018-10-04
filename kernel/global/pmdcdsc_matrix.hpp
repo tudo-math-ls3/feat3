@@ -583,7 +583,7 @@ namespace FEAT
           graph_s.sort_indices();
 
           // allocate Schur-matrix
-          this->_neighbour_matrices.at(i) = _asm_neighbour_matrix_from_graph(graph_s);
+          this->_neighbour_matrices.at(i).convert(NeighMatrixTypeS(graph_s));
 
           watch_init_sym_neighbour_s.stop();
         }
@@ -999,53 +999,6 @@ namespace FEAT
         else
           s += "    --- ]\n";
         return s;
-      }
-
-      /**
-       * \brief Auxiliary function: assembles a reduced neighbour matrix from a graph
-       */
-      static NeighMatrixTypeS _asm_neighbour_matrix_from_graph(const Adjacency::Graph& graph)
-      {
-        // get number of rows, columns and indices
-        const Index num_rows = graph.get_num_nodes_domain();
-        const Index num_cols = graph.get_num_nodes_image();
-        const Index num_nzes = graph.get_num_indices();
-
-        // get graph arrays
-        const Index* dom_ptr = graph.get_domain_ptr();
-        const Index* img_idx = graph.get_image_idx();
-
-        // count number of non-empty rows
-        Index num_nzrs = Index(0);
-        for(Index i(0); i < num_rows; ++i)
-        {
-          num_nzrs += Index(dom_ptr[i] < dom_ptr[i+1] ? 1 : 0);
-        }
-
-        // allocate output matrix
-        NeighMatrixTypeS matrix(num_rows, num_cols, num_nzes, num_nzrs);
-
-        // get matrix arrays
-        IndexType* row_ptr = matrix.row_ptr();
-        IndexType* row_idx = matrix.row_numbers();
-        IndexType* col_idx = matrix.col_ind();
-
-        // fill arrays
-        row_ptr[0] = IndexType(dom_ptr[0]);
-        for(Index i(0), j(0); i < num_rows; ++i)
-        {
-          if(dom_ptr[i] < dom_ptr[i + 1])
-          {
-            ASSERT(j < num_nzrs);
-            row_idx[  j] = IndexType(i);
-            row_ptr[++j] = IndexType(dom_ptr[i+1]);
-          }
-        }
-
-        for(Index k(0); k < num_nzes; ++k)
-          col_idx[k] = IndexType(img_idx[k]);
-
-        return matrix;
       }
 
       /**
