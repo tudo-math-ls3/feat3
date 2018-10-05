@@ -83,23 +83,23 @@
 }
 
 @article{GMS06,
-	author = "J. L. Guermond and P. Minev and J. Shen",
-	title = "An overview of projection methods for incompressible flows ",
-	journal = "Computer Methods in Applied Mechanics and Engineering ",
-	volume = "195",
-	number = "44–47",
-	pages = "6011 - 6045",
-	year = "2006",
-	issn = "0045-7825",
-	doi = "http://dx.doi.org/10.1016/j.cma.2005.10.010",
-	url = "http://www.sciencedirect.com/science/article/pii/S0045782505004640",
-	keywords = "Navier–Stokes equations",
-	keywords = "Projection methods",
-	keywords = "Fractional step methods",
-	keywords = "Incompressibility",
-	keywords = "Finite elements",
-	keywords = "Spectral approximations ",
-	abstract = "A series of numerical issues related to the analysis and implementation of fractional step methods for incompressible flows are addressed in this paper. These methods are often referred to in the literature as projection methods, and can be classified into three classes, namely the pressure-correction methods, the velocity-correction methods, and the consistent splitting methods. For each class of schemes, theoretical and numerical convergence results available in the literature are reviewed and open questions are discussed. The essential results are summarized in a table which could serve as a useful reference to numerical analysts and practitioners. "
+  author = "J. L. Guermond and P. Minev and J. Shen",
+  title = "An overview of projection methods for incompressible flows ",
+  journal = "Computer Methods in Applied Mechanics and Engineering ",
+  volume = "195",
+  number = "44–47",
+  pages = "6011 - 6045",
+  year = "2006",
+  issn = "0045-7825",
+  doi = "http://dx.doi.org/10.1016/j.cma.2005.10.010",
+  url = "http://www.sciencedirect.com/science/article/pii/S0045782505004640",
+  keywords = "Navier–Stokes equations",
+  keywords = "Projection methods",
+  keywords = "Fractional step methods",
+  keywords = "Incompressibility",
+  keywords = "Finite elements",
+  keywords = "Spectral approximations ",
+  abstract = "A series of numerical issues related to the analysis and implementation of fractional step methods for incompressible flows are addressed in this paper. These methods are often referred to in the literature as projection methods, and can be classified into three classes, namely the pressure-correction methods, the velocity-correction methods, and the consistent splitting methods. For each class of schemes, theoretical and numerical convergence results available in the literature are reviewed and open questions are discussed. The essential results are summarized in a table which could serve as a useful reference to numerical analysts and practitioners. "
 }
 
 @book{HR11,
@@ -136,12 +136,74 @@
   url = {http://epubs.siam.org/doi/pdf/10.1137/030601880}
 }
 
+@inproceedings{Krasnopolsky10,
+  author    = {Boris Krasnopolsky},
+  title     = {The reordered BiCGStab method for distributed memory computer systems},
+  booktitle = {Proceedings of the International Conference on Computational Science,
+               {ICCS} 2010, University of Amsterdam, The Netherlands, May 31 - June
+               2, 2010},
+  number    = {1},
+  pages     = {213--218},
+  year      = {2010},
+  crossref  = {DBLP:conf/iccS/2010},
+  url       = {http://dx.doi.org/10.1016/j.procs.2010.04.024},
+  doi       = {10.1016/j.procs.2010.04.024},
+  timestamp = {Thu, 21 May 2015 17:35:10 +0200},
+  biburl    = {http://dblp2.uni-trier.de/rec/bib/journals/procedia/Krasnopolsky10},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@article{KreutzerHWFB13,
+  author    = {Moritz Kreutzer and
+               Georg Hager and
+               Gerhard Wellein and
+               Holger Fehske and
+               Alan R. Bishop},
+  title     = {A unified sparse matrix data format for modern processors with wide
+               {SIMD} units},
+  journal   = {CoRR},
+  volume    = {abs/1307.6209},
+  year      = {2013},
+  url       = {http://arxiv.org/abs/1307.6209},
+  archivePrefix = {arXiv},
+  eprint    = {1307.6209},
+  timestamp = {Wed, 07 Jun 2017 14:40:28 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/corr/KreutzerHWFB13},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@phdthesis{Metsch:2013,
+  author = {B.~Metsch},
+  title = {{Algebraic Multigrid (AMG) for Saddle Point Systems}},
+  school = {Institut f\"ur Numerische Simulation, Universit\"{a}t Bonn},
+  year = {2013},
+  annote = {INSdiss,thesis},
+  type = {Dissertation},
+  month = jul,
+  http_pdf = {http://wissrech.ins.uni-bonn.de/research/pub/metsch/dissertation_metsch.pdf 1}
+}
+
 @manual{MPI31,
   title = {MPI: A Message-Passing Interface Standard, Version 3.1},
   organization = {Message Passing Interface Forum},
   year = {2015},
   month = {6},
   url = {http://mpi-forum.org/docs}
+}
+
+@article {NLA:NLA1808,
+author = {Ghysels, P. and K\l{}osiewicz, P. and Vanroose, W.},
+title = {Improving the arithmetic intensity of multigrid with the help of polynomial smoothers},
+journal = {Numerical Linear Algebra with Applications},
+volume = {19},
+number = {2},
+publisher = {John Wiley & Sons, Ltd},
+issn = {1099-1506},
+url = {http://dx.doi.org/10.1002/nla.1808},
+doi = {10.1002/nla.1808},
+pages = {253--267},
+keywords = {multigrid, Chebyshev iteration, arithmetic intensity, bound by memory bandwidth},
+year = {2012},
 }
 
 @book{NW06,
@@ -199,6 +261,41 @@
   url = {http://www-users.cs.umn.edu/~saad/IterMethBook_2ndEd.pdf}
 }
 
+@article{Sleijpen1993,
+  author = {Sleijpen, Gerard L.G., Fokkema, Diederik R.},
+  journal = {ETNA. Electronic Transactions on Numerical Analysis [electronic only]},
+  keywords = {Bi-conjugate gradients; non-symmetric linear systems; iterative solvers; GMRES; Krylov subspace; Bi-CGSTAB algorithm; convergence},
+  language = {eng},
+  pages = {11-32},
+  publisher = {Kent State University, Department of Mathematics and Computer Science},
+  title = {BiCGstab() for linear equations involving unsymmetric matrices with complex spectrum.},
+  url = {http://eudml.org/doc/118652},
+  volume = {1},
+  year = {1993}
+}
+
+@article{Sonneveld09,
+  author = {Peter Sonneveld and Martin B. van Gijzen},
+  title = {IDR(s): A Family of Simple and Fast Algorithms for Solving Large Nonsymmetric Systems of Linear Equations},
+  journal = {SIAM Journal on Scientific Computing},
+  volume = {31},
+  number = {2},
+  pages = {1035-1062},
+  year = {2009},
+  doi = {10.1137/070685804},
+  URL = {https://doi.org/10.1137/070685804},
+}
+
+@book{TurekCFD,
+  author = {S. Turek},
+  title = {Efficient solvers for incompressible flow problems: An algorithmic approach in view of computational aspects},
+  year = {1999},
+  edition = {1st},
+  publisher = {Springer},
+  isbn = {978-3-642-58393-3},
+  doi = {10.1007/978-3-642-58393-3},
+}
+
 @article{Vanka86,
   author={S. P. Vanka},
   title={Block-Implicit Multigrid Solution of Navier-Stokes Equations in Primitive Variables},
@@ -222,23 +319,6 @@
   eprint = { http://dx.doi.org/10.1137/0913035 }
 }
 
-@inproceedings{Krasnopolsky10,
-  author    = {Boris Krasnopolsky},
-  title     = {The reordered BiCGStab method for distributed memory computer systems},
-  booktitle = {Proceedings of the International Conference on Computational Science,
-               {ICCS} 2010, University of Amsterdam, The Netherlands, May 31 - June
-               2, 2010},
-  number    = {1},
-  pages     = {213--218},
-  year      = {2010},
-  crossref  = {DBLP:conf/iccS/2010},
-  url       = {http://dx.doi.org/10.1016/j.procs.2010.04.024},
-  doi       = {10.1016/j.procs.2010.04.024},
-  timestamp = {Thu, 21 May 2015 17:35:10 +0200},
-  biburl    = {http://dblp2.uni-trier.de/rec/bib/journals/procedia/Krasnopolsky10},
-  bibsource = {dblp computer science bibliography, http://dblp.org}
-}
-
 @article{Wittmann13,
   author    = {Markus Wittmann and
                Georg Hager and
@@ -252,74 +332,4 @@
   timestamp = {Wed, 07 Jun 2017 14:40:41 +0200},
   biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-1302-4280},
   bibsource = {dblp computer science bibliography, http://dblp.org}
-}
-
-@article{Sleijpen1993,
-  author = {Sleijpen, Gerard L.G., Fokkema, Diederik R.},
-  journal = {ETNA. Electronic Transactions on Numerical Analysis [electronic only]},
-  keywords = {Bi-conjugate gradients; non-symmetric linear systems; iterative solvers; GMRES; Krylov subspace; Bi-CGSTAB algorithm; convergence},
-  language = {eng},
-  pages = {11-32},
-  publisher = {Kent State University, Department of Mathematics and Computer Science},
-  title = {BiCGstab() for linear equations involving unsymmetric matrices with complex spectrum.},
-  url = {http://eudml.org/doc/118652},
-  volume = {1},
-  year = {1993}
-}
-
-@article {NLA:NLA1808,
-author = {Ghysels, P. and K\l{}osiewicz, P. and Vanroose, W.},
-title = {Improving the arithmetic intensity of multigrid with the help of polynomial smoothers},
-journal = {Numerical Linear Algebra with Applications},
-volume = {19},
-number = {2},
-publisher = {John Wiley & Sons, Ltd},
-issn = {1099-1506},
-url = {http://dx.doi.org/10.1002/nla.1808},
-doi = {10.1002/nla.1808},
-pages = {253--267},
-keywords = {multigrid, Chebyshev iteration, arithmetic intensity, bound by memory bandwidth},
-year = {2012},
-}
-
-@article{Sonneveld09,
-  author = {Peter Sonneveld and Martin B. van Gijzen},
-  title = {IDR(s): A Family of Simple and Fast Algorithms for Solving Large Nonsymmetric Systems of Linear Equations},
-  journal = {SIAM Journal on Scientific Computing},
-  volume = {31},
-  number = {2},
-  pages = {1035-1062},
-  year = {2009},
-  doi = {10.1137/070685804},
-  URL = {https://doi.org/10.1137/070685804},
-}
-
-@phdthesis{Metsch:2013,
-  author = {B.~Metsch},
-  title = {{Algebraic Multigrid (AMG) for Saddle Point Systems}},
-  school = {Institut f\"ur Numerische Simulation, Universit\"{a}t Bonn},
-  year = {2013},
-  annote = {INSdiss,thesis},
-  type = {Dissertation},
-  month = jul,
-  http_pdf = {http://wissrech.ins.uni-bonn.de/research/pub/metsch/dissertation_metsch.pdf 1}
-}
-
-@article{KreutzerHWFB13,
-  author    = {Moritz Kreutzer and
-               Georg Hager and
-               Gerhard Wellein and
-               Holger Fehske and
-               Alan R. Bishop},
-  title     = {A unified sparse matrix data format for modern processors with wide
-               {SIMD} units},
-  journal   = {CoRR},
-  volume    = {abs/1307.6209},
-  year      = {2013},
-  url       = {http://arxiv.org/abs/1307.6209},
-  archivePrefix = {arXiv},
-  eprint    = {1307.6209},
-  timestamp = {Wed, 07 Jun 2017 14:40:28 +0200},
-  biburl    = {https://dblp.org/rec/bib/journals/corr/KreutzerHWFB13},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
 }

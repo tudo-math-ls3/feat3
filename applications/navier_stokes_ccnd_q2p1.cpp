@@ -595,6 +595,7 @@ namespace NvSCCNDQ2P1dc
 
     DataType nu = 1e-3;
     DataType v_max = DataType(dim) * DataType(0.15); // 2D: 0.3, 3D: 0.45
+    DataType upsam = 0.0;       // streamline diffusion parameter
     Index max_nl_steps = 10;    // max. nonlinear solver iterations
     Index max_mg_steps = 25;    // max. multigrid iterations
     Index smooth_steps = 8;
@@ -605,6 +606,7 @@ namespace NvSCCNDQ2P1dc
 
     args.parse("nu", nu);
     args.parse("v-max", v_max);
+    args.parse("upsam", upsam);
     args.parse("max-nl-steps", max_nl_steps);
     args.parse("max-mg-steps", max_mg_steps);
     args.parse("smooth-steps", smooth_steps);
@@ -630,6 +632,7 @@ namespace NvSCCNDQ2P1dc
       comm.print("\nProblem Parameters:");
       comm.print(String("Nu").pad_back(pl, pc) + ": " + stringify(nu));
       comm.print(String("V-Max").pad_back(pl, pc) + ": " + stringify(v_max));
+      comm.print(String("Upsam").pad_back(pl, pc) + ": " + stringify(upsam));
       comm.print(String("System").pad_back(pl, pc) + ": " + (navier ? "Navier-Stokes" : "Stokes"));
       comm.print(String("Tensor").pad_back(pl, pc) + ": " + (defo ? "Deformation" : "Gradient"));
       comm.print(String("NL-Solver").pad_back(pl, pc) + ": " + (newton ? "Newton" : "Picard"));
@@ -984,12 +987,14 @@ namespace NvSCCNDQ2P1dc
     {
       comm.print("\nSolving Navier-Stokes system...");
 
-      // setup burgers assembler for matrix / defect vector
+      // setup burgers assembler for matrix
       Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
       burgers_mat.deformation = defo;
       burgers_mat.nu = nu;
       burgers_mat.beta = DataType(1);
       burgers_mat.frechet_beta = DataType(newton ? 1 : 0);
+      burgers_mat.sd_delta = upsam;
+      burgers_mat.sd_nu = nu;
 
       // setup burgers assembler for defect vector
       Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_def;
@@ -1061,6 +1066,13 @@ namespace NvSCCNDQ2P1dc
           // get a clone of the global velocity vector
           typename SystemLevelType::GlobalVeloVector vec_conv(
             &the_system_level.gate_velo, vec_sol.local().template at<0>().clone());
+
+          // set velocity norm for streamline diffusion (if enabled)
+          if(Math::abs(upsam) > DataType(0))
+          {
+            // set norm by convection vector; we can use this for all levels
+            burgers_mat.set_sd_v_norm(vec_conv);
+          }
 
           // loop over all system levels
           for(std::size_t i(0); i < system_levels.size(); ++i)
@@ -1459,6 +1471,7 @@ namespace NvSCCNDQ2P1dc
     args.support("vtk");
     args.support("mesh");
     args.support("nu");
+    args.support("upsam");
     args.support("max-nl-steps");
     args.support("max-mg-steps");
     args.support("smooth-steps");
