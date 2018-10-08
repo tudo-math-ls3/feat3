@@ -5,7 +5,6 @@
 // includes, FEAT
 #include <kernel/trafo/mapping_base.hpp>
 #include <kernel/trafo/standard/evaluator.hpp>
-#include <kernel/trafo/standard/volume.hpp>
 
 namespace FEAT
 {
@@ -91,19 +90,16 @@ namespace FEAT
          * Index for which the volume is computed.
          *
          * \returns The volume of cell.
-         *
-         * \author Jordi Paul
          */
-        template<typename ShapeType_, typename CoordType_ = CoordType>
+        template<typename ShapeType_ = ShapeType, typename CoordType_ = CoordType>
         CoordType_ compute_vol(const Index cell) const
         {
-          // Extract the transformation, the underlying mesh's index and vertex sets and stuff 'em into the
-          // CellVolumeEvaluator who does the actual work.
-          return CellVolumeEvaluator<ShapeType_>::template compute_vol<CoordType_>(
-            *this,
-            this->get_mesh().template get_index_set<ShapeType_::dimension,0>(),
-            this->get_mesh().get_vertex_set(),
-            cell);
+          typename Evaluator<ShapeType_, CoordType_>::Type evaluator(*this);
+
+          evaluator.prepare(cell);
+          CoordType_ vol = evaluator.volume();
+          evaluator.finish();
+          return vol;
         }
 
         /**
@@ -113,11 +109,16 @@ namespace FEAT
          */
         CoordType compute_vol()
         {
+          typename Evaluator<ShapeType, CoordType>::Type evaluator(*this);
+
           CoordType vol(0);
 
-          for(Index cell(0); cell < this->get_mesh().get_num_entities(ShapeType::dimension); ++cell)
+          Index num_cells = this->get_mesh().get_num_entities(ShapeType::dimension);
+          for(Index cell(0); cell < num_cells; ++cell)
           {
-            vol += compute_vol<ShapeType>(cell);
+            evaluator.prepare(cell);
+            vol += evaluator.volume();
+            evaluator.finish();
           }
 
           return vol;

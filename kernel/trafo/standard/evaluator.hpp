@@ -276,6 +276,7 @@ namespace FEAT
             jac_mat(i,0) = _coeff[i][1];
           }
         }
+
         /**
          * \brief Computes the hessian tensor for a given domain point.
          *
@@ -288,6 +289,20 @@ namespace FEAT
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
           hess_ten.format();
+        }
+
+        /**
+         * \brief Computes and returns the volume of the current cell.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume() const
+        {
+          DataType v = DataType(0);
+          for(int i(0); i < image_dim; ++i)
+            v += Math::sqr(_coeff[i][1]);
+          return Math::sqrt(v);
         }
       }; // class Evaluator<Simplex<1>,...>
 
@@ -446,6 +461,23 @@ namespace FEAT
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
           hess_ten.format();
+        }
+
+        /**
+         * \brief Computes and returns the volume of the current cell.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume() const
+        {
+          JacobianMatrixType jac_mat;
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+          }
+          return jac_mat.vol() / DataType(2);
         }
       }; // class Evaluator<Simplex<2>,...>
 
@@ -611,6 +643,24 @@ namespace FEAT
         {
           hess_ten.format();
         }
+
+        /**
+         * \brief Computes and returns the volume of the current cell.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume() const
+        {
+          JacobianMatrixType jac_mat;
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+            jac_mat(i,2) = _coeff[i][3];
+          }
+          return jac_mat.vol() / DataType(6);
+        }
       }; // class Evaluator<Simplex<3>,...>
 
       /* ************************************************************************************* */
@@ -764,6 +814,20 @@ namespace FEAT
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
           hess_ten.format();
+        }
+
+        /**
+         * \brief Computes and returns the volume of the current cell.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume() const
+        {
+          DataType v = DataType(0);
+          for(int i(0); i < image_dim; ++i)
+            v += Math::sqr(_coeff[i][1]);
+          return DataType(2) * Math::sqrt(v);
         }
       }; // class Evaluator<Hypercube<1>,...>
 
@@ -930,6 +994,38 @@ namespace FEAT
             hess_ten(i,0,1) = hess_ten(i,1,0) = _coeff[i][3];
           }
         }
+
+        /**
+         * \brief Computes and returns the volume of the current cell.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume() const
+        {
+          // According to Varignon's theorem, the area/volume of a quadrilateral is
+          // equal to twice the area of the dual parallelogram of the quadrilateral,
+          // which is spanned by the four edge midpoints of the quadrilateral.
+          // The Jacobian matrix of this transformation evaluated at the barycentre
+          // of the reference element spans a parallelogram, which intersects with
+          // our original quadrilateral in the edge midpoints and therefore (again
+          // using Varignon's theorem) has the same area as the original quadrilateral.
+          // Now the area of the "Jacobian parallelogram" is equal to four times
+          // the determinant of its Jacobian determinant, which finally gives us a
+          // formula for our quadrilateral area: 4*det(Jacobian(0,0)).
+          // Note that this is not a lousy approximation, but a real identity.
+
+          // compute jacobian matrix at barycentre
+          JacobianMatrixType jac_mat;
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+          }
+
+          // return scaled volume
+          return DataType(4) * jac_mat.vol();
+        }
       }; // class Evaluator<Hypercube<2>,...>
 
       /**
@@ -1007,7 +1103,6 @@ namespace FEAT
          * \param[in] cell_index
          * The index of the cell for which the evaluator is to be prepared.
          */
-
         void prepare(Index cell_index)
         {
           // prepare base-class
@@ -1110,8 +1205,34 @@ namespace FEAT
             hess_ten(i,1,2) = hess_ten(i,2,1) = _coeff[i][6] + _coeff[i][7] * dom_point[0];
           }
         }
-      }; // class Evaluator<Hypercube<3>,...>
 
+        /**
+         * \brief Computes and returns the volume of the current cell.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume() const
+        {
+          // In analogy to 2D, we approximate the volume by the scaled jacobian
+          // determinant in the cell barycentre. However, in contrast to 2D,
+          // this is only an approximation for the exact volume.
+          // If this turns out to be too imprecise, this should be replaced by
+          // a quadrature formula such as e.g. 2x2x2 Gauss-Legendre.
+
+          // compute jacobian matrix at barycentre
+          JacobianMatrixType jac_mat;
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+            jac_mat(i,2) = _coeff[i][3];
+          }
+
+          // return scaled volume
+          return DataType(8) * jac_mat.vol();
+        }
+      }; // class Evaluator<Hypercube<3>,...>
     } // namespace Standard
   } // namespace Trafo
 } // namespace FEAT

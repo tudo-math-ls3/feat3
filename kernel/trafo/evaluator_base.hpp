@@ -287,6 +287,14 @@ namespace FEAT
        * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
        */
       void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point) const;
+
+      /**
+       * \brief Computes and returns the volume of the current cell.
+       *
+       * \returns
+       * The volume of the current cell.
+       */
+      DataType volume() const;
 #endif // DOXYGEN
     }; // class EvaluatorBase<...>
 

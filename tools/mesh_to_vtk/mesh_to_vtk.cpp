@@ -4,6 +4,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/runtime.hpp>
 
@@ -56,6 +57,10 @@ static void display_help()
   std::cout << " --no-proj" << std::endl;
   std::cout << "Do not compute projection to charts" << std::endl;
   std::cout << std::endl;
+  std::cout << " --no-volume" << std::endl;
+  std::cout << "Do not compute cell volumes" << std::endl;
+  std::cout << std::endl;
+
   std::cout << " --help" << std::endl;
   std::cout << "Displays this message" << std::endl;
 }
@@ -210,6 +215,9 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   // compute projection fields?
   bool calc_proj = (args.check("no-proj") < 0);
 
+  // compute cell volumes?
+  bool calc_volume = (args.check("no-volume") < 0);
+
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
   Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
@@ -276,12 +284,18 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     if(lvl < lvl_min)
       continue;
 
+    // get our mesh
+    Mesh_& mesh = *node->get_mesh();
+
+    // create a trafo for our mesh
+    Trafo::Standard::Mapping<Mesh_> trafo(mesh);
+
     // Create a VTK exporter for our mesh
     FEAT::String vtkname = filename + "." + stringify(lvl);
     std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
-    Geometry::ExportVTK<Mesh_> exporter(*node->get_mesh());
+    Geometry::ExportVTK<Mesh_> exporter(mesh);
 
-    std::vector<double> vtx_data(node->get_mesh()->get_num_entities(0), 0.0);
+    std::vector<double> vtx_data(mesh.get_num_entities(0), 0.0);
 
     // loop over all mesh parts
     for(auto it = part_names.begin(); it != part_names.end(); ++it)
@@ -306,10 +320,23 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
         vtx_data[trg[i]] = 0.0;
     }
 
+    // compute cell volumes?
+    if(calc_volume)
+    {
+      std::vector<double> volume(mesh.get_num_elements(), 0.0);
+
+      for(Index i(0); i < mesh.get_num_elements(); ++i)
+      {
+        volume[i] = trafo.compute_vol(i);
+      }
+
+      exporter.add_cell_scalar("volume", volume.data());
+    }
+
     // For every chart in the atlas, compute the distance of every mesh vertex to it
     if(calc_dist)
     {
-      const auto& vtx = node->get_mesh()->get_vertex_set();
+      const auto& vtx = mesh.get_vertex_set();
 
       std::vector<double> distances(vtx.get_num_vertices(), 0.0);
 
@@ -325,7 +352,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     // compute projection fields?
     if(calc_proj)
     {
-      const auto& vtx = node->get_mesh()->get_vertex_set();
+      const auto& vtx = mesh.get_vertex_set();
 
       std::vector<double> prj_x(vtx.get_num_vertices(), 0.0);
       std::vector<double> prj_y(vtx.get_num_vertices(), 0.0);
@@ -367,7 +394,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
         continue;
 
       // allocate and fill rank vector
-      std::vector<double> r(std::size_t(node->get_mesh()->get_num_entities(Mesh_::shape_dim)), -1.0);
+      std::vector<double> r(std::size_t(mesh.get_num_entities(Mesh_::shape_dim)), -1.0);
       for(Index i(0); i < part.size(); ++i)
       {
         auto it = part.get_patches().image_begin(i);
@@ -422,6 +449,7 @@ int run(int argc, char* argv[])
   args.support("no-adapt");
   args.support("no-dist");
   args.support("no-proj");
+  args.support("no-volume");
   args.support("angles");
   args.support("offset");
   args.support("origin");
