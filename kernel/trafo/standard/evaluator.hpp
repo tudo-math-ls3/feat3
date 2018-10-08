@@ -304,6 +304,23 @@ namespace FEAT
             v += Math::sqr(_coeff[i][1]);
           return Math::sqrt(v);
         }
+
+        /**
+         * \brief Computes and returns the directed mesh width.
+         *
+         * This function approximates the cell width along a given normalised ray direction vector.
+         *
+         * \param[in] ray
+         * A (normalised) direction vector. Must not be a null vector.
+         *
+         * \returns
+         * The mesh width in direction of the input ray vector.
+         */
+        DataType width_directed(const ImagePointType& DOXY(ray)) const
+        {
+          // in 1D, the width is always equal to the volume
+          return volume();
+        }
       }; // class Evaluator<Simplex<1>,...>
 
       /* ************************************************************************************* */
@@ -478,6 +495,54 @@ namespace FEAT
             jac_mat(i,1) = _coeff[i][2];
           }
           return jac_mat.vol() / DataType(2);
+        }
+
+        /**
+         * \brief Computes and returns the directed mesh width.
+         *
+         * This function approximates the cell width along a given normalised ray direction vector.
+         *
+         * \param[in] ray
+         * A (normalised) direction vector. Must not be a null vector.
+         *
+         * \returns
+         * The mesh width in direction of the input ray vector.
+         */
+        DataType width_directed(const ImagePointType& ray) const
+        {
+          // This one is a little tricky:
+          // We follow a similar approach as on quadrilaterals here, i.e. we first map the ray
+          // vector onto the reference cells by multiplying it to the inverse jacobian matrix.
+          // However, our reference cell is the "right triangle" spanned by the three points
+          // (0,0) (1,0) (0,1) and therefore its edges have different lengths, which would
+          // result in a "skew" width. To circumvent this, we will afterwards map the ray
+          // vector onto a "equilateral unit triangle" (i.e. the triangle where all edges
+          // have length = 1) and we compute the norm of that mapped vector then.
+          JacobianMatrixType jac_mat;
+          JacobianInverseType jac_inv;
+          DomainPointType ref_ray;
+
+          // compute jacobian matrix
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+          }
+
+          // invert jacobian matrix and multiply by ray vector
+          jac_inv.set_inverse(jac_mat);
+          ref_ray.set_mat_vec_mult(jac_inv, ray);
+
+          // We have mapped the ray onto our reference triangle. Now let's map that one
+          // onto a equilateral unit triangle, which can be performed by multiplying
+          // the following matrix by the reference ray vector:
+          //
+          //  eut_ray := [ -1       +1      ] * ref_ray
+          //             [ sqrt(3)  sqrt(3) ]
+          //
+          // Finally, we have to compute the norm of that vector, which is explicitly
+          // written down in the denominator of the following expression:
+          return DataType(2) / Math::sqrt(Math::sqr(ref_ray[1]-ref_ray[0]) + DataType(3) * Math::sqr(ref_ray[0]+ref_ray[1]));
         }
       }; // class Evaluator<Simplex<2>,...>
 
@@ -661,6 +726,51 @@ namespace FEAT
           }
           return jac_mat.vol() / DataType(6);
         }
+
+        /**
+         * \brief Computes and returns the directed mesh width.
+         *
+         * This function approximates the cell width along a given normalised ray direction vector.
+         *
+         * \param[in] ray
+         * A (normalised) direction vector. Must not be a null vector.
+         *
+         * \returns
+         * The mesh width in direction of the input ray vector.
+         */
+        DataType width_directed(const ImagePointType& ray) const
+        {
+          // We follow the same approach as for triangles here:
+          // First, map the ray onto the reference element and then
+          // map it to a regular tetrahedron to compute its norm.
+          JacobianMatrixType jac_mat;
+          JacobianInverseType jac_inv;
+          DomainPointType ref_ray;
+
+          // compute jacobian matrix
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+            jac_mat(i,2) = _coeff[i][3];
+          }
+
+          // invert jacobian matrix and multiply by ray vector
+          jac_inv.set_inverse(jac_mat);
+          ref_ray.set_mat_vec_mult(jac_inv, ray);
+
+          // The transformation from the reference tetrahedron to the regular unit tetrahedron
+          // can be performed by applying the following matrix-vector product:
+          //
+          //             [ 2  1         1      ]
+          //  eut_ray := [ 0  1        -1      ] * ref_ray
+          //             [ 0  sqrt(2)  sqrt(2) ]
+          //
+          // Finally, we have to compute the norm of that vector, which is explicitly
+          // written down in the denominator of the following expression:
+          return DataType(2) / Math::sqrt(Math::sqr(DataType(2) * ref_ray[0] + ref_ray[1] + ref_ray[2]) +
+            Math::sqr(ref_ray[1] - ref_ray[2]) + DataType(2) * Math::sqr(ref_ray[1] + ref_ray[2]));
+        }
       }; // class Evaluator<Simplex<3>,...>
 
       /* ************************************************************************************* */
@@ -828,6 +938,23 @@ namespace FEAT
           for(int i(0); i < image_dim; ++i)
             v += Math::sqr(_coeff[i][1]);
           return DataType(2) * Math::sqrt(v);
+        }
+
+        /**
+         * \brief Computes and returns the directed mesh width.
+         *
+         * This function approximates the cell width along a given normalised ray direction vector.
+         *
+         * \param[in] ray
+         * A (normalised) direction vector. Must not be a null vector.
+         *
+         * \returns
+         * The mesh width in direction of the input ray vector.
+         */
+        DataType width_directed(const ImagePointType& DOXY(ray)) const
+        {
+          // in 1D, the width is always equal to the volume
+          return volume();
         }
       }; // class Evaluator<Hypercube<1>,...>
 
@@ -1013,7 +1140,7 @@ namespace FEAT
           // Now the area of the "Jacobian parallelogram" is equal to four times
           // the determinant of its Jacobian determinant, which finally gives us a
           // formula for our quadrilateral area: 4*det(Jacobian(0,0)).
-          // Note that this is not a lousy approximation, but a real identity.
+          // Note that this is not a lousy approximation, but a true identity :)
 
           // compute jacobian matrix at barycentre
           JacobianMatrixType jac_mat;
@@ -1025,6 +1152,38 @@ namespace FEAT
 
           // return scaled volume
           return DataType(4) * jac_mat.vol();
+        }
+
+        /**
+         * \brief Computes and returns the directed mesh width.
+         *
+         * This function approximates the cell width along a given normalised ray direction vector.
+         *
+         * \param[in] ray
+         * A (normalised) direction vector. Must not be a null vector.
+         *
+         * \returns
+         * The mesh width in direction of the input ray vector.
+         */
+        DataType width_directed(const ImagePointType& ray) const
+        {
+          JacobianMatrixType jac_mat;
+          JacobianInverseType jac_inv;
+          DomainPointType ref_ray;
+
+          // compute jacobian matrix at barycentre
+          for(int i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+          }
+
+          // invert jacobian matrix and multiply by ray vector
+          jac_inv.set_inverse(jac_mat);
+          ref_ray.set_mat_vec_mult(jac_inv, ray);
+
+          // return scaled inverse ray norm
+          return DataType(2) / ref_ray.norm_euclid();
         }
       }; // class Evaluator<Hypercube<2>,...>
 
@@ -1214,14 +1373,52 @@ namespace FEAT
          */
         DataType volume() const
         {
-          // In analogy to 2D, we approximate the volume by the scaled jacobian
-          // determinant in the cell barycentre. However, in contrast to 2D,
-          // this is only an approximation for the exact volume.
-          // If this turns out to be too imprecise, this should be replaced by
-          // a quadrature formula such as e.g. 2x2x2 Gauss-Legendre.
+          // In contrast to 2D, it is not sufficient to evaluate the Jacobian determinant
+          // in the barycentre of the cell to compute the cell's volume, as this will give
+          // very inaccurate results for non-parallelepiped cells. Instead, we have to use
+          // the 2x2x2 Gauss-Legendre cubature rule to integrate the volume of the cell,
+          // which is hard-coded in the code below.
+
+          // compute 1D Gauss-Legendre root
+          const DataType cx = DataType(1) / Math::sqrt(DataType(3));
+
+          JacobianMatrixType jac_mat;
+          DomainPointType cub_pt;
+          DataType vol = DataType(0);
+
+          // loop over all 8 cubature points
+          for(int i(0); i < 8; ++i)
+          {
+            // set cubature point coords by magic bitshifts
+            for(int j(0); j < 3; ++j)
+              cub_pt[j] = DataType((((i >> j) & 1) << 1) - 1) * cx;
+
+            // compute jacobian matrix and add its volume
+            calc_jac_mat(jac_mat, cub_pt);
+            vol += jac_mat.vol();
+          }
+
+          return vol;
+        }
+
+        /**
+         * \brief Computes and returns the directed mesh width.
+         *
+         * This function approximates the cell width along a given normalised ray direction vector.
+         *
+         * \param[in] ray
+         * A (normalised) direction vector. Must not be a null vector.
+         *
+         * \returns
+         * The mesh width in direction of the input ray vector.
+         */
+        DataType width_directed(const ImagePointType& ray) const
+        {
+          JacobianMatrixType jac_mat;
+          JacobianInverseType jac_inv;
+          DomainPointType ref_ray;
 
           // compute jacobian matrix at barycentre
-          JacobianMatrixType jac_mat;
           for(int i(0); i < image_dim; ++i)
           {
             jac_mat(i,0) = _coeff[i][1];
@@ -1229,8 +1426,12 @@ namespace FEAT
             jac_mat(i,2) = _coeff[i][3];
           }
 
-          // return scaled volume
-          return DataType(8) * jac_mat.vol();
+          // invert jacobian matrix and multiply by ray vector
+          jac_inv.set_inverse(jac_mat);
+          ref_ray.set_mat_vec_mult(jac_inv, ray);
+
+          // return scaled inverse ray norm
+          return DataType(2) / ref_ray.norm_euclid();
         }
       }; // class Evaluator<Hypercube<3>,...>
     } // namespace Standard

@@ -295,6 +295,26 @@ namespace FEAT
        * The volume of the current cell.
        */
       DataType volume() const;
+
+      /**
+       * \brief Computes and returns the directed mesh width.
+       *
+       * The usual internal implementation of this function returns the following expression:
+       * \f[ L\cdot \| J_\tau^{-1} \cdot v \|_2^{-1} \f]
+       * where
+       * - \f$J_\tau\f$ is the Jacobian matrix of the transformation from the reference hypercube
+       *   or a regular (equilateral) simplex, evaluated in the barycentre of that element.
+       * - \e v is the given (normalised) ray direction vector.
+       * - \e L is an appropriate scaling factor, which is chosen to ensure that this function
+       *   returns a value of 1 for the unit element with all edge lengths equal to 1
+       *
+       * \param[in] ray
+       * A (normalised) direction vector. Must not be a null vector.
+       *
+       * \returns
+       * The mesh width in direction of the input ray vector.
+       */
+      DataType width_directed(const ImagePointType& ray) const;
 #endif // DOXYGEN
     }; // class EvaluatorBase<...>
 
