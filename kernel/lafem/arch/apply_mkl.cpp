@@ -33,7 +33,9 @@ void Apply<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, 
     opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
   sparse_matrix_t A;
+  FEAT_DISABLE_WARNINGS
   sparse_status_t status = mkl_sparse_s_create_csr(&A, SPARSE_INDEX_BASE_ZERO, mrows, mcolumns, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr + 1), (MKL_INT*)col_ind, (float*) val);
+  FEAT_RESTORE_WARNINGS
   if (status != SPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "MKL Sparse Error occurred in execution!\n");
   matrix_descr md;
@@ -84,7 +86,9 @@ void Apply<Mem::Main>::csr_mkl(double * r, const double a, const double * const 
     opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
   sparse_matrix_t A;
+  FEAT_DISABLE_WARNINGS
   sparse_status_t status = mkl_sparse_d_create_csr(&A, SPARSE_INDEX_BASE_ZERO, mrows, mcolumns, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr + 1), (MKL_INT*)col_ind, (double*) val);
+  FEAT_RESTORE_WARNINGS
   if (status != SPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "MKL Sparse Error occurred in execution!\n");
   matrix_descr md;
