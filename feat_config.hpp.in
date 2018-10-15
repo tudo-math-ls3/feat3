@@ -91,13 +91,15 @@
 /// The host compiler that will be used by nvcc for host code compilation.
 #define FEAT_CUDA_HOST_COMPILER "${FEAT_CUDA_HOST_COMPILER}"
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 /// Path to CUDA Compiler
-#define CUDA_NVCC_EXECUTABLE "${CUDA_NVCC_EXECUTABLE}"
+#define FEAT_CUDA_NVCC_EXECUTABLE "${CUDA_NVCC_EXECUTABLE}"
 /// CUDA CXX Compiler Flags
-#define CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}"
+#define FEAT_CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}"
 /// CUDA SDK Version
-#define CUDA_VERSION "${CUDA_VERSION}"
+#define FEAT_CUDA_VERSION "${CUDA_VERSION}"
+/// CUDA major version
+#define FEAT_CUDA_VERSION_MAJOR ${CUDA_VERSION_MAJOR}
 /// compile for this CUDA device architecture
 #define FEAT_CUDA_ARCH "${FEAT_CUDA_ARCH}"
 #endif

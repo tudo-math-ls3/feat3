@@ -361,16 +361,20 @@ Path to CMAKE_CXX_COMPILER_ARG1, if any.
 The CXXFLAGS of the host compiler.
 
 <hr>
-\subsection ppm_cuda_nvcc_executable CUDA_NVCC_EXECUTABLE
+\subsection ppm_cuda_nvcc_executable FEAT_CUDA_NVCC_EXECUTABLE
 Path to the used nvcc compiler.
 
 <hr>
-\subsection ppm_cuda_nvcc_flags CUDA_NVCC_FLAGS
+\subsection ppm_cuda_nvcc_flags FEAT_CUDA_NVCC_FLAGS
 The CXXFLAGS of the nvcc compiler.
 
 <hr>
-\subsection ppm_cuda_version CUDA_VERSION
+\subsection ppm_cuda_version FEAT_CUDA_VERSION
 Version of the cuda SDK.
+
+<hr>
+\subsection ppm_cuda_version_major FEAT_CUDA_VERSION_MAJOR
+Major version of the cuda SDK.
 
 <hr>
 \subsection ppm_cuda_arch FEAT_CUDA_ARCH

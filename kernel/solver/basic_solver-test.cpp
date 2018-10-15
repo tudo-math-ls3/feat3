@@ -83,8 +83,8 @@ public:
     // check against reference solution
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     const DataType d = vec_sol.norm2sqr();
-    TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance: "
-      + stringify_fp_sci(d) + "; expected <= " + stringify(tol));
+    TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance\n"
+      + "result: " + stringify_fp_sci(d) + "; expected result <= " + stringify(tol));
 
     // check number of iterations
     const Index n = solver.get_num_iter();
@@ -313,8 +313,8 @@ public:
     // check against reference solution
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     const DataType d = vec_sol.norm2sqr();
-    TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance: "
-      + stringify_fp_sci(d) + "; expected <= " + stringify(tol));
+    TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance\n"
+      + "result: " + stringify_fp_sci(d) + "; expected result <= " + stringify(tol));
 
     // check number of iterations
     const Index n = solver.get_num_iter();
@@ -442,6 +442,7 @@ public:
       test_solver("PCGNR-JAC-JAC", *solver, vec_sol, vec_ref, vec_rhs, 43);
     }
 
+#if(FEAT_CUDA_VERSION_MAJOR >= 8)
     // test FGMRES-SPAI
     {
       auto precon = Solver::new_spai_precond(matrix, filter);
@@ -455,6 +456,7 @@ public:
       auto solver = Solver::new_rgcr(matrix, filter, precon);
       test_solver("RGCR-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 17);
     }
+#endif
 
 
 #ifdef FEAT_HAVE_CUSOLVER
@@ -641,8 +643,8 @@ public:
     // check against reference solution
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     const DataType d = vec_sol.norm2sqr();
-    TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance: "
-      + stringify_fp_sci(d) + "; expected <= " + stringify(tol));
+    TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance\n"
+      + "result: " + stringify_fp_sci(d) + "; expected result <= " + stringify(tol));
 
     // check number of iterations
     const Index n = solver.get_num_iter();
