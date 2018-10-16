@@ -442,7 +442,7 @@ public:
       test_solver("PCGNR-JAC-JAC", *solver, vec_sol, vec_ref, vec_rhs, 43);
     }
 
-#if(FEAT_CUDA_VERSION_MAJOR >= 8)
+#if defined(FEAT_CUDA_VERSION_MAJOR) && (FEAT_CUDA_VERSION_MAJOR >= 8)
     // test FGMRES-SPAI
     {
       auto precon = Solver::new_spai_precond(matrix, filter);
