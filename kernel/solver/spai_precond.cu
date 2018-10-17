@@ -257,8 +257,12 @@ namespace FEAT
 
                 cuda_spai_csr_rowlen_kernel <<<rwgrid, rwblock >>> (m, rowptr, rowlens);
                 SPAI_CHECK_KERNEL_ERROR();
+                if (cudaDeviceSynchronize() != cudaSuccess)
+                    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred");
                 thrust::device_ptr<unsigned int> result_dev = thrust::max_element(thrust::device_ptr<unsigned int>(rowlens),
                     thrust::device_ptr<unsigned int>(rowlens) + m);
+                if (cudaDeviceSynchronize() != cudaSuccess)
+                    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred");
                 unsigned int maxrowlen;
                 SPAI_API_CALL(cudaMemcpy(&maxrowlen, result_dev.get(), sizeof(unsigned int), cudaMemcpyDeviceToHost));
                 return maxrowlen;
