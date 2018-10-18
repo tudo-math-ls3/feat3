@@ -10,7 +10,7 @@ def configure_pgi(cpu, buildid, compiler, restrict_errors):
     cxxflags += " -e1"
 
   if "debug" in buildid:
-    cxxflags += "  -O0" #-g
+    cxxflags += "  -O0 -g"
 
   elif "opt" in buildid:
     cxxflags += " -O3 -mcmodel=medium -Minline -fastsse -Mipa=fast,inline -Msmartalloc -Mprefetch -Msafeptr" #-gopt
