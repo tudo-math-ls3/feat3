@@ -161,6 +161,7 @@ ADD_SUBDIRECTORY( kernel )
 ADD_SUBDIRECTORY( test_system )
 ADD_SUBDIRECTORY( tools )
 ADD_SUBDIRECTORY( applications )
+ADD_SUBDIRECTORY( area51 )
 ADD_SUBDIRECTORY( benchmarks )
 ADD_SUBDIRECTORY( tutorials )
 
