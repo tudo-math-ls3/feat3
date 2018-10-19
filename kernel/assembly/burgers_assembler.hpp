@@ -206,6 +206,7 @@ namespace FEAT
 
         // our local streamline diffusion coefficients
         Tiny::Vector<DataType, max_local_dofs> streamdiff_coeffs;
+        streamdiff_coeffs.format();
 
         // our local delta for streamline diffusion
         DataType local_delta = DataType(0);
@@ -401,8 +402,7 @@ namespace FEAT
             }
 
             // assemble streamline diffusion?
-            //if(need_streamdiff)
-            if(local_delta > tol_eps)
+            if(need_streamdiff && (local_delta > tol_eps))
             {
               // test function loop
               for(int i(0); i < num_loc_dofs; ++i)
@@ -538,6 +538,7 @@ namespace FEAT
 
         // our local streamline diffusion coefficients
         Tiny::Vector<DataType, max_local_dofs> streamdiff_coeffs;
+        streamdiff_coeffs.format();
 
         // our local delta for streamline diffusion
         DataType local_delta = DataType(0);
@@ -671,8 +672,7 @@ namespace FEAT
             }
 
             // assemble streamline diffusion?
-            //if(need_streamdiff)
-            if(local_delta > tol_eps)
+            if(need_streamdiff && (local_delta > tol_eps))
             {
               // test function loop
               for(int i(0); i < num_loc_dofs; ++i)
