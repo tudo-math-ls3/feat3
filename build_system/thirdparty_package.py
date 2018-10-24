@@ -12,7 +12,7 @@ import glob
 class ThirdpartyPackage(object):
   def __init__(self,trunk_dirname):
     # Package name as given in the build id.
-    self.name = "NullPackage"
+    self.name = ["NullPackage"]
     # Name of folder where the package is expected to be found.
     self.dirname = "NullDirName"
     # Url from where to download the file, not including the filename.
@@ -34,7 +34,7 @@ class ThirdpartyPackage(object):
     # This is the folder where the third party package is assumed to be. Not to be confused with self.target_dirname
     expected_dirname = self.trunk_dirname+os.sep+self.dirname
     if not os.path.isdir(expected_dirname):
-      print (self.name +" enabled, but could not find a directory with name " + expected_dirname+ ", checking for file...")
+      print (self.names[0] +" enabled, but could not find a directory with name " + expected_dirname + ", checking for file...")
       if not os.path.isfile(target_filename):
         print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
         download(self.url,target_filename)

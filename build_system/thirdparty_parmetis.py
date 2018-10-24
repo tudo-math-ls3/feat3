@@ -7,7 +7,7 @@ import os
 class PARMETIS(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "parmetis"
+    self.names = ["parmetis", "metis"]
     self.dirname = "parmetis"
     self.filename = "parmetis-4.0.3.tar.gz"
     self.url = "http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/" + self.filename

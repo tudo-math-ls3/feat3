@@ -7,7 +7,7 @@ import os
 class SuiteSparse(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "umfpack"
+    self.names = ["umfpack"]
     self.dirname = "SuiteSparse"
     self.filename = "SuiteSparse-5.2.0.tar.gz"
     self.url = "http://faculty.cse.tamu.edu/davis/SuiteSparse/" + self.filename

@@ -5,7 +5,7 @@ import os
 class FParser(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "fparser"
+    self.names = ["fparser"]
     self.dirname = "fparser"
     self.filename = "fparser4.5.2.zip"
     self.url = "http://warp.povusers.org/FunctionParser/" + self.filename

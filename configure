@@ -490,10 +490,12 @@ if "mpi" not in buildid and ("parmetis" in buildid or "metis" in buildid):
 
 # optional third party libraries
 for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
-  if package.name in buildid:
-    package.add()
-    cmake_flags += package.cmake_flags
-    remove_string(unused_tokens, package.name)
+  for name in package.names:
+    if name in buildid:
+      package.add()
+      cmake_flags += package.cmake_flags
+      remove_string(unused_tokens, name)
+      continue
 
 # clean up previous configurations
 clean = [ "CMakeCache.txt", trunk_dirname+os.sep+"CMakeCache.txt" ]

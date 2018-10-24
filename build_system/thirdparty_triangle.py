@@ -6,7 +6,7 @@ import os
 
 class Triangle(ThirdpartyPackage):
   def __init__(self,trunk_dirname):
-    self.name = "triangle"
+    self.names = ["triangle"]
     self.dirname = "triangle"
     self.filename = "triangle.zip"
     self.url = "http://www.netlib.org/voronoi/triangle.zip"

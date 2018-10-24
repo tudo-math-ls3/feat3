@@ -7,7 +7,7 @@ import os
 class HYPRE(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "hypre"
+    self.names = ["hypre"]
     self.dirname = "hypre"
     self.filename = "hypre-2.11.2.tar.gz"
     self.url = "https://computation.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods/download/" + self.filename

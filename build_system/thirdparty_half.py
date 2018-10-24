@@ -7,7 +7,7 @@ import os
 class HALF(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "half"
+    self.names = ["half"]
     self.dirname = "half"
     self.filename = "half-1.12.0.zip"
     self.url = "http://downloads.sourceforge.net/project/half/half/1.12.0/half-1.12.0.zip?r=http%3A%2F%2Fhalf.sourceforge.net%2Findex.html&ts=1455282582&use_mirror=netcologne"

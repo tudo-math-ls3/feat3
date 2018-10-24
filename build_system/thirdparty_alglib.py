@@ -7,7 +7,7 @@ import os
 class ALGLIB(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "alglib"
+    self.names = ["alglib"]
     self.dirname = "alglib"
     self.filename = "alglib-3.13.0.cpp.gpl.zip"
     self.url = "http://www.alglib.net/translator/re/" + self.filename

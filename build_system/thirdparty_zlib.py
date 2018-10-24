@@ -7,7 +7,7 @@ import os
 class ZLIB(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.name = "zlib"
+    self.names = ["zlib"]
     self.dirname = "zlib"
     self.filename = "zlib-1.2.11.tar.gz"
     self.url = "http://www.zlib.net/" + self.filename
