@@ -98,6 +98,11 @@ public:
     TEST_CHECK_EQUAL(consec->query("~/sqrt4", ""), "2");
     TEST_CHECK_EQUAL(mysec->query("!/E", ""), "m*c^2");
 
+    // test the parse_entry function
+    int ival = 0;
+    TEST_CHECK(yoursec->parse_entry("sqrt4", ival, false)); // exists
+    TEST_CHECK(yoursec->parse_entry("foobar", ival, true)); // not exists
+
     // okay, test passed
   } // test_0
 

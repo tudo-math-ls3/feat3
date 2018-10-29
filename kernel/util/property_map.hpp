@@ -226,6 +226,36 @@ namespace FEAT
     const PropertyMap* get_sub_section(String name) const;
 
     /**
+     * \brief Parses an object from the value of an entry
+     *
+     * If an entry for the given key exists, this function is equivalent to
+     * <tt>this->get_entry(key).first.parse(x)</tt>.
+     *
+     * \param[in] key
+     * The key of the entry whose value is to be parsed.
+     *
+     * \param[out] x
+     * A reference to the object that is to be parsed into.
+     *
+     * \param[in] rtn_non_exist
+     * The value that this function should return if there exisits no entry for the given key.
+     *
+     * \returns
+     * - \c true, if the entry exists and was parsed successfully,
+     * - \c false, if the entry exists but could not be parsed,
+     * - \c rtn_non_exist, if the entry does not exist
+     */
+    template<typename T_>
+    bool parse_entry(const String& key, T_& x, bool rtn_non_exist = true) const
+    {
+      std::pair<String, bool> it = this->get_entry(key);
+      if(it.second)
+        return it.first.parse(x);
+      else
+        return rtn_non_exist;
+    }
+
+    /**
      * \brief Returns a pointer to the parent section.
      *
      * \returns
