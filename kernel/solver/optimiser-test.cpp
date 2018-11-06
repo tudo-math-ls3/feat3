@@ -666,5 +666,5 @@ ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFun
 alg_mincg_rb_d(double(0.8), Index(41), Index(118), NLCGDirectionUpdate::DYHSHybrid);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_mincg_bs_d(double(0.33), Index(58), Index(217), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_bs_d(double(0.33), Index(65), Index(220), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAT_HAVE_ALGLIB
