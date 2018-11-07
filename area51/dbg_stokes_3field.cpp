@@ -138,8 +138,8 @@ namespace Stokes3Field
     static constexpr int BlockWidth = nsc;
 
     static constexpr TrafoTags trafo_config = TrafoTags::none;
-    static constexpr SpaceTags test_config = SpaceTags::grad;
-    static constexpr SpaceTags trial_config = SpaceTags::value;
+    static constexpr SpaceTags test_config = SpaceTags::value;
+    static constexpr SpaceTags trial_config = SpaceTags::grad;
 
     template<typename AsmTraits_>
     class Evaluator :
@@ -401,7 +401,8 @@ namespace Stokes3Field
     MatrixTypeK& matrix_k = matrix.template at<2,0>();
 
     // assemble stokes matrix structures
-    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_a, space_velo);
+    //Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_a, space_velo);
+    Assembly::SymbolicAssembler::assemble_matrix_diag(matrix_a, space_velo);
     Assembly::SymbolicAssembler::assemble_matrix_std2(matrix_b, space_velo, space_pres);
     Assembly::SymbolicAssembler::assemble_matrix_std2(matrix_d, space_pres, space_velo);
 
@@ -436,8 +437,8 @@ namespace Stokes3Field
 
     // assemble matrix block A
     //Assembly::Common::LaplaceOperatorBlocked<dim> operator_a; // gradient tensor
-    Assembly::Common::DuDvOperatorBlocked<dim>  operator_a; // deformation tensor
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix1(matrix_a, operator_a, space_velo, cubature);
+    //Assembly::Common::DuDvOperatorBlocked<dim>  operator_a; // deformation tensor
+    //Assembly::BilinearOperatorAssembler::assemble_block_matrix1(matrix_a, operator_a, space_velo, cubature);
 
     // assemble matrix blocks B and D
     Assembly::GradPresDivVeloAssembler::assemble(matrix_b, matrix_d, space_velo, space_pres, cubature);

@@ -233,6 +233,35 @@ namespace FEAT
       }
 
       /**
+       * \brief Assembles the diagonal Dof-Adjacency graph for identical test- and trial-spaces.
+       *
+       * \param[in] space
+       * The space representing the test- and trial spaces to be used for the assembly.
+       *
+       * \returns
+       * The diagonal Dof-Adjacency graph of the space.
+       */
+      template<typename Space_>
+      static Adjacency::Graph assemble_graph_diag(const Space_& space)
+      {
+        // get number of DOFs
+        const Index n = space.get_num_dofs();
+
+        // create a graph
+        Adjacency::Graph graph(n, n, n);
+
+        // get and fill the arrays
+        Index* dom_ptr = graph.get_domain_ptr();
+        Index* img_idx = graph.get_image_idx();
+        for(Index i(0); i < n; ++i)
+          dom_ptr[i] = img_idx[i] = i;
+        dom_ptr[n] = n;
+
+        // return the graph
+        return graph;
+      }
+
+      /**
        * \brief Assembles the standard Dof-Adjacency graph.
        *
        * \param[in] fine_space
@@ -365,6 +394,21 @@ namespace FEAT
       static void assemble_matrix_ext1(MatrixType_ & matrix, const Space_& space)
       {
         matrix = MatrixType_(assemble_graph_ext1(space));
+      }
+
+      /**
+       * \brief Assembles a diagonal matrix structure from a single space.
+       *
+       * \param[out] matrix
+       * A reference to the matrix to be assembled.
+       *
+       * \param[in] space
+       * The space to be used for the assembly.
+       */
+      template<typename MatrixType_, typename Space_>
+      static void assemble_matrix_diag(MatrixType_ & matrix, const Space_& space)
+      {
+        matrix = MatrixType_(assemble_graph_diag(space));
       }
 
       /**
