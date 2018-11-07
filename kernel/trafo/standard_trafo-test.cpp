@@ -838,7 +838,13 @@ class InverseMappingTest
 
       for(int np(0); np < num_points; ++np)
       {
+        // We size-cast away the last column since it is just for result checking, so the correct version gets called
+        /// \compilerhack AOCC aka clang does not deduct the template parameters correctly
+#if defined(FEAT_COMPILER_CLANG)
+        Trafo::Standard::template inverse_mapping<DT_, world_dim, world_dim, world_dim, world_dim+1, world_dim>(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+#else
         Trafo::Standard::inverse_mapping(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+#endif
 
         Tiny::Vector<DT_, world_dim> test(coords[0]);
         for(int i(0); i < world_dim-1; ++i)
@@ -973,7 +979,12 @@ class InverseMappingTest
       for(int np(0); np < num_points; ++np)
       {
         // We size-cast away the last column since it is just for result checking, so the correct version gets called
+        /// \compilerhack AOCC aka clang does not deduct the template parameters correctly
+#if defined(FEAT_COMPILER_CLANG)
+        Trafo::Standard::template inverse_mapping<DT_, world_dim, world_dim, world_dim+1, world_dim>(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+#else
         Trafo::Standard::inverse_mapping(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+#endif
 
         Tiny::Vector<DT_, world_dim> test(coords[0]);
         for(int i(0); i < world_dim-1; ++i)

@@ -26,6 +26,15 @@ which is a constant integral expression identifying the compiler version, e.g. t
 G++ 4.7.2 compiler. See the compiler's documentation for details.
 
 <hr>
+\subsection ppm_feat_compiler_clang FEAT_COMPILER_CLANG
+This macro is defined if the Clang/LLVM C++ compiler is detected. Its value is defined as
+\verbatim
+(__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+\endverbatim
+which is a constant integral expression identifying the compiler version, e.g. the value <c>40702</c> identifies the
+clang 4.7.2 compiler. See the compiler's documentation for details.
+
+<hr>
 \subsection ppm_feat_compiler_intel FEAT_COMPILER_INTEL
 This macro is defined if the Intel C++ compiler is detected. Its value coindices with the compiler's internal macro
 <c>__INTEL_COMPILER</c>, which is a constant integral expression identifying the compiler version, e.g. the value
