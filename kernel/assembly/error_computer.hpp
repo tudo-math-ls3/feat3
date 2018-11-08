@@ -822,14 +822,14 @@ namespace FEAT
         }
         if(sei.have_h1)
         {
-          os << "H1-Error: " << stringify_fp_sci(sei.norm_h1) << std::endl;
+          os << "H1-Error: " << stringify_fp_sci(sei.norm_h1) << " [";
           for(int i(0); i < dim_; ++i)
             os << " " << stringify_fp_sci(sei.norm_h1_comp[i]);
           os << " ]" << std::endl;
         }
         if(sei.have_h2)
         {
-          os << "H2-Error: " << stringify_fp_sci(sei.norm_h2) << std::endl;
+          os << "H2-Error: " << stringify_fp_sci(sei.norm_h2) << " [";
           for(int i(0); i < dim_; ++i)
             os << " " << stringify_fp_sci(sei.norm_h2_comp[i]);
           os << " ]" << std::endl;
