@@ -151,6 +151,11 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
         cxxflags += " -march=skylake -m64" #no special kabylake support, yet
+    elif cpu == "coffee-lake":
+      if platform.system() == "Darwin":
+        cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+      else:
+        cxxflags += " -march=skylake -m64"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
