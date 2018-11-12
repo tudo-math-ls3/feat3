@@ -35,6 +35,7 @@
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/vanka.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
@@ -618,6 +619,7 @@ namespace NvSCCNDQ2P1dc
     const bool navier = (args.check("stokes") < 0);
     const bool newton = (args.check("picard") < 0);
     const bool defo = (args.check("defo") >= 0);
+    const bool old_vanka = (args.check("old-vanka") >= 0);
     const bool testmode = (args.check("test-mode") >= 0);
 
 #ifdef FEAT_HAVE_UMFPACK
@@ -642,6 +644,7 @@ namespace NvSCCNDQ2P1dc
       comm.print(String("NonLin RelTol").pad_back(pl, pc) + ": " + stringify_fp_sci(nonlin_tol));
       comm.print(String("Max LinSol Iter").pad_back(pl, pc) + ": " + stringify(max_mg_steps));
       comm.print(String("Max NonLin Iter").pad_back(pl, pc) + ": " + stringify(max_nl_steps));
+      comm.print(String("Vanka Type").pad_back(pl, pc) + ": " + (old_vanka ? "Old Vanka version" : "AmaVanka version"));
       if(umf_cgs)
         comm.print(String("Coarse Solver").pad_back(pl, pc) + ": UMFPACK");
       else
@@ -868,19 +871,34 @@ namespace NvSCCNDQ2P1dc
       std::shared_ptr<
         Solver::Vanka<
           typename SystemLevelType::LocalSystemMatrix,
-          typename SystemLevelType::LocalSystemFilter>>> vankas;
+          typename SystemLevelType::LocalSystemFilter>>> old_vankas;
+    std::deque<
+      std::shared_ptr<
+        Solver::AmaVanka<
+          typename SystemLevelType::LocalSystemMatrix,
+          typename SystemLevelType::LocalSystemFilter>>> ama_vankas;
+
 
     // push levels into multigrid
     for(std::size_t i(0); i < system_levels.size(); ++i)
     {
       SystemLevelType& lvl = *system_levels.at(i);
 
-      // Create Vanka
-      auto vanka = Solver::new_vanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Solver::VankaType::block_full_add);
-      vankas.push_back(vanka);
+      // a pointer for our Schwarz-Vanka
+      std::shared_ptr<Solver::SolverBase<GlobalSystemVector>> schwarz;
 
-      // create schwarz
-      auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+      if(old_vanka)
+      {
+        auto vanka = Solver::new_vanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Solver::VankaType::block_full_add);
+        old_vankas.push_back(vanka);
+        schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+      }
+      else
+      {
+        auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
+        ama_vankas.push_back(vanka);
+        schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+      }
 
       if((i+1) < domain.size_virtual())
       {
@@ -946,10 +964,18 @@ namespace NvSCCNDQ2P1dc
     watch_nonlin_solver_init.stop();
 
     // accumulate vanka sizes
+    if(old_vanka)
     {
-      summary.counts[Counts::vanka_data] = Index(vankas.front()->data_size());
+      summary.counts[Counts::vanka_data] = Index(old_vankas.front()->data_size());
       summary.bytes[Bytes::vanka] = 0ull;
-      for(auto& v : vankas)
+      for(auto& v : old_vankas)
+        summary.bytes[Bytes::vanka] += v->bytes();
+    }
+    else
+    {
+      summary.counts[Counts::vanka_data] = Index(ama_vankas.front()->data_size());
+      summary.bytes[Bytes::vanka] = 0ull;
+      for(auto& v : ama_vankas)
         summary.bytes[Bytes::vanka] += v->bytes();
     }
 
@@ -1174,8 +1200,18 @@ namespace NvSCCNDQ2P1dc
     summary.times[Times::mg_transfer] = multigrid_hierarchy->get_time_transfer();
 
     // accumulate vanka timings
+    if(old_vanka)
     {
-      for(auto& v : vankas)
+      for(auto& v : old_vankas)
+      {
+        summary.times[Times::vanka_init_sym] += v->time_init_symbolic();
+        summary.times[Times::vanka_init_num] += v->time_init_numeric();
+        summary.times[Times::vanka_apply] += v->time_apply();
+      }
+    }
+    else
+    {
+      for(auto& v : ama_vankas)
       {
         summary.times[Times::vanka_init_sym] += v->time_init_symbolic();
         summary.times[Times::vanka_init_num] += v->time_init_numeric();
@@ -1485,6 +1521,7 @@ namespace NvSCCNDQ2P1dc
     args.support("iters");
     args.support("gmresk");
     args.support("test-mode");
+    args.support("old-vanka");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();

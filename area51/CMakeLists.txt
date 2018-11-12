@@ -14,6 +14,9 @@ TARGET_LINK_LIBRARIES(basis-dump feat)
 ADD_EXECUTABLE(dbg-alg-dof-parti dbg_alg_dof_parti.cpp)
 TARGET_LINK_LIBRARIES(dbg-alg-dof-parti feat)
 
+ADD_EXECUTABLE(dbg-amavanka dbg_amavanka.cpp)
+TARGET_LINK_LIBRARIES(dbg-amavanka feat)
+
 ADD_EXECUTABLE(dbg-mesh-width dbg_mesh_width.cpp)
 TARGET_LINK_LIBRARIES(dbg-mesh-width feat)
 

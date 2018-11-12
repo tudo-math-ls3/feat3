@@ -1214,6 +1214,9 @@ namespace FEAT
           + _vec_scale.bytes() + _vec_tmp1.bytes() + _vec_tmp2.bytes();
       }
 
+      /**
+       * \brief Resets the internal stop watches for time measurement.
+       */
       void reset_timings()
       {
         watch_init_symbolic.reset();
@@ -1221,14 +1224,25 @@ namespace FEAT
         watch_apply.reset();
       }
 
+      /**
+       * \brief Returns the total accumulated time for symbolic initialisation.
+       */
       double time_init_symbolic() const
       {
         return watch_init_symbolic.elapsed();
       }
+
+      /**
+       * \brief Returns the total accumulated time for numeric initialisation.
+       */
       double time_init_numeric() const
       {
         return watch_init_numeric.elapsed();
       }
+
+      /**
+       * \brief Returns the total accumulated time for the solver application.
+       */
       double time_apply() const
       {
         return watch_apply.elapsed();

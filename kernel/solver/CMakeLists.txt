@@ -73,6 +73,7 @@ endif(FEAT_HAVE_CUDA)
 
 # list of solver tests
 SET (test_list
+  amavanka-test
   amg-test
   basic_solver-test
   cusolver-test

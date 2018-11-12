@@ -350,16 +350,14 @@ public:
     const int level = 2;
 
     // create mesh node
-    MeshNode* mesh_node = nullptr;
-    std::vector<Index> ranks, ctags;
-    Geometry::UnitCubePatchGenerator<MeshType>::create(0, 1, mesh_node, ranks, ctags);
+    std::shared_ptr<MeshNode> mesh_node;
+    std::vector<int> ranks;
+    Geometry::UnitCubePatchGenerator<MeshType>::create(0, 1, mesh_node, ranks);
 
     // refine a few times
     for(int i = 0; i < level; ++i)
     {
-      MeshNode* old_node = mesh_node;
-      mesh_node = old_node->refine();
-      delete old_node;
+      mesh_node = std::shared_ptr<MeshNode>(mesh_node->refine());
     }
 
     // test RT/Q0
@@ -413,9 +411,6 @@ public:
     test_defo<Q2Q1>(*mesh_node, VankaType::nodal_full_add,  DT_(1.0));
     test_defo<Q2Q1>(*mesh_node, VankaType::block_diag_add,  DT_(1.0));
     test_defo<Q2Q1>(*mesh_node, VankaType::block_full_add,  DT_(1.0));
-
-    // delete mesh node
-    delete mesh_node;
   }
 };
 

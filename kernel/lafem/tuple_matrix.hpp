@@ -240,6 +240,16 @@ namespace FEAT
         return _first.template used_elements<perspective_>() + _rest.template used_elements<perspective_>();
       }
 
+      /**
+       * \brief Returns the total amount of bytes allocated.
+       *
+       * \returns The amount of bytes allocated in all arrays
+       */
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /// Returns a descriptive string for this container.
       static String name()
       {
@@ -471,6 +481,11 @@ namespace FEAT
       Index used_elements() const
       {
         return _first.template used_elements<perspective_>();
+      }
+
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       static String name()
@@ -860,6 +875,16 @@ namespace FEAT
         return _first.template used_elements<perspective_>() + _rest.template used_elements<perspective_>();
       }
 
+      /**
+       * \brief Returns the total amount of bytes allocated.
+       *
+       * \returns The amount of bytes allocated in all arrays
+       */
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /// Returns a descriptive string for this container.
       static String name()
       {
@@ -1120,6 +1145,11 @@ namespace FEAT
       Index used_elements() const
       {
         return _first.template used_elements<perspective_>();
+      }
+
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       static String name()
