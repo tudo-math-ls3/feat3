@@ -18,6 +18,7 @@ namespace FEAT
 {
   namespace Solver
   {
+    /// \cond internal
     namespace Intern
     {
 #ifdef FEAT_HAVE_CUDA
@@ -217,6 +218,7 @@ nextj:
 #endif
 
     } // namespace Intern
+    /// \endcond
 
 
     template<typename Matrix_, typename Filter_>

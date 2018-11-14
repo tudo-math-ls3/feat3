@@ -50,14 +50,6 @@ namespace FEAT
       virtual void apply(VT_ & out, const VT_ & in) = 0;
     };
 
-
-    /**
-     * \brief SPAI-Preconditioner.
-     *
-     * This class represents the SPAI-Preconditioner \f$M \approx A^{-1}\f$.
-     *
-     * \author Christoph Lohmann
-     */
     /// \cond internal
     namespace Intern
     {
@@ -852,7 +844,13 @@ namespace FEAT
     } // namespace Intern
     /// \endcond
 
-
+    /**
+     * \brief SPAI-Preconditioner.
+     *
+     * This class represents the SPAI-Preconditioner \f$M \approx A^{-1}\f$.
+     *
+     * \author Christoph Lohmann
+     */
     template <typename MT_, typename VT_>
     class SPAIPreconditioner : public Intern::SPAIPreconditionerMTdepending<MT_, VT_>
     {

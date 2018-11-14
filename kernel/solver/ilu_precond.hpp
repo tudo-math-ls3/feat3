@@ -15,6 +15,7 @@ namespace FEAT
 {
   namespace Solver
   {
+    /// \cond internal
     namespace Intern
     {
       int cuda_ilu_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
@@ -1054,6 +1055,7 @@ namespace FEAT
         }
       }; // class ILUCoreBlocked
     } // namespace Intern
+    /// \endcond
 
     /**
      * \brief ILU(0) and ILU(p) preconditioner implementation

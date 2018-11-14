@@ -21,6 +21,19 @@ namespace FEAT
    */
   namespace Solver
   {
+    /// \cond internal
+    /**
+     * \brief Solver internals namespace
+     *
+     * This namespace is used by various solver implementations to outsource various
+     * magic template wrapper classes,  "core" implementation classes or other fancy
+     * stuff that is not be included into the actual solver class for whatever reasons.
+     */
+    namespace Intern
+    {
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief Solver status return codes enumeration
      *
@@ -442,8 +455,12 @@ namespace FEAT
         _mpi_wait_stop_spmv    = Statistics::get_time_mpi_wait_spmv();
         _mpi_wait_stop_collective    = Statistics::get_time_mpi_wait_collective();
         Statistics::add_solver_expression(std::make_shared<ExpressionTimings>(_solver_name, _at.elapsed_now(),
-              _mpi_execute_reduction_stop - _mpi_execute_reduction_start, _mpi_execute_spmv_stop - _mpi_execute_spmv_start, _mpi_execute_collective_stop - _mpi_execute_collective_start,
-          _mpi_wait_stop_reduction - _mpi_wait_start_reduction, _mpi_wait_stop_spmv - _mpi_wait_start_spmv, _mpi_wait_stop_collective - _mpi_wait_start_collective));
+          _mpi_execute_reduction_stop - _mpi_execute_reduction_start,
+          _mpi_execute_spmv_stop - _mpi_execute_spmv_start,
+          _mpi_execute_collective_stop - _mpi_execute_collective_start,
+          _mpi_wait_stop_reduction - _mpi_wait_start_reduction,
+          _mpi_wait_stop_spmv - _mpi_wait_start_spmv,
+          _mpi_wait_stop_collective - _mpi_wait_start_collective));
 
         _destroyed = true;
       }
