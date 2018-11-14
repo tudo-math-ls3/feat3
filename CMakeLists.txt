@@ -133,19 +133,23 @@ if (FEAT_HAVE_TRIANGLE)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/triangle/")
 endif(FEAT_HAVE_TRIANGLE)
 
-# our custom target to build (not execute) all tests in all directories
+# our custom target to build (but not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
-if(DOXYGEN_FOUND)
-  configure_file(${FEAT_SOURCE_DIR}/doxy_in/doxygen_config.in ${FEAT_BINARY_DIR}/doxy_in/doxygen_config @ONLY)
-  add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${FEAT_BINARY_DIR}/doxy_in/doxygen_config
-    WORKING_DIRECTORY ${FEAT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM
-    )
-endif(DOXYGEN_FOUND)
+if (DOXYGEN_FOUND)
+  set(DOXYGEN_OUTPUT_DIRECTORY "${FEAT_BINARY_DIR}/doc")
+  set(DOXYGEN_GENERATE_HTML YES)
+  set(DOXYGEN_GENERATE_MAN NO)
+  set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
+  set(DOXYGEN_IMAGE_PATH "${FEAT_SOURCE_DIR}/doxy_in")
+  set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/thirdparty/*")
+  set(DOXYGEN_WARN_LOGFILE "${FEAT_BINARY_DIR}/doc/warnings.log")
+  doxygen_add_docs(doc ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
+  set(DOXYGEN_ENABLED_SECTIONS "internal")
+  doxygen_add_docs(doc-internal ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
+endif (DOXYGEN_FOUND)
 
 if (CMAKE_CXX_COMPILER_ARG1)
   string(STRIP ${CMAKE_CXX_COMPILER_ARG1} CMAKE_CXX_COMPILER_ARG1_STRIPED)
