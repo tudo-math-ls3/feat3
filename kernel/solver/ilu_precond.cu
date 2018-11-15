@@ -16,6 +16,7 @@ namespace FEAT
 {
   namespace Solver
   {
+    /// \cond internal
     namespace Intern
     {
       // CSR
@@ -386,6 +387,7 @@ namespace FEAT
 
         delete info;
       }
-    }
-  }
-}
+    } // namespace Intern
+    /// \endcond
+  } // namespace Solver
+} // namespace FEAT
