@@ -86,22 +86,22 @@ namespace FEAT
 
       /// rest-class emplacement ctor; for internal use only
       explicit TupleMatrixRow(First_&& the_first, RestClass&& the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest))
+        _first(std::forward<First_>(the_first)),
+        _rest(std::forward<RestClass>(the_rest))
       {
       }
 
       /// Sub-Matrix emplacement constructor
       explicit TupleMatrixRow(First_&& the_first, Rest_&&... the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest...))
+        _first(std::forward<First_>(the_first)),
+        _rest(std::forward<Rest_>(the_rest)...)
       {
       }
 
       /// move ctor
       TupleMatrixRow(TupleMatrixRow&& other) :
-        _first(std::move(other._first)),
-        _rest(std::move(other._rest))
+        _first(std::forward<First_>(other._first)),
+        _rest(std::forward<RestClass>(other._rest))
       {
       }
 
@@ -110,8 +110,8 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
-          _rest = std::move(other._rest);
+          _first = std::forward<First_>(other._first);
+          _rest = std::forward<RestClass>(other._rest);
         }
         return *this;
       }
@@ -398,13 +398,13 @@ namespace FEAT
 
       /// Sub-Vector emplacement constructor
       explicit TupleMatrixRow(First_&& the_first) :
-        _first(std::move(the_first))
+        _first(std::forward<First_>(the_first))
       {
       }
 
       /// move ctor
       TupleMatrixRow(TupleMatrixRow&& other) :
-        _first(std::move(other._first))
+        _first(std::forward<First_>(other._first))
       {
       }
 
@@ -413,7 +413,7 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
+          _first = std::forward<First_>(other._first);
         }
         return *this;
       }
@@ -719,22 +719,22 @@ namespace FEAT
 
       /// rest-class emplacement ctor; for internal use only
       explicit TupleMatrix(FirstRow_&& the_first, RestClass&& the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest))
+        _first(std::forward<FirstRow_>(the_first)),
+        _rest(std::forward<RestClass>(the_rest))
       {
       }
 
       /// Sub-Matrix emplacement constructor
       explicit TupleMatrix(FirstRow_&& the_first, RestRows_&&... the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest...))
+        _first(std::forward<FirstRow_>(the_first)),
+        _rest(std::forward<RestRows_>(the_rest)...)
       {
       }
 
       /// move ctor
       TupleMatrix(TupleMatrix&& other) :
-        _first(std::move(other._first)),
-        _rest(std::move(other._rest))
+        _first(std::forward<FirstRow_>(other._first)),
+        _rest(std::forward<RestClass>(other._rest))
       {
       }
 
@@ -743,8 +743,8 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
-          _rest = std::move(other._rest);
+          _first = std::forward<FirstRow_>(other._first);
+          _rest = std::forward<RestClass>(other._rest);
         }
         return *this;
       }
@@ -1063,13 +1063,13 @@ namespace FEAT
 
       /// Sub-Vector emplacement constructor
       explicit TupleMatrix(FirstRow_&& the_first) :
-        _first(std::move(the_first))
+        _first(std::forward<FirstRow_>(the_first))
       {
       }
 
       /// move ctor
       TupleMatrix(TupleMatrix&& other) :
-        _first(std::move(other._first))
+        _first(std::forward<FirstRow_>(other._first))
       {
       }
 
@@ -1078,7 +1078,7 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
+          _first = std::forward<FirstRow_>(other._first);
         }
         return *this;
       }

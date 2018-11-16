@@ -103,22 +103,22 @@ namespace FEAT
 
       /// rest-class emplacement ctor; for internal use only
       explicit TupleVector(First_&& the_first, RestClass&& the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest))
+        _first(std::forward<First_>(the_first)),
+        _rest(std::forward<RestClass>(the_rest))
       {
       }
 
       /// Sub-Vector emplacement constructor
       explicit TupleVector(First_&& the_first, Rest_&&... the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest...))
+        _first(std::forward<First_>(the_first)),
+        _rest(std::forward<Rest_>(the_rest)...)
       {
       }
 
       /// move ctor
       TupleVector(TupleVector&& other) :
-        _first(std::move(other._first)),
-        _rest(std::move(other._rest))
+        _first(std::forward<First_>(other._first)),
+        _rest(std::forward<RestClass>(other._rest))
       {
       }
 
@@ -127,8 +127,8 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
-          _rest = std::move(other._rest);
+          _first = std::forward<First_>(other._first);
+          _rest = std::forward<RestClass>(other._rest);
         }
         return *this;
       }
@@ -570,13 +570,13 @@ namespace FEAT
       }
 
       explicit TupleVector(First_&& the_first) :
-        _first(std::move(the_first))
+        _first(std::forward<First_>(the_first))
       {
       }
 
       /// move-ctor
       TupleVector(TupleVector&& other) :
-        _first(std::move(other._first))
+        _first(std::forward<First_>(other._first))
       {
       }
 
@@ -585,7 +585,7 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
+          _first = std::forward<First_>(other._first);
         }
         return *this;
       }

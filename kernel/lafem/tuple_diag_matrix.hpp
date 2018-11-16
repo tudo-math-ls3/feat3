@@ -74,8 +74,8 @@ namespace FEAT
 
       /// base-class constructor; this one is protected for a reason
       explicit TupleDiagMatrix(First_&& the_first, RestClass&& the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest))
+        _first(std::forward<First_>(the_first)),
+        _rest(std::forward<RestClass>(the_rest))
       {
       }
 
@@ -93,15 +93,15 @@ namespace FEAT
 
       /// Sub-Matrix emplacement constructor
       explicit TupleDiagMatrix(First_&& the_first, Rest_&&... the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest...))
+        _first(std::forward<First_>(the_first)),
+        _rest(std::forward<Rest_>(the_rest)...)
       {
       }
 
       /// move ctor
       TupleDiagMatrix(TupleDiagMatrix&& other) :
-        _first(std::move(other._first)),
-        _rest(std::move(other._rest))
+        _first(std::forward<First_>(other._first)),
+        _rest(std::forward<RestClass>(other._rest))
       {
       }
 
@@ -179,8 +179,8 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
-          _rest = std::move(other._rest);
+          _first = std::forward<First_>(other._first);
+          _rest = std::forward<RestClass>(other._rest);
         }
         return *this;
       }
@@ -603,13 +603,13 @@ namespace FEAT
       }
 
       explicit TupleDiagMatrix(First_&& the_first) :
-        _first(std::move(the_first))
+        _first(std::forward<First_>(the_first))
       {
       }
 
       /// move ctor
       TupleDiagMatrix(TupleDiagMatrix&& other) :
-        _first(std::move(other._first))
+        _first(std::forward<First_>(other._first))
       {
       }
 
@@ -658,7 +658,7 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _first = std::move(other._first);
+          _first = std::forward<First_>(other._first);
         }
         return *this;
       }
