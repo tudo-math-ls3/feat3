@@ -589,6 +589,8 @@ namespace DbgAmaVanka
     filter.filter_rhs(vec_rhs);
     filter.filter_sol(vec_sol);
 
+    auto vec_sol_2 = vec_sol.clone();
+
     filter_v.filter_mat(matrix_a);
 
     filter_v.filter_offdiag_row_mat(matrix_b);
@@ -606,17 +608,17 @@ namespace DbgAmaVanka
     new_solver->done();
 
 #ifdef FEAT_HAVE_CUDA
-    /*if(args.check("cuda") >= 0)
+    if(args.check("cuda") >= 0)
     {
       std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
-      typename SystemMatrixType::ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> matrix_cuda;
-      typename SystemFilterType::FilterTypeByMDI<Mem::CUDA, DataType, IndexType> filter_cuda;
-      typename SystemVectorType::ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_sol_cuda;
-      typename SystemVectorType::ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_rhs_cuda;
+      typename SystemMatrixType::template ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> matrix_cuda;
+      typename SystemFilterType::template FilterTypeByMDI<Mem::CUDA, DataType, IndexType> filter_cuda;
+      typename SystemVectorType::template ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_sol_cuda;
+      typename SystemVectorType::template ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_rhs_cuda;
 
       matrix_cuda.convert(matrix);
       filter_cuda.convert(filter);
-      vec_sol_cuda.convert(vec_sol);
+      vec_sol_cuda.convert(vec_sol_2);
       vec_rhs_cuda.convert(vec_rhs);
 
       auto cuda_vanka = Solver::new_amavanka(matrix_cuda, filter_cuda);
@@ -630,8 +632,16 @@ namespace DbgAmaVanka
       cuda_solver->set_plot_name("CUDA Vanka");
       cuda_solver->correct(vec_sol_cuda, vec_rhs_cuda);
       cuda_solver->done();
-    }*/
+
+      std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
+      std::cout << cuda_solver->get_summary() << std::endl;
+      std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
+    }
 #endif // FEAT_HAVE_CUDA
+
+    std::cout << std::endl << "New Vanka Summary:" << std::endl;
+    std::cout << new_solver->get_summary() << std::endl;
+    std::cout << "Vanka Apply Time: " << stringify_fp_fix(new_vanka->time_apply(),3) << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Analyse velocity field
@@ -840,7 +850,6 @@ namespace DbgAmaVanka
     new_solver->set_plot_name("New Vanka");
     new_solver->correct(vec_sol_1, vec_rhs);
     new_solver->done();
-    vec_sol.copy(vec_sol_1);
 
     auto old_vanka = Solver::new_vanka(saddle_matrix, filter, Solver::VankaType::block_full_add);
     auto old_solver = Solver::new_richardson(matrix, filter, omega, old_vanka);
@@ -852,13 +861,13 @@ namespace DbgAmaVanka
     old_solver->done();
 
 #ifdef FEAT_HAVE_CUDA
-    /*if(args.check("cuda") >= 0)
+    if(args.check("cuda") >= 0)
     {
       std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
-      typename SystemMatrixType::ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> matrix_cuda;
-      typename SystemFilterType::FilterTypeByMDI<Mem::CUDA, DataType, IndexType> filter_cuda;
-      typename SystemVectorType::ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_sol_cuda;
-      typename SystemVectorType::ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_rhs_cuda;
+      typename SystemMatrixType::template ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> matrix_cuda;
+      typename SystemFilterType::template FilterTypeByMDI<Mem::CUDA, DataType, IndexType> filter_cuda;
+      typename SystemVectorType::template ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_sol_cuda;
+      typename SystemVectorType::template ContainerTypeByMDI<Mem::CUDA, DataType, IndexType> vec_rhs_cuda;
 
       matrix_cuda.convert(matrix);
       filter_cuda.convert(filter);
@@ -877,18 +886,23 @@ namespace DbgAmaVanka
       cuda_solver->done();
 
       std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
-      std::cout << new_solver->get_summary() << std::endl;
-    }*/
+      std::cout << cuda_solver->get_summary() << std::endl;
+      std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
+    }
 #endif // FEAT_HAVE_CUDA
 
     std::cout << std::endl << "New Vanka Summary:" << std::endl;
     std::cout << new_solver->get_summary() << std::endl;
+    std::cout << "Vanka Apply Time: " << stringify_fp_fix(new_vanka->time_apply(),3) << std::endl;
 
     std::cout << std::endl << "Old Vanka Summary:" << std::endl;
     std::cout << old_solver->get_summary() << std::endl;
+    std::cout << "Vanka Apply Time: " << stringify_fp_fix(old_vanka->time_apply(),3) << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Analyse velocity field
+
+    vec_sol.copy(vec_sol_1);
 
     std::cout << std::endl << "Velocity Field Analysis" << std::endl;
 

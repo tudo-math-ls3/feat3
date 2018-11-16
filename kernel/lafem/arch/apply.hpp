@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/archs.hpp>
 
 #include <typeinfo>
@@ -231,7 +232,7 @@ namespace FEAT
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          XASSERT(BlockHeight_ < 10, "The generic cuda bcsr kernel does not support BlockHeight greather than 9!");
+          XASSERTM(BlockHeight_ < 10, "The generic cuda bcsr kernel does not support BlockHeight greather than 9!");
           csrb_wrapper(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_, BlockWidth_);
         }
 

@@ -168,8 +168,8 @@ namespace FEAT
         const NullMatrix<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other,
         CloneMode DOXY(clone_mode) = CloneMode::Weak)
       {
-        this->_num_rows = other._num_rows;
-        this->_num_cols = other._num_cols;
+        this->_num_rows = other.rows();
+        this->_num_cols = other.columns();
       }
 
       /**
@@ -182,8 +182,8 @@ namespace FEAT
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const NullMatrix<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
-        this->_num_rows = other._num_rows;
-        this->_num_cols = other._num_cols;
+        this->_num_rows = other.rows();
+        this->_num_cols = other.columns();
       }
 
       /**
