@@ -231,15 +231,18 @@ namespace FEAT
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          static_assert(BlockHeight_ == BlockWidth_, "cuda bcsr only supports squared matrix blocks!");
-          csrb_intern<DT_, BlockHeight_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+          XASSERT(BlockHeight_ < 10, "The generic cuda bcsr kernel does not support BlockHeight greather than 9!");
+          csrb_wrapper(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_, BlockWidth_);
         }
 
-        template <typename DT_, int BlockSize_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements);
+        template <typename DT_, typename IT_>
+        static void csrb_wrapper(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth);
 
-        template <typename DT_, int BlockSize_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements);
+        template <typename DT_, typename IT_>
+        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockSize);
+
+        template <typename DT_, typename IT_>
+        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth);
 
         template <typename DT_, typename IT_, int BlockSize_>
         static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements);
