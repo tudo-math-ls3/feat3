@@ -32,6 +32,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(FeatLibDirList)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(FeatLibDepList)</AdditionalDependencies>
+      <StackReserveSize>16777216</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
 
