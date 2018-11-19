@@ -596,9 +596,9 @@ namespace FEAT
             s += stringify(it->parti_level);
             s += " for ";
             s += stringify(it->num_parts);
-            s += " patches on ";
+            s += (it->num_parts > 1 ? " patches on " : " patch on ");
             s += stringify(it->num_procs);
-            s += " processes";
+            s += (it->num_procs > 1 ? " processes" : " process");
           }
 
           return s;
@@ -792,6 +792,9 @@ namespace FEAT
           // create single ancestry
           this->_create_ancestry_single();
           Ancestor& ancestor = this->_ancestry.front();
+
+          // use the whole base mesh here
+          ancestor.parti_info = "Using base-mesh";
 
           // refine up to desired minimum level
           int lvl = 0;
