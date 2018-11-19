@@ -255,6 +255,16 @@ namespace FEAT
       }
 
       /**
+       * \brief Returns the total amount of bytes allocated.
+       *
+       * \returns 0
+       */
+      std::size_t bytes() const
+      {
+        return std::size_t(0);
+      }
+
+      /**
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The Matrix to be copied.

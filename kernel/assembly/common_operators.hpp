@@ -838,6 +838,358 @@ namespace FEAT
           }
         }; // class DuDvOperatorBlocked::Evaluator<...>
       }; // class DuDVOperatorBlocked
+
+      /**
+       * \brief Stress-Divergence Operator
+       *
+       * This operator implements the stress-divergence operator \f$\nabla\cdot\sigma\f$
+       * which is used in the 3-field Stokes formulation. This operator supports both symmetric
+       * and unsymmetric stress fields in 2 or 3 dimensions.
+       *
+       * \tparam dim_
+       * The dimension of the space.
+       *
+       * \tparam nsc_
+       * The number of stress components.
+       *
+       * Possible valid combinations of (dim_,nsc_) are:
+       * - (2,3): symmetric 2D stress field with 3 components
+       * - (2,4): unsymmetric 2D stress field with 4 components
+       * - (3,6): symmetric 3D stress field with 6 components
+       * - (3,9): unsymmetric 3D stress field with 9 components
+       *
+       * \author Peter Zajac
+       */
+      template<int dim_, int nsc_>
+      class StressDivergenceOperator :
+        public Assembly::BilinearOperator
+      {
+      public:
+        static constexpr int BlockHeight = dim_;
+        static constexpr int BlockWidth = nsc_;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          explicit Evaluator(const StressDivergenceOperator& DOXY(operat)) {}
+
+          /// unsymmetric 2D version with 4 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 2, 4, 2, 4>& R, const Tiny::Vector<T_, 2, 2>& der, const T_ u)
+          {
+            // u_1 = dx sigma_11 + dy sigma_12 = dx sigma_1 + dy sigma_2
+            //     = (dx, dy, 0, 0) : (sigma_11, sigma_12, sigma_21, sigma_22)
+            R(0,0) = u * der(0);
+            R(0,1) = u * der(1);
+            R(0,2) = T_(0);
+            R(0,3) = T_(0);
+
+            // u_2 = dx sigma_21 + dy sigma_22 = dx sigma_3 + dy sigma_2
+            //     = (0, 0, dx, dy) : (sigma_11, sigma_12, sigma_21, sigma_22)
+            R(1,0) = T_(0);
+            R(1,1) = T_(0);
+            R(1,2) = u * der(0);
+            R(1,3) = u * der(1);
+          }
+
+          /// symmetric 2D version with 3 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 2, 3, 2, 3>& R, const Tiny::Vector<T_, 2, 2>& der, const T_ u)
+          {
+            // we have:
+            //  [ sigma_11 sigma_12 ]   [ sigma_1 sigma_3 ]
+            //  [ sigma_21 sigma_22 ] = [ sigma_3 sigma_2 ]
+
+            // u_1 = dx sigma_11 + dy sigma_12 = dx sigma_1 + dy sigma_3
+            //     = (dx, 0, dy) : (sigma_11, sigma_22, sigma_12)
+            R(0,0) = u * der(0);
+            R(0,1) = T_(0);
+            R(0,2) = u * der(1);
+
+            // u_2 = dx sigma_21 + dy sigma_22 = dx sigma_3 + dy sigma_2
+            //     = (0, dy, dx) : (sigma_11, sigma_22, sigma_12)
+            R(1,0) = T_(0);
+            R(1,1) = u * der(1);
+            R(1,2) = u * der(0);
+          }
+
+          /// unsymmetric 3D version with 9 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 3, 9, 3, 9>& R, const Tiny::Vector<T_, 3, 3>& der, const T_ u)
+          {
+            // u_1 = dx sigma_11 + dy sigma_12 + dz sigma_13 = dx sigma_1 + dy sigma_2 + dz sigma_3
+            R(0,0) = u * der(0);
+            R(0,1) = u * der(1);
+            R(0,2) = u * der(2);
+            R(0,3) = T_(0);
+            R(0,4) = T_(0);
+            R(0,5) = T_(0);
+            R(0,6) = T_(0);
+            R(0,7) = T_(0);
+            R(0,8) = T_(0);
+
+            // u_2 = dx sigma_21 + dy sigma_22 + dz sigma_23 = dx sigma_4 + dy sigma_5 + dz sigma_6
+            R(1,0) = T_(0);
+            R(1,1) = T_(0);
+            R(1,2) = T_(0);
+            R(1,3) = u * der(0);
+            R(1,4) = u * der(1);
+            R(1,5) = u * der(2);
+            R(1,6) = T_(0);
+            R(1,7) = T_(0);
+            R(1,8) = T_(0);
+
+            // u_3 = dx sigma_31 + dy sigma_32 + dz sigma_33 = dx sigma_7 + dy sigma_8 + dz sigma_9
+            R(2,0) = T_(0);
+            R(2,1) = T_(0);
+            R(2,2) = T_(0);
+            R(2,3) = T_(0);
+            R(2,4) = T_(0);
+            R(2,5) = T_(0);
+            R(2,6) = u * der(0);
+            R(2,7) = u * der(1);
+            R(2,8) = u * der(2);
+          }
+
+          /// symmetric 3D version with 6 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 3, 6, 3, 6>& R, const Tiny::Vector<T_, 3, 3>& der, const T_ u)
+          {
+            // we have:
+            //  [ sigma_11 sigma_12 sigma_13 ]   [ sigma_1 sigma_4 sigma_6 ]
+            //  [ sigma_21 sigma_22 sigma_23 ] = [ sigma_4 sigma_2 sigma_5 ]
+            //  [ sigma_22 sigma_23 sigma_33 ]   [ sigma_6 sigma_5 sigma_3 ]
+
+            // u_1 = dx sigma_11 + dy sigma_12 + dz sigma_13 = dx sigma_1 + dy sigma_4 + dz sigma_6
+            R(0,0) = u * der(0);
+            R(0,1) = T_(0);
+            R(0,2) = T_(0);
+            R(0,3) = u * der(1);
+            R(0,4) = T_(0);
+            R(0,5) = u * der(2);
+
+            // u_2 = dx sigma_21 + dy sigma_22 + dz sigma_23 = dx sigma_4 + dy sigma_2 + dz sigma_5
+            R(1,0) = T_(0);
+            R(1,1) = u * der(1);
+            R(1,2) = T_(0);
+            R(1,3) = u * der(0);
+            R(1,4) = u * der(2);
+            R(1,5) = T_(0);
+
+            // u_3 = dx sigma_31 + dy sigma_32 + dz sigma_33 = dx sigma_6 + dy sigma_5 + dz sigma_3
+            R(2,0) = T_(0);
+            R(2,1) = T_(0);
+            R(2,2) = u * der(2);
+            R(2,3) = T_(0);
+            R(2,4) = u * der(1);
+            R(2,5) = u * der(0);
+          }
+
+          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            OperatorValueType R;
+            eval(R, phi.grad, psi.value);
+            return R;
+          }
+        }; // class StressDivergenceOperator::Evaluator
+      }; // class StressDivergenceOperator
+
+      /**
+       * \brief Strain-Rate-Tensor Operator
+       *
+       * This operator implements the strain-rate-tensor operator \f$\mathbb{D}(u)\f$
+       * which is used in the 3-field Stokes formulation. This operator supports both symmetric
+       * and unsymmetric stress fields in 2 or 3 dimensions.
+       *
+       * \tparam dim_
+       * The dimension of the space.
+       *
+       * \tparam nsc_
+       * The number of stress components.
+       *
+       * Possible valid combinations of (dim_,nsc_) are:
+       * - (2,3): symmetric 2D stress field with 3 components
+       * - (2,4): unsymmetric 2D stress field with 4 components
+       * - (3,6): symmetric 3D stress field with 6 components
+       * - (3,9): unsymmetric 3D stress field with 9 components
+       *
+       * \author Peter Zajac
+       */
+      template<int dim_, int nsc_>
+      class StrainRateTensorOperator :
+        public Assembly::BilinearOperator
+      {
+      public:
+        static constexpr int BlockHeight = nsc_;
+        static constexpr int BlockWidth = dim_;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          explicit Evaluator(const StrainRateTensorOperator& DOXY(operat)) {}
+
+          /// unsymmetric 2D version with 4 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 4, 2, 4, 2>& K, const Tiny::Vector<T_, 2, 2>& der, const T_ s)
+          {
+            // sigma_1 [11] = dx u_1 = (dx, 0) : (u_1, u_2)
+            K(0,0) = s * der(0);
+            K(0,1) = T_(0);
+
+            // sigma_2 [12] = 1/2 * (dy u_1 + dx u_2) = 1/2 * (dy, dx) : (u_1, u_2)
+            K(1,0) = s * der(1) / T_(2);
+            K(1,1) = s * der(0) / T_(2);
+
+            // sigma_3 [21] = 1/2 * (dy u_1 + dx u_2) = 1/2 * (dy, dx) : (u_1, u_2)
+            K(2,0) = s * der(1) / T_(2);
+            K(2,1) = s * der(0) / T_(2);
+
+            // sigma_4 [22] = dy u_2 = (0, dy) : (u_1, u_2)
+            K(3,0) = T_(0);
+            K(3,1) = s * der(1);
+          }
+
+          /// symmetric 2D version with 3 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 3, 2, 3, 2>& K, const Tiny::Vector<T_, 2, 2>& der, const T_ s)
+          {
+            // we have:
+            //  [ sigma_11 sigma_12 ]   [ sigma_1 sigma_3 ]
+            //  [ sigma_21 sigma_22 ] = [ sigma_3 sigma_2 ]
+
+            // sigma_1 [11] = dx u_1 = (dx, 0) : (u_1, u_2)
+            K(0,0) = s * der(0);
+            K(0,1) = T_(0);
+
+            // sigma_2 [22] = dy u_2 = (0, dy) : (u_1, u_2)
+            K(1,0) = T_(0);
+            K(1,1) = s * der(1);
+
+            // sigma_3 [12] = 1/2 * (dy u_1 + dx u_2) = 1/2 * (dy, dx) : (u_1, u_2)
+            K(2,0) = s * der(1) / T_(2);
+            K(2,1) = s * der(0) / T_(2);
+          }
+
+          /// unsymmetric 3D version with 9 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 9, 3, 9, 3>& K, const Tiny::Vector<T_, 3, 3>& der, const T_ s)
+          {
+            // sigma_1 [11] = dx u_1 = (dx, 0, 0) : (u_1, u_2, u_3)
+            K(0,0) = s * der(0);
+            K(0,1) = T_(0);
+            K(0,2) = T_(0);
+
+            // sigma_2 [12] = 1/2 * (dy u_1 + dx u_2) = 1/2 * (dy, dx, 0) : (u_1, u_2, u_3)
+            K(1,0) = s * der(1) / T_(2);
+            K(1,1) = s * der(0) / T_(2);
+            K(1,2) = T_(0);
+
+            // sigma_3 [13] = 1/2 * (dz u_1 + dx u_3) = 1/2 * (dz, 0, dx) : (u_1, u_2, u_3)
+            K(2,0) = s * der(2) / T_(2);
+            K(2,1) = T_(0);
+            K(2,2) = s * der(0) / T_(2);
+
+            // sigma_4 [21] = 1/2 * (dx u_2 + dy u_1) = 1/2 * (dy, dx, 0) : (u_1, u_2, u_3)
+            K(3,0) = s * der(1) / T_(2);
+            K(3,1) = s * der(0) / T_(2);
+            K(3,2) = T_(0);
+
+            // sigma_5 [22] = dy u_2 = (0, dy, 0) : (u_1, u_2, u_3)
+            K(4,0) = T_(0);
+            K(4,1) = s * der(1);
+            K(4,2) = T_(0);
+
+            // sigma_6 [23] = 1/2 * (dz u_2 + dy u_3) = 1/2 * (0, dz, dy) : (u_1, u_2, u_3)
+            K(5,0) = T_(0);
+            K(5,1) = s * der(2) / T_(2);
+            K(5,2) = s * der(1) / T_(2);
+
+            // sigma_7 [31] = 1/2 * (dx u_3 + dz u_1) = 1/2 * (dz, 0, dx) : (u_1, u_2, u_3)
+            K(6,0) = s * der(2) / T_(2);
+            K(6,1) = T_(0);
+            K(6,1) = s * der(0) / T_(2);
+
+            // sigma_8 [32] = 1/2 * (dy u_3 + dz u_2) = 1/2 * (0, dz, dy) : (u_1, u_2, u_3)
+            K(7,0) = T_(0);
+            K(7,1) = s * der(2) / T_(2);
+            K(7,2) = s * der(1) / T_(2);
+
+            // sigma_9 [33] = dz u3 = (0, 0, dz) : (u_1, u_2, u_3)
+            K(8,0) = T_(0);
+            K(8,1) = T_(0);
+            K(8,2) = s * der(2);
+          }
+
+          /// symmetric 3D version with 6 stress components
+          template<typename T_>
+          static void eval(Tiny::Matrix<T_, 6, 3, 6, 3>& K, const Tiny::Vector<T_, 3, 3>& der, const T_ s)
+          {
+            // we have:
+            //  [ sigma_11 sigma_12 sigma_13 ]   [ sigma_1 sigma_4 sigma_6 ]
+            //  [ sigma_21 sigma_22 sigma_23 ] = [ sigma_4 sigma_2 sigma_5 ]
+            //  [ sigma_22 sigma_23 sigma_33 ]   [ sigma_6 sigma_5 sigma_3 ]
+
+            // sigma_1 [11] = dx u_1 = (dx, 0, 0) : (u_1, u_2, u_3)
+            K(0,0) = s * der(0);
+            K(0,1) = T_(0);
+            K(0,2) = T_(0);
+
+            // sigma_2 [22] = dy u_2 = (0, dy, 0) : (u_1, u_2, u_3)
+            K(1,0) = T_(0);
+            K(1,1) = s * der(1);
+            K(1,2) = T_(0);
+
+            // sigma_3 [33] = dz u3 = (0, 0, dz) : (u_1, u_2, u_3)
+            K(2,0) = T_(0);
+            K(2,1) = T_(0);
+            K(2,2) = s * der(2);
+
+            // sigma_4 [12] = 1/2 * (dy u_1 + dx u_2) = 1/2 * (dy, dx, 0) : (u_1, u_2, u_3)
+            K(3,0) = s * der(1) / T_(2);
+            K(3,1) = s * der(0) / T_(2);
+            K(3,2) = T_(0);
+
+            // sigma_5 [23] = 1/2 * (dz u_2 + dy u_3) = 1/2 * (0, dz, dy) : (u_1, u_2, u_3)
+            K(4,0) = T_(0);
+            K(4,1) = s * der(2) / T_(2);
+            K(4,2) = s * der(1) / T_(2);
+
+            // sigma_6 [13] = 1/2 * (dz u_1 + dx u_3) = 1/2 * (dz, 0, dx) : (u_1, u_2, u_3)
+            K(5,0) = s * der(2) / T_(2);
+            K(5,1) = T_(0);
+            K(5,2) = s * der(0) / T_(2);
+          }
+
+          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            OperatorValueType K;
+            eval(K, phi.grad, psi.value);
+            return K;
+          }
+        }; // class StrainRateTensorOperator::Evaluator
+      }; // class StrainRateTensorOperator
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAT

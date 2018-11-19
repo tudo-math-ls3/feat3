@@ -141,6 +141,35 @@ namespace FEAT
         {
         }
       }; // class StokesDomainLevel<...>
+
+      template<typename Mesh_, typename Trafo_, typename SpaceVelo_, typename SpacePres_, typename SpaceStress_>
+      class Stokes3FieldDomainLevel :
+        public Domain::DomainLevel<Mesh_>
+      {
+      public:
+        typedef Domain::DomainLevel<Mesh_> BaseClass;
+
+        typedef Mesh_ MeshType;
+        typedef Trafo_ TrafoType;
+        typedef SpaceVelo_ SpaceVeloType;
+        typedef SpacePres_ SpacePresType;
+        typedef SpaceStress_ SpaceStressType;
+
+        TrafoType trafo;
+        SpaceVeloType space_velo;
+        SpacePresType space_pres;
+        SpaceStressType space_stress;
+
+      public:
+        explicit Stokes3FieldDomainLevel(int lvl_idx, std::shared_ptr<Geometry::RootMeshNode<MeshType>> node) :
+          BaseClass(lvl_idx, node),
+          trafo(BaseClass::get_mesh()),
+          space_velo(trafo),
+          space_pres(trafo),
+          space_stress(trafo)
+        {
+        }
+      }; // class Stokes3FieldDomainLevel<...>
     } // namespace Domain
   } // namespace Control
 } // namespace FEAT

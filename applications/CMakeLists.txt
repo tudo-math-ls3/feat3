@@ -23,6 +23,7 @@ SET (app_list
   poisson_neumann
   poisson_scarc
   poisson_solver_factory
+  stokes_3field_bench
   stokes_dricav_2d
   stokes_poiseuille_2d
   stokes_vortex_2d
