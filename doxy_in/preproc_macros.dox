@@ -313,7 +313,7 @@ This macro is defined as 1 by the Visual Studio regression test system to disabl
 a custom exception filter for the Windows OS.
 
 <hr>
-\subsection ppm_feat_src_dir FEAT_SRC_DIR
+\subsection ppm_feat_source_dir FEAT_SOURCE_DIR
 This macro contains a string literal specifying the full absolute path to the root source directory.
 
 <hr>

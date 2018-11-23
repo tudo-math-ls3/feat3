@@ -14,7 +14,7 @@
 #cmakedefine FEAT_HAVE_MPI
 
 /// Path to the FEAT source dir
-#define FEAT_SRC_DIR "${FEAT_SOURCE_DIR}"
+#define FEAT_SOURCE_DIR "${FEAT_SOURCE_DIR}"
 
 /// Path to the FEAT binary dir
 #define FEAT_BINARY_DIR "${FEAT_BINARY_DIR}"
@@ -122,7 +122,7 @@
 /// cmake 'makefile' generator
 #define CMAKE_GENERATOR "${CMAKE_GENERATOR}"
 
-/// SHA1 of HEAD in FEAT_SRC_DIR
+/// SHA1 of HEAD in FEAT_SOURCE_DIR
 #define FEAT_GIT_SHA1 "${FEAT_GIT_SHA1}"
 
 /// Should we unroll all banded matrix kernels via template meta programming?
