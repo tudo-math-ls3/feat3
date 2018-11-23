@@ -186,6 +186,8 @@ namespace FEAT
           _desired_levels(),
           _extern_parti_names(),
           _required_elems_per_rank(1),
+          _genetic_time_init(5),
+          _genetic_time_mutate(5),
           _ancestry()
         {
         }
