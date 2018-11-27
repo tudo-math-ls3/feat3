@@ -442,7 +442,7 @@ namespace FEAT
       };
 
       /**
-       * \brief Wrapper struct for generating subshape@shape information
+       * \brief Wrapper struct for generating subshape\@shape information
        *
        * \tparam Shape_
        * Highest dimensional shape type
@@ -450,7 +450,7 @@ namespace FEAT
        * \tparam face_dim_
        * Dimension of the subshape
        *
-       * Using template recursion, this generates subshape@shape information for all subshapes of lower dimension,
+       * Using template recursion, this generates subshape\@shape information for all subshapes of lower dimension,
        * i.e. for Simplex<3> it generates edge@face, edge@cell and face@cell
        */
       template<typename Shape_, int face_dim_ = Shape_::dimension - 1>
@@ -460,12 +460,12 @@ namespace FEAT
         static constexpr int num_verts = Shape::FaceTraits<FaceType, 0>::count;
 
         /**
-         * \brief Generates subshape@shape information contained in an IndexSetHolder
+         * \brief Generates subshape\@shape information contained in an IndexSetHolder
          *
          * \param[in,out] ish
          * IndexsetHolder to be filled.
          *
-         * The only information this really needs is vertex@shape. If vertex@subshape is missing for any subshape,
+         * The only information this really needs is vertex\@shape. If vertex@subshape is missing for any subshape,
          * it is generated using IndexCalculator.
          *
          */
@@ -493,7 +493,7 @@ namespace FEAT
           IndexTree<FaceType> idx_tree(vert_adj.get_index_bound());
           idx_tree.parse(vert_adj);
 
-          // Call the helper. This in turn calls IndexCalculater::compute, which needs vertex@shape and
+          // Call the helper. This in turn calls IndexCalculater::compute, which needs vertex\@shape and
           // vertex@subshape information for all subshapes.
           RisbHelper<Shape_, face_dim_>::compute(ish, idx_tree);
         }
