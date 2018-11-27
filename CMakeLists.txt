@@ -164,6 +164,7 @@ if (DOXYGEN_FOUND)
                          an
                          the)
   set(DOXYGEN_FILE_PATTERS "*.c" "*.cc" "*.cxx" "*.cpp" "*.c++" "*.cu" "*.dox" "*.py" "*.h" "*.hh" "*.hpp" "*.h++" "*.f90" "*.f")
+  SET(DOXYGEN_HTML_TIMESTAMP YES)
   doxygen_add_docs(doc ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
   set(DOXYGEN_ENABLED_SECTIONS "internal")
   doxygen_add_docs(doc-internal ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
