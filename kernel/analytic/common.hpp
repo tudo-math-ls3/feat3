@@ -1671,7 +1671,7 @@ namespace FEAT
 
       /// \cond internal
       /**
-       * \brief Goldstein\/Price function
+       * \brief Goldstein-Price function
        *
        * \tparam DataType_
        * Floating point precision
@@ -1740,7 +1740,7 @@ namespace FEAT
       /// \endcond
 
       /**
-       * \brief Goldstein\/Price function
+       * \brief Goldstein-Price function
        *
        * \tparam DataType_
        * Floating point precision
