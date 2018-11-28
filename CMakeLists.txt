@@ -137,38 +137,40 @@ endif(FEAT_HAVE_TRIANGLE)
 ADD_CUSTOM_TARGET (tests)
 
 # add a target to generate API documentation with Doxygen
-find_package(Doxygen)
-if (DOXYGEN_FOUND)
-  set(DOXYGEN_OUTPUT_DIRECTORY "${FEAT_BINARY_DIR}/doc")
-  set(DOXYGEN_GENERATE_HTML YES)
-  set(DOXYGEN_GENERATE_MAN NO)
-  set(DOXYGEN_TAB_SIZE "2")
-  set(DOXYGEN_ALIASES
-    [["compilerhack=\xrefitem compilerhacks \"Compiler Hack\" \"Compiler Hacks\""]]
-    [["platformswitch=\xrefitem platformswitches \"Platform dependend code branching\" \"Platform depenendend code branches\""]])
-  set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
-  set(DOXYGEN_EXTRA_PACKAGES "amsmath" "amssymb")
-  set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
-  set(DOXYGEN_IMAGE_PATH "${FEAT_SOURCE_DIR}/doxy_in")
-  set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/thirdparty/*")
-  set(DOXYGEN_WARN_LOGFILE "${FEAT_BINARY_DIR}/doc/warnings.log")
-  set(DOXYGEN_ABBREVIATE_BRIEF "The $name class"
-                         "The $name widget"
-                         "The $name file"
-                         is
-                         provides
-                         specifies
-                         contains
-                         represents
-                         a
-                         an
-                         the)
-  set(DOXYGEN_FILE_PATTERS "*.c" "*.cc" "*.cxx" "*.cpp" "*.c++" "*.cu" "*.dox" "*.py" "*.h" "*.hh" "*.hpp" "*.h++" "*.f90" "*.f")
-  SET(DOXYGEN_HTML_TIMESTAMP YES)
-  doxygen_add_docs(doc ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
-  set(DOXYGEN_ENABLED_SECTIONS "internal")
-  doxygen_add_docs(doc-internal ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
-endif (DOXYGEN_FOUND)
+if (${CMAKE_VERSION} VERSION_GREATER "3.8.99")
+  find_package(Doxygen)
+  if (DOXYGEN_FOUND)
+    set(DOXYGEN_OUTPUT_DIRECTORY "${FEAT_BINARY_DIR}/doc")
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_GENERATE_MAN NO)
+    set(DOXYGEN_TAB_SIZE "2")
+    set(DOXYGEN_ALIASES
+      [["compilerhack=\xrefitem compilerhacks \"Compiler Hack\" \"Compiler Hacks\""]]
+      [["platformswitch=\xrefitem platformswitches \"Platform dependend code branching\" \"Platform depenendend code branches\""]])
+    set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
+    set(DOXYGEN_EXTRA_PACKAGES "amsmath" "amssymb")
+    set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
+    set(DOXYGEN_IMAGE_PATH "${FEAT_SOURCE_DIR}/doxy_in")
+    set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/thirdparty/*")
+    set(DOXYGEN_WARN_LOGFILE "${FEAT_BINARY_DIR}/doc/warnings.log")
+    set(DOXYGEN_ABBREVIATE_BRIEF "The $name class"
+                           "The $name widget"
+                           "The $name file"
+                           is
+                           provides
+                           specifies
+                           contains
+                           represents
+                           a
+                           an
+                           the)
+    set(DOXYGEN_FILE_PATTERS "*.c" "*.cc" "*.cxx" "*.cpp" "*.c++" "*.cu" "*.dox" "*.py" "*.h" "*.hh" "*.hpp" "*.h++" "*.f90" "*.f")
+    SET(DOXYGEN_HTML_TIMESTAMP YES)
+    doxygen_add_docs(doc ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
+    set(DOXYGEN_ENABLED_SECTIONS "internal")
+    doxygen_add_docs(doc-internal ${FEAT_SOURCE_DIR} COMMENT "Generating API documentation with Doxygen")
+  endif (DOXYGEN_FOUND)
+endif (${CMAKE_VERSION} VERSION_GREATER "3.8.99")
 
 if (CMAKE_CXX_COMPILER_ARG1)
   string(STRIP ${CMAKE_CXX_COMPILER_ARG1} CMAKE_CXX_COMPILER_ARG1_STRIPED)
