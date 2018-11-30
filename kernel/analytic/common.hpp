@@ -1685,7 +1685,7 @@ namespace FEAT
        *  \f[
        *    x_1 = (-0.6, -0.4)^T, x_2 = (1.2, 0.8)^T, x_3 = (1.8, 0.2),
        *  \f]
-       *  one saddle point \f$ x_4 = (-0.4, 0.6)^T \f$ and a local maximum in \f$ x_5 = (1.2, -0.2)^T.
+       *  one saddle point \f$ x_4 = (-0.4, 0.6)^T \f$ and a local maximum in \f$ x_5 = (1.2, -0.2)^T\f$.
        *
        *
        * \author Jordi Paul
