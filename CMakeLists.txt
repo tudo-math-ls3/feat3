@@ -151,7 +151,7 @@ if (${CMAKE_VERSION} VERSION_GREATER "3.8.99")
     set(DOXYGEN_EXTRA_PACKAGES "amsmath" "amssymb")
     set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
     set(DOXYGEN_IMAGE_PATH "${FEAT_SOURCE_DIR}/doxy_in")
-    set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/thirdparty/*")
+    set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/thirdparty/*" "*/tutorials/*" "*-test*.cpp")
     set(DOXYGEN_WARN_LOGFILE "${FEAT_BINARY_DIR}/doc/warnings.log")
     set(DOXYGEN_ABBREVIATE_BRIEF "The $name class"
                            "The $name widget"
