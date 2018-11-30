@@ -1593,12 +1593,12 @@ namespace NavierStokesCP2D
         Geometry::ExportVTK<MeshType> vtk(the_domain_level.get_mesh());
 
         // write solution
-        vtk.add_vertex_vector("v", (*vec_sol_v));
+        vtk.add_vertex_vector("v", vec_sol_v.local());
 
         // project pressure
         Cubature::DynamicFactory cub("gauss-legendre:2");
         LAFEM::DenseVector<Mem::Main, double, Index> vtx_p, vtx_der_p;
-        Assembly::DiscreteCellProjector::project(vtx_p, *vec_sol_p, the_domain_level.space_pres, cub);
+        Assembly::DiscreteCellProjector::project(vtx_p, vec_sol_p.local(), the_domain_level.space_pres, cub);
 
         // write pressure
         vtk.add_cell_scalar("p", vtx_p.elements());
@@ -1610,9 +1610,9 @@ namespace NavierStokesCP2D
         vec_der_p.axpy(vec_sol_p_1, vec_der_p, -DataType(1));
         vec_der_v.scale(vec_der_v, DataType(1) / delta_t);
         vec_der_p.scale(vec_der_p, DataType(1) / delta_t);
-        Assembly::DiscreteCellProjector::project(vtx_der_p, *vec_der_p, the_domain_level.space_pres, cub);
+        Assembly::DiscreteCellProjector::project(vtx_der_p, vec_der_p.local(), the_domain_level.space_pres, cub);
 
-        vtk.add_vertex_vector("v_dt", (*vec_der_v));
+        vtk.add_vertex_vector("v_dt", vec_der_v.local());
         vtk.add_cell_scalar("p_dt", vtx_der_p.elements());
 
         // export

@@ -1378,12 +1378,12 @@ namespace NvSCCNDQ2P1dc
         Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
         // project velocity and pressure
-        exporter.add_vertex_vector("v", (*vec_sol).template at<0>());
+        exporter.add_vertex_vector("v", vec_sol.local().template at<0>());
 
         // project pressure
         Cubature::DynamicFactory cub("gauss-legendre:2");
         LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
-        Assembly::DiscreteCellProjector::project(vtx_p, (*vec_sol).template at<1>(), the_domain_level.space_pres, cub);
+        Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
         // write pressure
         exporter.add_cell_scalar("pressure", vtx_p.elements());
@@ -1403,7 +1403,7 @@ namespace NvSCCNDQ2P1dc
         Geometry::ExportVTK<MeshType> exporter(mesh);
 
         // project velocity and pressure
-        exporter.add_vertex_vector("v", (*vec_sol).template at<0>());
+        exporter.add_vertex_vector("v", vec_sol.local().template at<0>());
 
         // finally, write the VTK file
         exporter.write(vtk_name2, comm);

@@ -58,23 +58,23 @@ namespace FEAT
           comm.allreduce(&cells_fine_local, &cells_fine_max, std::size_t(1), Dist::op_max);
           comm.allreduce(&cells_fine_local, &cells_fine_min, std::size_t(1), Dist::op_min);
 
-          Index dofs_coarse_local = (*system_levels.back()->matrix_sys).columns();
+          Index dofs_coarse_local = system_levels.back()->matrix_sys.local().columns();
           Index dofs_coarse_max;
           Index dofs_coarse_min;
           comm.allreduce(&dofs_coarse_local, &dofs_coarse_max, std::size_t(1), Dist::op_max);
           comm.allreduce(&dofs_coarse_local, &dofs_coarse_min, std::size_t(1), Dist::op_min);
-          Index dofs_fine_local = (*system_levels.front()->matrix_sys).columns();
+          Index dofs_fine_local = system_levels.front()->matrix_sys.local().columns();
           Index dofs_fine_max;
           Index dofs_fine_min;
           comm.allreduce(&dofs_fine_local, &dofs_fine_max, std::size_t(1), Dist::op_max);
           comm.allreduce(&dofs_fine_local, &dofs_fine_min, std::size_t(1), Dist::op_min);
 
-          Index nzes_coarse_local = (*system_levels.back()->matrix_sys).used_elements();
+          Index nzes_coarse_local = system_levels.back()->matrix_sys.local().used_elements();
           Index nzes_coarse_max;
           Index nzes_coarse_min;
           comm.allreduce(&nzes_coarse_local, &nzes_coarse_max, std::size_t(1), Dist::op_max);
           comm.allreduce(&nzes_coarse_local, &nzes_coarse_min, std::size_t(1), Dist::op_min);
-          Index nzes_fine_local = (*system_levels.front()->matrix_sys).used_elements();
+          Index nzes_fine_local = system_levels.front()->matrix_sys.local().used_elements();
           Index nzes_fine_max;
           Index nzes_fine_min;
           comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);

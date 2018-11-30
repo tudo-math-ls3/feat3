@@ -672,7 +672,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_float_ulong.emplace_back();
               local_systems_main_float_ulong.back().convert(local_matrix);
@@ -680,7 +680,7 @@ namespace FEAT
 
             for (auto& filter : filters_main_float_ulong)
             {
-              local_filters_main_float_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_main_float_ulong.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_main_float_ulong)
@@ -696,7 +696,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_double_ulong.emplace_back();
               local_systems_main_double_ulong.back().convert(local_matrix);
@@ -704,7 +704,7 @@ namespace FEAT
 
             for (auto& filter : filters_main_double_ulong)
             {
-              local_filters_main_double_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_main_double_ulong.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_main_double_ulong)
@@ -721,7 +721,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_float_ulong.emplace_back();
               local_systems_cuda_float_ulong.back().convert(local_matrix);
@@ -729,7 +729,7 @@ namespace FEAT
 
             for (auto& filter : filters_cuda_float_ulong)
             {
-              local_filters_cuda_float_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_cuda_float_ulong.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_cuda_float_ulong)
@@ -745,7 +745,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_double_ulong.emplace_back();
               local_systems_cuda_double_ulong.back().convert(local_matrix);
@@ -753,7 +753,7 @@ namespace FEAT
 
             for (auto& filter : filters_cuda_double_ulong)
             {
-              local_filters_cuda_double_ulong.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_cuda_double_ulong.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_cuda_double_ulong)
@@ -770,7 +770,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_float_uint.emplace_back();
               local_systems_main_float_uint.back().convert(local_matrix);
@@ -778,7 +778,7 @@ namespace FEAT
 
             for (auto& filter : filters_main_float_uint)
             {
-              local_filters_main_float_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_main_float_uint.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_main_float_uint)
@@ -794,7 +794,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_double_uint.emplace_back();
               local_systems_main_double_uint.back().convert(local_matrix);
@@ -802,7 +802,7 @@ namespace FEAT
 
             for (auto& filter : filters_main_double_uint)
             {
-              local_filters_main_double_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_main_double_uint.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_main_double_uint)
@@ -819,7 +819,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_float_uint.emplace_back();
               local_systems_cuda_float_uint.back().convert(local_matrix);
@@ -827,7 +827,7 @@ namespace FEAT
 
             for (auto& filter : filters_cuda_float_uint)
             {
-              local_filters_cuda_float_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_cuda_float_uint.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_cuda_float_uint)
@@ -843,7 +843,7 @@ namespace FEAT
 
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_double_uint.emplace_back();
               local_systems_cuda_double_uint.back().convert(local_matrix);
@@ -851,7 +851,7 @@ namespace FEAT
 
             for (auto& filter : filters_cuda_double_uint)
             {
-              local_filters_cuda_double_uint.push_back((*filter).clone(LAFEM::CloneMode::Shallow));
+              local_filters_cuda_double_uint.push_back(filter.local().clone(LAFEM::CloneMode::Shallow));
             }
 
             for (auto& transfer : transfers_cuda_double_uint)
@@ -1098,14 +1098,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_float_ulong.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_main_float_ulong.size() ; ++i)
             {
-              local_filters_main_float_ulong.at(i).convert(*filters_main_float_ulong.at(i));
+              local_filters_main_float_ulong.at(i).convert(filters_main_float_ulong.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_main_float_ulong.size() ; ++i)
@@ -1119,14 +1119,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_double_ulong.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_main_double_ulong.size() ; ++i)
             {
-              local_filters_main_double_ulong.at(i).convert(*filters_main_double_ulong.at(i));
+              local_filters_main_double_ulong.at(i).convert(filters_main_double_ulong.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_main_double_ulong.size() ; ++i)
@@ -1141,14 +1141,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_float_ulong.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_cuda_float_ulong.size() ; ++i)
             {
-              local_filters_cuda_float_ulong.at(i).convert(*filters_cuda_float_ulong.at(i));
+              local_filters_cuda_float_ulong.at(i).convert(filters_cuda_float_ulong.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_cuda_float_ulong.size() ; ++i)
@@ -1162,14 +1162,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_double_ulong.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_cuda_double_ulong.size() ; ++i)
             {
-              local_filters_cuda_double_ulong.at(i).convert(*filters_cuda_double_ulong.at(i));
+              local_filters_cuda_double_ulong.at(i).convert(filters_cuda_double_ulong.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_cuda_double_ulong.size() ; ++i)
@@ -1184,14 +1184,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_float_uint.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_main_float_uint.size() ; ++i)
             {
-              local_filters_main_float_uint.at(i).convert(*filters_main_float_uint.at(i));
+              local_filters_main_float_uint.at(i).convert(filters_main_float_uint.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_main_float_uint.size() ; ++i)
@@ -1205,14 +1205,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_main_double_uint.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_main_double_uint.size() ; ++i)
             {
-              local_filters_main_double_uint.at(i).convert(*filters_main_double_uint.at(i));
+              local_filters_main_double_uint.at(i).convert(filters_main_double_uint.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_main_double_uint.size() ; ++i)
@@ -1227,14 +1227,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_float_uint.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_cuda_float_uint.size() ; ++i)
             {
-              local_filters_cuda_float_uint.at(i).convert(*filters_cuda_float_uint.at(i));
+              local_filters_cuda_float_uint.at(i).convert(filters_cuda_float_uint.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_cuda_float_uint.size() ; ++i)
@@ -1248,14 +1248,14 @@ namespace FEAT
           {
             for (Index i(0) ; i < systems.size() ; ++i)
             {
-              auto local_matrix = (*(systems.at(i))).clone();
+              auto local_matrix = (systems.at(i)).local().clone();
               Global::synch_matrix(local_matrix, *gates_row.at(i)->_comm, gates_row.at(i)->_ranks, gates_row.at(i)->_mirrors, gates_col.at(i)->_mirrors);
               local_systems_cuda_double_uint.at(i).convert(local_matrix);
             }
 
             for (Index i(0) ; i < filters_cuda_double_uint.size() ; ++i)
             {
-              local_filters_cuda_double_uint.at(i).convert(*filters_cuda_double_uint.at(i));
+              local_filters_cuda_double_uint.at(i).convert(filters_cuda_double_uint.at(i).local());
             }
 
             for (Index i(0) ; i < transfers_cuda_double_uint.size() ; ++i)

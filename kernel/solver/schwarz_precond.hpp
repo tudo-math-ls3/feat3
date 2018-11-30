@@ -123,7 +123,7 @@ namespace FEAT
 
         // apply local solver
         Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_local_solver->name()));
-        Status status = _local_solver->apply(*vec_cor, *vec_def);
+        Status status = _local_solver->apply(vec_cor.local(), vec_def.local());
 
         // synchronise local status over communicator to obtain
         // a consistent status code on all processes

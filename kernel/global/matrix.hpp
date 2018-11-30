@@ -70,16 +70,6 @@ namespace FEAT
       {
       }
 
-      LocalMatrix_& operator*()
-      {
-        return _matrix;
-      }
-
-      const LocalMatrix_& operator*() const
-      {
-        return _matrix;
-      }
-
       LocalMatrix_& local()
       {
         return _matrix;
@@ -95,7 +85,7 @@ namespace FEAT
       {
         this->_row_gate = row_gate;
         this->_col_gate = col_gate;
-        this->_matrix.convert(*other);
+        this->_matrix.convert(other.local());
       }
 
       const GateRowType* get_row_gate() const
@@ -190,7 +180,7 @@ namespace FEAT
 
       void extract_diag(VectorTypeL& diag, bool sync = true) const
       {
-        _matrix.extract_diag(*diag);
+        _matrix.extract_diag(diag.local());
         if(sync)
         {
           diag.sync_0();
@@ -199,13 +189,13 @@ namespace FEAT
 
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
-        _matrix.apply(*r, *x);
+        _matrix.apply(r.local(), x.local());
         r.sync_0();
       }
 
       auto apply_async(VectorTypeL& r, const VectorTypeR& x) const -> decltype(r.sync_0_async())
       {
-        _matrix.apply(*r, *x);
+        _matrix.apply(r.local(), x.local());
         return r.sync_0_async();
       }
 
@@ -218,7 +208,7 @@ namespace FEAT
         r.from_1_to_0();
 
         // r <- r + alpha*A*x
-        _matrix.apply(*r, *x, *r, alpha);
+        _matrix.apply(r.local(), x.local(), r.local(), alpha);
 
         // synchronise r
         r.sync_0();
@@ -233,7 +223,7 @@ namespace FEAT
         r.from_1_to_0();
 
         // r <- r + alpha*A*x
-        _matrix.apply(*r, *x, *r, alpha);
+        _matrix.apply(r.local(), x.local(), r.local(), alpha);
 
         // synchronise r
         r.sync_0_async();

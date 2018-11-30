@@ -351,14 +351,14 @@ namespace StokesPoiseuille2D
 
       // project velocity and pressure
       LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy;
-      Assembly::DiscreteVertexProjector::project(vtx_vx, (*vec_sol).template at<0>().get(0), the_domain_level.space_velo);
-      Assembly::DiscreteVertexProjector::project(vtx_vy, (*vec_sol).template at<0>().get(1), the_domain_level.space_velo);
+      Assembly::DiscreteVertexProjector::project(vtx_vx, vec_sol.local().template at<0>().get(0), the_domain_level.space_velo);
+      Assembly::DiscreteVertexProjector::project(vtx_vy, vec_sol.local().template at<0>().get(1), the_domain_level.space_velo);
       exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
 
       // project pressure
       Cubature::DynamicFactory cub("auto-degree:2");
       LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
-      Assembly::DiscreteCellProjector::project(vtx_p, (*vec_sol).template at<1>(), the_domain_level.space_pres, cub);
+      Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure
       exporter.add_cell_scalar("pressure", vtx_p.elements());

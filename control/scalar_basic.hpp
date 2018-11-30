@@ -118,7 +118,7 @@ namespace FEAT
       std::size_t bytes() const
       {
         return this->gate_sys.bytes() + this->coarse_muxer_sys.bytes()
-          + this->transfer_sys.bytes() + (*this->matrix_sys).bytes();
+          + this->transfer_sys.bytes() + this->matrix_sys.local().bytes();
       }
 
       template<typename M_, typename D_, typename I_, typename SM_>
@@ -416,7 +416,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return BaseClass::bytes() + (*this->filter_sys).bytes();
+        return BaseClass::bytes() + this->filter_sys.local().bytes();
       }
 
       /**
@@ -504,7 +504,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return BaseClass::bytes() + (*this->filter_sys).bytes();
+        return BaseClass::bytes() + this->filter_sys.local().bytes();
       }
 
       /**

@@ -194,9 +194,9 @@ namespace Stokes3Field
 
     void compile_system_filter()
     {
-      (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
-      (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
-      (*filter_sys).template at<2>() = (*filter_stress).clone(LAFEM::CloneMode::Shallow);
+      filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+      filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
+      filter_sys.local().template at<2>() = filter_stress.local().clone(LAFEM::CloneMode::Shallow);
     }
 
     void compile_local_matrix()
@@ -1175,7 +1175,7 @@ namespace Stokes3Field
       Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
       // project velocity
-      exporter.add_vertex_vector("velocity", (*vec_sol).template at<0>());
+      exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
 
       // project stress
       add_stress_to_vtk(exporter, vec_sol.local().template at<2>());
@@ -1183,7 +1183,7 @@ namespace Stokes3Field
       // project pressure
       Cubature::DynamicFactory cub("gauss-legendre:2");
       LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
-      Assembly::DiscreteCellProjector::project(vtx_p, (*vec_sol).template at<1>(), the_domain_level.space_pres, cub);
+      Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure
       exporter.add_cell_scalar("pressure", vtx_p.elements());

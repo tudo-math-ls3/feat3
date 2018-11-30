@@ -42,16 +42,6 @@ namespace FEAT
       {
       }
 
-      LocalFilter_& operator*()
-      {
-        return _filter;
-      }
-
-      const LocalFilter_& operator*() const
-      {
-        return _filter;
-      }
-
       LocalFilter_& local()
       {
         return _filter;
@@ -65,7 +55,7 @@ namespace FEAT
       template<typename OtherGlobalFilter_>
       void convert(const OtherGlobalFilter_ & other)
       {
-        this->_filter.convert(*other);
+        this->_filter.convert(other.local());
       }
 
       Filter clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
@@ -75,12 +65,9 @@ namespace FEAT
 
       void clone(const Filter& other, LAFEM::CloneMode mode = LAFEM::CloneMode::Weak)
       {
-        if(&(*other) == &(*(*this)))
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a Global::Filter!");
-        }
+        XASSERTM(&(other.local()) != &(this->local()), "Trying to self-clone a Global::Filter!");
 
-        *(*this) = (*other).clone(mode);
+        this->local() = other->local().clone(mode);
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -91,22 +78,22 @@ namespace FEAT
 
       void filter_rhs(VectorType& vector) const
       {
-        _filter.filter_rhs(*vector);
+        _filter.filter_rhs(vector.local());
       }
 
       void filter_sol(VectorType& vector) const
       {
-        _filter.filter_sol(*vector);
+        _filter.filter_sol(vector.local());
       }
 
       void filter_def(VectorType& vector) const
       {
-        _filter.filter_def(*vector);
+        _filter.filter_def(vector.local());
       }
 
       void filter_cor(VectorType& vector) const
       {
-        _filter.filter_cor(*vector);
+        _filter.filter_cor(vector.local());
       }
     }; // class Filter<...>
   } // namespace Global

@@ -164,14 +164,14 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + (*this->matrix_s).bytes() + transfer_sys.bytes();
+        return this->matrix_sys.local().bytes () + this->matrix_s.local().bytes() + transfer_sys.bytes();
       }
 
       void compile_system_matrix()
       {
-        (*matrix_sys).block_a() = (*matrix_a).clone(LAFEM::CloneMode::Shallow);
-        (*matrix_sys).block_b() = (*matrix_b).clone(LAFEM::CloneMode::Shallow);
-        (*matrix_sys).block_d() = (*matrix_d).clone(LAFEM::CloneMode::Shallow);
+        matrix_sys.local().block_a() = matrix_a.local().clone(LAFEM::CloneMode::Shallow);
+        matrix_sys.local().block_b() = matrix_b.local().clone(LAFEM::CloneMode::Shallow);
+        matrix_sys.local().block_d() = matrix_d.local().clone(LAFEM::CloneMode::Shallow);
       }
 
       void compile_system_transfer()
@@ -764,8 +764,8 @@ namespace FEAT
 
       void compile_system_filter()
       {
-        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
-        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
     };
 
@@ -815,8 +815,8 @@ namespace FEAT
 
       void compile_system_filter()
       {
-        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
-        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
     };
 
@@ -863,13 +863,13 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + (*this->matrix_s).bytes() + (*filter_sys).bytes();
+        return this->matrix_sys.local().bytes () + this->matrix_s.local().bytes() + filter_sys.local().bytes();
       }
 
       void compile_system_filter()
       {
-        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
-        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
 
       /**
@@ -899,8 +899,8 @@ namespace FEAT
         typename BaseClass::GlobalPresVector vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
 
         // fetch the local vectors
-        typename BaseClass::LocalPresVector& vec_loc_v = *vec_glob_v;
-        typename BaseClass::LocalPresVector& vec_loc_w = *vec_glob_w;
+        typename BaseClass::LocalPresVector& vec_loc_v = vec_glob_v.local();
+        typename BaseClass::LocalPresVector& vec_loc_w = vec_glob_w.local();
 
         // fetch the frequency vector of the pressure gate
         typename BaseClass::LocalPresVector& vec_loc_f = this->gate_pres._freqs;
@@ -963,8 +963,8 @@ namespace FEAT
 
       void compile_system_filter()
       {
-        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
-        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
 
       /**
@@ -994,8 +994,8 @@ namespace FEAT
         typename BaseClass::GlobalPresVector vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
 
         // fetch the local vectors
-        typename BaseClass::LocalPresVector& vec_loc_v = *vec_glob_v;
-        typename BaseClass::LocalPresVector& vec_loc_w = *vec_glob_w;
+        typename BaseClass::LocalPresVector& vec_loc_v = vec_glob_v.local();
+        typename BaseClass::LocalPresVector& vec_loc_w = vec_glob_w.local();
 
         // fetch the frequency vector of the pressure gate
         typename BaseClass::LocalPresVector& vec_loc_f = this->gate_pres._freqs;

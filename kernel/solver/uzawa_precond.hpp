@@ -224,10 +224,10 @@ namespace FEAT
         // fetch the references
         VectorTypeV& tmp_v = this->_vec_tmp_v;
         VectorTypeP& tmp_p = this->_vec_tmp_p;
-        VectorTypeV& sol_v = vec_cor.template at<Index(0)>();
-        VectorTypeP& sol_p = vec_cor.template at<Index(1)>();
-        const VectorTypeV& rhs_v = vec_def.template at<Index(0)>();
-        const VectorTypeP& rhs_p = vec_def.template at<Index(1)>();
+        VectorTypeV& sol_v = vec_cor.template at<0>();
+        VectorTypeP& sol_p = vec_cor.template at<1>();
+        const VectorTypeV& rhs_v = vec_def.template at<0>();
+        const VectorTypeP& rhs_p = vec_def.template at<1>();
 
         // now let's check the preconditioner type
         switch(_uzawa_type)
@@ -524,8 +524,8 @@ namespace FEAT
       {
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         // first of all, copy RHS
-        (*_vec_rhs_v).copy((*vec_def).template at<0>());
-        (*_vec_rhs_p).copy((*vec_def).template at<1>());
+        _vec_rhs_v.local().copy(vec_def.local().template at<0>());
+        _vec_rhs_p.local().copy(vec_def.local().template at<1>());
 
         // now let's check the preconditioner type
         switch(_uzawa_type)
@@ -646,8 +646,8 @@ namespace FEAT
         }
 
         // finally, copy sol
-        (*vec_cor).template at<0>().copy(*_vec_sol_v);
-        (*vec_cor).template at<1>().copy(*_vec_sol_p);
+        vec_cor.local().template at<0>().copy(_vec_sol_v.local());
+        vec_cor.local().template at<1>().copy(_vec_sol_p.local());
 
         // okay
         Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 0));

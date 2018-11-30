@@ -96,16 +96,6 @@ namespace FEAT
         }
 
         /**
-         * \brief Derefencing operator
-         *
-         * \returns A reference to the underlying local nonlinear functional
-         */
-        LocalNonlinearFunctional_& operator*()
-        {
-          return _nonlinear_functional;
-        }
-
-        /**
          * \brief Gets the local nonlinear functional
          *
          * \returns A reference to the underlying local nonlinear functional
@@ -121,16 +111,6 @@ namespace FEAT
          * \returns A const reference to the underlying local nonlinear functional
          */
         const LocalNonlinearFunctional_& local() const
-        {
-          return _nonlinear_functional;
-        }
-
-        /**
-         * \brief const Derefencing operator
-         *
-         * \returns A const reference to the underlying local nonlinear functional
-         */
-        const LocalNonlinearFunctional_& operator*() const
         {
           return _nonlinear_functional;
         }
@@ -359,7 +339,7 @@ namespace FEAT
           // As the penalty term is quadratic, we have to compute the local functional values separately for summing
           // them up over all ranks
           const bool add_penalty_fval(false);
-          _nonlinear_functional.eval_fval_grad(fval, *grad, add_penalty_fval);
+          _nonlinear_functional.eval_fval_grad(fval, grad.local(), add_penalty_fval);
 
           // Sum up over all patches
           if(_row_gate != nullptr)

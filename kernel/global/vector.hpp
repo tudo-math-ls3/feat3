@@ -52,16 +52,6 @@ namespace FEAT
       {
       }
 
-      LocalVector_& operator*()
-      {
-        return _vector;
-      }
-
-      const LocalVector_& operator*() const
-      {
-        return _vector;
-      }
-
       LocalVector_& local()
       {
         return _vector;
@@ -76,7 +66,7 @@ namespace FEAT
       void convert(const GateType* gate, const OtherGlobalVector_ & other)
       {
         this->_gate = gate;
-        this->_vector.convert(*other);
+        this->_vector.convert(other.local());
       }
 
       const GateType* get_gate() const
@@ -145,12 +135,9 @@ namespace FEAT
 
       void clone(const Vector& other, LAFEM::CloneMode mode = LAFEM::CloneMode::Weak)
       {
-        if(&(*other) == &(*(*this)))
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a Global::Vector!");
-        }
+        XASSERTM(&(other.local()) != &(this->local()), "Trying to self-clone a Global::Vector!");
 
-        *(*this) = (*other).clone(mode);
+        this->local() = other.local().clone(mode);
       }
 
       void clear()
@@ -186,30 +173,30 @@ namespace FEAT
         // avoid self-copy
         if(this != &x)
         {
-          _vector.copy(*x);
+          _vector.copy(x.local());
         }
       }
 
       void axpy(const Vector& x, const Vector& y, const DataType alpha = DataType(1))
       {
-        _vector.axpy(*x, *y, alpha);
+        _vector.axpy(x.local(), y.local(), alpha);
       }
 
       void scale(const Vector& x, const DataType alpha)
       {
-        _vector.scale(*x, alpha);
+        _vector.scale(x.local(), alpha);
       }
 
       DataType dot(const Vector& x) const
       {
         if(_gate != nullptr)
-          return _gate->dot(_vector, *x);
-        return _vector.dot(*x);
+          return _gate->dot(_vector, x.local());
+        return _vector.dot(x.local());
       }
 
       std::shared_ptr<SynchScalarTicket<DataType>> dot_async(const Vector& x) const
       {
-        return _gate->dot_async(_vector, *x);
+        return _gate->dot_async(_vector, x.local());
       }
 
       DataType norm2sqr() const
@@ -234,12 +221,12 @@ namespace FEAT
 
       void component_invert(const Vector& x, const DataType alpha = DataType(1))
       {
-        _vector.component_invert(*x, alpha);
+        _vector.component_invert(x.local(), alpha);
       }
 
       void component_product(const Vector& x, const Vector& y)
       {
-        _vector.component_product(*x, *y);
+        _vector.component_product(x.local(), y.local());
       }
 
       DataType max_element() const

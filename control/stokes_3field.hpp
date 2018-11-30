@@ -210,7 +210,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return (*this->matrix_sys).bytes () + transfer_sys.bytes();
+        return this->matrix_sys.local().bytes () + transfer_sys.bytes();
       }
 
       void compile_system_matrix()

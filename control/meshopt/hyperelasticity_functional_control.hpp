@@ -335,7 +335,7 @@ namespace FEAT
               msg += precond->info() + String("\n");
             }
 
-            msg += (*(_system_levels.front()->global_functional)).info();
+            msg += _system_levels.front()->global_functional.local().info();
 
             return msg;
           }
@@ -378,7 +378,7 @@ namespace FEAT
           virtual void mesh_to_buffer() override
           {
             // Write finest level
-            (*(_system_levels.front()->global_functional)).mesh_to_buffer();
+            _system_levels.front()->global_functional.local().mesh_to_buffer();
 
             // Get the coords buffer on the finest level
             const auto& coords_buffer_loc = _system_levels.front()->coords_buffer.local();
@@ -418,9 +418,9 @@ namespace FEAT
 
                 sys_lvl->global_functional.eval_fval_grad(fval, grad);
                 sys_lvl->filter_sys.filter_def(grad);
-                exporter.add_vertex_vector("grad", *grad);
+                exporter.add_vertex_vector("grad", grad.local());
 
-                for(auto& it:(*(sys_lvl->filter_sys)).template at<0>())
+                for(auto& it:sys_lvl->filter_sys.local().template at<0>())
                 {
                   const String field_name("nu_"+it.first);
                   // WARNING: This explicitly assumes that the filter vector belong to a P1/Q1 space and thus "lives"
@@ -439,7 +439,7 @@ namespace FEAT
               precond->init_numeric();
 
             typename SystemLevelType::LocalCoordsBuffer vec_buf;
-            vec_buf.convert(*vec_state);
+            vec_buf.convert(vec_state.local());
 
             for(size_t level(get_num_levels()); level > 0; )
             {
@@ -506,7 +506,7 @@ namespace FEAT
               typename SystemLevelType::GlobalSystemVectorL::LocalVectorType vec_sol_lvl;
               vec_sol_lvl.convert(_system_levels.at(pos)->coords_buffer.local());
               // Filter this vector, copy back the contents and write the changes to the mesh
-              auto& dirichlet_filters_lvl = (*(_system_levels.at(pos)->filter_sys)).template at<1>();
+              auto& dirichlet_filters_lvl = (_system_levels.at(pos)->filter_sys).local().template at<1>();
               dirichlet_filters_lvl.filter_sol(vec_sol_lvl);
               _system_levels.at(pos)->coords_buffer.local().copy(vec_sol_lvl);
               _system_levels.at(pos)->global_functional.local().buffer_to_mesh();

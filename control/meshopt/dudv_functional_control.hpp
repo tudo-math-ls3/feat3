@@ -379,7 +379,7 @@ namespace FEAT
             _system_levels.front()->local_functional.mesh_to_buffer();
 
             // Get the coords buffer on the finest level
-            const auto& coords_buffer_loc = *(_system_levels.front()->coords_buffer);
+            const auto& coords_buffer_loc = _system_levels.front()->coords_buffer.local();
 
             // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
             for(size_t level(0); level < get_num_levels(); ++level )
@@ -544,7 +544,7 @@ namespace FEAT
               typename GlobalSystemVectorL::LocalVectorType vec_sol_lvl;
               vec_sol_lvl.convert(_system_levels.at(pos)->coords_buffer.local());
               // Filter this vector, copy back the contents and write the changes to the mesh
-              auto& dirichlet_filters_lvl = (*(_system_levels.at(pos)->filter_sys)).template at<1>();
+              auto& dirichlet_filters_lvl = _system_levels.at(pos)->filter_sys.local().template at<1>();
               dirichlet_filters_lvl.filter_sol(vec_sol_lvl);
               _system_levels.at(pos)->coords_buffer.local().copy(vec_sol_lvl);
               _system_levels.at(pos)->local_functional.buffer_to_mesh();

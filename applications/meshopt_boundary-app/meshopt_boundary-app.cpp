@@ -428,8 +428,8 @@ struct MeshoptBoundaryApp
     // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
     auto mesh_velocity = meshopt_ctrl->get_coords().clone();
 
-    bool* todo_boundary(new bool[(*old_coords).size()]);
-    for(Index i(0); i < (*old_coords).size(); ++i)
+    bool* todo_boundary(new bool[old_coords.local().size()]);
+    for(Index i(0); i < old_coords.local().size(); ++i)
     {
       todo_boundary[i] = true;
     }
@@ -453,9 +453,9 @@ struct MeshoptBoundaryApp
 
       // Get coords for modification
       new_coords.copy(meshopt_ctrl->get_coords());
-      auto& coords_loc = *new_coords;
+      auto& coords_loc = new_coords.local();
 
-      for(Index i(0); i < (*old_coords).size(); ++i)
+      for(Index i(0); i < old_coords.local().size(); ++i)
       {
         todo_boundary[i] = true;
       }
@@ -504,9 +504,9 @@ struct MeshoptBoundaryApp
 
         // Compute maximum of the mesh velocity
         DataType max_mesh_velocity(0);
-        for(IT_ i(0); i < (*mesh_velocity).size(); ++i)
+        for(IT_ i(0); i < mesh_velocity.local().size(); ++i)
         {
-          max_mesh_velocity = Math::max(max_mesh_velocity, (*mesh_velocity)(i).norm_euclid());
+          max_mesh_velocity = Math::max(max_mesh_velocity, (mesh_velocity.local())(i).norm_euclid());
         }
 
         comm.print("");
