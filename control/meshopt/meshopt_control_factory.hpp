@@ -94,8 +94,6 @@ namespace FEAT
         create_dudv_control(DomCtrl_& dom_ctrl, const String& section_key, PropertyMap* meshopt_config, PropertyMap* solver_config)
         {
           std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
-          std::deque<String> dirichlet_list;
-          std::deque<String> slip_list;
 
           // -1 causes the DuDvFunctionalControl to use max level of the underlying domain control
           int meshopt_lvl(-1);
@@ -111,11 +109,11 @@ namespace FEAT
 
           // Get list of boundary conditions
           auto dirichlet_list_p = meshopt_section->query("dirichlet_boundaries");
-          dirichlet_list_p.first.split_by_charset(dirichlet_list, " ");
+          std::deque<String> dirichlet_list = dirichlet_list_p.first.split_by_whitespaces();
 
           // Get list of boundary conditions
           auto slip_list_p = meshopt_section->query("slip_boundaries");
-          slip_list_p.first.split_by_charset(slip_list, " ");
+          std::deque<String> slip_list = slip_list_p.first.split_by_whitespaces();
 
           // Get meshopt level (if any)
           auto meshopt_lvl_p = meshopt_section->query("meshopt_lvl");
@@ -185,9 +183,6 @@ namespace FEAT
 
           std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
 
-          std::deque<String> dirichlet_list;
-          std::deque<String> slip_list;
-
           DT_ fac_norm(0);
           DT_ fac_det(0);
           DT_ fac_cof(0);
@@ -209,11 +204,11 @@ namespace FEAT
 
           // Get list of boundary conditions
           auto dirichlet_list_p = meshopt_section->query("dirichlet_boundaries");
-          dirichlet_list_p.first.split_by_charset(dirichlet_list, " ");
+          std::deque<String> dirichlet_list = dirichlet_list_p.first.split_by_whitespaces();
 
           // Get list of boundary conditions
           auto slip_list_p = meshopt_section->query("slip_boundaries");
-          slip_list_p.first.split_by_charset(slip_list, " ");
+          std::deque<String> slip_list = slip_list_p.first.split_by_whitespaces();
 
           // Get meshopt level (if any)
           auto meshopt_lvl_p = meshopt_section->query("meshopt_lvl");
@@ -461,8 +456,6 @@ namespace FEAT
           std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl_>> result(nullptr);
 
           String type("");
-          std::deque<String> dirichlet_list;
-          std::deque<String> slip_list;
 
           auto meshopt_section = meshopt_config->query_section(section_key);
           if(meshopt_section == nullptr)
@@ -482,13 +475,6 @@ namespace FEAT
             {
               type = type_p.first;
             }
-
-            auto dirichlet_list_p = meshopt_section->query("dirichlet_boundaries");
-            dirichlet_list_p.first.split_by_charset(dirichlet_list, " ");
-
-            auto slip_list_p = meshopt_section->query("slip_boundaries");
-            slip_list_p.first.split_by_charset(slip_list, " ");
-
           }
 
           if(type == "DuDv")

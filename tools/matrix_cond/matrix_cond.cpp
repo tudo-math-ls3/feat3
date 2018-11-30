@@ -538,9 +538,7 @@ namespace MatrixCond
     else
     {
       // fetch extension of filename
-      std::deque<String> ds;
-      matrix_name.split_by_charset(ds, ".");
-      mat_frm = ds.back();
+      mat_frm = matrix_name.split_by_string(".").back();
     }
 
     // try to map format

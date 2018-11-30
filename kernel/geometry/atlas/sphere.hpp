@@ -229,8 +229,7 @@ namespace FEAT
             throw Xml::GrammarError(iline, sline, "Invalid sphere radius");
 
           // try to parse midpoind
-          std::deque<String> mids;
-          attrs.find("midpoint")->second.split_by_charset(mids);
+          std::deque<String> mids = attrs.find("midpoint")->second.split_by_whitespaces();
           if(mids.size() != std::size_t(3))
             throw Xml::GrammarError(iline, sline, "Invalid sphere midpoint string");
           if(!mids.front().parse(mid_x) || !mids.at(1).parse(mid_y) || !mids.back().parse(mid_z))

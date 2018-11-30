@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <deque>
 #include <iomanip>
 #include <cstddef>
 
@@ -215,7 +216,7 @@ namespace FEAT
     /**
      * \brief Returns a null-terminated char string containing all white-space characters
      */
-    static const char* white_spaces()
+    static const char* whitespaces()
     {
       return " \a\b\f\n\r\t\v";
     }
@@ -272,7 +273,7 @@ namespace FEAT
      */
     String trim_front() const
     {
-      return trim_front(white_spaces());
+      return trim_front(whitespaces());
     }
 
     /**
@@ -304,7 +305,7 @@ namespace FEAT
      */
     String trim_back() const
     {
-      return trim_back(white_spaces());
+      return trim_back(whitespaces());
     }
 
     /**
@@ -336,7 +337,7 @@ namespace FEAT
      */
     String trim() const
     {
-      return trim(white_spaces());
+      return trim(whitespaces());
     }
 
     /**
@@ -448,59 +449,46 @@ namespace FEAT
      * This function separates the string into substrings, where two substrings are separated a delimiter
      * substring consisting only of delimiter charset characters.
      *
-     * This function is frequently used by parsers, which fork strings by whitespace characters.
+     * This function is frequently used by parsers, which split strings by whitespace characters.
      *
      * <b>Example:</b>\n
-     * When using the default whitespace delimiter character set, the string " 5  42\t7 " will be forked
+     * When using the default whitespace delimiter character set, the string " 5  42\t7 " will be split
      * into 3 substrings: "5", "42" and "7".
-     *
-     * \tparam Container_
-     * A container class which contains objects of type String, e.g. <c>std::vector<String></c>.
-     * This container class must support at least the following member functions:
-     *  - clear()
-     *  - push_back(const String&)
-     *  - size()
-     *
-     * \param[out] words
-     * A container of Strings which receives the substrings.
      *
      * \param[in] charset
      * The character set which is to be treated as the delimiter charset.
      *
      * \returns
-     * <c>words.size()</c>
+     * A deque of the sub-strings that resulted from the splitting.
      */
-    template<typename Container_>
-    size_type split_by_charset(
-      Container_& words,
-      const String & charset) const
+    std::deque<String> split_by_charset(const String & charset) const
     {
-      words.clear();
+      std::deque<String> words;
       if(empty() || charset.empty())
       {
-        return size_type(0);
+        return words;
       }
 
-      // find first occurrence of fork substring
+      // find first occurrence of split substring
       size_type off1(find_first_not_of(charset));
       if(off1 == npos)
       {
         // only delimiter characters; nothing to be extracted
-        return size_type(0);
+        return words;
       }
 
-      // go forking
+      // go splitting
       while(off1 != npos)
       {
         // find next occurrence of delimiter string
         size_type off2(find_first_of(charset, off1));
 
-        // add next fork substring to vector
+        // add next split substring to vector
         if(off2 == npos)
         {
           // extract last substring
           words.push_back(substr(off1));
-          return words.size();
+          return words;
         }
         else
         {
@@ -508,21 +496,25 @@ namespace FEAT
           words.push_back(substr(off1, (off2 == npos ? npos : off2 - off1)));
         }
 
-        // find next occurrence of fork substring
+        // find next occurrence of split substring
         off1 = find_first_not_of(charset, off2);
       }
 
       // okay
-      return words.size();
+      return words;
     }
 
     /**
      * \brief Splits the string by white-spaces.
+     *
+     * \see #split_by_charset()
+     *
+     * \returns
+     * A deque of the sub-strings that resulted from the splitting.
      */
-    template<typename Container_>
-    size_type split_by_charset(Container_& words) const
+    std::deque<String> split_by_whitespaces() const
     {
-      return split_by_charset(words, white_spaces());
+      return split_by_charset(whitespaces());
     }
 
     /**
@@ -531,47 +523,34 @@ namespace FEAT
      * This function separates the string into substrings, where the substrings are separated by a delimiter
      * string.
      *
-     * <b><Example:</b>\n
-     * When using "," as a delimiter string, the input string " ,5,,3" will be forked into 4 substrings:
+     * <b>Example:</b>\n
+     * When using "," as a delimiter string, the input string " ,5,,3" will be split into 4 substrings:
      * " ", "5", "" and "3".
-     *
-     * \tparam Container_
-     * A container class which contains objects of type String, e.g. <c>std::vector<String></c>.
-     * This container class must support at least the following member functions:
-     *  - clear()
-     *  - push_back(const String&)
-     *  - size()
-     *
-     * \param[out] words
-     * A container of Strings which receives the substrings.
      *
      * \param[in] delimiter
      * The string that is to be treated as a delimiter.
      *
      * \returns
-     * <c>words.size()</c>
+     * A deque of the sub-strings that resulted from the splitting.
      */
-    template<typename Container_>
-    size_type split_by_string(
-      Container_& words,
-      const String & delimiter) const
+    std::deque<String> split_by_string(const String & delimiter) const
     {
-      words.clear();
+      std::deque<String> words;
       if(empty() || delimiter.empty())
-        return size_type(0);
+        return words;
 
       // find first occurrence of delimiter substring
       size_type off1(find(delimiter));
       words.push_back(substr(0, off1));
       if(off1 == npos)
-        return words.size();
+        return words;
 
-      // go forking
-      const size_type dellen(delimiter.size());
+      // go splitting
+      const size_type del_len(delimiter.size());
       while(off1 != npos)
       {
         // increase leading offset by delimiter length
-        off1 += dellen;
+        off1 += del_len;
 
         // find next substring occurrence
         size_type off2 = find(delimiter, off1);
@@ -579,7 +558,7 @@ namespace FEAT
         {
           // extract last substring
           words.push_back(substr(off1));
-          return words.size();
+          return words;
         }
         else
         {
@@ -592,7 +571,7 @@ namespace FEAT
       }
 
       // okay
-      return words.size();
+      return words;
     }
 
     /**

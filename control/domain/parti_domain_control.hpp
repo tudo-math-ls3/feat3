@@ -280,8 +280,7 @@ namespace FEAT
             _allow_parti_metis = _allow_parti_naive = false;
             _allow_parti_genetic = false;
 
-            std::deque<String> allowed_partitioners;
-            parti_type_p.first.split_by_charset(allowed_partitioners);
+            std::deque<String> allowed_partitioners = parti_type_p.first.split_by_whitespaces();
 
             for(const auto& t : allowed_partitioners)
             {
@@ -306,7 +305,7 @@ namespace FEAT
           auto parti_extern_name_p = pmap.query("parti-extern-name");
           if(parti_extern_name_p.second)
           {
-            parti_extern_name_p.first.split_by_charset(_extern_parti_names);
+            this->_extern_parti_names = parti_extern_name_p.first.split_by_whitespaces();
           }
 
           auto parti_rank_elems_p = pmap.query("parti-rank-elems");
@@ -372,8 +371,7 @@ namespace FEAT
          */
         void set_desired_levels(const String& slvls)
         {
-          std::deque<String> sl;
-          slvls.split_by_charset(sl);
+          std::deque<String> sl = slvls.split_by_whitespaces();
           set_desired_levels(sl);
         }
 
@@ -393,7 +391,7 @@ namespace FEAT
           for(std::size_t i(0); i < slvls.size(); ++i)
           {
             int ilvl = -1, nprocs = -1;
-            slvls.at(i).split_by_charset(sv, ":");
+            sv = slvls.at(i).split_by_string(":");
 
             if((sv.size() < std::size_t(1)) || (sv.size() > std::size_t(2)))
               throw INTERNAL_ERROR("Invalid input format: '" + slvls.at(i) + "', expected 'level:patches'");

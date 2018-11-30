@@ -10,7 +10,7 @@
 #include <kernel/cubature/dunavant_driver.hpp>
 
 // includes, STL
-#include <vector>
+#include <deque>
 #include <algorithm>
 
 namespace FEAT
@@ -35,8 +35,7 @@ namespace FEAT
       static String map(const String& name)
       {
         // split the name into its parts
-        std::vector<String> parts;
-        name.split_by_charset(parts, ":");
+        std::deque<String> parts = name.split_by_string(":");
 
         // ensure that we have at least two parts
         if(parts.size() < std::size_t(2))
@@ -49,8 +48,7 @@ namespace FEAT
         parts.pop_back();
 
         // try to split the auto-part
-        std::vector<String> args;
-        auto_part.split_by_charset(args, "-");
+        std::deque<String> args = auto_part.split_by_string("-");
 
         // does this identify an auto-alias rule?
         if(args.front().compare_no_case("auto") != 0)

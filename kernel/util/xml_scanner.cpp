@@ -252,7 +252,7 @@ namespace FEAT
 
       // extract markup name
       {
-        size_t n0 = sdata.find_first_of(sdata.white_spaces());
+        size_t n0 = sdata.find_first_of(sdata.whitespaces());
         if(n0 != sdata.npos)
         {
           // markup name followed by whitespace

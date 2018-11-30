@@ -1113,9 +1113,9 @@ namespace NavierStokesPP
 
     // the number of processes (mpi)
     processes = std::stoi(savefile.get_entry("processes").first);
-    savefile.get_entry("cfg.part_names_in").first.split_by_charset(cfg.part_names_in);
-    savefile.get_entry("cfg.part_names_out").first.split_by_charset(cfg.part_names_out);
-    savefile.get_entry("cfg.part_names_no").first.split_by_charset(cfg.part_names_no);
+    cfg.part_names_in = savefile.get_entry("cfg.part_names_in").first.split_by_whitespaces();
+    cfg.part_names_out = savefile.get_entry("cfg.part_names_out").first.split_by_whitespaces();
+    cfg.part_names_no = savefile.get_entry("cfg.part_names_no").first.split_by_whitespaces();
     cfg.levels_in = savefile.get_entry("cfg.levels_in").first;
     cfg.levels = savefile.get_entry("cfg.levels").first;
     cfg.vtk_step = std::stoul(savefile.get_entry("cfg.vtk_step").first, NULL, 0);
@@ -1171,7 +1171,7 @@ namespace NavierStokesPP
     cfg.residual_lift = std::stod(savefile.get_entry("cfg.residual_lift").first);
     cfg.residual_lift2 = std::stod(savefile.get_entry("cfg.residual_lift2").first);
     cfg.mesh_path = savefile.get_entry("cfg.mesh_path").first;
-    savefile.get_entry("cfg.mesh_files").first.split_by_charset(cfg.mesh_files);
+    cfg.mesh_files = savefile.get_entry("cfg.mesh_files").first.split_by_whitespaces();
   }
 
   // load the data from the save state

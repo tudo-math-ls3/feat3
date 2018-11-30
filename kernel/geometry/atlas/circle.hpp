@@ -308,8 +308,7 @@ namespace FEAT
             throw Xml::GrammarError(iline, sline, "Invalid circle radius");
 
           // try to parse midpoind
-          std::deque<String> mids;
-          attrs.find("midpoint")->second.split_by_charset(mids);
+          std::deque<String> mids = attrs.find("midpoint")->second.split_by_whitespaces();
           if(mids.size() != std::size_t(2))
             throw Xml::GrammarError(iline, sline, "Invalid circle midpoint string");
           if(!mids.front().parse(mid_x) || !mids.back().parse(mid_y))
@@ -320,8 +319,7 @@ namespace FEAT
           if(it != attrs.end())
           {
             have_domain = true;
-            std::deque<String> doms;
-            it->second.split_by_charset(doms);
+            std::deque<String> doms = it->second.split_by_whitespaces();
             if(doms.size() != std::size_t(2))
               throw Xml::GrammarError(iline, sline, "Invalid circle domain string");
             if(!doms.front().parse(dom_0) || !doms.back().parse(dom_1))

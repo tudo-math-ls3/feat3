@@ -292,8 +292,7 @@ namespace FEAT
           throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
 
         // split line by whitespaces
-        std::deque<String> scoords;
-        sline.split_by_charset(scoords);
+        std::deque<String> scoords = sline.split_by_whitespaces();
 
         // check size
         if(scoords.size() != std::size_t(num_coords_))
@@ -455,8 +454,7 @@ namespace FEAT
           throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
 
         // split line by whitespaces
-        std::deque<String> sidx;
-        sline.split_by_charset(sidx);
+        std::deque<String> sidx = sline.split_by_whitespaces();
 
         // check size
         if(sidx.size() != std::size_t(_num_idx))
@@ -658,8 +656,7 @@ namespace FEAT
           throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
 
         // split line by whitespaces
-        std::deque<String> svals;
-        sline.split_by_charset(svals);
+        std::deque<String> svals = sline.split_by_whitespaces();
 
         // check size
         if(svals.size() != std::size_t(_my_dim))
@@ -738,8 +735,7 @@ namespace FEAT
           throw Xml::GrammarError(iline, sline, "Invalid closed markup");
 
         // fetch mesh type substrings
-        std::deque<String> stype;
-        attrs.find("type")->second.split_by_charset(stype, ":");
+        std::deque<String> stype = attrs.find("type")->second.split_by_string(":");
 
         // validate mesh type
         if(stype.size() != std::size_t(4))
@@ -762,8 +758,7 @@ namespace FEAT
         // okay, the mesh type seems fine
 
         // split sizes
-        std::deque<String> ssize;
-        attrs.find("size")->second.split_by_charset(ssize);
+        std::deque<String> ssize = attrs.find("size")->second.split_by_whitespaces();
         if(ssize.size() != std::size_t(Shape_::dimension+1))
           throw Xml::ContentError(iline, sline, "Invalid mesh size count");
 
@@ -937,8 +932,7 @@ namespace FEAT
           throw Xml::ContentError(iline, sline, "Invalid topology attribute '" + stopo_type + "'");
 
         // split sizes
-        std::deque<String> ssize;
-        attrs.find("size")->second.split_by_charset(ssize);
+        std::deque<String> ssize = attrs.find("size")->second.split_by_whitespaces();
         if(ssize.size() > std::size_t(Shape_::dimension+1))
           throw Xml::ContentError(iline, sline, "Invalid mesh part size count");
 
@@ -1144,8 +1138,7 @@ namespace FEAT
       virtual void create(int iline, const String& sline, const String&, const std::map<String, String>& attrs, bool) override
       {
         // split sizes
-        std::deque<String> ssize;
-        attrs.find("size")->second.split_by_charset(ssize);
+        std::deque<String> ssize = attrs.find("size")->second.split_by_whitespaces();
         if(ssize.size() != std::size_t(2))
           throw Xml::ContentError(iline, sline, "Invalid partition size");
 
@@ -1630,8 +1623,7 @@ namespace FEAT
               _mesh_type_string = it_m->second;
 
               // split up mesh type string
-              std::deque<String> mts;
-              _mesh_type_string.split_by_charset(mts, ":");
+              std::deque<String> mts = _mesh_type_string.split_by_string(":");
 
               if(mts.size() != std::size_t(4))
                 scanner.throw_grammar("Mesh file root markup has invalid 'mesh' attribute");

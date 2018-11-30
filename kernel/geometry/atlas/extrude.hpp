@@ -397,8 +397,7 @@ namespace FEAT
             auto it = attrs.find("origin");
             if(it != attrs.end())
             {
-              std::deque<String> sori;
-              it->second.split_by_charset(sori);
+              std::deque<String> sori = it->second.split_by_whitespaces();
               if(sori.size() != std::size_t(2))
                 throw Xml::GrammarError(iline, sline, "Invalid Extrude chart origin attribute");
               if(!sori.front().parse(_ori_x) || !sori.back().parse(_ori_y))
@@ -412,8 +411,7 @@ namespace FEAT
             auto it = attrs.find("offset");
             if(it != attrs.end())
             {
-              std::deque<String> soff;
-              it->second.split_by_charset(soff);
+              std::deque<String> soff = it->second.split_by_whitespaces();
               if(soff.size() != std::size_t(3))
                 throw Xml::GrammarError(iline, sline, "Invalid Extrude chart offset attribute");
               if(!soff.at(0).parse(_off_x) || !soff.at(1).parse(_off_y) || !soff.at(2).parse(_off_z))
@@ -427,8 +425,7 @@ namespace FEAT
             auto it = attrs.find("angles");
             if(it != attrs.end())
             {
-              std::deque<String> sang;
-              it->second.split_by_charset(sang);
+              std::deque<String> sang = it->second.split_by_whitespaces();
               if(sang.size() != std::size_t(3))
                 throw Xml::GrammarError(iline, sline, "Invalid Extrude chart angles attribute");
               if(!sang.at(0).parse(_yaw) || !sang.at(1).parse(_pitch) || !sang.at(2).parse(_roll))

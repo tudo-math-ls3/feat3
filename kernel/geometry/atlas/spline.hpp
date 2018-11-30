@@ -809,8 +809,7 @@ namespace FEAT
             throw Xml::ContentError(iline, sline, "Invalid content; exprected terminator");
 
           // split line by whitespaces
-          std::deque<String> scoords;
-          sline.split_by_charset(scoords);
+          std::deque<String> scoords = sline.split_by_whitespaces();
 
           // try to parse the control point count
           std::size_t num_ctrl(0);

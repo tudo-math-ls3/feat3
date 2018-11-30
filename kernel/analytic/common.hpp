@@ -2013,13 +2013,12 @@ namespace FEAT
           if((li == sbc.npos) || (ri == sbc.npos))
             return false;
 
-          std::deque<String> sv, sv0, sv1;
-          sbc.substr(li+1, ri-li-1).split_by_charset(sv, ",");
+          std::deque<String> sv = sbc.substr(li+1, ri-li-1).split_by_string(",");
           if((sv.size() < std::size_t(2)) || (sv.size() > std::size_t(3)))
             return false;
 
-          sv[0].trim().split_by_charset(sv0);
-          sv[1].trim().split_by_charset(sv1);
+          std::deque<String> sv0 = sv[0].trim().split_by_whitespaces();
+          std::deque<String> sv1 = sv[1].trim().split_by_whitespaces();
           if(sv0.size() != std::size_t(2)) return false;
           if(sv1.size() != std::size_t(2)) return false;
 

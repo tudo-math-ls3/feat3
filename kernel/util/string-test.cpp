@@ -28,7 +28,7 @@ public:
   {
     bool b;
     int i;
-    std::vector<String> words;
+    std::deque<String> words;
     String s;
 
     // test operator+
@@ -97,7 +97,7 @@ public:
     TEST_CHECK(!String("nonsense").parse(i));
 
     // test split-by-charset
-    String("  0 5 \n 3\tfoo ").split_by_charset(words);
+    words = String("  0 5 \n 3\tfoo ").split_by_whitespaces();
     TEST_CHECK_EQUAL(words.size(), 4u);
     TEST_CHECK_EQUAL(words[0], "0");
     TEST_CHECK_EQUAL(words[1], "5");
@@ -105,7 +105,7 @@ public:
     TEST_CHECK_EQUAL(words[3], "foo");
 
     // test split-by-string
-    String("0, 4,,7 , ").split_by_string(words, ",");
+    words = String("0, 4,,7 , ").split_by_string(",");
     TEST_CHECK_EQUAL(words.size(), 5u);
     TEST_CHECK_EQUAL(words[0], "0");
     TEST_CHECK_EQUAL(words[1], " 4");

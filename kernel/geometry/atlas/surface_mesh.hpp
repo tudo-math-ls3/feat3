@@ -966,8 +966,7 @@ namespace FEAT
             throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
 
           // split line by whitespaces
-          std::deque<String> scoords;
-          sline.split_by_charset(scoords);
+          std::deque<String> scoords = sline.split_by_whitespaces();
 
           // check size
           if(scoords.size() != std::size_t(3))
@@ -1037,8 +1036,7 @@ namespace FEAT
             throw Xml::ContentError(iline, sline, "Invalid content; exprected terminator");
 
           // split line by whitespaces
-          std::deque<String> sidx;
-          sline.split_by_charset(sidx);
+          std::deque<String> sidx = sline.split_by_whitespaces();
 
           // check size
           if(sidx.size() != std::size_t(3))

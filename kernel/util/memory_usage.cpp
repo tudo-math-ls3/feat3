@@ -58,8 +58,7 @@ namespace FEAT
       {
         if (line.starts_with("VmRSS"))
         {
-          std::vector<String> v;
-          line.split_by_charset(v);
+          std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size()-1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.current_physical = std::stoul(v.at(v.size()-2));
@@ -69,8 +68,7 @@ namespace FEAT
 
         if (line.starts_with("VmHWM"))
         {
-          std::vector<String> v;
-          line.split_by_charset(v);
+          std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size()-1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.peak_physical = std::stoul(v.at(v.size()-2));
@@ -80,8 +78,7 @@ namespace FEAT
 
         if (line.starts_with("VmSize"))
         {
-          std::vector<String> v;
-          line.split_by_charset(v);
+          std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size()-1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.current_virtual = std::stoul(v.at(v.size()-2));
@@ -91,8 +88,7 @@ namespace FEAT
 
         if (line.starts_with("VmPeak"))
         {
-          std::vector<String> v;
-          line.split_by_charset(v);
+          std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size()-1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.peak_virtual = std::stoul(v.at(v.size()-2));
@@ -102,8 +98,7 @@ namespace FEAT
 
         if (line.starts_with("VmSwap"))
         {
-          std::vector<String> v;
-          line.split_by_charset(v);
+          std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size()-1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
           info.current_swap = std::stoul(v.at(v.size()-2));

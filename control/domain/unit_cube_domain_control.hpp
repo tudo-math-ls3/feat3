@@ -344,8 +344,7 @@ namespace FEAT
           ilyrs.resize(lvls.size(), 1);
           for(std::size_t i(0); i < lvls.size(); ++i)
           {
-            std::deque<String> parts;
-            lvls.at(i).split_by_string(parts, ":");
+            std::deque<String> parts = lvls.at(i).split_by_string(":");
             if(!parts.front().parse(ilvls.at(i)))
             {
               comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as level");
@@ -376,8 +375,7 @@ namespace FEAT
           ilyrs.resize(lvls.size(), 1);
           for(std::size_t i(0); i < lvls.size(); ++i)
           {
-            std::deque<String> parts;
-            lvls.at(i).split_by_string(parts, ":");
+            std::deque<String> parts = lvls.at(i).split_by_string(":");
             if(!parts.front().parse(ilvls.at(i)))
             {
               comm_.print(std::cerr, "ERROR: failed to parse '" + lvls.at(i) + "' as level");

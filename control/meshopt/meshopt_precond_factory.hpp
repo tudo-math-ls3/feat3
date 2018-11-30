@@ -82,14 +82,11 @@ namespace FEAT
                 throw InternalError(__func__,__FILE__,__LINE__,
                 "precon_section "+precon_type_p.first+" has no linear_solver key!");
 
-              std::deque<String> precon_dirichlet_list;
-              std::deque<String> precon_slip_list;
-
               auto dirichlet_list_p = precon_section->query("dirichlet_boundaries");
-              dirichlet_list_p.first.split_by_charset(precon_dirichlet_list, " ");
+              std::deque<String> precon_dirichlet_list = dirichlet_list_p.first.split_by_whitespaces();
 
               auto slip_list_p = precon_section->query("slip_boundaries");
-              slip_list_p.first.split_by_charset(precon_slip_list, " ");
+              std::deque<String> precon_slip_list = slip_list_p.first.split_by_whitespaces();
 
               bool fixed_reference_domain(false);
               auto fixed_reference_domain_p = precon_section->query("fixed_reference_domain");

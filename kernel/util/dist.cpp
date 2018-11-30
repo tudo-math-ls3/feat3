@@ -803,8 +803,7 @@ namespace FEAT
           }
 
           // split message into single lines
-          std::vector<String> lines;
-          message.split_by_charset(lines, "\n");
+          std::deque<String> lines = message.split_by_charset("\n");
 
           // set line prefix
           String prefix = stringify(i).pad_front(ndig);

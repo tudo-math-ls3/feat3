@@ -1547,8 +1547,6 @@ namespace FEAT
 
           std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> result(nullptr);
 
-          std::deque<String> chart_list;
-
           // Get the configuration section
           auto my_section = config->query_section(section_key);
           if(my_section == nullptr)
@@ -1572,7 +1570,7 @@ namespace FEAT
             if(operation_p.second)
               operation = operation_p.first;
 
-            chart_list_p.first.split_by_charset(chart_list, " ");
+            std::deque<String> chart_list = chart_list_p.first.split_by_whitespaces();
 
             auto function_type_p = my_section->query("function_type");
             if(function_type_p.second)

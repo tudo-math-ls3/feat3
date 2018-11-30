@@ -142,7 +142,7 @@ struct MeshoptBoundaryApp
     std::deque<String> midpoint_deque;
     if(midpoint_p.second)
     {
-      midpoint_p.first.split_by_charset(midpoint_deque," ");
+      midpoint_deque = midpoint_p.first.split_by_whitespaces();
     }
 
     WorldPoint midpoint(DataType(0));
@@ -807,7 +807,7 @@ int run_app(int argc, char* argv[])
     "Application config is missing the mandatory ApplicationSettings section!");
 
     auto mesh_files_p = app_settings_section->query("mesh_files");
-    mesh_files_p.first.split_by_charset(mesh_files, " ");
+    mesh_files = mesh_files_p.first.split_by_whitespaces();
 
     // Read configuration for mesh optimisation to stream
     auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
