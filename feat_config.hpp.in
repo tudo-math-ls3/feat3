@@ -143,7 +143,4 @@
 /// Should we use separate threads for asynchronous mpi communication?
 #cmakedefine FEAT_MPI_THREAD_MULTIPLE
 
-/// Do we restrict ourselves to MPI 2 operations?
-#cmakedefine FEAT_MPI2_ONLY
-
 #endif // FEAT_CONFIG_HPP

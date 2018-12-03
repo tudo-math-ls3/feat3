@@ -107,8 +107,6 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Set mpi c compiler wrapper to xyz")
   print ("--mpi_cxx=xyz")
   print ("  Set mpi c++ compiler wrapper to xyz")
-  print ("--mpi2_only")
-  print ("  Use only MPI 2 operations")
   print ("--mkl_sparse_executor")
   print ("  Use the intel mkl sparse executor interface")
   print ("")
@@ -307,10 +305,6 @@ for option in extra_options:
     unused_extra_options.remove(option)
     mpi_cxx = option.replace("--mpi_cxx=", "", 1)
     cmake_flags += " -DFEAT_MPI_CXX:STRING=" + mpi_cxx
-
-  if option.startswith("--mpi2_only"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_MPI2_ONLY:BOOL=TRUE"
 
   if option.startswith("--mkl_sparse_executor"):
     unused_extra_options.remove(option)

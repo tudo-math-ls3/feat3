@@ -518,70 +518,60 @@ namespace FEAT
       MPI_Barrier(comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ibarrier() const
     {
       MPI_Request req(MPI_REQUEST_NULL);
       MPI_Ibarrier(comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::bcast(void* buffer, std::size_t count, const Datatype& datatype, int root) const
     {
       MPI_Bcast(buffer, int(count), datatype.dt, root, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ibcast(void* buffer, std::size_t count, const Datatype& datatype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
       MPI_Ibcast(buffer, int(count), datatype.dt, root, comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::gather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Gather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::igather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
       MPI_Igather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::scatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::iscatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
       MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::allgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       MPI_Allgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::iallgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
       MPI_Iallgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::allgatherv(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, const int* recvcounts, const int* displs, const Datatype& recvtype) const
     {
@@ -593,7 +583,6 @@ namespace FEAT
       MPI_Alltoall(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ialltoall(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
@@ -604,7 +593,6 @@ namespace FEAT
 #endif
       return Request(req);
     }
-#endif
 
     void Comm::alltoallv(const void* sendbuf, const int* sendcounts, const int* sdispls, const Datatype& sendtype, void* recvbuf, const int* recvcounts, const int* rdispls, const Datatype& recvtype) const
     {
@@ -617,7 +605,6 @@ namespace FEAT
       MPI_Reduce((sendbuf == recvbuf) && (_rank == root) ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, root, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ireduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
@@ -625,28 +612,24 @@ namespace FEAT
       MPI_Ireduce((sendbuf == recvbuf) && (_rank == root) ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, root, comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::allreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       MPI_Allreduce(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::iallreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
       MPI_Iallreduce(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, comm, &req);
       return Request(req);
     }
-#endif
 
     void Comm::scan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       MPI_Scan(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     /*Request Comm::iscan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
@@ -657,14 +640,12 @@ namespace FEAT
 #endif
       return Request(req);
     }*/
-#endif
 
     void Comm::exscan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       MPI_Exscan(sendbuf == recvbuf ? MPI_IN_PLACE : sendbuf, recvbuf, int(count), datatype.dt, op.op, comm);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     /*Request Comm::iexscan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
@@ -675,7 +656,6 @@ namespace FEAT
 #endif
       return Request(req);
     }*/
-#endif
 
     void Comm::send(const void* buffer, std::size_t count, const Datatype& datatype, int dest, int tag) const
     {
@@ -1092,26 +1072,22 @@ namespace FEAT
       // nothing to do
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ibarrier() const
     {
       // nothing to do
       return Request();
     }
-#endif
 
     void Comm::bcast(void*, std::size_t, const Datatype&, int) const
     {
       // nothing to do
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ibcast(void*, std::size_t, const Datatype&, int) const
     {
       // nothing to do
       return Request();
     }
-#endif
 
     void Comm::gather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
@@ -1119,14 +1095,12 @@ namespace FEAT
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::igather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       XASSERT(root == 0);
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
       return Request();
     }
-#endif
 
     void Comm::scatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
@@ -1134,27 +1108,23 @@ namespace FEAT
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::iscatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       XASSERT(root == 0);
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
       return Request();
     }
-#endif
 
     void Comm::allgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::iallgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
       return Request();
     }
-#endif
 
     void Comm::allgatherv(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, const int* recvcounts, const int* displs, const Datatype& recvtype) const
     {
@@ -1170,13 +1140,11 @@ namespace FEAT
         memcpy(recvbuf, sendbuf, sendcount * sendtype.size());
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ialltoall(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype);
       return Request();
     }
-#endif
 
     void Comm::alltoallv(const void* sendbuf, const int* sendcounts, const int* sdispls, const Datatype& sendtype, void* recvbuf, const int* recvcounts, const int* rdispls, const Datatype& recvtype) const
     {
@@ -1191,14 +1159,12 @@ namespace FEAT
       allreduce(sendbuf, recvbuf, count, datatype, op);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::ireduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op, int root) const
     {
       XASSERT(root == 0);
       allreduce(sendbuf, recvbuf, count, datatype, op);
       return Request();
     }
-#endif
 
     void Comm::allreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation&) const
     {
@@ -1206,39 +1172,33 @@ namespace FEAT
         memcpy(recvbuf, sendbuf, count * datatype.size());
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     Request Comm::iallreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       allreduce(sendbuf, recvbuf, count, datatype, op);
       return Request();
     }
-#endif
 
     void Comm::scan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       allreduce(sendbuf, recvbuf, count, datatype, op);
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     /*Request Comm::iscan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const
     {
       allreduce(sendbuf, recvbuf, count, datatype, op);
       return Request();
     }*/
-#endif
 
     void Comm::exscan(const void*, void*, std::size_t, const Datatype&, const Operation&) const
     {
       // nothing to do
     }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
     /*Request Comm::iexscan(const void*, void*, std::size_t, const Datatype&, const Operation&) const
     {
       // nothing to do
       return Request();
     }*/
-#endif
 
     void Comm::send(const void*, std::size_t, const Datatype&, int, int) const
     {
