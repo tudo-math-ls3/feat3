@@ -58,6 +58,9 @@
 /// Do we have HYPRE support enabled?
 #cmakedefine FEAT_HAVE_HYPRE
 
+/// Do we have CGAL support enabled?
+#cmakedefine FEAT_HAVE_CGAL
+
 /// Do we use a compiler wrapper, e.g. ccache or distcc
 #cmakedefine FEAT_USE_COMPILER_WRAPPER
 

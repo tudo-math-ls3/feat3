@@ -53,6 +53,7 @@ thirdparty/*.gz
 thirdparty/*.tgz
 thirdparty/*.zip
 thirdparty/alglib
+thirdparty/cgal
 thirdparty/fparser
 thirdparty/half
 thirdparty/hypre

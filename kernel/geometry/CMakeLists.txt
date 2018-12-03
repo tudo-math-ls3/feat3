@@ -8,7 +8,7 @@ ADD_SUBDIRECTORY( test_aux )
 
 # list of geometry source files and depenencies
 SET(kernel-geometry-list
-  empty_geometry.cpp
+  cgal.cpp
 )
 
 if (FEAT_EICKT)
@@ -28,6 +28,7 @@ TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 # list of geometry tests
 SET (test_list
   boundary_factory-test
+  cgal-test
   hit_test_factory-test
   index_calculator-test
   mesh_node-test-conf-quad
@@ -61,6 +62,14 @@ FOREACH (test ${test_list} )
     SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAT_VALGRIND)
 ENDFOREACH(test)
+
+
+#disabling warnings with pragmas does not always work with gcc
+#https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+  SET_SOURCE_FILES_PROPERTIES(cgal.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
+  SET_SOURCE_FILES_PROPERTIES(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
+endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 # add all tests to geometry_tests
 ADD_CUSTOM_TARGET(geometry_tests DEPENDS ${test_list})

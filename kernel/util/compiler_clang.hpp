@@ -27,6 +27,9 @@
   _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"") \
   _Pragma("clang diagnostic ignored \"-Wcast-qual\"") \
   _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"") \
+  _Pragma("clang diagnostic ignored \"-Wshadow\"") \
+  _Pragma("clang diagnostic ignored \"-Wundef\"") \
+  _Pragma("clang diagnostic ignored \"-Wimplicit-fallthrough\"") \
   _Pragma("clang diagnostic ignored \"-Wcomma\"")
 #else
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \

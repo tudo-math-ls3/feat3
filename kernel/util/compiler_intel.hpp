@@ -52,24 +52,19 @@
 #    define FEAT_COMPILER "Intel C/C++ compiler"
 #  endif
 
-// Note: The ICC 14.0.x compilers have a bug which causes the compiler to choke
-// on _Pragma statements in preprocessed include files; see
-// https://software.intel.com/en-us/forums/topic/515154?language=en
-// Therefore we skip any _Pragma definition for these versions, if any
-// Compiler wrapper is active, causing these errors.
-#if (__INTEL_COMPILER != 1400) || !defined(FEAT_USE_COMPILER_WRAPPER)
-
 #  define FEAT_DISABLE_WARNINGS _Pragma("warning(push,0)") \
     _Pragma("warning(disable:177)") \
     _Pragma("warning(disable:2259)") \
     _Pragma("warning(disable:1478)") \
+    _Pragma("warning(disable:1599)") \
+    _Pragma("warning(disable:1944)") \
+    _Pragma("warning(disable:3280)") \
     _Pragma("warning(disable:858)")
 
 #  define FEAT_RESTORE_WARNINGS _Pragma("warning(pop)")
 
 #  define FEAT_IVDEP _Pragma("ivdep")
 
-#endif //  (__INTEL_COMPILER != 1400) && defined(FEAT_USE_COMPILER_WRAPPER)
 
 // disable warning #2196 (routine is both "inline" and "noinline") unconditionally
 /// \todo evaluate, if the icc finally inlines or not the corresponding routines, marked by NOINLINE

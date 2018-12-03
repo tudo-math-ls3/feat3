@@ -133,6 +133,14 @@ if (FEAT_HAVE_TRIANGLE)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/triangle/")
 endif(FEAT_HAVE_TRIANGLE)
 
+if (FEAT_HAVE_CGAL)
+  #set(Boost_USE_STATIC_LIBS ON)
+  find_package(Boost REQUIRED COMPONENTS thread)
+  INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/cgal/CGAL-4.13/include")
+endif(FEAT_HAVE_CGAL)
+
 # our custom target to build (but not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 
