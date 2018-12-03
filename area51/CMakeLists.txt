@@ -11,6 +11,12 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_EXECUTABLE(basis-dump basis_dump.cpp)
 TARGET_LINK_LIBRARIES(basis-dump feat)
 
+ADD_EXECUTABLE(cgal-analyse-mesh cgal_analyse_mesh.cpp)
+TARGET_LINK_LIBRARIES(cgal-analyse-mesh feat)
+
+ADD_EXECUTABLE(cgal-analyse-mesh-parallel cgal_analyse_mesh_parallel.cpp)
+TARGET_LINK_LIBRARIES(cgal-analyse-mesh-parallel feat)
+
 ADD_EXECUTABLE(dbg-alg-dof-parti dbg_alg_dof_parti.cpp)
 TARGET_LINK_LIBRARIES(dbg-alg-dof-parti feat)
 
