@@ -1603,7 +1603,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.1, page 198
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request ibarrier() const;
 #endif
 
@@ -1948,7 +1948,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.2, page 199
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request ibcast(void* buffer, std::size_t count, const Datatype& datatype, int root) const;
 #endif
 
@@ -1970,7 +1970,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.2, page 199
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename T_>
       Request ibcast(T_* buffer, std::size_t count, int root) const
       {
@@ -2070,7 +2070,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.3, page 200
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request igather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const;
 #endif
 
@@ -2098,7 +2098,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.3, page 200
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename ST_, typename RT_>
       Request igather(const ST_* sendbuf, std::size_t sendcount, RT_* recvbuf, std::size_t recvcount, int root) const
       {
@@ -2190,7 +2190,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.4, page 202
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request iscatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const;
 #endif
 
@@ -2218,7 +2218,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.4, page 202
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename ST_, typename RT_>
       Request iscatter(const ST_* sendbuf, std::size_t sendcount, RT_* recvbuf, std::size_t recvcount, int root) const
       {
@@ -2301,7 +2301,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.5, page 204
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request iallgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const;
 #endif
 
@@ -2326,7 +2326,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.5, page 204
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename ST_, typename RT_>
       Request iallgather(const ST_* sendbuf, std::size_t sendcount, RT_* recvbuf, std::size_t recvcount) const
       {
@@ -2473,7 +2473,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.6, page 206
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request ialltoall(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const;
 #endif
 
@@ -2498,7 +2498,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.6, page 206
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename ST_, typename RT_>
       Request ialltoall(const ST_* sendbuf, std::size_t sendcount, RT_* recvbuf, std::size_t recvcount) const
       {
@@ -2674,7 +2674,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.7, page 209
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request ireduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op, int root) const;
 #endif
 
@@ -2706,7 +2706,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.7, page 209
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename T_>
       Request ireduce(const T_* sendbuf, T_* recvbuf, std::size_t count, const Operation& op, int root) const
       {
@@ -2795,7 +2795,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.8, page 210
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       Request iallreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const;
 #endif
 
@@ -2824,7 +2824,7 @@ namespace FEAT
        *
        * \see \cite MPI31 Section 5.12.8, page 210
        */
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       template<typename T_>
       Request iallreduce(const T_* sendbuf, T_* recvbuf, std::size_t count, const Operation& op) const
       {
@@ -2950,7 +2950,7 @@ namespace FEAT
         exscan(sendbuf, recvbuf, count, autotype<T_>(), op);
       }
 
-#if not defined(FEAT_MPI2_ONLY) || defined(DOXYGEN)
+#if defined(DOXYGEN) || !defined(FEAT_MPI2_ONLY)
       /*Request iexscan(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op) const;
 
       template<typename T_>
