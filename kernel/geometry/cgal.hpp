@@ -57,8 +57,11 @@ namespace FEAT
       /// Create a new CGALWrapper Instance and open the provided off (file-) stream.
       CGALWrapper(std::istream & file);
 
-      /// Check whether a point is inside the Polyhedron defined by the aforementioned off file.
+      /// Check whether a point is inside the Polyhedron defined at objects' construction.
       bool point_inside(double x, double y, double z) const;
+
+      /// Returns the minimun squared distance between the query point and all input primitives defined at objects' construction.
+      double squared_distance(double x, double y, double z) const;
 
       /// Destructor
       ~CGALWrapper()

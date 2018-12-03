@@ -42,6 +42,13 @@ bool FEAT::Geometry::CGALWrapper::point_inside(double x, double y, double z) con
   return (*_inside_tester)(query) == CGAL::ON_BOUNDED_SIDE;
 }
 
+double FEAT::Geometry::CGALWrapper::squared_distance(double x, double y, double z) const
+{
+  Point query(x, y, z);
+
+  return (double)_tree->squared_distance(query);
+}
+
 void FEAT::Geometry::CGALWrapper::_parse_off_data(std::istream & file)
 {
   delete _polyhedron;
