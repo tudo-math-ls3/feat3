@@ -44,11 +44,11 @@ FOREACH (app ${app_list} )
 ENDFOREACH(app)
 
 #disable advanced variable tracking for debug informations on big applications (it would be disabled afterwards anyways
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"))
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set_source_files_properties(meshopt_hyperelasticity_resize-app.cpp APPEND_STRING PROPERTIES COMPILE_FLAGS " -fno-var-tracking-assignments")
   set_source_files_properties(navier_stokes_ccnd_q2p1.cpp APPEND_STRING PROPERTIES COMPILE_FLAGS " -fno-var-tracking-assignments")
   set_source_files_properties(navier_stokes_cp2d_q2pq.cpp APPEND_STRING PROPERTIES COMPILE_FLAGS " -fno-var-tracking-assignments")
-endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"))
+endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 ######################### hierarch_transfer_test-app
 
