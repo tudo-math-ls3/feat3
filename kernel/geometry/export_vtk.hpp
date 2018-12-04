@@ -8,7 +8,6 @@
 #include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/function_scheduler.hpp>
 
 // includes, STL
 #include <fstream>
@@ -530,12 +529,6 @@ namespace FEAT
 
         // and close
         ofs.close();
-      }
-
-      void write_scheduled(const String& filename, const int rank, const int nparts)
-      {
-        auto func = [&] () { write_scheduled(filename, rank, nparts); };
-        Util::schedule_function(func, Util::ScheduleMode::clustered);
       }
 
       /**

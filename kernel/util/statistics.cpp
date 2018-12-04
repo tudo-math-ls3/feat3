@@ -1,5 +1,4 @@
 #include <kernel/util/statistics.hpp>
-#include <kernel/util/function_scheduler.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/solver/base.hpp>
 
@@ -452,13 +451,6 @@ void Statistics::print_solver_expressions()
   }
   std::cout<<std::endl;
 }
-
-/*
-void Statistics::write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename)
-{
-  auto func = [&] () { write_out_solver_statistics(rank, la_bytes, domain_bytes, mpi_bytes, cells, dofs, nzes, filename); };
-  Util::schedule_function(func, Util::ScheduleMode::clustered);
-}*/
 
 String Statistics::get_formatted_times(double total_time)
 {
