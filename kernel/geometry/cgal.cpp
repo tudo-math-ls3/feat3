@@ -59,4 +59,18 @@ void FEAT::Geometry::CGALWrapper::_parse_off_data(std::istream & file)
   _inside_tester = new Point_inside(*_tree);
 }
 
-#endif //FEAT_HAVE_CGAL
+#elif !defined(DOXYGEN)
+
+// Dummy class instance to silence ipo linker optimization warnings about empty libgeometry
+class ipo_foobar_geometry_cgal
+{
+public:
+  int i;
+  ipo_foobar_geometry_cgal() :
+    i(0)
+  {
+    (void)i;
+  }
+} ipo_barfoo_geometry_cgal;
+
+#endif // FEAT_HAVE_CGAL
