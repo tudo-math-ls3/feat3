@@ -53,15 +53,21 @@ void add_mesh_part(RMESH * rmesh, String & file)
 
 int main(int argc, char ** argv)
 {
-    if (argc != 3)
+    if (argc < 3)
     {
-        std::cout<<"Usage 'otto2mesh file.prj mesh.xml'"<<std::endl;
+        std::cout<<"Usage 'otto2mesh file.prj mesh.xml [coord-scaling-factor]'"<<std::endl;
         std::cout<<"Must be executed in the file.prj directory, as no folder vodoo takes place internally."<<std::endl;
         exit(EXIT_FAILURE);
     }
 
     String input(argv[1]);
     String output(argv[2]);
+
+    double scaling(1.);
+    if (argc == 4)
+    {
+      scaling = std::strtod(argv[3], NULL);
+    }
 
     std::list<String> file_list;
     std::ifstream file_prj(input);
@@ -120,9 +126,9 @@ int main(int argc, char ** argv)
         break;
       auto words = line.split_by_charset(String::whitespaces());
       Tiny::Vector<CMESH::CoordType, 3> v;
-      v[0] = std::strtod(words.at(0).c_str(), NULL);
-      v[1] = std::strtod(words.at(1).c_str(), NULL);
-      v[2] = std::strtod(words.at(2).c_str(), NULL);
+      v[0] = std::strtod(words.at(0).c_str(), NULL) * scaling;
+      v[1] = std::strtod(words.at(1).c_str(), NULL) * scaling;
+      v[2] = std::strtod(words.at(2).c_str(), NULL) * scaling;
       cmesh->get_vertex_set()[counter] = v;
       ++counter;
     }
