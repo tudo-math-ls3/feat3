@@ -996,8 +996,8 @@ namespace FEAT
 
         /// specialisation for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
-        static void scale_rows(LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
-          const DT_ omega, const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+        static void scale_rows(LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix, const DT_ omega,
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
           // get matrix arrays
           DT_* vals = matrix.val();
@@ -1010,25 +1010,33 @@ namespace FEAT
 
           // get graph domain pointer arrays
           const Index* row_dom_ptr = row_blocks.get_domain_ptr();
+          const Index* row_img_idx = row_blocks.get_image_idx();
 
           // loop over all rows/dofs
           for(Index i(0); i < num_rows; ++i)
           {
             XASSERT(row_dom_ptr[i] < row_dom_ptr[i+1]);
 
-            const DT_ sc = omega / DT_(row_dom_ptr[i+1] - row_dom_ptr[i]);
-            if(sc != DT_(1))
+            // get number of active macros for this DOF
+            Index n(0);
+            if(macro_mask.empty())
+              n = row_dom_ptr[i+1] - row_dom_ptr[i];
+            else
             {
-              for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
-                vals[j] *= sc;
+              for(Index j(row_dom_ptr[i]); j < row_dom_ptr[i+1]; ++j)
+                n += Index(macro_mask[row_img_idx[j]]);
             }
+
+            const DT_ sc = omega / DT_(Math::max(n,Index(1)));
+            for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+              vals[j] *= sc;
           }
         }
 
         /// specialisation for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
-        static void scale_rows(LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix,
-          const DT_ omega, const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+        static void scale_rows(LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix, const DT_ omega,
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
           // get matrix arrays
           Tiny::Matrix<DT_, bh_, bw_>* vals = matrix.val();
@@ -1041,53 +1049,61 @@ namespace FEAT
 
           // get graph domain pointer arrays
           const Index* row_dom_ptr = row_blocks.get_domain_ptr();
+          const Index* row_img_idx = row_blocks.get_image_idx();
 
           // loop over all rows/dofs
           for(Index i(0); i < num_rows; ++i)
           {
             XASSERT(row_dom_ptr[i] < row_dom_ptr[i+1]);
 
-            const DT_ sc = omega / DT_(row_dom_ptr[i+1] - row_dom_ptr[i]);
-            if(sc != DT_(1))
+            // get number of active macros for this DOF
+            Index n(0);
+            if(macro_mask.empty())
+              n = row_dom_ptr[i+1] - row_dom_ptr[i];
+            else
             {
-              for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
-                vals[j] *= sc;
+              for(Index j(row_dom_ptr[i]); j < row_dom_ptr[i+1]; ++j)
+                n += Index(macro_mask[row_img_idx[j]]);
             }
+
+            const DT_ sc = omega / DT_(Math::max(n,Index(1)));
+            for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+              vals[j] *= sc;
           }
         }
 
         /// specialisation for LAFEM::TupleMatrixRow
         template<typename DT_, typename First_, typename Second_, typename... Rest_>
-        static void scale_rows(LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix,
-          const DT_ omega, const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+        static void scale_rows(LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix, const DT_ omega,
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, row_block);
-          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, row_block);
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
+          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block);
         }
 
         /// specialisation for LAFEM::TupleMatrixRow (single column)
         template<typename DT_, typename First_>
-        static void scale_rows(LAFEM::TupleMatrixRow<First_>& matrix,
-          const DT_ omega, const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+        static void scale_rows(LAFEM::TupleMatrixRow<First_>& matrix, const DT_ omega,
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, row_block);
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
         }
 
         /// specialisation for LAFEM::TupleMatrix
         template<typename DT_, typename FirstRow_, typename SecondRow_, typename... RestRows_>
-        static void scale_rows(LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix,
-          const DT_ omega, const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+        static void scale_rows(LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix, const DT_ omega,
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, row_block);
-          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, row_block + Index(1));
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
+          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block + Index(1));
         }
 
         /// specialisation for LAFEM::TupleMatrix (single row)
         template<typename DT_, typename FirstRow_>
-        static void scale_rows(LAFEM::TupleMatrix<FirstRow_>& matrix,
-          const DT_ omega, const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+        static void scale_rows(LAFEM::TupleMatrix<FirstRow_>& matrix, const DT_ omega,
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, row_block);
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
         }
 
         /* ********************************************************************************************************* */
@@ -1209,8 +1225,12 @@ namespace FEAT
       VankaMatrixType _vanka;
       /// deduct macro dofs automatically?
       bool _auto_macros;
+      /// skip singular macros?
+      bool _skip_singular;
       /// the DOF-macro graphs
       std::vector<Adjacency::Graph> _macro_dofs, _dof_macros;
+      /// the macro mask
+      std::vector<int> _macro_mask;
       /// number of steps
       Index _num_steps;
       /// damping parameter
@@ -1247,6 +1267,7 @@ namespace FEAT
         _filter(filter),
         _vanka(),
         _auto_macros(true),
+        _skip_singular(false),
         _num_steps(num_steps),
         _omega(omega)
       {
@@ -1261,6 +1282,12 @@ namespace FEAT
         _auto_macros = true;
       }
 
+      /**
+       * \brief Pushes the dofs-at-macro graph of the next block.
+       *
+       * \param[in] dofs
+       * The dofs-at-macro graph of the block.
+       */
       void push_macro_dofs(Adjacency::Graph&& dofs)
       {
         _auto_macros = false;
@@ -1302,6 +1329,17 @@ namespace FEAT
       {
         XASSERT(omega > DataType(0));
         this->_omega = omega;
+      }
+
+      /**
+       * \brief Sets whether singular macros are to be skipped.
+       *
+       * \param[in] skip_sing
+       * Specifies whether singular macros are to be skipped.
+       */
+      void set_skip_singular(bool skip_sing)
+      {
+        this->_skip_singular = skip_sing;
       }
 
       /**
@@ -1407,6 +1445,10 @@ namespace FEAT
           this->_dof_macros.at(i) = Adjacency::Graph(Adjacency::RenderType::transpose, this->_macro_dofs.at(i));
         }
 
+        // allocate macro skip mask?
+        if(this->_skip_singular)
+          this->_macro_mask.resize(this->_macro_dofs.front().get_num_nodes_domain(), 0);
+
         // allocate Vanka matrix
         VankaMatrixMainType vanka_main;
         Solver::Intern::AmaVankaCore::alloc(vanka_main, this->_dof_macros, this->_macro_dofs, Index(0), Index(0));
@@ -1419,6 +1461,7 @@ namespace FEAT
       virtual void done_symbolic() override
       {
         this->_vanka.clear();
+        this->_macro_mask.clear();
         this->_dof_macros.clear();
         if(this->_auto_macros)
           this->_macro_dofs.clear();
@@ -1433,6 +1476,8 @@ namespace FEAT
       /// Performs numeric factorisation
       virtual void init_numeric() override
       {
+        const DataType eps = Math::eps<DataType>();
+
         watch_init_numeric.start();
         BaseClass::init_numeric();
 
@@ -1441,9 +1486,10 @@ namespace FEAT
         const Index stride = Intern::AmaVankaCore::calc_stride(this->_vanka, this->_macro_dofs);
 
         // allocate arrays for local matrix
-        std::vector<DataType> vec_local(stride*stride, DataType(0));
+        std::vector<DataType> vec_local(stride*stride, DataType(0)), vec_local_t(stride*stride, DataType(0));
         std::vector<Index> vec_pivot(stride);
         DataType* local = vec_local.data();
+        DataType* local_t = vec_local_t.data();
         Index* pivot = vec_pivot.data();
 
         // convert matrix to main memory
@@ -1462,12 +1508,65 @@ namespace FEAT
           const std::pair<Index,Index> nrc = Intern::AmaVankaCore::gather(matrix_main,
             local, stride, imacro, this->_macro_dofs, Index(0), Index(0), Index(0), Index(0));
 
-          // invert local matrix
-          Math::invert_matrix(nrc.first, stride, local, pivot);
+          // make sure we have gathered a square matrix
+          XASSERTM(nrc.first == nrc.second, "local matrix is not square");
 
-          // scatter local matrix
-          Intern::AmaVankaCore::scatter_add(vanka_main, local, stride, imacro, this->_macro_dofs,
-            Index(0), Index(0), Index(0), Index(0));
+          // do we check for singular macros?
+          if(this->_skip_singular)
+          {
+            // the approach used for checking the regularity of the local matrix is to check whether
+            //
+            //     || I - A*A^{-1} ||_F^2 < eps
+            //
+            // we could try to analyse the pivots returned by invert_matrix function instead, but
+            // unfortunately this approach sometimes leads to false positives
+
+            // make a backup if checking for singularity
+            for(Index i(0); i < nrc.first; ++i)
+              for(Index j(0); j < nrc.second; ++j)
+                local_t[i*stride+j] = local[i*stride+j];
+
+            // invert local matrix
+            Math::invert_matrix(nrc.first, stride, local, pivot);
+
+            // compute (squared) Frobenius norm of (I - A*A^{-1})
+            DataType norm = DataType(0);
+            for(Index i(0); i < nrc.first; ++i)
+            {
+              for(Index j(0); j < nrc.first; ++j)
+              {
+                DataType xij = DataType(i == j ? 1 : 0);
+                for(Index k(0); k < nrc.first; ++k)
+                  xij -= local_t[i*stride+k] * local[k*stride+j]; // A_ik * (A^{-1})_kj
+                norm += xij * xij;
+              }
+            }
+
+            // is the matrix block singular?
+            // Note: we check for !(norm < eps) instead of (norm >= eps),
+            // because the latter one evaluates to false if norm is NaN,
+            // which would result in a false negative
+            const bool singular = !(norm < eps);
+
+            // set macro regularity mask
+            this->_macro_mask[imacro] = (singular ? 0 : 1);
+
+            // scatter local matrix
+            if(!singular)
+            {
+              Intern::AmaVankaCore::scatter_add(vanka_main, local, stride, imacro, this->_macro_dofs,
+                Index(0), Index(0), Index(0), Index(0));
+            }
+          }
+          else // no singularity check
+          {
+            // invert local matrix
+            Math::invert_matrix(nrc.first, stride, local, pivot);
+
+            // scatter local matrix
+            Intern::AmaVankaCore::scatter_add(vanka_main, local, stride, imacro, this->_macro_dofs,
+              Index(0), Index(0), Index(0), Index(0));
+          }
 
           // reformat local matrix
           for(Index i(0); i < nrc.first; ++i)
@@ -1476,7 +1575,7 @@ namespace FEAT
         }
 
         // scale rows of Vanka matrix
-        Solver::Intern::AmaVankaCore::scale_rows(vanka_main, this->_omega, this->_dof_macros, Index(0));
+        Solver::Intern::AmaVankaCore::scale_rows(vanka_main, this->_omega, this->_dof_macros, this->_macro_mask, Index(0));
 
         // convert back
         /// \todo use copy maybe?
