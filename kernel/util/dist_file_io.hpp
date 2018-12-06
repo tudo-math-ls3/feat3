@@ -18,11 +18,13 @@ namespace FEAT
    * This class implements various static functions for reading and writing files in
    * text or binary mode in a distributed (i.e. parallel) build.
    *
-   * There are two sets of functions for reading files:
+   * There are three sets of functions for reading files:
    * - #read_common: one process reads a single text or binary file and broadcasts its
    *   contents to all other processes
    * - #read_sequence: each process reads a single text or binary file, which is indexed
    *   by the process rank
+   * - #read_ordered: all processes read from a single common binary file, ordered by ranks,
+   *   and using the official MPI I/O routines
    *
    * Moreover, there are two sets of functions for writing files:
    * - #write_sequence: each process writes a single text or binary file, which is indexed
@@ -34,8 +36,8 @@ namespace FEAT
    * and another one for objects of type BinaryStream for binary files.
    *
    * For both the read_sequence and write_sequence functions, one specifies a filename pattern
-   * which is used as a templated for the generation of the filename for each rank.
-   * The filename pattern has to contain a continuous block ofasterisks (*), which serves as
+   * which is used as a template for the generation of the filename for each rank.
+   * The filename pattern has to contain a continuous block of asterisks (*), which serves as
    * a place-holder for the 0-padded rank number.
    *
    * <b>Example:</b>\n
