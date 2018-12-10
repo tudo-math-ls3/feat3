@@ -26,7 +26,7 @@ void add_mesh_part(RMESH * rmesh, String & file)
     String header;
     getline(par_file, header);
     auto words = header.split_by_charset(String::whitespaces());
-    Index nodes = std::strtoul(words.at(0).c_str(), NULL, 0);
+    Index nodes = std::strtoul(words.at(0).c_str(), nullptr, 0);
     getline(par_file, header); // skip bulk line
 
     Index num_entities[4];
@@ -39,7 +39,7 @@ void add_mesh_part(RMESH * rmesh, String & file)
     Index counter(0);
     for (String line ; getline(par_file, line); )
     {
-      mesh_part->get_target_set<0>()[counter] = std::strtoul(line.c_str(), NULL, 0) - 1;
+      mesh_part->get_target_set<0>()[counter] = std::strtoul(line.c_str(), nullptr, 0) - 1;
       ++counter;
     }
 
@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
     double scaling(1.);
     if (argc == 4)
     {
-      scaling = std::strtod(argv[3], NULL);
+      scaling = std::strtod(argv[3], nullptr);
     }
 
     std::list<String> file_list;
@@ -109,10 +109,10 @@ int main(int argc, char ** argv)
       getline(mesh_tri, header);
       header.trim_me();
       auto words = header.split_by_charset(String::whitespaces());
-      num_entities[0] = std::strtoul(words.at(1).c_str(), NULL, 0);
+      num_entities[0] = std::strtoul(words.at(1).c_str(), nullptr, 0);
       num_entities[1] = Index(0);
       num_entities[2] = Index(0);
-      num_entities[3] = std::strtoul(words.at(0).c_str(), NULL, 0);
+      num_entities[3] = std::strtoul(words.at(0).c_str(), nullptr, 0);
     }
 
     auto cmesh = new CMESH(num_entities);
@@ -127,9 +127,9 @@ int main(int argc, char ** argv)
         break;
       auto words = line.split_by_charset(String::whitespaces());
       Tiny::Vector<CMESH::CoordType, 3> v;
-      v[0] = std::strtod(words.at(0).c_str(), NULL) * scaling;
-      v[1] = std::strtod(words.at(1).c_str(), NULL) * scaling;
-      v[2] = std::strtod(words.at(2).c_str(), NULL) * scaling;
+      v[0] = std::strtod(words.at(0).c_str(), nullptr) * scaling;
+      v[1] = std::strtod(words.at(1).c_str(), nullptr) * scaling;
+      v[2] = std::strtod(words.at(2).c_str(), nullptr) * scaling;
       cmesh->get_vertex_set()[counter] = v;
       ++counter;
     }
@@ -142,14 +142,14 @@ int main(int argc, char ** argv)
         break;
 
       auto words = line.split_by_charset(String::whitespaces());
-      cmesh->get_index_set<3, 0>()(counter, 0) = std::strtoul(words.at(0).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 1) = std::strtoul(words.at(1).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 2) = std::strtoul(words.at(3).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 3) = std::strtoul(words.at(2).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 4) = std::strtoul(words.at(4).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 5) = std::strtoul(words.at(5).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 6) = std::strtoul(words.at(7).c_str(), NULL, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 7) = std::strtoul(words.at(6).c_str(), NULL, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 0) = std::strtoul(words.at(0).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 1) = std::strtoul(words.at(1).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 2) = std::strtoul(words.at(3).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 3) = std::strtoul(words.at(2).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 4) = std::strtoul(words.at(4).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 5) = std::strtoul(words.at(5).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 6) = std::strtoul(words.at(7).c_str(), nullptr, 0) - 1;
+      cmesh->get_index_set<3, 0>()(counter, 7) = std::strtoul(words.at(6).c_str(), nullptr, 0) - 1;
       ++counter;
     }
     mesh_tri.close();
