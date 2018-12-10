@@ -2515,7 +2515,7 @@ namespace NavierStokesPP
     if ((args.check("level") > 0) && cfg.load.empty())
       domain.set_desired_levels(args.query("level")->second);
     else
-      domain.set_desired_levels(cfg.levels);
+      domain.set_desired_levels(cfg.levels_in);
 
     domain.create(cfg.mesh_files, cfg.mesh_path);
 
