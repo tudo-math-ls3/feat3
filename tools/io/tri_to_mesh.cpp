@@ -92,13 +92,14 @@ int main(int argc, char ** argv)
       std::cerr<<"no .tri file found in " << input << " !"<<std::endl;
       exit(1);
     }
-    file_list.erase(it);
 
     std::ifstream mesh_tri(*it);
     if (!mesh_tri)
     {
       std::cerr<<"file " << *it << " not found!"<<std::endl;
     }
+
+    file_list.erase(it);
 
     Index num_entities[4];
     {
