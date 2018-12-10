@@ -26,7 +26,8 @@ void add_mesh_part(RMESH * rmesh, String & file)
     String header;
     getline(par_file, header);
     auto words = header.split_by_charset(String::whitespaces());
-    Index nodes = std::strtoul(words.at(0).c_str(), nullptr, 0);
+    Index nodes(0);
+    words.at(0).parse(nodes);
     getline(par_file, header); // skip bulk line
 
     Index num_entities[4];
@@ -39,7 +40,9 @@ void add_mesh_part(RMESH * rmesh, String & file)
     Index counter(0);
     for (String line ; getline(par_file, line); )
     {
-      mesh_part->get_target_set<0>()[counter] = std::strtoul(line.c_str(), nullptr, 0) - 1;
+      line.parse(mesh_part->get_target_set<0>()[counter]);
+      mesh_part->get_target_set<0>()[counter] -= 1;
+
       ++counter;
     }
 
@@ -66,7 +69,8 @@ int main(int argc, char ** argv)
     double scaling(1.);
     if (argc == 4)
     {
-      scaling = std::strtod(argv[3], nullptr);
+      String sscaling(argv[3]);
+      sscaling.parse(scaling);
     }
 
     std::list<String> file_list;
@@ -109,10 +113,10 @@ int main(int argc, char ** argv)
       getline(mesh_tri, header);
       header.trim_me();
       auto words = header.split_by_charset(String::whitespaces());
-      num_entities[0] = std::strtoul(words.at(1).c_str(), nullptr, 0);
+      words.at(1).parse(num_entities[0]);
       num_entities[1] = Index(0);
       num_entities[2] = Index(0);
-      num_entities[3] = std::strtoul(words.at(0).c_str(), nullptr, 0);
+      words.at(0).parse(num_entities[3]);
     }
 
     auto cmesh = new CMESH(num_entities);
@@ -127,9 +131,12 @@ int main(int argc, char ** argv)
         break;
       auto words = line.split_by_charset(String::whitespaces());
       Tiny::Vector<CMESH::CoordType, 3> v;
-      v[0] = std::strtod(words.at(0).c_str(), nullptr) * scaling;
-      v[1] = std::strtod(words.at(1).c_str(), nullptr) * scaling;
-      v[2] = std::strtod(words.at(2).c_str(), nullptr) * scaling;
+      words.at(0).parse(v[0]);
+      v[0] *= scaling;
+      words.at(1).parse(v[1]);
+      v[1] *= scaling;
+      words.at(2).parse(v[2]);
+      v[2] *= scaling;
       cmesh->get_vertex_set()[counter] = v;
       ++counter;
     }
@@ -142,14 +149,22 @@ int main(int argc, char ** argv)
         break;
 
       auto words = line.split_by_charset(String::whitespaces());
-      cmesh->get_index_set<3, 0>()(counter, 0) = std::strtoul(words.at(0).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 1) = std::strtoul(words.at(1).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 2) = std::strtoul(words.at(3).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 3) = std::strtoul(words.at(2).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 4) = std::strtoul(words.at(4).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 5) = std::strtoul(words.at(5).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 6) = std::strtoul(words.at(7).c_str(), nullptr, 0) - 1;
-      cmesh->get_index_set<3, 0>()(counter, 7) = std::strtoul(words.at(6).c_str(), nullptr, 0) - 1;
+      words.at(0).parse(cmesh->get_index_set<3, 0>()(counter, 0));
+      cmesh->get_index_set<3, 0>()(counter, 0) -= 1;
+      words.at(1).parse(cmesh->get_index_set<3, 0>()(counter, 1));
+      cmesh->get_index_set<3, 0>()(counter, 1) -= 1;
+      words.at(3).parse(cmesh->get_index_set<3, 0>()(counter, 2));
+      cmesh->get_index_set<3, 0>()(counter, 2) -= 1;
+      words.at(2).parse(cmesh->get_index_set<3, 0>()(counter, 3));
+      cmesh->get_index_set<3, 0>()(counter, 3) -= 1;
+      words.at(4).parse(cmesh->get_index_set<3, 0>()(counter, 4));
+      cmesh->get_index_set<3, 0>()(counter, 4) -= 1;
+      words.at(5).parse(cmesh->get_index_set<3, 0>()(counter, 5));
+      cmesh->get_index_set<3, 0>()(counter, 5) -= 1;
+      words.at(7).parse(cmesh->get_index_set<3, 0>()(counter, 6));
+      cmesh->get_index_set<3, 0>()(counter, 6) -= 1;
+      words.at(6).parse(cmesh->get_index_set<3, 0>()(counter, 7));
+      cmesh->get_index_set<3, 0>()(counter, 7) -= 1;
       ++counter;
     }
     mesh_tri.close();
