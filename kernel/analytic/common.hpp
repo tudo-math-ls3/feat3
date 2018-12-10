@@ -2483,9 +2483,6 @@ namespace FEAT
          * \param[in] zeros_y
          * The roots for the y part
          *
-         * \param[in] zeros_z
-         * The roots for the z part
-         *
          */
         explicit YZPlaneParabolic(const DataType amplitude, const PointType& zeros_y) :
           _amplitude(amplitude),

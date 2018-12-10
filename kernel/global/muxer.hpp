@@ -203,9 +203,6 @@ namespace FEAT
       /**
        * \brief Adds a child rank and mirror for a parent process.
        *
-       * \param[in] child_rank
-       * The rank of the child patch of this parent process.
-       *
        * \param[in] child_mirror
        * The mirror of the child patch of this parent process.
        */

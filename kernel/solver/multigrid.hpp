@@ -300,7 +300,7 @@ namespace FEAT
        * \param[in] sys_filter
        * A reference to the system filter.
        *
-       * \param[in] transfer_operat
+       * \param[in] trans_operat
        * A reference to the transfer operator.
        *
        * \param[in] smooth_pre

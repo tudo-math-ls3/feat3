@@ -517,7 +517,7 @@ namespace FEAT
         return _status;
       }
 
-      /// Computes the overall convergence rate: (defect_final / defect_initial) ^ (1 / #iter)
+      /// Computes the overall convergence rate: (defect_final / defect_initial) ^ (1 / number of iterations)
       DataType calc_convergence_rate() const
       {
         // no iterations performed?

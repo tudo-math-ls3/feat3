@@ -58,7 +58,7 @@ namespace FEAT
       /**
        * \brief Specifies whether the graph's arrays are shared or not
        *
-       * This member specifies whether the Graph object will delete the #_domain_ptr, #_domain_end and #_image_idx
+       * This member specifies whether the Graph object will delete the #_domain_ptr and #_image_idx
        * arrays within the destructor.
        */
       bool _shared;

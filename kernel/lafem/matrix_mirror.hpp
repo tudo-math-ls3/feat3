@@ -543,7 +543,7 @@ namespace FEAT
         }
       }
 
-      /**
+      /*
        * \brief Performs a gather-operation on an operator matrix.
        *
        * \param[in,out] buffer
@@ -650,7 +650,7 @@ namespace FEAT
         }
       }*/
 
-      /**
+      /*
        * \brief Performs a scatter-axpy-operation on an operator matrix.
        *
        * \param[in,out] matrix

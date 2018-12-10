@@ -410,22 +410,24 @@ namespace FEAT
      *
      * Depending on the shape type and the dimension, the mesh consists of objects associated with every dimension,
      * i.e. dim =
-     *  0: vertices
-     *  1: edges
-     *  2: faces (Shape_::dimension==3) or cells (Shape_::dimension==2)
-     *  3: cells.
+     * - 0: vertices
+     * - 1: edges
+     * - 2: faces
+     * - 3: cells.
      *
      * An IndexSetHolder stores the complete adjacency structure in a matrix:
      *
-     * @      |vertex|edge|face|cell
-     * -----------------------------
-     * vertex |        v@e  v@f  v@c
-     * edge   |             e@f  e@c
-     * face   |                  f@c
-     * cell   |
+       \verbatim
+       @      |vertex|edge|face|cell
+       -----------------------------
+       vertex |        v@e  v@f  v@c
+       edge   |             e@f  e@c
+       face   |                  f@c
+       cell   |
+       \endverbatim
      *
      * Each entry in the IndexSetHolder is an IndexSet containing information of the type:
-     * For every cell: Which edges are present in that cell (e@c) etc.
+     * For every cell: Which edges are present in that cell (e\@c) etc.
      *
      *
      */
@@ -577,18 +579,18 @@ namespace FEAT
      * \tparam co_dim_
      * Codimension wrt. the subshape that causes the size updates.
      *
-     * When using meshes that contain only the vertex@shape information, the number of edges/faces is unknown so the
+     * When using meshes that contain only the vertex\@shape information, the number of edges/faces is unknown so the
      * corresponding IndexSets in the IndexSetHolder are initialised with size 0. If the IndexSet to dimensions
      * (shape_dim_-co_dim_, 0) is created, all IndexSets using the number of entities of dimension shape_dim_-co_dim_
      * need to be updated.
      *
      * To make this more clear:
-     * _shape_dim = 1: Nothing to do, as vertex@shape is already present.
-     * _shape_dim = 2: After vert@edge is computed, update the size of edge@cell.
-     * _shape_dim = 3: After vert@face is computed, update the size of face@cell.
-     *                 After vert@edge is computed, update the sizes of edge@cell and edge@face.
+     * _shape_dim = 1: Nothing to do, as vertex\@shape is already present.
+     * _shape_dim = 2: After vert\@edge is computed, update the size of edge\@cell.
+     * _shape_dim = 3: After vert\@face is computed, update the size of face\@cell.
+     *                 After vert\@edge is computed, update the sizes of edge\@cell and edge\@face.
      *
-     * \warning Because of the information hierarchy, these routines assume that the vertex@shape information is
+     * \warning Because of the information hierarchy, these routines assume that the vertex\@shape information is
      * present and correct for the highest dimensional shape and for all shapes with lower codimension!
      *
      * \author Jordi Paul
@@ -647,8 +649,8 @@ namespace FEAT
       template<typename IndexSetHolderType_>
       static void update(IndexSetHolderType_& ish)
       {
-        // Update edge@cell IndexSet dimensions
-        // vert@edge IndexSet
+        // Update edge\@cell IndexSet dimensions
+        // vert\@edge IndexSet
         auto& vert_at_subshape_index_set(ish.template get_index_set<shape_dim_-2,0>());
         // Number of cells
         Index num_shapes(ish.template get_index_set<shape_dim_,0>().get_num_entities());
@@ -660,7 +662,7 @@ namespace FEAT
         // size
         ish.template get_index_set<shape_dim_, shape_dim_-2>() = std::move(subshape_at_shape_index_set);
 
-        // Now do it again for the edge@face IndexSet
+        // Now do it again for the edge\@face IndexSet
         // Number of faces
         Index num_intermediate_shapes(ish.template get_index_set<shape_dim_-1,0>().get_num_entities());
         // Get the type of the IndexSet to dimensions <Shape_::dimension-1, Shape::dimension-2>
@@ -681,7 +683,7 @@ namespace FEAT
      * Maximum dimension of the shape to extract said information for.
      *
      * If the mesh file read by the MeshStreamer used by the MeshStreamerFactory does not provide complete
-     * information about edge@cell, edge@face and/or face@cell, the number of edges/faces is not correct in
+     * information about edge\@cell, edge\@face and/or face\@cell, the number of edges/faces is not correct in
      * the _mesh_data object. After fill_index_sets() is called, the size of these index set in the corresponding
      * IndexSetHolder gives the right number of edges/faces.
      *
@@ -709,7 +711,7 @@ namespace FEAT
       template<typename IndexSetHolderType_>
       static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
       {
-        // The number of entities of dimension dim_ is the length of the vertex@shape[dim_] IndexSet
+        // The number of entities of dimension dim_ is the length of the vertex\@shape[dim_] IndexSet
         num_entities[dim_] = ish.template get_index_set<dim_,0>().get_num_entities();
         // Recurse down
         NumEntitiesExtractor<dim_-1>::set_num_entities(ish, num_entities);

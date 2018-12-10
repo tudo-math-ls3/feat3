@@ -940,7 +940,6 @@ namespace FEAT
        *
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
-       * \param[in] transposed Should the product use the transposed matrix?
        */
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {

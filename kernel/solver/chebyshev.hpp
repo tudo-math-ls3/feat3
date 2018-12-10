@@ -62,9 +62,6 @@ namespace FEAT
        * \param[in] filter
        * The system filter.
        *
-       * \param[in] m
-       * The order of the polynom
-       *
        */
       explicit Chebyshev(const MatrixType& matrix, const FilterType& filter,
         const DataType fraction_min_ev = DataType(0.5), const DataType fraction_max_ev = DataType(0.8)) :
@@ -291,9 +288,6 @@ namespace FEAT
      *
      * \param[in] filter
      * The system filter.
-     *
-     * \param[in] m
-     * The order of the polynom
      *
      * \returns
      * A shared pointer to a new Chebyshev object.

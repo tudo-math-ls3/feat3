@@ -167,7 +167,7 @@ namespace FEAT
         /**
          * \brief Constructor
          *
-         * \param[in] comm
+         * \param[in] comm_
          * The main communicator to be used.
          *
          * \param[in] support_multi_layered
@@ -1210,7 +1210,7 @@ namespace FEAT
          * \param[inout] patch_mesh_node
          * The patch-mesh node that represents the partition whose halos are to be computed.
          *
-         * \param[inout] neigbour_ranks
+         * \param[inout] neighbour_ranks
          * The vector that receives the ranks of the new neighbours that derive from halo splitting.
          */
         void _split_basemesh_halos(
@@ -1516,7 +1516,7 @@ namespace FEAT
          * \param[inout] ancestor
          * The ancestor object for this layer.
          *
-         * \param[in] base_mesh_node
+         * \param[in] mesh_node
          * The base-mesh node that is to be partitioned.
          *
          * \param[in] check_extern
@@ -1742,7 +1742,7 @@ namespace FEAT
          * \param[inout] ancestor
          * The ancestor object for this layer.
          *
-         * \param[in] base_mesh_node
+         * \param[in] mesh_node
          * The base-mesh node that is to be partitioned.
          *
          * \returns

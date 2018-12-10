@@ -171,7 +171,7 @@ namespace FEAT
       /**
        * \brief Computes the required buffer size for a PowerVector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
       template<typename SubVector_>
@@ -183,7 +183,7 @@ namespace FEAT
       /**
        * \brief Creates a new buffer vector for a PowerVector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector for which the buffer is to be created.
        */
       template<typename SubVector_>

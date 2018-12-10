@@ -1081,9 +1081,7 @@ namespace FEAT
         _write_out_binary(file);
       }
     }; // class PowerVector<...,1>
-    /// \cond internal
 
-    /// \cond internal
     template <typename SubType_, Index count_>
     inline void dump_power_vector(std::ostream & os, const PowerVector<SubType_, count_>& x)
     {

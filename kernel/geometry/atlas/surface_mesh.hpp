@@ -541,10 +541,6 @@ namespace FEAT
          * \param[in] mesh
          * The (surface) mesh we are looking for x in.
          *
-         * \param[in,out] traversed
-         * Information about which facet was already traversed. No information is passed to or from this function,
-         * this is just so it does not need to be reallocated for every vertex.
-         *
          * For every subfacet, we need to know if it was already traversed by adding the neighbour across said
          * facet to the search stack. If the surface is concave, it might happen that facet A says "go to my
          * neighbour, B", and then B says "go to my neighbour, A". It's then clear that the wanted point lies on

@@ -21,7 +21,7 @@ namespace FEAT
        * \tparam dim
        * Shape dimension of the IndexSet that gets filled.
        *
-       * This only fills the vertex@shape information and leaves the rest to the RedundantIndexSetBuilder
+       * This only fills the vertex\@shape information and leaves the rest to the RedundantIndexSetBuilder
        *
        * \author Jordi Paul
        */

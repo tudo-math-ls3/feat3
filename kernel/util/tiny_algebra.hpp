@@ -1004,7 +1004,7 @@ namespace FEAT
       /**
        * \brief Sets this matrix to the cofactor matrix of another matrix.
        *
-       * \f$ \mathrm{Cof}(A) \f$ is the \emph{cofactor matrix} of \f$ A \f$. If \f$A \in \mathbb{R}^{n \times n}\f$,
+       * \f$ \mathrm{Cof}(A) \f$ is the <em>cofactor matrix</em> of \f$ A \f$. If \f$A \in \mathbb{R}^{n \times n}\f$,
        * define \f$A^{(i,j)} \in \mathbb{R}^{n-1 \times n-1}\f$ as the matrix obtained by deleting the \f$ i \f$th column
        * and \f$ j \f$th row of \f$ A \f$. Then
        * \f[

@@ -451,7 +451,7 @@ namespace FEAT
        * Dimension of the subshape
        *
        * Using template recursion, this generates subshape\@shape information for all subshapes of lower dimension,
-       * i.e. for Simplex<3> it generates edge@face, edge@cell and face@cell
+       * i.e. for Simplex<3> it generates edge\@face, edge\@cell and face\@cell
        */
       template<typename Shape_, int face_dim_ = Shape_::dimension - 1>
       struct RisbWrapper
@@ -465,7 +465,7 @@ namespace FEAT
          * \param[in,out] ish
          * IndexsetHolder to be filled.
          *
-         * The only information this really needs is vertex\@shape. If vertex@subshape is missing for any subshape,
+         * The only information this really needs is vertex\@shape. If vertex\@subshape is missing for any subshape,
          * it is generated using IndexCalculator.
          *
          */

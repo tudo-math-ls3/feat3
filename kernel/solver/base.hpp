@@ -199,7 +199,7 @@ namespace FEAT
        * \param[in] section_name
        * The name of the config section, which it does not know by itself
        *
-       * \param[in] section
+       * \param[in] config_section
        * A pointer to the PropertyMap section configuring this solver
        *
        */

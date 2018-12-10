@@ -141,7 +141,7 @@ namespace FEAT
      * \param[in] name
      * The name of the entry that was to be parsed.
      *
-     * \param[in] gotten
+     * \param[in] got
      * The string that was meant to be parsed.
      *
      * \param[in] expect

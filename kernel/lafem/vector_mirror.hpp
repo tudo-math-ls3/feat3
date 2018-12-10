@@ -200,7 +200,7 @@ namespace FEAT
       /**
        * \brief Computes the required buffer size for a DenseVector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
       template<typename Mem2_, typename DT2_, typename IT2_>
@@ -212,7 +212,7 @@ namespace FEAT
       /**
        * \brief Computes the required buffer size for a DenseVectorBlocked.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
       template<typename Mem2_, typename DT2_, typename IT2_, int block_size_>
@@ -224,7 +224,7 @@ namespace FEAT
       /**
        * \brief Computes the required buffer size for a SparseVector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
       template<typename Mem2_, typename DT2_, typename IT2_>
@@ -236,7 +236,7 @@ namespace FEAT
       /**
        * \brief Computes the required buffer size for a SparseVectorBlocked.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
       template<typename Mem2_, typename DT2_, typename IT2_, int block_size_>
@@ -248,7 +248,7 @@ namespace FEAT
       /**
        * \brief Creates a new buffer vector for a vector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector for which the buffer is to be created.
        */
       template<typename Vector_>

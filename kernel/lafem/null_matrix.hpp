@@ -280,7 +280,7 @@ namespace FEAT
        *
        * \param[in] value The value to be set (defaults to 0)
        */
-      void format(const DT_ DOXY(alpha) = DT_(1))
+      void format(const DT_ DOXY(value) = DT_(0))
       {
         // nothing to do here
       }

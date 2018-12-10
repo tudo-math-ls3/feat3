@@ -142,10 +142,10 @@ namespace FEAT
          * \param[in] section
          * A pointer to the PropertyMap section configuring this solver.
          *
-         * \param[in] functional
+         * \param[in] functional_
          * The functional.
          *
-         * \param[in] filter
+         * \param[in] filter_
          * The system filter.
          *
          */
@@ -667,10 +667,10 @@ namespace FEAT
          * \param[in] section
          * A pointer to the PropertyMap section configuring this solver
          *
-         * \param[in] op
+         * \param[in] functional_
          * The functional
          *
-         * \param[in] filter
+         * \param[in] filter_
          * The system filter.
          *
          */
@@ -1045,13 +1045,13 @@ namespace FEAT
     /**
      * \brief Creates a new ALGLIBMinCG solver object
      *
-     * \param[in] functional
+     * \param[in] functional_
      * The functional
      *
-     * \param[in] filter
+     * \param[in] filter_
      * The system filter.
      *
-     * \param[in] keep_iterates
+     * \param[in] keep_iterates_
      * Flag for keeping the iterates, defaults to false
      *
      * \returns
@@ -1076,10 +1076,10 @@ namespace FEAT
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
      *
-     * \param[in] functional
+     * \param[in] functional_
      * The functional
      *
-     * \param[in] filter
+     * \param[in] filter_
      * The system filter.
      *
      * \returns

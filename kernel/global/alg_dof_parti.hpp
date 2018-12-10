@@ -104,7 +104,7 @@ namespace FEAT
       Index _glob_dof_offset;
       /// global dof count over all processes
       Index _glob_dof_count;
-      /// global dof indices, size = #local DOFs
+      /// global dof indices, size = number of local DOFs
       std::vector<Index> _glob_dof_idx;
       /// mirror for this process's owned DOFs
       MirrorType _owned_mirror;
@@ -977,8 +977,8 @@ namespace FEAT
        * \param[in] adp_in
        * The algebraic dof partitioning to be used for this matrix.
        */
-      explicit AlgDofPartiMatrix(const AlgDofPartiType* lasi_in) :
-        _alg_dof_parti(lasi_in),
+      explicit AlgDofPartiMatrix(const AlgDofPartiType* adp_in) :
+        _alg_dof_parti(adp_in),
         _matrix()
       {
       }

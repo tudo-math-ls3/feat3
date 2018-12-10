@@ -389,7 +389,7 @@ namespace FEAT
          * An index-pair containing the number of rows and columns of the local matrix part, resp.
          */
         template<typename Matrix_, typename DT_>
-        static std::pair<Index,Index> gather(const Matrix_&,
+        static std::pair<Index,Index> gather(const Matrix_& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {

@@ -165,7 +165,7 @@ namespace FEAT
       /**
        * \brief Computes the required buffer size for a TupleVector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
       template<typename Tv_, typename... Tw_>
@@ -177,7 +177,7 @@ namespace FEAT
       /**
        * \brief Creates a new buffer vector for a TupleVector.
        *
-       * \tparam[in] vector
+       * \param[in] vector
        * The vector for which the buffer is to be created.
        */
       template<typename Tv_, typename... Tw_>

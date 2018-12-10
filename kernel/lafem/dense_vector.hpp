@@ -222,8 +222,8 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] size The size of the created vector.
-       * \param[in] pinned_allocation True if the memory should be allocated in a pinned manner.
+       * \param[in] size_in The size of the created vector.
+       * \param[in] pinning True if the memory should be allocated in a pinned manner.
        *
        * \warning Pinned memory allocation is only possible in main memory and needs cuda support.
        *
@@ -257,7 +257,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] size The size of the created vector.
+       * \param[in] size_in The size of the created vector.
        * \param[in] value The value, each element will be set to.
        *
        * Creates a vector with given size and value.
@@ -277,7 +277,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] size The size of the created vector.
+       * \param[in] size_in The size of the created vector.
        * \param[in] data An array containing the value data.
        *
        * Creates a vector with given size and given data.
@@ -307,9 +307,9 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] dv_ind The source DenseVector
+       * \param[in] dv_in The source DenseVector
        * \param[in] size_in The size of the created vector range.
-       * \param[in] offset The starting element of the created vector range in relation to the source vector.
+       * \param[in] offset_in The starting element of the created vector range in relation to the source vector.
        *
        * Creates a vector range from a given DenseVector
        *
@@ -373,7 +373,7 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte.
+       * \param[in] input A std::vector, containing the byte.
        *
        * Creates a vector from the given byte array.
        */
@@ -514,7 +514,7 @@ namespace FEAT
       /**
        * \brief Deserialisation of complete container entity.
        *
-       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
@@ -527,8 +527,7 @@ namespace FEAT
       /**
        * \brief Serialisation of complete container entity.
        *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[out] std::vector<char> A std::vector, containing the byte array.
+       * \returns A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *
@@ -568,7 +567,7 @@ namespace FEAT
       /**
        * \brief Performs \f$this \leftarrow x\f$.
        *
-       * \param[in] x The vector to be copied (could be of any format; must have same size).
+       * \param[in] a The vector to be copied (could be of any format; must have same size).
        */
       template<typename VT_>
       void copy(const VT_ & a)
@@ -581,7 +580,7 @@ namespace FEAT
       /**
        * \brief Performs \f$x \leftarrow this\f$.
        *
-       * \param[in] x The target-vector to be copied to (could be of any format; must have same size).
+       * \param[in] a The target-vector to be copied to (could be of any format; must have same size).
        */
       template<typename VT_>
       void copy_inv(VT_ & a) const

@@ -22,7 +22,6 @@ namespace FEAT
          * \param statistics_check The result of args.check("statistics"), i.e. the detail level(0 = some details, 1 = many details and log file output)
          * \param shape_dimension The maximum dimension of the used shapes
          * \param system_levels The system level hierarchy
-         * \param transfer_levels The transfer level hierarchy
          * \param domain The domain
          *
          */

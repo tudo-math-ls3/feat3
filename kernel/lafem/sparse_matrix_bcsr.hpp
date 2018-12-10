@@ -2077,7 +2077,7 @@ namespace FEAT
        * \brief Adds the trace of a double matrix multiplikation to a vector
        *
        * This function performs the following computation:
-       * \f[ v \leftarrow v + \alpha \mathrm{tr}( D \textnormal{diag}(A) \cdot B\f,]
+       * \f[ v \leftarrow v + \alpha \mathrm{tr}( D \textnormal{diag}(A) \cdot B\f]
        *
        * where \f$ B = \mathrm{this} \f$
        *

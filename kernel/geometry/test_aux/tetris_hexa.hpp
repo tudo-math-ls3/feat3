@@ -42,11 +42,11 @@ namespace FEAT
           ^                   |  J                |  K
           |                   | /                 | /
           |                   |/                  |/
-         11---->x             0---------A---------1\endverbatim
+         11---->x             0---------A---------1
          /
        z/
        v
-      *
+      * \endverbatim
       * \author Peter Zajac
       */
       HexaMesh* create_tetris_mesh_3d();
