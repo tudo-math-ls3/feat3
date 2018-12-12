@@ -201,7 +201,7 @@ namespace FEAT
                 local_matrix[i][j].add_scalar_main_diag(lambda * weight *  space_data_s.phi[i].value * space_data_s.phi[j].value);
 
                 // add scalar term 'gamma*v*grad(sigma)' for all components of sigma
-                local_matrix[i][j].add_scalar_main_diag(gamma * weight * Tiny::dot(loc_v, space_data_s.phi[i].grad) * space_data_s.phi[j].value);
+                local_matrix[i][j].add_scalar_main_diag(gamma * weight * space_data_s.phi[i].value * Tiny::dot(loc_v, space_data_s.phi[j].grad));
 
                 // evaluate actual Oldroyd operator
                 core_eval(local_matrix[i][j], loc_grad_v, -zeta * weight * space_data_s.phi[i].value * space_data_s.phi[j].value);
