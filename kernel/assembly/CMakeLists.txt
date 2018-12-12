@@ -15,6 +15,7 @@ SET (test_list
   grid_transfer-mass-test
   grid_transfer-tip-test
   interpolator-test
+  jump_stabil-test
   linear_functional-test
   rew_projector-test
 )

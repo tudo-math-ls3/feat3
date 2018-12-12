@@ -38,8 +38,8 @@ TARGET_LINK_LIBRARIES(dbg-trace-1 feat)
 ADD_EXECUTABLE(dbg-trace-2 dbg_trace_2.cpp)
 TARGET_LINK_LIBRARIES(dbg-trace-2 feat)
 
-ADD_EXECUTABLE(dbg-streamdiff dbg_streamdiff.cpp)
-TARGET_LINK_LIBRARIES(dbg-streamdiff feat)
+ADD_EXECUTABLE(dbg-stabilise dbg_stabilise.cpp)
+TARGET_LINK_LIBRARIES(dbg-stabilise feat)
 
 ADD_EXECUTABLE(dbg-tuple-matrix dbg_tuple_matrix.cpp)
 TARGET_LINK_LIBRARIES(dbg-tuple-matrix feat)

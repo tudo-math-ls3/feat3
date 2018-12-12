@@ -16,6 +16,7 @@
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/trace_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
@@ -192,11 +193,22 @@ namespace Andicore
     args.support("beta");
     args.support("theta");
     args.support("upsam");
+    args.support("gamma");
+
+    std::deque<std::pair<int,String>> unsupported = args.query_unsupported();
+    if(!unsupported.empty())
+    {
+      std::cerr << std::endl;
+      for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+      Runtime::abort();
+    }
 
     DataType nu = 1E-5;   // diffusion
     DataType beta = 1.0;  // convection
     DataType theta = 0.0; // reaction
-    DataType upsam = 0.0; // stabilisation
+    DataType upsam = 0.1; // stabilisation
+    DataType gamma = 0.01; // EOJ stabilisation
     Index level = 5;
 
     args.parse("level", level);
@@ -204,16 +216,18 @@ namespace Andicore
     args.parse("beta", beta);
     args.parse("theta", theta);
     args.parse("upsam", upsam);
+    args.parse("gamma", gamma);
 
     std::cout << String("Level").pad_back(20, '.') << ": " << level << std::endl;
     std::cout << String("nu").pad_back(20, '.') << ": " << nu << std::endl;
     std::cout << String("beta").pad_back(20, '.') << ": " << beta << std::endl;
     std::cout << String("theta").pad_back(20, '.') << ": " << theta << std::endl;
     std::cout << String("upsam").pad_back(20, '.') << ": " << upsam << std::endl;
+    std::cout << String("gamma").pad_back(20, '.') << ": " << gamma << std::endl;
 
     // ********************************************************************************************
 
-    Cubature::DynamicFactory cubature(String("auto-degree:") + stringify(2*(SpaceType::local_degree)+1));
+    Cubature::DynamicFactory cubature(String("auto-degree:") + stringify(2*(SpaceType::local_degree)+3));
 
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
@@ -236,10 +250,12 @@ namespace Andicore
 
     MatrixType matrix;
 
-    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+    //Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+    Assembly::SymbolicAssembler::assemble_matrix_ext1(matrix, space);
 
     VectorType vec_sol_1 = matrix.create_vector_r();
     VectorType vec_sol_2 = matrix.create_vector_r();
+    VectorType vec_sol_3 = matrix.create_vector_r();
     VectorType vec_rhs = matrix.create_vector_l();
 
     BlockedVectorType vec_conv(matrix.rows());
@@ -247,6 +263,7 @@ namespace Andicore
 
     vec_sol_1.format();
     vec_sol_2.format();
+    vec_sol_3.format();
     vec_rhs.format();
 
     Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature);
@@ -262,22 +279,36 @@ namespace Andicore
 
 
     Assembly::BurgersAssembler<DataType, IndexType, 2> burgers;
-    burgers.nu = nu;
-    burgers.beta = beta;
-    burgers.theta = theta;
+    Assembly::TraceAssembler<TrafoType> trace_asm(trafo);
+    trace_asm.compile_all_facets(true, false);
 
-    matrix.format();
-    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature);
-    filter.filter_mat(matrix);
 
 #ifdef FEAT_HAVE_UMFPACK
 
     auto solver = Solver::new_umfpack(matrix);
+    solver->init_symbolic();
 
-    solver->init();
+
+    // unstabilised
+    std::cout << "Solving Unstabilised System..." << std::endl;
+    burgers.nu = nu;
+    burgers.beta = beta;
+    burgers.theta = theta;
+    matrix.format();
+    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature);
+    filter.filter_mat(matrix);
+
+    solver->init_numeric();
     Solver::solve(*solver, vec_sol_1, vec_rhs, matrix, filter);
     solver->done_numeric();
 
+    Assembly::ScalarErrorInfo<DataType> errors_1 = Assembly::ScalarErrorComputer<1>::
+      compute(vec_sol_1, sol_function, space, cubature);
+    std::cout << errors_1 << std::endl;
+
+
+    // streamline diffusion
+    std::cout << "Solving Streamline Diffusion Stabilised System..." << std::endl;
     burgers.sd_delta = upsam;
     burgers.sd_nu = nu;
     burgers.set_sd_v_norm(vec_conv);
@@ -287,36 +318,56 @@ namespace Andicore
 
     solver->init_numeric();
     Solver::solve(*solver, vec_sol_2, vec_rhs, matrix, filter);
+    solver->done_numeric();
 
-    solver->done();
-
-    Assembly::ScalarErrorInfo<DataType> errors_1 = Assembly::ScalarErrorComputer<1>::
-      compute(vec_sol_1, sol_function, space, cubature);
     Assembly::ScalarErrorInfo<DataType> errors_2 = Assembly::ScalarErrorComputer<1>::
       compute(vec_sol_2, sol_function, space, cubature);
-
-    std::cout << "Unstabilised:" << std::endl;
-    std::cout << errors_1 << std::endl;
-
-    std::cout << "Streamline Diffusion:" << std::endl;
     std::cout << errors_2 << std::endl;
 
-    String vtk_name(String("./andicore-stabil-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+    // EOJ stabilisation
+    std::cout << "Solving Jump Stabilised System..." << std::endl;
+    burgers.nu = nu;
+    burgers.beta = beta;
+    burgers.theta = theta;
+    burgers.sd_nu = 0.0;
+    burgers.sd_delta = 0.0;
+    matrix.format();
+    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature);
+    trace_asm.assemble_jump_stabil_operator_matrix(matrix, space, cubature, gamma, DataType(2), DataType(2));
+    filter.filter_mat(matrix);
 
-    Geometry::ExportVTK<MeshType> exporter(mesh);
-    exporter.add_vertex_vector("conv", vec_conv);
-    exporter.add_vertex_scalar("sol_1", vec_sol_1.elements());
-    exporter.add_vertex_scalar("sol_2", vec_sol_2.elements());
-    exporter.add_vertex_scalar("rhs", vec_rhs.elements());
-    exporter.write(vtk_name);
+    solver->init_numeric();
+    Solver::solve(*solver, vec_sol_3, vec_rhs, matrix, filter);
+    solver->done_numeric();
 
-    std::cout << "Finished!" << std::endl;
+    Assembly::ScalarErrorInfo<DataType> errors_3 = Assembly::ScalarErrorComputer<1>::
+      compute(vec_sol_3, sol_function, space, cubature);
+    std::cout << errors_3 << std::endl;
+
+    solver->done_symbolic();
 
 #else // no UMFPACK
     std::cout << "You need to compile with UMFPACK support." << std::endl;
 #endif // FEAT_HAVE_UMFPACK
+
+    if(args.check("vtk") >= 0)
+    {
+      String vtk_name(String("./dbg-stabilise-lvl") + stringify(level));
+      args.parse("vtk", vtk_name);
+
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+
+      Geometry::ExportVTK<MeshType> exporter(mesh);
+      exporter.add_vertex_vector("conv", vec_conv);
+      exporter.add_vertex_scalar("sol_1", vec_sol_1.elements());
+      exporter.add_vertex_scalar("sol_2", vec_sol_2.elements());
+      exporter.add_vertex_scalar("sol_3", vec_sol_3.elements());
+      exporter.add_vertex_scalar("rhs", vec_rhs.elements());
+      exporter.write(vtk_name);
+    }
+
+    std::cout << "Finished!" << std::endl;
   }
 } // namespace Andicore
 
