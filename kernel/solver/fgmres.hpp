@@ -114,7 +114,8 @@ namespace FEAT
         const MatrixType& matrix, const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("FGMRES", section_name, section, precond),
         _system_matrix(matrix),
-        _system_filter(filter)
+        _system_filter(filter),
+        _inner_res_scale(DataType(0))
       {
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
