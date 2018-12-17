@@ -733,8 +733,8 @@ namespace FEAT
        */
       void init_symbolic()
       {
-        XASSERTM(!_have_init_symbolic, "init_symbolic() was already called");
-        XASSERTM(!_have_init_numeric, "init_numeric() was already called");
+        XASSERTM(!_have_init_numeric, "cannot call init_symbolic(): init_numeric() has already been called");
+        XASSERTM(!_have_init_symbolic, "cannot call init_symbolic(): init_symbolic() has already been called");
 
         // initialise all levels in forward order
         for(auto it = _levels.begin(); it != _levels.end(); ++it)
@@ -751,8 +751,8 @@ namespace FEAT
        */
       void done_symbolic()
       {
-        XASSERTM(_have_init_symbolic, "init_symbolic() has not yet been called");
-        XASSERTM(!_have_init_numeric, "init_numeric() was already called");
+        XASSERTM(!_have_init_numeric, "cannot call done_symbolic(): done_numeric() has not been called yet");
+        XASSERTM(_have_init_symbolic, "cannot call done_symbolic(): init_symbolic() has not been called yet");
 
         // release all levels in reverse order
         for(auto it = _levels.rbegin(); it != _levels.rend(); ++it)
@@ -770,8 +770,8 @@ namespace FEAT
        */
       void init_numeric()
       {
-        XASSERTM(_have_init_symbolic, "init_symbolic() has not yet been called");
-        XASSERTM(!_have_init_numeric, "init_numeric() was already called");
+        XASSERTM(!_have_init_numeric, "cannot call init_numeric(): init_numeric() has already been called");
+        XASSERTM(_have_init_symbolic, "cannot call init_numeric(): init_symbolic() has not been called yet");
 
         // initialise all levels in forward order
         for(auto it = _levels.begin(); it != _levels.end(); ++it)
@@ -788,7 +788,7 @@ namespace FEAT
        */
       void done_numeric()
       {
-        XASSERTM(_have_init_numeric, "init_numeric() has not yet been called");
+        XASSERTM(_have_init_numeric, "cannot call done_numeric(): init_numeric() has not been called yet");
 
         // release all levels in reverse order
         for(auto it = _levels.rbegin(); it != _levels.rend(); ++it)
