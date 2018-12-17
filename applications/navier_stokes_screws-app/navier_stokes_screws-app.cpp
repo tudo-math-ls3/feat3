@@ -1642,16 +1642,6 @@ struct NavierStokesScrewsApp
         }
         watch_asm_mat.stop();
 
-        // Update the pressure Laplace matrix stock and initialise the solver
-        watch_sol_init.start();
-        matrix_stock_pres.hierarchy_init_numeric();
-        solver_s->init_numeric();
-
-        // Update the pressure mass matrix and initialise the solver
-        ms_mass_p.refresh();
-        solver_m_p->init_numeric();
-        watch_sol_init.stop();
-
         // Assemble RHS vector for the velocity
         watch_asm_rhs.start();
 
@@ -1792,13 +1782,17 @@ struct NavierStokesScrewsApp
         watch_solver_a.start();
         Solver::Status status_a = solver_a->correct(vec_sol_v.at(0), vec_rhs_v);
         watch_solver_a.stop();
+
+        // release the solver
+        solver_a->done_numeric();
+        matrix_stock_velo.hierarchy_done_numeric();
+
+        // check the solver's output
         if(!Solver::status_success(status_a))
         {
           comm.print("\n\nERROR: velocity solver broke down!\n");
           failure = true;
           ++failed_checks;
-          solver_a->done_numeric();
-          matrix_stock_velo.hierarchy_done_numeric();
           break;
         }
 
@@ -1821,18 +1815,28 @@ struct NavierStokesScrewsApp
         filter_p.filter_rhs(vec_rhs_phi);
         watch_asm_rhs.stop();
 
+        // initialise pressure poisson solver
+        watch_sol_init.start();
+        matrix_stock_pres.hierarchy_init_numeric();
+        solver_s->init_numeric();
+        watch_sol_init.stop();
+
         // Solve auxillary pressure Poisson
         FEAT::Statistics::expression_target = "solver_s";
         watch_solver_s.start();
         Solver::Status status_s = solver_s->correct(vec_sol_phi.at(0), vec_rhs_phi);
         watch_solver_s.stop();
+
+        // release pressure poisson solver
+        solver_s->done_numeric();
+        matrix_stock_pres.hierarchy_done_numeric();
+
+        // check solver output
         if(!Solver::status_success(status_s))
         {
           comm.print("\n\nERROR: pressure poisson solver broke down!\n");
           failure = true;
           ++failed_checks;
-          solver_s->done_numeric();
-          matrix_stock_pres.hierarchy_done_numeric();
           break;
         }
 
@@ -1853,29 +1857,30 @@ struct NavierStokesScrewsApp
         }
         watch_asm_rhs.stop();
 
+        // Update the pressure mass matrix and initialise the solver
+        watch_sol_init.start();
+        ms_mass_p.refresh();
+        solver_m_p->init_numeric();
+        watch_sol_init.stop();
+
         // Solve pressure projection problem: M_p p[k+1] = M_p p[k] + M_p phi[k+1] + 1/Re D u[k+1]
         FEAT::Statistics::expression_target = "solver_m_p";
         watch_solver_m_p.start();
         Solver::Status status_m_p = solver_m_p->correct(vec_sol_p.at(0), vec_rhs_p);
+        watch_solver_m_p.stop();
+
+        // release solver
+        solver_m_p->done_numeric();
+
         // Is this necessary?
         filter_p.filter_sol(vec_sol_p.at(0));
-        watch_solver_m_p.stop();
         if(!Solver::status_success(status_m_p))
         {
           comm.print("\n\nERROR: pressure projection solver broke down!\n");
           failure = true;
           ++failed_checks;
-          solver_m_p->done_numeric();
           break;
         }
-
-        solver_a->done_numeric();
-        matrix_stock_velo.hierarchy_done_numeric();
-
-        solver_s->done_numeric();
-        matrix_stock_pres.hierarchy_done_numeric();
-
-        solver_m_p->done_numeric();
 
 #ifdef ANALYTIC_SOLUTION
         {
