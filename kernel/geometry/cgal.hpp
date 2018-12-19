@@ -7,19 +7,6 @@
 
 #if defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
 
-#define CGAL_HEADER_ONLY 1
-
-FEAT_DISABLE_WARNINGS
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
-#include <CGAL/AABB_face_graph_triangle_primitive.h>
-#include <CGAL/algorithm.h>
-#include <CGAL/Side_of_triangle_mesh.h>
-FEAT_RESTORE_WARNINGS
-
 namespace FEAT
 {
   namespace Geometry
@@ -36,16 +23,7 @@ namespace FEAT
     class CGALWrapper
     {
       private:
-      typedef CGAL::Simple_cartesian<double> K;
-      typedef K::Point_3 Point;
-      typedef CGAL::Polyhedron_3<K> Polyhedron;
-      typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
-      typedef CGAL::AABB_traits<K, Primitive> Traits;
-      typedef CGAL::AABB_tree<Traits> Tree;
-      typedef CGAL::Side_of_triangle_mesh<Polyhedron, K> Point_inside;
-      Polyhedron * _polyhedron;
-      Tree * _tree;
-      Point_inside * _inside_tester;
+      void * _cgal_data;
 
       /// read in stream in off file format and preprocess search tree for in/out test
       void _parse_off_data(std::istream & file);
@@ -64,12 +42,7 @@ namespace FEAT
       double squared_distance(double x, double y, double z) const;
 
       /// Destructor
-      ~CGALWrapper()
-      {
-        delete _inside_tester;
-        delete _tree;
-        delete _polyhedron;
-      }
+      ~CGALWrapper();
     };
 
   } // namespace Geometry

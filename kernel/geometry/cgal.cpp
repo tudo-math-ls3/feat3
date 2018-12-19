@@ -5,6 +5,20 @@
 
 #ifdef FEAT_HAVE_CGAL
 
+#define CGAL_HEADER_ONLY 1
+
+FEAT_DISABLE_WARNINGS
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/Polyhedron_3.h>
+#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
+#include <CGAL/AABB_face_graph_triangle_primitive.h>
+#include <CGAL/algorithm.h>
+#include <CGAL/Side_of_triangle_mesh.h>
+FEAT_RESTORE_WARNINGS
+
+
 #ifdef FEAT_COMPILER_INTEL
 #pragma warning disable 3280
 #pragma warning disable 1224
@@ -14,10 +28,37 @@
 
 using namespace CGAL;
 
+typedef CGAL::Simple_cartesian<double> K;
+typedef K::Point_3 Point;
+typedef CGAL::Polyhedron_3<K> Polyhedron;
+typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
+typedef CGAL::AABB_traits<K, Primitive> Traits;
+typedef CGAL::AABB_tree<Traits> Tree;
+typedef CGAL::Side_of_triangle_mesh<Polyhedron, K> Point_inside;
+
+struct CGALWrapperData
+{
+  Polyhedron * _polyhedron;
+  Tree * _tree;
+  Point_inside * _inside_tester;
+
+  CGALWrapperData() :
+    _polyhedron(nullptr),
+    _tree(nullptr),
+    _inside_tester(nullptr)
+  {
+  }
+
+  ~CGALWrapperData()
+  {
+    delete _inside_tester;
+    delete _tree;
+    delete _polyhedron;
+  }
+};
+
 FEAT::Geometry::CGALWrapper::CGALWrapper(String filename) :
-  _polyhedron(nullptr),
-  _tree(nullptr),
-  _inside_tester(nullptr)
+  _cgal_data(nullptr)
 {
   std::ifstream file(filename.c_str());
   XASSERTM(file.is_open(), "CGAL::read_off: file read error!");
@@ -27,9 +68,7 @@ FEAT::Geometry::CGALWrapper::CGALWrapper(String filename) :
 }
 
 FEAT::Geometry::CGALWrapper::CGALWrapper(std::istream & file) :
-  _polyhedron(nullptr),
-  _tree(nullptr),
-  _inside_tester(nullptr)
+  _cgal_data(nullptr)
 {
   _parse_off_data(file);
 }
@@ -39,31 +78,39 @@ bool FEAT::Geometry::CGALWrapper::point_inside(double x, double y, double z) con
   Point query(x, y, z);
 
   // Determine the side and return true if inside!
-  return (*_inside_tester)(query) == CGAL::ON_BOUNDED_SIDE;
+  CGALWrapperData * cd = (CGALWrapperData*)_cgal_data;
+  return (*(cd->_inside_tester))(query) == CGAL::ON_BOUNDED_SIDE;
 }
 
 double FEAT::Geometry::CGALWrapper::squared_distance(double x, double y, double z) const
 {
   Point query(x, y, z);
 
-  return (double)_tree->squared_distance(query);
+  CGALWrapperData * cd = (CGALWrapperData*)_cgal_data;
+  return (double)cd->_tree->squared_distance(query);
 }
 
 void FEAT::Geometry::CGALWrapper::_parse_off_data(std::istream & file)
 {
-  delete _polyhedron;
-  delete _tree;
-  delete _inside_tester;
+  delete (CGALWrapperData*)_cgal_data;
 
-  _polyhedron = new Polyhedron;
-  bool status = read_off(file, *_polyhedron);
+  _cgal_data = new CGALWrapperData;
+  CGALWrapperData * cd = (CGALWrapperData*)_cgal_data;
+
+  cd->_polyhedron = new Polyhedron;
+  bool status = read_off(file, *(cd->_polyhedron));
   XASSERTM(status == true, "CGAL::read_off: read error!");
 
   // Construct AABB tree with a KdTree
-  _tree = new Tree(faces(*_polyhedron).first, faces(*_polyhedron).second, *_polyhedron);
-  _tree->accelerate_distance_queries();
+  cd->_tree = new Tree(faces(*(cd->_polyhedron)).first, faces(*(cd->_polyhedron)).second, *(cd->_polyhedron));
+  cd->_tree->accelerate_distance_queries();
   // Initialize the point-in-polyhedron tester
-  _inside_tester = new Point_inside(*_tree);
+  cd->_inside_tester = new Point_inside(*(cd->_tree));
+}
+
+FEAT::Geometry::CGALWrapper::~CGALWrapper()
+{
+  delete (CGALWrapperData*)_cgal_data;
 }
 
 #elif !defined(DOXYGEN)
