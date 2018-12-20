@@ -26,8 +26,6 @@ FEAT_RESTORE_WARNINGS
 
 #include <kernel/geometry/cgal.hpp>
 
-using namespace CGAL;
-
 typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_3 Point;
 typedef CGAL::Polyhedron_3<K> Polyhedron;
