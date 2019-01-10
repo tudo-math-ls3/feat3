@@ -3,7 +3,7 @@
     This is the venturi-pipe mesh with explicit chart parametrisation.
   </Info>
   <Chart name="pipe:l">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 0 0
         0 0 5
@@ -12,10 +12,10 @@
         0
         1
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:r">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 42 0
         0 42 5
@@ -24,14 +24,14 @@
         0
         1
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:b">
-    <Spline dim="2" size="4" type="open">
+    <Bezier dim="2" size="4" type="open">
       <Points>
-        2 0 0 5.41339 -0.050702 10.586189 2.05
-        2 16 2 21.413395 2.050733 26.586185 -0.05
-        0 32 0
+        0 0 0
+        2 5.41339 -0.050702 10.586189 2.05 16 2
+        2 21.413395 2.050733 26.586185 -0.05 32 0
         0 42 0
       </Points>
       <Params>
@@ -40,25 +40,25 @@
         1
         2
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:tl">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
-        2 0 5 5.282172 5.053443 10.326587 3.046117
-        0 15.6 3.003095
+        0 0 5
+        2 5.282172 5.053443 10.326587 3.046117 15.6 3.003095
       </Points>
       <Params>
         0
         1
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:tr">
-    <Spline dim="2" size="3" type="open">
+    <Bezier dim="2" size="3" type="open">
       <Points>
-        2 16.4 3.003095 21.672235 3.04848 26.719368 5.051817
-        0 32 5
+        0 16.4 3.003095
+        2 21.672235 3.04848 26.719368 5.051817 32 5
         0 42 5
       </Points>
       <Params>
@@ -66,10 +66,10 @@
         1
         2
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:ul">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 15.6 3.003095
         0 15.6 5.4
@@ -78,10 +78,10 @@
         0
         1
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:ur">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 16.4 3.003095
         0 16.4 5.4
@@ -90,10 +90,10 @@
         0
         1
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:uc">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 15.6 5.4
         0 16.4 5.4
@@ -102,7 +102,7 @@
         0
         1
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Mesh type="conformal:simplex:2:2" size="64 159 96">
     <Vertices>

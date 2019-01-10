@@ -3,7 +3,7 @@
     This is the unit-square mesh consisting of four triangular cells.
   </Info>
   <Chart name="outer">
-    <Spline dim="2" size="5" type="closed">
+    <Bezier dim="2" size="5" type="closed">
       <Points>
         0 0 0
         0 1 0
@@ -18,7 +18,7 @@
         3
         4
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Mesh type="conformal:simplex:2:2" size="5 8 4">
     <Vertices>

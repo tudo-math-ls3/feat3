@@ -234,8 +234,8 @@ namespace FEAT
         if(this->template try_extrude_chart<Atlas::Circle<QuadMesh>>(hexa_chart, quad_chart))
           return hexa_chart;
 
-        // Is it a Spline chart?
-        if(this->template try_extrude_chart<Atlas::Spline<QuadMesh>>(hexa_chart, quad_chart))
+        // Is it a Bezier chart?
+        if(this->template try_extrude_chart<Atlas::Bezier<QuadMesh>>(hexa_chart, quad_chart))
           return hexa_chart;
 
         // If we come out here then we failed to extrude the 2D chart for some reason...

@@ -3,13 +3,13 @@
    This is the unit axe mesh consisting of a single quadrilateral.
   </Info>
   <Chart name="outer">
-    <Spline dim="2" size="5" type="closed">
+    <Bezier dim="2" size="5" type="closed">
       <Points>
-        2 0 0 0.25 -0.25 0.75 -0.25
-        2 1 0 0.75  0.25 0.75  0.75
-        2 1 1 0.75  1.25 0.25  1.25
-        2 0 1 0.25  0.75 0.25  0.25
         0 0 0
+        2 0.25 -0.25 0.75 -0.25 1 0
+        2 0.75 0.25 0.75 0.75 1 1
+        2 0.75 1.25 0.25 1.25 0 1
+        2 0.25 0.75 0.25 0.25 0 0
       </Points>
       <Params>
         0
@@ -18,7 +18,7 @@
         3
         4
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Mesh type="conformal:hypercube:2:2" size="4 4 1">
     <Vertices>

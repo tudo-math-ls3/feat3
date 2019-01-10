@@ -5,7 +5,7 @@
     This is the mesh that was used in the old FEAT versions.
   </Info>
   <Chart name="outer">
-    <Spline dim="2" size="5" type="closed">
+    <Bezier dim="2" size="5" type="closed">
       <Points>
         0 0 0
         0 2.2 0
@@ -20,7 +20,7 @@
         3
         4
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="circle">
     <Circle radius="0.05" midpoint="0.2 0.2" domain="0.5 -0.5" />

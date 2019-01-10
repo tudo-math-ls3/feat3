@@ -1,31 +1,31 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
   <Chart name="pipe:l">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 -0.4 0.5
         0 -0.4 0.3
       </Points>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:r">
-    <Spline dim="2" size="2" type="open">
+    <Bezier dim="2" size="2" type="open">
       <Points>
         0 0.4 -0.3
         0 0.4 -0.5
       </Points>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:b">
-    <Spline dim="2" size="8" type="open">
+    <Bezier dim="2" size="8" type="open">
       <Points>
-        0 -0.4  0.3
-        2  0.2  0.3 0.255 0.3 0.3 0.255
-        2  0.3  0.2 0.3 0.145 0.255 0.1
-        0  0.2  0.1
-        2 -0.2  0.1 -0.365 0.1 -0.5 -0.035
-        2 -0.5 -0.2 -0.5 -0.365 -0.365 -0.5
-        0 -0.2 -0.5
-        0  0.4 -0.5
+        0 -0.4 0.3
+        0 0.2 0.3
+        2 0.255 0.3 0.3 0.255 0.3 0.2
+        2 0.3 0.145 0.255 0.1 0.2 0.1
+        0 -0.2 0.1
+        2 -0.365 0.1 -0.5 -0.035 -0.5 -0.2
+        2 -0.5 -0.365 -0.365 -0.5 -0.2 -0.5
+        0 0.4 -0.5
       </Points>
       <Params>
         0
@@ -37,19 +37,19 @@
         13
         16
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Chart name="pipe:t">
-    <Spline dim="2" size="8" type="open">
+    <Bezier dim="2" size="8" type="open">
       <Points>
-        0  0.4 -0.3
-        2 -0.2 -0.3 -0.255 -0.3 -0.3 -0.255
-        2 -0.3 -0.2 -0.3 -0.145 -0.255 -0.1
-        0 -0.2 -0.1
-        2  0.2 -0.1 0.365 -0.1 0.5 0.035
-        2  0.5  0.2 0.5 0.365 0.365 0.5
-        0  0.2  0.5
-        0 -0.4  0.5
+        0 0.4 -0.3
+        0 -0.2 -0.3
+        2 -0.255 -0.3 -0.3 -0.255 -0.3 -0.2
+        2 -0.3 -0.145 -0.255 -0.1 -0.2 -0.1
+        0 0.2 -0.1
+        2 0.365 -0.1 0.5 0.035 0.5 0.2
+        2 0.5 0.365 0.365 0.5 0.2 0.5
+        0 -0.4 0.5
       </Points>
       <Params>
         0
@@ -61,7 +61,7 @@
         13
         16
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Mesh type="conformal:hypercube:2:2" size="34 49 16">
     <Vertices>

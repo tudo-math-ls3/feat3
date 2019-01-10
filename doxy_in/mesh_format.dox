@@ -116,7 +116,7 @@ where:
  +- Chart
  |  +- Circle
  |  +- Sphere
- |  +- Spline
+ |  +- Bezier
  |  |  +- Points
  |  |  +- Params
  |  +- SurfaceMesh
@@ -124,7 +124,7 @@ where:
  |  |  +- Triangles
  |  +- Extrude
  |     +- Circle
- |     +- Spline
+ |     +- Bezier
  +- Mesh
  |  +- Vertices
  |  +- Topology
@@ -225,8 +225,8 @@ A sphere of radius 0.2 around the midpoint (0.5, 1.0, 0.7) named "mySphere" woul
 </Chart>
 \endcode
 
-\subsection meshfile_chart_spline 2D Spline Chart Description
-The \c Spline chart represents a 2D Bezier-Spline (aka "Polybezier" aka "composite Bezier curve"), which can be used
+\subsection meshfile_chart_bezier 2D Bezier Chart Description
+The \c Bezier chart represents a 2D Bezier-Spline (aka "Polybezier" aka "composite Bezier curve"), which can be used
 to describe quite complex objects by a continuous composition of Bezier curves of possibly varying degree.
 
 Terminology:
@@ -236,7 +236,7 @@ Terminology:
 - A <b>control point</b> is a point which controls the shape of the Bezier curve segment spanned between two consecutive
   vertex points.
 
-The \c Spline chart contains the following attributes:
+The \c Bezier chart contains the following attributes:
 - \b dim (mandatory): specifies the dimension of the spline, must be equal to 2
 - \b size (mandatory): specifies the total number of vertex points of the spline
 - \b type (optional): specifies whether the spline is \b open or \b closed.
@@ -248,53 +248,53 @@ The \c Spline chart contains the following attributes:
 If a spline is declared as \b closed, then it is silently assumed that the start- and end-vertex points of the spline
 coincide.
 
-Each \c Spline chart must contain a child node named <c>Points</c> which encapsulates the coordinates of the
-vertex and control points, see \ref meshfile_chart_spline_points for details.
+Each \c Bezier chart must contain a child node named <c>Points</c> which encapsulates the coordinates of the
+vertex and control points, see \ref meshfile_chart_bezier_points for details.
 
-Furthermore, a \c Spline chart may also be parameterised. In this case, the spline need an additional child node
+Furthermore, a \c Bezier chart may also be parameterised. In this case, the spline needs an additional child node
 named \c Params, which encapsulates the 1D parameters for the vertex points of the Spline, see
-\ref meshfile_chart_spline_params for details.
+\ref meshfile_chart_bezier_params for details.
 
-\subsubsection meshfile_chart_spline_points Spline Points
+\subsubsection meshfile_chart_bezier_points Bezier Points
 The \c Points node itself has no attributes, and its contents specify both the vertex points and the control points
-of the Spline. Each line corresponds to a single Spline segment, which consists of the start vertex point as well
-as all control points following that vertex point, encoded in the following way:
-\f[ n~ v_x~ v_y~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y\f]
+of the Spline. Each line corresponds to a single Bezier segment, which consists of all control points following the
+previous vertex point as well as the end vertex point of the segment, encoded in the following way:
+\f[ n~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y~ v_x~ v_y\f]
 
 where
 - \e n specifies the number of control points for the segment
-- \f$v_x\f$ and \f$v_y\f$ specify the x- and y-coordinates of the vertex point, resp.
 - \f$c^k_x\f$ and \f$c^k_y\f$ specify the x- and y-coordinates of the <em>k</em>-th inner control point following the
-  vertex point, resp.
+  previous vertex point, resp.
+- \f$v_x\f$ and \f$v_y\f$ specify the x- and y-coordinates of the next vertex point, resp.
 
 \remark
 A Bezier curve without any inner control points is a simple line segment.
 
 \note
-The last vertex point of a spline must not have any control points.
+The first vertex point of a Bezier spline must \b not be preceeded by any control points.
 
-\subsubsection meshfile_chart_spline_params Spline Parameters
-A \c Spline chart may also be explicitly parameterised. In this case, the \c Spline node contains a child node named
+\subsubsection meshfile_chart_bezier_params Bezier Parameters
+A \c Bezier chart may also be explicitly parameterised. In this case, the \c Bezier node contains a child node named
 \c Params, which contain the 1D parameter values of the vertex points.
 
-\subsubsection meshfile_chart_spline_examples 2D Spline Chart Examples
-A Spline representing a simple line segment from (0.1, 0.5) to (0.7, 0.2) would be:
+\subsubsection meshfile_chart_bezier_examples 2D Bezier Chart Examples
+A Bezier spline representing a simple line segment from (0.1, 0.5) to (0.7, 0.2) would be:
 \code{.xml}
 <Chart name="line">
-  <Spline dim="2" size="2" type="open">
+  <Bezier dim="2" size="2" type="open">
     <Points>
       0 0.1 0.5
       0 0.7 0.2
     </Points>
-  </Spline>
+  </Bezier>
 </Chart>
 \endcode
 
-A (closed) Spline representing the polyline forming the boundary of the unit-square [0,1] x [0,1], equidistantly
+A (closed) Bezier spline representing the polyline forming the boundary of the unit-square [0,1] x [0,1], equidistantly
 parameterised over the 1D domain [0,4]:
 \code{.xml}
 <Chart name="square">
-  <Spline dim="2" size="5" type="closed">
+  <Bezier dim="2" size="5" type="closed">
     <Points>
       0 0 0
       0 1 0
@@ -309,41 +309,41 @@ parameterised over the 1D domain [0,4]:
       3.0
       4.0
     </Params>
-  </Spline>
+  </Bezier>
 </Chart>
 \endcode
 
 Consider the (open) cubic Bezier curve spanned by the four points (0.1, 0.2), (0.3, 0.1), (0.5, 0.1) and (0.7, 0.3).
 This curve has two vertex points (the first and the last one) as well as two (inner) control points between the
-two vertex points, so in our encoding the two control points "belong" to the first vertex point, whereas the seond (last)
+two vertex points, so in our encoding the two control points "belong" to the second vertex point, whereas the first
 vertex point has no control points:
 \code{.xml}
 <Chart name="curve">
-  <Spline dim="2" size="2" type="open">
+  <Bezier dim="2" size="2" type="open">
     <Points>
-      2 0.1 0.2 0.3 0.1 0.5 0.1
-      0 0.7 0.3
+      0 0.1 0.2
+      2 0.3 0.1 0.5 0.1 0.7 0.3
     </Points>
-  </Spline>
+  </Bezier>
 </Chart>
 \endcode
 
-A cubic Bezier spline with three vertex points (0,-0.5), (1,-0.2), (2,-0.5) and two (inner) control points for each of
-the two segments, equidistantly parameterised over the 1D domain [0,1]:
+A cubic Bezier spline with three vertex points (0, -0.5), (1, -0.2), (2, -0.5) and two (inner) control points
+for each of the two segments, equidistantly parameterised over the 1D domain [0,1]:
 \code{.xml}
 <Chart name="nozzle:b">
-  <Spline dim="2" size="3" type="open">
+  <Bezier dim="2" size="3" type="open">
     <Points>
-      2 0 -0.5 0.50 -0.5 0.65 -0.2
-      2 1 -0.2 1.35 -0.2 1.60 -0.35
-      0 2 -0.5
+      0 0 -0.5
+      2 0.50 -0.5 0.65 -0.2  1 -0.2
+      2 1.35 -0.2 1.60 -0.35 2 -0.5
     </Points>
     <Params>
       0.0
       0.5
       1.0
     </Params>
-  </Spline>
+  </Bezier>
 </Chart>
 \endcode
 
@@ -398,7 +398,7 @@ positive and negative Z-direction.
 
 The \c Extrude chart supports the following 2D child charts:
 - \c Circle, see \ref meshfile_chart_circle
-- \c Spline, see \ref meshfile_chart_spline
+- \c Bezier, see \ref meshfile_chart_bezier
 
 \subsubsection meshfile_chart_extrude_transform Transformation
 The \c Extrude chart supports the three attributes \c origin, \c offset and \c angles to define a "proper rigid

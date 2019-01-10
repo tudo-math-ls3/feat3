@@ -3,13 +3,13 @@
    This is the unit axe mesh consisting of a single quadrilateral.
   </Info>
   <Chart name="rotating_axe">
-    <Spline dim="2" size="5" type="closed" orientation="1">
+    <Bezier dim="2" size="5" type="closed" orientation="1">
       <Points>
-        2 0.25 0.25 0.375 0.125 0.625 0.125
-        2 0.75 0.25 0.625 0.375 0.625 0.625
-        2 0.75 0.75 0.625 0.875 0.375 0.875
-        2 0.25 0.75 0.375 0.625 0.375 0.375
         0 0.25 0.25
+        2 0.375 0.125 0.625 0.125 0.75 0.25
+        2 0.625 0.375 0.625 0.625 0.75 0.75
+        2 0.625 0.875 0.375 0.875 0.25 0.75
+        2 0.375 0.625 0.375 0.375 0.25 0.25
       </Points>
       <Params>
         0
@@ -18,6 +18,6 @@
         3
         4
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
 </FeatMeshFile>

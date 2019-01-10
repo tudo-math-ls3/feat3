@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_ATLAS_SPLINE_HPP
-#define KERNEL_GEOMETRY_ATLAS_SPLINE_HPP 1
+#ifndef KERNEL_GEOMETRY_ATLAS_BEZIER_HPP
+#define KERNEL_GEOMETRY_ATLAS_BEZIER_HPP 1
 
 #include <kernel/geometry/atlas/chart.hpp>
 
@@ -10,8 +10,8 @@ namespace FEAT
   {
     namespace Atlas
     {
-      /// Spline chart traits
-      struct SplineTraits
+      /// Bezier chart traits
+      struct BezierTraits
       {
         /// we support explicit map
         static constexpr bool is_explicit = true;
@@ -24,9 +24,9 @@ namespace FEAT
       };
 
       /**
-       * \brief Spline chart class template
+       * \brief Bezier chart class template
        *
-       * This chart represents a 2D spline of varying degree, which is represented
+       * This chart represents a 2D composite Bezier curve of varying degree, which is represented
        * by a vector of vertex points, Bezier control points and parameters.
        *
        * This chart implements both the implicit and explicit chart interfaces.
@@ -37,12 +37,12 @@ namespace FEAT
        * \author Peter Zajac
        */
       template<typename Mesh_>
-      class Spline :
-        public ChartCRTP<Spline<Mesh_>, Mesh_, SplineTraits>
+      class Bezier :
+        public ChartCRTP<Bezier<Mesh_>, Mesh_, BezierTraits>
       {
       public:
         /// The CRTP base class
-        typedef ChartCRTP<Spline<Mesh_>, Mesh_, SplineTraits> BaseClass;
+        typedef ChartCRTP<Bezier<Mesh_>, Mesh_, BezierTraits> BaseClass;
         /// Floating point type for coordinates
         typedef typename BaseClass::CoordType DataType;
         /// Vector type for world points aka. image points
@@ -67,7 +67,7 @@ namespace FEAT
 
       public:
         /// default CTOR
-        explicit Spline(bool closed = false, DataType orientation = DataType(1)) :
+        explicit Bezier(bool closed = false, DataType orientation = DataType(1)) :
           BaseClass(),
           _closed(closed),
           _orientation(orientation)
@@ -89,7 +89,7 @@ namespace FEAT
          * \param[in] closed
          * Specifies whether the spline is closed.
          */
-        explicit Spline(
+        explicit Bezier(
           const std::deque<std::size_t>& vtx_ptr,
           const std::deque<WorldPoint>& world,
           const std::deque<ParamPoint>& param,
@@ -102,8 +102,8 @@ namespace FEAT
           _orientation(orientation)
         {
           // we need at least 2 points
-          XASSERTM(_vtx_ptr.size() > std::size_t(1), "Spline needs at least 2 points");
-          XASSERTM(_param.empty() || (_param.size() == _vtx_ptr.size()), "Spline world/param size mismatch");
+          XASSERTM(_vtx_ptr.size() > std::size_t(1), "Bezier needs at least 2 points");
+          XASSERTM(_param.empty() || (_param.size() == _vtx_ptr.size()), "Bezier world/param size mismatch");
 
           // check last vertex pointer
           XASSERTM(_vtx_ptr.front() == std::size_t(0), "invalid vertex pointer array");
@@ -120,12 +120,12 @@ namespace FEAT
         }
 
         // use default copy ctor; this one is required by the MeshExtruder !
-        Spline(const Spline&) = default;
+        Bezier(const Bezier&) = default;
 
         /** \copydoc ChartBase::get_type() */
         virtual String get_type() const override
         {
-          return "spline";
+          return "bezier";
         }
 
         /**
@@ -312,6 +312,9 @@ namespace FEAT
         /**
          * \brief Projects a point onto one segment of the spline.
          *
+         * \note
+         * For the description of the Selimovic elimination test used in this function, see \cite Selimovic2006
+         *
          * \param[in] i
          * The index of the spline segment onto which to project
          *
@@ -332,7 +335,7 @@ namespace FEAT
           if(n == std::size_t(1))
           {
             // get the ends of the line segment
-            std::size_t k = _vtx_ptr[i];
+            const std::size_t k = _vtx_ptr[i];
             const WorldPoint& x0 = this->_world.at(k);
             const WorldPoint& x1 = this->_world.at(k+1);
 
@@ -342,6 +345,42 @@ namespace FEAT
 
             // compute t = <xp,xe>/<xe,xe> and clamp it to [0,1]
             return Math::clamp(Tiny::dot(xp,xe) / Tiny::dot(xe,xe), DataType(0), DataType(1));
+          }
+
+          // apply Selimovic elimination test
+          {
+            // get curve start- and end-points
+            const std::size_t ks = _vtx_ptr[i];
+            const std::size_t ke = _vtx_ptr[i+1];
+            const WorldPoint& xs = this->_world.at(ks);
+            const WorldPoint& xe = this->_world.at(ke);
+            const WorldPoint ps = xs - point;
+            const WorldPoint pe = xe - point;
+
+            // which is closer to our query point: the start or the end-point?
+            if(ps.norm_euclid_sqr() < pe.norm_euclid_sqr())
+            {
+              // test whether the start-point is the projection
+              bool prj_xs = true;
+              for(std::size_t k(ks + 1); k < ke; ++k)
+              {
+                prj_xs = prj_xs && (Tiny::dot(this->_world.at(k) - xs, ps) > DataType(0));
+              }
+
+              if(prj_xs)
+                return DataType(0);
+            }
+            else
+            {
+              // test whether the end-point is the projection
+              bool prj_xe = true;
+              for(std::size_t k(ks + 1); k < ke; ++k)
+              {
+                prj_xe = prj_xe && (Tiny::dot(this->_world.at(k) - xe, pe) > DataType(0));
+              }
+              if(prj_xe)
+                return DataType(1);
+            }
           }
 
           //
@@ -495,7 +534,7 @@ namespace FEAT
          */
         void map_param(WorldPoint& point, const ParamPoint& param) const
         {
-          XASSERTM(!this->_param.empty(), "Spline has no parameters");
+          XASSERTM(!this->_param.empty(), "Bezier has no parameters");
 
           // find enclosing segment
           const Index i = Index(this->find_param(param[0]));
@@ -517,25 +556,66 @@ namespace FEAT
         {
           // create a const copy of our input point
           const WorldPoint inpoint(point);
-          DataType mindist = DataType(0);
 
-          // loop over all line segments
+          // find the vertex that is closest to our input point and remember the distance
+          point =  this->_world.front();
+          DataType min_dist = (inpoint - point).norm_euclid_sqr();
+          for(std::size_t i(1); i < this->_vtx_ptr.size(); ++i)
+          {
+            DataType distance = (inpoint - this->_world.at(this->_vtx_ptr[i])).norm_euclid_sqr();
+            if(distance < min_dist)
+            {
+              point = this->_world.at(this->_vtx_ptr[i]);
+              min_dist = distance;
+            }
+          }
+
+          // compute square root to obtain real distance (and not squared one)
+          min_dist = Math::sqrt(min_dist);
+
+          // loop over all curve segments
           for(Index i(0); (i+1) < Index(this->_vtx_ptr.size()); ++i)
           {
+            // we now check the bounding box of the bezier curve segment against a
+            // "test box" of the current minimum distance around our input point
+
+            // can we skip this curve segment?
+            bool gt_x0 = false; // not left of our test box
+            bool lt_x1 = false; // not right of our test box
+            bool gt_y0 = false; // not below our test box
+            bool lt_y1 = false; // not above our test box
+
+            // loop over all points on this curve segment
+            for(std::size_t k(this->_vtx_ptr[i]); k <= this->_vtx_ptr[i+1]; ++k)
+            {
+              // get the vertex/control point - input point
+              const WorldPoint p = this->_world.at(k) - inpoint;
+
+              // check the position of this point
+              gt_x0 = gt_x0 || (p[0] > -min_dist);
+              lt_x1 = lt_x1 || (p[0] < +min_dist);
+              gt_y0 = gt_y0 || (p[1] > -min_dist);
+              lt_y1 = lt_y1 || (p[1] < +min_dist);
+            }
+
+            // we can skip the curve if all points of the curve are on one side of our test box:
+            if(!(gt_x0 && lt_x1 && gt_y0 && lt_y1)) // <==> (!gt_x0 || !lt_x1 || !gt_y0 || !lt_y1)
+              continue;
+
             // project on current segment
             const DataType t = project_on_segment(i, inpoint);
 
             // map point on current segment
             const WorldPoint x = map_on_segment(i, t);
 
-            // compute squared distance to original point
-            DataType distance = (x - inpoint).norm_euclid_sqr();
+            // compute distance to original point
+            DataType distance = (x - inpoint).norm_euclid();
 
             // is that a new projection candidate?
-            if((i == Index(0)) || (distance < mindist))
+            if(distance < min_dist)
             {
               point = x;
-              mindist = distance;
+              min_dist = distance;
             }
           }
         }
@@ -693,27 +773,27 @@ namespace FEAT
             sind2.append("    ");
           }
 
-          os << sindent << "<Spline dim=\"2\" size=\"" << this->_vtx_ptr.size() << "\"";
+          os << sindent << "<Bezier dim=\"2\" size=\"" << this->_vtx_ptr.size() << "\"";
           os << " type=\"" << (this->_closed ? "closed" : "open") << "\"";
           os << (_orientation == -DataType(1) ? " orientation=\"-1\"" : "" )<<">" << std::endl;
 
           // write points
           os << sind << "<Points>" << std::endl;
-          for(std::size_t i(0); (i+1) < _vtx_ptr.size(); ++i)
+          // write first vertex point
+          os << sind2 << 0;
+            for(int j(0); j < BaseClass::world_dim; ++j)
+              os << " " << _world[_vtx_ptr.front()][j];
+          // write remaining points
+          for(std::size_t i(1); i < _vtx_ptr.size(); ++i)
           {
             // write number of control points
-            os << sind2 << ( _vtx_ptr[i+1] - _vtx_ptr[i] - std::size_t(1));
+            os << sind2 << ( _vtx_ptr[i] - _vtx_ptr[i-1] - std::size_t(1));
             // write point coordinates
-            for(std::size_t k(_vtx_ptr[i]); k < _vtx_ptr[i+1]; ++k)
+            for(std::size_t k(_vtx_ptr[i-1]+1); k <= _vtx_ptr[i]; ++k)
               for(int j(0); j < BaseClass::world_dim; ++j)
                 os << " " << _world[k][j];
             os << std::endl;
           }
-          // write last vertex point
-          os << sind2 << 0;
-            for(int j(0); j < BaseClass::world_dim; ++j)
-              os << " " << _world[_vtx_ptr.back()][j];
-          os << std::endl;
           os << sind << "</Points>" << std::endl;
 
           // write parameters
@@ -726,13 +806,13 @@ namespace FEAT
           }
 
           // write terminator
-          os << sindent << "</Spline>" << std::endl;
+          os << sindent << "</Bezier>" << std::endl;
         }
 
       protected:
         std::size_t find_param(const DataType x) const
         {
-          XASSERTM(!_param.empty(),"Spline has no parameters");
+          XASSERTM(!_param.empty(),"Bezier has no parameters");
 
           // check for boundary
           if(x <= _param.front()[0])
@@ -760,21 +840,21 @@ namespace FEAT
           // return interval index
           return (il+1 < _param.size() ? il : (_param.size() - std::size_t(2)));
         }
-      }; // class Spline<...>
+      }; // class Bezier<...>
 
       template<typename Mesh_>
-      class SplinePointsParser :
+      class BezierPointsParser :
         public Xml::MarkupParser
       {
-        typedef Spline<Mesh_> ChartType;
+        typedef Bezier<Mesh_> ChartType;
 
       private:
-        Spline<Mesh_>& _spline;
+        Bezier<Mesh_>& _bezier;
         Index _size, _read;
 
       public:
-        explicit SplinePointsParser(Spline<Mesh_>& spline, Index size) :
-          _spline(spline), _size(size), _read(0)
+        explicit BezierPointsParser(Bezier<Mesh_>& bezier, Index size) :
+          _bezier(bezier), _size(size), _read(0)
         {
         }
 
@@ -816,9 +896,9 @@ namespace FEAT
           if(!scoords.front().parse(num_ctrl))
             throw Xml::ContentError(iline, sline, "Failed to parse control point count");
 
-          // the last point must not have control points
-          if(((_read+1) == _size) && (num_ctrl > std::size_t(0)))
-            throw Xml::ContentError(iline, sline, "Last point must be a vertex point");
+          // the first point must not have control points
+          if((_read == Index(0)) && (num_ctrl > std::size_t(0)))
+            throw Xml::ContentError(iline, sline, "First point must be a vertex point");
 
           // check size: 1 + (#ctrl+1) * #coords
           if(scoords.size() != ((num_ctrl+1) * std::size_t(ChartType::world_dim) + std::size_t(1)))
@@ -826,48 +906,48 @@ namespace FEAT
 
           typename ChartType::WorldPoint point;
 
-          // try to parse all coords of the vertex point
-          for(int i(0); i < ChartType::world_dim; ++i)
-          {
-            if(!scoords.at(std::size_t(i+1)).parse(point[i]))
-              throw Xml::ContentError(iline, sline, "Failed to parse vertex point coordinate");
-          }
-
-          // push the vertex point
-          _spline.push_vertex(point);
-
-          // now parse the control points
+          // try to parse the control points
           for(int k(0); k < int(num_ctrl); ++k)
           {
             for(int i(0); i < ChartType::world_dim; ++i)
             {
-              if(!scoords.at(std::size_t((k+1)*ChartType::world_dim+i+1)).parse(point[i]))
+              if(!scoords.at(std::size_t(k*ChartType::world_dim+i+1)).parse(point[i]))
                 throw Xml::ContentError(iline, sline, "Failed to parse control point coordinate");
             }
             // push the control point
-            _spline.push_control(point);
+            _bezier.push_control(point);
           }
+
+          // try to parse all coords of the vertex point
+          for(int i(0); i < ChartType::world_dim; ++i)
+          {
+            if(!scoords.at(std::size_t(int(num_ctrl)*ChartType::world_dim+i+1)).parse(point[i]))
+              throw Xml::ContentError(iline, sline, "Failed to parse vertex point coordinate");
+          }
+
+          // push the vertex point
+          _bezier.push_vertex(point);
 
           // okay, another point done
           ++_read;
 
           return true;
         }
-      }; // SplineParamsParser
+      }; // BezierParamsParser
 
       template<typename Mesh_>
-      class SplineParamsParser :
+      class BezierParamsParser :
         public Xml::MarkupParser
       {
-        typedef Spline<Mesh_> ChartType;
+        typedef Bezier<Mesh_> ChartType;
 
       private:
-        Spline<Mesh_>& _spline;
+        Bezier<Mesh_>& _bezier;
         Index _size, _read;
 
       public:
-        explicit SplineParamsParser(Spline<Mesh_>& spline, Index size) :
-          _spline(spline), _size(size), _read(0)
+        explicit BezierParamsParser(Bezier<Mesh_>& bezier, Index size) :
+          _bezier(bezier), _size(size), _read(0)
         {
         }
 
@@ -908,30 +988,30 @@ namespace FEAT
             throw Xml::ContentError(iline, sline, "Failed to parse param coordinate");
 
           // push
-          _spline.push_param(point);
+          _bezier.push_param(point);
 
           // okay, another point done
           ++_read;
 
           return true;
         }
-      }; // class SplineParamsParser
+      }; // class BezierParamsParser
 
       template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>>
-      class SplineChartParser :
+      class BezierChartParser :
         public Xml::MarkupParser
       {
       private:
-        typedef Spline<Mesh_> ChartType;
+        typedef Bezier<Mesh_> ChartType;
         typedef typename ChartType::DataType DataType;
         ChartReturn_*& _chart;
-        Spline<Mesh_>* _spline;
+        Bezier<Mesh_>* _bezier;
         Index _size;
 
       public:
-        explicit SplineChartParser(ChartReturn_*& chart) :
+        explicit BezierChartParser(ChartReturn_*& chart) :
           _chart(chart),
-          _spline(nullptr),
+          _bezier(nullptr),
           _size(0)
         {
         }
@@ -954,21 +1034,21 @@ namespace FEAT
         {
           // make sure this one isn't closed
           if(closed)
-            throw Xml::GrammarError(iline, sline, "Invalid closed Spline markup");
+            throw Xml::GrammarError(iline, sline, "Invalid closed Bezier markup");
 
           Index dim(0);
 
           // try to parse the dimension
           if(!attrs.find("dim")->second.parse(dim))
-            throw Xml::GrammarError(iline, sline, "Failed to parse Spline dimension");
+            throw Xml::GrammarError(iline, sline, "Failed to parse Bezier dimension");
           if(dim != Index(2))
-            throw Xml::GrammarError(iline, sline, "Invalid Spline dimension");
+            throw Xml::GrammarError(iline, sline, "Invalid Bezier dimension");
 
           // try to parse the size
           if(!attrs.find("size")->second.parse(_size))
-            throw Xml::GrammarError(iline, sline, "Failed to parse Spline size");
+            throw Xml::GrammarError(iline, sline, "Failed to parse Bezier size");
           if(_size < Index(2))
-            throw Xml::GrammarError(iline, sline, "Invalid Spline size");
+            throw Xml::GrammarError(iline, sline, "Invalid Bezier size");
 
           // try to check type
           bool poly_closed(false);
@@ -979,7 +1059,7 @@ namespace FEAT
             if(it->second == "closed")
               poly_closed = true;
             else if (it->second != "open")
-              throw Xml::ContentError(iline, sline, "Invalid Spline type; must be either 'closed' or 'open'");
+              throw Xml::ContentError(iline, sline, "Invalid Bezier type; must be either 'closed' or 'open'");
           }
 
           DataType orientation(1);
@@ -988,13 +1068,13 @@ namespace FEAT
             it->second.parse(orientation);
 
           // up to now, everything's fine
-          _spline = new ChartType(poly_closed, orientation);
+          _bezier = new ChartType(poly_closed, orientation);
         }
 
         virtual void close(int, const String&) override
         {
           // okay
-          _chart = _spline;
+          _chart = _bezier;
         }
 
         virtual bool content(int, const String&) override
@@ -1004,12 +1084,12 @@ namespace FEAT
 
         virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String& name) override
         {
-          if(name == "Points") return std::make_shared<SplinePointsParser<Mesh_>>(*_spline, _size);
-          if(name == "Params") return std::make_shared<SplineParamsParser<Mesh_>>(*_spline, _size);
+          if(name == "Points") return std::make_shared<BezierPointsParser<Mesh_>>(*_bezier, _size);
+          if(name == "Params") return std::make_shared<BezierParamsParser<Mesh_>>(*_bezier, _size);
           return nullptr;
         }
-      }; // class SplineChartParser<...>
+      }; // class BezierChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAT
-#endif // KERNEL_GEOMETRY_ATLAS_SPLINE_HPP
+#endif // KERNEL_GEOMETRY_ATLAS_BEZIER_HPP

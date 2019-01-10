@@ -4,8 +4,8 @@
 
 #include <kernel/geometry/atlas/chart.hpp>
 // supported sub-charts:
+#include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/circle.hpp>
-#include <kernel/geometry/atlas/spline.hpp>
 
 namespace FEAT
 {
@@ -467,14 +467,14 @@ namespace FEAT
             _chart = ext;
             return std::make_shared<Atlas::CircleChartParser<SubMeshType, Circle<SubMeshType>>>(ext->_sub_chart);
           }
-          if(name == "Spline")
+          if(name == "Bezier")
           {
-            auto* ext = new Extrude<Mesh_, Spline<SubMeshType>>();
+            auto* ext = new Extrude<Mesh_, Bezier<SubMeshType>>();
             ext->set_origin(_ori_x, _ori_y);
             ext->set_offset(_off_x, _off_y, _off_z);
             ext->set_angles(_yaw, _pitch, _roll);
             _chart = ext;
-            return std::make_shared<Atlas::SplineChartParser<SubMeshType, Spline<SubMeshType>>>(ext->_sub_chart);
+            return std::make_shared<Atlas::BezierChartParser<SubMeshType, Bezier<SubMeshType>>>(ext->_sub_chart);
           }
 
           return nullptr;

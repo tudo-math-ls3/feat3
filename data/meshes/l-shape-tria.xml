@@ -3,7 +3,7 @@
     This is the L-shape mesh consisting of twelve triangular cells.
   </Info>
   <Chart name="outer">
-    <Spline dim="2" size="7" type="closed">
+    <Bezier dim="2" size="7" type="closed">
       <Points>
         0 -1 -1
         0 1 -1
@@ -22,7 +22,7 @@
         5
         6
       </Params>
-    </Spline>
+    </Bezier>
   </Chart>
   <Mesh type="conformal:simplex:2:2" size="11 22 12">
     <Vertices>
