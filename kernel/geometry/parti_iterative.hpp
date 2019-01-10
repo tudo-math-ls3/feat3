@@ -139,12 +139,15 @@ namespace FEAT
           XASSERT(_num_elems >= _num_patches);
 
           // List of cells with informations regarding the partitioning layout
-          std::vector<Intern::PartiIterativeItem> items(_num_elems);
+          std::vector<Intern::PartiIterativeItem> items;
 
           bool bad_centers(true);
           while (bad_centers)
           {
             bad_centers = false;
+            _centers.clear();
+            items.clear();
+            items.resize(_num_elems);
 
             // find randomly num_patches different cells as cluster centers
             while(_centers.size() < _num_patches)
