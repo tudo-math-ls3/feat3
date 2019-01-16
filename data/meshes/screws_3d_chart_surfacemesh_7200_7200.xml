@@ -2,7 +2,7 @@
   <Info>
     SurfaceMesh charts for screws_3d_meshes.
   </Info>
-  <Chart name="screw:o">
+  <Chart name="screw:i">
     <SurfaceMesh verts=" 7200" trias=" 7200">
       <Vertices>
         0.114167626E+01  0.286526852E-02  0.000000000E+00
