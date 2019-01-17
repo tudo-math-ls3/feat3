@@ -196,6 +196,11 @@ namespace FEAT
       }
       /// \endcond
 
+      std::size_t bytes() const
+      {
+        return _vec_prim.bytes() + _vec_dual.bytes();
+      }
+
       /**
        * \brief Applies the filter onto the right-hand-side vector.
        *
