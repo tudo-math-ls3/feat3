@@ -4,6 +4,7 @@
 
 // includes, FEAT
 #include <kernel/util/exception.hpp>
+#include <kernel/util/dist.hpp>
 
 // includes, system
 #include <iostream>
@@ -351,6 +352,17 @@ namespace FEAT
     }
 
     /**
+     * \brief Merges another PropertyMap into \c this.
+     *
+     * \param[in] section
+     * The section to be merged into \c this.
+     *
+     * \param[in] replace
+     * Specifies the behaviour when conflicting key-value pairs are encountered. See add_entry() for more details.
+     */
+    void merge(const PropertyMap& section, bool replace = true);
+
+    /**
      * \brief Parses a file in INI-format.
      *
      * \param[in] filename
@@ -361,9 +373,28 @@ namespace FEAT
      *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
      *  - If \p replace = \c false, then the old value of the entry is kept.
      *
-     * \see PropertyMap::parse(std::istream&)
+     * \see PropertyMap::read(std::istream&)
      */
-    void parse(String filename, bool replace = true);
+    void read(String filename, bool replace = true)
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      read(comm, filename, replace);
+    }
+
+    /**
+     * \brief Parses a file in INI-format.
+     *
+     * \param[in] filename
+     * The name of the file to be parsed.
+     *
+     * \param[in] replace
+     * Specifies the behaviour when an entry with the same key already exists:
+     *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
+     *  - If \p replace = \c false, then the old value of the entry is kept.
+     *
+     * \see PropertyMap::read(std::istream&)
+     */
+    void read(const Dist::Comm& comm, String filename, bool replace = true);
 
     /**
      * \brief Parses an input stream.
@@ -376,35 +407,40 @@ namespace FEAT
      *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
      *  - If \p replace = \c false, then the old value of the entry is kept.
      */
-    void parse(std::istream& ifs, bool replace = true);
+    void read(std::istream& ifs, bool replace = true);
 
     /**
-     * \brief Merges another PropertyMap into \c this.
+     * \brief Writes the property map into a file.
      *
-     * \param[in] section
-     * The section to be merged into \c this.
-     *
-     * \param[in] replace
-     * Specifies the behaviour when conflicting key-value pairs are encountered. See add_entry() for more details.
-     */
-    void merge(const PropertyMap& section, bool replace = true);
-
-    /**
-     * \brief Dumps the section tree into a file.
-     *
-     * This function writes the whole section tree into a file, which can be parsed by the parse() function.
+     * This function writes the whole property map into a file, which can be parsed by the read() function.
      *
      * \param[in] filename
      * The name of the file into which to dump to.
      *
-     * \see PropertyMap::dump(std::ostream&, String::size_type) const
+     * \see PropertyMap::write(std::ostream&, String::size_type) const
      */
-    void dump(String filename) const;
+    void write(String filename) const
+    {
+      Dist::Comm comm(Dist::Comm::world());
+      write(comm, filename);
+    }
 
     /**
-     * \brief Dumps the section tree into an output stream.
+     * \brief Writes the property map into a file.
      *
-     * This function writes the whole section tree into an output stream, which can be parsed.
+     * This function writes the whole property map into a file, which can be parsed by the read() function.
+     *
+     * \param[in] filename
+     * The name of the file into which to dump to.
+     *
+     * \see PropertyMap::write(std::ostream&, String::size_type) const
+     */
+    void write(const Dist::Comm& comm, String filename) const;
+
+    /**
+     * \brief Writes the property map into an output stream.
+     *
+     * This function writes the whole property map into an output stream, which can be parsed.
      *
      * \param[in,out] os
      * A reference to an output stream to which to write to. It is silently assumed that the output stream is
@@ -417,7 +453,7 @@ namespace FEAT
      * The \p indent parameter is used internally for output formatting and does not need to be specified by the
      * caller.
      */
-    void dump(std::ostream& os, String::size_type indent = 0) const;
+    void write(std::ostream& os, String::size_type indent = 0) const;
   }; // class PropertyMap
 } // namespace FEAT
 

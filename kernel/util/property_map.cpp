@@ -1,4 +1,5 @@
 #include <kernel/util/property_map.hpp>
+#include <kernel/util/dist_file_io.hpp>
 
 #include <fstream>
 #include <stack>
@@ -196,40 +197,36 @@ namespace FEAT
     return iter->second;
   }
 
-  void PropertyMap::parse(String filename, bool replace)
+  void PropertyMap::merge(const PropertyMap& section, bool replace)
   {
-    // try to open the file
-    std::ifstream ifs(filename.c_str(), std::ios::in);
+    EntryMap::const_iterator valiter(section._values.begin());
+    EntryMap::const_iterator valend(section._values.end());
 
-    // if something went wrong
-    if(!ifs.is_open())
+    // merging _values of the two sections
+    for(; valiter != valend; ++valiter)
     {
-      throw FileNotFound(filename);
+      add_entry(valiter->first, valiter->second, replace);
     }
 
-    // parsing
-    try
+    SectionMap::const_iterator seciter(section._sections.begin());
+    SectionMap::const_iterator secend(section._sections.end());
+
+    // merging _sections of the two PropertyMaps
+    for(; seciter != secend; ++seciter)
     {
-      parse(ifs, replace);
-      ifs.close();
-    }
-    catch(SyntaxError& exc)
-    {
-      // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
-      // Note: The exception may indeed already have a filename; this happens when another (erroneous) file is
-      // included via the '@include' keyword.
-      if(exc.get_filename().empty())
-      {
-        throw(SyntaxError(exc.message(), filename));
-      }
-      else
-      {
-        throw;
-      }
+      // get PropertyMap pointer to the section corresponding to iter and merge again
+      add_section(seciter->first)->merge(*seciter->second, replace);
     }
   }
 
-  void PropertyMap::parse(std::istream& ifs, bool replace)
+  void PropertyMap::read(const Dist::Comm& comm, String filename, bool replace)
+  {
+    std::stringstream is;
+    DistFileIO::read_common(is, filename, comm);
+    read(is, replace);
+  }
+
+  void PropertyMap::read(std::istream& ifs, bool replace)
   {
     // a stack to keep track of all currently open sections
     std::stack<PropertyMap*> stack;
@@ -275,7 +272,7 @@ namespace FEAT
       }
 
       // check for special keywords; these begin with an @ sign
-      if(line.front() == '@')
+      /*if(line.front() == '@')
       {
         // if its an "@include "
         if(line.compare(0, 9, "@include ") == 0)
@@ -297,7 +294,8 @@ namespace FEAT
           throw SyntaxError("Unknown keyword in line " + stringify(cur_line) + " : " + line);
         }
       }
-      else if((found = line.find('#')) != std::string::npos)
+      else*/
+      if((found = line.find('#')) != std::string::npos)
       {
         // erase comment
         line.erase(found);
@@ -449,30 +447,12 @@ namespace FEAT
     }
   }
 
-  void PropertyMap::merge(const PropertyMap& section, bool replace)
+  void PropertyMap::write(const Dist::Comm& comm, String filename) const
   {
-    EntryMap::const_iterator valiter(section._values.begin());
-    EntryMap::const_iterator valend(section._values.end());
+    // only rank 0 writes
+    if(comm.rank() > 0)
+      return;
 
-    // merging _values of the two sections
-    for(; valiter != valend; ++valiter)
-    {
-      add_entry(valiter->first, valiter->second, replace);
-    }
-
-    SectionMap::const_iterator seciter(section._sections.begin());
-    SectionMap::const_iterator secend(section._sections.end());
-
-    // merging _sections of the two PropertyMaps
-    for(; seciter != secend; ++seciter)
-    {
-      // get PropertyMap pointer to the section corresponding to iter and merge again
-      add_section(seciter->first)->merge(*seciter->second, replace);
-    }
-  }
-
-  void PropertyMap::dump(String filename) const
-  {
     // open stream
     std::ofstream ofs(filename.c_str(), std::ios_base::out | std::ios_base::trunc);
     if(!ofs.is_open())
@@ -481,13 +461,13 @@ namespace FEAT
     }
 
     // dump into stream
-    dump(ofs);
+    write(ofs);
 
     // close stream
     ofs.close();
   }
 
-  void PropertyMap::dump(std::ostream& os, String::size_type indent) const
+  void PropertyMap::write(std::ostream& os, String::size_type indent) const
   {
     // prefix string: 2*indent spaces
     String prefix(2*indent, ' ');
@@ -510,7 +490,7 @@ namespace FEAT
       os << prefix << "{" << std::endl;
 
       // dump subsection with increased indent
-      (*sit).second->dump(os, indent + 1);
+      (*sit).second->write(os, indent + 1);
 
       // closing brace, including section name as comment
       os << prefix << "} # end of [" << (*sit).first << "]" << std::endl;

@@ -239,7 +239,7 @@ namespace StokesPoiseuille2D
     String solver_ini_name;
     args.parse("solver-ini", solver_ini_name);
     PropertyMap property_map;
-    property_map.parse(solver_ini_name, true);
+    property_map.read(comm, solver_ini_name, true);
     auto solver_a = Solver::SolverFactory::create_scalar_solver(matrix_stock_a, &property_map, "linsolver_a");
     auto solver_s = Solver::SolverFactory::create_scalar_solver(matrix_stock_s, &property_map, "linsolver_s");
 

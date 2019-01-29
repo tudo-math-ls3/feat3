@@ -8,7 +8,6 @@ INI files are simple ASCII text files whose contents are basically made up from 
 - \ref sec_comment
 - \ref sec_property
 - \ref sec_section
-- \ref sec_include
 - \ref sec_example
 
 
@@ -173,29 +172,6 @@ Hello = World!    # error: key-value pair after '}' in previous line\endverbatim
 }\endverbatim
   is illegal.
 
-\section sec_include File Inclusion
-By using the <c>\@include</c> keyword followed by a filepath, one can also include other files, e.g.
-\verbatim
-@include /home/data/myfile.txt\endverbatim
-will tell the parser to parse a file named \c myfile.txt lying in the path \c /home/data/.
-\warning
-The line containing the <c>\@include</c> statement must \e not contain comments, as the hash sign \c # does
-\e not denote the beginning of a comment in this case but is interpreted as part of the file's path instead.
-
-<b>Notes:</b>\n
-- Despite the obvious similarity to the <c>\#include</c> statement of the C/C++ preprocessor, the INI parser does
-  not copy-&-paste the to-be-included-file's contents into the file containing the <c>\@include</c> statement,
-  but instead separately parses the to-be-included-file and afterwards continues parsing the file containing the
-  <c>\@include</c> statement (unless an error occured)
-- As a consequence, each INI file must be self-contained.
-- The filepath is trimmed of leading and trailing whitespaces.
-- The contents of a file included by an <c>\@include</c> statement will be parsed into the currently active section,
-  e.g. the statement
-\verbatim
-[TheSection]
-@include somefile.txt\endverbatim
-will parse the contents of \c somefile.txt into \c TheSection.
-
 \section sec_example Examples
 \verbatim
 # This is a comment and the next line is a simple key-value pair in the root section
@@ -216,9 +192,6 @@ key = value
 
   # The next line will close both 'MySubSection' and 'MySection'
 }
-
-# Include another data file.
-include@ /home/feat/my_data.txt
 \endverbatim
 
 \author Peter Zajac

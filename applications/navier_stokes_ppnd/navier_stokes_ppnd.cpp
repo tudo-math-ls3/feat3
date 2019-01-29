@@ -1106,10 +1106,10 @@ namespace NavierStokesPP
   }; // class NavierStokesBlockedSystemLevel
 
   // load the configuration of a given save state (save file)
-  void load_conf(Config& cfg, int &processes)
+  void load_conf(Config& cfg, const Dist::Comm& comm, int &processes)
   {
     PropertyMap savefile;
-    savefile.parse(cfg.load,true);
+    savefile.read(comm, cfg.load, true);
 
     // the number of processes (mpi)
     processes = std::stoi(savefile.get_entry("processes").first);
@@ -1175,25 +1175,24 @@ namespace NavierStokesPP
   }
 
   // load the data from the save state
-  void load_data(Config& cfg, Index &time_step, Real &c_drag_old, Real &c_lift_old)
+  void load_data(Config& cfg, const Dist::Comm& comm, Index &time_step, Real &c_drag_old, Real &c_lift_old)
   {
     PropertyMap savefile;
-    savefile.parse(cfg.load,true);
+    savefile.read(comm, cfg.load, true);
 
     time_step = std::stoul(savefile.get_entry("time_step").first, NULL, 0);
 
     c_drag_old = std::stod(savefile.get_entry("c_drag_old").first);
     c_lift_old = std::stod(savefile.get_entry("c_lift_old").first);
-
   }
 
   // save the configuration in a savefile
-  void save(Config cfg, int processes, Index time_step,
+  void save(Config cfg, const Dist::Comm& comm, Index time_step,
              Real c_drag_old, Real c_lift_old)
   {
     PropertyMap savefile;
 
-    savefile.add_entry("processes",stringify_fp_sci(processes,8),true);
+    savefile.add_entry("processes",stringify_fp_sci(comm.size(),8),true);
     savefile.add_entry("time_step",stringify_fp_sci(time_step,8),true);
 
     savefile.add_entry("cfg.part_names_in",stringify_join(cfg.part_names_in, " "),true);
@@ -1248,7 +1247,7 @@ namespace NavierStokesPP
     String filename = cfg.save_file + ".ini";
 
     // save the configuration in the save file 'filename'
-    savefile.dump(filename);
+    savefile.write(comm, filename);
   }
 
 
@@ -1785,7 +1784,7 @@ namespace NavierStokesPP
     Index t_step(0);
     if (!cfg.load.empty())
     {
-      load_data(cfg,t_step, c_drag_old, c_lift_old);
+      load_data(cfg, comm, t_step, c_drag_old, c_lift_old);
       vec_sol_v_2.local().read_from_dvb(cfg.load.substr(0, cfg.load.length() - 4) + "_v2_" + stringify(rank));
       vec_sol_v_1.local().read_from_dvb(cfg.load.substr(0, cfg.load.length() - 4) + "_v1_" + stringify(rank));
       vec_sol_v.copy(vec_sol_v_1);
@@ -2407,11 +2406,8 @@ namespace NavierStokesPP
         vec_sol_p_1.local().write_out_dv(cfg.save_file + "_p1_" + stringify(rank));
         vec_f.local().write_out_dvb(cfg.save_file + "_f_" + stringify(rank));
         vec_f_old.local().write_out_dvb(cfg.save_file + "_f_old_" + stringify(rank));
-        if (rank == 0)
-        {
-          save(cfg, comm.size(), time_step, c_drag_old, c_lift_old);
-          comm.print("Save State: " + cfg.save_file + ".ini");
-        }
+        save(cfg, comm, time_step, c_drag_old, c_lift_old);
+        comm.print("Save State: " + cfg.save_file + ".ini");
         watch_save.stop();
       }
 
@@ -2656,18 +2652,15 @@ namespace NavierStokesPP
     args.parse("load", cfg.load);
     if (!cfg.load.empty())
     {
-      if (comm.rank() == 0)
+      int processes(0);
+      load_conf(cfg, comm, processes);
+      if (comm.size() != processes)
       {
-        int processes;
-        load_conf(cfg, processes);
-        if (comm.size() != processes)
-        {
         comm.print(std::cerr, "ERROR: wrong number of processes");
 
         comm.print(std::cerr, "Required are: " + stringify(processes));
         // abort
         FEAT::Runtime::abort();
-        }
       }
     }
 

@@ -166,7 +166,7 @@ namespace PoissonSolverFactory
     String solver_ini_name;
     args.parse("solver-ini", solver_ini_name);
     PropertyMap property_map;
-    property_map.parse(solver_ini_name, true);
+    property_map.read(comm, solver_ini_name, true);
     auto solver = Solver::SolverFactory::create_scalar_solver(matrix_stock, &property_map, "linsolver");
 
     matrix_stock.hierarchy_init();

@@ -18,21 +18,8 @@
 using namespace FEAT;
 
 // static member initialisation
-PropertyMap Runtime::_global_property_map;
 bool Runtime::_initialised = false;
 bool Runtime::_finished = false;
-
-PropertyMap * Runtime::global_property()
-{
-  if (!_initialised)
-  {
-    std::cerr << "ERROR: global_property_map not _initialised!" << std::endl;
-    std::cerr << "       Call Runtime::initialise first!" << std::endl;
-    std::cerr.flush();
-    Runtime::abort();
-  }
-  return &_global_property_map;
-}
 
 void Runtime::initialise(int& argc, char**& argv)
 {
@@ -66,39 +53,14 @@ void Runtime::initialise(int& argc, char**& argv)
     Runtime::abort();
   }
 
-  // get MPI_COMM_WORLD rank:
-  int rank = Dist::Comm::world().rank();
-
-  // read in initial settings from provided ini file via system environment variable FEAT3_INI_FILE
-  if (const char* c_file_path = std::getenv("FEAT3_INI_FILE"))
-  {
-    String property_file(c_file_path);
-    if (std::ifstream(property_file).good())
-    {
-      _global_property_map.parse(property_file, true);
-    }
-    else
-    {
-      std::cerr << "WARNING: FEAT ini file " << property_file << " not found!" << std::endl;
-    }
-  }
-
+  // initialise memory pool for main memory
   MemoryPool<Mem::Main>::initialise();
 
 #ifdef FEAT_HAVE_CUDA
-  MemoryPool<Mem::CUDA>::initialise(rank,
-    atoi(_global_property_map.query("MPI.ranks_per_node", "1").c_str()),
-    atoi(_global_property_map.query("MPI.ranks_per_uma", "1").c_str()),
-    atoi(_global_property_map.query("MPI.gpus_per_node", "1").c_str())
-    );
-  // read in initial settings from Runtime and store them in MemoryPool<CUDA>
-  Index misc = (Index)atoi(_global_property_map.query("CUDA.blocksize_misc", "256").c_str());
-  Index reduction = (Index)atoi(_global_property_map.query("CUDA.blocksize_reduction", "256").c_str());
-  Index spmv = (Index)atoi(_global_property_map.query("CUDA.blocksize_spmv", "256").c_str());
-  Index axpy = (Index)atoi(_global_property_map.query("CUDA.blocksize_axpy", "256").c_str());
-  MemoryPool<Mem::CUDA>::set_blocksize(misc, reduction, spmv, axpy);
-#else
-  (void)rank;
+  // initialise memory pool for CUDA memory
+  int rank = Dist::Comm::world().rank();
+  MemoryPool<Mem::CUDA>::initialise(rank, 1, 1, 1);
+  MemoryPool<Mem::CUDA>::set_blocksize(256, 256, 256, 256);
 #endif
 
   _initialised = true;

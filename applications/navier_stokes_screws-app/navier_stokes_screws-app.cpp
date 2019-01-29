@@ -2373,7 +2373,7 @@ int run_app(int argc, char* argv[])
     }
 
     // Parse the application config from the (synchronised) stream
-    application_config.parse(synchstream_app_config, true);
+    application_config.read(synchstream_app_config, true);
 
     // Get the application settings section
     auto app_settings_section = application_config.query_section("ApplicationSettings");
@@ -2391,7 +2391,7 @@ int run_app(int argc, char* argv[])
 
     comm.print("Reading mesh optimisation config from file "+meshopt_config_filename_p.first);
     DistFileIO::read_common(synchstream_meshopt_config, meshopt_config_filename_p.first);
-    meshopt_config.parse(synchstream_meshopt_config, true);
+    meshopt_config.read(synchstream_meshopt_config, true);
 
     // Read solver configuration to stream
     auto solver_config_filename_p = app_settings_section->query("solver_config_file");
@@ -2401,19 +2401,19 @@ int run_app(int argc, char* argv[])
 
     comm.print("Reading solver config from file "+solver_config_filename_p.first);
     DistFileIO::read_common(synchstream_solver_config, solver_config_filename_p.first);
-    solver_config.parse(synchstream_solver_config, true);
+    solver_config.read(synchstream_solver_config, true);
   }
   // If we are in test mode, all streams are filled by the hard coded stuff below
   else
   {
     read_test_application_config(synchstream_app_config);
-    application_config.parse(synchstream_app_config, true);
+    application_config.read(synchstream_app_config, true);
 
     read_test_meshopt_config(synchstream_meshopt_config);
-    meshopt_config.parse(synchstream_meshopt_config, true);
+    meshopt_config.read(synchstream_meshopt_config, true);
 
     read_test_solver_config(synchstream_solver_config);
-    solver_config.parse(synchstream_solver_config, true);
+    solver_config.read(synchstream_solver_config, true);
 
     read_test_mesh_file_names(mesh_files);
   }

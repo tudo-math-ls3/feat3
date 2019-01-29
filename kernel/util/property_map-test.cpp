@@ -58,7 +58,7 @@ public:
 
     // parse the stream
     PropertyMap parsec;
-    parsec.parse(ioss);
+    parsec.read(ioss);
 
     // test the root section entries
     TEST_CHECK_EQUAL(parsec.get_entry("hello").first, "World!");
@@ -123,7 +123,7 @@ public:
 
     // does parsing fail?
     PropertyMap parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
+    TEST_CHECK_THROWS(parsec.read(ioss), SyntaxError);
   } //test_1
 
   void test_2() const
@@ -143,7 +143,7 @@ public:
 
     // does parsing fail?
     PropertyMap parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
+    TEST_CHECK_THROWS(parsec.read(ioss), SyntaxError);
   } //test_2
 
   void test_3() const
@@ -156,7 +156,7 @@ public:
 
     // does parsing fail?
     PropertyMap parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
+    TEST_CHECK_THROWS(parsec.read(ioss), SyntaxError);
   } //test_3
 
   void test_4() const
@@ -169,7 +169,7 @@ public:
 
     // does parsing fail?
     PropertyMap parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
+    TEST_CHECK_THROWS(parsec.read(ioss), SyntaxError);
   } //test_4
 
   void test_5() const
@@ -186,7 +186,7 @@ public:
 
     // does parsing fail?
     PropertyMap parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
+    TEST_CHECK_THROWS(parsec.read(ioss), SyntaxError);
   } //test_5
 
   void test_6() const
@@ -217,7 +217,7 @@ public:
     ioss1 << "# ...without braces" << endl;
     ioss1 << "Key3 = something else" << endl;
 
-    parsec1.parse(ioss1, true); //parse first stream with replace = YES
+    parsec1.read(ioss1, true); //parse first stream with replace = YES
 
     TEST_CHECK(! parsec1.get_entry("key?").second);    // has to be false
     TEST_CHECK(parsec1.get_entry("key2").second);      // must be true as the key exists...
@@ -238,7 +238,7 @@ public:
     ioss2 << "# ...without braces" << endl;
     ioss2 << "Key3 = no idea" << endl;
 
-    parsec2.parse(ioss2, false); //parse second stream with replace = false
+    parsec2.read(ioss2, false); //parse second stream with replace = false
 
     TEST_CHECK(!parsec2.get_entry("key?").second);    // has to be false
     TEST_CHECK(parsec2.get_entry("key2").second);     // must be true as the key exists...

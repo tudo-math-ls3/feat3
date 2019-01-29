@@ -3,29 +3,20 @@
 #define KERNEL_RUNTIME_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/property_map.hpp>
 
 namespace FEAT
 {
   /// The class Runtime encapsulates various settings and functionality needed to run FEAT properly
   class Runtime
   {
-    private:
+  private:
+    /// signals, if initialise was called
+    static bool _initialised;
 
-      /// Feat's global property map, reads in feat.ini at startup
-      static PropertyMap _global_property_map;
+    /// signals, if finalise was called
+    static bool _finished;
 
-      /// signals, if initialise was called
-      static bool _initialised;
-
-      /// signals, if finalise was called
-      static bool _finished;
-
-    public:
-
-    /// Returns global property map, containing initial FEAT configuration, read in from feat.ini file
-    static PropertyMap * global_property();
-
+  public:
     /**
      * \brief FEAT initialisation
      *
