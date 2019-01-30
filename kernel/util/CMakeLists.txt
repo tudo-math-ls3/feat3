@@ -8,7 +8,6 @@ ADD_LIBRARY(kernel-util STATIC
   assertion.cpp
   dist.cpp
   dist_file_io.cpp
-  exception.cpp
   kahan_summation.cpp
   memory_pool.cpp
   memory_usage.cpp

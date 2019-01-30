@@ -30,10 +30,13 @@ namespace FEAT
     /**
      * \brief CTOR
      *
-     * \param message
+     * \param message_in
      * the exception's message.
      */
-    explicit Exception(const String & message);
+    explicit Exception(const String & message_in) :
+      _message(message_in)
+    {
+    }
 
     /**
      * \brief CTOR
@@ -41,27 +44,40 @@ namespace FEAT
      * \param function the current function name.
      * \param file the current file name.
      * \param line the current line number.
-     * \param message the exception's message.
+     * \param message_in the exception's message.
      */
     Exception(
         const char* const function,
         const char* const file,
         const long line,
-        const String & message);
+        const String & message_in) :
+      _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message_in)
+    {
+    }
 
     /// copy CTOR
-    Exception(const Exception & other);
+    Exception(const Exception &)
+    {
+    }
 
   public:
     /// DTOR
-    virtual ~Exception() throw();
+    virtual ~Exception() throw()
+    {
+    }
 
     /// returns error message
-    const String message() const;
+    const String message() const
+    {
+      return _message;
+    }
 
     /// return descriptive exception name
-    virtual const char * what() const throw() override;
-  };
+    virtual const char * what() const throw() override
+    {
+      return _message.empty() ? std::exception::what() : _message.c_str();
+    }
+  }; // class Exception
 
 
   /**
@@ -103,7 +119,7 @@ namespace FEAT
       Exception(function, file, line, "Internal error: " + message_in)
     {
     }
-  };
+  }; // class InternalError
 
   /**
    * \def INTERNAL_ERROR
