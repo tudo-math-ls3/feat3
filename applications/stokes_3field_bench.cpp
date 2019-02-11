@@ -11,6 +11,7 @@
 // \author Peter Zajac
 //
 #include <kernel/util/runtime.hpp>
+#include <kernel/util/memory_usage.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/statistics.hpp>
@@ -1118,9 +1119,9 @@ namespace Stokes3Field
 
     // get memory info
     {
-      auto meminfo = Util::get_memory_usage();
-      stats.mem_use[0] = meminfo.peak_physical;
-      stats.mem_use[1] = meminfo.peak_virtual;
+      MemoryUsage meminfo;
+      stats.mem_use[0] = meminfo.get_peak_physical();
+      stats.mem_use[1] = meminfo.get_peak_virtual();
     }
 
     stats.sync(comm);

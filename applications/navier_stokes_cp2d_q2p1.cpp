@@ -825,7 +825,8 @@ namespace NavierStokesCP2D
     comm.print(String("Domain size:").pad_back(20) + stringify(double(domain.bytes())  / (1024. * 1024.))  + " MByte");
     comm.print(String("MPI size:").pad_back(20) + stringify(double(mpi_size) / (1024. * 1024.)) + " MByte");
     comm.print(String("LA size:").pad_back(20) + stringify(double(la_size) / (1024. * 1024.)) + " MByte\n");
-    comm.print(Util::get_formatted_memory_usage());
+    MemoryUsage mu;
+    comm.print(mu.get_formatted_memory_usage());
     comm.print(String("#Mesh cells:").pad_back(20) + "coarse " + stringify(cells_coarse_max) + "/" + stringify(cells_coarse_min) + ", fine " +
         stringify(cells_fine_max) + "/" + stringify(cells_fine_min));
     comm.print(String("#DOFs:").pad_back(20) + "coarse " + stringify(dofs_coarse_max) + "/" + stringify(dofs_coarse_min) + ", fine " +

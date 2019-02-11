@@ -1414,9 +1414,9 @@ namespace NvSCCNDQ2P1dc
     summary.times[Times::total_run] = watch_total_run.elapsed();
 
     {
-      auto mi = Util::get_memory_usage();
-      summary.bytes[Bytes::peak_p] = mi.peak_physical;
-      summary.bytes[Bytes::peak_v] = mi.peak_virtual;
+      MemoryUsage mi;
+      summary.bytes[Bytes::peak_p] = mi.get_peak_physical();
+      summary.bytes[Bytes::peak_v] = mi.get_peak_virtual();
     }
 
     summary.sync(comm);

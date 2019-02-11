@@ -4,7 +4,6 @@
 #include <chrono>
 
 using namespace FEAT;
-using namespace FEAT::Util;
 using namespace FEAT::TestSystem;
 
 /**
@@ -32,12 +31,12 @@ public:
     std::chrono::seconds sec(t[5]);
     std::this_thread::sleep_for(sec);
 
-    auto m = get_memory_usage();
-    TEST_CHECK_NOT_EQUAL(m.current_physical, 0);
-    TEST_CHECK_NOT_EQUAL(m.peak_physical, 0);
-    TEST_CHECK_NOT_EQUAL(m.current_virtual, 0);
-    TEST_CHECK_NOT_EQUAL(m.peak_virtual, 0);
-    TEST_CHECK_EQUAL(m.current_swap, 0);
+    MemoryUsage mu;
+    TEST_CHECK_NOT_EQUAL(mu.get_current_physical(), 0);
+    TEST_CHECK_NOT_EQUAL(mu.get_peak_physical(), 0);
+    TEST_CHECK_NOT_EQUAL(mu.get_current_virtual(), 0);
+    TEST_CHECK_NOT_EQUAL(mu.get_peak_virtual(), 0);
+    TEST_CHECK_EQUAL(mu.get_current_swap(), 0);
 
     delete[] t;
   }

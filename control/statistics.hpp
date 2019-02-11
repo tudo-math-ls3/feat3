@@ -93,7 +93,8 @@ namespace FEAT
             std::cout<<String("Domain size:").pad_back(20) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
             std::cout<<String("MPI size:").pad_back(20) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl;
             std::cout<<String("LA size:").pad_back(20) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
-            std::cout<<Util::get_formatted_memory_usage()<<std::endl;
+            MemoryUsage mu;
+            std::cout<<mu.get_formatted_memory_usage()<<std::endl;
             std::cout<<String("#Mesh cells:").pad_back(20) << "coarse " << cells_coarse_max << "/" << cells_coarse_min << ", fine " << cells_fine_max << "/" << cells_fine_min << std::endl;
             std::cout<<String("#DOFs:").pad_back(20) << "coarse " << dofs_coarse_max << "/" << dofs_coarse_min << ", fine " << dofs_fine_max << "/" << dofs_fine_min << std::endl;
             std::cout<<String("#NZEs").pad_back(20) << "coarse " << nzes_coarse_max << "/" << nzes_coarse_min << ", fine " << nzes_fine_max << "/" << nzes_fine_min << std::endl;

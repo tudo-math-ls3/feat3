@@ -453,9 +453,9 @@ namespace PoissonDirichlet
 
     // get memory info
     {
-      auto meminfo = Util::get_memory_usage();
-      stats.mem_use[0] = meminfo.peak_physical;
-      stats.mem_use[1] = meminfo.peak_virtual;
+      MemoryUsage meminfo;
+      stats.mem_use[0] = meminfo.get_peak_physical();
+      stats.mem_use[1] = meminfo.get_peak_virtual();
     }
 
     stats.sync(comm);

@@ -10,7 +10,6 @@ ADD_LIBRARY(kernel-util STATIC
   dist_file_io.cpp
   kahan_summation.cpp
   memory_pool.cpp
-  memory_usage.cpp
   property_map.cpp
   runtime.cpp
   statistics.cpp
