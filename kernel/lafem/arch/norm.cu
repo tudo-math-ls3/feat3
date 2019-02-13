@@ -5,51 +5,49 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 // includes, CUDA
 #include <cublas_v2.h>
-
-namespace FEAT
-{
-  namespace LAFEM
-  {
-    namespace Intern
-    {
-      float cuda_norm2(const float * x, const Index size)
-      {
-        float result;
-        cublasStatus_t status;
-        status = cublasSnrm2(Util::Intern::cublas_handle, size, x, 1, &result);
-        if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasnrm2 failed with status code: " + stringify(status));
-        return result;
-      }
-
-      double cuda_norm2(const double * x, const Index size)
-      {
-        double result;
-        cublasStatus_t status;
-        status = cublasDnrm2(Util::Intern::cublas_handle, size, x, 1, &result);
-        if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasnrm2 failed with status code: " + stringify(status));
-        return result;
-      }
-    }
-  }
-}
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-DT_ Norm2<Mem::CUDA>::value(const DT_ * const x, const Index size)
+DT_ Norm2::value_cuda(const DT_ * const x, const Index size)
 {
-  DT_ result = Intern::cuda_norm2(x, size);
+  cudaDataType dt;
+  cudaDataType et;
+  if (typeid(DT_) == typeid(double))
+  {
+      dt = CUDA_R_64F;
+      et = CUDA_R_64F;
+  }
+  else if (typeid(DT_) == typeid(float))
+  {
+      dt = CUDA_R_32F;
+      et = CUDA_R_32F;
+  }
+#ifdef FEAT_HAVE_HALFMATH
+  else if (typeid(DT_) == typeid(Half))
+  {
+      dt = CUDA_R_16F;
+      et = CUDA_R_32F;
+  }
+#endif
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
+
+  cublasStatus_t status;
+  DT_ result(42.);
+
+  status = cublasNrm2Ex(Util::Intern::cublas_handle, size, x, dt, 1, &result, dt, et);
+  if (status != CUBLAS_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
+
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -59,5 +57,8 @@ DT_ Norm2<Mem::CUDA>::value(const DT_ * const x, const Index size)
   return result;
 }
 
-template float Norm2<Mem::CUDA>::value(const float * const, const Index);
-template double Norm2<Mem::CUDA>::value(const double * const, const Index);
+#ifdef FEAT_HAVE_HALFMATH
+template Half Norm2::value_cuda(const Half * const, const Index);
+#endif
+template float Norm2::value_cuda(const float * const, const Index);
+template double Norm2::value_cuda(const double * const, const Index);

@@ -183,7 +183,7 @@ namespace FEAT
        * The convection vector field norm.
        */
       template<typename IndexType_, int conv_dim_>
-      static DataType calc_sd_v_norm(const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, conv_dim_>& convect)
+      static DataType calc_sd_v_norm(const LAFEM::DenseVectorBlocked<DataType_, IndexType_, conv_dim_>& convect)
       {
         const auto* vals = convect.elements();
         DataType_ r = DataType_(0);

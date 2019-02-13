@@ -68,11 +68,11 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Backends: cuda, mkl")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scorep")
-  print ("  Debugging: valgrind, cudamemcheck, deathhandler")
-  print ("  Precision extensions: quadmath, half, floatx")
+  print ("  Debugging: valgrind, cudamemcheck, deathhandler, sanitizer")
+  print ("  Precision extensions: quadmath, floatx, half")
   print ("  Compilation process optimisations: cotire")
   print ("  Compiler optimisation steps: lto")
-  print ("  Third party source code: alglib, fparser, half, hypre, metis, superlu, trilinos, umfpack, zfp, zlib, zoltan")
+  print ("  Third party source code: alglib, fparser, half, hypre, metis, superlu, trilinos, umfpack, zlib, zoltan, boost, cgal")
   print ("Note that you must provide exactly one build mode, one parallelisation mode and one compiler.")
   print ("Note that you cannot combine any build id token with the guess token.")
   print ("Note that cudamemcheck is only active if cuda is activated, too.")
@@ -87,8 +87,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Be aware that icc needs the path to a gcc binary and clang needs the path to folder containing the whole toolchain.")
   print ("--cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
-  print ("--cuda_arch=sm_30")
-  print ("  Selects the cuda architecture target (defaults to sm_30 if not set).")
+  print ("--cuda_arch=sm_35")
+  print ("  Selects the cuda architecture target (defaults to sm_35 if not set).")
   print ("--export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json.")
   print ("--cpu=cputype")
@@ -498,6 +498,9 @@ if "scorep" in buildid:
   cmake_flags += " -DFEAT_USE_COMPILER_WRAPPER:BOOL=ON"
 
 
+if "cudamemcheck" in buildid:
+  remove_string(unused_tokens, "sanitizer")
+  cmake_flags += " -DFEAT_SANITIZER:BOOL=ON"
 
 if "cuda" in buildid:
   if not is_found("nvcc"):
@@ -506,7 +509,7 @@ if "cuda" in buildid:
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
   if not cuda_arch:
-    cuda_arch = "sm_30"
+    cuda_arch = "sm_35"
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
 
   if cuda_verbose:
@@ -537,6 +540,13 @@ if "quadmath" in buildid:
   remove_string(unused_tokens, "quadmath")
   cmake_flags += " -DFEAT_HAVE_QUADMATH:BOOL=ON"
 
+if "half" in buildid:
+  if "cuda" not in buildid:
+    print("Error: Using half without cuda is not supported!")
+    sys.exit()
+  remove_string(unused_tokens, "half")
+  cmake_flags += " -DFEAT_HAVE_HALFMATH:BOOL=ON"
+
 if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
   cmake_flags += " -DFEAT_COTIRE:BOOL=ON"
@@ -557,7 +567,7 @@ if "mpi" not in buildid and ("parmetis" in buildid or "metis" in buildid):
 
 # SuperLU needs MPI, because we only use SuperLU_DIST
 if ("mpi" not in buildid) and ("superlu" in buildid):
-  print("Error: SuperLU can only be used in combination with MPI!")
+  print("Error: SuperLU can only be used in combination with mpi!")
   sys.exit()
 
 # SuperLU needs MPI, because we only use SuperLU_DIST

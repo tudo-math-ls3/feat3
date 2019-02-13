@@ -38,10 +38,10 @@ namespace FEAT
       typedef Global::Muxer<LocalVectorType, Mirror_> MuxerType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      using TransferTypeByMDI = Transfer<
-        typename LocalTransfer_::template TransferTypeByMDI<Mem2_, DT2_, IT2_>,
-        typename Mirror_::template MirrorType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_, typename IT2_>
+      using TransferTypeByDI = Transfer<
+        typename LocalTransfer_::template TransferTypeByDI<DT2_, IT2_>,
+        typename Mirror_::template MirrorType<DT2_, IT2_> >;
 
       static constexpr bool is_global = true;
       static constexpr bool is_local = false;

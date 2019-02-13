@@ -162,22 +162,21 @@ namespace Stokes3Field
   template<
     int dim_,
     int nsc_ = (dim_*(dim_+1))/2,
-    typename MemType_ = Mem::Main,
     typename DataType_ = Real,
     typename IndexType_ = Index>
   class MyStokes3FieldSystemLevel :
-    public Control::Stokes3FieldSystemLevel<dim_, nsc_, MemType_, DataType_, IndexType_>
+    public Control::Stokes3FieldSystemLevel<dim_, nsc_, DataType_, IndexType_>
   {
   public:
-    typedef Control::Stokes3FieldSystemLevel<dim_, nsc_, MemType_, DataType_, IndexType_> BaseClass;
+    typedef Control::Stokes3FieldSystemLevel<dim_, nsc_, DataType_, IndexType_> BaseClass;
 
     // the filtered local system matrix for Vanka
     typename BaseClass::LocalSystemMatrix local_matrix_sys;
 
     // define local filter types
-    typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
-    typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
-    typedef LAFEM::NoneFilterBlocked<MemType_, DataType_, IndexType_, nsc_> LocalStressFilter;
+    typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloFilter;
+    typedef LAFEM::NoneFilter<DataType_, IndexType_> LocalPresFilter;
+    typedef LAFEM::NoneFilterBlocked<DataType_, IndexType_, nsc_> LocalStressFilter;
     typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter, LocalStressFilter> LocalSystemFilter;
 
     // define global filter types
@@ -247,7 +246,7 @@ namespace Stokes3Field
 
   // 2D version with 4 stress components
   template<typename Mesh_, typename DT_, typename IT_>
-  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, 4>& vs)
+  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<DT_, IT_, 4>& vs)
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n), s21(n);
@@ -267,7 +266,7 @@ namespace Stokes3Field
 
   // 2D version with 3 stress components
   template<typename Mesh_, typename DT_, typename IT_>
-  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, 3>& vs)
+  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<DT_, IT_, 3>& vs)
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n);
@@ -285,7 +284,7 @@ namespace Stokes3Field
 
   // 3D version with 6 stress components
   template<typename Mesh_, typename DT_, typename IT_>
-  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, 6>& vs)
+  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<DT_, IT_, 6>& vs)
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s33(n), s12(n), s23(n), s31(n);
@@ -742,7 +741,6 @@ namespace Stokes3Field
     const Dist::Comm& comm = domain.comm();
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
@@ -757,7 +755,7 @@ namespace Stokes3Field
     static constexpr int nsc = (dim*(dim+1))/2;
 
     // define our system level
-    typedef MyStokes3FieldSystemLevel<dim, nsc, MemType, DataType, IndexType> SystemLevelType;
+    typedef MyStokes3FieldSystemLevel<dim, nsc, DataType, IndexType> SystemLevelType;
 
 
     BenchStats stats(domain.size_virtual());
@@ -1189,7 +1187,7 @@ namespace Stokes3Field
 
       // project pressure
       Cubature::DynamicFactory cub("gauss-legendre:2");
-      LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
+      LAFEM::DenseVector<double, Index> vtx_p;
       Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure

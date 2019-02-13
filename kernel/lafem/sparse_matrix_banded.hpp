@@ -32,7 +32,6 @@ namespace FEAT
     /**
      * \brief sparse banded matrix
      *
-     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
@@ -75,8 +74,8 @@ namespace FEAT
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_, typename IT_ = Index>
-    class SparseMatrixBanded : public Container<Mem_, DT_, IT_>
+    template <typename DT_, typename IT_ = Index>
+    class SparseMatrixBanded : public Container<DT_, IT_>
     {
     public:
      /**
@@ -87,8 +86,7 @@ namespace FEAT
       class ScatterAxpy
       {
       public:
-        typedef LAFEM::SparseMatrixBanded<Mem::Main, DT_, IT_> MatrixType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::SparseMatrixBanded<DT_, IT_> MatrixType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
 
@@ -190,8 +188,7 @@ namespace FEAT
       class GatherAxpy
       {
       public:
-        typedef LAFEM::SparseMatrixBanded<Mem::Main, DT_, IT_> MatrixType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::SparseMatrixBanded<DT_, IT_> MatrixType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
 
@@ -316,12 +313,10 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Compatible L-vector type
-      typedef DenseVector<MemType, DataType, IT_> VectorTypeL;
+      typedef DenseVector<DataType, IT_> VectorTypeL;
       /// Compatible R-vector type
-      typedef DenseVector<MemType, DataType, IT_> VectorTypeR;
+      typedef DenseVector<DataType, IT_> VectorTypeR;
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_banded;
       /// our value type
@@ -364,12 +359,12 @@ namespace FEAT
         }
       };
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = SparseMatrixBanded<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = SparseMatrixBanded<DT2_, IT2_>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /**
        * \brief Constructor
@@ -377,7 +372,7 @@ namespace FEAT
        * Creates an empty non dimensional matrix.
        */
       explicit SparseMatrixBanded() :
-        Container<Mem_, DT_, IT_> (0)
+        Container<DT_, IT_> (0)
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -392,17 +387,17 @@ namespace FEAT
        *
        * Creates an empty matrix with given layout.
        */
-      explicit SparseMatrixBanded(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
-        Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
+      explicit SparseMatrixBanded(const SparseLayout<IT_, layout_id> & layout_in) :
+        Container<DT_, IT_> (layout_in._scalar_index.at(0))
       {
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
         for (auto i : this->_indices)
-          MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool::increase_memory(i);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(rows() * num_of_offsets()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(rows() * num_of_offsets()));
         this->_elements_size.push_back(rows() * num_of_offsets());
       }
 
@@ -417,9 +412,9 @@ namespace FEAT
        * Creates a matrix with given dimensions and content.
        */
       explicit SparseMatrixBanded(const Index rows_in, const Index columns_in,
-                                  DenseVector<Mem_, DT_, IT_> & val_in,
-                                  DenseVector<Mem_, IT_, IT_> & offsets_in) :
-        Container<Mem_, DT_, IT_>(rows_in * columns_in)
+                                  DenseVector<DT_, IT_> & val_in,
+                                  DenseVector<IT_, IT_> & offsets_in) :
+        Container<DT_, IT_>(rows_in * columns_in)
       {
         if (val_in.size() != rows_in * offsets_in.size())
         {
@@ -452,9 +447,9 @@ namespace FEAT
         this->_indices_size.push_back(offsets_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+          MemoryPool::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+          MemoryPool::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -466,7 +461,7 @@ namespace FEAT
        */
       template <typename MT_>
       explicit SparseMatrixBanded(const MT_ & other) :
-        Container<Mem_, DT_, IT_>(other.size())
+        Container<DT_, IT_>(other.size())
       {
         convert(other);
       }
@@ -479,7 +474,7 @@ namespace FEAT
        * Creates a matrix based on a given adjacency graph, representing the sparsity pattern.
        */
       explicit SparseMatrixBanded(const Adjacency::Graph & graph) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
@@ -497,7 +492,7 @@ namespace FEAT
           }
         }
 
-        DenseVector<Mem::Main, IT_, IT_> toffsets(Index(moffsets.size()));
+        DenseVector<IT_, IT_> toffsets(Index(moffsets.size()));
         auto * ptoffsets = toffsets.elements();
 
         IT_ idx(0);
@@ -507,9 +502,9 @@ namespace FEAT
           ++idx;
         }
 
-        DenseVector<Mem_, IT_, IT_> toffsets_mem;
+        DenseVector<IT_, IT_> toffsets_mem;
         toffsets_mem.convert(toffsets);
-        DenseVector<Mem_, DT_, IT_> tval_mem(Index(moffsets.size()) * num_rows, DT_(0));
+        DenseVector<DT_, IT_> tval_mem(Index(moffsets.size()) * num_rows, DT_(0));
 
         this->assign(SparseMatrixBanded(num_rows, num_cols, tval_mem, toffsets_mem));
       }
@@ -523,7 +518,7 @@ namespace FEAT
        * Creates a banded matrix based on the source filestream.
        */
       explicit SparseMatrixBanded(FileMode mode, String filename) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
       }
@@ -537,7 +532,7 @@ namespace FEAT
        * Creates a banded matrix based on the source filestream.
        */
       explicit SparseMatrixBanded(FileMode mode, std::istream& file) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, file);
       }
@@ -551,7 +546,7 @@ namespace FEAT
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       explicit SparseMatrixBanded(std::vector<char> input) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         deserialize<DT2_, IT2_>(input);
       }
@@ -564,7 +559,7 @@ namespace FEAT
        * Moves a given matrix to this matrix.
        */
       SparseMatrixBanded(SparseMatrixBanded && other) :
-        Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBanded>(other))
+        Container<DT_, IT_>(std::forward<SparseMatrixBanded>(other))
       {
       }
 
@@ -605,10 +600,10 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
+      template<typename DT2_, typename IT2_>
+      void clone(const SparseMatrixBanded<DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -618,12 +613,12 @@ namespace FEAT
        *
        * Assigns a new matrix layout, discarding all old data
        */
-      SparseMatrixBanded & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
+      SparseMatrixBanded & operator= (const SparseLayout<IT_, layout_id> & layout_in)
       {
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          MemoryPool::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool::release_memory(this->_indices.at(i));
 
         this->_elements.clear();
         this->_indices.clear();
@@ -636,9 +631,9 @@ namespace FEAT
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
         for (auto i : this->_indices)
-          MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool::increase_memory(i);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(rows() * num_of_offsets()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(rows() * num_of_offsets()));
         this->_elements_size.push_back(rows() * num_of_offsets());
 
         return *this;
@@ -651,19 +646,16 @@ namespace FEAT
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const SparseMatrixBanded<DT2_, IT2_> & other)
       {
         this->assign(other);
       }
 
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & csr_in)
+      template <typename DT2_, typename IT2_>
+      void convert(const SparseMatrixCSR<DT2_, IT2_> & csr)
       {
-        XASSERT(csr_in.template used_elements<Perspective::pod>() > 0);
-
-        SparseMatrixCSR<Mem::Main, DT_, IT_> csr;
-        csr.convert(csr_in);
+        XASSERT(csr.template used_elements<Perspective::pod>() > 0);
 
         std::set<IT_> offset_set;
         Index nrows(csr.rows());
@@ -678,7 +670,7 @@ namespace FEAT
           }
         }
 
-        DenseVector<Mem::Main, DT_, IT_> val_new(Index(offset_set.size()) * nrows, DT_(0));
+        DenseVector<DT_, IT_> val_new(Index(offset_set.size()) * nrows, DT_(0));
         for (Index row(0) ; row < nrows ; ++row)
         {
           for (Index i(csr.row_ptr()[row]) ; i < csr.row_ptr()[row+1] ; ++i)
@@ -690,7 +682,7 @@ namespace FEAT
           }
         }
 
-        DenseVector<Mem::Main, IT_, IT_> offsets_new(Index(offset_set.size()));
+        DenseVector<IT_, IT_> offsets_new(Index(offset_set.size()));
         auto it_offset = offset_set.begin();
         for (Index i(0) ; i < offset_set.size() ; ++i, ++it_offset)
         {
@@ -698,7 +690,7 @@ namespace FEAT
         }
         offset_set.clear();
 
-        SparseMatrixBanded<Mem::Main, DT_, IT_> temp(nrows, ncolumns, val_new, offsets_new);
+        SparseMatrixBanded<DT_, IT_> temp(nrows, ncolumns, val_new, offsets_new);
         this->assign(temp);
       }
 
@@ -755,14 +747,16 @@ namespace FEAT
         ASSERT(row < rows());
         ASSERT(col < columns());
 
+        MemoryPool::synchronize();
+
         const Index trows(this->_scalar_index.at(1));
 
         for (Index i(0); i < this->_scalar_index.at(4); ++i)
         {
-          const Index toffset(Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)));
+          const Index toffset(this->offsets()[i]);
           if (row + toffset + Index(1) == col + trows)
           {
-            return MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
+            return this->val()[i * trows + row];
           }
         }
         return DT_(0.);
@@ -773,9 +767,9 @@ namespace FEAT
        *
        * \return An object containing the sparse matrix layout.
        */
-      SparseLayout<Mem_, IT_, layout_id> layout() const
+      SparseLayout<IT_, layout_id> layout() const
       {
-        return SparseLayout<Mem_, IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
+        return SparseLayout<IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
       }
 
       /**
@@ -872,18 +866,6 @@ namespace FEAT
         this->_copy_content(x, full);
       }
 
-      /**
-       * \brief Performs \f$this \leftarrow x\f$.
-       *
-       * \param[in] x The Matrix to be copied.
-       * \param[in] full Shall we create a full copy, including scalars and index arrays?
-       */
-      template <typename Mem2_>
-      void copy(const SparseMatrixBanded<Mem2_, DT_, IT_> & x, bool full = false)
-      {
-        this->_copy_content(x, full);
-      }
-
       ///@name Linear algebra operations
       ///@{
       /**
@@ -917,7 +899,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
+        Arch::Axpy::value(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -939,7 +921,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements());
-        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->rows() * this->num_of_offsets());
+        Arch::Scale::value(this->val(), x.val(), alpha, this->rows() * this->num_of_offsets());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -957,7 +939,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
-        DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->rows() * this->num_of_offsets());
+        DT_ result = Arch::Norm2::value(this->val(), this->rows() * this->num_of_offsets());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -971,7 +953,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<Mem_,DT_, IT_>& r, const DenseVector<Mem_, DT_, IT_>& x) const
+      void apply(DenseVector<DT_, IT_>& r, const DenseVector<DT_, IT_>& x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
@@ -981,7 +963,7 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops( 2 * this->used_elements() );
 
-        Arch::Apply<Mem_>::banded(r.elements(),
+        Arch::Apply::banded(r.elements(),
             DT_(1),
             x.elements(),
             DT_(0),
@@ -1004,9 +986,9 @@ namespace FEAT
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      void apply(DenseVector<Mem_,DT_, IT_>& r,
-                 const DenseVector<Mem_, DT_, IT_>& x,
-                 const DenseVector<Mem_, DT_, IT_>& y,
+      void apply(DenseVector<DT_, IT_>& r,
+                 const DenseVector<DT_, IT_>& x,
+                 const DenseVector<DT_, IT_>& y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -1025,7 +1007,7 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
 
-        Arch::Apply<Mem_>::banded(r.elements(),
+        Arch::Apply::banded(r.elements(),
             alpha,
             x.elements(),
             DT_(1),
@@ -1049,9 +1031,9 @@ namespace FEAT
 
         for (Index i(0) ; i < num_of_offsets() ; ++i)
         {
-          if (MemoryPool<Mem_>::get_element(offsets(), i) == rows() - 1)
+          if (this->offsets[i] == this->rows() - 1)
           {
-            MemoryPool<Mem_>::copy(diag.elements(), val() + i * rows(), rows());
+            MemoryPool::copy(diag.elements(), val() + i * rows(), rows());
             break;
           }
         }
@@ -1213,7 +1195,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_> friend bool operator== (const SparseMatrixBanded & a, const SparseMatrixBanded<Mem2_, DT_, IT_> & b)
+      friend bool operator== (const SparseMatrixBanded & a, const SparseMatrixBanded & b)
       {
         if (a.rows() != b.rows())
           return false;
@@ -1232,31 +1214,11 @@ namespace FEAT
         DT_ * val_a;
         DT_ * val_b;
 
-        if(std::is_same<Mem::Main, Mem_>::value)
-        {
-          offsets_a = const_cast<IT_*>(a.offsets());
-          val_a = const_cast<DT_*>(a.val());
-        }
-        else
-        {
-          offsets_a = new IT_[a.num_of_offsets()];
-          MemoryPool<Mem_>::template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
-          val_a = new DT_[a.num_of_offsets() * a.rows()];
-          MemoryPool<Mem_>::template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
-        }
+        offsets_a = const_cast<IT_*>(a.offsets());
+        val_a = const_cast<DT_*>(a.val());
 
-        if(std::is_same<Mem::Main, Mem2_>::value)
-        {
-          offsets_b = const_cast<IT_*>(b.offsets());
-          val_b = const_cast<DT_*>(b.val());
-        }
-        else
-        {
-          offsets_b = new IT_[b.num_of_offsets()];
-          MemoryPool<Mem2_>::template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
-          val_b = new DT_[b.num_of_offsets() * b.rows()];
-          MemoryPool<Mem2_>::template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
-        }
+        offsets_b = const_cast<IT_*>(b.offsets());
+        val_b = const_cast<DT_*>(b.val());
 
         bool ret(true);
 
@@ -1276,17 +1238,6 @@ namespace FEAT
             ret = false;
             break;
           }
-        }
-
-        if(! std::is_same<Mem::Main, Mem_>::value)
-        {
-          delete[] offsets_a;
-          delete[] val_a;
-        }
-        if(! std::is_same<Mem::Main, Mem2_>::value)
-        {
-          delete[] offsets_b;
-          delete[] val_b;
         }
 
         return ret;

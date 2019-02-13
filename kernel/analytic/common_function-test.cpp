@@ -10,13 +10,13 @@ using namespace FEAT;
 using namespace FEAT::TestSystem;
 using namespace FEAT::Analytic;
 
-template<typename DT_>
+template<typename DT_, typename IT_>
 class CommonFunctionTest :
-  public FullTaggedTest<Mem::Main, DT_, Index>
+  public UnitTest
 {
 public:
-  CommonFunctionTest() :
-    FullTaggedTest<Mem::Main, DT_, Index>("CommonFunctionTest")
+  CommonFunctionTest(PreferredBackend backend) :
+    UnitTest("CommonFunctionTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -725,7 +725,7 @@ public:
 
   void test_heaviside_reg_function_2d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     // create heaviside-reg-function object
     Analytic::Common::HeavisideRegFunction<2> func;
@@ -746,7 +746,7 @@ public:
 
   void test_heaviside_reg_function_3d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
 
     // create heaviside-reg-function object
     Analytic::Common::HeavisideRegFunction<3> func;
@@ -847,7 +847,7 @@ public:
 
   void test_himmelblau_function() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     // create himmelblau-function object
     Analytic::Common::HimmelblauFunction func;
@@ -1745,4 +1745,25 @@ public:
   }
 };
 
-CommonFunctionTest<double> common_function_test_double;
+CommonFunctionTest<double, unsigned int> common_function_test_double_uint(PreferredBackend::generic);
+CommonFunctionTest<float, unsigned int> common_function_test_float_uint(PreferredBackend::generic);
+CommonFunctionTest<double, unsigned long> common_function_test_double_ulong(PreferredBackend::generic);
+CommonFunctionTest<float, unsigned long> common_function_test_float_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+CommonFunctionTest<float, unsigned long> mkl_common_function_test_float_ulong(PreferredBackend::mkl);
+CommonFunctionTest<double, unsigned long> mkl_common_function_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+CommonFunctionTest<__float128, unsigned long> common_function_test_float128_ulong(PreferredBackend::generic);
+CommonFunctionTest<__float128, unsigned int> common_function_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+CommonFunctionTest<Half, unsigned int> common_function_test_half_uint(PreferredBackend::generic);
+CommonFunctionTest<Half, unsigned long> common_function_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+CommonFunctionTest<float, unsigned int> cuda_common_function_test_float_uint(PreferredBackend::cuda);
+CommonFunctionTest<double, unsigned int> cuda_common_function_test_double_uint(PreferredBackend::cuda);
+CommonFunctionTest<float, unsigned long> cuda_common_function_test_float_ulong(PreferredBackend::cuda);
+CommonFunctionTest<double, unsigned long> cuda_common_function_test_double_ulong(PreferredBackend::cuda);
+#endif

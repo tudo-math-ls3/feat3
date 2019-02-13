@@ -51,9 +51,9 @@ namespace DbgIsoParam
   typedef MeshAtlas<MeshType> AtlasType;
   typedef RootMeshNode<MeshType> MeshNodeType;
 
-  typedef LAFEM::SparseMatrixCSR<Mem::Main, DT, Index> MatrixType;
-  typedef LAFEM::DenseVector<Mem::Main, DT, Index> VectorType;
-  typedef LAFEM::UnitFilter<Mem::Main, DT, Index> FilterType;
+  typedef LAFEM::SparseMatrixCSR<DT, Index> MatrixType;
+  typedef LAFEM::DenseVector<DT, Index> VectorType;
+  typedef LAFEM::UnitFilter<DT, Index> FilterType;
 
   static constexpr int nt = 3;
   static constexpr int ns = 3;

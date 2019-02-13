@@ -67,8 +67,8 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, typename SpaceV_, typename SpaceS_, int dim_, int nsc_>
       static void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, nsc_, nsc_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DT_, IT_, nsc_, nsc_>& matrix,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& convect,
         const SpaceV_& space_v,
         const SpaceS_& space_s,
         const Cubature::DynamicFactory& cubature_factory,
@@ -82,8 +82,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space_s.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space_v.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, nsc_, nsc_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, nsc_, nsc_> MatrixType;
 
         // define our assembly traits
         // we will "abuse" the 'trial space' of this assembly space for the velocity space,

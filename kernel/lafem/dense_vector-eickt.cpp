@@ -11,15 +11,9 @@ namespace FEAT
 {
   namespace LAFEM
   {
-    template class DenseVector<Mem::Main, float, unsigned int>;
-    template class DenseVector<Mem::Main, double, unsigned int>;
-    template class DenseVector<Mem::Main, float, unsigned long>;
-    template class DenseVector<Mem::Main, double, unsigned long>;
-#ifdef FEAT_HAVE_CUDA
-    template class DenseVector<Mem::CUDA, float, unsigned int>;
-    template class DenseVector<Mem::CUDA, double, unsigned int>;
-    template class DenseVector<Mem::CUDA, float, unsigned long>;
-    template class DenseVector<Mem::CUDA, double, unsigned long>;
-#endif
+    template class DenseVector<float, unsigned int>;
+    template class DenseVector<double, unsigned int>;
+    template class DenseVector<float, unsigned long>;
+    template class DenseVector<double, unsigned long>;
   }
 }

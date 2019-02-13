@@ -16,7 +16,6 @@
 #include <kernel/lafem/power_mirror.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 
 namespace FEAT
@@ -150,40 +149,35 @@ namespace FEAT
        * A \transient reference to the mesh-part that is to be mirrored.
        */
       template<
-        typename MemType_,
         typename DataType_,
         typename IndexType_,
         typename Space_,
         typename MeshPart_>
       static void assemble_mirror(
-        LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror,
+        LAFEM::VectorMirror<DataType_, IndexType_>& vec_mirror,
         const Space_& space, const MeshPart_& mesh_part)
       {
         // count number of dofs in mirror
         const Index count = Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::count(space, mesh_part);
 
         // allocate mirror in main memory
-        LAFEM::VectorMirror<Mem::Main, DataType_, IndexType_> vmir(space.get_num_dofs(), count);
+        vec_mirror = LAFEM::VectorMirror<DataType_, IndexType_>(space.get_num_dofs(), count);
 
         // fill mirror indices
         if(count > Index(0))
         {
-          Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::fill(vmir.indices(), space, mesh_part);
+          Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::fill(vec_mirror.indices(), space, mesh_part);
         }
-
-        // convert mirror
-        vec_mirror.convert(vmir);
       }
 
       template<
-        typename MemType_,
         typename DataType_,
         typename IndexType_,
         Index blocks_,
         typename Space_,
         typename MeshPart_>
       static void assemble_mirror(
-        LAFEM::PowerMirror<LAFEM::VectorMirror<MemType_, DataType_, IndexType_>, blocks_>& vec_mirror,
+        LAFEM::PowerMirror<LAFEM::VectorMirror<DataType_, IndexType_>, blocks_>& vec_mirror,
         const Space_& space, const MeshPart_& mesh_part)
       {
         assemble_mirror(vec_mirror._sub_mirror, space, mesh_part);

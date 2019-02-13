@@ -5,44 +5,49 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
-
-namespace FEAT
-{
-  namespace LAFEM
-  {
-    namespace Intern
-    {
-      template <typename DT_>
-      __global__ void cuda_scale(DT_ * r, const DT_ * x, const DT_ s, const Index count)
-      {
-        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx >= count)
-          return;
-        r[idx] = x[idx] * s;
-      }
-    }
-  }
-}
-
+#include <kernel/util/cuda_util.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
+void Scale::value_cuda(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
-  dim3 grid;
-  dim3 block;
-  block.x = blocksize;
-  grid.x = (unsigned)ceil((size)/(double)(block.x));
+  cudaDataType dt;
+  cudaDataType et;
+  if (typeid(DT_) == typeid(double))
+  {
+      dt = CUDA_R_64F;
+      et = CUDA_R_64F;
+  }
+  else if (typeid(DT_) == typeid(float))
+  {
+      dt = CUDA_R_32F;
+      et = CUDA_R_32F;
+  }
+#ifdef FEAT_HAVE_HALFMATH
+  else if (typeid(DT_) == typeid(Half))
+  {
+      dt = CUDA_R_16F;
+      et = CUDA_R_32F;
+  }
+#endif
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
 
-  FEAT::LAFEM::Intern::cuda_scale<<<grid, block>>>(r, x, s, size);
+  if (r != x)
+    ///\todo cuse cublasCopyEx when available
+    cudaMemcpy(r, x, size * sizeof(DT_), cudaMemcpyDefault);
+
+  cublasStatus_t status;
+
+  status = cublasScalEx(Util::Intern::cublas_handle, size, &s, et, r, dt, 1, et);
+  if (status != CUBLAS_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
+
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -50,5 +55,8 @@ void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const In
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Scale<Mem::CUDA>::value(float *, const float * const, const float, const Index);
-template void Scale<Mem::CUDA>::value(double *, const double * const, const double, const Index);
+#ifdef FEAT_HAVE_HALFMATH
+template void Scale::value_cuda(Half *, const Half * const, const Half, const Index);
+#endif
+template void Scale::value_cuda(float *, const float * const, const float, const Index);
+template void Scale::value_cuda(double *, const double * const, const double, const Index);

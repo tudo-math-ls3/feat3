@@ -20,11 +20,11 @@ typedef StandardRefinery<StructMesh3d> StructMeshRefinery3d;
  * \test Tests the StandardRefinery class templates.
  */
 class StandardRefineryTestStructHexa
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   StandardRefineryTestStructHexa() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-struct-hexa")
+    UnitTest("standard_refinery-test-struct-hexa")
   {
   }
 

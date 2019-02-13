@@ -20,11 +20,11 @@ using namespace FEAT::Geometry;
  */
 
 class IndexMappingTest
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   IndexMappingTest() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("index_mapping-test")
+    UnitTest("index_mapping-test")
   {
   }
 

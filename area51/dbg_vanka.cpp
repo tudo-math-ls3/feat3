@@ -114,15 +114,15 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   typename Space_<TrafoType>::P space_p(trafo);
   const String name = Space_<TrafoType>::name();
 
-  typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> ScalarMatrixType;
+  typedef LAFEM::SparseMatrixCSR<double, Index> ScalarMatrixType;
   //typedef LAFEM::PowerDiagMatrix<ScalarMatrixType, dim> MatrixTypeA;
   typedef LAFEM::PowerFullMatrix<ScalarMatrixType, dim, dim> MatrixTypeA;
   typedef LAFEM::PowerColMatrix<ScalarMatrixType, dim> MatrixTypeB;
   typedef LAFEM::PowerRowMatrix<ScalarMatrixType, dim> MatrixTypeD;
   typedef LAFEM::SaddlePointMatrix<MatrixTypeA, MatrixTypeB, MatrixTypeD> MatrixType;
   typedef MatrixType::VectorTypeL VectorType;
-  typedef LAFEM::NoneFilter<Mem::Main, double, Index> NoneFilterType;
-  typedef LAFEM::UnitFilter<Mem::Main, double, Index> UnitFilterType;
+  typedef LAFEM::NoneFilter<double, Index> NoneFilterType;
+  typedef LAFEM::UnitFilter<double, Index> UnitFilterType;
   typedef LAFEM::PowerFilter<UnitFilterType, dim> VeloFilterType;
   typedef LAFEM::TupleFilter<VeloFilterType, NoneFilterType> FilterType;
 

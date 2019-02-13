@@ -21,9 +21,6 @@
 #include <limits>
 
 // includes, thirdparty
-#ifdef FEAT_HAVE_HALFMATH
-#include <half.hpp>
-#endif // FEAT_HAVE_HALFMATH
 #ifdef FEAT_HAVE_ZLIB
 #include <zlib.h>
 #endif // FEAT_HAVE_ZLIB
@@ -72,7 +69,7 @@ namespace FEAT
 #if defined(FEAT_HAVE_HALFMATH) || defined(DOXYGEN)
 #define FEAT_HAVE_PACK_TYPE_F16 1
     /// 16-bit floating point type
-    typedef half_float::half f16;
+    typedef Half f16;
     // make sure this really has only 16 bits; this may be violated by a stupid compiler
     static_assert(sizeof(f16) == 2, "16-bit float is assumed to have exactly 16 bits");
 #endif

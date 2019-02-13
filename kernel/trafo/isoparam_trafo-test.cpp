@@ -17,11 +17,11 @@ using namespace FEAT::TestSystem;
 
 template<typename DataType_>
 class IsoparamTrafoVolumeTest
-  : public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public UnitTest
 {
 public:
   IsoparamTrafoVolumeTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("IsoparamTrafoVolumeTest")
+    UnitTest("IsoparamTrafoVolumeTest", Type::Traits<DataType_>::name())
   {
   }
 

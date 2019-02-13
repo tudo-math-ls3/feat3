@@ -60,8 +60,6 @@ namespace FEAT
       typedef PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_> ContClass;
       /// sub-matrix type
       typedef SubType_ SubMatrixType;
-      /// sub-matrix memory type
-      typedef typename SubMatrixType::MemType MemType;
       /// sub-matrix data type
       typedef typename SubMatrixType::DataType DataType;
       /// sub-matrix index type
@@ -73,9 +71,9 @@ namespace FEAT
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, width_> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = PowerFullMatrix<
-        typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, width_, height_>;
+        typename SubType_::template ContainerType<DT2_, IT2_>, width_, height_>;
 
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = height_;
@@ -100,7 +98,7 @@ namespace FEAT
       }
 
       /// sub-matrix layout ctor
-      explicit PowerFullMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
+      explicit PowerFullMatrix(const SparseLayout<IndexType, layout_id>& layout) :
         _container(layout)
       {
       }
@@ -362,7 +360,7 @@ namespace FEAT
         _container.apply(r, x);
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
         _container.apply(r, x);
       }
@@ -372,8 +370,8 @@ namespace FEAT
         _container.apply(r, x, y, alpha);
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
-                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+                 const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
         _container.apply(r, x, y, alpha);
       }
@@ -414,8 +412,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const PowerFullMatrix & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const PowerFullMatrix & a, const PowerFullMatrix & b)
       {
         return a._container == b._container;
       }

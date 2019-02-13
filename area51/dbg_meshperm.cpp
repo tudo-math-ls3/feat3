@@ -24,8 +24,8 @@
 using namespace FEAT;
 using namespace FEAT::Geometry;
 
-typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
-typedef LAFEM::DenseVector<Mem::Main, double, Index> VectorType;
+typedef LAFEM::SparseMatrixCSR<double, Index> MatrixType;
+typedef LAFEM::DenseVector<double, Index> VectorType;
 
 String get_file_title(const String& filename)
 {

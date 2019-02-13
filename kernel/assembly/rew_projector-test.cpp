@@ -26,13 +26,16 @@ using namespace FEAT::TestSystem;
  * \tparam DataType_
  * The data type for the test. Shall be either double or float.
  *
+ * \tparam IndexType_
+ * The index type for the test. Shall be either unsigned int or unsigned long.
+ *
  * \author Peter Zajac
  */
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class RewProjectorTest :
-  public TestSystem::TaggedTest<Archs::None, DataType_>
+  public UnitTest
 {
-  typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+  typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -43,8 +46,8 @@ class RewProjectorTest :
   typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceRT;
 
 public:
-  RewProjectorTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("RewProjectorTest")
+  RewProjectorTest(PreferredBackend backend) :
+    UnitTest("RewProjectorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -71,19 +74,19 @@ public:
 
     // project Q0
     DataType_ q0_err = project<QuadSpaceQ0>(trafo, "gauss-legendre:2");
-    q0_err = q0_err/DataType_(7.9731492672E-2) - DataType_(1);
+    q0_err = q0_err / DataType_(7.9731492672E-2) - DataType_(1);
     TEST_CHECK_EQUAL_WITHIN_EPS(q0_err, DataType_(0), eps);
     //TEST_CHECK_EQUAL_WITHIN_EPS(q0_err, DataType_(7.97315E-2), eps);
 
     // project Q1
     DataType_ q1_err = project<QuadSpaceQ1>(trafo, "gauss-legendre:3");
-    q1_err = q1_err/DataType_(4.1430308042E-3) - DataType_(1);
+    q1_err = q1_err / DataType_(4.1430308042E-3) - DataType_(1);
     TEST_CHECK_EQUAL_WITHIN_EPS(q1_err, DataType_(0), eps);
     //TEST_CHECK_EQUAL_WITHIN_EPS(q1_err, DataType_(4.14303E-3), eps);
 
     // project RT
     DataType_ rt_err = project<QuadSpaceRT>(trafo, "gauss-legendre:3");
-    rt_err = rt_err/DataType_(7.5903151744E-3) - DataType_(1);
+    rt_err = rt_err / DataType_(7.5903151744E-3) - DataType_(1);
     TEST_CHECK_EQUAL_WITHIN_EPS(rt_err, DataType_(0), eps);
     //TEST_CHECK_EQUAL_WITHIN_EPS(rt_err, DataType_(7.59032E-3), eps);
   }
@@ -110,5 +113,25 @@ public:
 
 };
 
-RewProjectorTest<float> rew_projector_test_float;
-RewProjectorTest<double> rew_projector_test_double;
+RewProjectorTest<float, unsigned int> rew_projector_test_float_uint(PreferredBackend::generic);
+RewProjectorTest<double, unsigned int> rew_projector_test_double_uint(PreferredBackend::generic);
+RewProjectorTest<float, unsigned long> rew_projector_test_float_ulong(PreferredBackend::generic);
+RewProjectorTest<double, unsigned long> rew_projector_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+RewProjectorTest<float, unsigned long> mkl_rew_projector_test_float_ulong(PreferredBackend::mkl);
+RewProjectorTest<double, unsigned long> mkl_rew_projector_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+RewProjectorTest<__float128, unsigned int> rew_projector_test_float128_uint(PreferredBackend::generic);
+RewProjectorTest<__float128, unsigned long> rew_projector_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+RewProjectorTest<Half, unsigned int> rew_projector_test_half_uint(PreferredBackend::generic);
+RewProjectorTest<Half, unsigned long> rew_projector_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+RewProjectorTest<float, unsigned int> cuda_rew_projector_test_float_uint(PreferredBackend::cuda);
+RewProjectorTest<double, unsigned int> cuda_rew_projector_test_double_uint(PreferredBackend::cuda);
+RewProjectorTest<float, unsigned long> cuda_rew_projector_test_float_ulong(PreferredBackend::cuda);
+RewProjectorTest<double, unsigned long> cuda_rew_projector_test_double_ulong(PreferredBackend::cuda);
+#endif

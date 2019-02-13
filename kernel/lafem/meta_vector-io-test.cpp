@@ -18,17 +18,19 @@ using namespace FEAT::TestSystem;
  *
  * \author Dirk Ribbrock
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorIOTest
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorIOTest() :
-    BaseClass("MetaVectorIOTest")
+   MetaVectorIOTest(PreferredBackend backend) :
+    BaseClass("MetaVectorIOTest", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -65,9 +67,25 @@ public:
   }
 };
 
-MetaVectorIOTest<Mem::Main, float, Index> meta_vector_io_test_generic_float;
-MetaVectorIOTest<Mem::Main, double, Index> meta_vector_io_test_generic_double;
+MetaVectorIOTest<float, unsigned int> meta_vector_io_test_generic_float_uint(PreferredBackend::generic);
+MetaVectorIOTest<double, unsigned int> meta_vector_io_test_generic_double_uint(PreferredBackend::generic);
+MetaVectorIOTest<float, unsigned long> meta_vector_io_test_generic_float_ulong(PreferredBackend::generic);
+MetaVectorIOTest<double, unsigned long> meta_vector_io_test_generic_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorIOTest<float, unsigned long> mkl_meta_vector_io_test_float_ulong(PreferredBackend::mkl);
+MetaVectorIOTest<double, unsigned long> mkl_meta_vector_io_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaVectorIOTest<__float128, unsigned int> meta_vector_io_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorIOTest<__float128, unsigned long> meta_vector_io_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorIOTest<Half, unsigned int> meta_vector_io_test_half_uint(PreferredBackend::generic);
+MetaVectorIOTest<Half, unsigned long> meta_vector_io_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorIOTest<Mem::CUDA, float, Index> meta_vector_io_test_cuda_float;
-MetaVectorIOTest<Mem::CUDA, double, Index> meta_vector_io_test_cuda_double;
+MetaVectorIOTest<float, unsigned int> meta_vector_io_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorIOTest<double, unsigned int> meta_vector_io_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorIOTest<float, unsigned long> meta_vector_io_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorIOTest<double, unsigned long> meta_vector_io_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif

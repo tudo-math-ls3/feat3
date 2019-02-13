@@ -28,36 +28,22 @@ namespace FEAT
       template <>
       struct LayoutId<SparseLayoutId::lt_csr>
       {
-        template<typename Mem_, typename DT_, typename IT_>
-        using MatrixType = SparseMatrixCSR<Mem_, DT_, IT_>;
+        template<typename DT_, typename IT_>
+        using MatrixType = SparseMatrixCSR<DT_, IT_>;
       };
 
       template <>
       struct LayoutId<SparseLayoutId::lt_cscr>
       {
-        template<typename Mem_, typename DT_, typename IT_>
-        using MatrixType = SparseMatrixCSCR<Mem_, DT_, IT_>;
-      };
-
-      template <>
-      struct LayoutId<SparseLayoutId::lt_coo>
-      {
-        template<typename Mem_, typename DT_, typename IT_>
-        using MatrixType = SparseMatrixCOO<Mem_, DT_, IT_>;
-      };
-
-      template <>
-      struct LayoutId<SparseLayoutId::lt_ell>
-      {
-        template<typename Mem_, typename DT_, typename IT_>
-        using MatrixType = SparseMatrixELL<Mem_, DT_, IT_>;
+        template<typename DT_, typename IT_>
+        using MatrixType = SparseMatrixCSCR<DT_, IT_>;
       };
 
       template <>
       struct LayoutId<SparseLayoutId::lt_banded>
       {
-        template<typename Mem_, typename DT_, typename IT_>
-        using MatrixType = SparseMatrixBanded<Mem_, DT_, IT_>;
+        template<typename DT_, typename IT_>
+        using MatrixType = SparseMatrixBanded<DT_, IT_>;
       };
 
     } // namespace Intern
@@ -66,7 +52,6 @@ namespace FEAT
     /**
      * \brief Layout scheme for sparse matrix containers.
      *
-     * \tparam Mem_ The memory where the layout data is lying.
      * \tparam Layout_ The Matrix Type, which represented by the layout.
      *
      * This class acts as an data wrapper for all index arrays, describing a specific sparse matrix layout.
@@ -77,7 +62,7 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename IT_, SparseLayoutId Layout_>
+    template <typename IT_, SparseLayoutId Layout_>
     class SparseLayout
     {
     public:
@@ -86,7 +71,7 @@ namespace FEAT
       std::vector<Index> _scalar_index;
 
       template<typename DT_>
-      using MatrixType = typename Intern::LayoutId<Layout_>::template MatrixType<Mem_, DT_, IT_>;
+      using MatrixType = typename Intern::LayoutId<Layout_>::template MatrixType<DT_, IT_>;
 
       SparseLayout() :
         _indices(),
@@ -101,7 +86,7 @@ namespace FEAT
         _scalar_index(scalar_index)
       {
         for(auto i : this->_indices)
-          MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool::increase_memory(i);
       }
 
       /// move constructor
@@ -116,7 +101,7 @@ namespace FEAT
       virtual ~SparseLayout()
       {
         for(auto i : this->_indices)
-          MemoryPool<Mem_>::release_memory(i);
+          MemoryPool::release_memory(i);
       }
 
       /// move operator=

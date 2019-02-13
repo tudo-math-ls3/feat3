@@ -18,7 +18,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_>
-      DT_ DotProduct<Mem::Main>::value_generic(const DT_ * const x, const DT_ * const y, const Index size)
+      DT_ DotProduct::value_generic(const DT_ * const x, const DT_ * const y, const Index size)
       {
         DT_ r(0);
 
@@ -41,7 +41,7 @@ namespace FEAT
       }
 
       template <typename DT_>
-      DT_ TripleDotProduct<Mem::Main>::value_generic(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+      DT_ TripleDotProduct::value_generic(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
       {
         DT_ r(0);
 

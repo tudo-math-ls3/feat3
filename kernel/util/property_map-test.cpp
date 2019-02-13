@@ -18,12 +18,12 @@ using namespace FEAT::TestSystem;
  * \author Peter Zajac
  * \author Constantin Christof
  */
-class PropertyMapTest
-  : public TaggedTest<Archs::None, Archs::None>
+class PropertyMapTest :
+  public TestSystem::UnitTest
 {
 public:
   PropertyMapTest() :
-    TaggedTest<Archs::None, Archs::None>("PropertyMapTest")
+    TestSystem::UnitTest("PropertyMapTest")
   {
   }
 

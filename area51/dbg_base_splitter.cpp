@@ -89,7 +89,6 @@ namespace DbgBaseSplitter
     comm.print("Chosen  Levels: " + domain.format_chosen_levels());
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
@@ -97,14 +96,14 @@ namespace DbgBaseSplitter
     Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_func;
 
     // define our system level
-    typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::ScalarUnitFilterSystemLevel<DataType, IndexType> SystemLevelType;
 
     // get our assembled vector type
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
 
     typedef typename SystemLevelType::SystemMirror MirrorType;
 
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, 2> VectorTypeBlocked;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, 2> VectorTypeBlocked;
 
     // fetch our finest levels
     DomainLevelType& the_domain_level = *domain.front();

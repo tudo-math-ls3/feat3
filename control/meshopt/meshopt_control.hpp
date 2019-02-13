@@ -6,7 +6,6 @@
 #ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
 #define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
@@ -38,13 +37,13 @@ namespace FEAT
     {
       /// \cond internal
       /// Forward declarations
-      template<typename, typename, typename, template<typename, typename, typename> class>
+      template<typename, typename, template<typename, typename> class>
       class MeshoptSystemLevel;
 
-      template<typename, typename, typename, template<typename, typename, typename> class>
+      template<typename, typename, template<typename, typename> class>
       class QuadraticSystemLevel;
 
-      template<typename, typename, typename, template<typename, typename, typename> class>
+      template<typename, typename, template<typename, typename> class>
       class NonlinearSystemLevel;
 
       /// \endcond
@@ -77,9 +76,9 @@ namespace FEAT
 
           /// Type for buffer vectors exchanging information between mesh and some vector type on which the solvers
           /// operate
-          typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, world_dim> LocalCoordsBuffer;
+          typedef LAFEM::DenseVectorBlocked<CoordType, Index, world_dim> LocalCoordsBuffer;
           /// corresponding vector mirror
-          typedef LAFEM::VectorMirror<Mem::Main, CoordType, Index> CoordsMirror;
+          typedef LAFEM::VectorMirror<CoordType, Index> CoordsMirror;
           /// The global version of LocalCoordsBuffer, needed for prepare setting the internal state variable
           typedef Global::Vector<LocalCoordsBuffer, CoordsMirror> GlobalCoordsBuffer;
 
@@ -326,9 +325,6 @@ namespace FEAT
       /**
        * \brief SystemLevel base class
        *
-       * \tparam Mem_
-       * Memory architecture for the system of equations wrt. the solver
-       *
        * \tparam DT_
        * Floating point type
        *
@@ -341,21 +337,19 @@ namespace FEAT
        */
       template
       <
-        typename Mem_, typename DT_, typename IT_,
-        template<typename, typename, typename> class Functional_
+        typename DT_, typename IT_,
+        template<typename, typename> class Functional_
       >
       class MeshoptSystemLevel
       {
         public:
-          /// Memory architecture for the solver
-          typedef Mem_ MemType;
           /// Floating point precision for the solver
           typedef DT_ DataType;
           /// Index type for the solver
           typedef IT_ IndexType;
 
           /// The (patch-)local mesh quality functional
-          typedef Functional_<Mem_, DT_, IT_> LocalFunctional;
+          typedef Functional_<DT_, IT_> LocalFunctional;
 
           /// The finite element space
           typedef typename LocalFunctional::SpaceType SpaceType;
@@ -373,7 +367,7 @@ namespace FEAT
           /// Local coordinates buffer type for passing information to or from the mesh
           typedef typename LocalFunctional::CoordsBufferType LocalCoordsBuffer;
           /// Local inter-level transfer matrix
-          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, LocalFunctional::MeshType::world_dim>
+          typedef LAFEM::SparseMatrixBWrappedCSR<DT_, IT_, LocalFunctional::MeshType::world_dim>
             LocalSystemTransferMatrix;
           /// Local transfer operator
           typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
@@ -386,12 +380,12 @@ namespace FEAT
           typedef typename LocalFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
 
           /// Mirrors for system vectors
-          //typedef LAFEM::VectorMirrorBlocked<Mem_, DT_, IT_, LocalFunctional::BlockHeight> SystemMirror;
-          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> SystemMirror;
+          //typedef LAFEM::VectorMirrorBlocked<DT_, IT_, LocalFunctional::BlockHeight> SystemMirror;
+          typedef LAFEM::VectorMirror<DT_, IT_> SystemMirror;
           /// Gates for the system
           typedef Global::Gate<LocalSystemVectorR, SystemMirror> SystemGate;
           /// Mirrors for scalar vectors
-          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
+          typedef LAFEM::VectorMirror<DT_, IT_> ScalarMirror;
           /// Gates for scalar vectors
           typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 
@@ -733,9 +727,6 @@ namespace FEAT
       /**
        * \brief SystemLevel for a quadratic mesh quality functional leading to a linear system
        *
-       * \tparam Mem_
-       * Memory architecture for the system of equations wrt. the solver
-       *
        * \tparam DT_
        * Floating point type
        *
@@ -751,24 +742,22 @@ namespace FEAT
        */
       template
       <
-        typename Mem_, typename DT_, typename IT_,
-        template<typename, typename, typename> class Functional_
+        typename DT_, typename IT_,
+        template<typename, typename> class Functional_
       >
-      class QuadraticSystemLevel : public MeshoptSystemLevel<Mem_, DT_, IT_, Functional_>
+      class QuadraticSystemLevel : public MeshoptSystemLevel<DT_, IT_, Functional_>
       {
         public:
-          /// Memory architecture for the solver
-          typedef Mem_ MemType;
           /// Floating point precision for the solver
           typedef DT_ DataType;
           /// Index type for the solver
           typedef IT_ IndexType;
 
           /// Our base class
-          typedef MeshoptSystemLevel<Mem_, DT_, IT_, Functional_> BaseClass;
+          typedef MeshoptSystemLevel<DT_, IT_, Functional_> BaseClass;
 
           /// (Patch-) Local mesh quality functional type
-          typedef Functional_<Mem_, DT_, IT_> LocalFunctional;
+          typedef Functional_<DT_, IT_> LocalFunctional;
 
           /// The finite element space
           typedef typename LocalFunctional::SpaceType SpaceType;
@@ -788,7 +777,7 @@ namespace FEAT
           /// Local coordinates buffer type for passing information to or from the mesh
           typedef typename BaseClass::LocalCoordsBuffer LocalCoordsBuffer;
           /// Local inter-level transfer matrix
-          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, LocalFunctional::MeshType::world_dim>
+          typedef LAFEM::SparseMatrixBWrappedCSR<DT_, IT_, LocalFunctional::MeshType::world_dim>
             LocalSystemTransferMatrix;
           /// Local transfer operator
           typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
@@ -805,7 +794,7 @@ namespace FEAT
           /// Gates for the system
           typedef typename BaseClass::SystemGate SystemGate;
           /// Mirrors for scalar vectors
-          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
+          typedef LAFEM::VectorMirror<DT_, IT_> ScalarMirror;
           /// Gates for scalar vectors
           typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 
@@ -881,9 +870,6 @@ namespace FEAT
       /**
        * \brief (Non)linear system of equations on one mesh refinement level
        *
-       * \tparam Mem_
-       * Memory architecture for the system of equations wrt. the solver
-       *
        * \tparam DT_
        * Floating point type
        *
@@ -898,24 +884,22 @@ namespace FEAT
        */
       template
       <
-        typename Mem_, typename DT_, typename IT_,
-        template<typename, typename, typename> class Functional_
+        typename DT_, typename IT_,
+        template<typename, typename> class Functional_
       >
-      class NonlinearSystemLevel : public MeshoptSystemLevel<Mem_, DT_, IT_, Functional_>
+      class NonlinearSystemLevel : public MeshoptSystemLevel<DT_, IT_, Functional_>
       {
         public:
-          /// Memory architecture for the solver
-          typedef Mem_ MemType;
           /// Floating point precision for the solver
           typedef DT_ DataType;
           /// Index type for the solver
           typedef IT_ IndexType;
 
           /// (Patch-) Local mesh quality functional type
-          typedef Functional_<Mem_, DT_, IT_> LocalFunctional;
+          typedef Functional_<DT_, IT_> LocalFunctional;
 
           /// Our base class
-          typedef MeshoptSystemLevel<Mem_, DT_, IT_, Functional_> BaseClass;
+          typedef MeshoptSystemLevel<DT_, IT_, Functional_> BaseClass;
 
           /// The finite element space
           typedef typename LocalFunctional::SpaceType SpaceType;
@@ -933,7 +917,7 @@ namespace FEAT
           /// Local coordinates buffer type for passing information to or from the mesh
           typedef typename LocalFunctional::CoordsBufferType LocalCoordsBuffer;
           /// Local inter-level transfer matrix
-          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, LocalFunctional::MeshType::world_dim>
+          typedef LAFEM::SparseMatrixBWrappedCSR<DT_, IT_, LocalFunctional::MeshType::world_dim>
             LocalSystemTransferMatrix;
           /// Local transfer operator
           typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
@@ -946,11 +930,11 @@ namespace FEAT
           typedef typename LocalFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
 
           /// Mirrors for system vectors
-          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> SystemMirror;
+          typedef LAFEM::VectorMirror<DT_, IT_> SystemMirror;
           /// Gates for the system
           typedef Global::Gate<LocalSystemVectorR, SystemMirror> SystemGate;
           /// Mirrors for scalar vectors
-          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
+          typedef LAFEM::VectorMirror<DT_, IT_> ScalarMirror;
           /// Gates for scalar vectors
           typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 

@@ -64,26 +64,22 @@ namespace FEAT
       /// number of vector blocks
       static constexpr int num_blocks = TupleVector<Rest_...>::num_blocks + 1;
 
-      /// sub-vector mem-type
-      typedef typename First_::MemType MemType;
       /// sub-vector data-type
       typedef typename First_::DataType DataType;
       /// sub-vector index-type
       typedef typename First_::IndexType IndexType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = TupleVector<
-        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+        typename First_::template ContainerType<DT2_, IT2_>,
+        typename Rest_::template ContainerType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
-      // ensure that all sub-vector have the same mem- and data-type
-      static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
-                    "sub-vectors have different mem-types");
+      // ensure that all sub-vector have the same data-type
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
                     "sub-vectors have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
@@ -563,16 +559,15 @@ namespace FEAT
     public:
       static constexpr int num_blocks = 1;
 
-      typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = TupleVector<typename First_::template ContainerType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
     protected:
       First_ _first;

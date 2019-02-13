@@ -20,7 +20,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_>
-      Index MaxAbsIndex<Mem::Main>::value_generic(const DT_ * const x, const Index size)
+      Index MaxAbsIndex::value_generic(const DT_ * const x, const Index size)
       {
         DT_ max(0);
         Index max_i(0);

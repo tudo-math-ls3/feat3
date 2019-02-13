@@ -32,7 +32,6 @@ namespace HierarchTransferTestApp
     }
   };
 
-  typedef Mem::Main MemType;
   typedef Real DataType;
   typedef Index IndexType;
 

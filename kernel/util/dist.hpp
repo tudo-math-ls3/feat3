@@ -177,7 +177,7 @@ namespace FEAT
 #endif
 
 #if defined(FEAT_HAVE_HALFMATH) || defined(DOXYGEN)
-    /// custom Datatype for half_float::half
+    /// custom Datatype for __half
     extern const Datatype dt__half;
 #endif
 
@@ -216,7 +216,7 @@ namespace FEAT
 #endif
 
 #if defined(FEAT_HAVE_HALFMATH) || defined(DOXYGEN)
-    template<> inline const Datatype& autotype<half_float::half>()  {return dt__half;}
+    template<> inline const Datatype& autotype<__half>()  {return dt__half;}
 #endif
 
     /// \endcond

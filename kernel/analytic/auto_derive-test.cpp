@@ -79,13 +79,13 @@ public:
   };
 }; // class VectorTestFunction
 
-template<typename DT_>
+template<typename DT_, typename IT_>
 class AutoDeriveTest :
-  public FullTaggedTest<Mem::Main, DT_, Index>
+  public UnitTest
 {
 public:
-  AutoDeriveTest() :
-    FullTaggedTest<Mem::Main, DT_, Index>("AutoDeriveTest")
+  AutoDeriveTest(PreferredBackend backend) :
+    UnitTest("AutoDeriveTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -149,4 +149,4 @@ public:
   }
 }; // class AutoDeriveTest<...>
 
-AutoDeriveTest<double> auto_derive_test_double;
+AutoDeriveTest<double, Index> auto_derive_test_double(PreferredBackend::generic);

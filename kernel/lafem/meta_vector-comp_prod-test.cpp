@@ -17,17 +17,19 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorCompProdTest
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorCompProdTest() :
-    BaseClass("MetaVectorCompProdTest")
+   MetaVectorCompProdTest(PreferredBackend backend) :
+    BaseClass("MetaVectorCompProdTest", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -88,9 +90,25 @@ public:
   }
 };
 
-MetaVectorCompProdTest<Mem::Main, float, Index> meta_vector_comp_prod_test_generic_float;
-MetaVectorCompProdTest<Mem::Main, double, Index> meta_vector_comp_prod_test_generic_double;
+MetaVectorCompProdTest<float, unsigned int> meta_vector_comp_prod_test_float_uint(PreferredBackend::generic);
+MetaVectorCompProdTest<double, unsigned int> meta_vector_comp_prod_test_double_uint(PreferredBackend::generic);
+MetaVectorCompProdTest<float, unsigned long> meta_vector_comp_prod_test_float_ulong(PreferredBackend::generic);
+MetaVectorCompProdTest<double, unsigned long> meta_vector_comp_prod_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorCompProdTest<float, unsigned long> mkl_meta_vector_comp_prod_test_float_ulong(PreferredBackend::mkl);
+MetaVectorCompProdTest<double, unsigned long> mkl_meta_vector_comp_prod_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaVectorCompProdTest<__float128, unsigned int> meta_vector_comp_prod_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorCompProdTest<__float128, unsigned long> meta_vector_comp_prod_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorCompProdTest<Half, unsigned int> meta_vector_comp_prod_test_half_uint(PreferredBackend::generic);
+MetaVectorCompProdTest<Half, unsigned long> meta_vector_comp_prod_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorCompProdTest<Mem::CUDA, float, Index> meta_vector_comp_prod_test_cuda_float;
-MetaVectorCompProdTest<Mem::CUDA, double, Index> meta_vector_comp_prod_test_cuda_double;
+MetaVectorCompProdTest<float, unsigned int> meta_vector_comp_prod_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorCompProdTest<double, unsigned int> meta_vector_comp_prod_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorCompProdTest<float, unsigned long> meta_vector_comp_prod_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorCompProdTest<double, unsigned long> meta_vector_comp_prod_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif

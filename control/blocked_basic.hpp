@@ -30,21 +30,18 @@ namespace FEAT
   {
     template<
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename TransferMatrix_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>
+      typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>
       >
     class BlockedBasicSystemLevel
     {
     public:
-      static_assert(std::is_same<MemType_, typename BlockedMatrix_::MemType>::value, "MemType mismatch!");
       static_assert(std::is_same<DataType_, typename BlockedMatrix_::DataType>::value, "DataType mismatch!");
       static_assert(std::is_same<IndexType_, typename BlockedMatrix_::IndexType>::value, "IndexType mismatch!");
 
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
       static constexpr int dim = dim_;
@@ -65,7 +62,7 @@ namespace FEAT
       typedef typename LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> SystemMirror;
 
       /// define system gate
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
@@ -390,34 +387,32 @@ namespace FEAT
 
     template<
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename TransferMatrix_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>>
+      typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>>
     class BlockedUnitFilterSystemLevel :
-      public BlockedBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_>
+      public BlockedBasicSystemLevel<dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_>
     {
     public:
-      typedef BlockedBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_> BaseClass;
+      typedef BlockedBasicSystemLevel<dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_> BaseClass;
 
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> SystemMirror;
 
       /// define local filter type
-      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalSystemFilter;
+      typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalSystemFilter;
 
       /// define global filter type
       typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
 
       /// Our class base type
-      template <typename Mem2_, typename DT2_, typename IT2_, typename BlockedMatrix2_>
-      using BaseType = BlockedUnitFilterSystemLevel<dim_, Mem2_, DT2_, IT2_, BlockedMatrix2_>;
+      template <typename DT2_, typename IT2_, typename BlockedMatrix2_>
+      using BaseType = BlockedUnitFilterSystemLevel<dim_, DT2_, IT2_, BlockedMatrix2_>;
 
       /// our global system filter
       GlobalSystemFilter filter_sys;

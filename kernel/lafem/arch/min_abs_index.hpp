@@ -9,8 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
-
+#include <kernel/util/runtime.hpp>
 
 
 namespace FEAT
@@ -19,11 +18,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct MinAbsIndex;
-
-      template <>
-      struct MinAbsIndex<Mem::Main>
+      struct MinAbsIndex
       {
         template <typename DT_>
         static Index value(const DT_ * const x, const Index size)
@@ -31,43 +26,30 @@ namespace FEAT
           return value_generic(x, size);
         }
 
-#ifdef FEAT_HAVE_MKL
         static Index value(const float * const x, const Index size)
         {
-          return value_mkl(x, size);
+          BACKEND_SKELETON_RETURN(value_cuda, value_mkl, value_generic, x, size)
         }
 
         static Index value(const double * const x, const Index size)
         {
-          return value_mkl(x, size);
+          BACKEND_SKELETON_RETURN(value_cuda, value_mkl, value_generic, x, size)
         }
-#endif
-
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static Index value(const __float128 * const x, const Index size)
-        {
-          return value_generic(x, size);
-        }
-#endif
 
         template <typename DT_>
         static Index value_generic(const DT_ * const x, const Index size);
 
         static Index value_mkl(const float * const x, const Index size);
         static Index value_mkl(const double * const x, const Index size);
+
+        template <typename DT_>
+        static Index value_cuda(const DT_ * const x, const Index size);
       };
 
 #ifdef FEAT_EICKT
-      extern template Index MinAbsIndex<Mem::Main>::value_generic(const float * const, const Index);
-      extern template Index MinAbsIndex<Mem::Main>::value_generic(const double * const, const Index);
+      extern template Index MinAbsIndex::value_generic(const float * const, const Index);
+      extern template Index MinAbsIndex::value_generic(const double * const, const Index);
 #endif
-
-      template <>
-      struct MinAbsIndex<Mem::CUDA>
-      {
-        template <typename DT_>
-        static Index value(const DT_ * const x, const Index size);
-      };
 
     } // namespace Arch
   } // namespace LAFEM

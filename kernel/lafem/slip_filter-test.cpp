@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
@@ -31,24 +30,23 @@ using namespace FEAT::TestSystem;
  */
 template
 <
-  typename MemType_,
   typename DT_,
   typename IT_,
   int BlockSize_
 >
 class SlipFilterVectorTest
-: public FullTaggedTest<MemType_, DT_, IT_>
+: public UnitTest
 {
   typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-  typedef DenseVectorBlocked<MemType_, DT_, IT_, BlockSize_> VectorType;
-  typedef DenseVectorBlocked<MemType_, IT_, IT_, BlockSize_> IVectorType;
-  typedef SlipFilter<MemType_, DT_, IT_, BlockSize_> FilterType;
+  typedef DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
+  typedef DenseVectorBlocked<IT_, IT_, BlockSize_> IVectorType;
+  typedef SlipFilter<DT_, IT_, BlockSize_> FilterType;
 
   public:
-  SlipFilterVectorTest()
-    : FullTaggedTest<MemType_, DT_, IT_>("SlipFilterVectorTest")
-    {
-    }
+  SlipFilterVectorTest(PreferredBackend backend)
+    : UnitTest("SlipFilterVectorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
 
   virtual ~SlipFilterVectorTest()
   {
@@ -146,19 +144,27 @@ class SlipFilterVectorTest
   }
 };
 
-SlipFilterVectorTest<Mem::Main, float, Index, 2> component_filter_test_generic_fi_2;
-SlipFilterVectorTest<Mem::Main, double, unsigned int, 2> component_filter_test_generic_di_2;
-SlipFilterVectorTest<Mem::Main, float, unsigned int, 3> component_filter_test_generic_fi_3;
-SlipFilterVectorTest<Mem::Main, double, Index, 3> component_filter_test_generic_di_3;
+SlipFilterVectorTest<float, Index, 2> slip_filter_vector_test_fi_2(PreferredBackend::generic);
+SlipFilterVectorTest<double, unsigned int, 2> slip_filter_vector_test_di_2(PreferredBackend::generic);
+SlipFilterVectorTest<float, unsigned int, 3> slip_filter_vector_test_fi_3(PreferredBackend::generic);
+SlipFilterVectorTest<double, Index, 3> slip_filter_vector_test_di_3(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SlipFilterVectorTest<float, unsigned long, 2> mkl_slip_filter_vector_test_float_ulong(PreferredBackend::mkl);
+SlipFilterVectorTest<double, unsigned long, 3> mkl_slip_filter_vector_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SlipFilterVectorTest<Mem::Main, __float128, unsigned int, 2> component_filter_test_generic_q_2;
-SlipFilterVectorTest<Mem::Main, __float128, Index, 3> component_filter_test_generic_q_3;
+SlipFilterVectorTest<__float128, unsigned int, 2> slip_filter_vector_test_q_2(PreferredBackend::generic);
+SlipFilterVectorTest<__float128, Index, 3> slip_filter_vector_test_q_3(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+//SlipFilterVectorTest<Half, unsigned int, 2> slip_filter_vector_test_half_uint(PreferredBackend::generic);
+//SlipFilterVectorTest<Half, unsigned long, 3> slip_filter_vector_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SlipFilterVectorTest<Mem::CUDA, float, unsigned int, 2> component_filter_test_cuda_fi_2;
-SlipFilterVectorTest<Mem::CUDA, float, Index, 3> component_filter_test_cuda_fi_3;
-SlipFilterVectorTest<Mem::CUDA, double, Index, 2> component_filter_test_cuda_di_2;
-SlipFilterVectorTest<Mem::CUDA, double, unsigned int, 3> component_filter_test_cuda_di_3;
+SlipFilterVectorTest<float, unsigned int, 2> slip_filter_vector_test_cuda_fi_2(PreferredBackend::cuda);
+SlipFilterVectorTest<float, Index, 3> slip_filter_vector_test_cuda_fi_3(PreferredBackend::cuda);
+SlipFilterVectorTest<double, Index, 2> slip_filter_vector_test_cuda_di_2(PreferredBackend::cuda);
+SlipFilterVectorTest<double, unsigned int, 3> slip_filter_vector_test_cuda_di_3(PreferredBackend::cuda);
 #endif
 
 /**
@@ -171,19 +177,18 @@ SlipFilterVectorTest<Mem::CUDA, double, unsigned int, 3> component_filter_test_c
  */
 template
 <
-  typename MemType_,
   typename DT_,
   typename IT_
 >
 class SlipFilterAssemblyTest
-: public FullTaggedTest<MemType_, DT_, IT_>
+: public UnitTest
 {
 
   public:
-    SlipFilterAssemblyTest()
-      : FullTaggedTest<MemType_, DT_, IT_>("SlipFilterAssemblyTest")
-      {
-      }
+    SlipFilterAssemblyTest(PreferredBackend backend)
+      : UnitTest("SlipFilterAssemblyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
 
     /**
      * Runs a test in 2d.
@@ -196,11 +201,9 @@ class SlipFilterAssemblyTest
       typedef Geometry::ConformalMesh<ShapeType, world_dim, DT_> MeshType;
 
       typedef Tiny::Vector<DT_, world_dim> ValueType;
-      typedef DenseVectorBlocked<MemType_, DT_, IT_, world_dim> VectorType;
-      typedef DenseVectorBlocked<Mem::Main, DT_, IT_, world_dim> CheckVectorType;
+      typedef DenseVectorBlocked<DT_, IT_, world_dim> VectorType;
 
-      typedef SlipFilter<MemType_, DT_, IT_, world_dim> FilterType;
-      typedef SlipFilter<Mem::Main, DT_, IT_, world_dim> CheckFilterType;
+      typedef SlipFilter<DT_, IT_, world_dim> FilterType;
 
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;
       typedef SpaceType_<TrafoType> SpaceType;
@@ -294,16 +297,16 @@ class SlipFilterAssemblyTest
       SpaceType my_space(my_trafo);
 
       // Create the analytic function component wise
-      LAFEM::DenseVector<MemType_, DT_, IT_>comp0(my_space.get_num_dofs());
+      LAFEM::DenseVector<DT_, IT_>comp0(my_space.get_num_dofs());
       Analytic::Common::CosineWaveFunction<2> func0;
       Assembly::Interpolator::project(comp0, func0, my_space);
 
-      LAFEM::DenseVector<MemType_, DT_, IT_>comp1(my_space.get_num_dofs());
+      LAFEM::DenseVector<DT_, IT_>comp1(my_space.get_num_dofs());
       Analytic::Common::SineBubbleFunction<2> func1;
       Assembly::Interpolator::project(comp1, func1, my_space);
 
       // Paste the components into a blocked vector and keep a copy for checking
-      CheckVectorType vec_org(my_space.get_num_dofs(), DT_(0));
+      VectorType vec_org(my_space.get_num_dofs(), DT_(0));
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         ValueType tmp(DT_(0));
@@ -327,30 +330,22 @@ class SlipFilterAssemblyTest
       // Check results
       const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-      // Download the filtered vector if necessary
-      CheckVectorType check_vec;
-      check_vec.convert(vec);
-
-      // Download the filter if necessary
-      CheckFilterType check_filter;
-      check_filter.convert(my_filter);
-
       // First check all filtered entries if they are really orthogonal to the normal vector saved in the filter
-      for(Index i(0); i < check_filter.used_elements(); ++i)
+      for(Index i(0); i < my_filter.used_elements(); ++i)
       {
-        Index j(check_filter.get_indices()[i]);
+        Index j(my_filter.get_indices()[i]);
         //TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
-        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_filter_vector()(j)), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(vec(j), my_filter.get_filter_vector()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
-        check_vec(j, vec_org(j));
+        vec(j, vec_org(j));
       }
 
       // Now check all values in the vector to make sure the filter did not touch the rest
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         for(int d(0); d < world_dim; ++d)
-          TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
+          TEST_CHECK_EQUAL_WITHIN_EPS(vec(i)(d), vec_org(i)(d), tol);
       }
     }
 
@@ -366,12 +361,9 @@ class SlipFilterAssemblyTest
       typedef Geometry::ConformalMesh<ShapeType, world_dim, DT_> MeshType;
 
       typedef Tiny::Vector<DT_, world_dim> ValueType;
-      typedef DenseVectorBlocked<MemType_, DT_, IT_, world_dim> VectorType;
+      typedef DenseVectorBlocked<DT_, IT_, world_dim> VectorType;
 
-      typedef DenseVectorBlocked<Mem::Main, DT_, IT_, world_dim> CheckVectorType;
-
-      typedef SlipFilter<MemType_, DT_, IT_, world_dim> FilterType;
-      typedef SlipFilter<Mem::Main, DT_, IT_, world_dim> CheckFilterType;
+      typedef SlipFilter<DT_, IT_, world_dim> FilterType;
 
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;
       // The SlipFilter is implemented for Lagrange 1/2 only
@@ -394,21 +386,21 @@ class SlipFilterAssemblyTest
       SpaceType my_space(my_trafo);
 
       // Create the analytic function component wise
-      LAFEM::DenseVector<MemType_, DT_, IT_>comp0(my_space.get_num_dofs());
+      LAFEM::DenseVector<DT_, IT_>comp0(my_space.get_num_dofs());
       Analytic::Common::ConstantFunction<3> func0(-DT_(0.5));
       Assembly::Interpolator::project(comp0, func0, my_space);
 
-      LAFEM::DenseVector<MemType_, DT_, IT_>comp1(my_space.get_num_dofs());
+      LAFEM::DenseVector<DT_, IT_>comp1(my_space.get_num_dofs());
       Analytic::Common::SineBubbleFunction<3> func1;
       Assembly::Interpolator::project(comp1, func1, my_space);
 
-      LAFEM::DenseVector<MemType_, DT_, IT_>comp2(my_space.get_num_dofs());
+      LAFEM::DenseVector<DT_, IT_>comp2(my_space.get_num_dofs());
       Analytic::Common::CosineWaveFunction<3> func2;
       Assembly::Interpolator::project(comp2, func2, my_space);
 
       // Paste the components into a blocked vector and keep a copy for checking
       VectorType vec(my_space.get_num_dofs(), DT_(0));
-      CheckVectorType vec_org(my_space.get_num_dofs(), DT_(0));
+      VectorType vec_org(my_space.get_num_dofs(), DT_(0));
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         ValueType tmp(DT_(0));
@@ -436,30 +428,22 @@ class SlipFilterAssemblyTest
       // Check results
       const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-      // Download the filter if necessary
-      CheckFilterType check_filter;
-      check_filter.convert(my_filter);
-
-      // Download the filtered vector if necessary
-      CheckVectorType check_vec;
-      check_vec.convert(vec);
-
       // First check all filtered entries if they are really orthogonal to the normal vector saved in the filter
-      for(Index i(0); i < check_filter.used_elements(); ++i)
+      for(Index i(0); i < my_filter.used_elements(); ++i)
       {
-        Index j(check_filter.get_indices()[i]);
+        Index j(my_filter.get_indices()[i]);
         //TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
-        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_filter_vector()(j)), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(vec(j),my_filter.get_filter_vector()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
-        check_vec(j, vec_org(j));
+        vec(j, vec_org(j));
       }
 
       // Now check all values in the vector to make sure the filter did not touch the rest
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         for(int d(0); d < world_dim; ++d)
-          TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
+          TEST_CHECK_EQUAL_WITHIN_EPS(vec(i)(d), vec_org(i)(d), tol);
       }
     }
 
@@ -474,12 +458,25 @@ class SlipFilterAssemblyTest
 
 };
 
-SlipFilterAssemblyTest<Mem::Main, float, Index> sfat_f;
-SlipFilterAssemblyTest<Mem::Main, double, unsigned int> sfat_d;
+SlipFilterAssemblyTest<float, unsigned int> slip_filter_assembly_test_float_uint(PreferredBackend::generic);
+SlipFilterAssemblyTest<float, unsigned long> slip_filter_assembly_test_float_ulong(PreferredBackend::generic);
+SlipFilterAssemblyTest<double, unsigned int> slip_filter_assembly_test_double_uint(PreferredBackend::generic);
+SlipFilterAssemblyTest<double, unsigned long> slip_filter_assembly_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SlipFilterAssemblyTest<float, unsigned long> mkl_slip_filter_assembly_test_float_ulong(PreferredBackend::mkl);
+SlipFilterAssemblyTest<double, unsigned long> mkl_slip_filter_assembly_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SlipFilterAssemblyTest<Mem::Main, __float128, Index> sfat_q;
+SlipFilterAssemblyTest<__float128, unsigned long> slip_filter_assembly_test_float128_ulong(PreferredBackend::generic);
+SlipFilterAssemblyTest<__float128, unsigned int> slip_filter_assembly_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+//SlipFilterAssemblyTest<Half, unsigned int> slip_filter_assembly_test_half_uint(PreferredBackend::generic);
+//SlipFilterAssemblyTest<Half, unsigned long> slip_filter_assembly_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SlipFilterAssemblyTest<Mem::CUDA, float, unsigned int> sfat_f_cuda;
-SlipFilterAssemblyTest<Mem::CUDA, double, Index> sfat_d_cuda;
+SlipFilterAssemblyTest<float, unsigned long> cuda_slip_filter_assembly_test_float_ulong(PreferredBackend::cuda);
+SlipFilterAssemblyTest<double, unsigned long> cuda_slip_filter_assembly_test_double_ulong(PreferredBackend::cuda);
+SlipFilterAssemblyTest<float, unsigned int> cuda_slip_filter_assembly_test_float_uint(PreferredBackend::cuda);
+SlipFilterAssemblyTest<double, unsigned int> cuda_slip_filter_assembly_test_double_uint(PreferredBackend::cuda);
 #endif

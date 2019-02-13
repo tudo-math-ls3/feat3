@@ -56,11 +56,11 @@ struct Q2P1
 
 template<typename DT_, typename IT_>
 class AmaVankaTest :
-  public FullTaggedTest<Mem::Main, DT_, IT_>
+  public UnitTest
 {
 public:
-  AmaVankaTest() :
-    FullTaggedTest<Mem::Main, DT_, IT_>("AmaVankaTest")
+  AmaVankaTest(PreferredBackend backend) :
+    UnitTest("AmaVankaTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -88,15 +88,15 @@ public:
     typename Space_<TrafoType>::P space_p(trafo);
     const String name = Space_<TrafoType>::name();
 
-    typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim, dim> MatrixTypeA;
-    typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim, 1> MatrixTypeB;
-    typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, dim> MatrixTypeD;
+    typedef LAFEM::SparseMatrixBCSR<DT_, IT_, dim, dim> MatrixTypeA;
+    typedef LAFEM::SparseMatrixBCSR<DT_, IT_, dim, 1> MatrixTypeB;
+    typedef LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim> MatrixTypeD;
     typedef LAFEM::SaddlePointMatrix<MatrixTypeA, MatrixTypeB, MatrixTypeD> MatrixType;
 
     typedef typename MatrixType::VectorTypeL VectorType;
 
-    typedef LAFEM::UnitFilterBlocked<Mem::Main, DT_, IT_, dim> VeloFilterType;
-    typedef LAFEM::NoneFilter<Mem::Main, double, Index> PresFilterType;
+    typedef LAFEM::UnitFilterBlocked<DT_, IT_, dim> VeloFilterType;
+    typedef LAFEM::NoneFilter<DT_, IT_> PresFilterType;
     typedef LAFEM::TupleFilter<VeloFilterType, PresFilterType> FilterType;
 
     MatrixType matrix;
@@ -195,4 +195,25 @@ public:
   }
 };
 
-AmaVankaTest<double, Index> amavanka_test_double_index;
+//AmaVankaTest<float, unsigned int> amavanka_test_float_uint(PreferredBackend::generic);
+//AmaVankaTest<double, unsigned int> amavanka_test_double_uint(PreferredBackend::generic);
+//AmaVankaTest<float, unsigned long> amavanka_test_float_ulong(PreferredBackend::generic);
+AmaVankaTest<double, unsigned long> amavanka_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+AmaVankaTest<float, unsigned long> mkl_amavanka_test_float_ulong(PreferredBackend::mkl);
+AmaVankaTest<double, unsigned long> mkl_amavanka_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+AmaVankaTest<__float128, unsigned int> amavanka_test_float128_uint(PreferredBackend::generic);
+AmaVankaTest<__float128, unsigned long> amavanka_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+AmaVankaTest<Half, unsigned int> amavanka_test_half_uint(PreferredBackend::generic);
+AmaVankaTest<Half, unsigned long> amavanka_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+AmaVankaTest<float, unsigned int> cuda_amavanka_test_float_uint(PreferredBackend::cuda);
+AmaVankaTest<double, unsigned int> cuda_amavanka_test_double_uint(PreferredBackend::cuda);
+AmaVankaTest<float, unsigned long> cuda_amavanka_test_float_ulong(PreferredBackend::cuda);
+AmaVankaTest<double, unsigned long> cuda_amavanka_test_double_ulong(PreferredBackend::cuda);
+#endif

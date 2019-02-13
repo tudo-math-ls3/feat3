@@ -26,8 +26,6 @@ namespace FEAT
     class NonlinearFunctional
     {
       public:
-        /// Memory architecture of the local functional
-        typedef typename LocalNonlinearFunctional_::MemType MemType;
         /// Floating point data type of the local functional
         typedef typename LocalNonlinearFunctional_::DataType DataType;
         /// Index type of the local functional

@@ -17,11 +17,11 @@
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class LinearFunctionalTest :
-  public TestSystem::TaggedTest<Archs::None, DataType_>
+  public UnitTest
 {
-  typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+  typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -31,8 +31,8 @@ class LinearFunctionalTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  LinearFunctionalTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("LinearFunctionalTest")
+  LinearFunctionalTest(PreferredBackend backend) :
+    UnitTest("LinearFunctionalTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -84,23 +84,23 @@ public:
     VectorType vector2(num_verts, DataType_(0));
 
     // compute squared mesh width
-    const DataType_ weight = DataType_(1) / DataType_(4*num_quads);
+    const DataType_ weight = DataType_(1) / DataType_(4 * num_quads);
 
     // get the vertex set of the mesh
     //const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // get the index set of the mesh
-    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2, 0>());
 
     // loop over all quads
-    for(Index i(0); i < num_quads; ++i)
+    for (Index i(0); i < num_quads; ++i)
     {
-      for(int j(0); j < 4; ++j)
+      for (int j(0); j < 4; ++j)
         vector2(index_set[i][j], vector2(index_set[i][j]) + weight);
     }
 
     // loop over all vertices
-    for(Index i(0); i < num_verts; ++i)
+    for (Index i(0); i < num_verts; ++i)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), vector2(i), eps);
     }
@@ -136,13 +136,13 @@ public:
     const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // get the index set of the mesh
-    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2, 0>());
 
     // get the constant pi
     const DataType_ pi = Math::pi<DataType_>();
 
     // loop over all quads
-    for(Index i(0); i < num_quads; ++i)
+    for (Index i(0); i < num_quads; ++i)
     {
       // get quad dimensions
       DataType_ x0 = DataType_(vertex_set[index_set[i][0]][0]);
@@ -152,7 +152,7 @@ public:
 
       // compute analytic integral:
       // int_[x0,x1]x[y0,y1] sin(Pi*x)*sin(pi*y) dxy = (cos(pi*x0) - cos(pi*x1))*(cos(pi*y0) - cos(pi*y1)) / pi^2
-      DataType_ s = ((Math::cos(pi*x0) - Math::cos(pi*x1)) * (Math::cos(pi*y0)-Math::cos(pi*y1))) / (pi*pi);
+      DataType_ s = ((Math::cos(pi * x0) - Math::cos(pi * x1)) * (Math::cos(pi * y0) - Math::cos(pi * y1))) / (pi * pi);
 
       // validate vector data
       TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
@@ -160,5 +160,25 @@ public:
   }
 };
 
-LinearFunctionalTest<float> linear_functional_test_float;
-LinearFunctionalTest<double> linear_functional_test_double;
+LinearFunctionalTest<float, unsigned int> linear_functional_test_float_uint(PreferredBackend::generic);
+LinearFunctionalTest<double, unsigned int> linear_functional_test_double_uint(PreferredBackend::generic);
+LinearFunctionalTest<float, unsigned long> linear_functional_test_float_ulong(PreferredBackend::generic);
+LinearFunctionalTest<double, unsigned long> linear_functional_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+LinearFunctionalTest<float, unsigned long> mkl_linear_functional_test_float_ulong(PreferredBackend::mkl);
+LinearFunctionalTest<double, unsigned long> mkl_linear_functional_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+LinearFunctionalTest<__float128, unsigned int> linear_functional_test_float128_uint(PreferredBackend::generic);
+LinearFunctionalTest<__float128, unsigned long> linear_functional_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+LinearFunctionalTest<Half, unsigned int> linear_functional_test_half_uint(PreferredBackend::generic);
+LinearFunctionalTest<Half, unsigned long> linear_functional_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+LinearFunctionalTest<float, unsigned int> cuda_linear_functional_test_float_uint(PreferredBackend::cuda);
+LinearFunctionalTest<double, unsigned int> cuda_linear_functional_test_double_uint(PreferredBackend::cuda);
+LinearFunctionalTest<float, unsigned long> cuda_linear_functional_test_float_ulong(PreferredBackend::cuda);
+LinearFunctionalTest<double, unsigned long> cuda_linear_functional_test_double_ulong(PreferredBackend::cuda);
+#endif

@@ -9,8 +9,79 @@
 
 #include <kernel/base_header.hpp>
 
+#include <iostream>
+
+#ifdef FEAT_HAVE_CUDA
+#define CUDA_SKELETON_VOID(function_cuda, ...)\
+  function_cuda(__VA_ARGS__);\
+  return;
+#else
+#define CUDA_SKELETON_VOID(function_cuda, ...)\
+  [[fallthrough]];
+#endif
+
+#ifdef FEAT_HAVE_MKL
+#define MKL_SKELETON_VOID(function_mkl, ...)\
+  function_mkl(__VA_ARGS__);\
+  return;
+#else
+#define MKL_SKELETON_VOID(function_mkl, ...)\
+  [[fallthrough]];
+#endif
+
+#define BACKEND_SKELETON_VOID(function_cuda, function_mkl, function_generic, ...)\
+  switch(Runtime::get_preferred_backend())\
+  {\
+    case PreferredBackend::cuda:\
+      CUDA_SKELETON_VOID(function_cuda, __VA_ARGS__)\
+    case PreferredBackend::mkl:\
+      MKL_SKELETON_VOID(function_mkl, __VA_ARGS__)\
+    case PreferredBackend::generic:\
+    default:\
+      function_generic(__VA_ARGS__);\
+      return;\
+  }
+
+#ifdef FEAT_HAVE_CUDA
+#define CUDA_SKELETON_RETURN(function_cuda, ...)\
+  return function_cuda(__VA_ARGS__);
+#else
+#define CUDA_SKELETON_RETURN(function_cuda, ...)\
+  [[fallthrough]];
+#endif
+
+#ifdef FEAT_HAVE_MKL_
+#define MKL_SKELETON_RETURN(function_mkl, ...)\
+  return function_mkl(__VA_ARGS__);
+#else
+#define MKL_SKELETON_RETURN(function_mkl, ...)\
+  [[fallthrough]];
+#endif
+
+#define BACKEND_SKELETON_RETURN(function_cuda, function_mkl, function_generic, ...)\
+  switch(Runtime::get_preferred_backend())\
+  {\
+    case PreferredBackend::cuda:\
+      CUDA_SKELETON_RETURN(function_cuda, __VA_ARGS__)\
+    case PreferredBackend::mkl:\
+      MKL_SKELETON_RETURN(function_mkl, __VA_ARGS__)\
+    case PreferredBackend::generic:\
+    default:\
+      return function_generic(__VA_ARGS__);\
+  }
+
 namespace FEAT
 {
+  /// The backend that shall be used in all compute heavy calculations
+  enum class PreferredBackend
+  {
+    generic = 0, /**< generic c++ code */
+    mkl, /**< intel mkl blas library */
+    cuda /**< nvidia cuda gpgpu support */
+  };
+
+  std::ostream & operator<< (std::ostream & left, FEAT::PreferredBackend backend);
+
   /// The class Runtime encapsulates various settings and functionality needed to run FEAT properly
   class Runtime
   {
@@ -20,6 +91,9 @@ namespace FEAT
 
     /// signals, if finalize was called
     static bool _finished;
+
+    /// the currently preferred backend
+    static PreferredBackend _preferred_backend;
 
   public:
     /**
@@ -34,7 +108,7 @@ namespace FEAT
      * \param[in] argc, argv
      * The argument parameters of the calling \p main function.
      */
-    static void initialize(int& argc, char**& argv);
+    static void initialize(int& argc, char**& argv, PreferredBackend backend = PreferredBackend::generic);
 
     /**
      * \brief FEAT abortion
@@ -68,7 +142,18 @@ namespace FEAT
      * An exit code (<c>EXIT_SUCCESS</c>) that can be returned by the \p main function.
      */
     static int finalize();
+
+    /// set new preferred backend
+    static void set_preferred_backend(PreferredBackend preferred_backend);
+
+    /// get current preferred backend
+    static PreferredBackend get_preferred_backend();
   };
+
+  /**
+   * Output operator for PreferredBackend
+   */
+  std::ostream & operator<< (std::ostream & left, PreferredBackend value);
 
 } // namespace FEAT
 

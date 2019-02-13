@@ -30,9 +30,9 @@ namespace FEAT
       template <typename LocalFilter2_, typename Mirror2_ = Mirror_>
       using FilterType = Filter<LocalFilter2_, Mirror2_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = Filter<typename LocalFilter_::template FilterType<Mem2_, DataType2_, IndexType2_>, typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = Filter<typename LocalFilter_::template FilterType<DataType2_, IndexType2_>, typename Mirror_::template MirrorType<DataType2_, IndexType2_> >;
 
       static constexpr bool is_global = true;
       static constexpr bool is_local = false;

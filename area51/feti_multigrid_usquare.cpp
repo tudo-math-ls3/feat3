@@ -97,28 +97,26 @@ namespace FETI{
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // Linear System type definitions
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Our local matrix type: a standard CSR matrix
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
 
   // Our local vector type: the usual dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
 
   // Our local filter type: the unit filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
-  typedef LAFEM::MeanFilter<MemType, DataType, IndexType> MeanFilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> LocalFilterType;
+  typedef LAFEM::MeanFilter<DataType, IndexType> MeanFilterType;
 
   //we create a filter chain with a Diricchlet and a mean Filter
   typedef LAFEM::FilterChain <LocalFilterType, MeanFilterType> FilterChainType;
 
   // The vector mirror takes the usual memory, data and index types as template parameters:
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
+  typedef LAFEM::VectorMirror<DataType, IndexType> VectorMirrorType;
 
   // The next one is new: this is the class that is responsible for the grid transfer.
   // In contrast to the other LAFEM containers that we have typedefed before, the 'Transfer'
@@ -136,9 +134,9 @@ namespace FETI{
   typedef Solver::Umfpack RegularUmfpack;
   typedef Solver::UmfpackMean FloatingUmfpack;
   //see synch_vec regarding memory...
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferMain;
+  typedef LAFEM::DenseVector<DataType, IndexType> BufferMain;
   /// the buffer vector type (possibly in device memory) for now the same as buffermain
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferType;
+  typedef LAFEM::DenseVector<DataType, IndexType> BufferType;
 
   class Umf
   {
@@ -327,7 +325,7 @@ namespace FETI{
 //         coarse_solver->set_tol_abs_low(1e-12);
         //we will use umfpack as coarse solver:
         //check if we are floating, or not:
-        std::shared_ptr<Solver::SolverBase<LAFEM::DenseVector<Mem::Main, double, Index>>> coarse_solver;
+        std::shared_ptr<Solver::SolverBase<LAFEM::DenseVector<double, Index>>> coarse_solver;
         if(lvl.filter_chain.at<1>().get_vec_prim().empty())
           coarse_solver = Solver::new_umfpack(lvl.matrix);
         else
@@ -736,7 +734,7 @@ namespace FETI{
       for(std::size_t i(0); i < n; ++i)
       {
         // create buffer vector in main memory
-        recv_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input), LAFEM::Pinning::disabled);
+        recv_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input));
         //buffer size right?
 
         // post receive
@@ -751,7 +749,7 @@ namespace FETI{
       for(std::size_t i(0); i < n; ++i)
       {
         // create buffer
-        send_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input), LAFEM::Pinning::disabled);
+        send_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input));
         // gather from mirror
         _gate_mirrors.at(i).gather(send_bufs.at(i), input);
         // post send
@@ -806,7 +804,7 @@ namespace FETI{
       for(std::size_t i(0); i < n; ++i)
       {
         // create buffer vector in main memory
-        recv_bufs.at(i) = BufferMain(vec.at(i).size(), LAFEM::Pinning::disabled);
+        recv_bufs.at(i) = BufferMain(vec.at(i).size());
 
         // post receive
         recv_reqs.push_back(_comm->irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), _gate_ranks.at(i)));
@@ -818,7 +816,7 @@ namespace FETI{
 
       for(std::size_t i(0); i < n; ++i)
       {
-        send_bufs.at(i) = BufferMain(vec.at(i).size(), LAFEM::Pinning::disabled);
+        send_bufs.at(i) = BufferMain(vec.at(i).size());
         send_bufs.at(i).copy(vec.at(i));
 
         // post send

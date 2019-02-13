@@ -7,7 +7,6 @@
 #ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP
 #define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP 1
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 #include <kernel/meshopt/rumpf_functionals/p1.hpp>
 #include <kernel/meshopt/rumpf_functionals/q1.hpp>
@@ -38,22 +37,19 @@ namespace FEAT
        */
       template
       <
-        template<typename, typename, typename, typename, typename, typename> class Functional_,
+        template<typename, typename, typename, typename, typename> class Functional_,
         typename CellFunctional_
       >
       class SetCellFunctional
       {
         public:
-          template<typename A, typename B, typename C, typename D>
-          using Functional = Functional_<A, B, C, D, CellFunctional_, FEAT::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
+          template<typename DT_, typename IT_, typename Trafo_>
+          using Functional = Functional_<DT_, IT_, Trafo_, CellFunctional_, FEAT::Meshopt::RumpfTrafo<Trafo_, typename Trafo_::CoordType>>;
       };
       /// \endcond
 
       /**
        * \brief Factory for MeshoptControl objects
-       *
-       * \tparam Mem_
-       * Memory architecture of the solver.
        *
        * \tparam DT_
        * Floating point type for the solver.
@@ -64,13 +60,10 @@ namespace FEAT
        * This class can construct MeshoptControl objects of different types at runtime based on PropertyMaps and
        * returns them through base class std::shared_ptrs.
        *
-       * \note Because Meshopt::HyperelasticityFunctional is only implemented for Mem::Main, only Mem::Main will work
-       * for now.
-       *
        * \note At this time, the only transformation available is Trafo::Standard.
        *
        */
-      template<typename Mem_, typename DT_, typename IT_>
+      template<typename DT_, typename IT_>
       struct ControlFactory
       {
         /**
@@ -146,7 +139,7 @@ namespace FEAT
             fixed_reference_domain = (std::stoi(fixed_reference_domain_p.first) == 1);
           }
 
-          typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_> DuDvCtrl;
+          typedef Control::Meshopt::DuDvFunctionalControl<DT_, IT_, DomCtrl_> DuDvCtrl;
           result = std::make_shared<DuDvCtrl>(
             dom_ctrl, meshopt_lvl,
             dirichlet_list, slip_list, solver_p.first, *solver_config, fixed_reference_domain);
@@ -395,7 +388,7 @@ namespace FEAT
           if(global_functional_p.first == "HyperelasticityFunctional")
           {
             typedef typename FEAT::Meshopt::
-              HyperelasticityFunctional<Mem_, DT_, IT_, TrafoType, CellFunctional_>::RefCellTrafo RefCellTrafo;
+              HyperelasticityFunctional<DT_, IT_, TrafoType, CellFunctional_>::RefCellTrafo RefCellTrafo;
 
             std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunctionBase<TrafoType, RefCellTrafo>>
               mesh_conc_func(nullptr);
@@ -411,7 +404,7 @@ namespace FEAT
                 }
 
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
-            <Mem_, DT_, IT_, DomCtrl_,
+            <DT_, IT_, DomCtrl_,
             SetCellFunctional<FEAT::Meshopt::HyperelasticityFunctional, CellFunctional_>::template Functional>>
               (dom_ctrl, meshopt_lvl, dirichlet_list, slip_list, solver_p.first,
               *solver_config, my_functional, scale_computation, mesh_conc_func, DT_(align_mesh));

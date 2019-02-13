@@ -24,13 +24,16 @@ using namespace FEAT::TestSystem;
  * \tparam DataType_
  * The data type for the test. Shall be either double or float.
  *
+ * \tparam IndexType_
+ * The index type for the test. Shall be either unsigned int or unsigned long.
+ *
  * \author Peter Zajac
  */
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class InterpolatorTest :
-  public TestSystem::TaggedTest<Archs::None, DataType_>
+  public UnitTest
 {
-  typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+  typedef LAFEM::DenseVector<DataType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -40,8 +43,8 @@ class InterpolatorTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  InterpolatorTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("InterpolatorTest")
+  InterpolatorTest(PreferredBackend backend) :
+    UnitTest("InterpolatorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -93,7 +96,7 @@ public:
     const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // loop over all vertices
-    for(Index i(0); i < num_verts; ++i)
+    for (Index i(0); i < num_verts; ++i)
     {
       // compute sine-bubble value in vertex position
       DataType_ s = Analytic::Common::SineBubbleStatic<DataType_>
@@ -132,21 +135,21 @@ public:
     const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // get the index set of the mesh
-    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2, 0>());
 
     // loop over all quads
-    for(Index i(0); i < num_quads; ++i)
+    for (Index i(0); i < num_quads; ++i)
     {
       // compute quad center
       DataType_ x(0), y(0);
-      for(int j(0); j < 4; ++j)
+      for (int j(0); j < 4; ++j)
       {
         x += DataType_(vertex_set[index_set[i][j]][0]);
         y += DataType_(vertex_set[index_set[i][j]][1]);
       }
 
       // compute sine-bubble value in quad center
-      DataType_ s = Analytic::Common::SineBubbleStatic<DataType_>::eval(DataType_(0.25)*x, DataType_(0.25)*y);
+      DataType_ s = Analytic::Common::SineBubbleStatic<DataType_>::eval(DataType_(0.25) * x, DataType_(0.25) * y);
 
       // validate vector data
       TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
@@ -154,5 +157,25 @@ public:
   }
 };
 
-InterpolatorTest<float> interpolator_test_float;
-InterpolatorTest<double> interpolator_test_double;
+InterpolatorTest<float, unsigned int> interpolator_test_float_uint(PreferredBackend::generic);
+InterpolatorTest<double, unsigned int> interpolator_test_double_uint(PreferredBackend::generic);
+InterpolatorTest<float, unsigned long> interpolator_test_float_ulong(PreferredBackend::generic);
+InterpolatorTest<double, unsigned long> interpolator_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+InterpolatorTest<float, unsigned long> mkl_interpolator_test_float_ulong(PreferredBackend::mkl);
+InterpolatorTest<double, unsigned long> mkl_interpolator_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+InterpolatorTest<__float128, unsigned int> interpolator_test_float128_uint(PreferredBackend::generic);
+InterpolatorTest<__float128, unsigned long> interpolator_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+InterpolatorTest<Half, unsigned int> interpolator_test_half_uint(PreferredBackend::generic);
+InterpolatorTest<Half, unsigned long> interpolator_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+InterpolatorTest<float, unsigned int> cuda_interpolator_test_float_uint(PreferredBackend::cuda);
+InterpolatorTest<double, unsigned int> cuda_interpolator_test_double_uint(PreferredBackend::cuda);
+InterpolatorTest<float, unsigned long> cuda_interpolator_test_float_ulong(PreferredBackend::cuda);
+InterpolatorTest<double, unsigned long> cuda_interpolator_test_double_ulong(PreferredBackend::cuda);
+#endif

@@ -17,7 +17,7 @@ namespace FEAT
     template<typename Space_, typename DT_, typename IT_, int dim_>
     struct FEVelo
     {
-      typedef typename LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> LocalVectorType_;
+      typedef typename LAFEM::DenseVectorBlocked<DT_, IT_, dim_> LocalVectorType_;
       const Space_& _space;
       const LocalVectorType_& _local_FE_coeff;
 
@@ -355,8 +355,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Tiny::Matrix<DataType_, dim_, dim_>& orientation,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
@@ -368,8 +368,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -633,10 +633,10 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Tiny::Matrix<DataType_, dim_, dim_>& orientation,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -646,7 +646,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -956,8 +956,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function2_, typename Function4_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function2_ function2,
         const Function4_ function4,
         const Space_& space,
@@ -970,8 +970,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -1277,11 +1277,11 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function2_, typename Function4_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function2_& function2,
         const Function4_& function4,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -1291,7 +1291,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -1648,9 +1648,9 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function2_, typename Function4_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& velocity_field,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& velocity_field,
         const Function2_& function2,
         const Function4_& function4,
         const Space_& space,
@@ -1664,8 +1664,8 @@ namespace FEAT
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(velocity_field.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -2005,12 +2005,12 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function2_, typename Function4_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& velocity_field,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& velocity_field,
         const Function2_& function2,
         const Function4_& function4,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -2021,7 +2021,7 @@ namespace FEAT
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(velocity_field.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -2395,8 +2395,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename VeloSpace_, typename Function2_, typename Function4_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const FEVelo<VeloSpace_, DataType_, IndexType_, dim_>& velo_func,
         const IndexType_ level_diff,
         const Function2_& function2,
@@ -2411,8 +2411,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -2778,13 +2778,13 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename VeloSpace_, typename Function2_, typename Function4_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const FEVelo<VeloSpace_, DataType_, IndexType_, dim_>& velo_func,
         const IndexType_ level_diff,
         const Function2_& function2,
         const Function4_& function4,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -2794,7 +2794,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -3178,10 +3178,10 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_ * (dim_ +1)/2>& tensor2,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_ * (dim_ +1)/2>& tensor2,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -3194,10 +3194,10 @@ namespace FEAT
         XASSERTM(tensor2.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(tensor4.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_*(dim_+1)/2> Orient2Type;
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24> Orient4Type;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)/2> Orient2Type;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24> Orient4Type;
 
 
         // first of all, let's see what we have to assemble
@@ -3524,11 +3524,11 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_ * (dim_ +1)/2>& tensor2,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_ * (dim_ +1)/2>& tensor2,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -3540,9 +3540,9 @@ namespace FEAT
         XASSERTM(tensor2.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(tensor4.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_*(dim_+1)/2> Orient2Type;
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24> Orient4Type;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)/2> Orient2Type;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24> Orient4Type;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -3896,8 +3896,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
@@ -3909,8 +3909,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -4171,10 +4171,10 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -4184,7 +4184,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -4489,8 +4489,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
@@ -4502,8 +4502,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -4771,10 +4771,10 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -4784,7 +4784,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -5091,8 +5091,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
@@ -5104,8 +5104,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -5397,10 +5397,10 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -5410,7 +5410,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -5735,8 +5735,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
@@ -5748,8 +5748,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -6039,10 +6039,10 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_, typename Function_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Function_& function,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -6052,7 +6052,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -6371,8 +6371,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -6383,8 +6383,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -6653,9 +6653,9 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -6665,7 +6665,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -6951,8 +6951,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ x_threshold,
@@ -6964,8 +6964,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
 
         // first of all, let's see what we have to assemble
@@ -7243,9 +7243,9 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ x_threshold,
@@ -7256,7 +7256,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));

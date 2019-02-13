@@ -6,5 +6,4 @@
 #include <kernel/util/memory_pool.hpp>
 
 // static member initialization
-std::map<void*, FEAT::Util::Intern::MemoryInfo> FEAT::MemoryPool<FEAT::Mem::Main>::_pool;
-std::map<void*, FEAT::Util::Intern::MemoryInfo> FEAT::MemoryPool<FEAT::Mem::Main>::_pinned_pool;
+std::map<void*, FEAT::Util::Intern::MemoryInfo> FEAT::MemoryPool::_pool;

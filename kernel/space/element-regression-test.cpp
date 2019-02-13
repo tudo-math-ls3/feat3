@@ -42,11 +42,10 @@ namespace ElementRegression
 
   typedef double DataType;
   typedef Index IndexType;
-  typedef Mem::Main MemType;
 
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   template<typename Shape_>
   struct MeshGen;
@@ -146,7 +145,7 @@ namespace ElementRegression
 
   template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_, typename... ElArgs_>
   class ElementRegressionBase :
-    public TestSystem::BaseTest
+    public TestSystem::UnitTest
   {
   protected:
     typedef Geometry::ConformalMesh<Shape_> MeshType;
@@ -165,7 +164,7 @@ namespace ElementRegression
 
   public:
     explicit ElementRegressionBase(String name, Index level, double h0, double h1, double h2) :
-      TestSystem::BaseTest(name + ":" + SpaceType::name() + ":" + Shape_::name() + ":" + stringify(level)),
+      TestSystem::UnitTest(name + ":" + SpaceType::name() + ":" + Shape_::name() + ":" + stringify(level)),
       _level(level),
       cubature_factory("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree+1)+1)),
       h0_ref(h0),
@@ -342,7 +341,7 @@ namespace ElementRegression
     virtual void solve_system(const MatrixType& matrix, const FilterType& filter, VectorType& vec_sol, const VectorType& vec_rhs) const
     {
       // create a SSOR preconditioner
-      auto precon = Solver::new_ssor_precond(matrix, filter, DataType(1));
+      auto precon = Solver::new_ssor_precond(PreferredBackend::generic, matrix, filter, DataType(1));
 
       // create a PCG solver
       Solver::PCG<MatrixType, FilterType> solver(matrix, filter, precon);

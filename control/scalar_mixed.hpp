@@ -48,21 +48,19 @@ namespace FEAT
     template
     <
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     class ScalarMixedSystemLevel
     {
       public:
         // basic types
-        typedef MemType_ MemType;
         typedef DataType_ DataType;
         typedef IndexType_ IndexType;
         static constexpr int dim = dim_;
@@ -83,9 +81,9 @@ namespace FEAT
         typedef LAFEM::TupleVector<LocalVeloVector, LocalPresVector> LocalSystemVector;
 
         // define local filter types
-        typedef LAFEM::SlipFilter<MemType_, DataType_, IndexType_, dim_> LocalVeloSlipFilter;
+        typedef LAFEM::SlipFilter<DataType_, IndexType_, dim_> LocalVeloSlipFilter;
         typedef LAFEM::FilterSequence<LocalVeloSlipFilter> LocalVeloFilter;
-        typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+        typedef LAFEM::NoneFilter<DataType_, IndexType_> LocalPresFilter;
         typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
         // define local transfer matrix types
@@ -99,7 +97,7 @@ namespace FEAT
         typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
         // define mirror types
-        typedef LAFEM::VectorMirror<MemType, DataType, IndexType> ScalarMirror;
+        typedef LAFEM::VectorMirror<DataType, IndexType> ScalarMirror;
         typedef ScalarMirror VeloMirror;
         typedef ScalarMirror PresMirror;
         typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
@@ -235,8 +233,8 @@ namespace FEAT
             = transfer_pres.get_mat_rest().clone(LAFEM::CloneMode::Shallow);
         }
 
-        template<typename M_, typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
-        void convert(const ScalarMixedSystemLevel<dim_, M_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
+        template<typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
+        void convert(const ScalarMixedSystemLevel<dim_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
         {
           gate_velo.convert(other.gate_velo);
           gate_pres.convert(other.gate_pres);

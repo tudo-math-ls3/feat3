@@ -27,11 +27,11 @@ typedef BoundaryFactory<RootMesh> RootBndFactory;
  * \author Peter Zajac
  */
 class BoundaryFactoryTest
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   BoundaryFactoryTest() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("BoundaryFactoryTest")
+    UnitTest("BoundaryFactoryTest")
   {
   }
 

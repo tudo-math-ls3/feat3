@@ -275,8 +275,6 @@ namespace CCND_FIBER
 
 
   typedef double DataType;
-  // our one and only memory type
-  typedef Mem::Main MemType;
   // our one and only index type
   typedef Index IndexType;
 
@@ -287,18 +285,17 @@ namespace CCND_FIBER
    */
   template<
   int dim_,
-  typename MemType_ = Mem::Main,
   typename DataType_ = DataType,
   typename IndexType_ = Index,
-  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
+  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>>
   class ModNavierStokesBlockedSystemLevel :
-  public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+  public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
-    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     // the noflow velocity filter, used in bench3 simulation
     typename BaseClass::LocalVeloFilter local_velo_filter_noflow;
@@ -461,7 +458,7 @@ namespace CCND_FIBER
 
     //for discrete Velo FE Full Tensor formulation matrix
     template<typename SpaceV_, typename Cubature_, typename Function2_, typename Function4_>
-    void assemble_truncated_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, dim_>& velo_vec, const Function2_& func2, const Function4_& func4, const DataType_ alpha = DataType(0.))
+    void assemble_truncated_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& velo_vec, const Function2_& func2, const Function4_& func4, const DataType_ alpha = DataType(0.))
     {
       Assembly::FullFETensorBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
       burgers_mat.nu = nu;
@@ -482,7 +479,7 @@ namespace CCND_FIBER
 
     //for fiber orientation formulation matrix
     template<typename SpaceV_, typename Cubature_>
-    void assemble_velocity_laplace_matrix_fiber(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, dim_*(dim_+1)/2>& tensor2, const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4, const DataType alpha = DataType(0.))
+    void assemble_velocity_laplace_matrix_fiber(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)/2>& tensor2, const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4, const DataType alpha = DataType(0.))
     {
       Assembly::FullFiberOrientationTensorBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
       burgers_mat.nu = nu;
@@ -549,18 +546,17 @@ namespace CCND_FIBER
    */
   template<
   int dim_,
-  typename MemType_ = Mem::Main,
   typename DataType_ = DataType,
   typename IndexType_ = Index,
-  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
+  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>>
   class ModNavierStokesBlockedMeanPresSystemLevel :
-  public Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+  public Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
-    typedef Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+    typedef Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     // the noflow velocity filter, used in bench3 simulation
     typename BaseClass::LocalVeloFilter local_velo_filter_noflow;
@@ -703,7 +699,7 @@ namespace CCND_FIBER
 
     //for discrete Velo FE Full Tensor formulation matrix
     template<typename SpaceV_, typename Cubature_, typename Function2_, typename Function4_>
-    void assemble_truncated_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, dim_>& velo_vec, const Function2_& func2, const Function4_& func4, const DataType_ alpha = DataType(0.))
+    void assemble_truncated_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& velo_vec, const Function2_& func2, const Function4_& func4, const DataType_ alpha = DataType(0.))
     {
       Assembly::FullFETensorBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
       burgers_mat.nu = nu;
@@ -724,7 +720,7 @@ namespace CCND_FIBER
 
     //for fiber orientation formulation matrix
     template<typename SpaceV_, typename Cubature_>
-    void assemble_velocity_laplace_matrix_fiber(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, dim_*(dim_+1)/2>& tensor2, const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4, const DataType alpha = DataType(0.))
+    void assemble_velocity_laplace_matrix_fiber(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType_ N_p, const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)/2>& tensor2, const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_*(dim_+1)*(dim_+2)*(dim_+3)/24>& tensor4, const DataType alpha = DataType(0.))
     {
       Assembly::FullFiberOrientationTensorBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
       burgers_mat.nu = nu;

@@ -18,7 +18,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_, typename IT_>
-      void Lumping<Mem::Main>::csr_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
+      void Lumping::csr_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
         const IT_ * const row_ptr, const Index rows)
       {
         for (Index row(0); row < rows; row++)
@@ -34,7 +34,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      void Lumping<Mem::Main>::bcsr_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
+      void Lumping::bcsr_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
         const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
       {
         Index block_height = Index(BlockHeight);
@@ -59,25 +59,6 @@ namespace FEAT
               }
             }
           }
-        }
-      }
-
-      template <typename DT_, typename IT_>
-      void Lumping<Mem::Main>::ell_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
-        const IT_ * const cs, const IT_ * const /*cl*/, const Index C, const Index rows)
-      {
-        for (Index row(0) ; row < rows ; ++row)
-        {
-          const Index chunk(row / C);
-          const Index local_row(row % C);
-          const Index chunk_end(cs[chunk+1]);
-
-          DT_ sum(0);
-          for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
-          {
-            sum += val[pcol];
-          }
-          lump[row] = sum;
         }
       }
     } // namespace Arch

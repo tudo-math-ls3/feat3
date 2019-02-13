@@ -17,17 +17,19 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorDotNorm2Test
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorDotNorm2Test() :
-    BaseClass("MetaVectorDotNorm2Test")
+   MetaVectorDotNorm2Test(PreferredBackend backend) :
+    BaseClass("MetaVectorDotNorm2Test", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -86,11 +88,27 @@ public:
   }
 };
 
-MetaVectorDotNorm2Test<Mem::Main, float, Index> meta_vector_dot_norm2_test_generic_float;
-MetaVectorDotNorm2Test<Mem::Main, double, Index> meta_vector_dot_norm2_test_generic_double;
+MetaVectorDotNorm2Test<float, unsigned int> meta_vector_dot_norm2_test_generic_float_uint(PreferredBackend::generic);
+MetaVectorDotNorm2Test<double, unsigned int> meta_vector_dot_norm2_test_generic_double_uint(PreferredBackend::generic);
+MetaVectorDotNorm2Test<float, unsigned long> meta_vector_dot_norm2_test_generic_float_ulong(PreferredBackend::generic);
+MetaVectorDotNorm2Test<double, unsigned long> meta_vector_dot_norm2_test_generic_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorDotNorm2Test<float, unsigned long> mkl_meta_vector_dot_norm2_test_float_ulong(PreferredBackend::mkl);
+MetaVectorDotNorm2Test<double, unsigned long> mkl_meta_vector_dot_norm2_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaVectorDotNorm2Test<__float128, unsigned int> meta_vector_dot_norm2_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorDotNorm2Test<__float128, unsigned long> meta_vector_dot_norm2_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorDotNorm2Test<Half, unsigned int> meta_vector_dot_norm2_test_half_uint(PreferredBackend::generic);
+MetaVectorDotNorm2Test<Half, unsigned long> meta_vector_dot_norm2_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorDotNorm2Test<Mem::CUDA, float, Index> meta_vector_dot_norm2_test_cuda_float;
-MetaVectorDotNorm2Test<Mem::CUDA, double, Index> meta_vector_dot_norm2_test_cuda_double;
+MetaVectorDotNorm2Test<float, unsigned int> meta_vector_dot_norm2_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorDotNorm2Test<double, unsigned int> meta_vector_dot_norm2_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorDotNorm2Test<float, unsigned long> meta_vector_dot_norm2_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorDotNorm2Test<double, unsigned long> meta_vector_dot_norm2_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif
 
 /**
@@ -100,17 +118,19 @@ MetaVectorDotNorm2Test<Mem::CUDA, double, Index> meta_vector_dot_norm2_test_cuda
  *
  * \author Jordi Paul
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorTripleDotTest
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorTripleDotTest() :
-    BaseClass("MetaVectorTripleDotTest")
+   MetaVectorTripleDotTest(PreferredBackend backend) :
+    BaseClass("MetaVectorTripleDotTest", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -171,8 +191,25 @@ public:
   }
 };
 
-MetaVectorTripleDotTest<Mem::Main, float, Index> meta_vector_triple_dot_test_generic_float;
-MetaVectorTripleDotTest<Mem::Main, double, Index> meta_vector_triple_dot_test_generic_double;
+MetaVectorTripleDotTest<float, unsigned int> meta_vector_triple_dot_test_generic_float_uint(PreferredBackend::generic);
+MetaVectorTripleDotTest<double, unsigned int> meta_vector_triple_dot_test_generic_double_uint(PreferredBackend::generic);
+MetaVectorTripleDotTest<float, unsigned long> meta_vector_triple_dot_test_generic_float_ulong(PreferredBackend::generic);
+MetaVectorTripleDotTest<double, unsigned long> meta_vector_triple_dot_test_generic_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorTripleDotTest<float, unsigned long> mkl_meta_vector_triple_dot_test_float_ulong(PreferredBackend::mkl);
+MetaVectorTripleDotTest<double, unsigned long> mkl_meta_vector_triple_dot_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaVectorTripleDotTest<Mem::Main, __float128, Index> meta_vector_triple_dot_test_generic_float128;
+MetaVectorTripleDotTest<__float128, unsigned int> meta_vector_triple_dot_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorTripleDotTest<__float128, unsigned long> meta_vector_triple_dot_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorTripleDotTest<Half, unsigned int> meta_vector_triple_dot_test_half_uint(PreferredBackend::generic);
+MetaVectorTripleDotTest<Half, unsigned long> meta_vector_triple_dot_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MetaVectorTripleDotTest<float, unsigned int> meta_vector_triple_dot_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorTripleDotTest<double, unsigned int> meta_vector_triple_dot_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorTripleDotTest<float, unsigned long> meta_vector_triple_dot_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorTripleDotTest<double, unsigned long> meta_vector_triple_dot_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif

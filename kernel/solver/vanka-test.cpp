@@ -65,12 +65,12 @@ struct Q2Q1
 };
 
 template<typename DT_, typename IT_>
-class VankaTest :
-  public FullTaggedTest<Mem::Main, DT_, IT_>
+class VankaTest
+  : public TestSystem::UnitTest
 {
 public:
   VankaTest() :
-    FullTaggedTest<Mem::Main, DT_, IT_>("VankaTest")
+    TestSystem::UnitTest("VankaTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name())
   {
   }
 
@@ -98,14 +98,14 @@ public:
     typename Space_<TrafoType>::P space_p(trafo);
     const String name = Space_<TrafoType>::name();
 
-    typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> ScalarMatrixType;
+    typedef LAFEM::SparseMatrixCSR<DT_, IT_> ScalarMatrixType;
     typedef LAFEM::PowerDiagMatrix<ScalarMatrixType, dim> MatrixTypeA;
     typedef LAFEM::PowerColMatrix<ScalarMatrixType, dim> MatrixTypeB;
     typedef LAFEM::PowerRowMatrix<ScalarMatrixType, dim> MatrixTypeD;
     typedef LAFEM::SaddlePointMatrix<MatrixTypeA, MatrixTypeB, MatrixTypeD> MatrixType;
     typedef typename MatrixType::VectorTypeL VectorType;
-    typedef LAFEM::NoneFilter<Mem::Main, double, Index> NoneFilterType;
-    typedef LAFEM::UnitFilter<Mem::Main, double, Index> UnitFilterType;
+    typedef LAFEM::NoneFilter<DT_, IT_> NoneFilterType;
+    typedef LAFEM::UnitFilter<DT_, IT_> UnitFilterType;
     typedef LAFEM::PowerFilter<UnitFilterType, dim> VeloFilterType;
     typedef LAFEM::TupleFilter<VeloFilterType, NoneFilterType> FilterType;
 
@@ -227,14 +227,14 @@ public:
     typename Space_<TrafoType>::P space_p(trafo);
     const String name = Space_<TrafoType>::name();
 
-    typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> ScalarMatrixType;
+    typedef LAFEM::SparseMatrixCSR<DT_, IT_> ScalarMatrixType;
     typedef LAFEM::PowerFullMatrix<ScalarMatrixType, dim, dim> MatrixTypeA;
     typedef LAFEM::PowerColMatrix<ScalarMatrixType, dim> MatrixTypeB;
     typedef LAFEM::PowerRowMatrix<ScalarMatrixType, dim> MatrixTypeD;
     typedef LAFEM::SaddlePointMatrix<MatrixTypeA, MatrixTypeB, MatrixTypeD> MatrixType;
     typedef typename MatrixType::VectorTypeL VectorType;
-    typedef LAFEM::NoneFilter<Mem::Main, double, Index> NoneFilterType;
-    typedef LAFEM::UnitFilter<Mem::Main, double, Index> UnitFilterType;
+    typedef LAFEM::NoneFilter<DT_, IT_> NoneFilterType;
+    typedef LAFEM::UnitFilter<DT_, IT_> UnitFilterType;
     typedef LAFEM::PowerFilter<UnitFilterType, dim> VeloFilterType;
     typedef LAFEM::TupleFilter<VeloFilterType, NoneFilterType> FilterType;
 

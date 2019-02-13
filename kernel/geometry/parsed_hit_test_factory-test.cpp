@@ -23,11 +23,11 @@ using namespace FEAT::Geometry;
  */
 
 class ParsedHitTestFactoryTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   ParsedHitTestFactoryTest() :
-    TaggedTest<Archs::None, Archs::None>("parsed_hit_test_factory-test")
+    UnitTest("parsed_hit_test_factory-test")
   {
   }
 

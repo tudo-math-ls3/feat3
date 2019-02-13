@@ -110,7 +110,7 @@ namespace CCND_FIBER
       SpaceOrientationType* orient_space = new SpaceOrientationType{trafo};
       orient_ptr.reset(orient_space);
     }
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim_> orient_sol(unsteady_solver.is_root_process() ? orient_ptr->get_num_dofs() : 0);
+    LAFEM::DenseVectorBlocked<DataType, IndexType, dim_> orient_sol(unsteady_solver.is_root_process() ? orient_ptr->get_num_dofs() : 0);
     orient_sol.format();
 
     //get our starting solution, solves the basic, steady Navier-Stokes system

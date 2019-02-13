@@ -299,7 +299,7 @@ namespace FEAT
         {
           // copy coordinates
           for(int i(0); i < dim_; ++i)
-            _vars[std::size_t(i)] = point[i];
+            _vars[std::size_t(i)] = double(point[i]);
 
           // evaluate the parser
           const double val = _parser.Eval(_vars.data());
@@ -576,11 +576,11 @@ namespace FEAT
         {
           // copy coordinates
           for(int i(0); i < dom_dim_; ++i)
-            _vars[std::size_t(i)] = point[i];
+            _vars[std::size_t(i)] = double(point[i]);
 
           // evaluate the parser
           ValueType val;
-        for(std::size_t i(0); i < _parsers.size(); ++i)
+          for(std::size_t i(0); i < _parsers.size(); ++i)
           {
             // evaluate the parser
             val[int(i)] = DataType(_parsers[i].Eval(_vars.data()));

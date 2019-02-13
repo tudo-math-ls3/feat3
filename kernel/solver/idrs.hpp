@@ -48,12 +48,11 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef typename MatrixType::MemType MemType;
       typedef typename MatrixType::IndexType IndexType;
       typedef PreconditionedIterativeSolver<VectorType> BaseClass;
 
-      typedef FEAT::LAFEM::DenseMatrix<MemType, DataType, IndexType> DMatrix;
-      typedef FEAT::LAFEM::DenseVector<MemType, DataType, IndexType> DVector;
+      typedef FEAT::LAFEM::DenseMatrix<DataType, IndexType> DMatrix;
+      typedef FEAT::LAFEM::DenseVector<DataType, IndexType> DVector;
       typedef SolverBase<VectorType> PrecondType;
 
     protected:

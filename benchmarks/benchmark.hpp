@@ -26,7 +26,6 @@ namespace FEAT
      * \param[in] bytes The amount of bytes moved by a single function call.
      *
      **/
-    template <typename Mem_>
     void run_bench(std::function<void (void)> func, double flops, double bytes)
     {
 #ifdef FEAT_DEBUG_MODE
@@ -36,11 +35,11 @@ namespace FEAT
       Index iters(1);
       //warmup
       func();
-      MemoryPool<Mem_>::synchronize();
+      MemoryPool::synchronize();
 
       TimeStamp at;
       func();
-      MemoryPool<Mem_>::synchronize();
+      MemoryPool::synchronize();
       double test_run_time(at.elapsed_now());
       std::cout<<"test time: "<<test_run_time<<std::endl;
       if (test_run_time < 0.1)
@@ -55,7 +54,7 @@ namespace FEAT
         {
           func();
         }
-        MemoryPool<Mem_>::synchronize();
+        MemoryPool::synchronize();
         times.push_back(at.elapsed_now());
       }
 

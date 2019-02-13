@@ -13,8 +13,6 @@
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
@@ -37,17 +35,17 @@ namespace FEAT
     /// \cond internal
     namespace Intern
     {
-      template<typename Mem_, typename DT_, typename IT_, int size_>
+      template<typename DT_, typename IT_, int size_>
       struct BCSRVectorHelper
       {
         static_assert(size_ > 1, "invalid block size");
-        typedef DenseVectorBlocked<Mem_, DT_, IT_, size_> VectorType;
+        typedef DenseVectorBlocked<DT_, IT_, size_> VectorType;
       };
 
-      template<typename Mem_, typename DT_, typename IT_>
-      struct BCSRVectorHelper<Mem_, DT_, IT_, 1>
+      template<typename DT_, typename IT_>
+      struct BCSRVectorHelper<DT_, IT_, 1>
       {
-        typedef DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef DenseVector< DT_, IT_> VectorType;
       };
 
       template<typename DT_, int BlockHeight_, int BlockWidth_, Perspective perspective_>
@@ -67,7 +65,6 @@ namespace FEAT
     /**
      * \brief CSR based blocked sparse matrix.
      *
-     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
@@ -88,15 +85,13 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-    class SparseMatrixBCSR : public Container<Mem_, DT_, IT_>
+    template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+    class SparseMatrixBCSR : public Container<DT_, IT_>
     {
       static_assert(BlockHeight_ > 0, "invalid block size");
       static_assert(BlockWidth_ > 0, "invalid block size");
 
     public:
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -115,17 +110,17 @@ namespace FEAT
       typedef const IT_* ImageIterator;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
-      typedef typename Intern::BCSRVectorHelper<Mem_, DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
+      typedef typename Intern::BCSRVectorHelper<DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
       /// Compatible R-vector type
-      typedef typename Intern::BCSRVectorHelper<Mem_, DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
+      typedef typename Intern::BCSRVectorHelper<DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
@@ -140,8 +135,7 @@ namespace FEAT
       class ScatterAxpy
       {
       public:
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
         typedef Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> ValueType;
@@ -259,7 +253,7 @@ namespace FEAT
        * Creates an empty non dimensional matrix.
        */
       explicit SparseMatrixBCSR() :
-        Container<Mem_, DT_, IT_> (0)
+        Container<DT_, IT_> (0)
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -278,7 +272,7 @@ namespace FEAT
        * \note This matrix does not allocate any memory
        */
       explicit SparseMatrixBCSR(Index rows_in, Index columns_in) :
-        Container<Mem_, DT_, IT_> (rows_in * columns_in)
+        Container<DT_, IT_> (rows_in * columns_in)
       {
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -297,7 +291,7 @@ namespace FEAT
        * \note The allocated memory will not be initialized.
        */
       explicit SparseMatrixBCSR(Index rows_in, Index columns_in, Index used_elements_in) :
-        Container<Mem_, DT_, IT_> (rows_in * columns_in)
+        Container<DT_, IT_> (rows_in * columns_in)
       {
         XASSERT(rows_in != Index(0) && columns_in != Index(0));
 
@@ -305,13 +299,13 @@ namespace FEAT
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(used_elements_in);
 
-        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
+        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_elements()));
         this->_indices_size.push_back(_used_elements());
 
-        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows() + 1));
+        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_rows() + 1));
         this->_indices_size.push_back(_rows() + 1);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
         this->_elements_size.push_back(used_elements<Perspective::pod>());
 
       }
@@ -323,29 +317,29 @@ namespace FEAT
        *
        * Creates an empty matrix with given layout.
        */
-      explicit SparseMatrixBCSR(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
-        Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
+      explicit SparseMatrixBCSR(const SparseLayout<IT_, layout_id> & layout_in) :
+        Container<DT_, IT_> (layout_in._scalar_index.at(0))
       {
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
         for (auto i : this->_indices)
-          MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool::increase_memory(i);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
         this->_elements_size.push_back(used_elements<Perspective::pod>());
       }
 
       /**
        * \brief Constructor
        *
-       * \param[in] graph The.graph to create the matrix from
+       * \param[in] graph The graph to create the matrix from
        *
-       * Creates a CSR blocked matrix based on a given adjacency graph representing the sparsity pattern.
+       * Creates a BCSR blocked matrix based on a given adjacency graph representing the sparsity pattern.
        */
       explicit SparseMatrixBCSR(const Adjacency::Graph & graph) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
@@ -358,10 +352,10 @@ namespace FEAT
         }
 
         // Create temporary vectors. Row and column pointer are block wise
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_ptr(num_rows+1);
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> vcol_idx(num_nnze);
+        LAFEM::DenseVector<IT_, IT_> vrow_ptr(num_rows+1);
+        LAFEM::DenseVector<IT_, IT_> vcol_idx(num_nnze);
         // The data array has to account for the block size
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze*Index(BlockHeight_*BlockWidth_), DT_(0));
+        LAFEM::DenseVector<DT_, IT_> vdata(num_nnze*Index(BlockHeight_*BlockWidth_), DT_(0));
 
         const Index * dom_ptr(graph.get_domain_ptr());
         const Index * img_idx(graph.get_image_idx());
@@ -378,7 +372,7 @@ namespace FEAT
           pcol_idx[i] = IT_(img_idx[i]);
 
         // build the matrix
-        this->assign(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
+        this->assign(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
       }
 
       /**
@@ -390,7 +384,7 @@ namespace FEAT
        * Creates a BCSR matrix based on the source file.
        */
       explicit SparseMatrixBCSR(FileMode mode, String filename) :
-        Container<Mem_, DT_, IT_>(0)
+        Container< DT_, IT_>(0)
       {
         read_from(mode, filename);
       }
@@ -404,7 +398,7 @@ namespace FEAT
        * Creates a BCSR matrix based on the source filestream.
        */
       explicit SparseMatrixBCSR(FileMode mode, std::istream& file) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, file);
       }
@@ -422,8 +416,8 @@ namespace FEAT
        * Creates a matrix with given dimensions and content.
        */
       explicit SparseMatrixBCSR(const Index rows_in, const Index columns_in,
-                                      DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
-        Container<Mem_, DT_, IT_>(rows_in * columns_in)
+                                      DenseVector< IT_, IT_> & col_ind_in, DenseVector< DT_, IT_> & val_in, DenseVector< IT_, IT_> & row_ptr_in) :
+        Container<DT_, IT_>(rows_in * columns_in)
       {
         /// \todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
         XASSERT(col_ind_in.size() > 0);
@@ -445,9 +439,9 @@ namespace FEAT
         this->_indices_size.push_back(row_ptr_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+          MemoryPool::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+          MemoryPool::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -459,7 +453,7 @@ namespace FEAT
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       explicit SparseMatrixBCSR(std::vector<char> input) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         deserialize<DT2_, IT2_>(input);
       }
@@ -472,7 +466,7 @@ namespace FEAT
        * Moves a given matrix to this matrix.
        */
       SparseMatrixBCSR(SparseMatrixBCSR && other) :
-        Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBCSR>(other))
+        Container<DT_, IT_>(std::forward<SparseMatrixBCSR>(other))
       {
       }
 
@@ -513,10 +507,10 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other, CloneMode clone_mode = CloneMode::Weak)
+      template<typename DT2_, typename IT2_>
+      void clone(const SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_> & other, CloneMode clone_mode = CloneMode::Weak)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -526,10 +520,23 @@ namespace FEAT
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
         this->assign(other);
+      }
+
+      /**
+       * \brief Conversion method
+       *
+       * \param[in] graph The graph to create the matrix from
+       *
+       * Creates a BCSR blocked matrix based on a given adjacency graph representing the sparsity pattern.
+       */
+      void convert(const Adjacency::Graph & graph)
+      {
+        SparseMatrixBCSR temp(graph);
+        this->assign(temp);
       }
 
       /**
@@ -539,12 +546,12 @@ namespace FEAT
        *
        * Assigns a new matrix layout, discarding all old data
        */
-      SparseMatrixBCSR & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
+      SparseMatrixBCSR & operator= (const SparseLayout<IT_, layout_id> & layout_in)
       {
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          MemoryPool::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool::release_memory(this->_indices.at(i));
 
         this->_elements.clear();
         this->_indices.clear();
@@ -557,9 +564,9 @@ namespace FEAT
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
         for (auto i : this->_indices)
-          MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool::increase_memory(i);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
         this->_elements_size.push_back(used_elements<Perspective::pod>());
 
         return *this;
@@ -812,23 +819,20 @@ namespace FEAT
             break;
           case FileMode::fm_mtx:
           {
-            SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> temp;
-            temp.convert(*this);
-
             file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-            file << temp.template rows<Perspective::pod>() << " " << temp.template columns<Perspective::pod>() << " " << temp.template used_elements<Perspective::pod>() << std::endl;
+            file << this->template rows<Perspective::pod>() << " " << this->template columns<Perspective::pod>() << " " << this->template used_elements<Perspective::pod>() << std::endl;
 
             for (Index row(0) ; row < rows() ; ++row)
             {
-              const IT_ end(temp.row_ptr()[row + 1]);
-              for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
+              const IT_ end(this->row_ptr()[row + 1]);
+              for (IT_ i(this->row_ptr()[row]) ; i < end ; ++i)
               {
-                auto block = temp.val()[i];
+                auto block = this->val()[i];
                 for (int y(0) ; y < BlockHeight_ ; ++y)
                 {
                   for (int x(0) ; x < BlockWidth_ ; ++x)
                   {
-                    file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)temp.col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
+                    file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)this->col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
                   }
                 }
               }
@@ -853,15 +857,15 @@ namespace FEAT
         ASSERT(row < rows());
         ASSERT(col < columns());
 
-        for (Index i(MemoryPool<Mem_>::get_element(this->row_ptr(), row)) ; i < MemoryPool<Mem_>::get_element(row_ptr(), row + 1) ; ++i)
+        MemoryPool::synchronize();
+
+        for (Index i(this->row_ptr()[row]) ; i < this->row_ptr()[row+1] ; ++i)
         {
-          if (MemoryPool<Mem_>::get_element(this->col_ind(), i) == col)
+          if (this->col_ind()[i] == col)
           {
-            ValueType t;
-            MemoryPool<Mem_>::download((DT_*)t.v, this->val<Perspective::pod>() + i * Index(BlockHeight_*BlockWidth_), Index(BlockHeight_*BlockWidth_));
-            return t;
+            return this->val<Perspective::native>()[i];
           }
-          if (MemoryPool<Mem_>::get_element(this->col_ind(), i) > col)
+          if (this->col_ind()[i] > col)
             break; //return zero element
         }
 
@@ -873,9 +877,9 @@ namespace FEAT
        *
        * \return An object containing the sparse matrix layout.
        */
-      SparseLayout<Mem_, IT_, layout_id> layout() const
+      SparseLayout<IT_, layout_id> layout() const
       {
-        return SparseLayout<Mem_, IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
+        return SparseLayout<IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
       }
 
       /**
@@ -1018,18 +1022,6 @@ namespace FEAT
         this->_copy_content(x, full);
       }
 
-      /**
-       * \brief Performs \f$this \leftarrow x\f$.
-       *
-       * \param[in] x The Matrix to be copied.
-       * \param[in] full Shall we create a full copy, including scalars and index arrays?
-       */
-      template <typename Mem2_>
-      void copy(const SparseMatrixBCSR<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & x, bool full = false)
-      {
-        this->_copy_content(x, full);
-      }
-
       ///@name Linear algebra operations
       ///@{
       /**
@@ -1063,7 +1055,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        Arch::Axpy<Mem_>::dv(this->template val<Perspective::pod>(),
+        Arch::Axpy::value(this->template val<Perspective::pod>(),
             alpha,
             x.template val<Perspective::pod>(),
             y.template val<Perspective::pod>(),
@@ -1087,7 +1079,7 @@ namespace FEAT
 
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements<Perspective::pod>());
-        Arch::Scale<Mem_>::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), alpha, this->used_elements<Perspective::pod>());
+        Arch::Scale::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), alpha, this->used_elements<Perspective::pod>());
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
@@ -1101,7 +1093,7 @@ namespace FEAT
       {
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        DT_ result = Arch::Norm2<Mem_>::value(this->template val<Perspective::pod>(),
+        DT_ result = Arch::Norm2::value(this->template val<Perspective::pod>(),
                                               this->used_elements<Perspective::pod>());
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1121,7 +1113,7 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::RowNorm<Mem_>::bcsr_norm2(row_norms.template elements<Perspective::pod>(),
+        Arch::RowNorm::bcsr_norm2(row_norms.template elements<Perspective::pod>(),
           this->template val<Perspective::pod>(),
           col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
 
@@ -1142,7 +1134,7 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::RowNorm<Mem_>::bcsr_norm2sqr(row_norms.template elements<Perspective::pod>(),
+        Arch::RowNorm::bcsr_norm2sqr(row_norms.template elements<Perspective::pod>(),
           this->template val<Perspective::pod>(),
           col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
 
@@ -1177,7 +1169,7 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::RowNorm<Mem_>::bcsr_scaled_norm2sqr(row_norms.template elements<Perspective::pod>(),
+        Arch::RowNorm::bcsr_scaled_norm2sqr(row_norms.template elements<Perspective::pod>(),
            scal.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
           col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
 
@@ -1192,9 +1184,9 @@ namespace FEAT
        *
        * \note The resulting matrix has transposed block dimensions, too.
        */
-      SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
+      SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
       {
-        SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> x_t;
+        SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_> x_t;
         x_t.transpose(*this);
         return x_t;
       }
@@ -1204,9 +1196,9 @@ namespace FEAT
        *
        * \param[in] x The matrix to be transposed.
        */
-      void transpose(const SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> & x)
+      void transpose(const SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_> & x)
       {
-        using XType = SparseMatrixBCSR<Mem_, DT_, IT_, BlockWidth_, BlockHeight_>;
+        using XType = SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_>;
         if (x.used_elements() == 0)
         {
           SparseMatrixBCSR r(x.rows(), x.columns());
@@ -1214,20 +1206,17 @@ namespace FEAT
           return;
         }
 
-        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockWidth_, BlockHeight_> tx;
-        tx.convert(x);
+        const Index txrows(x.rows());
+        const Index txcolumns(x.columns());
+        const Index txused_elements(x.used_elements());
 
-        const Index txrows(tx.rows());
-        const Index txcolumns(tx.columns());
-        const Index txused_elements(tx.used_elements());
+        const IT_ * ptxcol_ind(x.col_ind());
+        const IT_ * ptxrow_ptr(x.row_ptr());
+        const typename XType::ValueType * ptxval(x.val());
 
-        const IT_ * ptxcol_ind(tx.col_ind());
-        const IT_ * ptxrow_ptr(tx.row_ptr());
-        const typename XType::ValueType * ptxval(tx.val());
-
-        DenseVector<Mem::Main, IT_, IT_> tcol_ind(txused_elements);
-        DenseVector<Mem::Main, DT_, IT_> tval(txused_elements * BlockHeight_ * BlockWidth_);
-        DenseVector<Mem::Main, IT_, IT_> trow_ptr(txcolumns + 1, IT_(0));
+        DenseVector<IT_, IT_> tcol_ind(txused_elements);
+        DenseVector<DT_, IT_> tval(txused_elements * BlockHeight_ * BlockWidth_);
+        DenseVector<IT_, IT_> trow_ptr(txcolumns + 1, IT_(0));
 
         IT_ * ptcol_ind(tcol_ind.elements());
         ValueType * ptval((ValueType*)tval.elements());
@@ -1263,11 +1252,9 @@ namespace FEAT
         }
         ptrow_ptr[0] = 0;
 
-        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> tx_t(txcolumns, txrows, tcol_ind, tval, trow_ptr);
+        SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> tx_t(txcolumns, txrows, tcol_ind, tval, trow_ptr);
 
-        SparseMatrixBCSR<Mem_, DT_, IT_, BlockHeight_, BlockWidth_> x_t;
-        x_t.convert(tx_t);
-        this->assign(x_t);
+        this->assign(tx_t);
       }
 
       /**
@@ -1278,7 +1265,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVector< DT_, IT_> & x) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
@@ -1294,7 +1281,7 @@ namespace FEAT
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1310,7 +1297,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVector< DT_, IT_> & x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
@@ -1327,7 +1314,7 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1343,7 +1330,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
@@ -1360,7 +1347,7 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1376,7 +1363,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
@@ -1393,7 +1380,7 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1413,9 +1400,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVector<Mem_,DT_, IT_> & r,
-                 const DenseVector<Mem_, DT_, IT_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVector<DT_, IT_> & r,
+                 const DenseVector< DT_, IT_> & x,
+                 const DenseVector< DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
@@ -1435,7 +1422,7 @@ namespace FEAT
 
         Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
 
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1455,9 +1442,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
-                 const DenseVector<Mem_, DT_, IT_> & x,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight_> & y,
+                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 const DenseVector< DT_, IT_> & x,
+                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -1476,7 +1463,7 @@ namespace FEAT
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1496,9 +1483,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVector<Mem_,DT_, IT_> & r,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVector<DT_, IT_> & r,
+                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVector< DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
@@ -1517,7 +1504,7 @@ namespace FEAT
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1537,9 +1524,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight_> & y,
+                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -1558,7 +1545,7 @@ namespace FEAT
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1578,9 +1565,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVector< DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -1599,7 +1586,7 @@ namespace FEAT
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+        Arch::Apply::template bcsr<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1640,9 +1627,9 @@ namespace FEAT
        * otherwise the missing entries are ignored (dropped).
        */
       void add_double_mat_product(
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& d,
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& a,
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& b,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& d,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& a,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& b,
         const DT_ alpha = DT_(1),
         const bool allow_incomplete = false)
       {
@@ -1773,9 +1760,9 @@ namespace FEAT
        * otherwise the missing entries are ignored (dropped).
        */
       void add_double_mat_product(
-        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& a,
-        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,
+        const LAFEM::SparseMatrixCSR<DT_, IT_>& d,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& a,
+        const LAFEM::SparseMatrixCSR<DT_, IT_>& b,
         const DT_ alpha = DT_(1),
         const bool allow_incomplete = false)
       {
@@ -1875,7 +1862,7 @@ namespace FEAT
       {
         XASSERTM(lump.size() == rows(), "lump vector size does not match matrix row count!");
 
-        Arch::Lumping<Mem_>::bcsr(
+        Arch::Lumping::bcsr(
           lump.template elements<Perspective::pod>(),
           this->template val<Perspective::pod>(),
           col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
@@ -1907,19 +1894,18 @@ namespace FEAT
        * \param[out] diag
        * The vector containing the diagonal entry values
        */
-      void extract_diag(VectorTypeL & diag, DenseVector<Mem_, IT_, IT_> & diag_indices) const
+      void extract_diag(VectorTypeL & diag, DenseVector<IT_, IT_> & diag_indices) const
       {
         XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
         XASSERTM(rows() == columns(), "matrix is not square!");
 
         for (Index row(0); row < rows(); row++)
         {
-          const Index index = MemoryPool<Mem_>::get_element(diag_indices.elements(), row);
+          const Index index = diag_indices.elements()[row];
           typename VectorTypeL::ValueType t(0);
           if (index != used_elements())
           {
-            ValueType m;
-            MemoryPool<Mem_>::download((DT_*)&m, this->template val<LAFEM::Perspective::pod>() + (index * BlockHeight_ * BlockWidth_), BlockHeight_ * BlockWidth_);
+            ValueType m = this->template val<LAFEM::Perspective::native>()[index];
             for (int i(0) ; i < BlockHeight_ ; ++i)
             {
               t[i] = m[i][i];
@@ -1960,12 +1946,12 @@ namespace FEAT
        * \param[out] diag_indices
        * A vector containing the indices of the diagonal entries
        */
-      void extract_diag_indices(DenseVector<Mem_, IT_, IT_> & diag_indices) const
+      void extract_diag_indices(DenseVector<IT_, IT_> & diag_indices) const
       {
         XASSERTM(diag_indices.size() == rows(), "diag size does not match matrix row count!");
         XASSERTM(rows() == columns(), "matrix is not square!");
 
-        Arch::Diagonal<Mem_>::csr(diag_indices.elements(), col_ind(), row_ptr(), rows());
+        Arch::Diagonal::csr(diag_indices.elements(), col_ind(), row_ptr(), rows());
       }
 
       /**
@@ -1973,9 +1959,9 @@ namespace FEAT
        *
        * \returns A vector containing the indices of the diagonal entries
        */
-      DenseVector<Mem_, IT_, IT_> extract_diag_indices() const
+      DenseVector<IT_, IT_> extract_diag_indices() const
       {
-        DenseVector<Mem_, IT_, IT_> diag_indices(this->template rows<LAFEM::Perspective::native>());
+        DenseVector<IT_, IT_> diag_indices(this->template rows<LAFEM::Perspective::native>());
         extract_diag_indices(diag_indices);
         return diag_indices;
       }
@@ -1990,8 +1976,6 @@ namespace FEAT
         XASSERTM(perm_col.size() == this->columns(), "Container columns does not match permutation size");
 
         // http://de.mathworks.com/help/matlab/math/sparse-matrix-operations.html#f6-13070
-        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> local;
-        local.convert(*this);
         IT_ * temp_row_ptr = new IT_[rows() + 1];
         IT_ * temp_col_ind = new IT_[used_elements()];
         ValueType * temp_val = new ValueType[used_elements()];
@@ -1999,18 +1983,18 @@ namespace FEAT
         Index * perm_pos;
         perm_pos = perm_row.get_perm_pos();
 
-        //permute rows from local to temp_*
+        //permute rows from source to temp_*
         Index new_start(0);
         temp_row_ptr[0] = 0;
-        for (Index row(0) ; row < local.rows() ; ++row)
+        for (Index row(0) ; row < this->rows() ; ++row)
         {
-          Index row_size(local.row_ptr()[perm_pos[row] + 1] - local.row_ptr()[perm_pos[row]]);
+          Index row_size(this->row_ptr()[perm_pos[row] + 1] - this->row_ptr()[perm_pos[row]]);
 
           //iterate over all elements in single one new and old row
-          for (Index i(new_start), j(local.row_ptr()[perm_pos[row]]) ; i < new_start + row_size ; ++i, ++j)
+          for (Index i(new_start), j(this->row_ptr()[perm_pos[row]]) ; i < new_start + row_size ; ++i, ++j)
           {
-            temp_col_ind[i] = local.col_ind()[j];
-            temp_val[i] = local.val()[j];
+            temp_col_ind[i] = this->col_ind()[j];
+            temp_val[i] = this->val()[j];
           }
 
           new_start += row_size;
@@ -2021,12 +2005,12 @@ namespace FEAT
         Adjacency::Permutation perm_col_inv = perm_col.inverse();
         perm_pos = perm_col_inv.get_perm_pos();
 
-        //permute columns from temp_* to local
-        ::memcpy(local.row_ptr(), temp_row_ptr, (rows() + 1) * sizeof(IT_));
-        ::memcpy(local.val(), temp_val, used_elements() * sizeof(ValueType));
+        //permute columns from temp_* to source
+        ::memcpy(this->row_ptr(), temp_row_ptr, (rows() + 1) * sizeof(IT_));
+        ::memcpy(this->val(), temp_val, used_elements() * sizeof(ValueType));
         for (Index i(0) ; i < used_elements() ; ++i)
         {
-          local.col_ind()[i] = (IT_)perm_pos[temp_col_ind[i]];
+          this->col_ind()[i] = (IT_)perm_pos[temp_col_ind[i]];
         }
 
         delete[] temp_row_ptr;
@@ -2038,25 +2022,23 @@ namespace FEAT
         ValueType swap_val;
         for (Index row(0) ; row < rows() ; ++row)
         {
-          Index offset(local.row_ptr()[row]);
-          Index row_size(local.row_ptr()[row+1] - local.row_ptr()[row]);
+          Index offset(this->row_ptr()[row]);
+          Index row_size(this->row_ptr()[row+1] - this->row_ptr()[row]);
           for (Index i(1), j ; i < row_size ; ++i)
           {
-            swap_key = local.col_ind()[i + offset];
-            swap_val = local.val()[i + offset];
+            swap_key = this->col_ind()[i + offset];
+            swap_val = this->val()[i + offset];
             j = i;
-            while (j > 0 && local.col_ind()[j - 1 + offset] > swap_key)
+            while (j > 0 && this->col_ind()[j - 1 + offset] > swap_key)
             {
-              local.col_ind()[j + offset] = local.col_ind()[j - 1 + offset];
-              local.val()[j + offset] = local.val()[j - 1 + offset];
+              this->col_ind()[j + offset] = this->col_ind()[j - 1 + offset];
+              this->val()[j + offset] = this->val()[j - 1 + offset];
               --j;
             }
-            local.col_ind()[j + offset] = swap_key;
-            local.val()[j + offset] = swap_val;
+            this->col_ind()[j + offset] = swap_key;
+            this->val()[j + offset] = swap_val;
           }
         }
-
-        this->assign(local);
       }
 
       /**
@@ -2099,12 +2081,12 @@ namespace FEAT
        */
       template<int BHD_>
       void add_trace_double_mat_mult(
-        typename LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BHD_, BlockHeight>::VectorTypeL& v,
-        const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BHD_, BlockHeight>& d,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, BlockHeight>& a,
+        typename LAFEM::SparseMatrixBCSR< DT_, IT_, BHD_, BlockHeight>::VectorTypeL& v,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, BHD_, BlockHeight>& d,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, BlockHeight>& a,
         const DT_ alpha = DT_(1)) const
       {
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BHD_, BlockHeight> MatrixD;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BHD_, BlockHeight> MatrixD;
 
         static constexpr IT_ bhd = IT_(BHD_);
         static constexpr IT_ bwd = IT_(BlockHeight);
@@ -2179,8 +2161,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const SparseMatrixBCSR & a, const SparseMatrixBCSR<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & b)
+      friend bool operator== (const SparseMatrixBCSR & a, const SparseMatrixBCSR & b)
       {
         if (a.rows() != b.rows())
           return false;
@@ -2201,37 +2182,13 @@ namespace FEAT
 
         bool ret(true);
 
-        if(std::is_same<Mem::Main, Mem_>::value)
-        {
-          col_ind_a = const_cast<IT_*>(a.col_ind());
-          val_a = const_cast<DT_*>(a.template val<Perspective::pod>());
-          row_ptr_a = const_cast<IT_*>(a.row_ptr());
-        }
-        else
-        {
-          col_ind_a = new IT_[a.used_elements()];
-          MemoryPool<Mem_>::template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
-          val_a = new DT_[a.template used_elements<Perspective::pod>()];
-          MemoryPool<Mem_>::template download<DT_>(val_a, a.template val<Perspective::pod>(), a.template used_elements<Perspective::pod>());
-          row_ptr_a = new IT_[a.rows() + 1];
-          MemoryPool<Mem_>::template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
-        }
+        col_ind_a = const_cast<IT_*>(a.col_ind());
+        val_a = const_cast<DT_*>(a.template val<Perspective::pod>());
+        row_ptr_a = const_cast<IT_*>(a.row_ptr());
 
-        if(std::is_same<Mem::Main, Mem2_>::value)
-        {
-          col_ind_b = const_cast<IT_*>(b.col_ind());
-          val_b = const_cast<DT_*>(b.template val<Perspective::pod>());
-          row_ptr_b = const_cast<IT_*>(b.row_ptr());
-        }
-        else
-        {
-          col_ind_b = new IT_[b.used_elements()];
-          MemoryPool<Mem2_>::template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
-          val_b = new DT_[b.template used_elements<Perspective::pod>()];
-          MemoryPool<Mem2_>::template download<DT_>(val_b, b.template val<Perspective::pod>(), b.template used_elements<Perspective::pod>());
-          row_ptr_b = new IT_[b.rows() + 1];
-          MemoryPool<Mem2_>::template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
-        }
+        col_ind_b = const_cast<IT_*>(b.col_ind());
+        val_b = const_cast<DT_*>(b.template val<Perspective::pod>());
+        row_ptr_b = const_cast<IT_*>(b.row_ptr());
 
         for (Index i(0) ; i < a.used_elements() ; ++i)
         {
@@ -2264,19 +2221,6 @@ namespace FEAT
               break;
             }
           }
-        }
-
-        if(! std::is_same<Mem::Main, Mem_>::value)
-        {
-          delete[] col_ind_a;
-          delete[] val_a;
-          delete[] row_ptr_a;
-        }
-        if(! std::is_same<Mem::Main, Mem2_>::value)
-        {
-          delete[] col_ind_b;
-          delete[] val_b;
-          delete[] row_ptr_b;
         }
 
         return ret;
@@ -2353,7 +2297,7 @@ namespace FEAT
         }
       }
 
-      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride = 1)
+      void set_line_reverse(const Index row, const DT_ * const pval_set, const Index stride = 1)
       {
         const auto * prow_ptr(this->row_ptr());
         auto * pval(this->val());

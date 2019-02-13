@@ -50,8 +50,6 @@ namespace FEAT
     public:
       /// sub-matrix type
       typedef SubType_ SubMatrixType;
-      /// sub-matrix memory type
-      typedef typename SubMatrixType::MemType MemType;
       /// sub-matrix data type
       typedef typename SubMatrixType::DataType DataType;
       /// sub-matrix index type
@@ -63,12 +61,12 @@ namespace FEAT
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, blocks_> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<DT2_, IT2_>, blocks_>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = blocks_;
@@ -95,7 +93,7 @@ namespace FEAT
       }
 
       /// sub-matrix layout ctor
-      explicit PowerDiagMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
+      explicit PowerDiagMatrix(const SparseLayout<IndexType, layout_id>& layout) :
         _first(layout),
         _rest(layout)
       {
@@ -497,16 +495,16 @@ namespace FEAT
         rest().apply(r.rest(), x.rest());
       }
 
-      void apply(DenseVector<MemType, DataType , IndexType>& r, const DenseVector<MemType, DataType , IndexType>& x) const
+      void apply(DenseVector<DataType , IndexType>& r, const DenseVector<DataType , IndexType>& x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
-        DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> r_first(r, first().rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().rows(), first().rows());
 
-        DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
-        DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
+        DenseVector<DataType, IndexType> x_first(x, first().columns(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().columns(), first().columns());
 
         first().apply(r_first, x_first);
         rest().apply(r_rest, x_rest);
@@ -534,21 +532,21 @@ namespace FEAT
         rest().apply(r.rest(), x.rest(), y.rest(), alpha);
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
-                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+                 const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
         XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
-        DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> r_first(r, first().rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().rows(), first().rows());
 
-        DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
-        DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
+        DenseVector<DataType, IndexType> x_first(x, first().columns(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().columns(), first().columns());
 
-        DenseVector<MemType, DataType, IndexType> y_first(y, first().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> y_rest(y, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> y_first(y, first().rows(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, rest().rows(), first().rows());
 
         first().apply(r_first, x_first, y_first, alpha);
         rest().apply(r_rest, x_rest, y_rest, alpha);
@@ -611,7 +609,7 @@ namespace FEAT
         }
       }
 
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
+      void set_line_reverse(const Index row, const DataType * const pval_set, const Index stride = 1)
       {
         const Index brows(this->first().template rows<Perspective::pod>());
 
@@ -653,8 +651,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const PowerDiagMatrix & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const PowerDiagMatrix & a, const PowerDiagMatrix & b)
       {
         return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
@@ -669,7 +666,6 @@ namespace FEAT
 
     public:
       typedef SubType_ SubMatrixType;
-      typedef typename SubMatrixType::MemType MemType;
       typedef typename SubMatrixType::DataType DataType;
       typedef typename SubMatrixType::IndexType IndexType;
       /// sub-matrix layout type
@@ -679,12 +675,12 @@ namespace FEAT
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, 1> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<DT2_, IT2_>, 1>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       static constexpr int num_row_blocks = 1;
       static constexpr int num_col_blocks = 1;
@@ -705,7 +701,7 @@ namespace FEAT
       }
 
       /// sub-matrix layout ctor
-      explicit PowerDiagMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
+      explicit PowerDiagMatrix(const SparseLayout<IndexType, layout_id>& layout) :
         _first(layout)
       {
       }
@@ -946,7 +942,7 @@ namespace FEAT
         first().apply(r.first(), x.first());
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
         first().apply(r, x);
       }
@@ -956,8 +952,8 @@ namespace FEAT
         first().apply(r.first(), x.first(), y.first(), alpha);
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
-                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+                 const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
         first().apply(r, x, y, alpha);
       }
@@ -997,7 +993,7 @@ namespace FEAT
         this->first().set_line(row, pval_set, pcol_set, col_start, stride);
       }
 
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
+      void set_line_reverse(const Index row, const DataType * const pval_set, const Index stride = 1)
       {
         this->first().set_line_reverse(row, pval_set, stride);
       }
@@ -1027,8 +1023,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const PowerDiagMatrix & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const PowerDiagMatrix & a, const PowerDiagMatrix & b)
       {
         return (a.name() == b.name()) && (a.first() == b.first());
       }

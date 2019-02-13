@@ -83,20 +83,18 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename DT_, typename IT_>
-    class AlgDofParti<LAFEM::DenseVector<Mem::Main, DT_, IT_>, LAFEM::VectorMirror<Mem::Main, DT_, IT_>>
+    class AlgDofParti<LAFEM::DenseVector<DT_, IT_>, LAFEM::VectorMirror<DT_, IT_>>
     {
     public:
-      /// our memory tag type
-      typedef Mem::Main MemType;
       /// our data type
       typedef DT_ DataType;
       /// our index type
       typedef IT_ IndexType;
 
       /// the local vector type
-      typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
+      typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
       /// the vector mirror type
-      typedef LAFEM::VectorMirror<MemType, DataType, IndexType> MirrorType;
+      typedef LAFEM::VectorMirror<DataType, IndexType> MirrorType;
       /// the global vector type
       typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
       /// the global gate type
@@ -106,11 +104,11 @@ namespace FEAT
       /// our communicator
       const Dist::Comm* _comm;
       /// global dof offset of this process
-      Index _glob_dof_offset;
+      IndexType _glob_dof_offset;
       /// global dof count over all processes
-      Index _glob_dof_count;
+      IndexType _glob_dof_count;
       /// global dof indices, size = number of local DOFs
-      std::vector<Index> _glob_dof_idx;
+      std::vector<IndexType> _glob_dof_idx;
       /// mirror for this process's owned DOFs
       MirrorType _owned_mirror;
       /// rank/mirror-pair of DOF-owner processes
@@ -135,8 +133,8 @@ namespace FEAT
       void clear()
       {
         _comm = nullptr;
-        _glob_dof_offset = Index(0);
-        _glob_dof_count = Index(0);
+        _glob_dof_offset = IndexType(0);
+        _glob_dof_count = IndexType(0);
         _glob_dof_idx.clear();
         _owned_mirror.clear();
         _neighbors_owner.clear();
@@ -152,25 +150,25 @@ namespace FEAT
       }
 
       /// \returns The number of global DOFs owned by this process.
-      Index get_num_owned_dofs() const
+      IndexType get_num_owned_dofs() const
       {
-        return this->_owned_mirror.num_indices();
+        return IndexType(this->_owned_mirror.num_indices());
       }
 
       /// \returns The number of local DOFs shared by this process.
-      Index get_num_local_dofs() const
+      IndexType get_num_local_dofs() const
       {
-        return this->_owned_mirror.size();
+        return IndexType(this->_owned_mirror.size());
       }
 
       /// \returns The total number of global DOFs.
-      Index get_num_global_dofs() const
+      IndexType get_num_global_dofs() const
       {
         return this->_glob_dof_count;
       }
 
       /// \returns The index of the first global DOF owned by this process.
-      Index get_global_dof_offset() const
+      IndexType get_global_dof_offset() const
       {
         return this->_glob_dof_offset;
       }
@@ -178,7 +176,7 @@ namespace FEAT
       /**
        * \brief Returns the global-dof-indices array.
        */
-      const std::vector<Index> get_global_dof_indices() const
+      const std::vector<IndexType> get_global_dof_indices() const
       {
         return this->_glob_dof_idx;
       }
@@ -192,7 +190,7 @@ namespace FEAT
        * \returns
        * The global index of the local DOF.
        */
-      Index map_local_to_global_index(const Index local_dof_idx) const
+      IndexType map_local_to_global_index(const IndexType local_dof_idx) const
       {
         ASSERT(local_dof_idx < this->_owned_mirror.size());
         return this->_glob_dof_idx.at(local_dof_idx);
@@ -207,7 +205,7 @@ namespace FEAT
        * \returns
        * The local index of the owned DOF.
        */
-      Index map_owned_to_local_index(const Index owned_dof_idx) const
+      IndexType map_owned_to_local_index(const IndexType owned_dof_idx) const
       {
         ASSERT(owned_dof_idx < this->_owned_mirror.num_indices());
         return this->_owned_mirror.indices()[owned_dof_idx];
@@ -222,15 +220,15 @@ namespace FEAT
       }
 
       /// \returns The number of owner neighbors.
-      Index get_num_owner_neighbors() const
+      IndexType get_num_owner_neighbors() const
       {
-        return Index(this->_neighbors_owner.size());
+        return IndexType(this->_neighbors_owner.size());
       }
 
       /// \returns The number of donee neighbors.
-      Index get_num_donee_neighbors() const
+      IndexType get_num_donee_neighbors() const
       {
-        return Index(this->_neighbors_donee.size());
+        return IndexType(this->_neighbors_donee.size());
       }
 
       /**
@@ -242,7 +240,7 @@ namespace FEAT
        * \returns
        * The rank of the i-th owner neighbor.
        */
-      int get_owner_rank(Index i) const
+      int get_owner_rank(IndexType i) const
       {
         return this->_neighbors_owner.at(i).first;
       }
@@ -256,7 +254,7 @@ namespace FEAT
        * \returns
        * The rank of the i-th donee neighbor.
        */
-      int get_donee_rank(Index i) const
+      int get_donee_rank(IndexType i) const
       {
         return this->_neighbors_donee.at(i).first;
       }
@@ -273,7 +271,7 @@ namespace FEAT
        * \returns
        * The mirror of the i-th owner neighbor.
        */
-      const MirrorType& get_owner_mirror(Index i) const
+      const MirrorType& get_owner_mirror(IndexType i) const
       {
         return this->_neighbors_owner.at(i).second;
       }
@@ -290,7 +288,7 @@ namespace FEAT
        * \returns
        * The mirror of the i-th donee neighbor.
        */
-      const MirrorType& get_donee_mirror(Index i) const
+      const MirrorType& get_donee_mirror(IndexType i) const
       {
         return this->_neighbors_donee.at(i).second;
       }
@@ -376,7 +374,7 @@ namespace FEAT
         const std::vector<int>& neighbor_ranks = gate._ranks;
 
         // get number of local DOFs on our patch
-        const Index num_local_dofs = gate._freqs.size();
+        const IndexType num_local_dofs = IndexType(gate._freqs.size());
 
         // As a very first step, we have to decide which process will become the
         // owner of each DOF. In this implementation, each DOF is owned by by the
@@ -414,23 +412,23 @@ namespace FEAT
         // Okay, at this point we (and all other processes) know the owners of
         // each of our local DOFs. Now, we have to generate a vector of all
         // local DOF indices of the DOFs that we own:
-        std::vector<Index> owned_dofs;
+        std::vector<IndexType> owned_dofs;
         owned_dofs.reserve(num_local_dofs);
 
         // Furthermore, we need the 'inverse' information, i.e. for each of our
         // local DOFs, we have to store the "owned DOF index" if we own this
         // particular DOF. We initialize the vector with ~0, which stands for
         // "not my DOF":
-        std::vector<Index> own_dof_idx(num_local_dofs, ~Index(0));
+        std::vector<IndexType> own_dof_idx(num_local_dofs, ~IndexType(0));
 
         // Loop over all local DOFs
-        for(Index i(0); i < num_local_dofs; ++i)
+        for(IndexType i(0); i < num_local_dofs; ++i)
         {
           // Am I the owner of this DOF?
           if(dof_owners[i] == my_rank)
           {
             // Yes, that's my DOF, so let's give it a new 'my owned DOF' index:
-            own_dof_idx.at(i) = Index(owned_dofs.size());
+            own_dof_idx.at(i) = IndexType(owned_dofs.size());
             // And remember that I own this DOF:
             owned_dofs.push_back(i);
           }
@@ -440,7 +438,7 @@ namespace FEAT
         XASSERTM(!owned_dofs.empty(), "this process has no DOFs!");
 
         // get number of my owned DOFS
-        const Index num_owned_dofs = Index(owned_dofs.size());
+        const IndexType num_owned_dofs = IndexType(owned_dofs.size());
 
         // Next, we have to determine the global offset of our first owned DOF, which
         // is easily obtained by an exclusive-scan over each processes owned DOF count:
@@ -475,7 +473,7 @@ namespace FEAT
             // means that all our local DOFs, which are shared with that particular
             // neighbor, are owned by some *other* neighbor process(es) and not by
             // the particular neighbor that we are currently considering.
-            std::vector<Index> v = _owner_vidx(mirror, dof_owners, neighbor_rank);
+            std::vector<IndexType> v = _owner_vidx(mirror, dof_owners, neighbor_rank);
             if(!v.empty())
             {
               // That neighbor owns at least one of our local DOFs, so create a mirror
@@ -494,7 +492,7 @@ namespace FEAT
             // means that all our local DOFs, which are shared with that particular
             // neighbor, are owned by some *other* neighbor process(es) and not by
             // this process (i.e. us).
-            std::vector<Index> v = _donee_vidx(mirror, own_dof_idx);
+            std::vector<IndexType> v = _donee_vidx(mirror, own_dof_idx);
             if(!v.empty())
             {
               // We own at least of one of the neighbor's local DOFs, so create a mirror
@@ -513,13 +511,13 @@ namespace FEAT
         // Let's create the vector of the required length, initialize all its indices to
         // ~0, which will can be used for a sanity check later on to ensure that we know
         // the global indices of all our local DOFs:
-        this->_glob_dof_idx.resize(num_local_dofs, ~Index(0));
+        this->_glob_dof_idx.resize(num_local_dofs, ~IndexType(0));
 
         // Next, let's loop over all DOFs that we own and assign their corresponding
         // global DOF indices, starting with our global DOF offset, which we have already
         // determined before:
         for(std::size_t i(0); i < owned_dofs.size(); ++i)
-          this->_glob_dof_idx[owned_dofs[i]] = this->_glob_dof_offset + Index(i);
+          this->_glob_dof_idx[owned_dofs[i]] = this->_glob_dof_offset + IndexType(i);
 
         // Finally, we also need to query the global DOF indices of all our local DOFs,
         // which are owned by some neighbor process (i.e. we are the donee for these DOFs).
@@ -527,10 +525,10 @@ namespace FEAT
         // to all of our "donee-neighbors".
 
         // Allocate index buffers and post receives for all of our owner-neighbors:
-        const Index num_neigh_owner = Index(_neighbors_owner.size());
+        const IndexType num_neigh_owner = IndexType(_neighbors_owner.size());
         Dist::RequestVector recv_reqs(num_neigh_owner);
-        std::vector<std::vector<Index>> recv_bufs(num_neigh_owner);
-        for(Index i(0); i < num_neigh_owner; ++i)
+        std::vector<std::vector<IndexType>> recv_bufs(num_neigh_owner);
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           const std::size_t num_idx = _neighbors_owner.at(i).second.num_indices();
           recv_bufs.at(i).resize(num_idx);
@@ -539,21 +537,21 @@ namespace FEAT
 
         // Allocate index buffers, fill them with the global DOF indices of our owned
         // DOFs and send them to the donee-neighbors:
-        const Index num_neigh_donee = Index(_neighbors_donee.size());
+        const IndexType num_neigh_donee = IndexType(_neighbors_donee.size());
         Dist::RequestVector send_reqs(num_neigh_donee);
-        std::vector<std::vector<Index>> send_bufs(num_neigh_donee);
-        for(Index i(0); i < num_neigh_donee; ++i)
+        std::vector<std::vector<IndexType>> send_bufs(num_neigh_donee);
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           // Get the mirror for this donee-neighbor:
           const MirrorType& mirror = _neighbors_donee.at(i).second;
           const Index num_idx = mirror.num_indices();
-          const Index* mir_idx = mirror.indices();
+          const IndexType* mir_idx = mirror.indices();
           // Allocate buffer of required size and translate the indices of our mirror,
           // which are "owned DOF indices", to global DOF indices, where:
           //   global_dof_index := global_dof_offset + owned_dof_index
           send_bufs.at(i).resize(num_idx);
-          Index* jdx = send_bufs.at(i).data();
-          for(Index j(0); j < num_idx; ++j)
+          IndexType* jdx = send_bufs.at(i).data();
+          for(IndexType j(0); j < num_idx; ++j)
             jdx[j] = this->_glob_dof_offset + mir_idx[j];
           send_reqs[i] = comm.isend(send_bufs.at(i).data(), num_idx, _neighbors_donee.at(i).first);
         }
@@ -563,11 +561,11 @@ namespace FEAT
         {
           const MirrorType& mirror = _neighbors_owner.at(i).second;
           const Index num_idx = mirror.num_indices();
-          const Index* mir_idx = mirror.indices();
-          const Index* jdx = recv_bufs.at(i).data();
+          const IndexType* mir_idx = mirror.indices();
+          const IndexType* jdx = recv_bufs.at(i).data();
           // Scatter the global DOF indices, which our friendly owner-neighbor has
           // provided us with, into our global DOF index vector:
-          for(Index j(0); j < num_idx; ++j)
+          for(IndexType j(0); j < num_idx; ++j)
             this->_glob_dof_idx[mir_idx[j]] = jdx[j];
         }
 
@@ -577,35 +575,35 @@ namespace FEAT
 #ifdef DEBUG
         // Last but not least: debug-mode sanity check
         // We now should know the global DOF indices for all of our local DOFs:
-        for(Index gdi : this->_glob_dof_idx)
+        for(IndexType gdi : this->_glob_dof_idx)
         {
-          XASSERTM(gdi != ~Index(0), "invalid global DOF index");
+          XASSERTM(gdi != ~IndexType(0), "invalid global DOF index");
         }
 #endif // DEBUG
       }
 
     private:
       // auxiliary function: create a mirror from a vector of indices
-      static MirrorType _vidx2mirror(const Index size, const std::vector<Index>& vidx)
+      static MirrorType _vidx2mirror(const IndexType size, const std::vector<IndexType>& vidx)
       {
-        const Index nidx = Index(vidx.size());
+        const IndexType nidx = IndexType(vidx.size());
         MirrorType mirror(size, nidx);
         IndexType* idx = mirror.indices();
-        for(Index i(0); i < nidx; ++i)
+        for(IndexType i(0); i < nidx; ++i)
           idx[i] = vidx[i];
         return mirror;
       }
 
       // auxiliary function: create an index vector of all *local DOFs*
       // which are owned by the process with the given neighbor rank:
-      static std::vector<Index> _owner_vidx(const MirrorType& old_mir,
+      static std::vector<IndexType> _owner_vidx(const MirrorType& old_mir,
         const std::vector<int>& dof_owners, const int neighbor_rank)
       {
-        std::vector<Index> v;
+        std::vector<IndexType> v;
         v.reserve(old_mir.num_indices());
 
         const IndexType* old_idx = old_mir.indices();
-        for(Index i(0); i < old_mir.num_indices(); ++i)
+        for(IndexType i(0); i < old_mir.num_indices(); ++i)
         {
           // is this neighbor the owner?
           if(neighbor_rank == dof_owners[old_idx[i]])
@@ -616,17 +614,17 @@ namespace FEAT
 
       // auxiliary function: create an index vector all *owned DOFs*
       // which are local DOFs of the process whose mirror is given:
-      static std::vector<Index> _donee_vidx(const MirrorType& old_mir,
-        const std::vector<Index>& own_dof_idx)
+      static std::vector<IndexType> _donee_vidx(const MirrorType& old_mir,
+        const std::vector<IndexType>& own_dof_idx)
       {
-        std::vector<Index> v;
+        std::vector<IndexType> v;
         v.reserve(old_mir.num_indices());
 
         const IndexType* old_idx = old_mir.indices();
-        for(Index i(0); i < old_mir.num_indices(); ++i)
+        for(IndexType i(0); i < old_mir.num_indices(); ++i)
         {
           // do we own the DOF in this mirror?
-          if(own_dof_idx[old_idx[i]] != ~Index(0))
+          if(own_dof_idx[old_idx[i]] != ~IndexType(0))
             v.push_back(own_dof_idx[old_idx[i]]);
         }
         return v;
@@ -660,8 +658,6 @@ namespace FEAT
     class AlgDofPartiVector
     {
     public:
-      /// our memory tag type
-      typedef typename LocalVector_::MemType MemType;
       /// our data type
       typedef typename LocalVector_::DataType DataType;
       /// our index type
@@ -679,9 +675,9 @@ namespace FEAT
       typedef Global::AlgDofParti<LocalVector_, Mirror_> AlgDofPartiType;
 
       /// the buffer vector type used for communication
-      typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferVectorType;
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
       /// the vector type used for the internal storage of our owned DOFs
-      typedef LAFEM::DenseVector<MemType, DataType, IndexType> OwnedVectorType;
+      typedef LAFEM::DenseVector<DataType, IndexType> OwnedVectorType;
 
     protected:
       /// the algebraic dof-partitioning
@@ -833,8 +829,8 @@ namespace FEAT
         const Dist::Comm& comm = *this->get_comm();
 
         // get the number of owner- and donee-neighbors
-        const Index num_neigh_owner = adp.get_num_owner_neighbors();
-        const Index num_neigh_donee = adp.get_num_donee_neighbors();
+        const IndexType num_neigh_owner = adp.get_num_owner_neighbors();
+        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
 
         // The basic idea is simple:
         // 1) Send the shared DOFs to all of our donee-neighbors
@@ -844,7 +840,7 @@ namespace FEAT
         // Create receive buffers and post receives for all owner-neighbors
         Dist::RequestVector recv_reqs(num_neigh_owner);
         std::vector<BufferVectorType> recv_bufs(num_neigh_owner);
-        for(Index i(0); i < num_neigh_owner; ++i)
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           // create a vector buffer
           // note: owner mirrors relate to local DOF indices
@@ -857,7 +853,7 @@ namespace FEAT
         // to our donee-neighbors
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<BufferVectorType> send_bufs(num_neigh_donee);
-        for(Index i(0); i < num_neigh_donee; ++i)
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           // get mirror, create buffer and gather the shared DOFs
           // note: donee mirrors relate to owned DOF indices
@@ -878,7 +874,7 @@ namespace FEAT
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter received DOFs into our output vector
-          adp.get_owner_mirror(Index(idx)).scatter_axpy(local_vector, recv_bufs.at(idx));
+          adp.get_owner_mirror(IndexType(idx)).scatter_axpy(local_vector, recv_bufs.at(idx));
         }
 
         // at this point, all receives should have finished
@@ -919,8 +915,6 @@ namespace FEAT
     class AlgDofPartiMatrix
     {
     public:
-      /// our memory tag type
-      typedef typename LocalMatrix_::MemType MemType;
       /// our data type
       typedef typename LocalMatrix_::DataType DataType;
       /// our index type
@@ -937,12 +931,12 @@ namespace FEAT
       typedef typename LocalMatrixType::VectorTypeR LocalVectorType;
 
       /// the buffer vector type used for communication
-      typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> BufferVectorType;
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
       /// the buffer matrix type used for communication
-      typedef LAFEM::MatrixMirrorBuffer<Mem::Main, DataType, IndexType> BufferMatrixType;
+      typedef LAFEM::MatrixMirrorBuffer<DataType, IndexType> BufferMatrixType;
 
       /// the matrix type used for the internal storage of our owned matrix rows
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType> OwnedMatrixType;
+      typedef LAFEM::SparseMatrixCSR<DataType, IndexType> OwnedMatrixType;
 
       /// the algebraic DOF partitioning
       typedef Global::AlgDofParti<LocalVectorType, MirrorType> AlgDofPartiType;
@@ -960,7 +954,7 @@ namespace FEAT
       /// the data array mirrors for our donee and owner neighbors
       std::vector<MirrorType> _data_donee_mirs, _data_owner_mirs;
       /// the data array "mirror" for this process
-      std::vector<std::pair<Index,Index>> _my_data_mir;
+      std::vector<std::pair<IndexType,IndexType>> _my_data_mir;
 
     public:
       /// default constructor
@@ -1157,8 +1151,8 @@ namespace FEAT
         // format our internal matrix
         this->_matrix.format();
 
-        const Index num_neigh_owner = adp.get_num_owner_neighbors();
-        const Index num_neigh_donee = adp.get_num_donee_neighbors();
+        const IndexType num_neigh_owner = adp.get_num_owner_neighbors();
+        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
 
         Dist::RequestVector recv_reqs(num_neigh_donee);
         Dist::RequestVector send_reqs(num_neigh_owner);
@@ -1167,7 +1161,7 @@ namespace FEAT
         std::vector<BufferVectorType> owner_vbufs(num_neigh_owner);
 
         // create receive buffers and post receives
-        for(Index i(0); i < num_neigh_donee; ++i)
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           // create buffer
           BufferVectorType& buf = donee_vbufs.at(i);
@@ -1178,7 +1172,7 @@ namespace FEAT
         }
 
         // post sends
-        for(Index i(0); i < num_neigh_owner; ++i)
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           // create buffer
           BufferVectorType& buf = owner_vbufs.at(i);
@@ -1235,18 +1229,18 @@ namespace FEAT
        * \param[in] filter
        * The unit-filter that is to be applied onto the matrix. May be empty.
        */
-      void filter_matrix(const LAFEM::UnitFilter<MemType, DataType, IndexType>& filter)
+      void filter_matrix(const LAFEM::UnitFilter<DataType, IndexType>& filter)
       {
         // empty filter?
-        if(filter.used_elements() <= Index(0))
+        if(filter.used_elements() <= IndexType(0))
           return;
 
         // get our partitioning
         const AlgDofPartiType& adp = *this->_alg_dof_parti;
 
         // get global owned DOF offset and count
-        const Index off_glob = adp.get_global_dof_offset();
-        const Index num_glob = adp.get_num_global_dofs();
+        const IndexType off_glob = adp.get_global_dof_offset();
+        const IndexType num_glob = adp.get_num_global_dofs();
 
         // get local filter indices
         const Index num_idx = filter.used_elements();
@@ -1258,18 +1252,18 @@ namespace FEAT
         DataType* val = this->_matrix.val();
 
         // loop over all filter indices
-        for(Index i(0); i < num_idx; ++i)
+        for(IndexType i(0); i < num_idx; ++i)
         {
           // translate local to global filter DOF index
-          const Index gidx = adp.map_local_to_global_index(fil_idx[i]);
+          const IndexType gidx = adp.map_local_to_global_index(fil_idx[i]);
 
           // determine whether we own this DOF
           if((gidx < off_glob) || (off_glob + num_glob <= gidx))
             continue; // not my DOF
 
           // okay, that's my DOF, so filter the row
-          const Index row = gidx - off_glob;
-          for(Index j(row_ptr[row]); j < row_ptr[row+1]; ++j)
+          const IndexType row = gidx - off_glob;
+          for(IndexType j(row_ptr[row]); j < row_ptr[row+1]; ++j)
           {
             val[j] = DataType(col_idx[j] == gidx ? 1 : 0);
           }
@@ -1300,7 +1294,7 @@ namespace FEAT
        */
       static BufferMatrixType _asm_mat_buf(
         const LocalMatrixType& local_matrix, const MirrorType& mirror,
-        const std::vector<Index>& gdi, const Index num_glob_dofs)
+        const std::vector<IndexType>& gdi, const IndexType num_glob_dofs)
       {
         const Index num_idx = mirror.num_indices();
         const IndexType* mir_idx = mirror.indices();
@@ -1309,8 +1303,8 @@ namespace FEAT
         const IndexType* col_idx = local_matrix.col_ind();
 
         // count number of non-zeros in matrix buffer
-        Index nnze = Index(0);
-        for(Index i(0); i < num_idx; ++i)
+        IndexType nnze = IndexType(0);
+        for(IndexType i(0); i < num_idx; ++i)
         {
           nnze += (row_ptr[mir_idx[i]+1] - row_ptr[mir_idx[i]]);
         }
@@ -1321,13 +1315,13 @@ namespace FEAT
         IndexType* buf_idx = buf.col_ind();
 
         // set up buffer structure
-        buf_ptr[0] = Index(0);
-        for(Index i(0); i < num_idx; ++i)
+        buf_ptr[0] = IndexType(0);
+        for(IndexType i(0); i < num_idx; ++i)
         {
-          const Index row = mir_idx[i];
-          Index k = buf_ptr[i];
+          const IndexType row = mir_idx[i];
+          IndexType k = buf_ptr[i];
           // map local DOFs to global DOFs
-          for(Index j(row_ptr[row]); j < row_ptr[row+1]; ++j, ++k)
+          for(IndexType j(row_ptr[row]); j < row_ptr[row+1]; ++j, ++k)
             buf_idx[k] = gdi[col_idx[j]];
           buf_ptr[i+1] = k;
         }
@@ -1354,13 +1348,13 @@ namespace FEAT
         const Dist::Comm& comm = *this->get_comm();
 
         // get number of neighbors and allocate buffer vectors
-        const Index num_neigh_owner = adp.get_num_owner_neighbors();
-        const Index num_neigh_donee = adp.get_num_donee_neighbors();
+        const IndexType num_neigh_owner = adp.get_num_owner_neighbors();
+        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
         _owner_bufs.resize(num_neigh_owner);
         _donee_bufs.resize(num_neigh_donee);
 
         // create the owner buffers by using the auxiliary helper function.
-        for(Index i(0); i < num_neigh_owner; ++i)
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           this->_owner_bufs.at(i) = _asm_mat_buf(local_matrix, adp.get_owner_mirror(i),
             adp.get_global_dof_indices(), adp.get_num_global_dofs());
@@ -1381,23 +1375,23 @@ namespace FEAT
         Dist::RequestVector recv_reqs(num_neigh_donee);
 
         // receive buffer dimensions vector
-        std::vector<std::array<Index,4>> send_dims(num_neigh_owner);
-        std::vector<std::array<Index,4>> recv_dims(num_neigh_donee);
+        std::vector<std::array<IndexType,4>> send_dims(num_neigh_owner);
+        std::vector<std::array<IndexType,4>> recv_dims(num_neigh_donee);
 
         // post send-buffer dimension receives
-        for(Index i(0); i < num_neigh_donee; ++i)
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           recv_reqs[i] = comm.irecv(recv_dims.at(i).data(), std::size_t(4), adp.get_donee_rank(i));
         }
 
         // send owner-buffer dimensions
-        for(Index i(0); i < num_neigh_owner; ++i)
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           const BufferMatrixType& sbuf = this->_owner_bufs.at(i);
-          send_dims.at(i)[0] = sbuf.rows();
-          send_dims.at(i)[1] = sbuf.columns();
-          send_dims.at(i)[2] = sbuf.entries_per_nonzero();
-          send_dims.at(i)[3] = sbuf.used_elements();
+          send_dims.at(i)[0] = IndexType(sbuf.rows());
+          send_dims.at(i)[1] = IndexType(sbuf.columns());
+          send_dims.at(i)[2] = IndexType(sbuf.entries_per_nonzero());
+          send_dims.at(i)[3] = IndexType(sbuf.used_elements());
           send_reqs[i] = comm.isend(send_dims.at(i).data(), std::size_t(4), adp.get_owner_rank(i));
         }
 
@@ -1405,20 +1399,20 @@ namespace FEAT
         recv_reqs.wait_all();
 
         // allocate donee-buffers
-        for(Index i(0); i < num_neigh_donee; ++i)
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           // get the receive buffer dimensions
-          Index nrows = recv_dims.at(i)[0];
-          Index ncols = recv_dims.at(i)[1];
-          Index nepnz = recv_dims.at(i)[2];
-          Index nnze  = recv_dims.at(i)[3];
+          IndexType nrows = recv_dims.at(i)[0];
+          IndexType ncols = recv_dims.at(i)[1];
+          IndexType nepnz = recv_dims.at(i)[2];
+          IndexType nnze  = recv_dims.at(i)[3];
 
           // allocate receive buffer
           this->_donee_bufs.at(i) = BufferMatrixType(nrows, ncols, nnze, nepnz);
         }
 
         // post donee-buffer row-pointer array receives
-        for(Index i(0); i < num_neigh_donee; ++i)
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           recv_reqs[i] = comm.irecv(this->_donee_bufs.at(i).row_ptr(),
             this->_donee_bufs.at(i).rows()+std::size_t(1), adp.get_donee_rank(i));
@@ -1428,7 +1422,7 @@ namespace FEAT
         send_reqs.wait_all();
 
         // post owner-buffer row-pointer array sends
-        for(Index i(0); i < num_neigh_owner; ++i)
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           send_reqs[i] = comm.isend(this->_owner_bufs.at(i).row_ptr(),
             this->_owner_bufs.at(i).rows()+std::size_t(1), adp.get_owner_rank(i));
@@ -1438,7 +1432,7 @@ namespace FEAT
         recv_reqs.wait_all();
 
         // post donee-buffer column-index array receives
-        for(Index i(0); i < num_neigh_donee; ++i)
+        for(IndexType i(0); i < num_neigh_donee; ++i)
         {
           recv_reqs[i] = comm.irecv(this->_donee_bufs.at(i).col_ind(),
             this->_donee_bufs.at(i).used_elements(), adp.get_donee_rank(i));
@@ -1448,7 +1442,7 @@ namespace FEAT
         send_reqs.wait_all();
 
         // post owner-buffer column-index array sends
-        for(Index i(0); i < num_neigh_owner; ++i)
+        for(IndexType i(0); i < num_neigh_owner; ++i)
         {
           send_reqs[i] = comm.isend(this->_owner_bufs.at(i).col_ind(),
             this->_owner_bufs.at(i).used_elements(), adp.get_owner_rank(i));
@@ -1474,8 +1468,8 @@ namespace FEAT
         // get our matrix dimensions:
         // * each row of our matrix corresponds to one owned DOF
         // * each column corresponds to one global DOF
-        const Index num_rows = adp.get_num_owned_dofs();
-        const Index num_cols = adp.get_num_global_dofs();
+        const IndexType num_rows = adp.get_num_owned_dofs();
+        const IndexType num_cols = adp.get_num_global_dofs();
 
         // Unfortunately, assembling the matrix structure is not that easy,
         // because it is a union of our owned matrix structure and all of
@@ -1491,11 +1485,11 @@ namespace FEAT
         const IndexType* loc_row_ptr = local_matrix.row_ptr();
         const IndexType* loc_col_idx = local_matrix.col_ind();
         const IndexType* own_mir_idx = adp.get_owned_mirror().indices();
-        for(Index i(0); i < num_rows; ++i)
+        for(IndexType i(0); i < num_rows; ++i)
         {
           // get the local DOF index of our i-th owned DOF
-          const Index lrow = own_mir_idx[i];
-          for(Index j(loc_row_ptr[lrow]); j < loc_row_ptr[lrow + 1]; ++j)
+          const IndexType lrow = own_mir_idx[i];
+          for(IndexType j(loc_row_ptr[lrow]); j < loc_row_ptr[lrow + 1]; ++j)
           {
             // translate the local column indices into global DOF indices
             dynamic_graph.insert(i, adp.map_local_to_global_index(loc_col_idx[j]));
@@ -1503,8 +1497,8 @@ namespace FEAT
         }
 
         // process all donee-neighbor buffers
-        const Index num_neigh_donee = adp.get_num_donee_neighbors();
-        for(Index ineigh(0); ineigh < num_neigh_donee; ++ineigh)
+        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
+        for(IndexType ineigh(0); ineigh < num_neigh_donee; ++ineigh)
         {
           // get the mirror and the matrix buffer of that donee neighbor
           // note: the donee mirror indices are owned DOF indices
@@ -1517,13 +1511,13 @@ namespace FEAT
           const IndexType* buf_idx = buf.col_ind();
 
           // loop over all matrix buffer rows
-          for(Index i(0); i < num_idx; ++i)
+          for(IndexType i(0); i < num_idx; ++i)
           {
             // the owned DOF index of our the buffer matrix row
-            const Index row = mir_idx[i];
+            const IndexType row = mir_idx[i];
 
             // loop over all buffer indices
-            for(Index j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
+            for(IndexType j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
             {
               // insert entry into our local matrix
               dynamic_graph.insert(row, buf_idx[j]);
@@ -1567,17 +1561,17 @@ namespace FEAT
         IndexType* dat_idx = dat_mir.indices();
 
         // loop over all buffer matrix rows
-        for(Index i(0); i < buf_rows; ++i)
+        for(IndexType i(0); i < buf_rows; ++i)
         {
           // get local matrix row index
-          const Index row = row_idx[i];
-          for(Index j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
+          const IndexType row = row_idx[i];
+          for(IndexType j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
           {
             // get global column index
-            const Index col = buf_idx[j];
+            const IndexType col = buf_idx[j];
 
             // loop over the corresponding row of our matrix
-            for(Index k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            for(IndexType k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
             {
               // is this the column we are looking for?
               if(col_idx[k] == col)
@@ -1611,7 +1605,7 @@ namespace FEAT
        */
       static MirrorType _asm_owner_data_mir(const LocalMatrixType& local_matrix,
         const MirrorType& mirror, const BufferMatrixType& buffer,
-        const std::vector<Index>& glob_dof_idx)
+        const std::vector<IndexType>& glob_dof_idx)
       {
         // allocate mirror
         const Index buf_rows = buffer.rows();
@@ -1626,17 +1620,17 @@ namespace FEAT
         IndexType* dat_idx = dat_mir.indices();
 
         // loop over all buffer matrix rows
-        for(Index i(0); i < buf_rows; ++i)
+        for(IndexType i(0); i < buf_rows; ++i)
         {
           // get local matrix row index
-          const Index row = row_idx[i];
-          for(Index j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
+          const IndexType row = row_idx[i];
+          for(IndexType j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
           {
             // get global column index
-            const Index col = buf_idx[j];
+            const IndexType col = buf_idx[j];
 
             // loop over the corresponding row of our matrix
-            for(Index k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+            for(IndexType k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
             {
               // is this the column we are looking for?
               if(glob_dof_idx[col_idx[k]] == col)
@@ -1671,13 +1665,13 @@ namespace FEAT
 
         // assemble donee data mirrors
         this->_data_donee_mirs.resize(this->_donee_bufs.size());
-        for(Index i(0); i < this->_donee_bufs.size(); ++i)
+        for(IndexType i(0); i < this->_donee_bufs.size(); ++i)
           this->_data_donee_mirs.at(i) = _asm_donee_data_mir(this->_matrix,
             adp.get_donee_mirror(i), this->_donee_bufs.at(i));
 
         // assemble owner data mirrors
         this->_data_owner_mirs.resize(this->_owner_bufs.size());
-        for(Index i(0); i < this->_owner_bufs.size(); ++i)
+        for(IndexType i(0); i < this->_owner_bufs.size(); ++i)
           this->_data_owner_mirs.at(i) = _asm_owner_data_mir(local_matrix,
             adp.get_owner_mirror(i), this->_owner_bufs.at(i),
             adp.get_global_dof_indices());
@@ -1692,29 +1686,29 @@ namespace FEAT
         _my_data_mir.clear();
         _my_data_mir.reserve(this->_matrix.used_elements());
 
-        const Index num_owned_dofs = adp.get_num_owned_dofs();
+        const IndexType num_owned_dofs = adp.get_num_owned_dofs();
         const IndexType* loc_dof_idx = adp.get_owned_mirror().indices();
-        const std::vector<Index>& glob_dof_idx = adp.get_global_dof_indices();
+        const std::vector<IndexType>& glob_dof_idx = adp.get_global_dof_indices();
 
         XASSERT(num_owned_dofs == this->_matrix.rows());
 
         // loop over all our owned DOFS
-        for(Index own_dof(0); own_dof < num_owned_dofs; ++own_dof)
+        for(IndexType own_dof(0); own_dof < num_owned_dofs; ++own_dof)
         {
           // get the local DOF index for this owned DOF
-          const Index loc_dof = loc_dof_idx[own_dof];
+          const IndexType loc_dof = loc_dof_idx[own_dof];
 
           // loop over all columns of our owned DOF matrix
-          for(Index j(row_ptr_x[own_dof]); j < row_ptr_x[own_dof + 1]; ++j)
+          for(IndexType j(row_ptr_x[own_dof]); j < row_ptr_x[own_dof + 1]; ++j)
           {
             // get the column index, which is a global DOF index
-            const Index col_x = col_idx_x[j];
+            const IndexType col_x = col_idx_x[j];
 
             // loop over the row of the local matrix
-            for(Index k(row_ptr_a[loc_dof]); k < row_ptr_a[loc_dof + 1]; ++k)
+            for(IndexType k(row_ptr_a[loc_dof]); k < row_ptr_a[loc_dof + 1]; ++k)
             {
               // get the local column index and map it to a global one
-              const Index col_a = glob_dof_idx[col_idx_a[k]];
+              const IndexType col_a = glob_dof_idx[col_idx_a[k]];
 
               // match?
               if(col_a == col_x)
@@ -1767,7 +1761,7 @@ namespace FEAT
         const DataType* mat_val = local_matrix.val();
         const IndexType* mir_idx = data_mirror.indices();
         const Index n = buffer.size();
-        for(Index i(0); i < n; ++i)
+        for(IndexType i(0); i < n; ++i)
           buf_val[i] = mat_val[mir_idx[i]];
       }
 
@@ -1793,7 +1787,7 @@ namespace FEAT
         const DataType* buf_val = buffer.elements();
         const IndexType* mir_idx = data_mirror.indices();
         const Index n = buffer.size();
-        for(Index i(0); i < n; ++i)
+        for(IndexType i(0); i < n; ++i)
           mat_val[mir_idx[i]] += buf_val[i];
       }
     }; // class AlgDofPartiMatrixCSR

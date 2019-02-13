@@ -57,25 +57,23 @@ namespace FEAT
     <
       int dim_,
       int nsc_ = (dim_*(dim_+1))/2,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename MatrixBlockM_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, nsc_, nsc_>,
-      typename MatrixBlockK_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, nsc_, dim_>,
-      typename MatrixBlockL_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, nsc_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixS_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, nsc_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename MatrixBlockM_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, nsc_, nsc_>,
+      typename MatrixBlockK_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, nsc_, dim_>,
+      typename MatrixBlockL_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, nsc_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixS_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, nsc_>
     >
     class Stokes3FieldSystemLevel
     {
     public:
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
       static constexpr int dim = dim_;
@@ -92,9 +90,9 @@ namespace FEAT
       typedef MatrixBlockM_ LocalMatrixBlockM;
       typedef MatrixBlockK_ LocalMatrixBlockK;
       typedef MatrixBlockL_ LocalMatrixBlockL;
-      typedef LAFEM::NullMatrix<MemType_, DataType_, IndexType_,   1,   1> NullMatrixBlockPP;
-      typedef LAFEM::NullMatrix<MemType_, DataType_, IndexType_, nsc,   1> NullMatrixBlockSP;
-      typedef LAFEM::NullMatrix<MemType_, DataType_, IndexType_,   1, nsc> NullMatrixBlockPS;
+      typedef LAFEM::NullMatrix<DataType_, IndexType_,   1,   1> NullMatrixBlockPP;
+      typedef LAFEM::NullMatrix<DataType_, IndexType_, nsc,   1> NullMatrixBlockSP;
+      typedef LAFEM::NullMatrix<DataType_, IndexType_,   1, nsc> NullMatrixBlockPS;
       typedef LAFEM::TupleMatrix<
         LAFEM::TupleMatrixRow<LocalMatrixBlockA, LocalMatrixBlockB, LocalMatrixBlockL>,
         LAFEM::TupleMatrixRow<LocalMatrixBlockD, NullMatrixBlockPP, NullMatrixBlockPS>,
@@ -120,7 +118,7 @@ namespace FEAT
       typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       // define mirror types
-      typedef LAFEM::VectorMirror<MemType, DataType, IndexType> ScalarMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> ScalarMirror;
       typedef ScalarMirror VeloMirror;
       typedef ScalarMirror PresMirror;
       typedef ScalarMirror StressMirror;

@@ -17,7 +17,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     print ("Error: Intel Compiler version less then 15 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-std=c++11 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304,2305"
+  cxxflags = "-std=c++17 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304,2305"
 
   if restrict_errors:
     cxxflags += " -diag-error-limit1"

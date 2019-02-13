@@ -8,18 +8,10 @@
 #define KERNEL_UTIL_TYPE_TRAITS_HPP 1
 
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 
 #include <typeindex>
-
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
-FEAT_DISABLE_WARNINGS
-#define HALF_ROUND_STYLE 2
-//#define HALF_ROUND_TIES_TO_EVEN 1
-#define HALF_ENABLE_CPP11_TYPE_TRAITS 1
-#include <half.hpp>
-FEAT_RESTORE_WARNINGS
-#endif // FEAT_HAVE_HALFMATH $$ !defined(__CUDACC__)
 
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
 FEAT_DISABLE_WARNINGS
@@ -601,14 +593,14 @@ namespace FEAT
     };
 #endif // FEAT_HAVE_QUADMATH && !__CUDACC__
 
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
+#if defined(FEAT_HAVE_HALFMATH)
     /**
-     * \brief Type Traits specialization for <c>half</c>
+     * \brief Type Traits specialization for <c>Half</c>
      *
      * \author Dirk Ribbrock
      */
     template<>
-    struct Traits<half_float::half>
+    struct Traits<Half>
     {
       /// this type is not integral
       static constexpr bool is_int = false;
@@ -625,16 +617,16 @@ namespace FEAT
       /// returns a string identifying the datatype
       static String name()
       {
-        return "half";
+        return "Half";
       }
 
       /// returns composition of datatype size, int-, float- and signed feature
       static uint64_t feature_hash()
       {
-        return uint64_t(sizeof(half_float::half)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
+        return uint64_t(sizeof(Half)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
-#endif // FEAT_HAVE_HALFMATH && !__CUDACC__
+#endif // FEAT_HAVE_HALFMATH
 
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     /**

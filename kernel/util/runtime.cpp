@@ -24,13 +24,18 @@
 #include <mpi.h>
 #endif
 
+#ifdef FEAT_HAVE_CUDA
+#include <kernel/util/cuda_util.hpp>
+#endif
+
 using namespace FEAT;
 
 // static member initialization
 bool Runtime::_initialized = false;
 bool Runtime::_finished = false;
+PreferredBackend Runtime::_preferred_backend = PreferredBackend::generic;
 
-void Runtime::initialize(int& argc, char**& argv)
+void Runtime::initialize(int& argc, char**& argv, PreferredBackend preferred_backend)
 {
   /// \platformswitch
   /// On Windows, these two function calls MUST come before anything else,
@@ -62,14 +67,16 @@ void Runtime::initialize(int& argc, char**& argv)
     Runtime::abort();
   }
 
+  _preferred_backend = preferred_backend;
+
   // initialize memory pool for main memory
-  MemoryPool<Mem::Main>::initialize();
+  MemoryPool::initialize();
 
 #ifdef FEAT_HAVE_CUDA
   // initialize memory pool for CUDA memory
   int rank = Dist::Comm::world().rank();
-  MemoryPool<Mem::CUDA>::initialize(rank, 1, 1, 1);
-  MemoryPool<Mem::CUDA>::set_blocksize(256, 256, 256, 256);
+  Util::cuda_initialize(rank, 1, 1, 1);
+  Util::cuda_set_blocksize(256, 256, 256, 256);
 #endif
 
   _initialized = true;
@@ -129,9 +136,9 @@ int Runtime::finalize()
     Runtime::abort();
   }
 
-  MemoryPool<Mem::Main>::finalize();
+  MemoryPool::finalize();
 #ifdef FEAT_HAVE_CUDA
-  MemoryPool<Mem::CUDA>::finalize();
+  Util::cuda_finalize();
 #endif
 
   // finalize Dist operations
@@ -141,4 +148,38 @@ int Runtime::finalize()
 
   // return successful exit code
   return EXIT_SUCCESS;
+}
+
+void Runtime::set_preferred_backend(PreferredBackend preferred_backend)
+{
+  _preferred_backend = preferred_backend;
+}
+
+PreferredBackend Runtime::get_preferred_backend()
+{
+  return _preferred_backend;
+}
+
+std::ostream & FEAT::operator<< (std::ostream & left, PreferredBackend value)
+{
+  switch (value)
+  {
+    case PreferredBackend::generic:
+      left << "generic";
+      break;
+
+    case PreferredBackend::mkl:
+      left << "mkl";
+      break;
+
+    case PreferredBackend::cuda:
+      left << "cuda";
+      break;
+
+    default:
+      left << "unknown preferred backend";
+      break;
+  }
+
+  return left;
 }

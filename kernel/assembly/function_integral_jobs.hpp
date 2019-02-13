@@ -644,8 +644,8 @@ namespace FEAT
     struct DiscreteFunctionIntegral;
 
     /// specialization for LAFEM::DenseVector coefficient vectors
-    template<typename Mem_, typename DT_, typename IT_, typename Space_>
-    struct DiscreteFunctionIntegral<LAFEM::DenseVector<Mem_, DT_, IT_>, Space_>
+    template<typename DT_, typename IT_, typename Space_>
+    struct DiscreteFunctionIntegral<LAFEM::DenseVector<DT_, IT_>, Space_>
     {
       /// the FunctionIntegralInfo type for this scalar discrete function
       typedef FunctionIntegralInfo<DT_, DT_,
@@ -654,8 +654,8 @@ namespace FEAT
     };
 
     /// specialization for LAFEM::DenseVectorBlocked coefficient vectors
-    template<typename Mem_, typename DT_, typename IT_, int bs_, typename Space_>
-    struct DiscreteFunctionIntegral<LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, bs_>, Space_>
+    template<typename DT_, typename IT_, int bs_, typename Space_>
+    struct DiscreteFunctionIntegral<LAFEM::DenseVectorBlocked<DT_, IT_, bs_>, Space_>
     {
       /// the FunctionIntegralInfo type for this blocked discrete function
       typedef FunctionIntegralInfo<DT_, Tiny::Vector<DT_, bs_>,
@@ -924,15 +924,15 @@ namespace FEAT
         static constexpr bool valid = false;
       };
 
-      template<typename Fun_, typename Mem_, typename DT_, typename IT_>
-      struct ErrCompatHelper<Fun_, LAFEM::DenseVector<Mem_, DT_, IT_>>
+      template<typename Fun_, typename DT_, typename IT_>
+      struct ErrCompatHelper<Fun_, LAFEM::DenseVector<DT_, IT_>>
       {
         // scalar vector, so function must also be scalar
         static constexpr bool valid = Fun_::ImageType::is_scalar;
       };
 
-      template<typename Fun_, typename Mem_, typename DT_, typename IT_, int dim_>
-      struct ErrCompatHelper<Fun_, LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, dim_>>
+      template<typename Fun_, typename DT_, typename IT_, int dim_>
+      struct ErrCompatHelper<Fun_, LAFEM::DenseVectorBlocked<DT_, IT_, dim_>>
       {
         typedef typename Fun_::ImageType ImageType;
         // blocked vector, so function must be a vector field of same dimension

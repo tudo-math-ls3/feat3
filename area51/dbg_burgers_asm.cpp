@@ -31,15 +31,14 @@ namespace DbgBurgersAsm
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
   typedef Space::Lagrange2::Element<TrafoType> SpaceType;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> ScalarMatrixType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> ScalarVectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> ScalarMatrixType;
+  typedef LAFEM::DenseVector<DataType, IndexType> ScalarVectorType;
 
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> BlockedMatrixType;
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> BlockedVectorType;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> BlockedMatrixType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BlockedVectorType;
 
   DataType diff_max(const BlockedMatrixType& a, const BlockedMatrixType& b)
   {

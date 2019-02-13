@@ -23,9 +23,6 @@ namespace FEAT
     /**
      * \brief Handles vector prolongation, restriction and serialization
      *
-     * \tparam Mem_
-     * Memory architecture
-     *
      * \tparam DT_
      * Data type in the vector
      *
@@ -51,27 +48,25 @@ namespace FEAT
      * \author Peter Zajac
      * \author Jordi Paul
      */
-    template<typename Mem_, typename DT_, typename IT_>
+    template<typename DT_, typename IT_>
     class VectorMirror :
-      public Container<Mem_, DT_, IT_>
+      public Container<DT_, IT_>
     {
     public:
       /// our base class
-      typedef Container<Mem_, DT_, IT_> BaseClass;
-      /// memory typedef
-      typedef Mem_ MemType;
+      typedef Container<DT_, IT_> BaseClass;
       /// data-type typedef
       typedef DT_ DataType;
       /// index-type typedef
       typedef IT_ IndexType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using MirrorType = VectorMirror<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using MirrorType = VectorMirror<DT2_, IT2_>;
 
-      /// this typedef lets you create a mirror with new Memory, Data and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a mirror with new Data and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using MirrorTypeByDI = MirrorType<DataType2_, IndexType2_>;
 
       /// ImageIterator for Adjactor interface implementation
       typedef IT_* ImageIterator;
@@ -104,7 +99,7 @@ namespace FEAT
         this->_scalar_index.push_back(num_idx); // number of indices
         if(num_idx > Index(0))
         {
-          this->_indices.push_back(MemoryPool<MemType>::template allocate_memory<IndexType>(num_idx));
+          this->_indices.push_back(MemoryPool::template allocate_memory<IndexType>(num_idx));
           this->_indices_size.push_back(num_idx);
         }
       }
@@ -165,10 +160,10 @@ namespace FEAT
        * \param[in] other The source container to create the clone from.
        * \param[in] clone_mode The actual cloning procedure.
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const VectorMirror<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
+      template<typename DT2_, typename IT2_>
+      void clone(const VectorMirror<DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -177,8 +172,8 @@ namespace FEAT
        * \param[in] other
        * The source mirror.
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const VectorMirror<Mem2_, DT2_, IT2_>& other)
+      template<typename DT2_, typename IT2_>
+      void convert(const VectorMirror<DT2_, IT2_>& other)
       {
         this->assign(other);
       }
@@ -225,8 +220,8 @@ namespace FEAT
        * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      Index buffer_size(const DenseVector<Mem2_, DT2_, IT2_>& DOXY(vector)) const
+      template<typename DT2_, typename IT2_>
+      Index buffer_size(const DenseVector<DT2_, IT2_>& DOXY(vector)) const
       {
         return num_indices();
       }
@@ -237,8 +232,8 @@ namespace FEAT
        * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
-      template<typename Mem2_, typename DT2_, typename IT2_, int block_size_>
-      Index buffer_size(const DenseVectorBlocked<Mem2_, DT2_, IT2_, block_size_>& DOXY(vector)) const
+      template<typename DT2_, typename IT2_, int block_size_>
+      Index buffer_size(const DenseVectorBlocked<DT2_, IT2_, block_size_>& DOXY(vector)) const
       {
         return num_indices()*Index(block_size_);
       }
@@ -249,8 +244,8 @@ namespace FEAT
        * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      Index buffer_size(const SparseVector<Mem2_, DT2_, IT2_>& DOXY(vector)) const
+      template<typename DT2_, typename IT2_>
+      Index buffer_size(const SparseVector<DT2_, IT2_>& DOXY(vector)) const
       {
         return num_indices();
       }
@@ -261,8 +256,8 @@ namespace FEAT
        * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
-      template<typename Mem2_, typename DT2_, typename IT2_, int block_size_>
-      Index buffer_size(const SparseVectorBlocked<Mem2_, DT2_, IT2_, block_size_>& DOXY(vector)) const
+      template<typename DT2_, typename IT2_, int block_size_>
+      Index buffer_size(const SparseVectorBlocked<DT2_, IT2_, block_size_>& DOXY(vector)) const
       {
         return num_indices()*Index(block_size_);
       }
@@ -274,9 +269,9 @@ namespace FEAT
        * The vector for which the buffer is to be created.
        */
       template<typename Vector_>
-      DenseVector<MemType, DataType, IndexType> create_buffer(const Vector_& vector) const
+      DenseVector<DataType, IndexType> create_buffer(const Vector_& vector) const
       {
-        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<DataType, IndexType>(buffer_size(vector));
       }
 
       /**
@@ -292,8 +287,8 @@ namespace FEAT
        * The offset within the buffer.
        */
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& vector,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
+        const LAFEM::DenseVector<DataType, IndexType>& vector,
         const Index buffer_offset = Index(0)) const
       {
         XASSERT(buffer_offset + this->num_indices() <= buffer.size());
@@ -302,7 +297,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::gather_dv(
+        LAFEM::Arch::Mirror::gather_dv(
           buffer_offset, this->num_indices(), this->indices(), buffer.elements(), vector.elements());
       }
 
@@ -322,8 +317,8 @@ namespace FEAT
        * The offset within the buffer.
        */
       void scatter_axpy(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::DenseVector<DataType, IndexType>& vector,
+        const LAFEM::DenseVector<DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {
@@ -333,7 +328,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::scatter_dv(
+        LAFEM::Arch::Mirror::scatter_dv(
           buffer_offset, this->num_indices(), this->indices(), buffer.elements(), vector.elements(), alpha);
       }
 
@@ -351,8 +346,8 @@ namespace FEAT
        */
       template<int block_size_>
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
-        const LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, block_size_>& vector,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
+        const LAFEM::DenseVectorBlocked<DataType, IndexType, block_size_>& vector,
         const Index buffer_offset = Index(0)) const
       {
         XASSERT(buffer_offset + Index(block_size_)*this->num_indices() <= buffer.size());
@@ -361,7 +356,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::gather_dvb(
+        LAFEM::Arch::Mirror::gather_dvb(
           Index(block_size_), buffer_offset, this->num_indices(), this->indices(),
           buffer.elements(), vector.template elements<Perspective::pod>());
       }
@@ -383,8 +378,8 @@ namespace FEAT
        */
       template<int block_size_>
       void scatter_axpy(
-        LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, block_size_>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::DenseVectorBlocked<DataType, IndexType, block_size_>& vector,
+        const LAFEM::DenseVector< DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {
@@ -394,7 +389,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::scatter_dvb(
+        LAFEM::Arch::Mirror::scatter_dvb(
           Index(block_size_), buffer_offset, this->num_indices(), this->indices(),
           buffer.elements(), vector.template elements<Perspective::pod>(), alpha);
       }
@@ -412,8 +407,8 @@ namespace FEAT
        * The offset within the buffer vector.
        */
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
-        const LAFEM::SparseVector<MemType, DataType, IndexType>& vector,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
+        const LAFEM::SparseVector<DataType, IndexType>& vector,
         const Index buffer_offset = Index(0)) const
       {
         XASSERT(buffer_offset + this->num_indices() <= buffer.size());
@@ -422,7 +417,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::gather_sv(
+        LAFEM::Arch::Mirror::gather_sv(
           buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
           vector.used_elements(), vector.elements(), vector.indices());
       }
@@ -443,8 +438,8 @@ namespace FEAT
        * The offset within the buffer.
        */
       void scatter_axpy(
-        LAFEM::SparseVector<MemType, DataType, IndexType>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::SparseVector<DataType, IndexType>& vector,
+        const LAFEM::DenseVector<DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {
@@ -454,7 +449,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::scatter_sv(
+        LAFEM::Arch::Mirror::scatter_sv(
           buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
           vector.used_elements(), vector.elements(), vector.indices(), alpha);
       }
@@ -473,8 +468,8 @@ namespace FEAT
        */
       template<int block_size_>
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
-        const LAFEM::SparseVectorBlocked<MemType, DataType, IndexType, block_size_>& vector,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
+        const LAFEM::SparseVectorBlocked<DataType, IndexType, block_size_>& vector,
         const Index buffer_offset = Index(0)) const
       {
         XASSERT(buffer_offset + Index(block_size_)*this->num_indices() <= buffer.size());
@@ -483,7 +478,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::gather_svb(
+        LAFEM::Arch::Mirror::gather_svb(
           Index(block_size_), buffer_offset, this->num_indices(), this->indices(),buffer.elements(),
           vector.used_elements(), vector.template elements<Perspective::pod>(), vector.indices());
       }
@@ -505,8 +500,8 @@ namespace FEAT
        */
       template<int block_size_>
       void scatter_axpy(
-        LAFEM::SparseVectorBlocked<MemType, DataType, IndexType, block_size_>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::SparseVectorBlocked<DataType, IndexType, block_size_>& vector,
+        const LAFEM::DenseVector<DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {
@@ -516,7 +511,7 @@ namespace FEAT
         if(this->empty())
           return;
 
-        LAFEM::Arch::Mirror<MemType>::scatter_svb(
+        LAFEM::Arch::Mirror::scatter_svb(
           Index(block_size_), buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
           vector.used_elements(), vector.template elements<Perspective::pod>(), vector.indices(), alpha);
       }
@@ -543,8 +538,8 @@ namespace FEAT
        *
        * \returns The size of the input template vector.
        */
-      template<Perspective perspective_, typename Mem2_, typename DT2_, typename IT2_>
-      Index mask_scatter(const DenseVector<Mem2_, DT2_, IT2_>& vector, std::vector<int>& mask,
+      template<Perspective perspective_, typename DT2_, typename IT2_>
+      Index mask_scatter(const DenseVector<DT2_, IT2_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
         XASSERT(Index(mask.size()) >= vector.template size<perspective_>());
@@ -580,8 +575,8 @@ namespace FEAT
        *
        * \returns The size of the input template vector.
        */
-      template<Perspective perspective_, typename Mem2_, typename DT2_, typename IT2_, int block_size_>
-      void mask_scatter(const DenseVectorBlocked<Mem2_, DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
+      template<Perspective perspective_, typename DT2_, typename IT2_, int block_size_>
+      void mask_scatter(const DenseVectorBlocked<DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
         XASSERT(Index(mask.size()) >= vector.template size<perspective_>());

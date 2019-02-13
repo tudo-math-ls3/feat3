@@ -46,24 +46,24 @@ namespace FEAT
       };
 #endif // DOXYGEN
 
-      template<typename Mem_, typename DT_, typename IT_, int bh_, int bw_>
-      struct AmaVankaMatrixHelper<LAFEM::NullMatrix<Mem_, DT_, IT_, bh_, bw_>>
+      template<typename DT_, typename IT_, int bh_, int bw_>
+      struct AmaVankaMatrixHelper<LAFEM::NullMatrix<DT_, IT_, bh_, bw_>>
       {
-        typedef LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bh_, bw_> VankaMatrix;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_> VankaMatrix;
         static constexpr int num_blocks = 1;
       }; // struct AmaVankaMatrixHelper<LAFEM::NullMatrix<...>>
 
-      template<typename Mem_, typename DT_, typename IT_>
-      struct AmaVankaMatrixHelper<LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>>
+      template<typename DT_, typename IT_>
+      struct AmaVankaMatrixHelper<LAFEM::SparseMatrixCSR<DT_, IT_>>
       {
-        typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> VankaMatrix;
+        typedef LAFEM::SparseMatrixCSR<DT_, IT_> VankaMatrix;
         static constexpr int num_blocks = 1;
       }; // struct AmaVankaMatrixHelper<LAFEM::SparseMatrixCSR<...>>
 
-      template<typename Mem_, typename DT_, typename IT_, int bh_, int bw_>
-      struct AmaVankaMatrixHelper<LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bh_, bw_>>
+      template<typename DT_, typename IT_, int bh_, int bw_>
+      struct AmaVankaMatrixHelper<LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>>
       {
-        typedef LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bh_, bw_> VankaMatrix;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_> VankaMatrix;
         static constexpr int num_blocks = 1;
       }; // struct AmaVankaMatrixHelper<LAFEM::SparseMatrixBCSR<...>>
 
@@ -102,7 +102,6 @@ namespace FEAT
       template<typename MatrixA_, typename MatrixB_, typename MatrixD_>
       struct AmaVankaMatrixHelper<LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>>
       {
-        typedef typename MatrixA_::MemType MemType;
         typedef typename MatrixA_::DataType DataType;
         typedef typename MatrixA_::IndexType IndexType;
         static constexpr int block_size = MatrixA_::BlockWidth;
@@ -110,11 +109,11 @@ namespace FEAT
 
         typedef LAFEM::TupleMatrix<
           LAFEM::TupleMatrixRow<
-            LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, block_size, block_size>,
-            LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, block_size, 1>>,
+            LAFEM::SparseMatrixBCSR<DataType, IndexType, block_size, block_size>,
+            LAFEM::SparseMatrixBCSR<DataType, IndexType, block_size, 1>>,
           LAFEM::TupleMatrixRow<
-            LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 1, block_size>,
-            LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 1, 1>>
+            LAFEM::SparseMatrixBCSR<DataType, IndexType, 1, block_size>,
+            LAFEM::SparseMatrixBCSR<DataType, IndexType, 1, 1>>
         > VankaMatrix;
       }; // struct AmaVankaMatrixHelper<LAFEM::SaddlePointMatrix<...>>
 
@@ -154,15 +153,15 @@ namespace FEAT
 #endif // DOXYGEN
 
         /// specialization for LAFEM::SparseMatrixCSR
-        template<typename Mem_, typename DT_, typename IT_>
-        static void block_sizes(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>&, std::vector<Index>& sizes)
+        template<typename DT_, typename IT_>
+        static void block_sizes(const LAFEM::SparseMatrixCSR<DT_, IT_>&, std::vector<Index>& sizes)
         {
           sizes.push_back(Index(1));
         }
 
         /// specialization for LAFEM::SparseMatrixBCSR
-        template<typename Mem_, typename DT_, typename IT_, int bs_>
-        static void block_sizes(const LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bs_, bs_>&, std::vector<Index>& sizes)
+        template<typename DT_, typename IT_, int bs_>
+        static void block_sizes(const LAFEM::SparseMatrixBCSR<DT_, IT_, bs_, bs_>&, std::vector<Index>& sizes)
         {
           sizes.push_back(Index(bs_));
         }
@@ -222,30 +221,24 @@ namespace FEAT
          */
         //template<typename MatrixA_, typename MatrixB_, typename MatrixD_>
         //static bool deduct_macro_dofs(const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix,
-        template<typename Mem_, typename DT_, typename IT_, int bs_>
+        template<typename DT_, typename IT_, int bs_>
         static bool deduct_macro_dofs(
           const LAFEM::SaddlePointMatrix<
-            LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bs_, bs_>,
-            LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bs_, 1>,
-            LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, 1, bs_>>& matrix,
+            LAFEM::SparseMatrixBCSR<DT_, IT_, bs_, bs_>,
+            LAFEM::SparseMatrixBCSR<DT_, IT_, bs_, 1>,
+            LAFEM::SparseMatrixBCSR<DT_, IT_, 1, bs_>>& matrix,
           std::vector<Adjacency::Graph>& macro_dofs)
         {
           typedef IT_ IndexType;
 
-          // download matrices B and D to main memory
-          LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bs_, 1> matrix_b;
-          LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, bs_> matrix_d;
-          matrix_b.convert(matrix.block_b());
-          matrix_d.convert(matrix.block_d());
-
           // fetch matrix dimensions
-          const Index num_dofs_p = Index(matrix_d.rows());
+          const Index num_dofs_p = Index(matrix.block_d().rows());
 
           // fetch matrix array
-          const IndexType* row_ptr_b = matrix_b.row_ptr();
-          const IndexType* col_idx_b = matrix_b.col_ind();
-          const IndexType* row_ptr_d = matrix_d.row_ptr();
-          const IndexType* col_idx_d = matrix_d.col_ind();
+          const IndexType* row_ptr_b = matrix.block_b().row_ptr();
+          const IndexType* col_idx_b = matrix.block_b().col_ind();
+          const IndexType* row_ptr_d = matrix.block_d().row_ptr();
+          const IndexType* col_idx_d = matrix.block_d().col_ind();
 
           // PHASE 1: determine pressure macros
           std::map<IndexType, int> map_s;
@@ -348,8 +341,8 @@ namespace FEAT
 
           // create graphs
           macro_dofs.resize(std::size_t(2));
-          macro_dofs.front() = Adjacency::Graph(num_macros, matrix_b.rows(), Index(v_idx.size()), v_ptr.data(), v_idx.data());
-          macro_dofs.back()  = Adjacency::Graph(num_macros, matrix_d.rows(), Index(p_idx.size()), p_ptr.data(), p_idx.data());
+          macro_dofs.front() = Adjacency::Graph(num_macros, matrix.block_b().rows(), Index(v_idx.size()), v_ptr.data(), v_idx.data());
+          macro_dofs.back()  = Adjacency::Graph(num_macros, matrix.block_d().rows(), Index(p_idx.size()), p_ptr.data(), p_idx.data());
           return true;
         }
 
@@ -403,7 +396,7 @@ namespace FEAT
 
         /// specialization for LAFEM::NullMatrix
         template<typename DT_, typename IT_, int bh_, int bw_>
-        static std::pair<Index,Index> gather(const LAFEM::NullMatrix<Mem::Main, DT_, IT_, bh_, bw_>&,
+        static std::pair<Index,Index> gather(const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
           DT_*, const Index, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index, const Index row_block, const Index, const Index col_block)
         {
@@ -421,7 +414,7 @@ namespace FEAT
 
         /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
-        static std::pair<Index,Index> gather(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
+        static std::pair<Index,Index> gather(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -482,7 +475,7 @@ namespace FEAT
 
         /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
-        static std::pair<Index,Index> gather(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix,
+        static std::pair<Index,Index> gather(const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -666,29 +659,28 @@ namespace FEAT
 #endif // DOXYGEN
 
         /// specialization for LAFEM::SparseMatrixCSR
-        template<typename Mem_, typename DT_, typename IT_>
-        static void alloc(LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>& matrix,
+        template<typename DT_, typename IT_>
+        static void alloc(LAFEM::SparseMatrixCSR<DT_, IT_>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_block, const Index col_block)
         {
           XASSERT(row_block < Index(dof_macros.size()));
           XASSERT(col_block < Index(macro_dofs.size()));
           Adjacency::Graph graph(Adjacency::RenderType::injectify_sorted, dof_macros.at(row_block), macro_dofs.at(col_block));
-          LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> matrix_main(graph);
+          LAFEM::SparseMatrixCSR<DT_, IT_> matrix_main(graph);
           matrix.convert(matrix_main);
         }
 
         /// specialization for LAFEM::SparseMatrixBCSR
-        template<typename Mem_, typename DT_, typename IT_, int bh_, int bw_>
-        static void alloc(LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bh_, bw_>& matrix,
+        template<typename DT_, typename IT_, int bh_, int bw_>
+        static void alloc(LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_block, const Index col_block)
         {
           XASSERT(row_block < Index(dof_macros.size()));
           XASSERT(col_block < Index(macro_dofs.size()));
           Adjacency::Graph graph(Adjacency::RenderType::injectify_sorted, dof_macros.at(row_block), macro_dofs.at(col_block));
-          LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_> matrix_main(graph);
-          matrix.convert(matrix_main);
+          matrix.convert(graph);
         }
 
         /// specialization for LAFEM::TupleMatrixRow
@@ -782,7 +774,7 @@ namespace FEAT
 
         /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
-        static std::pair<Index,Index> scatter_add(LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
+        static std::pair<Index,Index> scatter_add(LAFEM::SparseMatrixCSR<DT_, IT_>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -842,7 +834,7 @@ namespace FEAT
 
         /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
-        static std::pair<Index,Index> scatter_add(LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix,
+        static std::pair<Index,Index> scatter_add(LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -999,7 +991,7 @@ namespace FEAT
 
         /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
-        static void scale_rows(LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix, const DT_ omega,
+        static void scale_rows(LAFEM::SparseMatrixCSR<DT_, IT_>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
           // get matrix arrays
@@ -1038,7 +1030,7 @@ namespace FEAT
 
         /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
-        static void scale_rows(LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix, const DT_ omega,
+        static void scale_rows(LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
         {
           // get matrix arrays
@@ -1205,8 +1197,6 @@ namespace FEAT
       /// our base-class
       typedef Solver::SolverBase<typename Matrix_::VectorTypeL> BaseClass;
 
-      /// our memory type
-      typedef typename Matrix_::MemType MemType;
       /// our data type
       typedef typename Matrix_::DataType DataType;
       /// our index type
@@ -1217,8 +1207,6 @@ namespace FEAT
     protected:
       /// the type of our Vanka matrix
       typedef typename Intern::AmaVankaMatrixHelper<Matrix_>::VankaMatrix VankaMatrixType;
-      /// the type of our Vanka matrix in main memory
-      typedef typename VankaMatrixType::template ContainerTypeByMDI<Mem::Main, DataType, IndexType> VankaMatrixMainType;
 
       /// the system matrix
       const Matrix_& _matrix;
@@ -1452,10 +1440,7 @@ namespace FEAT
         if(this->_skip_singular)
           this->_macro_mask.resize(this->_macro_dofs.front().get_num_nodes_domain(), 0);
 
-        // allocate Vanka matrix
-        VankaMatrixMainType vanka_main;
-        Solver::Intern::AmaVankaCore::alloc(vanka_main, this->_dof_macros, this->_macro_dofs, Index(0), Index(0));
-        this->_vanka.convert(vanka_main);
+        Solver::Intern::AmaVankaCore::alloc(this->_vanka, this->_dof_macros, this->_macro_dofs, Index(0), Index(0));
 
         watch_init_symbolic.stop();
       }
@@ -1495,20 +1480,13 @@ namespace FEAT
         DataType* local_t = vec_local_t.data();
         Index* pivot = vec_pivot.data();
 
-        // convert matrix to main memory
-        typename Matrix_::template ContainerTypeByMDI<Mem::Main, DataType, IndexType> matrix_main;
-        matrix_main.convert(this->_matrix);
-
-        // get Vanka matrix in main mem and format
-        VankaMatrixMainType vanka_main;
-        vanka_main.convert(this->_vanka);
-        vanka_main.format();
+        this->_vanka.format();
 
         // loop over all macros
         for(Index imacro(0); imacro < num_macros; ++imacro)
         {
           // gather local matrix
-          const std::pair<Index,Index> nrc = Intern::AmaVankaCore::gather(matrix_main,
+          const std::pair<Index,Index> nrc = Intern::AmaVankaCore::gather(this->_matrix,
             local, stride, imacro, this->_macro_dofs, Index(0), Index(0), Index(0), Index(0));
 
           // make sure we have gathered a square matrix
@@ -1557,7 +1535,7 @@ namespace FEAT
             // scatter local matrix
             if(!singular)
             {
-              Intern::AmaVankaCore::scatter_add(vanka_main, local, stride, imacro, this->_macro_dofs,
+              Intern::AmaVankaCore::scatter_add(this->_vanka, local, stride, imacro, this->_macro_dofs,
                 Index(0), Index(0), Index(0), Index(0));
             }
           }
@@ -1567,7 +1545,7 @@ namespace FEAT
             Math::invert_matrix(nrc.first, stride, local, pivot);
 
             // scatter local matrix
-            Intern::AmaVankaCore::scatter_add(vanka_main, local, stride, imacro, this->_macro_dofs,
+            Intern::AmaVankaCore::scatter_add(this->_vanka, local, stride, imacro, this->_macro_dofs,
               Index(0), Index(0), Index(0), Index(0));
           }
 
@@ -1578,11 +1556,7 @@ namespace FEAT
         }
 
         // scale rows of Vanka matrix
-        Solver::Intern::AmaVankaCore::scale_rows(vanka_main, this->_omega, this->_dof_macros, this->_macro_mask, Index(0));
-
-        // convert back
-        /// \todo use copy maybe?
-        this->_vanka.convert(vanka_main);
+        Solver::Intern::AmaVankaCore::scale_rows(this->_vanka, this->_omega, this->_dof_macros, this->_macro_mask, Index(0));
 
         watch_init_numeric.stop();
       }

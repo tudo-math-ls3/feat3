@@ -5,72 +5,72 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 // includes, CUDA
 #include <cublas_v2.h>
-
-namespace FEAT
-{
-  namespace LAFEM
-  {
-    namespace Intern
-    {
-
-      float cuda_dot_product(const float * x, const float * y, const Index size)
-      {
-        float result;
-        cublasStatus_t status;
-        status = cublasSdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result);
-        if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
-        return result;
-      }
-
-      double cuda_dot_product(const double * x, const double * y, const Index size)
-      {
-        double result;
-        cublasStatus_t status;
-        status = cublasDdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result);
-        if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
-        return result;
-      }
-    }
-  }
-}
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-DT_ DotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y, const Index size)
+DT_ DotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const Index size)
 {
-  DT_ result = Intern::cuda_dot_product(x, y, size);
+  cudaDataType dt;
+  cudaDataType et;
+  if (typeid(DT_) == typeid(double))
+  {
+      dt = CUDA_R_64F;
+      et = CUDA_R_64F;
+  }
+  else if (typeid(DT_) == typeid(float))
+  {
+      dt = CUDA_R_32F;
+      et = CUDA_R_32F;
+  }
+#ifdef FEAT_HAVE_HALFMATH
+  else if (typeid(DT_) == typeid(Half))
+  {
+      dt = CUDA_R_16F;
+      et = CUDA_R_32F;
+  }
+#endif
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
+
+  cublasStatus_t status;
+  DT_ result(0.);
+
+  status = cublasDotEx(Util::Intern::cublas_handle, size, x, dt, 1, y, dt, 1, &result, dt, et);
+  if (status != CUBLAS_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
+
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
+
   return result;
 }
-
-template float DotProduct<Mem::CUDA>::value(const float * const, const float * const, const Index);
-template double DotProduct<Mem::CUDA>::value(const double * const, const double * const, const Index);
+#ifdef FEAT_HAVE_HALFMATH
+template Half DotProduct::value_cuda(const Half * const, const Half * const, const Index);
+#endif
+template float DotProduct::value_cuda(const float * const, const float * const, const Index);
+template double DotProduct::value_cuda(const double * const, const double * const, const Index);
 
 template <typename DT_>
-DT_ TripleDotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+DT_ TripleDotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
 {
   DT_ * temp;
   cudaMalloc((void **) &temp, size * sizeof(DT_));
-  ComponentProduct<Mem::CUDA>::value(temp, y, z, size);
-  DT_ result = Intern::cuda_dot_product(x, temp, size);
+  ComponentProduct::value_cuda(temp, y, z, size);
+  DT_ result = DotProduct::value_cuda(x, temp, size);
   cudaFree(temp);
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
@@ -80,6 +80,8 @@ DT_ TripleDotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y,
 #endif
   return result;
 }
-
-template float TripleDotProduct<Mem::CUDA>::value(const float * const x, const float * const y, const float * const z, const Index size);
-template double TripleDotProduct<Mem::CUDA>::value(const double * const x, const double * const y, const double * const z, const Index size);
+#ifdef FEAT_HAVE_HALFMATH
+template Half TripleDotProduct::value_cuda(const Half * const x, const Half * const y, const Half * const z, const Index size);
+#endif
+template float TripleDotProduct::value_cuda(const float * const x, const float * const y, const float * const z, const Index size);
+template double TripleDotProduct::value_cuda(const double * const x, const double * const y, const double * const z, const Index size);

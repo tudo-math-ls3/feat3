@@ -8,7 +8,7 @@
 #define KERNEL_LAFEM_META_VECTOR_TEST_BASE_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+// #include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
@@ -22,20 +22,20 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename MemType_, typename DataType_, typename IndexType_>
+    template<typename DataType_, typename IndexType_>
     class MetaVectorTestBase
-      : public FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+      : public FEAT::TestSystem::UnitTest
     {
     public:
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
-      typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
+      typedef DenseVector<DataType, IndexType> ScalarVector;
       typedef PowerVector<ScalarVector, 2> PowerVector2;
       typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
-      explicit MetaVectorTestBase(const char* name) :
-        FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
+      explicit MetaVectorTestBase(const String& id_in, const String datatype_name = "none", const String index_name = "none", PreferredBackend preferred_backend = PreferredBackend::generic)
+       : FEAT::TestSystem::UnitTest(id_in, datatype_name, index_name, preferred_backend)
       {
       }
 
@@ -87,8 +87,7 @@ namespace FEAT
       // generate test-vector x
       static MetaVector gen_vector_x(Index n00, Index n01, Index n1)
       {
-        // Mem::Main vectors
-        DenseVector<Mem::Main, DataType, IndexType> r00(n00), r01(n01), r1(n1);
+        DenseVector<DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
         for(Index i(0); i < n00; ++i)
@@ -109,8 +108,7 @@ namespace FEAT
       // generate test-vector y
       static MetaVector gen_vector_y(Index n00, Index n01, Index n1)
       {
-        // Mem::Main vectors
-        DenseVector<Mem::Main, DataType, IndexType> r00(n00), r01(n01), r1(n1);
+        DenseVector<DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
         for(Index i(0); i < n00; ++i)
@@ -131,8 +129,7 @@ namespace FEAT
       // Generate test-vector z. It is crucial that z_i != 0
       static MetaVector gen_vector_z(Index n00, Index n01, Index n1)
       {
-        // Mem::Main vectors
-        DenseVector<Mem::Main, DataType, IndexType> r00(n00), r01(n01), r1(n1);
+        DenseVector<DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
         for(Index i(0); i < n00; ++i)

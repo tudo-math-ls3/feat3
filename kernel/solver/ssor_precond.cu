@@ -6,7 +6,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 
-#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
@@ -190,7 +189,7 @@ namespace FEAT
         int row_offset(0);
         for (int i(0) ; i < ncolors ; ++i)
         {
-          Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+          Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
           block.x = blocksize;
@@ -216,7 +215,7 @@ namespace FEAT
         int row_offset(0);
         for (int i(0) ; i < ncolors ; ++i)
         {
-          Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+          Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
           block.x = blocksize;
@@ -245,7 +244,7 @@ namespace FEAT
         int row_offset(0);
         for (int i(0) ; i < ncolors ; ++i)
         {
-          Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+          Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
           block.x = blocksize;
@@ -277,7 +276,7 @@ namespace FEAT
         int row_offset(0);
         for (int i(0) ; i < ncolors ; ++i)
         {
-          Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+          Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
           block.x = blocksize;

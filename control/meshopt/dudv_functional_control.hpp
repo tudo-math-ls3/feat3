@@ -7,7 +7,6 @@
 #ifndef FEAT_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP
 #define FEAT_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
@@ -41,9 +40,6 @@ namespace FEAT
       /**
        * \brief Control class for DuDvFunctionals
        *
-       * \tparam Mem_
-       * The memory architecture of the local DuDvFunctional
-       *
        * \tparam DT_
        * The floating point precision for the solver
        *
@@ -57,13 +53,11 @@ namespace FEAT
        * \author Jordi Paul
        *
        */
-      template<typename Mem_, typename DT_, typename IT_, typename DomainControl_>
+      template<typename DT_, typename IT_, typename DomainControl_>
       class DuDvFunctionalControl
       : public MeshoptControlBase<DomainControl_>
       {
         public:
-          /// Our memory architecture
-          typedef Mem_ MemType;
           /// The floating point type
           typedef DT_ DataType;
           /// The index type
@@ -83,11 +77,11 @@ namespace FEAT
           typedef typename DomainLevelType::TrafoType TrafoType;
 
           /// Template-alias away the Trafo so the SystemLevel can take it as a template template parameter
-          template<typename A, typename B, typename C>
-          using LocalFunctionalType =  FEAT::Meshopt::DuDvFunctional<A, B, C, TrafoType>;
+          template<typename DT2_, typename IT2_>
+          using LocalFunctionalType =  FEAT::Meshopt::DuDvFunctional<DT2_, IT2_, TrafoType>;
 
           /// The FE space the transformation lives in
-          typedef typename LocalFunctionalType<Mem_, DT_, IT_>::SpaceType TrafoSpace;
+          typedef typename LocalFunctionalType<DT_, IT_>::SpaceType TrafoSpace;
 
           /// The underlying mesh type
           typedef typename DomainControl_::MeshType MeshType;
@@ -95,10 +89,10 @@ namespace FEAT
           typedef typename MeshType::CoordType CoordType;
 
           /// Linear system of equations on one refinement level
-          typedef QuadraticSystemLevel<Mem_, DT_, IT_, LocalFunctionalType> SystemLevelType;
+          typedef QuadraticSystemLevel<DT_, IT_, LocalFunctionalType> SystemLevelType;
 
           /// Inter-level transfer matrix
-          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
+          typedef LAFEM::SparseMatrixBWrappedCSR<DT_, IT_, MeshType::world_dim> TransferMatrixType;
           /// Global left vector type
           typedef typename SystemLevelType::GlobalSystemVectorL GlobalSystemVectorL;
           /// Global right vector type

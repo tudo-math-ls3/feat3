@@ -9,15 +9,6 @@
 
 // includes, FEAT
 #include <kernel/solver/base.hpp>
-#include <kernel/lafem/dense_matrix.hpp>
-#include <kernel/lafem/sparse_matrix_banded.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
-#include <kernel/lafem/power_diag_matrix.hpp>
-#include <kernel/lafem/power_full_matrix.hpp>
-#include <kernel/lafem/tuple_diag_matrix.hpp>
-#include <kernel/global/matrix.hpp>
 
 namespace FEAT
 {

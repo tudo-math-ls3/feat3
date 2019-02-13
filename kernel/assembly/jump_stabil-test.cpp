@@ -20,6 +20,7 @@
 #include <kernel/util/runtime.hpp>
 
 using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 // reference jumps computed by FEAT2 (inner edges only)
 // parameters:
@@ -75,17 +76,16 @@ static const double ref_jumps_q1t_grad[] =
 };
 
 
-template<typename Mem_, typename DT_, typename IT_>
+template<typename DT_, typename IT_>
 class JumpStabilTest :
-  public TestSystem::FullTaggedTest<Mem_, DT_, IT_>
+  public UnitTest
 {
 public:
-  typedef Mem_ MemType;
   typedef DT_ DataType;
   typedef IT_ IndexType;
 
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> MeshType;
   typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactory;
@@ -93,15 +93,15 @@ public:
 
   const DataType tol;
 
-  JumpStabilTest() :
-    TestSystem::FullTaggedTest<Mem_, DT_, IT_>("JumpStabilTest"),
+  JumpStabilTest(PreferredBackend backend) :
+    UnitTest("JumpStabilTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
     tol(Math::pow(Math::eps<DataType>(), DataType(0.8)))
   {
   }
 
   virtual void run() const override
   {
-    const int level_max = 5;
+    const IT_ level_max = IT_(5);
 
     // create coarse mesh
     std::shared_ptr<MeshType> mesh;
@@ -109,7 +109,7 @@ public:
 
     std::cout << "Q1: Gradient" << std::endl;
     mesh = std::make_shared<MeshType>(mesh_factory);
-    for(int level = 1; level < level_max; ++level)
+    for(IT_ level = IT_(1); level < level_max; ++level)
     {
       {
         auto coarse_mesh = mesh;
@@ -127,7 +127,7 @@ public:
 
     std::cout << "Q2: Gradient" << std::endl;
     mesh = std::make_shared<MeshType>(mesh_factory);
-    for(int level = 1; level < level_max; ++level)
+    for(IT_ level = IT_(1); level < level_max; ++level)
     {
       {
         auto coarse_mesh = mesh;
@@ -145,7 +145,7 @@ public:
 
     std::cout << "Q1~: Gradient" << std::endl;
     mesh = std::make_shared<MeshType>(mesh_factory);
-    for(int level = 1; level < level_max; ++level)
+    for(IT_ level = IT_(1); level < level_max; ++level)
     {
       {
         auto coarse_mesh = mesh;
@@ -163,7 +163,7 @@ public:
   }
 
   template<typename Space_>
-  void test_space(Space_& space, int level, DataType ref_value) const
+  void test_space(Space_& space, IT_ level, DataType ref_value) const
   {
     // assemble extended matrix structure
     MatrixType matrix;
@@ -205,4 +205,5 @@ public:
   }
 }; // class JumpStabilTest
 
-JumpStabilTest<Mem::Main, double, Index> jump_stabil_test_main_double_index;
+JumpStabilTest<double, unsigned int> jump_stabil_test_double_uint(PreferredBackend::generic);
+JumpStabilTest<double, unsigned long> jump_stabil_test_double_ulong(PreferredBackend::generic);

@@ -45,7 +45,6 @@ namespace FEAT
     /**
      * \brief Sparse vector class template.
      *
-     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      * \tparam BlockSize_ The size of the represented blocks
@@ -65,8 +64,8 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
-    class SparseVectorBlocked : public Container<Mem_, DT_, IT_>
+    template <typename DT_, typename IT_, int BlockSize_>
+    class SparseVectorBlocked : public Container<DT_, IT_>
     {
     private:
       template <typename T1_, typename T2_>
@@ -110,8 +109,6 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Our size of a single block
       static constexpr int BlockSize = BlockSize_;
       /// Our value type
@@ -123,7 +120,7 @@ namespace FEAT
        * Creates an empty non dimensional vector.
        */
       explicit SparseVectorBlocked() :
-        Container<Mem_, DT_, IT_> (0)
+        Container<DT_, IT_> (0)
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -139,7 +136,7 @@ namespace FEAT
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       explicit SparseVectorBlocked(std::vector<char> input) :
-         Container<Mem_, DT_, IT_>(0)
+         Container<DT_, IT_>(0)
       {
         deserialize<DT2_,IT2_>(input);
       }
@@ -153,7 +150,7 @@ namespace FEAT
        * Creates a vector based on the source file.
        */
       explicit SparseVectorBlocked(FileMode mode, String filename) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
       }
@@ -167,7 +164,7 @@ namespace FEAT
        * Creates a vector based on the source filestream.
        */
       explicit SparseVectorBlocked(FileMode mode, std::istream& file) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, file);
       }
@@ -181,7 +178,7 @@ namespace FEAT
        * Creates a vector with a given size.
        */
       explicit SparseVectorBlocked(Index size_in) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -199,9 +196,9 @@ namespace FEAT
        *
        * Creates a vector with a given size.
        */
-      explicit SparseVectorBlocked(Index size_in, DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & elements_in,
-                            DenseVector<Mem_, IT_, IT_> & indices_in, bool is_sorted = true) :
-        Container<Mem_, DT_, IT_>(size_in)
+      explicit SparseVectorBlocked(Index size_in, DenseVectorBlocked<DT_, IT_, BlockSize_> & elements_in,
+                            DenseVector<IT_, IT_> & indices_in, bool is_sorted = true) :
+        Container<DT_, IT_>(size_in)
       {
         XASSERT(size_in != Index(0));
         XASSERTM(indices_in.size() == elements_in.size(), "Vector size mismatch!");
@@ -217,9 +214,9 @@ namespace FEAT
         this->_indices_size.push_back(indices_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+          MemoryPool::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+          MemoryPool::increase_memory(this->_indices.at(i));
 
         this->sort();
       }
@@ -232,7 +229,7 @@ namespace FEAT
        * Moves another vector to this vector.
        */
       SparseVectorBlocked(SparseVectorBlocked && other) :
-        Container<Mem_, DT_, IT_>(std::forward<SparseVectorBlocked>(other))
+        Container<DT_, IT_>(std::forward<SparseVectorBlocked>(other))
       {
       }
 
@@ -273,10 +270,10 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const SparseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
+      template<typename DT2_, typename IT2_>
+      void clone(const SparseVectorBlocked<DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -289,8 +286,8 @@ namespace FEAT
        * \note This creates a deep copy in any case!
        *
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const SparseVectorBlocked<DT2_, IT2_, BlockSize_> & other)
       {
         this->sort();
         this->clone(other);
@@ -359,9 +356,9 @@ namespace FEAT
       Index size() const
       {
         if (perspective_ == Perspective::pod)
-          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size() * Index(BlockSize_);
+          return static_cast<const Container<DT_, IT_> *>(this)->size() * Index(BlockSize_);
         else
-          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size();
+          return static_cast<const Container<DT_, IT_> *>(this)->size();
       }
 
       /**
@@ -375,6 +372,8 @@ namespace FEAT
       {
         ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
+        MemoryPool::synchronize();
+
         if (this->_elements.size() == 0)
           return ValueType(0.);
 
@@ -384,16 +383,14 @@ namespace FEAT
         Index i(0);
         while (i < used_elements())
         {
-          if (MemoryPool<Mem_>::get_element(indices(), i) >= index)
+          if (indices()[i] >= index)
             break;
           ++i;
         }
 
-        if (i < used_elements() && MemoryPool<Mem_>::get_element(indices(), i) == index)
+        if (i < used_elements() && indices()[i] == index)
         {
-          ValueType t;
-          MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + i * Index(BlockSize_), Index(BlockSize_));
-          return t;
+          return this->elements()[i];
         }
         else
           return ValueType(0.);
@@ -417,24 +414,24 @@ namespace FEAT
         // vector is empty, no arrays allocated
         if (this->_elements.size() == 0)
         {
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(alloc_increment() * Index(BlockSize_)));
+          this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(alloc_increment() * Index(BlockSize_)));
           this->_elements_size.push_back(alloc_increment() * Index(BlockSize_));
-          MemoryPool<Mem_>::template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment() * Index(BlockSize_));
-          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(alloc_increment()));
+          MemoryPool::template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment() * Index(BlockSize_));
+          this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(alloc_increment()));
           this->_indices_size.push_back(alloc_increment());
-          MemoryPool<Mem_>::template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
+          MemoryPool::template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
           _allocated_elements() = alloc_increment();
-          MemoryPool<Mem_>::upload(this->_elements.at(0), val.v, Index(BlockSize_));
-          MemoryPool<Mem_>::set_memory(this->_indices.at(0), IT_(index));
+          MemoryPool::copy(this->_elements.at(0), val.v, Index(BlockSize_));
+          MemoryPool::set_memory(this->_indices.at(0), IT_(index));
           _used_elements() = 1;
         }
 
         // append element in already allocated arrays
         else if(_used_elements() < allocated_elements())
         {
-          MemoryPool<Mem_>::upload(this->_elements.at(0) + _used_elements() * Index(BlockSize_), val.v,
+          MemoryPool::copy(this->_elements.at(0) + _used_elements() * Index(BlockSize_), val.v,
           Index(BlockSize_));
-          MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
+          MemoryPool::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
           ++_used_elements();
         }
 
@@ -443,25 +440,25 @@ namespace FEAT
         {
           _allocated_elements() += alloc_increment();
 
-          DT_ * elements_new(MemoryPool<Mem_>::template allocate_memory<DT_>(
+          DT_ * elements_new(MemoryPool::template allocate_memory<DT_>(
             allocated_elements() * Index(BlockSize_)));
-          MemoryPool<Mem_>::template set_memory<DT_>(elements_new, DT_(4711),
+          MemoryPool::template set_memory<DT_>(elements_new, DT_(4711),
           allocated_elements() * Index(BlockSize_));
-          IT_ * indices_new(MemoryPool<Mem_>::template allocate_memory<IT_>(allocated_elements()));
-          MemoryPool<Mem_>::template set_memory<IT_>(indices_new, IT_(4711), allocated_elements());
+          IT_ * indices_new(MemoryPool::template allocate_memory<IT_>(allocated_elements()));
+          MemoryPool::template set_memory<IT_>(indices_new, IT_(4711), allocated_elements());
 
-          MemoryPool<Mem_>::copy(elements_new, this->_elements.at(0), _used_elements() * Index(BlockSize_));
-          MemoryPool<Mem_>::copy(indices_new, this->_indices.at(0), _used_elements());
+          MemoryPool::copy(elements_new, this->_elements.at(0), _used_elements() * Index(BlockSize_));
+          MemoryPool::copy(indices_new, this->_indices.at(0), _used_elements());
 
-          MemoryPool<Mem_>::release_memory(this->_elements.at(0));
-          MemoryPool<Mem_>::release_memory(this->_indices.at(0));
+          MemoryPool::release_memory(this->_elements.at(0));
+          MemoryPool::release_memory(this->_indices.at(0));
 
           this->_elements.at(0) = elements_new;
           this->_indices.at(0) = indices_new;
 
-          MemoryPool<Mem_>::upload(this->_elements.at(0) + used_elements() * Index(BlockSize_), val.v,
+          MemoryPool::copy(this->_elements.at(0) + used_elements() * Index(BlockSize_), val.v,
           Index(BlockSize_));
-          MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
+          MemoryPool::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
 
           ++_used_elements();
           this->_elements_size.at(0) = allocated_elements() * Index(BlockSize_);
@@ -484,18 +481,8 @@ namespace FEAT
 
           IT_ * pindices;
           ValueType * pelements;
-          if (typeid(Mem_) == typeid(Mem::Main))
-          {
-            pindices = this->_indices.at(0);
-            pelements = this->elements();
-          }
-          else
-          {
-            pindices = new IT_[_allocated_elements()];
-            pelements = new ValueType[_allocated_elements()];
-            MemoryPool<Mem_>::download(pindices, this->_indices.at(0), _allocated_elements());
-            MemoryPool<Mem_>::download((DT_*)pelements, this->_elements.at(0), _allocated_elements() * BlockSize_);
-          }
+          pindices = this->_indices.at(0);
+          pelements = this->elements();
 
           _insertion_sort(pindices, pelements, _used_elements());
 
@@ -514,14 +501,6 @@ namespace FEAT
           while (pindices[_used_elements() - 1 - junk] == std::numeric_limits<IT_>::max() && junk < _used_elements())
             ++junk;
           _used_elements() -= junk;
-
-          if (typeid(Mem_) != typeid(Mem::Main))
-          {
-            MemoryPool<Mem_>::upload(this->_indices.at(0), pindices, _allocated_elements());
-            MemoryPool<Mem_>::upload(this->_elements.at(0), (DT_*)pelements, _allocated_elements() * BlockSize_);
-            delete[] pindices;
-            delete[] pelements;
-          }
         }
       }
 
@@ -634,10 +613,9 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(max_abs_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
+        DT_ result(this->template elements<Perspective::pod>()[max_abs_index]);
         result = Math::abs(result);
 
         TimeStamp ts_stop;
@@ -655,10 +633,9 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(min_abs_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + min_abs_index, 1);
+        DT_ result(this->template elements<Perspective::pod>()[min_abs_index]);
         result = Math::abs(result);
 
         TimeStamp ts_stop;
@@ -676,10 +653,9 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(max_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + max_index, 1);
+        DT_ result(this->template elements<Perspective::pod>()[max_index]);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -696,10 +672,9 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(min_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + min_index, 1);
+        DT_ result(this->template elements<Perspective::pod>()[min_index]);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -717,16 +692,14 @@ namespace FEAT
 
         XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
-        SparseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> local;
-        local.convert(*this);
-        SparseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> target(this->size());
+        SparseVectorBlocked<DT_, IT_, BlockSize_> target(this->size());
 
         auto inv = perm.inverse();
         const Index * const inv_pos(inv.get_perm_pos());
-        for (Index i(0) ; i < local.used_elements() ; ++i)
+        for (Index i(0) ; i < this->used_elements() ; ++i)
         {
-          const Index col = local.indices()[i];
-          target(inv_pos[col], local(col));
+          const Index col = this->indices()[i];
+          target(inv_pos[col], (*this)(col));
         }
 
         target.sort();
@@ -792,7 +765,7 @@ namespace FEAT
        * \param[in] a A vector to compare with.
        * \param[in] b A vector to compare with.
        */
-      template <typename Mem2_> friend bool operator== (const SparseVectorBlocked & a, const SparseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & b)
+      friend bool operator== (const SparseVectorBlocked & a, const SparseVectorBlocked & b)
       {
         if (a.size() != b.size())
           return false;

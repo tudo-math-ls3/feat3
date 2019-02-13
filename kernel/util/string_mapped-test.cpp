@@ -40,12 +40,12 @@ inline std::ostream& operator<<(std::ostream& os, MyPrecon p)
  *
  * \author Peter Zajac
  */
-class StringMappedTest
-  : public TaggedTest<Archs::None, Archs::None>
+class StringMappedTest :
+  public TestSystem::UnitTest
 {
 public:
   StringMappedTest() :
-    TaggedTest<Archs::None, Archs::None>("StringMappedTest")
+    TestSystem::UnitTest("StringMappedTest")
   {
   }
 

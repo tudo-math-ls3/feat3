@@ -93,7 +93,7 @@ namespace FEAT
       if(*dt == dt__float128.dt)         func_op_t<Op_, __float128>        (iv, iov, n); else
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-      if(*dt == dt__half.dt)             func_op_t<Op_, half_float::half>  (iv, iov, n); else
+      if(*dt == dt__half.dt)             func_op_t<Op_, __half>  (iv, iov, n); else
 #endif
       {
         // unsupported datatype
@@ -129,9 +129,9 @@ namespace FEAT
       MPI_Type_commit(&dt_f128.dt);
 #endif // FEAT_HAVE_QUADMATH
 #ifdef FEAT_HAVE_HALFMATH
-      // Create a custom MPI datatype for 'half_float::half'
+      // Create a custom MPI datatype for '__half'
       Datatype& dt_half = const_cast<Datatype&>(Dist::dt__half);
-      MPI_Type_contiguous(int(sizeof(half_float::half)), MPI_BYTE, &dt_half.dt);
+      MPI_Type_contiguous(int(sizeof(__half)), MPI_BYTE, &dt_half.dt);
       MPI_Type_commit(&dt_half.dt);
 #endif // FEAT_HAVE_HALFMATH
 
@@ -201,7 +201,7 @@ namespace FEAT
 #endif
 #ifdef FEAT_HAVE_HALFMATH
     // This needs to initialized by Dist::initialize() !
-    const Datatype dt__half              (0,                      sizeof(half_float::half));
+    const Datatype dt__half              (0,                      sizeof(__half));
 #endif
 
     // operations
@@ -860,7 +860,7 @@ namespace FEAT
     const Datatype dt__float128          (34, sizeof(__float128));
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-    const Datatype dt__half              (35, sizeof(half_float::half));
+    const Datatype dt__half              (35, sizeof(__half));
 #endif
     const Datatype dt_signed_int8        (41, sizeof(std::int8_t));
     const Datatype dt_signed_int16       (42, sizeof(std::int16_t));

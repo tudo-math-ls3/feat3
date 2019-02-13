@@ -5,7 +5,6 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
 #include <iostream>
 
@@ -28,16 +27,11 @@ int main(int argc, char ** argv)
       exit(EXIT_FAILURE);
     }
     String input_extension(input.substr(input.size() - 4, 4));
-    SparseMatrixCSR<Mem::Main, double, Index> orig;
+    SparseMatrixCSR<double, Index> orig;
     if (input_extension == ".mtx")
       orig.read_from(FileMode::fm_mtx, input);
     else if (input_extension == ".csr")
       orig.read_from(FileMode::fm_csr, input);
-    else if (input_extension == ".ell")
-    {
-      SparseMatrixELL<Mem::Main, double, Index> temp(FileMode::fm_ell, input);
-      orig.convert(temp);
-    }
     else
     {
       std::cout<<"Input Filetype not known: " << input << std::endl;
@@ -50,7 +44,7 @@ int main(int argc, char ** argv)
     orig.radius_row(best_radius, best_radius_index);
     std::cout<<"Initial: "<<best_radius<<std::endl;
 
-    SparseMatrixCSR<Mem::Main, double, Index> best;
+    SparseMatrixCSR<double, Index> best;
     best.clone(orig, CloneMode::Deep);
 
     Permutation perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_default);
@@ -259,17 +253,10 @@ int main(int argc, char ** argv)
         best.write_out(FileMode::fm_mtx, output);
       else if (output_extension == ".csr")
         best.write_out(FileMode::fm_csr, output);
-      else if (output_extension == ".ell")
-      {
-        SparseMatrixELL<Mem::Main, double, Index> temp;
-        temp.convert(best);
-        temp.write_out(FileMode::fm_ell, output);
-      }
       else
       {
         std::cout<<"Output Filetype not known: " << output << std::endl;
         exit(EXIT_FAILURE);
       }
     }
-
 }

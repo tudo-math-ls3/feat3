@@ -9,9 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
@@ -27,36 +25,33 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<
-      typename Mem_,
       typename DT_,
       typename IT_ = Index>
     class UnitFilter
     {
     public:
-      /// mem-type typedef
-      typedef Mem_ MemType;
       /// data-type typedef
       typedef DT_ DataType;
       /// index-type typedef
       typedef IT_ IndexType;
 
       /// our supported vector type
-      typedef DenseVector<MemType, DataType, IndexType> VectorType;
+      typedef DenseVector<DataType, IndexType> VectorType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using FilterType = UnitFilter<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using FilterType = UnitFilter<DT2_, IT2_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
 
     private:
       /// SparseVector, containing all entries of the unit filter
-      SparseVector<Mem_, DT_, IT_> _sv;
+      SparseVector<DT_, IT_> _sv;
 
     public:
       /// default constructor
@@ -83,7 +78,7 @@ namespace FEAT
        * \param[in] values DenseVector containing element values
        * \param[in] indices DenseVector containing element indices
        */
-      explicit UnitFilter(Index size_in, DenseVector<Mem_, DT_, IT_> & values, DenseVector<Mem_, IT_, IT_> & indices) :
+      explicit UnitFilter(Index size_in, DenseVector<DT_, IT_> & values, DenseVector<IT_, IT_> & indices) :
         _sv(size_in, values, indices)
       {
         XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
@@ -125,8 +120,8 @@ namespace FEAT
       }
 
       /// \brief Converts data from another UnitFilter
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const UnitFilter<Mem2_, DT2_, IT2_>& other)
+      template<typename DT2_, typename IT2_>
+      void convert(const UnitFilter<DT2_, IT2_>& other)
       {
         _sv.convert(other.get_filter_vector());
       }
@@ -144,12 +139,12 @@ namespace FEAT
       }
 
       /// \cond internal
-      SparseVector<Mem_, DT_, IT_>& get_filter_vector()
+      SparseVector<DT_, IT_>& get_filter_vector()
       {
         return _sv;
       }
 
-      const SparseVector<Mem_, DT_, IT_>& get_filter_vector() const
+      const SparseVector<DT_, IT_>& get_filter_vector() const
       {
         return _sv;
       }
@@ -248,7 +243,7 @@ namespace FEAT
 
 #endif
       ///\cond internal
-      void filter_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
+      void filter_mat(SparseMatrixCSR<DT_, IT_> & matrix) const
       {
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
@@ -267,7 +262,7 @@ namespace FEAT
         }
       }
 
-      void filter_offdiag_row_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixCSR<DT_, IT_> & matrix) const
       {
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
@@ -285,113 +280,13 @@ namespace FEAT
         }
       }
 
-      void filter_offdiag_col_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> &) const
-      {
-        // nothing to do here
-      }
-
-      void filter_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
-      {
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
-
-        const Index tused_elements(matrix.used_elements());
-        const IndexType* row_idx(matrix.row_indices());
-        const IndexType* col_idx(matrix.column_indices());
-        DT_* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          IndexType ix(_sv.indices()[i]);
-          // replace by unit row
-          Index j(0);
-          while(row_idx[j] < ix)
-          {
-            ++j;
-          }
-          while (j < tused_elements && row_idx[j] <= ix)
-          {
-            v[j] = (col_idx[j] == ix) ? DT_(1) : DT_(0);
-            ++j;
-          }
-        }
-      }
-
-      void filter_offdiag_row_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
-      {
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
-
-        const Index tused_elements(matrix.used_elements());
-        const Index* row_idx(matrix.row_indices());
-        DT_* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          IndexType ix(_sv.indices()[i]);
-          // replace by null row
-          Index j(0);
-          while(row_idx[j] < ix)
-          {
-            ++j;
-          }
-          while (j < tused_elements && row_idx[j] <= ix)
-          {
-            v[j] = DT_(0);
-            ++j;
-          }
-        }
-      }
-
-      void filter_offdiag_col_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> &) const
-      {
-        // nothing to do here
-      }
-
-      void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
-      {
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
-
-        const Index tC(matrix.C());
-        const IndexType * pcs(matrix.cs());
-        const IndexType * pcol_ind(matrix.col_ind());
-        DT_* pval(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          IndexType ix(_sv.indices()[i]);
-          // replace by unit row
-          for(IndexType j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
-          {
-            pval[j] = (pcol_ind[j] == ix) ? DT_(1) : DT_(0);
-          }
-        }
-      }
-
-      void filter_offdiag_row_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
-      {
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
-
-        const Index tC(matrix.C());
-        const IndexType * pcs(matrix.cs());
-        DT_* pval(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          IndexType ix(_sv.indices()[i]);
-          // replace by null row
-          for(IndexType j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
-          {
-            pval[j] = DT_(0);
-          }
-        }
-      }
-
-      void filter_offdiag_col_mat(SparseMatrixELL<Mem::Main, DT_, IT_> &) const
+      void filter_offdiag_col_mat(SparseMatrixCSR<DT_, IT_> &) const
       {
         // nothing to do here
       }
 
       template<int block_width_>
-      void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, block_width_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, 1, block_width_> & matrix) const
       {
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
@@ -410,7 +305,7 @@ namespace FEAT
       }
 
       template<int block_height_>
-      void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, block_height_, 1> &) const
+      void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, block_height_, 1> &) const
       {
         // nothing to do here
       }
@@ -422,11 +317,11 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
+      void filter_rhs(DenseVector<DT_, IT_> & vector) const
       {
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilter<Mem_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
+          Arch::UnitFilter::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -435,7 +330,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      void filter_sol(DenseVector<Mem_, DT_, IT_> & vector) const
+      void filter_sol(DenseVector<DT_, IT_> & vector) const
       {
         // same as rhs
         filter_rhs(vector);
@@ -447,11 +342,11 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
+      void filter_def(DenseVector<DT_, IT_> & vector) const
       {
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilter<Mem_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
+          Arch::UnitFilter::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -460,7 +355,7 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      void filter_cor(DenseVector<Mem_, DT_, IT_> & vector) const
+      void filter_cor(DenseVector<DT_, IT_> & vector) const
       {
         // same as def
         filter_def(vector);

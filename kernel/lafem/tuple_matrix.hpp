@@ -42,30 +42,26 @@ namespace FEAT
       /// number of matrix columns
       static constexpr int num_blocks = TupleMatrixRow<Rest_...>::num_blocks + 1;
 
-      /// sub-matrix mem-type
-      typedef typename First_::MemType MemType;
       /// sub-matrix data-type
       typedef typename First_::DataType DataType;
       /// sub-matrix index-type
       typedef typename First_::IndexType IndexType;
 
-      // ensure that all sub-matrix have the same mem- and data-type
-      static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
-                    "sub-matrices have different mem-types");
+      // ensure that all sub-matrix have the same data-type
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
                     "sub-matrices have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
                     "sub-matrices have different index-types");
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = TupleMatrixRow<
-        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+        typename First_::template ContainerType<DT2_, IT2_>,
+        typename Rest_::template ContainerType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatype and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatype and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
       typedef typename First_::VectorTypeL VectorTypeL;
@@ -401,19 +397,17 @@ namespace FEAT
       /// number of matrix columns
       static constexpr int num_blocks = 1;
 
-      /// sub-matrix mem-type
-      typedef typename First_::MemType MemType;
       /// sub-matrix data-type
       typedef typename First_::DataType DataType;
       /// sub-matrix index-type
       typedef typename First_::IndexType IndexType;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = TupleMatrixRow<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = TupleMatrixRow<typename First_::template ContainerType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
       typedef typename First_::VectorTypeL VectorTypeL;
@@ -724,30 +718,26 @@ namespace FEAT
       // sanity check: number of column blocks must match for all rows
       static_assert(num_col_blocks == RestClass::num_col_blocks, "column blocks mismatch");
 
-      /// sub-matrix mem-type
-      typedef typename FirstRow_::MemType MemType;
       /// sub-matrix data-type
       typedef typename FirstRow_::DataType DataType;
       /// sub-matrix index-type
       typedef typename FirstRow_::IndexType IndexType;
 
-      // ensure that all sub-matrix have the same mem- and data-type
-      static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
-                    "sub-matrices have different mem-types");
+      // ensure that all sub-matrix have the same data-type
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
                     "sub-matrices have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
                     "sub-matrices have different index-types");
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = TupleMatrix<
-        typename FirstRow_::template ContainerType<Mem2_, DT2_, IT2_>,
-        typename RestRows_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+        typename FirstRow_::template ContainerType<DT2_, IT2_>,
+        typename RestRows_::template ContainerType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatype and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatype and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
       typedef TupleVector<typename FirstRow_::VectorTypeL, typename RestRows_::VectorTypeL...> VectorTypeL;
@@ -1117,18 +1107,16 @@ namespace FEAT
       static constexpr int num_col_blocks = FirstRow_::num_blocks;
 
 
-      /// sub-matrix mem-type
-      typedef typename FirstRow_::MemType MemType;
       /// sub-matrix data-type
       typedef typename FirstRow_::DataType DataType;
       /// sub-matrix index-type
       typedef typename FirstRow_::IndexType IndexType;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = TupleMatrix<typename FirstRow_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      template < typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = TupleMatrix<typename FirstRow_::template ContainerType<DT2_, IT2_> >;
 
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
       typedef TupleVector<typename FirstRow_::VectorTypeL> VectorTypeL;

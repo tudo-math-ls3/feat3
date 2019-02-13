@@ -70,8 +70,6 @@ template
   {
     /// Precision for meshes etc, everything else uses the same data type
     typedef DT_ DataType;
-    // Rumpf Smoothers are implemented for Mem::Main only
-    typedef Mem::Main MemType;
     // So we use Index
     typedef Index IndexType;
     /// Shape of the mesh cells
@@ -83,11 +81,11 @@ template
     /// Our functional type
     typedef FunctionalType_<DataType, TrafoType> FunctionalType;
     /// The Rumpf smoother
-    typedef HyperelasticityFunctionalType_<MemType, DataType, IndexType, TrafoType, FunctionalType> HyperelasticityFunctionalType;
+    typedef HyperelasticityFunctionalType_<DataType, IndexType, TrafoType, FunctionalType> HyperelasticityFunctionalType;
     /// Filter for Dirichlet boundary conditions
-    typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> DirichletFilterType;
+    typedef LAFEM::UnitFilterBlocked<DataType, IndexType, MeshType::world_dim> DirichletFilterType;
     /// Filter for slip boundary conditions
-    typedef LAFEM::SlipFilter<MemType, DataType, IndexType, MeshType::world_dim> SlipFilterType;
+    typedef LAFEM::SlipFilter<DataType, IndexType, MeshType::world_dim> SlipFilterType;
     /// Combined filter
     typedef LAFEM::FilterChain
     <
@@ -250,8 +248,8 @@ template<typename A, typename B>
 using MyLocalFunctional = Meshopt::RumpfFunctional<A, B>;
 
 // Vanilla Rumpf smoother
-template<typename A, typename B, typename C, typename D, typename E>
-using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
+template<typename A, typename B, typename C, typename D>
+using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D>;
 
 int main(int argc, char** argv)
 {

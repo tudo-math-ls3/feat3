@@ -4,25 +4,23 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
-#include <kernel/adjacency/export_tga.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <iostream>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
-using namespace FEAT::Adjacency;
 
 int main(int argc, char ** argv)
 {
     if (argc != 3)
     {
-        std::cout<<"Usage 'ell2tga ell-file tga-file'"<<std::endl;
+        std::cout<<"Usage 'dv2mtx dv-file mtx-file'"<<std::endl;
         exit(EXIT_FAILURE);
     }
 
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixELL<Mem::Main, double> matrix(FileMode::fm_ell, input);
-    ExportTGA::write(output, matrix);
+    DenseVector<double, Index> dv(FileMode::fm_dv, input);
+    dv.write_out(FileMode::fm_mtx, output);
 }

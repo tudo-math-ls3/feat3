@@ -30,7 +30,7 @@ namespace FEAT
      * <b>Example</b>:\n
      * To use the ILUPreconditioner class for CSR-matrices, one would have to use the following class template
      * combination:
-     * <c>PreconWrapper<SparseMatrixCSR<Mem::Main,double>, ILUPreconditioner></c>.
+     * <c>PreconWrapper<SparseMatrixCSR<double>, ILUPreconditioner></c>.
      *
      * \author Peter Zajac
      */

@@ -13,17 +13,17 @@
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class BognerFoxSchmitTest
-  : public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public UnitTest
 {
   static constexpr TrafoTags unit_trafo_config = TrafoTags::jac_det | TrafoTags::jac_inv;
 
   static constexpr SpaceTags unit_space_config = SpaceTags::value | SpaceTags::grad;
 
 public:
-  BognerFoxSchmitTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("BognerFoxSchmit Test")
+  BognerFoxSchmitTest(PreferredBackend backend) :
+    UnitTest("BognerFoxSchmit Test", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -169,5 +169,19 @@ public:
   }
 };
 
-BognerFoxSchmitTest<double> bogner_fox_schmit_test_double;
-BognerFoxSchmitTest<float> bogner_fox_schmit_test_float;
+BognerFoxSchmitTest<double, unsigned int> bogner_fox_schmit_test_double_uint(PreferredBackend::generic);
+BognerFoxSchmitTest<float, unsigned int> bogner_fox_schmit_test_float_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+BognerFoxSchmitTest<float, unsigned long> mkl_bogner_fox_schmit_test_float_ulong(PreferredBackend::mkl);
+BognerFoxSchmitTest<double, unsigned long> mkl_bogner_fox_schmit_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+BognerFoxSchmitTest<__float128, unsigned int> bogner_fox_schmit_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+BognerFoxSchmitTest<Half, unsigned int> bogner_fox_schmit_test_half_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+BognerFoxSchmitTest<float, unsigned int> cuda_bogner_fox_schmit_test_float_uint(PreferredBackend::cuda);
+BognerFoxSchmitTest<double, unsigned int> cuda_bogner_fox_schmit_test_double_uint(PreferredBackend::cuda);
+#endif

@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 
 using namespace FEAT;
@@ -17,24 +16,20 @@ using namespace FEAT::TestSystem;
  *
  * \test test description missing
  *
- * \tparam Mem_
- * description missing
- *
  * \tparam DT_
  * description missing
  *
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseVectorBlockedTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  SparseVectorBlockedTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorBlockedTest")
+  SparseVectorBlockedTest(PreferredBackend backend)
+    : UnitTest("SparseVectorBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -44,11 +39,11 @@ public:
 
   virtual void run() const override
   {
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> zero1;
-    SparseVectorBlocked<Mem::Main, DT_, IT_, 2> zero2;
+    SparseVectorBlocked<DT_, IT_, 2> zero1;
+    SparseVectorBlocked<DT_, IT_, 2> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> a(10);
+    SparseVectorBlocked<DT_, IT_, 2> a(10);
     TEST_CHECK_EQUAL(a, a);
     Tiny::Vector<DT_, 2> tv1(41);
     Tiny::Vector<DT_, 2> tv2(42);
@@ -63,13 +58,13 @@ public:
     TEST_CHECK_EQUAL(a(6)[1], tv2[1]);
     TEST_CHECK_EQUAL(a.used_elements(), Index(3));
 
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> b(a.clone());
+    SparseVectorBlocked<DT_, IT_, 2> b(a.clone());
     TEST_CHECK_EQUAL(a, b);
     a(2, tv2);
     TEST_CHECK_NOT_EQUAL(a, b);
 
     //increase vector size above alloc_increment
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> c(1001);
+    SparseVectorBlocked<DT_, IT_, 2> c(1001);
     for (Index i(1) ; i <= c.size() ; ++i)
     {
       c(c.size() - i, tv1);
@@ -79,7 +74,7 @@ public:
     std::cout << "seed: " << seed << std::endl;
     Random rng(seed);
     Adjacency::Permutation prm_rnd(a.size(), rng);
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> ap(a.clone());
+    SparseVectorBlocked<DT_, IT_, 2> ap(a.clone());
     ap.permute(prm_rnd);
     prm_rnd = prm_rnd.inverse();
     ap.permute(prm_rnd);
@@ -87,23 +82,38 @@ public:
     TEST_CHECK_EQUAL(ap.used_elements(), Index(4));
   }
 };
-SparseVectorBlockedTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_test_float;
-SparseVectorBlockedTest<Mem::Main, double, Index> cpu_sparse_vector_blocked_test_double;
+SparseVectorBlockedTest<float, unsigned int> cpu_sparse_vector_blocked_test_float_uint(PreferredBackend::generic);
+SparseVectorBlockedTest<double, unsigned int> cpu_sparse_vector_blocked_test_double_uint(PreferredBackend::generic);
+SparseVectorBlockedTest<float, unsigned long> cpu_sparse_vector_blocked_test_float_ulong(PreferredBackend::generic);
+SparseVectorBlockedTest<double, unsigned long> cpu_sparse_vector_blocked_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseVectorBlockedTest<float, unsigned long> mkl_cpu_sparse_vector_blocked_test_float_ulong(PreferredBackend::mkl);
+SparseVectorBlockedTest<double, unsigned long> mkl_cpu_sparse_vector_blocked_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseVectorBlockedTest<__float128, unsigned long> cpu_sparse_vector_blocked_test_float128_ulong(PreferredBackend::generic);
+SparseVectorBlockedTest<__float128, unsigned int> cpu_sparse_vector_blocked_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseVectorBlockedTest<Half, unsigned int> cpu_sparse_vector_blocked_test_half_uint(PreferredBackend::generic);
+SparseVectorBlockedTest<Half, unsigned long> cpu_sparse_vector_blocked_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorBlockedTest<Mem::CUDA, float, Index> cuda_sparse_vector_blocked_test_float;
-SparseVectorBlockedTest<Mem::CUDA, double, Index> cuda_sparse_vector_blocked_test_double;
+SparseVectorBlockedTest<float, unsigned int> cuda_sparse_vector_blocked_test_float_uint(PreferredBackend::cuda);
+SparseVectorBlockedTest<double, unsigned int> cuda_sparse_vector_blocked_test_double_uint(PreferredBackend::cuda);
+SparseVectorBlockedTest<float, unsigned long> cuda_sparse_vector_blocked_test_float_ulong(PreferredBackend::cuda);
+SparseVectorBlockedTest<double, unsigned long> cuda_sparse_vector_blocked_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseVectorBlockedSerializeTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  SparseVectorBlockedSerializeTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorBlockedSerializeTest")
+  SparseVectorBlockedSerializeTest(PreferredBackend backend)
+    : UnitTest("SparseVectorBlockedSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -113,7 +123,7 @@ public:
 
   virtual void run() const override
   {
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> a(10);
+    SparseVectorBlocked<DT_, IT_, 2> a(10);
     TEST_CHECK_EQUAL(a, a);
     Tiny::Vector<DT_, 2> tv1(41);
     Tiny::Vector<DT_, 2> tv2(42);
@@ -127,20 +137,20 @@ public:
     BinaryStream bs;
     a.write_out(FileMode::fm_svb, bs);
     bs.seekg(0);
-    SparseVectorBlocked<Mem::Main, DT_, IT_, 2> bin(FileMode::fm_svb, bs);
+    SparseVectorBlocked<DT_, IT_, 2> bin(FileMode::fm_svb, bs);
     TEST_CHECK_EQUAL(bin, a);
 
     auto op = a.serialize(LAFEM::SerialConfig(false, false));
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> o(op);
+    SparseVectorBlocked<DT_, IT_, 2> o(op);
     TEST_CHECK_EQUAL(a, o);
 #ifdef FEAT_HAVE_ZLIB
     auto zl = a.serialize(LAFEM::SerialConfig(true, false));
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> zlib(zl);
+    SparseVectorBlocked<DT_, IT_, 2> zlib(zl);
     TEST_CHECK_EQUAL(zlib, a);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> zfp(zf);
+    SparseVectorBlocked<DT_, IT_, 2> zfp(zf);
     for (Index i(0) ; i < a.size() ; ++i)
     {
       for(int j(0) ; j < a(i).n ; ++j)
@@ -151,9 +161,25 @@ public:
 #endif
   }
 };
-SparseVectorBlockedSerializeTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_serialize_test_float;
-SparseVectorBlockedSerializeTest<Mem::Main, double, Index> cpu_sparse_vector_blocked_serialize_test_double;
+SparseVectorBlockedSerializeTest<float, unsigned int> cpu_sparse_vector_blocked_serialize_test_float_uint(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest<double, unsigned int> cpu_sparse_vector_blocked_serialize_test_double_uint(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest<float, unsigned long> cpu_sparse_vector_blocked_serialize_test_float_ulong(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest<double, unsigned long> cpu_sparse_vector_blocked_serialize_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseVectorBlockedSerializeTest<float, unsigned long> mkl_cpu_sparse_vector_blocked_serialize_test_float_ulong(PreferredBackend::mkl);
+SparseVectorBlockedSerializeTest<double, unsigned long> mkl_cpu_sparse_vector_blocked_serialize_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseVectorBlockedSerializeTest<__float128, unsigned long> cpu_sparse_vector_blocked_serialize_test_float128_ulong(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest<__float128, unsigned int> cpu_sparse_vector_blocked_serialize_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseVectorBlockedSerializeTest<Half, unsigned int> cpu_sparse_vector_blocked_serialize_test_half_uint(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest<Half, unsigned long> cpu_sparse_vector_blocked_serialize_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorBlockedSerializeTest<Mem::CUDA, float, Index> cuda_sparse_vector_blocked_serialize_test_float;
-SparseVectorBlockedSerializeTest<Mem::CUDA, double, Index> cuda_sparse_vector_blocked_serialize_test_double;
+SparseVectorBlockedSerializeTest<float, unsigned int> cuda_sparse_vector_blocked_serialize_test_float_uint(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest<double, unsigned int> cuda_sparse_vector_blocked_serialize_test_double_uint(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest<float, unsigned long> cuda_sparse_vector_blocked_serialize_test_float_ulong(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest<double, unsigned long> cuda_sparse_vector_blocked_serialize_test_double_ulong(PreferredBackend::cuda);
 #endif

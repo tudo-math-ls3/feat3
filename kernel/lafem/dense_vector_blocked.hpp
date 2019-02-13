@@ -60,7 +60,6 @@ namespace FEAT
     /**
      * \brief Blocked Dense data vector class template.
      *
-     * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.
      * \tparam BlockSize_ The size of the represented blocks
@@ -76,28 +75,26 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
-    class DenseVectorBlocked : public Container<Mem_, DT_, IT_>
+    template <typename DT_, typename IT_, int BlockSize_>
+    class DenseVectorBlocked : public Container<DT_, IT_>
     {
     public:
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Our size of a single block
       static constexpr int BlockSize = BlockSize_;
       /// Our value type
       typedef Tiny::Vector<DT_, BlockSize_> ValueType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = DenseVectorBlocked<DT2_, IT2_, BlockSize_>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /**
        * \brief Scatter-Axpy operation for DenseVectorBlocked
@@ -107,8 +104,7 @@ namespace FEAT
       class ScatterAxpy
       {
       public:
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> VectorType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
         typedef Tiny::Vector<DT_, BlockSize_> ValueType;
@@ -148,14 +144,13 @@ namespace FEAT
       class GatherAxpy
       {
       public:
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> VectorType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
         typedef Tiny::Vector<DT_, BlockSize_> ValueType;
 
       private:
-        IT_ _num_entries;
+        Index _num_entries;
         const ValueType * _data;
 
       public:
@@ -194,7 +189,7 @@ namespace FEAT
        * Creates an empty non dimensional vector.
        */
       explicit DenseVectorBlocked() :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_> (0)
       {
       }
 
@@ -203,33 +198,16 @@ namespace FEAT
        *
        * \param[in] size_in
        * The size of the created vector. aka block count
-       * \param[in] pinning True if the memory should be allocated in a pinned manner.
-       *
-       * \warning Pinned memory allocation is only possible in main memory and needs cuda support.
        *
        * Creates a vector with a given block count.
        */
-      explicit DenseVectorBlocked(Index size_in, Pinning pinning = Pinning::disabled) :
-        Container<Mem_, DT_, IT_>(size_in)
+      explicit DenseVectorBlocked(Index size_in) :
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
 
-        XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
-
-        if (pinning == Pinning::enabled)
-        {
-  #ifdef FEAT_HAVE_CUDA
-          this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size<Perspective::pod>()));
-  #else
-          // no cuda support enabled - we cannot serve and do not need pinned memory support
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
-  #endif
-        }
-        else
-        {
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
-        }
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size<Perspective::pod>()));
 
         this->_elements_size.push_back(size<Perspective::pod>());
       }
@@ -246,15 +224,15 @@ namespace FEAT
        * Creates a vector with given size and value.
        */
       explicit DenseVectorBlocked(Index size_in, DT_ value) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size<Perspective::pod>()));
         this->_elements_size.push_back(size<Perspective::pod>());
 
-        MemoryPool<Mem_>::set_memory(this->_elements.at(0), value, size<Perspective::pod>());
+        MemoryPool::set_memory(this->_elements.at(0), value, size<Perspective::pod>());
       }
 
       /**
@@ -266,7 +244,7 @@ namespace FEAT
        * Creates a vector with given size and given data.
        */
       explicit DenseVectorBlocked(Index size_in, DT_ * data) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
@@ -274,10 +252,10 @@ namespace FEAT
         this->_elements.push_back(data);
         this->_elements_size.push_back(size<Perspective::pod>());
 
-        for (Index i(0); i < this->_elements.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
-        for (Index i(0); i < this->_indices.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool::increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -287,8 +265,8 @@ namespace FEAT
        *
        * Creates a vector from a DenseVector source
        */
-      explicit DenseVectorBlocked(const DenseVector<Mem_, DT_, IT_> & other) :
-        Container<Mem_, DT_, IT_>(other.size() / Index(BlockSize_))
+      explicit DenseVectorBlocked(const DenseVector<DT_, IT_> & other) :
+        Container<DT_, IT_>(other.size() / Index(BlockSize_))
       {
         convert(other);
       }
@@ -305,7 +283,7 @@ namespace FEAT
        * \note The created DenseVectorBlocked has no own memory management nor own allocated memory and should be used carefully!
        */
       explicit DenseVectorBlocked(const DenseVectorBlocked & dv_in, Index size_in, Index offset_in) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         this->_foreign_memory = true;
 
@@ -323,7 +301,7 @@ namespace FEAT
        * Creates a vector from the given source file.
        */
       explicit DenseVectorBlocked(FileMode mode, String filename) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
       }
@@ -336,8 +314,8 @@ namespace FEAT
        *
        * Creates a vector from the given source file.
        */
-      explicit DenseVectorBlocked(FileMode mode, std::istream & file) :
-        Container<Mem_, DT_, IT_>(0)
+      explicit DenseVectorBlocked(FileMode mode, std::istream& file) :
+        Container<DT_, IT_>(0)
       {
         read_from(mode, file);
       }
@@ -351,7 +329,7 @@ namespace FEAT
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       explicit DenseVectorBlocked(std::vector<char> input) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         deserialize<DT2_, IT2_>(input);
       }
@@ -367,12 +345,12 @@ namespace FEAT
        * Creates a vector from the given random number generator.
        */
       explicit DenseVectorBlocked(Random & rng, Index size_in, DataType min, DataType max) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size<Perspective::pod>()));
         this->_elements_size.push_back(size<Perspective::pod>());
 
         this->format(rng, min, max);
@@ -386,7 +364,7 @@ namespace FEAT
        * Moves another vector to this vector.
        */
       DenseVectorBlocked(DenseVectorBlocked && other) :
-        Container<Mem_, DT_, IT_>(std::forward<DenseVectorBlocked>(other))
+        Container<DT_, IT_>(std::forward<DenseVectorBlocked>(other))
       {
       }
 
@@ -435,10 +413,10 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
+      template< typename DT2_, typename IT2_>
+      void clone(const DenseVectorBlocked<DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -448,8 +426,8 @@ namespace FEAT
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const DenseVectorBlocked<DT2_, IT2_, BlockSize_> & other)
       {
         this->assign(other);
       }
@@ -461,8 +439,8 @@ namespace FEAT
        *
        * Use source scalar vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const DenseVector<Mem2_, DT2_, IT2_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const DenseVector<DT2_, IT2_> & other)
       {
         XASSERTM(other.size() % Index(BlockSize_) == 0, "DenseVector cannot be converted to given blocksize!");
 
@@ -473,10 +451,10 @@ namespace FEAT
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(size<Perspective::pod>());
 
-        for (Index i(0); i < this->_elements.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
-        for (Index i(0); i < this->_indices.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool::increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -529,7 +507,7 @@ namespace FEAT
       }
 
       /// \copydoc val()
-      /// const version.
+      /// non const version.
       template <Perspective perspective_ = Perspective::native>
       auto elements() -> typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
       {
@@ -549,9 +527,9 @@ namespace FEAT
       Index size() const
       {
         if (perspective_ == Perspective::pod)
-          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size() * Index(BlockSize_);
+          return static_cast<const Container<DT_, IT_> *>(this)->size() * Index(BlockSize_);
         else
-          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size();
+          return static_cast<const Container<DT_, IT_> *>(this)->size();
       }
 
       /**
@@ -564,9 +542,10 @@ namespace FEAT
       const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
       {
         ASSERT(index < this->size());
-        Tiny::Vector<DT_, BlockSize_> t;
-        MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + index * Index(BlockSize_), Index(BlockSize_));
-        return t;
+
+        MemoryPool::synchronize();
+
+        return this->elements<Perspective::native>()[index];
       }
 
       /**
@@ -578,7 +557,8 @@ namespace FEAT
       void operator()(Index index, const Tiny::Vector<DT_, BlockSize_> & value)
       {
         ASSERT(index < this->size());
-        MemoryPool<Mem_>::upload(this->_elements.at(0) + index * Index(BlockSize_), value.v, Index(BlockSize_));
+        this->elements<Perspective::native>()[index] = value;
+        MemoryPool::synchronize();
       }
 
       /**
@@ -598,18 +578,6 @@ namespace FEAT
        * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
       void copy(const DenseVectorBlocked & x, bool full = false)
-      {
-        this->_copy_content(x, full);
-      }
-
-      /**
-       * \brief Performs \f$this \leftarrow x\f$.
-       *
-       * \param[in] x The vector to be copied.
-       * \param[in] full Shall we create a full copy, including scalars and index arrays?
-       */
-      template <typename Mem2_>
-      void copy(const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & x, bool full = false)
       {
         this->_copy_content(x, full);
       }
@@ -682,7 +650,7 @@ namespace FEAT
               XABORTM("Input-file is no dense-vector-file");
           }
 
-          DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> tmp(rows / BlockSize_);
+          DenseVectorBlocked<DT_, IT_, BlockSize_> tmp(rows / BlockSize_);
           DT_ * pval(tmp.template elements<Perspective::pod>());
 
           while (! file.eof())
@@ -735,9 +703,9 @@ namespace FEAT
           }
 
           _size() = Index(data.size()) / Index(BlockSize_);
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(Index(data.size())));
+          this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(Index(data.size())));
           this->_elements_size.push_back(Index(data.size()));
-          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+          MemoryPool::template copy<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
           break;
         }
         case FileMode::fm_dvb:
@@ -783,7 +751,7 @@ namespace FEAT
         {
         case FileMode::fm_mtx:
         {
-          DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> temp;
+          DenseVectorBlocked<DT_, IT_, BlockSize_> temp;
           temp.convert(*this);
 
           const Index tsize(temp.template size<Perspective::pod>());
@@ -799,15 +767,15 @@ namespace FEAT
         }
         case FileMode::fm_exp:
         {
-          DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->size<Perspective::pod>()));
-          MemoryPool<Mem_>::template download<DT_>(temp, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
+          DT_ * temp = MemoryPool::template allocate_memory<DT_>((this->size<Perspective::pod>()));
+          MemoryPool::template copy<DT_>(temp, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
           for (Index i(0); i < this->size<Perspective::pod>(); ++i)
           {
             file << std::scientific << temp[i] << std::endl;
           }
 
-          MemoryPool<Mem::Main>::release_memory(temp);
+          MemoryPool::release_memory(temp);
           break;
         }
         case FileMode::fm_dvb:
@@ -846,7 +814,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy<Mem_>::dv(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -865,7 +833,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::ComponentProduct<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Arch::ComponentProduct::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
         Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
@@ -887,7 +855,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::ComponentInvert<Mem_>::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
+        Arch::ComponentInvert::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
         Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
@@ -906,7 +874,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::Scale<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
+        Arch::Scale::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
         Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
@@ -930,7 +898,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->template size<Perspective::pod>() * 3);
-        DataType result = Arch::TripleDotProduct<Mem_>::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        DataType result = Arch::TripleDotProduct::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -952,7 +920,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        DataType result = Arch::DotProduct<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        DataType result = Arch::DotProduct::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -970,7 +938,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        DataType result = Arch::Norm2<Mem_>::value(elements<Perspective::pod>(), this->size<Perspective::pod>());
+        DataType result = Arch::Norm2::value(elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -998,10 +966,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(max_abs_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
+        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
         result = Math::abs(result);
 
         TimeStamp ts_stop;
@@ -1019,10 +987,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(min_abs_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + min_abs_index, 1);
+        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + min_abs_index, 1);
         result = Math::abs(result);
 
         TimeStamp ts_stop;
@@ -1040,10 +1008,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(max_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + max_index, 1);
+        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + max_index, 1);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1060,10 +1028,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(min_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + min_index, 1);
+        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + min_index, 1);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1081,23 +1049,20 @@ namespace FEAT
 
         XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
-        DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> local;
-        local.convert(*this);
-        perm.apply(local.template elements<Perspective::native>());
-        this->assign(local);
+        perm.apply(elements<Perspective::native>());
       }
 
       /// \cond internal
       /// Writes the vector-entries in an allocated array
       void set_vec(DT_ * const pval_set) const
       {
-        MemoryPool<Mem_>::copy(pval_set, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        MemoryPool::copy(pval_set, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
       }
 
       /// Writes data of an array in the vector
       void set_vec_inv(const DT_ * const pval_set)
       {
-        MemoryPool<Mem_>::copy(this->template elements<Perspective::pod>(), pval_set, this->size<Perspective::pod>());
+        MemoryPool::copy(this->template elements<Perspective::pod>(), pval_set, this->size<Perspective::pod>());
       }
       /// \endcond
 
@@ -1107,8 +1072,7 @@ namespace FEAT
        * \param[in] a A vector to compare with.
        * \param[in] b A vector to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator==(const DenseVectorBlocked & a, const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & b)
+      friend bool operator== (const DenseVectorBlocked & a, const DenseVectorBlocked & b)
       {
         if (a.size() != b.size())
           return false;
@@ -1125,25 +1089,8 @@ namespace FEAT
         DT_ * ta;
         DT_ * tb;
 
-        if (std::is_same<Mem::Main, Mem_>::value)
-        {
-          ta = const_cast<DT_ *>(a.template elements<Perspective::pod>());
-        }
-        else
-        {
-          ta = new DT_[a.template size<Perspective::pod>()];
-          MemoryPool<Mem_>::template download<DT_>(ta, a.template elements<Perspective::pod>(), a.template size<Perspective::pod>());
-        }
-
-        if (std::is_same<Mem::Main, Mem2_>::value)
-        {
-          tb = const_cast<DT_ *>(b.template elements<Perspective::pod>());
-        }
-        else
-        {
-          tb = new DT_[b.template size<Perspective::pod>()];
-          MemoryPool<Mem2_>::template download<DT_>(tb, b.template elements<Perspective::pod>(), b.template size<Perspective::pod>());
-        }
+        ta = const_cast<DT_*>(a.template elements<Perspective::pod>());
+        tb = const_cast<DT_*>(b.template elements<Perspective::pod>());
 
         for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
         {
@@ -1153,11 +1100,6 @@ namespace FEAT
             break;
           }
         }
-
-        if (! std::is_same<Mem::Main, Mem_>::value)
-          delete[] ta;
-        if (! std::is_same<Mem::Main, Mem2_>::value)
-          delete[] tb;
 
         return ret;
       }

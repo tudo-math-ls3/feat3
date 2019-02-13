@@ -30,7 +30,7 @@ namespace FEAT
      * direct solver UMFPACK for doing the actual dirty work.
      *
      * \note
-     * This solver can only be applied onto SparseMatrixCSR<Mem::Main,double,Index> matrices.
+     * This solver can only be applied onto SparseMatrixCSR<double,Index> matrices.
      * If you want to apply UMFPACK on other matrix types, use the GenericUmfpack solver instead.
      *
      * \attention
@@ -40,13 +40,13 @@ namespace FEAT
      * \author Peter Zajac
      */
     class Umfpack :
-      public SolverBase<LAFEM::DenseVector<Mem::Main, double, Index>>
+      public SolverBase<LAFEM::DenseVector<double, Index>>
     {
     public:
       /// compatible matrix type
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<double, Index> MatrixType;
       /// compatible vector type
-      typedef LAFEM::DenseVector<Mem::Main, double, Index> VectorType;
+      typedef LAFEM::DenseVector<double, Index> VectorType;
 
       /// our base class
       typedef SolverBase<VectorType> BaseClass;
@@ -115,7 +115,7 @@ namespace FEAT
      * \returns
      * A shared pointer to a new Umfpack object.
      */
-    inline std::shared_ptr<Umfpack> new_umfpack(const LAFEM::SparseMatrixCSR<Mem::Main, double, Index>& matrix)
+    inline std::shared_ptr<Umfpack> new_umfpack(const LAFEM::SparseMatrixCSR<double, Index>& matrix)
     {
       return std::make_shared<Umfpack>(matrix);
     }
@@ -140,13 +140,13 @@ namespace FEAT
      * \author Peter Zajac
      */
     class UmfpackMean :
-      public SolverBase<LAFEM::DenseVector<Mem::Main, double, Index>>
+      public SolverBase<LAFEM::DenseVector<double, Index>>
     {
     public:
       /// compatible matrix type
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<double, Index> MatrixType;
       /// compatible vector type
-      typedef LAFEM::DenseVector<Mem::Main, double, Index> VectorType;
+      typedef LAFEM::DenseVector<double, Index> VectorType;
 
       /// our base class
       typedef SolverBase<VectorType> BaseClass;
@@ -186,7 +186,7 @@ namespace FEAT
        */
       explicit UmfpackMean(
         const MatrixType& system_matrix,
-        const LAFEM::MeanFilter<Mem::Main, double, Index>& mean_filter) :
+        const LAFEM::MeanFilter<double, Index>& mean_filter) :
         UmfpackMean(system_matrix, mean_filter.get_vec_dual())
       {
       }
@@ -228,8 +228,8 @@ namespace FEAT
      * A shared pointer to a new UmfpackMean object.
      */
     inline std::shared_ptr<UmfpackMean> new_umfpack_mean(
-      const LAFEM::SparseMatrixCSR<Mem::Main, double, Index>& matrix,
-      const LAFEM::DenseVector<Mem::Main, double, Index>& weight_vector)
+      const LAFEM::SparseMatrixCSR<double, Index>& matrix,
+      const LAFEM::DenseVector<double, Index>& weight_vector)
     {
       return std::make_shared<UmfpackMean>(matrix, weight_vector);
     }
@@ -247,8 +247,8 @@ namespace FEAT
      * A shared pointer to a new UmfpackMean object.
      */
     inline std::shared_ptr<UmfpackMean> new_umfpack_mean(
-      const LAFEM::SparseMatrixCSR<Mem::Main, double, Index>& matrix,
-      const LAFEM::MeanFilter<Mem::Main, double, Index>& filter)
+      const LAFEM::SparseMatrixCSR<double, Index>& matrix,
+      const LAFEM::MeanFilter<double, Index>& filter)
     {
       return std::make_shared<UmfpackMean>(matrix, filter);
     }
@@ -276,22 +276,22 @@ namespace FEAT
      */
     template<typename DT_, typename IT_, int dim_>
     class SaddleUmfpackMean :
-      public SolverBase<LAFEM::TupleVector<LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>, LAFEM::DenseVector<Mem::Main, DT_, IT_>>>
+      public SolverBase<LAFEM::TupleVector<LAFEM::DenseVectorBlocked<DT_, IT_, dim_>, LAFEM::DenseVector<DT_, IT_>>>
     {
     public:
       /// compatible matrix type
-      typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_> MatrixTypeA;
-      typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, 1> MatrixTypeB;
-      typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, dim_> MatrixTypeD;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_> MatrixTypeA;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, 1> MatrixTypeB;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim_> MatrixTypeD;
       typedef LAFEM::SaddlePointMatrix<MatrixTypeA, MatrixTypeB, MatrixTypeD> MatrixType;
 
       /// compatible vector type
-      typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> VectorTypeV;
-      typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorTypeP;
+      typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim_> VectorTypeV;
+      typedef LAFEM::DenseVector<DT_, IT_> VectorTypeP;
       typedef LAFEM::TupleVector<VectorTypeV, VectorTypeP> VectorType;
 
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, double, Index> UmfMatrixType;
-      typedef LAFEM::DenseVector<Mem::Main, double, Index> UmfVectorType;
+      typedef LAFEM::SparseMatrixCSR<double, Index> UmfMatrixType;
+      typedef LAFEM::DenseVector<double, Index> UmfVectorType;
 
       /// our base class
       typedef SolverBase<VectorType> BaseClass;
@@ -337,7 +337,7 @@ namespace FEAT
        */
       explicit SaddleUmfpackMean(
         const MatrixType& system_matrix,
-        const LAFEM::MeanFilter<Mem::Main, DT_, IT_>& mean_filter) :
+        const LAFEM::MeanFilter<DT_, IT_>& mean_filter) :
         SaddleUmfpackMean(system_matrix, mean_filter.get_vec_dual())
       {
       }
@@ -603,10 +603,10 @@ namespace FEAT
     template<typename DT_, typename IT_, int dim_>
     inline std::shared_ptr<SaddleUmfpackMean<DT_, IT_, dim_>> new_saddle_umfpack_mean(
       const LAFEM::SaddlePointMatrix<
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_>,
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, 1>,
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, dim_>>& matrix,
-      const LAFEM::DenseVector<Mem::Main, DT_, IT_>& weight_vector)
+        LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_>,
+        LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, 1>,
+        LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim_>>& matrix,
+      const LAFEM::DenseVector<DT_, IT_>& weight_vector)
     {
       return std::make_shared<SaddleUmfpackMean<DT_, IT_, dim_>>(matrix, weight_vector);
     }
@@ -626,10 +626,10 @@ namespace FEAT
     template<typename DT_, typename IT_, int dim_>
     inline std::shared_ptr<SaddleUmfpackMean<DT_, IT_, dim_>> new_saddle_umfpack_mean(
       const LAFEM::SaddlePointMatrix<
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_>,
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, 1>,
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, dim_>>& matrix,
-      const LAFEM::MeanFilter<Mem::Main, DT_, IT_>& filter)
+        LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_>,
+        LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, 1>,
+        LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim_>>& matrix,
+      const LAFEM::MeanFilter<DT_, IT_>& filter)
     {
       return std::make_shared<SaddleUmfpackMean<DT_, IT_, dim_>>(matrix, filter);
     }
@@ -646,10 +646,10 @@ namespace FEAT
       class GenericUmfpackVectorHelper
       {
       private:
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> _vec_tmp;
+        LAFEM::DenseVector<DT_, IT_> _vec_tmp;
 
       public:
-        void init(const LAFEM::DenseVector<Mem::Main, double, Index>& v)
+        void init(const LAFEM::DenseVector<double, Index>& v)
         {
           _vec_tmp.convert(v);
         }
@@ -660,14 +660,14 @@ namespace FEAT
         }
 
         template<typename VT_>
-        void download(LAFEM::DenseVector<Mem::Main, double, Index>& vo, const VT_& vi)
+        void download(LAFEM::DenseVector<double, Index>& vo, const VT_& vi)
         {
           _vec_tmp.copy(vi);
           vo.convert(_vec_tmp);
         }
 
         template<typename VT_>
-        void upload(VT_& vo, const LAFEM::DenseVector<Mem::Main, double, Index>& vi)
+        void upload(VT_& vo, const LAFEM::DenseVector<double, Index>& vi)
         {
           _vec_tmp.convert(vi);
           _vec_tmp.copy_inv(vo);
@@ -679,7 +679,7 @@ namespace FEAT
       class GenericUmfpackVectorHelper<double, Index>
       {
       public:
-        void init(const LAFEM::DenseVector<Mem::Main, double, Index>&)
+        void init(const LAFEM::DenseVector<double, Index>&)
         {
         }
 
@@ -688,13 +688,13 @@ namespace FEAT
         }
 
         template<typename VT_>
-        void download(LAFEM::DenseVector<Mem::Main, double, Index>& vo, const VT_& vi)
+        void download(LAFEM::DenseVector<double, Index>& vo, const VT_& vi)
         {
           vo.copy(vi);
         }
 
         template<typename VT_>
-        void upload(VT_& vo, const LAFEM::DenseVector<Mem::Main, double, Index>& vi)
+        void upload(VT_& vo, const LAFEM::DenseVector<double, Index>& vi)
         {
           vi.copy_inv(vo);
         }
@@ -728,9 +728,9 @@ namespace FEAT
     protected:
       /// our matrix
       const MatrixType& _matrix;
-      /// the matrix for our Umfpack solver (SparseMatrixCSR<Mem::Main, double, Index>)
+      /// the matrix for our Umfpack solver (SparseMatrixCSR<double, Index>)
       typename Umfpack::MatrixType _umf_matrix;
-      /// the vectors for our Umfpack solver (DenseVector<Mem::Main, double, Index>)
+      /// the vectors for our Umfpack solver (DenseVector<double, Index>)
       typename Umfpack::VectorType _umf_vsol, _umf_vrhs;
       /// vector helper
       Intern::GenericUmfpackVectorHelper<typename VectorType::DataType, typename VectorType::IndexType> _vec_helper;
@@ -759,8 +759,11 @@ namespace FEAT
       {
         BaseClass::init_symbolic();
 
+        // convert our system matrix to <double, Index> (if necessary)
+        typename MatrixType::template ContainerType<double, Index> mat_double;
+        mat_double.convert(_matrix);
         // convert matrix to obtain the structure
-        _umf_matrix.convert(_matrix);
+        _umf_matrix.convert(mat_double);
 
         // create vectors
         _umf_vsol = _umf_matrix.create_vector_l();
@@ -790,9 +793,9 @@ namespace FEAT
       {
         BaseClass::init_numeric();
 
-        // convert our system matrix to <Mem::Main, double, Index> (if necessary)
-        typename MatrixType::template ContainerType<Mem::Main, double, Index> mat_main;
-        mat_main.convert(_matrix);
+        // convert our system matrix to <double, Index> (if necessary)
+        typename MatrixType::template ContainerType<double, Index> mat_double;
+        mat_double.convert(_matrix);
 
         // get the array of our CSR matrix
         const Index* row_ptr = _umf_matrix.row_ptr();
@@ -801,7 +804,7 @@ namespace FEAT
 
         // copy entries into our CSR matrix
         for(Index i(0); i < _umf_matrix.rows(); ++i)
-          mat_main.set_line(i, val + row_ptr[i], col_idx + row_ptr[i], 0);
+          mat_double.set_line(i, val + row_ptr[i], col_idx + row_ptr[i], 0);
 
         // factorize
         _umfpack.init_numeric();

@@ -4,9 +4,9 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/util/binary_stream.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
 
@@ -22,15 +22,14 @@ using namespace FEAT::TestSystem;
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRTest")
+   SparseMatrixBCSRTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -41,10 +40,10 @@ public:
   void test_vector_types() const
   {
     // define a hand-full of sparse matrix BCSR
-    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> bcsr_3x3;
-    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 1> bcsr_3x1;
-    SparseMatrixBCSR<Mem_, DT_, IT_, 1, 3> bcsr_1x3;
-    SparseMatrixBCSR<Mem_, DT_, IT_, 1, 1> bcsr_1x1;
+    SparseMatrixBCSR<DT_, IT_, 3, 3> bcsr_3x3;
+    SparseMatrixBCSR<DT_, IT_, 3, 1> bcsr_3x1;
+    SparseMatrixBCSR<DT_, IT_, 1, 3> bcsr_1x3;
+    SparseMatrixBCSR<DT_, IT_, 1, 1> bcsr_1x1;
 
     // now create the left/right vectors
     TEST_CHECK_EQUAL(bcsr_3x3.create_vector_l().name(), "DenseVectorBlocked");
@@ -61,27 +60,27 @@ public:
   {
     test_vector_types();
 
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zero1;
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zero2;
+    SparseMatrixBCSR<DT_, IT_, 2, 3> zero1;
+    SparseMatrixBCSR<DT_, IT_, 2, 3> zero2;
     TEST_CHECK_EQUAL(zero2, zero1);
     zero2.convert(zero1);
 
-    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1)/DT_(7*i+1));
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
     TEST_CHECK_EQUAL(c(1,0)(0,0), DT_(0));
     TEST_CHECK_EQUAL(c(1,1)(1,1), DT_(10+1)/DT_(7*10+1));
 
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> d;
+    SparseMatrixBCSR<DT_, IT_, 2, 3> d;
     d.convert(c);
     TEST_CHECK_EQUAL(d.rows(), c.rows());
     TEST_CHECK_EQUAL(d.columns(), c.columns());
@@ -89,7 +88,7 @@ public:
     TEST_CHECK_EQUAL(d, c);
     TEST_CHECK_EQUAL((void*)d.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)d.row_ptr(), (void*)c.row_ptr());
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> e;
+    SparseMatrixBCSR<DT_, IT_, 2, 3> e;
     e.clone(c);
     TEST_CHECK_EQUAL(e, c);
     TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
@@ -99,7 +98,7 @@ public:
     TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_NOT_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
 
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> f(c.layout());
+    SparseMatrixBCSR<DT_, IT_, 2, 3> f(c.layout());
     TEST_CHECK_EQUAL(f.rows(), c.rows());
     TEST_CHECK_EQUAL(f.columns(), c.columns());
     TEST_CHECK_EQUAL(f.used_elements(), c.used_elements());
@@ -108,31 +107,38 @@ public:
 
   }
 };
-SparseMatrixBCSRTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_test_float_ulong;
-SparseMatrixBCSRTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_test_double_ulong;
-SparseMatrixBCSRTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_test_float_uint;
-SparseMatrixBCSRTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_test_double_uint;
+SparseMatrixBCSRTest<float, unsigned long> cpu_sparse_matrix_bcsr_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRTest<double, unsigned long> cpu_sparse_matrix_bcsr_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRTest<float, unsigned int> cpu_sparse_matrix_bcsr_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRTest<double, unsigned int> cpu_sparse_matrix_bcsr_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRTest<float, unsigned long> mkl_cpu_sparse_matrix_bcsr_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRTest<double, unsigned long> mkl_cpu_sparse_matrix_bcsr_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_test_float128_ulong;
-SparseMatrixBCSRTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_test_float128_uint;
+SparseMatrixBCSRTest<__float128, unsigned long> cpu_sparse_matrix_bcsr_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRTest<__float128, unsigned int> cpu_sparse_matrix_bcsr_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRTest<Half, unsigned int> cpu_sparse_matrix_bcsr_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRTest<Half, unsigned long> cpu_sparse_matrix_bcsr_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_test_float_ulong;
-SparseMatrixBCSRTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_test_double_ulong;
-SparseMatrixBCSRTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_test_float_uint;
-SparseMatrixBCSRTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_test_double_uint;
+SparseMatrixBCSRTest<float, unsigned long> cuda_sparse_matrix_bcsr_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRTest<double, unsigned long> cuda_sparse_matrix_bcsr_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRTest<float, unsigned int> cuda_sparse_matrix_bcsr_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRTest<double, unsigned int> cuda_sparse_matrix_bcsr_test_double_uint(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRSerializeTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRSerializeTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRSerializeTest")
+   SparseMatrixBCSRSerializeTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -141,45 +147,46 @@ public:
   }
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1)/DT_(7*i+1));
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
     BinaryStream bs;
     c.write_out(FileMode::fm_bcsr, bs);
     bs.seekg(0);
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> g(FileMode::fm_bcsr, bs);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> g(FileMode::fm_bcsr, bs);
     TEST_CHECK_EQUAL(g, c);
 
-    /*std::stringstream ts;
-    f.write_out(FileMode::fm_mtx, ts);
-    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, f);
+    //std::stringstream ts;
+    //f.write_out(FileMode::fm_mtx, ts);
+    //SparseMatrixCSR<DT_, IT_> j(FileMode::fm_mtx, ts);
+    //TEST_CHECK_EQUAL(j, f);
 
-    std::stringstream ts2;
-    f.write_out_mtx(ts2, true);
-    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
-    TEST_CHECK_EQUAL(j2, f);*/
+    //std::stringstream ts2;
+    //f.write_out_mtx(ts2, true);
+    //SparseMatrixCSR<DT_, IT_> j2(FileMode::fm_mtx, ts2);
+    //TEST_CHECK_EQUAL(j2, f);
 
     auto kp = c.serialize(LAFEM::SerialConfig(false, false));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> k(kp);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> k(kp);
     TEST_CHECK_EQUAL(k, c);
+
 #ifdef FEAT_HAVE_ZLIB
     auto zl = c.serialize(LAFEM::SerialConfig(true, false));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zlib(zl);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> zlib(zl);
     TEST_CHECK_EQUAL(k, c);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zfp(zf);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> zfp(zf);
     for(Index i(0) ; i < c.rows() ; ++i)
     {
       for(Index j(0) ; j < c.columns() ; ++j)
@@ -197,16 +204,29 @@ public:
   }
 };
 
-SparseMatrixBCSRSerializeTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_float_ulong;
-SparseMatrixBCSRSerializeTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_double_ulong;
-SparseMatrixBCSRSerializeTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_float_uint;
-SparseMatrixBCSRSerializeTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_double_uint;
-#ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRSerializeTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_float_ulong;
-SparseMatrixBCSRSerializeTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_double_ulong;
-SparseMatrixBCSRSerializeTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_float_uint;
-SparseMatrixBCSRSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_double_uint;
+SparseMatrixBCSRSerializeTest<float, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest<double, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest<float, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest<double, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRSerializeTest<float, unsigned long> mkl_cpu_sparse_matrix_bcsr_serialize_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRSerializeTest<double, unsigned long> mkl_cpu_sparse_matrix_bcsr_serialize_test_double_ulong(PreferredBackend::mkl);
 #endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRSerializeTest<__float128, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest<__float128, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRSerializeTest<Half, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest<Half, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRSerializeTest<float, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest<double, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest<float, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest<double, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_double_uint(PreferredBackend::cuda);
+#endif
+
 /**
  * \brief Test class for the sparse matrix csr blocked apply method.
  *
@@ -215,15 +235,14 @@ SparseMatrixBCSRSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matri
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRApplyTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRApplyTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRApplyTest")
+   SparseMatrixBCSRApplyTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -233,22 +252,22 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
-    DenseVector<Mem_, DT_, IT_> x(c.template columns<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> y(c.template rows<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> r(c.template rows<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> ref(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> x(c.template columns<Perspective::pod>());
+    DenseVector<DT_, IT_> y(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> r(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> ref(c.template rows<Perspective::pod>());
     for (Index i(0) ; i < x.size() ; ++i)
     {
       x(i, DT_(i));
@@ -259,11 +278,11 @@ public:
       ref(i, DT_(4711));
       y(i, DT_(i % 100));
     }
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> xb(x);
-    DenseVectorBlocked<Mem_, DT_, IT_, 2> yb(y);
-    DenseVectorBlocked<Mem_, DT_, IT_, 2> rb(r);
+    DenseVectorBlocked<DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<DT_, IT_, 2> yb(y);
+    DenseVectorBlocked<DT_, IT_, 2> rb(r);
 
-    SparseMatrixCSR<Mem_, DT_, IT_> csr;
+    SparseMatrixCSR<DT_, IT_> csr;
     csr.convert(c);
     csr.apply(ref, x);
 
@@ -288,11 +307,6 @@ public:
     c.apply(r, x, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
-    // &r == &y
-    r.copy(y);
-    c.apply(r, x, r, alpha);
-    TEST_CHECK_EQUAL(r, ref);
-
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
@@ -304,6 +318,9 @@ public:
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
+    c.apply(rb, xb, y, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
 
     //axpy
     alpha = DT_(1.234);
@@ -323,24 +340,37 @@ public:
     c.apply(r, xb, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.apply(rb, xb, y, alpha);
+    c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.apply(rb, xb, yb, alpha);
+    c.apply(rb, xb, y, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
   }
 };
-SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_apply_test_float_ulong;
-SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_test_double_ulong;
-SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_test_float_uint;
-SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_test_double_uint;
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRApplyTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_apply_test_float128_ulong;
-SparseMatrixBCSRApplyTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_apply_test_float128_uint;
+SparseMatrixBCSRApplyTest<float, unsigned long> cpu_sm_bcsr_apply_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest<double, unsigned long> cpu_sm_bcsr_apply_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest<float, unsigned int> cpu_sm_bcsr_apply_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest<double, unsigned int> cpu_sm_bcsr_apply_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRApplyTest<float, unsigned long> mkl_cpu_sm_bcsr_apply_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRApplyTest<double, unsigned long> mkl_cpu_sm_bcsr_apply_test_double_ulong(PreferredBackend::mkl);
 #endif
-
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRApplyTest<__float128, unsigned long> cpu_sm_bcsr_apply_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest<__float128, unsigned int> cpu_sm_bcsr_apply_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRApplyTest<Half, unsigned int> cpu_sm_bcsr_apply_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest<Half, unsigned long> cpu_sm_bcsr_apply_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRApplyTest<float, unsigned long> cuda_sm_bcsr_apply_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest<double, unsigned long> cuda_sm_bcsr_apply_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest<float, unsigned int> cuda_sm_bcsr_apply_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest<double, unsigned int> cuda_sm_bcsr_apply_test_double_uint(PreferredBackend::cuda);
+#endif
 
 /**
  * \brief Test class for the sparse matrix csr blocked apply method.
@@ -350,15 +380,14 @@ SparseMatrixBCSRApplyTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRApplySquareTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRApplySquareTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRApplySquareTest")
+   SparseMatrixBCSRApplySquareTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRApplySquareTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -368,22 +397,22 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(18);
+    DenseVector<DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> c(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 3, 3> c(2, 2, dv2, dv1, dv3);
 
-    DenseVector<Mem_, DT_, IT_> x(c.template columns<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> y(c.template rows<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> r(c.template rows<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> ref(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> x(c.template columns<Perspective::pod>());
+    DenseVector<DT_, IT_> y(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> r(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> ref(c.template rows<Perspective::pod>());
     for (Index i(0) ; i < x.size() ; ++i)
     {
       x(i, DT_(i));
@@ -394,16 +423,15 @@ public:
       ref(i, DT_(4711));
       y(i, DT_(i % 100));
     }
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> xb(x);
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> yb(y);
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> rb(r);
+    DenseVectorBlocked<DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<DT_, IT_, 3> yb(y);
+    DenseVectorBlocked<DT_, IT_, 3> rb(r);
 
-    SparseMatrixCSR<Mem_, DT_, IT_> csr;
+    SparseMatrixCSR<DT_, IT_> csr;
     csr.convert(c);
     csr.apply(ref, x);
 
     c.apply(r, x);
-
     TEST_CHECK_EQUAL(r, ref);
 
     c.apply(rb, x);
@@ -436,6 +464,10 @@ public:
     TEST_CHECK_EQUAL(r, ref);
 
     c.apply(rb, xb, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, xb, y, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
@@ -472,32 +504,39 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
   }
 };
-SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_float_ulong;
-SparseMatrixBCSRApplySquareTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_double_ulong;
-SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_float_uint;
-SparseMatrixBCSRApplySquareTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_double_uint;
+SparseMatrixBCSRApplySquareTest<float, unsigned long> cpu_sm_bcsr_apply_square_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest<double, unsigned long> cpu_sm_bcsr_apply_square_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest<float, unsigned int> cpu_sm_bcsr_apply_square_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest<double, unsigned int> cpu_sm_bcsr_apply_square_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRApplySquareTest<float, unsigned long> mkl_cpu_sm_bcsr_apply_square_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRApplySquareTest<double, unsigned long> mkl_cpu_sm_bcsr_apply_square_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRApplySquareTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_float128_ulong;
-SparseMatrixBCSRApplySquareTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_float128_uint;
+SparseMatrixBCSRApplySquareTest<__float128, unsigned long> cpu_sm_bcsr_apply_square_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest<__float128, unsigned int> cpu_sm_bcsr_apply_square_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRApplySquareTest<Half, unsigned int> cpu_sm_bcsr_apply_square_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest<Half, unsigned long> cpu_sm_bcsr_apply_square_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRApplySquareTest<Mem::CUDA, float, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_float_uint;
-SparseMatrixBCSRApplySquareTest<Mem::CUDA, double, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_double_uint;
-SparseMatrixBCSRApplySquareTest<Mem::CUDA, float, unsigned long> gpu_sparse_matrix_bcsr_apply_square_test_float_ulong;
-SparseMatrixBCSRApplySquareTest<Mem::CUDA, double, unsigned long> gpu_sparse_matrix_bcsr_apply_square_test_double_ulong;
+SparseMatrixBCSRApplySquareTest<float, unsigned int> gpu_sm_bcsr_apply_square_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest<double, unsigned int> gpu_sm_bcsr_apply_square_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest<float, unsigned long> gpu_sm_bcsr_apply_square_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest<double, unsigned long> gpu_sm_bcsr_apply_square_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRDiagTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRDiagTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRDiagTest")
+   SparseMatrixBCSRDiagTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRDiagTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -507,44 +546,49 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(18);
+    DenseVector<DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
-    DenseVector<Mem_, IT_, IT_> dv2(3);
+    DenseVector<IT_, IT_> dv2(3);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
     dv2(2, IT_(2));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> smb(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 3, 3> smb(2, 2, dv2, dv1, dv3);
 
     auto diag = smb.extract_diag();
-    typedef decltype(diag) DiagType;
-    typename DiagType::template ContainerTypeByMDI<Mem::Main, DT_, IT_> diag_main;
-    diag_main.convert(diag);
-    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[0], 1);
-    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[1], 5);
-    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[2], 9);
-    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[3], 10);
-    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[4], 14);
-    TEST_CHECK_EQUAL(diag_main.template elements<Perspective::pod>()[5], 18);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[0], 1);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[1], 5);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[2], 9);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[3], 10);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[4], 14);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[5], 18);
   }
 };
-SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float_ulong;
-SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_diag_test_double_ulong;
-SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float_uint;
-SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_diag_test_double_uint;
+SparseMatrixBCSRDiagTest<float, unsigned long> cpu_sm_bcsr_diag_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest<double, unsigned long> cpu_sm_bcsr_diag_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest<float, unsigned int> cpu_sm_bcsr_diag_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest<double, unsigned int> cpu_sm_bcsr_diag_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRDiagTest<float, unsigned long> mkl_cpu_sm_bcsr_diag_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRDiagTest<double, unsigned long> mkl_cpu_sm_bcsr_diag_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRDiagTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float128_ulong;
-SparseMatrixBCSRDiagTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float128_uint;
+SparseMatrixBCSRDiagTest<__float128, unsigned long> cpu_sm_bcsr_diag_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest<__float128, unsigned int> cpu_sm_bcsr_diag_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRDiagTest<Half, unsigned int> cpu_sm_bcsr_diag_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest<Half, unsigned long> cpu_sm_bcsr_diag_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRDiagTest<Mem::CUDA, float, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float_ulong_cuda;
-SparseMatrixBCSRDiagTest<Mem::CUDA, double, unsigned long> cpu_sparse_matrix_bcsr_diag_test_double_ulong_cuda;
-SparseMatrixBCSRDiagTest<Mem::CUDA, float, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float_uint_cuda;
-SparseMatrixBCSRDiagTest<Mem::CUDA, double, unsigned int> cpu_sparse_matrix_bcsr_diag_test_double_uint_cuda;
+SparseMatrixBCSRDiagTest<float, unsigned long> cuda_sm_bcsr_diag_test_float_ulong_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest<double, unsigned long> cuda_sm_bcsr_diag_test_double_ulong_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest<float, unsigned int> cuda_sm_bcsr_diag_test_float_uint_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest<double, unsigned int> cuda_sm_bcsr_diag_test_double_uint_cuda(PreferredBackend::cuda);
 #endif
 
 
@@ -556,15 +600,14 @@ SparseMatrixBCSRDiagTest<Mem::CUDA, double, unsigned int> cpu_sparse_matrix_bcsr
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRScaleTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRScaleTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRScaleTest")
+   SparseMatrixBCSRScaleTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRScaleTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -574,53 +617,60 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
     {
       dv1(i, DT_(i+1));
     }
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(a.layout());
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> c(a.layout());
 
     DT_ scal = DT_(4711);
 
-    SparseMatrixCSR<Mem_, DT_, IT_> a_s;
-    a_s.convert(a);
-    SparseMatrixCSR<Mem_, DT_, IT_> ref(a_s.layout());
-    SparseMatrixCSR<Mem_, DT_, IT_> result_s;
-    ref.scale(a_s, scal);
+    SparseMatrixCSR<DT_, IT_> a_csr;
+    a_csr.convert(a);
+    SparseMatrixCSR<DT_, IT_> ref(a_csr.layout());
+    SparseMatrixCSR<DT_, IT_> result_csr;
+    ref.scale(a_csr, scal);
 
     c.scale(a, scal);
-    result_s.convert(c);
-    TEST_CHECK_EQUAL(result_s, ref);
+    result_csr.convert(c);
+    TEST_CHECK_EQUAL(result_csr, ref);
 
     a.scale(a, scal);
-    result_s.convert(a);
-    TEST_CHECK_EQUAL(result_s, ref);
+    result_csr.convert(a);
+    TEST_CHECK_EQUAL(result_csr, ref);
   }
 };
-SparseMatrixBCSRScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_scale_test_float_ulong;
-SparseMatrixBCSRScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_scale_test_double_ulong;
-SparseMatrixBCSRScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float_uint;
-SparseMatrixBCSRScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_scale_test_double_uint;
+SparseMatrixBCSRScaleTest<float, unsigned long> cpu_sm_bcsr_scale_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest<double, unsigned long> cpu_sm_bcsr_scale_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest<float, unsigned int> cpu_sm_bcsr_scale_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest<double, unsigned int> cpu_sm_bcsr_scale_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRScaleTest<float, unsigned long> mkl_cpu_sm_bcsr_scale_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRScaleTest<double, unsigned long> mkl_cpu_sm_bcsr_scale_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRScaleTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_scale_test_float128_ulong;
-SparseMatrixBCSRScaleTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float128_uint;
+SparseMatrixBCSRScaleTest<__float128, unsigned long> cpu_sparse_matrix_bcsr_scale_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest<__float128, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRScaleTest<Half, unsigned int> cpu_sm_bcsr_scale_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest<Half, unsigned long> cpu_sm_bcsr_scale_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_scale_test_float_ulong;
-SparseMatrixBCSRScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_scale_test_double_ulong;
-SparseMatrixBCSRScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_scale_test_float_uint;
-SparseMatrixBCSRScaleTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_scale_test_double_uint;
+SparseMatrixBCSRScaleTest<float, unsigned long> cuda_sm_bcsr_scale_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest<double, unsigned long> cuda_sm_bcsr_scale_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest<float, unsigned int> cuda_sm_bcsr_scale_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest<double, unsigned int> cuda_sm_bcsr_scale_test_double_uint(PreferredBackend::cuda);
 #endif
-
 
 /**
  * \brief Test class for the sparse matrix csr blocked norm method.
@@ -630,15 +680,14 @@ SparseMatrixBCSRScaleTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bc
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRNormTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : UnitTest
 {
 public:
-   SparseMatrixBCSRNormTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRNormTest")
+   SparseMatrixBCSRNormTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRNormTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -648,41 +697,49 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
     {
       dv1(i, DT_(i+1));
     }
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
 
-    SparseMatrixCSR<Mem_, DT_, IT_> a_s;
-    a_s.convert(a);
-    DT_ ref = a_s.norm_frobenius();
+    SparseMatrixCSR<DT_, IT_> a_csr;
+    a_csr.convert(a);
+    DT_ ref = a_csr.norm_frobenius();
 
     DT_ result = a.norm_frobenius();
     TEST_CHECK_EQUAL(result, ref);
   }
 };
-SparseMatrixBCSRNormTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_norm_test_float_ulong;
-SparseMatrixBCSRNormTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_norm_test_double_ulong;
-SparseMatrixBCSRNormTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_norm_test_float_uint;
-SparseMatrixBCSRNormTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_norm_test_double_uint;
+SparseMatrixBCSRNormTest<float, unsigned long> cpu_sm_bcsr_norm_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRNormTest<double, unsigned long> cpu_sm_bcsr_norm_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRNormTest<float, unsigned int> cpu_sm_bcsr_norm_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRNormTest<double, unsigned int> cpu_sm_bcsr_norm_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRNormTest<float, unsigned long> mkl_cpu_sm_bcsr_norm_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRNormTest<double, unsigned long> mkl_cpu_sm_bcsr_norm_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRNormTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_norm_test_float128_ulong;
-SparseMatrixBCSRNormTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_norm_test_float128_uint;
+SparseMatrixBCSRNormTest<__float128, unsigned long> cpu_sm_bcsr_norm_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRNormTest<__float128, unsigned int> cpu_sm_bcsr_norm_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRNormTest<Half, unsigned int> cpu_sm_bcsr_norm_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRNormTest<Half, unsigned long> cpu_sm_bcsr_norm_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRNormTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_norm_test_float_ulong;
-SparseMatrixBCSRNormTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_norm_test_double_ulong;
-SparseMatrixBCSRNormTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_norm_test_float_uint;
-SparseMatrixBCSRNormTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_norm_test_double_uint;
+SparseMatrixBCSRNormTest<float, unsigned long> cuda_sm_bcsr_norm_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest<double, unsigned long> cuda_sm_bcsr_norm_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest<float, unsigned int> cuda_sm_bcsr_norm_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest<double, unsigned int> cuda_sm_bcsr_norm_test_double_uint(PreferredBackend::cuda);
 #endif
 
 
@@ -694,15 +751,14 @@ SparseMatrixBCSRNormTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcs
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRAxpyTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRAxpyTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRAxpyTest")
+   SparseMatrixBCSRAxpyTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -712,37 +768,34 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
     {
       dv1(i, DT_(i+1));
     }
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
-    DenseVector<Mem_, DT_, IT_> dv4(12);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+    DenseVector<DT_, IT_> dv4(12);
     for (Index i(0) ; i < dv4.size() ; ++i)
     {
       dv4(i, DT_(i-1));
     }
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> b(2, 2, dv2, dv4, dv3);
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(a.layout());
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> ref(a.layout());
+    SparseMatrixBCSR<DT_, IT_, 2, 3> b(2, 2, dv2, dv4, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> c(a.layout());
+    SparseMatrixBCSR<DT_, IT_, 2, 3> ref(a.layout());
 
     DT_ scal = DT_(1.234);
 
-    SparseMatrixBCSR<Mem::Main, DT_, IT_, 2, 3> ref_local;
-    ref_local.convert(ref);
-    for(Index i(0) ; i < ref_local.template used_elements<Perspective::pod>() ; ++i)
+    for(Index i(0) ; i < ref.template used_elements<Perspective::pod>() ; ++i)
     {
-      ref_local.template val<Perspective::pod>()[i] = scal * dv1(i) + dv4(i);
+      ref.template val<Perspective::pod>()[i] = scal * dv1(i) + dv4(i);
     }
-    ref.convert(ref_local);
 
     c.axpy(a, b, scal);
     TEST_CHECK_EQUAL(c, ref);
@@ -761,37 +814,43 @@ public:
     TEST_CHECK_EQUAL(c, ref);
 
     scal = DT_(1);
-    for(Index i(0) ; i < ref_local.template used_elements<Perspective::pod>() ; ++i)
+    for(Index i(0) ; i < ref.template used_elements<Perspective::pod>() ; ++i)
     {
-      ref_local.template val<Perspective::pod>()[i] = dv1(i) + dv4(i);
+      ref.template val<Perspective::pod>()[i] = dv1(i) + dv4(i);
     }
-    ref.convert(ref_local);
     c.axpy(a, b, scal);
     TEST_CHECK_EQUAL(c, ref);
 
     scal = DT_(-1);
-    for(Index i(0) ; i < ref_local.template used_elements<Perspective::pod>() ; ++i)
+    for(Index i(0) ; i < ref.template used_elements<Perspective::pod>() ; ++i)
     {
-      ref_local.template val<Perspective::pod>()[i] = dv4(i) - dv1(i);
+      ref.template val<Perspective::pod>()[i] = dv4(i) - dv1(i);
     }
-    ref.convert(ref_local);
     c.axpy(a, b, scal);
     TEST_CHECK_EQUAL(c, ref);
   }
 };
-SparseMatrixBCSRAxpyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_float_ulong;
-SparseMatrixBCSRAxpyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_double_ulong;
-SparseMatrixBCSRAxpyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_float_uint;
-SparseMatrixBCSRAxpyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_double_uint;
+SparseMatrixBCSRAxpyTest<float, unsigned long> cpu_sm_bcsr_axpy_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest<double, unsigned long> cpu_sm_bcsr_axpy_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest<float, unsigned int> cpu_sm_bcsr_axpy_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest<double, unsigned int> cpu_sm_bcsr_axpy_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRAxpyTest<float, unsigned long> mkl_cpu_sm_bcsr_axpy_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRAxpyTest<double, unsigned long> mkl_cpu_sm_bcsr_axpy_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRAxpyTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_float128_ulong;
-SparseMatrixBCSRAxpyTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_float128_uint;
+SparseMatrixBCSRAxpyTest<__float128, unsigned long> cpu_sm_bcsr_axpy_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest<__float128, unsigned int> cpu_sm_bcsr_axpy_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRAxpyTest<Half, unsigned int> cpu_sm_bcsr_axpy_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest<Half, unsigned long> cpu_sm_bcsr_axpy_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_float_ulong;
-SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_double_ulong;
-SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_float_uint;
-SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_double_uint;
+SparseMatrixBCSRAxpyTest<float, unsigned long> cuda_sm_bcsr_axpy_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest<double, unsigned long> cuda_sm_bcsr_axpy_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest<float, unsigned int> cuda_sm_bcsr_axpy_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest<double, unsigned int> cuda_sm_bcsr_axpy_test_double_uint(PreferredBackend::cuda);
 #endif
 
 /**
@@ -802,15 +861,14 @@ SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcs
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBCSRPermuteTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-   SparseMatrixBCSRPermuteTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRPermuteTest")
+   SparseMatrixBCSRPermuteTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRPermuteTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -820,26 +878,26 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> dv1(18);
+    DenseVector<DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
-    DenseVector<Mem_, IT_, IT_> dv2(2);
+    DenseVector<IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
-    DenseVector<Mem_, IT_, IT_> dv3(3);
+    DenseVector<IT_, IT_> dv3(3);
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> a(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 3, 3> a(2, 2, dv2, dv1, dv3);
 
-    DenseVector<Mem_, DT_, IT_> x(a.template columns<Perspective::pod>());
-    DenseVector<Mem_, DT_, IT_> r(a.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> x(a.template columns<Perspective::pod>());
+    DenseVector<DT_, IT_> r(a.template rows<Perspective::pod>());
     for (Index i(0) ; i < x.size() ; ++i)
     {
       x(i, DT_(i));
     }
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> xb(x);
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> rb(r);
+    DenseVectorBlocked<DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<DT_, IT_, 3> rb(r);
 
     /////////////////////////
 
@@ -869,17 +927,25 @@ public:
     TEST_CHECK_EQUAL(a, a_backup);
   }
 };
-SparseMatrixBCSRPermuteTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_permute_test_float_ulong;
-SparseMatrixBCSRPermuteTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_permute_test_double_ulong;
-SparseMatrixBCSRPermuteTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_permute_test_float_uint;
-SparseMatrixBCSRPermuteTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_permute_test_double_uint;
+SparseMatrixBCSRPermuteTest<float, unsigned long> cpu_sm_bcsr_permute_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest<double, unsigned long> cpu_sm_bcsr_permute_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest<float, unsigned int> cpu_sm_bcsr_permute_test_float_uint(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest<double, unsigned int> cpu_sm_bcsr_permute_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRPermuteTest<float, unsigned long> mkl_cpu_sm_bcsr_permute_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRPermuteTest<double, unsigned long> mkl_cpu_sm_bcsr_permute_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRPermuteTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_permute_test_float128_ulong;
-SparseMatrixBCSRPermuteTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_permute_test_float128_uint;
+SparseMatrixBCSRPermuteTest<__float128, unsigned long> cpu_sm_bcsr_permute_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest<__float128, unsigned int> cpu_sm_bcsr_permute_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRPermuteTest<Half, unsigned int> cpu_sm_bcsr_permute_test_half_uint(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest<Half, unsigned long> cpu_sm_bcsr_permute_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRPermuteTest<Mem::CUDA, float, unsigned long> cpu_sparse_matrix_bcsr_permute_test_float_ulong_cuda;
-SparseMatrixBCSRPermuteTest<Mem::CUDA, double, unsigned long> cpu_sparse_matrix_bcsr_permute_test_double_ulong_cuda;
-SparseMatrixBCSRPermuteTest<Mem::CUDA, float, unsigned int> cpu_sparse_matrix_bcsr_permute_test_float_uint_cuda;
-SparseMatrixBCSRPermuteTest<Mem::CUDA, double, unsigned int> cpu_sparse_matrix_bcsr_permute_test_double_uint_cuda;
+SparseMatrixBCSRPermuteTest<float, unsigned long> cuda_sm_bcsr_permute_test_float_ulong_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest<double, unsigned long> cuda_sm_bcsr_permute_test_double_ulong_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest<float, unsigned int> cuda_sm_bcsr_permute_test_float_uint_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest<double, unsigned int> cuda_sm_bcsr_permute_test_double_uint_cuda(PreferredBackend::cuda);
 #endif

@@ -34,7 +34,6 @@ namespace DbgMeshDistortion
   typedef Shape::Hypercube<2> ShapeType;
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
 
   void main(Index level)

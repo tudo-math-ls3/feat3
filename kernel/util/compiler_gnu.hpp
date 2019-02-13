@@ -19,10 +19,7 @@
 #if !defined(FEAT_COMPILER) && defined(__GNUC__)
 
 // calc linear sortable gcc version
-#  define _GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-
-// define FEAT_COMPILER_GCC
-#  define FEAT_COMPILER_GNU _GCC_VER
+#  define FEAT_COMPILER_GNU (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
 #if(__GNUC__ >= 9)
 #  define FEAT_COMPILER "GNU C++ compiler 9.x.x (or newer)"
@@ -41,12 +38,12 @@
 #  define FEAT_COMPILER "GNU C++ compiler"
 #endif
 
-#if(_GCC_VER >= 40900)
+#if(FEAT_COMPILER_GNU >= 40900)
 #  define FEAT_PRAGMA_IVDEP _Pragma("GCC ivdep")
 #endif
 
 
-#if(_GCC_VER >= 50000)
+#if(FEAT_COMPILER_GNU >= 50000)
 #define FEAT_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"") \

@@ -264,7 +264,7 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename DataType_, Index dim_>
+    template<typename DataType_, int dim_>
     class SphereHitTestFunction
     {
     public:

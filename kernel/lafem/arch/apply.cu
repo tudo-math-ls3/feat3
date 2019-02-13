@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/scale.hpp>
@@ -21,45 +20,6 @@ namespace FEAT
   {
     namespace Intern
     {
-      template <typename DT_>
-      __global__ void cuda_apply_mv_csr(DT_ * r, const DT_ a, const DT_ * x, const DT_ b, const DT_ * val,
-          const unsigned long * col_ind, const unsigned long * row_ptr, const Index count, const bool transposed)
-      {
-        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx >= count)
-          return;
-
-        DT_ sum(0);
-        const Index end(row_ptr[idx + 1]);
-        for (Index i(row_ptr[idx]) ; i < end ; ++i)
-        {
-          sum += val[i] * x[col_ind[i]];
-        }
-        r[idx] = (sum * a) + b * r[idx];
-      }
-
-      template <typename DT_, typename IT_>
-      __global__ void cuda_apply_mv_ell(DT_ * r, const DT_ a, const DT_ * x, const DT_ b, const DT_ * val, const IT_ * col_ind,
-                                       const IT_ * cs, const IT_ * cl, const Index rows, const Index C)
-      {
-        const Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx >= rows)
-          return;
-
-
-        DT_ sum(0);
-        const Index chunk(idx / C);
-        const Index local_row(idx % C);
-        const Index chunk_end(cs[chunk+1]);
-
-        for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
-        {
-          sum += val[pcol] * x[col_ind[pcol]];
-        }
-        r[idx] = sum * a + b * r[idx];
-
-      }
-
       template <typename DT_, typename IT_>
       __global__ void cuda_apply_banded(DT_ * r, const DT_ alpha, const DT_ * x, const DT_ beta, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
       {
@@ -92,33 +52,7 @@ namespace FEAT
         r[idx] = (sum*alpha) + beta * r[idx];
       }
 
-      void cusparse_apply_csr(cusparseOperation_t trans,
-                                       int m, int n, int nnz,
-                                       const float * alpha, const cusparseMatDescr_t descrA,
-                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
-                                       const float * x, const float * beta, float * y)
-      {
-        cusparseStatus_t status;
-        status = cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
-                       csrColInd, x, beta, y);
-        if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrmv failed with status code: " + stringify(status));
-      }
-
-      void cusparse_apply_csr(cusparseOperation_t trans,
-                                       int m, int n, int nnz,
-                                       const double * alpha, const cusparseMatDescr_t descrA,
-                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
-                                       const double * x, const double * beta, double * y)
-      {
-        cusparseStatus_t status;
-        status = cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
-                       csrColInd, x, beta, y);
-        if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrmv failed with status code: " + stringify(status));
-      }
-
-      void cusparse_apply_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+      void cusparse_apply_bcsr(cusparseDirection_t dir, cusparseOperation_t trans,
                                        int m, int n, int nnz,
                                        const float * alpha, const cusparseMatDescr_t descrA,
                                        const float * csrVal, const int * csrRowPtr, const int *csrColInd,
@@ -132,7 +66,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrmv failed with status code: " + stringify(status));
       }
 
-      void cusparse_apply_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+      void cusparse_apply_bcsr(cusparseDirection_t dir, cusparseOperation_t trans,
                                        int m, int n, int nnz,
                                        const double * alpha, const cusparseMatDescr_t descrA,
                                        const double * csrVal, const int * csrRowPtr, const int *csrColInd,
@@ -155,7 +89,7 @@ namespace FEAT
         cublasStatus_t status;
         status = cublasSgemv(Util::Intern::cublas_handle, trans, n, m, alpha, val, n, x, 1, beta, y, 1);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasSgemv failed with status code: " + stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
       }
 
       void cublas_apply_dense(cublasOperation_t trans,
@@ -167,7 +101,7 @@ namespace FEAT
         cublasStatus_t status;
         status = cublasDgemv(Util::Intern::cublas_handle, trans, n, m, alpha, val, n, x, 1, beta, y, 1);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemv failed with status code: " + stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
       }
 
       template <typename DT_, typename IT_, int BlockSize_>
@@ -200,7 +134,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      __global__ void cuda_apply_csrb(DT_ * r, const DT_ a, const DT_ * x, const DT_ b, const DT_ * val, const IT_ * col_ind,
+      __global__ void cuda_apply_bcsr(DT_ * r, const DT_ a, const DT_ * x, const DT_ b, const DT_ * val, const IT_ * col_ind,
           const IT_ * row_ptr, const Index count, const int BlockHeight, const int BlockWidth)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
@@ -238,40 +172,8 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-template <typename DT_>
-void Apply<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed)
-{
-  if (transposed)
-    throw InternalError(__func__, __FILE__, __LINE__, "transposedd csr product not supported for IT=unsigned long!");
-
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
-  dim3 grid;
-  dim3 block;
-  block.x = blocksize;
-  grid.x = (unsigned)ceil((rows)/(double)(block.x));
-
-  if (Math::abs(b) < Math::eps<DT_>())
-  {
-    MemoryPool<Mem::CUDA>::set_memory(r, DT_(0), (transposed?columns:rows));
-  }
-  else if (r != y)
-  {
-    MemoryPool<Mem::CUDA>::copy(r, y, (transposed?columns:rows));
-  }
-
-  FEAT::LAFEM::Intern::cuda_apply_mv_csr<<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows, transposed);
-#ifdef FEAT_DEBUG_MODE
-  cudaDeviceSynchronize();
-  cudaError_t last_error(cudaGetLastError());
-  if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
-#endif
-}
-template void Apply<Mem::CUDA>::csr(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-template void Apply<Mem::CUDA>::csr(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-
-template <typename DT_>
-void Apply<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed)
+template <typename DT_, typename IT_>
+void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed)
 {
   cusparseOperation_t trans;
   if (transposed)
@@ -279,19 +181,75 @@ void Apply<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ 
   else
     trans = CUSPARSE_OPERATION_NON_TRANSPOSE;
 
-  cusparseMatDescr_t descr=0;
-  cusparseCreateMatDescr(&descr);
-  cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
-  cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+  cudaDataType dt;
+  cudaDataType ct; //compute type
+  if (typeid(DT_) == typeid(double))
+  {
+      dt = CUDA_R_64F;
+      ct = CUDA_R_64F;
+  }
+  else if (typeid(DT_) == typeid(float))
+  {
+      dt = CUDA_R_32F;
+      ct = CUDA_R_32F;
+  }
+#ifdef FEAT_HAVE_HALFMATH
+  else if (typeid(DT_) == typeid(Half))
+  {
+      dt = CUDA_R_16F;
+      ct = CUDA_R_32F; //cusparseSpMV does not support computation in half, yet
+  }
+#endif
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
+
+  cusparseIndexType_t it;
+  if (typeid(IT_) == typeid(unsigned int))
+      it = CUSPARSE_INDEX_32I;
+  else if (typeid(IT_) == typeid(unsigned long))
+      it = CUSPARSE_INDEX_64I;
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "unsupported index type!");
+
+  cusparseStatus_t status;
+
+  cusparseSpMatDescr_t descr=0;
+  status = cusparseCreateCsr(&descr, rows, columns, used_elements, (void*)row_ptr, (void*)col_ind, (void*)val, it, it, CUSPARSE_INDEX_BASE_ZERO, dt);
+  if (status != CUSPARSE_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cusparseGetErrorString(status)));
+
+  cusparseDnVecDescr_t dx;
+  status = cusparseCreateDnVec(&dx, (transposed?rows:columns), (void*)x, dt);
+  if (status != CUSPARSE_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cusparseGetErrorString(status)));
+
+  cusparseDnVecDescr_t dr;
+  status = cusparseCreateDnVec(&dr, (transposed?columns:rows), (void*)r, dt);
+  if (status != CUSPARSE_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cusparseGetErrorString(status)));
+
 
   if (r != y)
   {
-    MemoryPool<Mem::CUDA>::copy(r, y, (transposed?columns:rows));
+    MemoryPool::copy(r, y, (transposed?columns:rows));
   }
 
-  FEAT::LAFEM::Intern::cusparse_apply_csr(trans, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &b, r);
+  size_t buffer_size(0);
+  status = cusparseSpMV_bufferSize(Util::Intern::cusparse_handle, trans, &a, descr, dx, &b, dr, ct, CUSPARSE_SPMV_CSR_ALG1, &buffer_size);
+  if (status != CUSPARSE_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMV_bufferSize failed with status code: " + stringify(cusparseGetErrorString(status)));
 
-  cusparseDestroyMatDescr(descr);
+  void* buffer;
+  cudaMalloc(&buffer, buffer_size);
+
+  status = cusparseSpMV(Util::Intern::cusparse_handle, trans, &a, descr, dx, &b, dr, ct, CUSPARSE_SPMV_CSR_ALG1, buffer);
+  if (status != CUSPARSE_STATUS_SUCCESS)
+    throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMV failed with status code: " + stringify(cusparseGetErrorString(status)));
+
+  cusparseDestroySpMat(descr);
+  cusparseDestroyDnVec(dx);
+  cusparseDestroyDnVec(dr);
+  cudaFree(buffer);
 
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
@@ -300,13 +258,22 @@ void Apply<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ 
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply<Mem::CUDA>::csr(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
-template void Apply<Mem::CUDA>::csr(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+#ifdef FEAT_HAVE_HALFMATH
+template void Apply::csr_cuda(Half *, const Half, const Half * const, const Half, const Half * const, const Half * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+#endif
+
+template void Apply::csr_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+#ifdef FEAT_HAVE_HALFMATH
+template void Apply::csr_cuda(Half *, const Half, const Half * const, const Half, const Half * const, const Half * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+#endif
 
 //silence the compiler by pretending to accept any IT_ but hopefully only 'unsigned int' calls will be made
-//this circumnavigates the missing static_if in csrb_wrapper
+//this circumnavigates the missing static_if in bcsr_wrapper
 template <typename DT_, typename IT_>
-void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockSize)
+void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockSize)
 {
   if (r != y)
   {
@@ -318,7 +285,7 @@ void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, co
   cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
   cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
-  FEAT::LAFEM::Intern::cusparse_apply_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+  FEAT::LAFEM::Intern::cusparse_apply_bcsr(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
       BlockSize, x, &b, r);
 
   cusparseDestroyMatDescr(descr);
@@ -332,9 +299,9 @@ void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, co
 }
 
 template <typename DT_, typename IT_>
-void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth)
+void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+  Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -342,14 +309,14 @@ void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, co
 
   if (Math::abs(b) < Math::eps<DT_>())
   {
-    MemoryPool<Mem::CUDA>::set_memory(r, DT_(0), /*(transposed?columns:rows)*/ rows * BlockHeight);
+    MemoryPool::set_memory(r, DT_(0), /*(transposed?columns:rows)*/ rows * BlockHeight);
   }
   else if (r != y)
   {
-    MemoryPool<Mem::CUDA>::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockHeight);
+    MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockHeight);
   }
 
-  FEAT::LAFEM::Intern::cuda_apply_csrb<DT_, IT_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
+  FEAT::LAFEM::Intern::cuda_apply_bcsr<DT_, IT_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -359,29 +326,29 @@ void Apply<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, co
 }
 
 template <typename DT_, typename IT_>
-void Apply<Mem::CUDA>:: csrb_wrapper(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth)
+void Apply::bcsr_wrapper_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth)
 {
   //CUSPARSE
   if (BlockHeight == BlockWidth && typeid(unsigned int) == typeid(IT_))
   {
-    csrb_intern<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight);
+    bcsr_intern_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight);
   }
   //GENERIC
   else
   {
-    csrb_intern<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight, BlockWidth);
+    bcsr_intern_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight, BlockWidth);
   }
 }
-template void Apply<Mem::CUDA>::csrb_wrapper<float, unsigned int>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int, const int);
-template void Apply<Mem::CUDA>::csrb_wrapper<double, unsigned int>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int, const int);
-template void Apply<Mem::CUDA>::csrb_wrapper<float, unsigned long>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int, const int);
-template void Apply<Mem::CUDA>::csrb_wrapper<double, unsigned long>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<float, unsigned int>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<double, unsigned int>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<float, unsigned long>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<double, unsigned long>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int, const int);
 
 template <typename DT_, typename IT_, int BlockSize_>
-void Apply<Mem::CUDA>::csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows,
+void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows,
     const Index columns, const Index used_elements)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+  Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -389,11 +356,11 @@ void Apply<Mem::CUDA>::csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT
 
   if (Math::abs(b) < Math::eps<DT_>())
   {
-    MemoryPool<Mem::CUDA>::set_memory(r, DT_(0), /*(transposed?columns:rows)*/ rows * BlockSize_);
+    MemoryPool::set_memory(r, DT_(0), /*(transposed?columns:rows)*/ rows * BlockSize_);
   }
   else if (r != y)
   {
-    MemoryPool<Mem::CUDA>::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockSize_);
+    MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockSize_);
   }
 
   FEAT::LAFEM::Intern::cuda_apply_csrsb<DT_, IT_, BlockSize_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows);
@@ -404,66 +371,35 @@ void Apply<Mem::CUDA>::csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply<Mem::CUDA>::csrsb<float, unsigned long, 1>
+template void Apply::csrsb_cuda<float, unsigned long, 1>
   (float *, const float, const float *, const float, const float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<double, unsigned long, 1>
+template void Apply::csrsb_cuda<double, unsigned long, 1>
   (double *, const double, const double *, const double, const double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<float, unsigned int, 1>
+template void Apply::csrsb_cuda<float, unsigned int, 1>
   (float *, const float, const float *, const float, const float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<double, unsigned int, 1>
+template void Apply::csrsb_cuda<double, unsigned int, 1>
   (double *, const double, const double *, const double, const double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<float, unsigned long, 2>
+template void Apply::csrsb_cuda<float, unsigned long, 2>
   (float *, const float, const float *, const float, const float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<double, unsigned long, 2>
+template void Apply::csrsb_cuda<double, unsigned long, 2>
   (double *, const double, const double *, const double, const double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<float, unsigned int, 2>
+template void Apply::csrsb_cuda<float, unsigned int, 2>
   (float *, const float, const float *, const float, const float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<double, unsigned int, 2>
+template void Apply::csrsb_cuda<double, unsigned int, 2>
   (double *, const double, const double *, const double, const double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<float, unsigned long, 3>
+template void Apply::csrsb_cuda<float, unsigned long, 3>
   (float *, const float, const float *, const float, const float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<double, unsigned long, 3>
+template void Apply::csrsb_cuda<double, unsigned long, 3>
   (double *, const double, const double *, const double, const double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<float, unsigned int, 3>
+template void Apply::csrsb_cuda<float, unsigned int, 3>
   (float *, const float, const float *, const float, const float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::csrsb<double, unsigned int, 3>
+template void Apply::csrsb_cuda<double, unsigned int, 3>
   (double *, const double, const double *, const double, const double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_>
-void Apply<Mem::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
+void Apply::banded_cuda(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const Index num_of_offsets, const Index rows, const Index columns)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
-  dim3 grid;
-  dim3 block;
-  block.x = blocksize;
-  grid.x = (unsigned)ceil((rows)/(double)(block.x));
-
-  if (Math::abs(b) < Math::eps<DT_>())
-  {
-    MemoryPool<Mem::CUDA>::set_memory(r, DT_(0), rows);
-  }
-  else if (r != y)
-  {
-    MemoryPool<Mem::CUDA>::copy(r, y, rows);
-  }
-
-  FEAT::LAFEM::Intern::cuda_apply_mv_ell<<<grid, block>>>(r, a, x, b, val, col_ind, cs, cl, rows, C);
-#ifdef FEAT_DEBUG_MODE
-  cudaDeviceSynchronize();
-  cudaError_t last_error(cudaGetLastError());
-  if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
-#endif
-}
-template void Apply<Mem::CUDA>::ell(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-template void Apply<Mem::CUDA>::ell(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-template void Apply<Mem::CUDA>::ell(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-template void Apply<Mem::CUDA>::ell(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-
-template <typename DT_, typename IT_>
-void Apply<Mem::CUDA>::banded(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const Index num_of_offsets, const Index rows, const Index columns)
-{
-  Index blocksize(128);
+  Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -471,22 +407,22 @@ void Apply<Mem::CUDA>::banded(DT_ * r, const DT_ alpha, const DT_ * const x, con
 
   if (Math::abs(beta) < Math::eps<DT_>())
   {
-    MemoryPool<Mem::CUDA>::set_memory(r, DT_(0), rows);
+    MemoryPool::set_memory(r, DT_(0), rows);
   }
   else if (r != y)
   {
-    MemoryPool<Mem::CUDA>::copy(r, y, rows);
+    MemoryPool::copy(r, y, rows);
   }
 
   FEAT::LAFEM::Intern::cuda_apply_banded<<<grid, block>>>(r, alpha, x, beta, val, offsets, num_of_offsets, rows, columns);
 }
-template void Apply<Mem::CUDA>::banded(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::banded(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::banded(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply<Mem::CUDA>::banded(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
 
 template <typename DT_>
-void Apply<Mem::CUDA>::dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+void Apply::dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
 {
   if (r != y)
   {
@@ -502,5 +438,5 @@ void Apply<Mem::CUDA>::dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply<Mem::CUDA>::dense(float * r, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
-template void Apply<Mem::CUDA>::dense(double * r, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);
+template void Apply::dense_cuda(float * r, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
+template void Apply::dense_cuda(double * r, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);

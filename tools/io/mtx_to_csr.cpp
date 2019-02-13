@@ -5,7 +5,6 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <iostream>
 
 using namespace FEAT;
@@ -22,6 +21,6 @@ int main(int argc, char ** argv)
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixCSR<Mem::Main, double> csr(FileMode::fm_mtx, input);
+    SparseMatrixCSR<double, Index> csr(FileMode::fm_mtx, input);
     csr.write_out(FileMode::fm_csr, output);
 }

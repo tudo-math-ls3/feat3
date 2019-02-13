@@ -23,7 +23,7 @@ SET (test_list
 # create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feat test_system kernel-geometry-test-aux)
+  TARGET_LINK_LIBRARIES(${test} feat test_system)
 
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

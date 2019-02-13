@@ -89,24 +89,22 @@ namespace FETI{
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // Linear System type definitions
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Our local matrix type: a standard CSR matrix
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
 
   // Our local vector type: the usual dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
 
   // Our local filter type: the unit filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> LocalFilterType;
 
   // The vector mirror takes the usual memory, data and index types as template parameters:
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
+  typedef LAFEM::VectorMirror<DataType, IndexType> VectorMirrorType;
 
   // The gate class template is defined in the "Global" namespace and it takes two
   // template arguments: the local vector and the vector mirror types:
@@ -119,9 +117,9 @@ namespace FETI{
   typedef Solver::Umfpack RegularUmfpack;
   typedef Solver::UmfpackMean FloatingUmfpack;
   //see synch_vec regarding memory...
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferMain;
+  typedef LAFEM::DenseVector<DataType, IndexType> BufferMain;
   /// the buffer vector type (possibly in device memory) for now the same as buffermain
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferType;
+  typedef LAFEM::DenseVector<DataType, IndexType> BufferType;
 
   class Umf
   {
@@ -495,7 +493,7 @@ namespace FETI{
       for(std::size_t i(0); i < n; ++i)
       {
         // create buffer vector in main memory
-        recv_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input), LAFEM::Pinning::disabled);
+        recv_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input));
         //buffer size right?
 
         // post receive
@@ -510,7 +508,7 @@ namespace FETI{
       for(std::size_t i(0); i < n; ++i)
       {
         // create buffer
-        send_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input), LAFEM::Pinning::disabled);
+        send_bufs.at(i) = BufferMain(_gate_mirrors.at(i).buffer_size(input));
         // gather from mirror
         _gate_mirrors.at(i).gather(send_bufs.at(i), input);
         // post send
@@ -565,7 +563,7 @@ namespace FETI{
       for(std::size_t i(0); i < n; ++i)
       {
         // create buffer vector in main memory
-        recv_bufs.at(i) = BufferMain(vec.at(i).size(), LAFEM::Pinning::disabled);
+        recv_bufs.at(i) = BufferMain(vec.at(i).size());
 
         // post receive
         recv_reqs.push_back(_comm->irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), _gate_ranks.at(i)));
@@ -577,7 +575,7 @@ namespace FETI{
 
       for(std::size_t i(0); i < n; ++i)
       {
-        send_bufs.at(i) = BufferMain(vec.at(i).size(), LAFEM::Pinning::disabled);
+        send_bufs.at(i) = BufferMain(vec.at(i).size());
         send_bufs.at(i).copy(vec.at(i));
 
         // post send
@@ -989,7 +987,6 @@ namespace FETI{
       //return value depending wether we want to take square root or not
       return (sqrt ?  Math::sqrt(r) : r);
     }
-
     //performs target = target + scalar * other
     void update_vector(std::vector<LocalVectorType>& target, std::vector<LocalVectorType>& other, DataType scalar)
     {

@@ -17,12 +17,12 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-class RandomTest
-  : public TaggedTest<Archs::None, Archs::None>
+class RandomTest :
+  public TestSystem::UnitTest
 {
 public:
   RandomTest() :
-    TaggedTest<Archs::None, Archs::None>("RandomTest")
+    TestSystem::UnitTest("RandomTest")
   {
   }
 

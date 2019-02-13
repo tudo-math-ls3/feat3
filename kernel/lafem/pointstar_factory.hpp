@@ -24,7 +24,7 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename DataType_, typename IndexType_ = Index>
+    template<typename DataType_, typename IndexType_>
     class PointstarFactoryBase
     {
     protected:
@@ -49,7 +49,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d pointstar matrix
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr() const = 0;
+      virtual SparseMatrixCSR<DataType_, IndexType_> matrix_csr() const = 0;
 
       /**
        * \brief Computes the smallest eigenvalue of the pointstar matrix.
@@ -87,7 +87,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d eigenvector
        */
-      virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const
+      virtual DenseVector<DataType_, IndexType_> eigenvector_min() const
       {
         // compute vector length
         Index neq(1);
@@ -95,7 +95,7 @@ namespace FEAT
           neq *= _m;
 
         // create vector
-        DenseVector<Mem::Main, DataType_, IndexType_> vector(neq, DataType_(1));
+        DenseVector<DataType_, IndexType_> vector(neq, DataType_(1));
         DataType_* v = vector.elements();
 
         // compute x scaling factor
@@ -122,7 +122,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d Q2-bubble vector
        */
-      DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const
+      DenseVector<DataType_, IndexType_> vector_q2_bubble() const
       {
         // compute vector length
         Index neq(1);
@@ -130,7 +130,7 @@ namespace FEAT
           neq *= _m;
 
         // create vector
-        DenseVector<Mem::Main, DataType_, IndexType_> vector(neq, DataType_(1));
+        DenseVector<DataType_, IndexType_> vector(neq, DataType_(1));
         DataType_* v = vector.elements();
 
         // compute x scaling factor
@@ -164,7 +164,7 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename DataType_, typename IndexType_ = Index>
+    template<typename DataType_, typename IndexType_>
     class PointstarFactoryFD :
       public PointstarFactoryBase<DataType_, IndexType_>
     {
@@ -191,7 +191,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d FD-stye pointstar matrix.
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr() const override
+      virtual SparseMatrixCSR<DataType_, IndexType_> matrix_csr() const override
       {
         // declare some variables
         Index i,j,k,l,n,neq,nnze,bpl,rpb,rps,b;
@@ -210,11 +210,11 @@ namespace FEAT
         }
 
         // create five vectors
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_row_ptr(neq+IndexType_(1));
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_col_idx(nnze);
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_dor(neq, IndexType_(0));
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_epr(neq, IndexType_(1));
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_data(nnze);
+        DenseVector<IndexType_, IndexType_> vec_row_ptr(neq+IndexType_(1));
+        DenseVector<IndexType_, IndexType_> vec_col_idx(nnze);
+        DenseVector<IndexType_, IndexType_> vec_dor(neq, IndexType_(0));
+        DenseVector<IndexType_, IndexType_> vec_epr(neq, IndexType_(1));
+        DenseVector<DataType_, IndexType_> vec_data(nnze);
 
         // get data
         data = vec_data.elements();
@@ -372,7 +372,7 @@ namespace FEAT
         }
 
         // return the matrix
-        return SparseMatrixCSR<Mem::Main, DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
+        return SparseMatrixCSR<DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
       }
 
       /**
@@ -422,7 +422,7 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename DataType_, typename IndexType_ = Index>
+    template<typename DataType_, typename IndexType_>
     class PointstarFactoryFE :
       public PointstarFactoryBase<DataType_, IndexType_>
     {
@@ -448,7 +448,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d FE-stye pointstar matrix.
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr() const override
+      virtual SparseMatrixCSR<DataType_, IndexType_> matrix_csr() const override
       {
         // declare some variables
         Index i,j,k,l,n,neq,nnze,bpl,rpb,rps,b;
@@ -466,11 +466,11 @@ namespace FEAT
         }
 
         // create five vectors
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_row_ptr(neq+IndexType_(1));
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_col_idx(nnze, IndexType_(neq));
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_dor(neq, IndexType_(0));
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_epr(neq, IndexType_(1));
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_data(nnze);
+        DenseVector<IndexType_, IndexType_> vec_row_ptr(neq+IndexType_(1));
+        DenseVector<IndexType_, IndexType_> vec_col_idx(nnze, IndexType_(neq));
+        DenseVector<IndexType_, IndexType_> vec_dor(neq, IndexType_(0));
+        DenseVector<IndexType_, IndexType_> vec_epr(neq, IndexType_(1));
+        DenseVector<DataType_, IndexType_> vec_data(nnze);
 
         // get data
         data = vec_data.elements();
@@ -645,7 +645,7 @@ namespace FEAT
           col_idx[i] -= IndexType_(neq);
 
         // return the matrix
-        return SparseMatrixCSR<Mem::Main, DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
+        return SparseMatrixCSR<DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
       }
 
       /**
@@ -657,10 +657,10 @@ namespace FEAT
        * \returns
        * The m^d x m^d FE-stye pointstar matrix with Neumann boundaries.
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr_neumann() const
+      virtual SparseMatrixCSR<DataType_, IndexType_> matrix_csr_neumann() const
       {
         // create matrix with default values
-        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix = this->matrix_csr();
+        SparseMatrixCSR<DataType_, IndexType_> matrix = this->matrix_csr();
 
         // get matrix arrays
         const IndexType_ m = IndexType_(this->_m);
@@ -882,7 +882,7 @@ namespace FEAT
      *
      * \author Christoph Lohmann
      */
-    template<typename DataType_, typename IndexType_ = Index>
+    template<typename DataType_, typename IndexType_>
     class PointstarFactoryBase2
     {
     protected:
@@ -917,7 +917,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d pointstar matrix
        */
-      virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const = 0;
+      virtual SparseMatrixBanded<DataType_, IndexType_> matrix_banded() const = 0;
 
       /**
        * \brief Computes the smallest eigenvalue of the pointstar matrix.
@@ -955,7 +955,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d eigenvector
        */
-      virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const = 0;
+      virtual DenseVector<DataType_, IndexType_> eigenvector_min() const = 0;
 
       /**
        * \brief Computes a Q2-bubble vector.
@@ -966,7 +966,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d Q2-bubble vector
        */
-      virtual DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const = 0;
+      virtual DenseVector<DataType_, IndexType_> vector_q2_bubble() const = 0;
     }; // PointstarFactoryBase2
 
     /**
@@ -979,7 +979,7 @@ namespace FEAT
      *
      * \author Christoph Lohmann
      */
-    template<typename DataType_, typename IndexType_ = Index>
+    template<typename DataType_, typename IndexType_>
     class PointstarFactoryFD2 :
       public PointstarFactoryBase2<DataType_, IndexType_>
     {
@@ -1006,7 +1006,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d FD-stye pointstar matrix.
        */
-      virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const override
+      virtual SparseMatrixBanded<DataType_, IndexType_> matrix_banded() const override
       {
         const IndexType_ d(IndexType_(this->_d));
         const IndexType_ * const pnos(this->_num_of_subintervalls.data());
@@ -1015,7 +1015,7 @@ namespace FEAT
         /**
          * Create matrix-structure
          */
-        SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix(PointstarStructureFD::value<DataType_, IndexType_>(this->_num_of_subintervalls));
+        SparseMatrixBanded<DataType_, IndexType_> matrix(PointstarStructureFD::value<DataType_, IndexType_>(this->_num_of_subintervalls));
         const IndexType_ neq(IndexType_(matrix.rows()));
         DataType_ * const pval(matrix.val());
 
@@ -1116,7 +1116,7 @@ namespace FEAT
         return 2 * x;
       }
 
-      virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const override
+      virtual DenseVector<DataType_, IndexType_> eigenvector_min() const override
       {
         const IndexType_ * const pnos(this->_num_of_subintervalls.data());
         const Index d(this->_d);
@@ -1129,7 +1129,7 @@ namespace FEAT
         }
 
         // create vector
-        DenseVector<Mem::Main, DataType_, IndexType_> vector(size, DataType_(1));
+        DenseVector<DataType_, IndexType_> vector(size, DataType_(1));
         DataType_* v = vector.elements();
 
         for(Index i(0); i < size; ++i)
@@ -1155,7 +1155,7 @@ namespace FEAT
        * \returns
        * The m^d x m^d Q2-bubble vector
        */
-      DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const override
+      DenseVector<DataType_, IndexType_> vector_q2_bubble() const override
       {
         const Index d(this->_d);
         const IndexType_ * const pnos(this->_num_of_subintervalls.data());
@@ -1169,7 +1169,7 @@ namespace FEAT
         }
 
         // create vector
-        DenseVector<Mem::Main, DataType_, IndexType_> vector(size, DataType_(1));
+        DenseVector<DataType_, IndexType_> vector(size, DataType_(1));
         DataType_* v = vector.elements();
 
         for(Index i(0); i < size; ++i)

@@ -7,7 +7,6 @@
 #include <kernel/shape.hpp>
 
 using namespace FEAT;
-using namespace FEAT::TestSystem;
 using namespace FEAT::Shape;
 
 /**
@@ -18,19 +17,12 @@ using namespace FEAT::Shape;
  * \author Peter Zajac
  */
 class ShapeTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public TestSystem::UnitTest
 {
 public:
   ShapeTest() :
-    TaggedTest<Archs::None, Archs::None>("shape_test")
+    TestSystem::UnitTest("shape_test")
   {
-  }
-
-  int bla(int dim, int i) const
-  {
-    int ret = 1 - ((((dim >> 1) ^ 1) ^ i) << 1);
-    std::cout << ret << std::endl;
-    return ret;
   }
 
   virtual void run() const override

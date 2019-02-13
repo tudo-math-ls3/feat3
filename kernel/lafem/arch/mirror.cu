@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/mirror.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -67,9 +66,9 @@ namespace FEAT
     namespace Arch
     {
       template<typename DT_, typename IT_>
-      void Mirror<Mem::CUDA>::gather_dv(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
+      void Mirror::gather_dv_cuda(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
       {
-        Index blocksize = MemoryPool<Mem::CUDA>::blocksize_misc;
+        Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
         block.x = blocksize;
@@ -85,15 +84,15 @@ namespace FEAT
 #endif
       }
 
-      template void Mirror<Mem::CUDA>::gather_dv(const Index, const Index, const unsigned long*, float*, const float*);
-      template void Mirror<Mem::CUDA>::gather_dv(const Index, const Index, const unsigned long*, double*, const double*);
-      template void Mirror<Mem::CUDA>::gather_dv(const Index, const Index, const unsigned int*, float*, const float*);
-      template void Mirror<Mem::CUDA>::gather_dv(const Index, const Index, const unsigned int*, double*, const double*);
+      template void Mirror::gather_dv_cuda(const Index, const Index, const unsigned long*, float*, const float*);
+      template void Mirror::gather_dv_cuda(const Index, const Index, const unsigned long*, double*, const double*);
+      template void Mirror::gather_dv_cuda(const Index, const Index, const unsigned int*, float*, const float*);
+      template void Mirror::gather_dv_cuda(const Index, const Index, const unsigned int*, double*, const double*);
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::CUDA>::scatter_dv(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
+      void Mirror::scatter_dv_cuda(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
       {
-        Index blocksize = MemoryPool<Mem::CUDA>::blocksize_misc;
+        Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
         block.x = blocksize;
@@ -109,15 +108,15 @@ namespace FEAT
 #endif
       }
 
-      template void Mirror<Mem::CUDA>::scatter_dv(const Index, const Index, const unsigned long*, const float*, float*, float);
-      template void Mirror<Mem::CUDA>::scatter_dv(const Index, const Index, const unsigned long*, const double*, double*, double);
-      template void Mirror<Mem::CUDA>::scatter_dv(const Index, const Index, const unsigned int*, const float*, float*, float);
-      template void Mirror<Mem::CUDA>::scatter_dv(const Index, const Index, const unsigned int*, const double*, double*, double);
+      template void Mirror::scatter_dv_cuda(const Index, const Index, const unsigned long*, const float*, float*, float);
+      template void Mirror::scatter_dv_cuda(const Index, const Index, const unsigned long*, const double*, double*, double);
+      template void Mirror::scatter_dv_cuda(const Index, const Index, const unsigned int*, const float*, float*, float);
+      template void Mirror::scatter_dv_cuda(const Index, const Index, const unsigned int*, const double*, double*, double);
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::CUDA>::gather_dvb(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
+      void Mirror::gather_dvb_cuda(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
       {
-        Index blocksize = MemoryPool<Mem::CUDA>::blocksize_misc;
+        Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
         block.x = blocksize;
@@ -133,15 +132,15 @@ namespace FEAT
 #endif
       }
 
-      template void Mirror<Mem::CUDA>::gather_dvb(const Index, const Index, const Index, const unsigned long*, float*, const float*);
-      template void Mirror<Mem::CUDA>::gather_dvb(const Index, const Index, const Index, const unsigned long*, double*, const double*);
-      template void Mirror<Mem::CUDA>::gather_dvb(const Index, const Index, const Index, const unsigned int*, float*, const float*);
-      template void Mirror<Mem::CUDA>::gather_dvb(const Index, const Index, const Index, const unsigned int*, double*, const double*);
+      template void Mirror::gather_dvb_cuda(const Index, const Index, const Index, const unsigned long*, float*, const float*);
+      template void Mirror::gather_dvb_cuda(const Index, const Index, const Index, const unsigned long*, double*, const double*);
+      template void Mirror::gather_dvb_cuda(const Index, const Index, const Index, const unsigned int*, float*, const float*);
+      template void Mirror::gather_dvb_cuda(const Index, const Index, const Index, const unsigned int*, double*, const double*);
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::CUDA>::scatter_dvb(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
+      void Mirror::scatter_dvb_cuda(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
       {
-        Index blocksize = MemoryPool<Mem::CUDA>::blocksize_misc;
+        Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
         block.x = blocksize;
@@ -157,10 +156,10 @@ namespace FEAT
 #endif
       }
 
-      template void Mirror<Mem::CUDA>::scatter_dvb(const Index, const Index, const Index, const unsigned long*, const float*, float*, float);
-      template void Mirror<Mem::CUDA>::scatter_dvb(const Index, const Index, const Index, const unsigned long*, const double*, double*, double);
-      template void Mirror<Mem::CUDA>::scatter_dvb(const Index, const Index, const Index, const unsigned int*, const float*, float*, float);
-      template void Mirror<Mem::CUDA>::scatter_dvb(const Index, const Index, const Index, const unsigned int*, const double*, double*, double);
+      template void Mirror::scatter_dvb_cuda(const Index, const Index, const Index, const unsigned long*, const float*, float*, float);
+      template void Mirror::scatter_dvb_cuda(const Index, const Index, const Index, const unsigned long*, const double*, double*, double);
+      template void Mirror::scatter_dvb_cuda(const Index, const Index, const Index, const unsigned int*, const float*, float*, float);
+      template void Mirror::scatter_dvb_cuda(const Index, const Index, const Index, const unsigned int*, const double*, double*, double);
     }
   } // namespace LAFEM
 } // namespace FEAT

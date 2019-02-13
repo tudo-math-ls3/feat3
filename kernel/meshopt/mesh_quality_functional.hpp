@@ -43,7 +43,7 @@ namespace FEAT
         /// The shape type
         typedef typename MeshType::ShapeType ShapeType;
         /// Type for the vectors to hold coordinates etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, MeshType::world_dim> CoordsBufferType;
+        typedef LAFEM::DenseVectorBlocked<CoordType, Index, MeshType::world_dim> CoordsBufferType;
 
       public:
         /// The mesh for the underlying transformation

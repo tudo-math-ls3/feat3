@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
 
 
 namespace FEAT
@@ -18,11 +18,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct Transpose;
-
-      template <>
-      struct Transpose<Mem::Main>
+      struct Transpose
       {
         template <typename DT_>
         static void value(DT_ * r, const DT_ * const x, const Index rows_x, const Index columns_x)
@@ -30,43 +26,30 @@ namespace FEAT
           value_generic(r, x, rows_x, columns_x);
         }
 
-#ifdef FEAT_HAVE_MKL
         static void value(float * r, const float * const x, const Index rows_x, const Index columns_x)
         {
-          value_mkl(r, x, rows_x, columns_x);
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, x, rows_x, columns_x)
         }
 
         static void value(double * r, const double * const x, const Index rows_x, const Index columns_x)
         {
-          value_mkl(r, x, rows_x, columns_x);
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, x, rows_x, columns_x)
         }
-#endif
-
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void value(__float128 * r, const __float128 * const x, const Index rows_x, const Index columns_x)
-        {
-          value_generic(r, x, rows_x, columns_x);
-        }
-#endif
 
         template <typename DT_>
         static void value_generic(DT_ * r, const DT_ * const x, const Index rows_x, const Index columns_x);
 
         static void value_mkl(float * r, const float * const x, const Index rows_x, const Index columns_x);
         static void value_mkl(double * r, const double * const x, const Index rows_x, const Index columns_x);
+
+        static void value_cuda(float * r, const float * const x, const Index rows_x, const Index columns_x);
+        static void value_cuda(double * r, const double * const x, const Index rows_x, const Index columns_x);
       };
 
 #ifdef FEAT_EICKT
-      extern template void Transpose<Mem::Main>::value_generic(float *, const float * const, const Index, const Index);
-      extern template void Transpose<Mem::Main>::value_generic(double *, const double * const, const Index, const Index);
+      extern template void Transpose::value_generic(float *, const float * const, const Index, const Index);
+      extern template void Transpose::value_generic(double *, const double * const, const Index, const Index);
 #endif
-
-      template <>
-      struct Transpose<Mem::CUDA>
-      {
-        static void value(float * r, const float * const x, const Index rows_x, const Index columns_x);
-        static void value(double * r, const double * const x, const Index rows_x, const Index columns_x);
-      };
 
     } // namespace Arch
   } // namespace LAFEM

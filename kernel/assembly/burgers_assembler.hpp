@@ -124,8 +124,8 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_matrix(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>& matrix,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -136,8 +136,8 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_> MatrixType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_> MatrixType;
 
         // tolerance: sqrt(eps)
         const DataType tol_eps = Math::sqrt(Math::eps<DataType>());
@@ -460,7 +460,7 @@ namespace FEAT
       template<typename Matrix_, typename Space_, typename CubatureFactory_>
       void assemble_scalar_matrix(
         Matrix_& matrix,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -471,7 +471,7 @@ namespace FEAT
         XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
         typedef Matrix_ MatrixType;
 
         // tolerance: sqrt(eps)
@@ -728,9 +728,9 @@ namespace FEAT
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
-        LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
+        LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& primal,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
@@ -740,7 +740,7 @@ namespace FEAT
         XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         // first of all, let's see what we have to assemble
         const bool need_diff = (Math::abs(nu) > DataType(0));
@@ -961,7 +961,7 @@ namespace FEAT
        * \param[in] convect
        * The \transient (local) convection field vector.
        */
-      void set_sd_v_norm(const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect)
+      void set_sd_v_norm(const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect)
       {
         const auto* vals = convect.elements();
         DataType_ r = DataType(0);

@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
 
 
 namespace FEAT
@@ -18,11 +18,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct ComponentProduct;
-
-      template <>
-      struct ComponentProduct<Mem::Main>
+      struct ComponentProduct
       {
         template <typename DT_>
         static void value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
@@ -30,44 +26,37 @@ namespace FEAT
           value_generic(r, x, y, size);
         }
 
-#ifdef FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_HALFMATH
+        static void value(Half * r, const Half * const x, const Half * const y, const Index size)
+        {
+          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, x, y, size)
+        }
+#endif
+
         static void value(float * r, const float * const x, const float * const y, const Index size)
         {
-          value_mkl(r, x, y, size);
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, x, y, size)
         }
 
         static void value(double * r, const double * const x, const double * const y, const Index size)
         {
-          value_mkl(r, x, y, size);
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, x, y, size)
         }
-#endif // FEAT_HAVE_MKL
-
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void value(__float128 * r, const __float128 * const x, const __float128 * const y, const Index size)
-        {
-          value_generic(r, x, y, size);
-        }
-#endif
 
         template <typename DT_>
         static void value_generic(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size);
 
         static void value_mkl(float * r, const float * const x, const float * const y, const Index size);
         static void value_mkl(double * r, const double * const x, const double * const y, const Index size);
+
+        template <typename DT_>
+        static void value_cuda(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size);
       };
 
 #ifdef FEAT_EICKT
-      extern template void ComponentProduct<Mem::Main>::value_generic(float *, const float * const, const float * const, const Index);
-      extern template void ComponentProduct<Mem::Main>::value_generic(double *, const double * const, const double * const, const Index);
+      extern template void ComponentProduct::value_generic(float *, const float * const, const float * const, const Index);
+      extern template void ComponentProduct::value_generic(double *, const double * const, const double * const, const Index);
 #endif
-
-      template <>
-      struct ComponentProduct<Mem::CUDA>
-      {
-        template <typename DT_>
-        static void value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size);
-      };
-
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

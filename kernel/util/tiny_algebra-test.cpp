@@ -20,7 +20,7 @@ using Math::cub;
  */
 template<typename DataType_>
 class TinyAlgebraTest :
-  public TaggedTest<Archs::None, DataType_>
+  public TestSystem::UnitTest
 {
 private:
   // machine exactness
@@ -66,7 +66,7 @@ private:
 public:
   // constructor
   explicit TinyAlgebraTest(const std::string& test_name) :
-    TaggedTest<Archs::None, DataType_>(test_name),
+    TestSystem::UnitTest(test_name, Type::Traits<DataType_>::name()),
     _eps(Math::eps<DataType_>())
   {
   }

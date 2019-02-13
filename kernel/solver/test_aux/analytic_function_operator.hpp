@@ -18,9 +18,6 @@ namespace FEAT
     /**
      * \brief Wrapper class defining an operator based on a scalar AnalyticFunction
      *
-     * \tparam Mem_
-     * Memory type the optimizer has to work in
-     *
      * \tparam DT_
      * Floating point precision
      *
@@ -38,7 +35,7 @@ namespace FEAT
      * to excessive up-/downloading. It's still here to provide a unified class interface for operators.
      *
      */
-    template<typename Mem_, typename DT_, typename IT_, typename Function_>
+    template<typename DT_, typename IT_, typename Function_>
     class AnalyticFunctionOperator
     {
       public:
@@ -46,8 +43,6 @@ namespace FEAT
         static_assert(std::is_same<typename Function_::ImageType, Analytic::Image::Scalar>::value,
         "AnalyticFunctionOperator is implemented for scalar functions only");
 
-        /// Memory architecture of the vectors we work in
-        typedef Mem_ MemType;
         /// Floating point type
         typedef DT_ DataType;
         /// Integer type
@@ -72,9 +67,9 @@ namespace FEAT
         static constexpr int dim = PointType::n;
 
         /// Input vector for the operator and its gradient
-        typedef LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, dim> VectorTypeR;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim> VectorTypeR;
         /// Output vector for the operator's gradient
-        typedef LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, dim> VectorTypeL;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim> VectorTypeL;
         /// Output vector for the operator's gradient
         typedef VectorTypeR GradientType;
         /// Output matrix for the operator's hessian

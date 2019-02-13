@@ -99,8 +99,6 @@ namespace FEAT
 
       /// sub-mirror type
       typedef SubMirror_ SubMirrorType;
-      /// sub-mirror mem-type
-      typedef typename SubMirrorType::MemType MemType;
       /// sub-mirror data-type
       typedef typename SubMirrorType::DataType DataType;
       /// sub-mirror index-type
@@ -110,12 +108,12 @@ namespace FEAT
       static constexpr int num_blocks = count_;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using MirrorType = PowerMirror<typename SubMirrorType::template MirrorType<Mem2_, DT2_, IT2_>, count_>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using MirrorType = PowerMirror<typename SubMirrorType::template MirrorType<DT2_, IT2_>, count_>;
 
-      /// this typedef lets you create a mirror with new Memory, Data and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a mirror with new Data and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using MirrorTypeByDI = MirrorType<DataType2_, IndexType2_>;
 
       /// the one and only sub-mirror object
       SubMirrorType _sub_mirror;
@@ -204,9 +202,9 @@ namespace FEAT
        * The vector for which the buffer is to be created.
        */
       template<typename SubVector_>
-      DenseVector<MemType, DataType, IndexType> create_buffer(const PowerVector<SubVector_, count_>& vector) const
+      DenseVector<DataType, IndexType> create_buffer(const PowerVector<SubVector_, count_>& vector) const
       {
-        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<DataType, IndexType>(buffer_size(vector));
       }
 
       /**
@@ -258,7 +256,7 @@ namespace FEAT
       /** \copydoc VectorMirror::gather() */
       template<typename Tv_>
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
         const LAFEM::PowerVector<Tv_, count_>& vector,
         const Index buffer_offset = Index(0)) const
       {
@@ -269,7 +267,7 @@ namespace FEAT
       template<typename Tv_>
       void scatter_axpy(
         LAFEM::PowerVector<Tv_, count_>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const LAFEM::DenseVector<DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {

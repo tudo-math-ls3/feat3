@@ -69,26 +69,24 @@ namespace FEAT
     class Muxer
     {
     public:
-      /// the memory type
-      typedef typename LocalVector_::MemType MemType;
       /// the data type
       typedef typename LocalVector_::DataType DataType;
       /// the index type
       typedef typename LocalVector_::IndexType IndexType;
       /// the internal buffer vector type (possibly in device memory)
-      typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferType;
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferType;
       /// the internal buffer vector type in main memory
-      typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> BufferMain;
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferMain;
 
       /// Our 'base' class type
       template <typename LocalVector2_, typename Mirror2_>
       using MuxerType = Muxer<LocalVector2_, Mirror2_>;
 
-      /// this typedef lets you create a gate container with new Memory, Data and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using MuxerTypeByMDI = Muxer<
-        typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>,
-        typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
+      /// this typedef lets you create a gate container with new Data and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using MuxerTypeByDI = Muxer<
+        typename LocalVector_::template ContainerType<DataType2_, IndexType2_>,
+        typename Mirror_::template MirrorType<DataType2_, IndexType2_> >;
 
     public:
       /// the sibling communicator

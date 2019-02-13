@@ -53,7 +53,7 @@ namespace FEAT
      * \tparam Filter_
      * Filter to apply to the functional's gradient
      *
-     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Functional can specify other
+     * \note ALGLIB's algorithms always run in double precision. Although the Functional can specify other
      * types, this will just to excess type conversions with no added benefit (like the speedup from computing in
      * float) and a general slow-down. It is not prohibited at this point so that these classes can be instantiated
      * so check if the implementation is clean.
@@ -583,7 +583,7 @@ namespace FEAT
      * reset, seemingly turning the algorithm into steepest descent if called in every iteration. For strongly
      * nonlinear problems (like the ones we are interested in), this makes preconditioning awkward to useless.
      *
-     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Functional can specify other
+     * \note ALGLIB's algorithms always run in double precision. Although the Functional can specify other
      * types, this will just to excess type conversions with no added benefit (like the speedup from computing in
      * float) and a general slow-down. It is not prohibited at this point so that these classes can be instantiated
      * so check if the implementation is clean.

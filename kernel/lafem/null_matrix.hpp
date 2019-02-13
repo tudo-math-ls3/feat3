@@ -19,17 +19,17 @@ namespace FEAT
     /// \cond internal
     namespace Intern
     {
-      template<typename Mem_, typename DT_, typename IT_, int size_>
+      template<typename DT_, typename IT_, int size_>
       struct BlockedVectorHelper
       {
         static_assert(size_ > 1, "invalid block size");
-        typedef DenseVectorBlocked<Mem_, DT_, IT_, size_> VectorType;
+        typedef DenseVectorBlocked<DT_, IT_, size_> VectorType;
       };
 
-      template<typename Mem_, typename DT_, typename IT_>
-      struct BlockedVectorHelper<Mem_, DT_, IT_, 1>
+      template<typename DT_, typename IT_>
+      struct BlockedVectorHelper<DT_, IT_, 1>
       {
-        typedef DenseVector<Mem_, DT_, IT_> VectorType;
+        typedef DenseVector<DT_, IT_> VectorType;
       };
     } // namespace Intern
     /// \endcond
@@ -48,20 +48,18 @@ namespace FEAT
      * whether the corresponding block dimension is 1 or greater than 1 (in analogy
      * to the SparseMatrixBCSR class).
      *
-     * Also note that the \p Mem_, \p DT_ and \p IT_ template arguments are only
+     * Also note that the \p DT_ and \p IT_ template arguments are only
      * required for the conformance with the LAFEM matrix interface.
      *
      * \author Peter Zajac
      */
-    template<typename Mem_, typename DT_, typename IT_, int BlockHeight_ = 1, int BlockWidth_ = 1>
+    template<typename DT_, typename IT_, int BlockHeight_ = 1, int BlockWidth_ = 1>
     class NullMatrix
     {
       static_assert(BlockHeight_ > 0, "invalid block size");
       static_assert(BlockWidth_ > 0, "invalid block size");
 
     public:
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -77,17 +75,17 @@ namespace FEAT
       typedef const IT_* ImageIterator;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = NullMatrix<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = NullMatrix<DT2_, IT2_, BlockHeight_, BlockWidth_>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatype and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatype and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
-      typedef typename Intern::BlockedVectorHelper<Mem_, DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
+      typedef typename Intern::BlockedVectorHelper<DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
       /// Compatible R-vector type
-      typedef typename Intern::BlockedVectorHelper<Mem_, DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
+      typedef typename Intern::BlockedVectorHelper<DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
@@ -169,9 +167,9 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
+      template<typename DT2_, typename IT2_>
       void clone(
-        const NullMatrix<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other,
+        const NullMatrix<DT2_, IT2_, BlockHeight_, BlockWidth_> & other,
         CloneMode DOXY(clone_mode) = CloneMode::Weak)
       {
         this->_num_rows = other.rows();
@@ -185,8 +183,8 @@ namespace FEAT
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const NullMatrix<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const NullMatrix<DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
         this->_num_rows = other.rows();
         this->_num_cols = other.columns();
@@ -287,18 +285,6 @@ namespace FEAT
        * \param[in] value The value to be set (defaults to 0)
        */
       void format(const DT_ DOXY(value) = DT_(0))
-      {
-        // nothing to do here
-      }
-
-      /**
-       * \brief Performs \f$this \leftarrow x\f$.
-       *
-       * \param[in] x The Matrix to be copied.
-       * \param[in] full Shall we create a full copy, including scalars and index arrays?
-       */
-      template <typename Mem2_>
-      void copy(const NullMatrix<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & DOXY(x), bool DOXY(full) = false)
       {
         // nothing to do here
       }
@@ -414,9 +400,9 @@ namespace FEAT
        *
        * \note The resulting matrix has transposed block dimensions, too.
        */
-      NullMatrix<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
+      NullMatrix<DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
       {
-        return NullMatrix<Mem_, DT_, IT_, BlockWidth_, BlockHeight_>(_num_cols, _num_rows);
+        return NullMatrix<DT_, IT_, BlockWidth_, BlockHeight_>(_num_cols, _num_rows);
       }
 
       /**
@@ -424,7 +410,7 @@ namespace FEAT
        *
        * \param[in] x The matrix to be transposed.
        */
-      void transpose(const NullMatrix<Mem_, DT_, IT_, BlockWidth_, BlockHeight_> & x)
+      void transpose(const NullMatrix<DT_, IT_, BlockWidth_, BlockHeight_> & x)
       {
         x = this->transpose();
       }
@@ -435,7 +421,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
@@ -449,7 +435,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVector<DT_, IT_> & x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
@@ -463,7 +449,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
@@ -477,7 +463,7 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
@@ -494,9 +480,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVector<Mem_,DT_, IT_> & r,
-                 const DenseVector<Mem_, DT_, IT_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVector<DT_, IT_> & r,
+                 const DenseVector<DT_, IT_> & x,
+                 const DenseVector<DT_, IT_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
@@ -515,9 +501,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
-                 const DenseVector<Mem_, DT_, IT_> & x,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight_> & y,
+                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 const DenseVector<DT_, IT_> & x,
+                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -536,9 +522,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVector<Mem_,DT_, IT_> & r,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVector<DT_, IT_> & r,
+                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVector<DT_, IT_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
@@ -557,9 +543,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight_> & y,
+                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -578,9 +564,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVector<DT_, IT_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");

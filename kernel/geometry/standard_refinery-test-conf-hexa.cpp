@@ -26,11 +26,11 @@ typedef StandardRefinery<SubMesh> SubMeshRefinery;
  * \author Constantin Christof
  */
 class StandardRefineryTestConfHexa
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   StandardRefineryTestConfHexa() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-conf-hexa")
+    UnitTest("standard_refinery-test-conf-hexa")
   {
   }
 

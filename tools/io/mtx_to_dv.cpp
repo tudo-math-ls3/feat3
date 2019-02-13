@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <iostream>
 
 using namespace FEAT;
@@ -14,13 +14,13 @@ int main(int argc, char ** argv)
 {
     if (argc != 3)
     {
-        std::cout<<"Usage 'ell2mtx ell-file mtx-file'"<<std::endl;
+        std::cout<<"Usage 'mtx2dv mtx-file dv-file'"<<std::endl;
         exit(EXIT_FAILURE);
     }
 
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixELL<Mem::Main, double> ell(FileMode::fm_ell, input);
-    ell.write_out(FileMode::fm_mtx, output);
+    DenseVector<double, Index> dv(FileMode::fm_mtx, input);
+    dv.write_out(FileMode::fm_dv, output);
 }

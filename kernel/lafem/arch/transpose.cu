@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/transpose.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -14,7 +13,7 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-void Transpose<Mem::CUDA>::value(float * r, const float * const x, Index rows_x, Index columns_x)
+void Transpose::value_cuda(float * r, const float * const x, Index rows_x, Index columns_x)
 {
   cublasStatus_t status;
   float one(1);
@@ -32,7 +31,7 @@ void Transpose<Mem::CUDA>::value(float * r, const float * const x, Index rows_x,
     status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, rows_x, columns_x, &one, x, columns_x, &zero, nullptr, columns_x, r, rows_x);
   }
   if (status != CUBLAS_STATUS_SUCCESS)
-    throw InternalError(__func__, __FILE__, __LINE__, "cublasSgeam failed with status code: " + stringify(status));
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
@@ -42,7 +41,7 @@ void Transpose<Mem::CUDA>::value(float * r, const float * const x, Index rows_x,
 #endif
 }
 
-void Transpose<Mem::CUDA>::value(double * r, const double * const x, Index rows_x, Index columns_x)
+void Transpose::value_cuda(double * r, const double * const x, Index rows_x, Index columns_x)
 {
   cublasStatus_t status;
   double one(1);
@@ -61,7 +60,7 @@ void Transpose<Mem::CUDA>::value(double * r, const double * const x, Index rows_
   }
 
   if (status != CUBLAS_STATUS_SUCCESS)
-    throw InternalError(__func__, __FILE__, __LINE__, "cublasDgeam failed with status code: " + stringify(status));
+    throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();

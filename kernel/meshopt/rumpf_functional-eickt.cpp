@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/shape.hpp>
 
 #include <kernel/meshopt/rumpf_functional.hpp>

@@ -18,9 +18,7 @@
 #if !defined(FEAT_COMPILER) && defined(__clang__)
 
 // calc linear sortable clang version
-#define _CLANG_VER (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
-
-#define FEAT_COMPILER_CLANG _CLANG_VER
+#define FEAT_COMPILER_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 
 #define FEAT_COMPILER "Clang Compiler" // __clang_version__ contains details
 

@@ -54,15 +54,13 @@ using namespace FEAT;
 
 namespace AnalyseMeshCGAL
 {
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Use the standard dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
 
   // In most tutorials, we have defined the shape-type of the mesh as a (compile-time
   // constant) typedef at this point prior to defining the actual application code.

@@ -1053,26 +1053,25 @@ namespace NavierStokesPP
   template
   <
     int dim_,
-    typename MemType_ = Mem::Main,
     typename DataType_ = Real,
     typename IndexType_ = Index,
     // MatrixBlockA = standard Matrix Block A
     // Algorithm:
     // S_u := alpha M_u + theta K_u + nu_u L_u (burgers equation for the velocity)
-    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
     // MatrixBlockB = standard Matrix Block B
     // gradient Matrix
-    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
     // MatrixBlockD = standard Matrix Block D
     // divergence Matrix
-    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
   >
   class NavierStokesBlockedSystemLevel :
-    public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+    public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
-    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     typedef typename BaseClass::GlobalVeloVector GlobalVeloVector;
     typedef typename BaseClass::GlobalPresVector GlobalPresVector;
@@ -1267,7 +1266,6 @@ namespace NavierStokesPP
     TimeStamp stamp_start;
 
     // our arch types
-    typedef Mem::Main MemType;
     typedef Real DataType;
     typedef Index IndexType;
 
@@ -1282,7 +1280,7 @@ namespace NavierStokesPP
     static constexpr int dim = ShapeType::dimension;
 
     // define our velocity and pressure system levels
-    typedef NavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef NavierStokesBlockedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
@@ -2234,7 +2232,7 @@ namespace NavierStokesPP
 
           // project pressure
           Cubature::DynamicFactory cub("gauss-legendre:2");
-          LAFEM::DenseVector<Mem::Main, double, Index> vtx_p, vtx_der_p;
+          LAFEM::DenseVector<double, Index> vtx_p, vtx_der_p;
           GlobalPresVector vec_sol_p_post = vec_sol_p.clone();
           vec_sol_p_post.axpy(vec_sol_p,vec_sol_p_1);
           vec_sol_p_post.scale(vec_sol_p_post,DataType(0.5));

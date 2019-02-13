@@ -5,10 +5,10 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 namespace FEAT
 {
@@ -22,7 +22,8 @@ namespace FEAT
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
-        r[idx] = x[idx] * y[idx];
+        ///\todo skip conversion step
+        r[idx] = float(x[idx] * y[idx]);
       }
     }
   }
@@ -34,9 +35,9 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-void ComponentProduct<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
+void ComponentProduct::value_cuda(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
+  Index blocksize = Util::cuda_blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -50,6 +51,8 @@ void ComponentProduct<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ 
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-
-template void ComponentProduct<Mem::CUDA>::value(float *, const float * const, const float * const, const Index);
-template void ComponentProduct<Mem::CUDA>::value(double *, const double * const, const double * const, const Index);
+#ifdef FEAT_HAVE_HALFMATH
+template void ComponentProduct::value_cuda(Half *, const Half * const, const Half * const, const Index);
+#endif
+template void ComponentProduct::value_cuda(float *, const float * const, const float * const, const Index);
+template void ComponentProduct::value_cuda(double *, const double * const, const double * const, const Index);

@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/min_abs_index.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -26,7 +25,7 @@ namespace FEAT
         cublasStatus_t status;
         status = cublasIsamin(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasmin failed with status code "+ stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
         return (Index)result - 1;
       }
 
@@ -36,7 +35,7 @@ namespace FEAT
         cublasStatus_t status;
         status = cublasIdamin(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasmin failed with status code "+ stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
         return (Index)result - 1;
       }
     }
@@ -48,7 +47,7 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-Index MinAbsIndex<Mem::CUDA>::value(const DT_ * const x, const Index size)
+Index MinAbsIndex::value_cuda(const DT_ * const x, const Index size)
 {
   Index result = Intern::cuda_min_abs_index(x, size);
 #ifdef FEAT_DEBUG_MODE
@@ -60,5 +59,5 @@ Index MinAbsIndex<Mem::CUDA>::value(const DT_ * const x, const Index size)
   return result;
 }
 
-template Index MinAbsIndex<Mem::CUDA>::value(const float * const, const Index);
-template Index MinAbsIndex<Mem::CUDA>::value(const double * const, const Index);
+template Index MinAbsIndex::value_cuda(const float * const, const Index);
+template Index MinAbsIndex::value_cuda(const double * const, const Index);

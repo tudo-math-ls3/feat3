@@ -28,11 +28,11 @@ typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
  * \author Peter Zajac
  */
 class ShapeConvertTest
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   ShapeConvertTest() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("ShapeConvertTest")
+    UnitTest("ShapeConvertTest")
   {
   }
 

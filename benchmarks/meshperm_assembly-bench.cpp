@@ -29,12 +29,11 @@ namespace MeshPermAssemblyBench
 {
   using namespace FEAT;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> ScalarMatrixType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> ScalarVectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> ScalarMatrixType;
+  typedef LAFEM::DenseVector<DataType, IndexType> ScalarVectorType;
 
   /// minimum numeric assembly count
   int min_num_asm_count = 3;
@@ -181,11 +180,11 @@ namespace MeshPermAssemblyBench
     static constexpr int dim = Shape_::dimension;
 
     // assemble matrix structure
-    LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> matrix;
+    LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
 
     // interpolate convection vector
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> vector;
+    LAFEM::DenseVectorBlocked<DataType, IndexType, dim> vector;
     Analytic::Common::CosineWaveFunction<dim> cosine_wave;
     Analytic::Gradient<decltype(cosine_wave)> conv_func(cosine_wave);
     Assembly::Interpolator::project(vector, conv_func, space);
@@ -236,11 +235,11 @@ namespace MeshPermAssemblyBench
     bres.num_worker_threads = int(dom_asm.get_num_worker_threads());
 
     // assemble matrix structure
-    LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> matrix;
+    LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
 
     // interpolate convection vector
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> vector;
+    LAFEM::DenseVectorBlocked<DataType, IndexType, dim> vector;
     Analytic::Common::CosineWaveFunction<dim> cosine_wave;
     Analytic::Gradient<decltype(cosine_wave)> conv_func(cosine_wave);
     Assembly::Interpolator::project(vector, conv_func, space);

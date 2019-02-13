@@ -17,17 +17,19 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorCompInvertTest
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorCompInvertTest() :
-    BaseClass("MetaVectorCompInvertTest")
+   MetaVectorCompInvertTest(PreferredBackend backend) :
+    BaseClass("MetaVectorCompInvertTest", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -63,5 +65,25 @@ public:
   }
 };
 
-MetaVectorCompInvertTest<Mem::Main, float, Index> meta_vector_comp_invert_test_generic_float;
-MetaVectorCompInvertTest<Mem::Main, double, Index> meta_vector_comp_invert_test_generic_double;
+MetaVectorCompInvertTest<float, unsigned int> meta_vector_comp_invert_test_float_uint(PreferredBackend::generic);
+MetaVectorCompInvertTest<double, unsigned int> meta_vector_comp_invert_test_double_uint(PreferredBackend::generic);
+MetaVectorCompInvertTest<float, unsigned long> meta_vector_comp_invert_test_float_ulong(PreferredBackend::generic);
+MetaVectorCompInvertTest<double, unsigned long> meta_vector_comp_invert_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorCompInvertTest<float, unsigned long> mkl_meta_vector_comp_invert_test_float_ulong(PreferredBackend::mkl);
+MetaVectorCompInvertTest<double, unsigned long> mkl_meta_vector_comp_invert_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaVectorCompInvertTest<__float128, unsigned int> meta_vector_comp_invert_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorCompInvertTest<__float128, unsigned long> meta_vector_comp_invert_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorCompInvertTest<Half, unsigned int> meta_vector_comp_invert_test_half_uint(PreferredBackend::generic);
+MetaVectorCompInvertTest<Half, unsigned long> meta_vector_comp_invert_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MetaVectorCompInvertTest<float, unsigned int> meta_vector_comp_invert_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorCompInvertTest<double, unsigned int> meta_vector_comp_invert_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorCompInvertTest<float, unsigned long> meta_vector_comp_invert_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorCompInvertTest<double, unsigned long> meta_vector_comp_invert_test_cuda_double_ulong(PreferredBackend::cuda);
+#endif

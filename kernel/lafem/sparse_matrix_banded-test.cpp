@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/util/binary_stream.hpp>
@@ -23,24 +22,20 @@ using namespace FEAT::TestSystem;
  *
  * \test test description missing
  *
- * \tparam Mem_
- * description missing
- *
  * \tparam DT_
  * description missing
  *
  * \author Christoph Lohmann
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  SparseMatrixBandedTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedTest")
+   SparseMatrixBandedTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -48,7 +43,7 @@ public:
   {
   }
 
-  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
 
   virtual void run() const override
   {
@@ -63,20 +58,18 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
-    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
     FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
-    DenseVector<Mem_, IT_, IT_> vec_offsets;
-    vec_offsets.convert(tvec_offsets);
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
 
-    SparseMatrixBanded<Mem_, DT_, IT_> a(rows, columns, vec_val, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> a(rows, columns, vec_val, vec_offsets);
 
     // calculate number of used elements
     Index nnz(0);
@@ -94,7 +87,7 @@ public:
     TEST_CHECK_EQUAL(a.columns(), columns);
 
     auto b = a.clone();
-    SparseMatrixBanded<Mem_, DT_, IT_> bl(b.layout());
+    SparseMatrixBanded<DT_, IT_> bl(b.layout());
     TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(bl.size(), b.size());
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
@@ -106,7 +99,7 @@ public:
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
-    typename SparseLayout<Mem_, IT_, SparseLayoutId::lt_banded>::template MatrixType<DT_> x(b.layout());
+    typename SparseLayout<IT_, SparseLayoutId::lt_banded>::template MatrixType<DT_> x(b.layout());
     // icc 14.0.2 does not understand the following line, so we need a typedef hier
     //typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
     typedef decltype(b.layout()) LayoutId;
@@ -114,11 +107,11 @@ public:
     TEST_CHECK_EQUAL((void*)x.offsets(), (void*)b.offsets());
     TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
 
-    SparseMatrixBanded<Mem_, DT_, IT_> z;
+    SparseMatrixBanded<DT_, IT_> z;
     z.convert(a);
     TEST_CHECK_EQUAL(a, z);
 
-    SparseMatrixBanded<Mem_, DT_, IT_> c;
+    SparseMatrixBanded<DT_, IT_> c;
     c.clone(a);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)a.val());
     TEST_CHECK_EQUAL((void*)c.offsets(), (void*)a.offsets());
@@ -126,12 +119,12 @@ public:
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)z.val());
     TEST_CHECK_NOT_EQUAL((void*)c.offsets(), (void*)z.offsets());
 
-    DenseVector<Mem_, IT_, IT_> offsets_d(c.num_of_offsets(), c.offsets());
-    DenseVector<Mem_, DT_, IT_> val_d(c.num_of_offsets() * c.rows(), c.val());
-    SparseMatrixBanded<Mem_, DT_, IT_> d(c.rows(), c.columns(), val_d, offsets_d);
+    DenseVector<IT_, IT_> offsets_d(c.num_of_offsets(), c.offsets());
+    DenseVector<DT_, IT_> val_d(c.num_of_offsets() * c.rows(), c.val());
+    SparseMatrixBanded<DT_, IT_> d(c.rows(), c.columns(), val_d, offsets_d);
     TEST_CHECK_EQUAL(d, c);
 
-    SparseMatrixBanded<Mem::Main, DT_, IT_> e;
+    SparseMatrixBanded<DT_, IT_> e;
     e.convert(c);
     TEST_CHECK_EQUAL(e, c);
     e.copy(c);
@@ -139,27 +132,38 @@ public:
   }
 };
 
-SparseMatrixBandedTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_test_float_ulong;
-SparseMatrixBandedTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong;
-SparseMatrixBandedTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_test_float_uint;
-SparseMatrixBandedTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_test_double_uint;
+SparseMatrixBandedTest<float, unsigned long> cpu_sparse_matrix_banded_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBandedTest<double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBandedTest<float, unsigned int> cpu_sparse_matrix_banded_test_float_uint(PreferredBackend::generic);
+SparseMatrixBandedTest<double, unsigned int> cpu_sparse_matrix_banded_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBandedTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedTest<__float128, unsigned long> cpu_sparse_matrix_banded_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBandedTest<__float128, unsigned int> cpu_sparse_matrix_banded_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedTest<Half, unsigned int> cpu_sparse_matrix_banded_test_half_uint(PreferredBackend::generic);
+SparseMatrixBandedTest<Half, unsigned long> cpu_sparse_matrix_banded_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong;
-SparseMatrixBandedTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong;
-SparseMatrixBandedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_test_float_uint;
-SparseMatrixBandedTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_test_double_uint;
+SparseMatrixBandedTest<float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBandedTest<double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBandedTest<float, unsigned int> cuda_sparse_matrix_banded_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBandedTest<double, unsigned int> cuda_sparse_matrix_banded_test_double_uint(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedSerializeTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  SparseMatrixBandedSerializeTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedSerializeTest")
+  SparseMatrixBandedSerializeTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -167,7 +171,7 @@ public:
   {
   }
 
-  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
 
   virtual void run() const override
   {
@@ -182,39 +186,37 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
-    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
     FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
-    DenseVector<Mem_, IT_, IT_> vec_offsets;
-    vec_offsets.convert(tvec_offsets);
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
 
-    SparseMatrixBanded<Mem_, DT_, IT_> c(rows, columns, vec_val, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> c(rows, columns, vec_val, vec_offsets);
 
     BinaryStream bs;
     c.write_out(FileMode::fm_bm, bs);
     bs.seekg(0);
-    SparseMatrixBanded<Mem_, DT_, IT_> f(FileMode::fm_bm, bs);
+    SparseMatrixBanded<DT_, IT_> f(FileMode::fm_bm, bs);
     TEST_CHECK_EQUAL(f, c);
 
     auto kp = c.serialize(LAFEM::SerialConfig(false, false));
-    SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
+    SparseMatrixBanded<DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, c);
 
 #ifdef FEAT_HAVE_ZLIB
     auto zl = c.serialize(LAFEM::SerialConfig(true, false));
-    SparseMatrixBanded<Mem_, DT_, IT_> zlib(zl);
+    SparseMatrixBanded<DT_, IT_> zlib(zl);
     TEST_CHECK_EQUAL(zlib, c);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
-    SparseMatrixBanded<Mem_, DT_, IT_> zfp(zf);
+    SparseMatrixBanded<DT_, IT_> zfp(zf);
     for(Index i(0); i < c.rows() ; ++i)
     {
       for(Index j(0) ; j < c.columns() ; ++j)
@@ -225,35 +227,46 @@ public:
 #endif
   }
 };
-SparseMatrixBandedSerializeTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_serialize_test_float_ulong;
-SparseMatrixBandedSerializeTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_serialize_test_double_ulong;
-SparseMatrixBandedSerializeTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_serialize_test_float_uint;
-SparseMatrixBandedSerializeTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_serialize_test_double_uint;
+SparseMatrixBandedSerializeTest<float, unsigned long> cpu_sparse_matrix_banded_serialize_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest<double, unsigned long> cpu_sparse_matrix_banded_serialize_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest<float, unsigned int> cpu_sparse_matrix_banded_serialize_test_float_uint(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest<double, unsigned int> cpu_sparse_matrix_banded_serialize_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedSerializeTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_serialize_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBandedSerializeTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_serialize_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedSerializeTest<__float128, unsigned long> cpu_sparse_matrix_banded_serialize_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest<__float128, unsigned int> cpu_sparse_matrix_banded_serialize_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedSerializeTest<Half, unsigned int> cpu_sparse_matrix_banded_serialize_test_half_uint(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest<Half, unsigned long> cpu_sparse_matrix_banded_serialize_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedSerializeTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_serialize_test_float_ulong;
-SparseMatrixBandedSerializeTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_serialize_test_double_ulong;
-SparseMatrixBandedSerializeTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_serialize_test_float_uint;
-SparseMatrixBandedSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_serialize_test_double_uint;
+SparseMatrixBandedSerializeTest<float, unsigned long> cuda_sparse_matrix_banded_serialize_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest<double, unsigned long> cuda_sparse_matrix_banded_serialize_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest<float, unsigned int> cuda_sparse_matrix_banded_serialize_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest<double, unsigned int> cuda_sparse_matrix_banded_serialize_test_double_uint(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedApplyTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 private:
   const Index _opt;
 public:
-  SparseMatrixBandedApplyTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedApplyTest"), _opt(0)
+  SparseMatrixBandedApplyTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend), _opt(0)
   {
   }
 
-  explicit SparseMatrixBandedApplyTest(const Index opt)
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedApplyTest: "
-                                            + stringify(opt) + " offsets"), _opt(opt)
+  explicit SparseMatrixBandedApplyTest(PreferredBackend backend, const Index opt)
+    : UnitTest("SparseMatrixBandedApplyTest: "
+                                            + stringify(opt) + " offsets", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend), _opt(opt)
   {
   }
 
@@ -261,7 +274,7 @@ public:
   {
   }
 
-  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
 
   virtual void run() const override
   {
@@ -284,18 +297,16 @@ public:
     else
       num_of_offsets = _opt;
 
-    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
-    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<DT_, IT_> vec_val(num_of_offsets * rows);
 
     // create random vector of offsets
     FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
-    DenseVector<Mem_, IT_, IT_> vec_offsets;
-    vec_offsets.convert(tvec_offsets);
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
 
     // fill data-array
     for (Index i(0); i < vec_val.size(); ++i)
@@ -304,10 +315,10 @@ public:
     }
 
     // create test-matrix
-    SparseMatrixBanded<Mem_, DT_, IT_> sys(rows, columns, vec_val, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> sys(rows, columns, vec_val, vec_offsets);
 
     auto x(sys.create_vector_r());
-    DenseVector<Mem_, DT_, IT_> r(rows, DT_(0));
+    DenseVector<DT_, IT_> r(rows, DT_(0));
     auto ref1(sys.create_vector_l());
     auto ref2(sys.create_vector_l());
 
@@ -368,33 +379,43 @@ public:
   }
 };
 
-SparseMatrixBandedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong;
-SparseMatrixBandedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong;
-SparseMatrixBandedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint;
-SparseMatrixBandedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint;
+SparseMatrixBandedApplyTest<float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBandedApplyTest<double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBandedApplyTest<float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint(PreferredBackend::generic);
+SparseMatrixBandedApplyTest<double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint(PreferredBackend::generic);
 
-SparseMatrixBandedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong_9(9);
-SparseMatrixBandedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(9);
-SparseMatrixBandedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(9);
-SparseMatrixBandedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(9);
+SparseMatrixBandedApplyTest<float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest<double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest<float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest<double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(PreferredBackend::generic,9);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedApplyTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_apply_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBandedApplyTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_apply_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedApplyTest<__float128, unsigned long> cpu_sparse_matrix_banded_apply_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBandedApplyTest<__float128, unsigned int> cpu_sparse_matrix_banded_apply_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedApplyTest<Half, unsigned int> cpu_sparse_matrix_banded_apply_test_half_uint(PreferredBackend::generic);
+SparseMatrixBandedApplyTest<Half, unsigned long> cpu_sparse_matrix_banded_apply_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
-SparseMatrixBandedApplyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
-SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
-SparseMatrixBandedApplyTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint;
+SparseMatrixBandedApplyTest<float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest<double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest<float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest<double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedScaleTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  SparseMatrixBandedScaleTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedScaleTest")
+  SparseMatrixBandedScaleTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedScaleTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -402,7 +423,7 @@ public:
   {
   }
 
-  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
 
   virtual void run() const override
   {
@@ -419,19 +440,17 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
-    DenseVector<Mem_, DT_, IT_> vec_val_a(num_of_offsets * rows);
-    DenseVector<Mem_, DT_, IT_> vec_val_ref(num_of_offsets * rows, DT_(1));
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<DT_, IT_> vec_val_a(num_of_offsets * rows);
+    DenseVector<DT_, IT_> vec_val_ref(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
     FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
-    DenseVector<Mem_, IT_, IT_> vec_offsets;
-    vec_offsets.convert(tvec_offsets);
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
 
     // fill data-array
     for (Index i(0); i < vec_val_a.size(); ++i)
@@ -441,9 +460,9 @@ public:
     }
 
     // create test-matrix
-    SparseMatrixBanded<Mem_, DT_, IT_> ref(rows, columns, vec_val_ref, vec_offsets);
-    SparseMatrixBanded<Mem_, DT_, IT_> a(rows, columns, vec_val_a, vec_offsets);
-    SparseMatrixBanded<Mem_, DT_, IT_> b;
+    SparseMatrixBanded<DT_, IT_> ref(rows, columns, vec_val_ref, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> a(rows, columns, vec_val_a, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> b;
     b.clone(a);
 
     b.scale(a, s);
@@ -454,13 +473,25 @@ public:
   }
 };
 
-SparseMatrixBandedScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_scale_test_float_ulong;
-SparseMatrixBandedScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong;
-SparseMatrixBandedScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint;
-SparseMatrixBandedScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint;
+SparseMatrixBandedScaleTest<float, unsigned long> cpu_sparse_matrix_banded_scale_test_float_ulong(PreferredBackend::generic);
+SparseMatrixBandedScaleTest<double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBandedScaleTest<float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint(PreferredBackend::generic);
+SparseMatrixBandedScaleTest<double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedScaleTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_scale_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixBandedScaleTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_scale_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedScaleTest<__float128, unsigned long> cpu_sparse_matrix_banded_scale_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixBandedScaleTest<__float128, unsigned int> cpu_sparse_matrix_banded_scale_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedScaleTest<Half, unsigned int> cpu_sparse_matrix_banded_scale_test_half_uint(PreferredBackend::generic);
+SparseMatrixBandedScaleTest<Half, unsigned long> cpu_sparse_matrix_banded_scale_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong;
-SparseMatrixBandedScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong;
-SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint;
-SparseMatrixBandedScaleTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_scale_test_double_uint;
+SparseMatrixBandedScaleTest<float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest<double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest<float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest<double, unsigned int> cuda_sparse_matrix_banded_scale_test_double_uint(PreferredBackend::cuda);
 #endif

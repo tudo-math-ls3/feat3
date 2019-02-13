@@ -31,20 +31,14 @@ TARGET_LINK_LIBRARIES(mesh2vtk feat)
 ADD_EXECUTABLE(csr2mtx io/csr_to_mtx.cpp)
 TARGET_LINK_LIBRARIES (csr2mtx feat)
 
-ADD_EXECUTABLE(ell2mtx io/ell_to_mtx.cpp)
-TARGET_LINK_LIBRARIES (ell2mtx feat)
-
 ADD_EXECUTABLE(mtx2csr io/mtx_to_csr.cpp)
 TARGET_LINK_LIBRARIES (mtx2csr feat)
 
-ADD_EXECUTABLE(mtx2ell io/mtx_to_ell.cpp)
-TARGET_LINK_LIBRARIES (mtx2ell feat)
+ADD_EXECUTABLE(dm2mtx io/dm_to_mtx.cpp)
+TARGET_LINK_LIBRARIES (dm2mtx feat)
 
-ADD_EXECUTABLE(csr2ell io/csr_to_ell.cpp)
-TARGET_LINK_LIBRARIES (csr2ell feat)
-
-ADD_EXECUTABLE(ell2csr io/ell_to_csr.cpp)
-TARGET_LINK_LIBRARIES (ell2csr feat)
+ADD_EXECUTABLE(mtx2dm io/mtx_to_dm.cpp)
+TARGET_LINK_LIBRARIES (mtx2dm feat)
 
 ADD_EXECUTABLE(dv2exp io/dv_to_exp.cpp)
 TARGET_LINK_LIBRARIES (dv2exp feat)
@@ -52,11 +46,14 @@ TARGET_LINK_LIBRARIES (dv2exp feat)
 ADD_EXECUTABLE(exp2dv io/exp_to_dv.cpp)
 TARGET_LINK_LIBRARIES (exp2dv feat)
 
+ADD_EXECUTABLE(dv2mtx io/dv_to_mtx.cpp)
+TARGET_LINK_LIBRARIES (dv2mtx feat)
+
+ADD_EXECUTABLE(mtx2dv io/mtx_to_dv.cpp)
+TARGET_LINK_LIBRARIES (mtx2dv feat)
+
 ADD_EXECUTABLE(csr2tga io/csr_to_tga.cpp)
 TARGET_LINK_LIBRARIES (csr2tga feat)
-
-ADD_EXECUTABLE(ell2tga io/ell_to_tga.cpp)
-TARGET_LINK_LIBRARIES (ell2tga feat)
 
 ADD_EXECUTABLE(mtx2tga io/mtx_to_tga.cpp)
 TARGET_LINK_LIBRARIES (mtx2tga feat)
@@ -76,7 +73,7 @@ TARGET_LINK_LIBRARIES(checkpoint-info feat)
 if (FEAT_HAVE_CUDA)
   CUDA_ADD_EXECUTABLE(cuda-device-info cuda_device_info/cuda_device_info.cpp)
   SET_PROPERTY(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CUDA_INCLUDE_DIRS}")
-  TARGET_LINK_LIBRARIES (cuda-device-info)
+  #TARGET_LINK_LIBRARIES (cuda-device-info)
 endif(FEAT_HAVE_CUDA)
 
 if (FEAT_HAVE_FPARSER)

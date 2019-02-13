@@ -23,9 +23,9 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class RannacherTurekTest
-  : public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public UnitTest
 {
   typedef Shape::Quadrilateral ShapeType;
   typedef Geometry::ConformalMesh<ShapeType> QuadMesh;
@@ -41,8 +41,8 @@ class RannacherTurekTest
   static constexpr SpaceTags unit_space_config = SpaceTags::value | SpaceTags::grad;
 
 public:
-  RannacherTurekTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("Rannacher-Turek Test")
+  RannacherTurekTest(PreferredBackend backend) :
+    UnitTest("Rannacher-Turek Test", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -162,5 +162,19 @@ public:
   }
 };
 
-RannacherTurekTest<double> rannacher_turek_test_double;
-RannacherTurekTest<float> rannacher_turek_test_float;
+RannacherTurekTest<double, unsigned long> rannacher_turek_test_double_ulong(PreferredBackend::generic);
+RannacherTurekTest<float, unsigned long> rannacher_turek_test_float_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+RannacherTurekTest<float, unsigned long> mkl_rannacher_turek_test_float_ulong(PreferredBackend::mkl);
+RannacherTurekTest<double, unsigned long> mkl_rannacher_turek_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+RannacherTurekTest<__float128, unsigned long> rannacher_turek_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+RannacherTurekTest<Half, unsigned long> rannacher_turek_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+RannacherTurekTest<float, unsigned long> cuda_rannacher_turek_test_float_ulong(PreferredBackend::cuda);
+RannacherTurekTest<double, unsigned long> cuda_rannacher_turek_test_double_ulong(PreferredBackend::cuda);
+#endif

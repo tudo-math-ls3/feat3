@@ -95,11 +95,11 @@ public:
  * \author Peter Zajac
  */
 class XmlScannerTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public TestSystem::UnitTest
 {
 public:
   XmlScannerTest() :
-    TaggedTest<Archs::None, Archs::None>("XmlScannerTest")
+    TestSystem::UnitTest("XmlScannerTest")
   {
   }
 

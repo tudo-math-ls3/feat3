@@ -10,7 +10,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/base.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/random.hpp>
@@ -33,44 +32,6 @@ namespace FEAT
    */
   namespace LAFEM
   {
-    /// \cond internal
-    namespace Intern
-    {
-      struct AssignStruct
-      {
-        template <typename MT_, typename T1_>
-        static void assign(std::vector<T1_ *> & own, const std::vector<T1_ *> & other)
-        {
-          own.assign(other.begin(), other.end());
-
-          for (Index i(0) ; i < own.size() ; ++i)
-            MemoryPool<MT_>::increase_memory(own.at(i));
-        }
-
-        template <typename MT_, typename T1_, typename T2_>
-        static void assign(std::vector<T1_ *> &, const std::vector<T2_ *> &)
-        {
-          XABORTM("Should never be reached!");
-        }
-
-        template <typename T_>
-        static void assign_scalar(std::vector<T_> & own, const std::vector<T_> & other)
-        {
-          own(other.begin(), other.end());
-        }
-
-        template <typename T1_, typename T2_>
-        static void assign_scalar(std::vector<T1_> & own, const std::vector<T2_> & other)
-        {
-          for(auto t : other)
-          {
-            own.push_back(T1_(t));
-          }
-        }
-      };
-    } //namespace Intern
-    /// \endcond
-
     /**
      * \brief Config class for serialize parameter
      *
@@ -247,7 +208,6 @@ namespace FEAT
      *
      * All LAFEM-Container are derived from this base class. \sa \ref lafem_design
      *
-     * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.
      *
@@ -257,10 +217,10 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class Container
     {
-      template <typename Mem2_, typename DT2_, typename IT2_>
+      template <typename DT2_, typename IT2_>
       friend class Container;
 
     protected:
@@ -298,53 +258,16 @@ namespace FEAT
           for (Index i(0) ; i < _indices.size() ; ++i)
           {
             XASSERTM(_indices_size.at(i) == other.get_indices_size().at(i), "Container size mismatch!");
-            MemoryPool<Mem_>::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+            MemoryPool::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
           }
         }
 
         for (Index i(0) ; i < _elements.size() ; ++i)
         {
           XASSERTM(_elements_size.at(i) == other.get_elements_size().at(i), "Container size mismatch!");
-          MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+          MemoryPool::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
         }
 
-      }
-
-      template <typename Mem2_>
-      void _copy_content(const Container<Mem2_, DT_, IT_> & other, bool full)
-      {
-        XASSERTM(_elements.size() == other.get_elements().size(), "Container size mismatch!");
-        XASSERTM(_indices.size() == other.get_indices().size(), "Container size mismatch!");
-        XASSERTM(_scalar_index.size() == other.get_scalar_index().size(), "Container size mismatch!");
-        XASSERTM(_scalar_dt.size() == other.get_scalar_dt().size(), "Container size mismatch!");
-
-        if (full)
-        {
-          this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
-          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
-
-          for (Index i(0) ; i < _indices.size() ; ++i)
-          {
-            XASSERTM(_indices_size.at(i) == other.get_indices_size().at(i), "Container size mismatch!");
-            if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
-              MemoryPool<Mem2_>::template download<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
-            else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
-              MemoryPool<Mem_>::template upload<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
-            else
-              XABORTM("Memory Backend not known!");
-          }
-        }
-
-        for (Index i(0) ; i < _elements.size() ; ++i)
-        {
-          XASSERTM(_elements_size.at(i) == other.get_elements_size().at(i), "Container size mismatch!");
-          if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
-            MemoryPool<Mem2_>::template download<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
-          else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
-            MemoryPool<Mem_>::template upload<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
-          else
-            XABORTM("Memory Backend not known!");
-        }
       }
 
       /**
@@ -355,13 +278,13 @@ namespace FEAT
        * \param[in] other The source container.
        *
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void assign(const Container<Mem2_, DT2_, IT2_> & other)
+      template <typename DT2_, typename IT2_>
+      void assign(const Container<DT2_, IT2_> & other)
       {
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          MemoryPool::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool::release_memory(this->_indices.at(i));
 
         this->_elements.clear();
         this->_indices.clear();
@@ -373,112 +296,50 @@ namespace FEAT
         this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
         this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
         this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
-        Intern::AssignStruct::template assign_scalar<DT_, DT2_>(this->_scalar_dt, other.get_scalar_dt());
-
-
-        if (std::is_same<Mem_, Mem2_>::value && std::is_same<DT_, DT2_>::value)
+        if constexpr (std::is_same<DT_, DT2_>::value)
         {
-          Intern::AssignStruct::template assign<Mem_, DT_>(this->_elements, other.get_elements());
+          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
+
         }
-        else if (std::is_same<Mem_, Mem2_>::value)
+        else
         {
-          for (Index i(0) ; i < this->_elements_size.size() ; ++i)
+          for(auto t : other.get_scalar_dt())
           {
-            const Index tsize(this->_elements_size.at(i));
-            this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(tsize));
-            MemoryPool<Mem_>::convert(this->_elements.at(i), other.get_elements().at(i), tsize);
+            this->_scalar_dt.push_back(DT_(t));
           }
+        }
+
+        if constexpr (std::is_same<DT_, DT2_>::value)
+        {
+          this->_elements.assign(other.get_elements().begin(), other.get_elements().end());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool::increase_memory(this->_elements.at(i));
         }
         else
         {
           for (Index i(0) ; i < this->_elements_size.size() ; ++i)
           {
             const Index tsize(this->_elements_size.at(i));
-            this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(tsize));
-
-            DT_ * pthis(nullptr);
-            DT2_ * pother(nullptr);
-            if (std::is_same<Mem_, Mem::Main>::value)
-            {
-              pthis = this->_elements.at(i);
-            }
-            else
-            {
-              pthis = new DT_[tsize];
-            }
-            if (std::is_same<Mem2_, Mem::Main>::value)
-            {
-              pother = other.get_elements().at(i);
-            }
-            else
-            {
-              pother = new DT2_[tsize];
-              MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), tsize);
-            }
-
-            MemoryPool<Mem::Main>::convert(pthis, pother, tsize);
-
-            if (! std::is_same<Mem_, Mem::Main>::value)
-            {
-              MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), pthis, tsize);
-              delete[] pthis;
-            }
-            if (!std::is_same<Mem2_, Mem::Main>::value)
-              delete[] pother;
+            this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(tsize));
+            MemoryPool::convert(this->_elements.at(i), other.get_elements().at(i), tsize);
           }
         }
 
-        if (std::is_same<Mem_, Mem2_>::value && std::is_same<IT_, IT2_>::value)
+        if constexpr (std::is_same<IT_, IT2_>::value)
         {
-          Intern::AssignStruct::template assign<Mem_, IT_>(this->_indices, other.get_indices());
-        }
-        else if (std::is_same<Mem_, Mem2_>::value)
-        {
-          for (Index i(0) ; i < this->_indices_size.size() ; ++i)
-          {
-            const Index tsize(this->_indices_size.at(i));
-            this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(tsize));
-            MemoryPool<Mem_>::convert(this->_indices.at(i), other.get_indices().at(i), tsize);
-          }
+          this->_indices.assign(other.get_indices().begin(), other.get_indices().end());
+
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool::increase_memory(this->_indices.at(i));
         }
         else
         {
           for (Index i(0) ; i < this->_indices_size.size() ; ++i)
           {
             const Index tsize(this->_indices_size.at(i));
-            this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(tsize));
-
-            IT_ * pthis(nullptr);
-            IT2_ * pother(nullptr);
-
-            if (std::is_same<Mem_, Mem::Main>::value)
-            {
-              pthis = this->_indices.at(i);
-            }
-            else
-            {
-              pthis = new IT_[tsize];
-            }
-
-            if (std::is_same<Mem2_, Mem::Main>::value)
-            {
-              pother = other.get_indices().at(i);
-            }
-            else
-            {
-              pother = new IT2_[tsize];
-              MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), tsize);
-            }
-
-            MemoryPool<Mem::Main>::convert(pthis, pother, tsize);
-
-            if (! std::is_same<Mem_, Mem::Main>::value)
-            {
-              MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), pthis, tsize);
-              delete[] pthis;
-            }
-            if (!std::is_same<Mem2_, Mem::Main>::value)
-              delete[] pother;
+            this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(tsize));
+            MemoryPool::convert(this->_indices.at(i), other.get_indices().at(i), tsize);
           }
         }
       }
@@ -495,7 +356,7 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       std::uint64_t _serialized_size(const LAFEM::SerialConfig& config = LAFEM::SerialConfig()) const
       {
-        Container<Mem::Main, DT2_, IT2_> tc(0);
+        Container<DT2_, IT2_> tc(0);
         tc.assign(*this);
 
         std::uint64_t gsize(4 * sizeof(std::uint64_t)); //raw array size + magic number + type_index DT_ + type_index IT_
@@ -595,7 +456,7 @@ namespace FEAT
         if((compress & CompressionModes::indices_mask) == CompressionModes::indices_zlib) // If zlib is used for indices
             compression_type_index = compression_type_index | Pack::Type::Mask_Z;
 
-        Container<Mem::Main, DT2_, IT2_> tc(0);
+        Container<DT2_, IT2_> tc(0);
         tc.assign(*this);
 
         std::uint64_t gsize = this->template _serialized_size<DT2_, IT2_>(config);
@@ -761,7 +622,7 @@ namespace FEAT
       void _deserialize(FileMode mode, std::vector<char> & input)
       {
         this->clear();
-        Container<Mem::Main, DT2_, IT2_> tc(0);
+        Container<DT2_, IT2_> tc(0);
         tc.clear();
 
         char * array(input.data());
@@ -861,7 +722,7 @@ namespace FEAT
           global_i = Index((global_i * sizeof(DT2_) + sizeof(char) - 1u) / sizeof(char));
           for(Index i(0); i < Index(uiarray[4]); ++i)
           {
-            tc._elements.push_back(MemoryPool<Mem::Main>::template allocate_memory<DT2_>(tc._elements_size.at(i)));
+            tc._elements.push_back(MemoryPool::template allocate_memory<DT2_>(tc._elements_size.at(i)));
             if(0u == Pack::decode(tc._elements.at(i), &array[global_i], (std::size_t) tc._elements_size.at(i), (std::size_t) elements_bytes[i], compression_type_elements, false))
               XABORTM("Cannot decode compressed elements array");
             global_i += (Index)elements_bytes[i];
@@ -872,8 +733,8 @@ namespace FEAT
         {
           for (Index i(0) ; i < Index(uiarray[4]) ; ++i)
           {
-            tc._elements.push_back(MemoryPool<Mem::Main>::template allocate_memory<DT2_>(tc._elements_size.at(i)));
-            MemoryPool<Mem::Main>::template upload<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
+            tc._elements.push_back(MemoryPool::template allocate_memory<DT2_>(tc._elements_size.at(i)));
+            MemoryPool::template copy<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
             global_i += tc._elements_size.at(i);
           }
         }
@@ -883,7 +744,7 @@ namespace FEAT
           global_i = Index((global_i * sizeof(DT2_) + sizeof(char) - 1u) / sizeof(char));
           for (Index i(0) ; i < Index(uiarray[5]) ; ++i)
           {
-            tc._indices.push_back(MemoryPool<Mem::Main>::template allocate_memory<IT2_>(tc._indices_size.at(i)));
+            tc._indices.push_back(MemoryPool::template allocate_memory<IT2_>(tc._indices_size.at(i)));
             if(0u == Pack::decode(tc._indices.at(i), &array[global_i], (std::size_t) tc._indices_size.at(i), (std::size_t) indices_bytes[i], compression_type_index, false))
               XABORTM("Cannot decode compressed indice array");
             global_i += (Index)indices_bytes[i];
@@ -894,8 +755,8 @@ namespace FEAT
           global_i = Index((global_i * sizeof(DT2_) + sizeof(IT2_) - 1u) / sizeof(IT2_));
           for (Index i(0) ; i < Index(uiarray[5]) ; ++i)
           {
-            tc._indices.push_back(MemoryPool<Mem::Main>::template allocate_memory<IT2_>(tc._indices_size.at(i)));
-            MemoryPool<Mem::Main>::template upload<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));
+            tc._indices.push_back(MemoryPool::template allocate_memory<IT2_>(tc._indices_size.at(i)));
+            MemoryPool::template copy<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));
             global_i += tc._indices_size.at(i);
           }
         }
@@ -948,9 +809,9 @@ namespace FEAT
         if(! _foreign_memory)
         {
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::release_memory(_elements.at(i));
+            MemoryPool::release_memory(_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Mem_>::release_memory(_indices.at(i));
+            MemoryPool::release_memory(_indices.at(i));
         }
       }
 
@@ -986,7 +847,7 @@ namespace FEAT
       void format(DT_ value = DT_(0))
       {
         for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryPool<Mem_>::set_memory(_elements.at(i), value, _elements_size.at(i));
+          MemoryPool::set_memory(_elements.at(i), value, _elements_size.at(i));
       }
 
       /**
@@ -1002,7 +863,7 @@ namespace FEAT
         {
           for (Index i(0) ; i < _elements_size.at(e); ++i)
           {
-            MemoryPool<Mem_>::set_memory(this->_elements.at(e) + i, rng(min, max));
+            MemoryPool::set_memory(this->_elements.at(e) + i, rng(min, max));
           }
         }
       }
@@ -1015,9 +876,9 @@ namespace FEAT
         if (! _foreign_memory)
         {
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+            MemoryPool::release_memory(this->_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool::release_memory(this->_indices.at(i));
         }
 
         this->_elements.clear();
@@ -1058,16 +919,16 @@ namespace FEAT
         {
           for (Index i(0) ; i < other._indices.size() ; ++i)
           {
-            this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(this->_indices_size.at(i)));
+            this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(this->_indices_size.at(i)));
             if (clone_mode == CloneMode::Deep)
-              MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
+              MemoryPool::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
           }
 
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
-            this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(this->_elements_size.at(i)));
+            this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_elements_size.at(i)));
             if (clone_mode == CloneMode::Deep)
-              MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+              MemoryPool::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
           return;
@@ -1076,14 +937,14 @@ namespace FEAT
         {
           this->_indices.assign(other._indices.begin(), other._indices.end());
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+            MemoryPool::increase_memory(this->_indices.at(i));
         }
 
         if(clone_mode == CloneMode::Shallow)
         {
           this->_elements.assign(other._elements.begin(), other._elements.end());
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+            MemoryPool::increase_memory(this->_elements.at(i));
 
           return;
         }
@@ -1091,7 +952,7 @@ namespace FEAT
         {
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
-            this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(this->_elements_size.at(i)));
+            this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_elements_size.at(i)));
           }
 
           return;
@@ -1100,8 +961,8 @@ namespace FEAT
         {
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
-            this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(this->_elements_size.at(i)));
-            MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+            this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_elements_size.at(i)));
+            MemoryPool::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
           return;
@@ -1109,8 +970,8 @@ namespace FEAT
       }
 
       /// \copydoc clone(const Container&,CloneMode)
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const Container<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
+      template <typename DT2_, typename IT2_>
+      void clone(const Container<DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
       {
         Container t(other.size());
         t.assign(other);
@@ -1130,9 +991,9 @@ namespace FEAT
           return;
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          MemoryPool::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool::release_memory(this->_indices.at(i));
 
         this->_elements = std::move(other._elements);
         this->_indices = std::move(other._indices);
@@ -1280,8 +1141,6 @@ namespace FEAT
        * block containers to switch between
        * the raw number of used elements and
        * the number of used elements, when every block is counted as one entry.
-       *
-       * Most containers like SparseMatrixCSR ignore this template parameter.
        */
       template <Perspective = Perspective::native>
       Index used_elements() const

@@ -23,9 +23,9 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class DiscontinuousTest
-  : public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public UnitTest
 {
   typedef Shape::Quadrilateral ShapeType;
   typedef Geometry::ConformalMesh<ShapeType> QuadMesh;
@@ -41,8 +41,8 @@ class DiscontinuousTest
   static constexpr SpaceTags unit_space_config = SpaceTags::value;
 
 public:
-  DiscontinuousTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("Discontinuous Test")
+  DiscontinuousTest(PreferredBackend backend) :
+    UnitTest("Discontinuous Test", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -118,5 +118,19 @@ public:
   }
 };
 
-DiscontinuousTest<double> discontinuous_test_double;
-DiscontinuousTest<float> discontinuous_test_float;
+DiscontinuousTest<double, unsigned int> discontinuous_test_double_uint(PreferredBackend::generic);
+DiscontinuousTest<float, unsigned int> discontinuous_test_float_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DiscontinuousTest<float, unsigned long> mkl_discontinuous_schmit_test_float_ulong(PreferredBackend::mkl);
+DiscontinuousTest<double, unsigned long> mkl_discontinuous_schmit_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DiscontinuousTest<__float128, unsigned int> discontinuous_schmit_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DiscontinuousTest<Half, unsigned int> discontinuous_schmit_test_half_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DiscontinuousTest<float, unsigned int> cuda_discontinuous_schmit_test_float_uint(PreferredBackend::cuda);
+DiscontinuousTest<double, unsigned int> cuda_discontinuous_schmit_test_double_uint(PreferredBackend::cuda);
+#endif

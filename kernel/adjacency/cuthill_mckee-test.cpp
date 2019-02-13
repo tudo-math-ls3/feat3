@@ -21,11 +21,11 @@ using namespace FEAT::Adjacency;
  */
 
 class CuthillMcKeeTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   CuthillMcKeeTest() :
-    TaggedTest<Archs::None, Archs::None>("cuthill_mckee_test")
+    UnitTest("cuthill_mckee_test")
   {
   }
 

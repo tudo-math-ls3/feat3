@@ -20,22 +20,21 @@
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
-template<typename MT_, typename DT_, typename IT_>
+template<typename DT_, typename IT_>
 class DiscreteEvaluatorTest :
-  public TestSystem::FullTaggedTest<MT_, DT_, IT_>
+  public UnitTest
 {
 public:
   static constexpr int dim = 2;
-  typedef MT_ MemType;
   typedef DT_ DataType;
   typedef IT_ IndexType;
 
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> ScalarVectorType;
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> BlockedVectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> ScalarVectorType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BlockedVectorType;
 
 
-  DiscreteEvaluatorTest() :
-    TestSystem::FullTaggedTest<MT_, DT_, IT_>("DiscreteEvaluatorTest")
+  DiscreteEvaluatorTest(PreferredBackend backend) :
+    UnitTest("DiscreteEvaluatorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -44,7 +43,7 @@ public:
     // Note:
     // The tolerances need to be large, as we are checking analytic
     // function values against discrete function values!
-    test_fe_eval(3, 1E-3, 1E-2, 2E-1);
+    test_fe_eval(IT_(3), DT_(1E-3), DT_(1E-2), DT_(2E-1));
   }
 
   void test_fe_eval(Index level, DataType val_tol, DataType grad_tol, DataType hess_tol) const
@@ -146,4 +145,25 @@ public:
   }
 }; // class DiscreteEvaluatorTest<...>
 
-DiscreteEvaluatorTest<Mem::Main, double, Index> discrete_evaluator_test_main_double_index;
+DiscreteEvaluatorTest<double, unsigned int> discrete_evaluator_test_main_double_uint(PreferredBackend::generic);
+DiscreteEvaluatorTest<float, unsigned int> discrete_evaluator_test_main_float_uint(PreferredBackend::generic);
+DiscreteEvaluatorTest<double, unsigned long> discrete_evaluator_test_main_double_ulong(PreferredBackend::generic);
+DiscreteEvaluatorTest<float, unsigned long> discrete_evaluator_test_main_float_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DiscreteEvaluatorTest<float, unsigned long> mkl_discrete_evaluator_test_float_ulong(PreferredBackend::mkl);
+DiscreteEvaluatorTest<double, unsigned long> mkl_discrete_evaluator_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DiscreteEvaluatorTest<__float128, unsigned long> discrete_evaluator_test_float128_ulong(PreferredBackend::generic);
+DiscreteEvaluatorTest<__float128, unsigned int> discrete_evaluator_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DiscreteEvaluatorTest<Half, unsigned int> discrete_evaluator_test_half_uint(PreferredBackend::generic);
+DiscreteEvaluatorTest<Half, unsigned long> discrete_evaluator_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DiscreteEvaluatorTest<float, unsigned int> cuda_discrete_evaluator_test_float_uint(PreferredBackend::cuda);
+DiscreteEvaluatorTest<double, unsigned int> cuda_discrete_evaluator_test_double_uint(PreferredBackend::cuda);
+DiscreteEvaluatorTest<float, unsigned long> cuda_discrete_evaluator_test_float_ulong(PreferredBackend::cuda);
+DiscreteEvaluatorTest<double, unsigned long> cuda_discrete_evaluator_test_double_ulong(PreferredBackend::cuda);
+#endif

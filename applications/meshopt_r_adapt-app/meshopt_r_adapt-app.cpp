@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 #include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -27,12 +26,9 @@ static void read_test_meshopt_config(std::stringstream&, const int);
 static void read_test_solver_config(std::stringstream&);
 static void read_test_mesh_file_names(std::deque<String>&, const int);
 
-template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
+template<typename DT_, typename IT_, typename Mesh_>
 struct MeshoptRAdaptApp
 {
-  /// The memory architecture. Although this looks freely chosable, it has to be Mem::Main for now because all the
-  /// Hyperelasticity functionals are implemented for Mem::Main only
-  typedef Mem_ MemType;
   /// The floating point type
   typedef DT_ DataType;
   /// The index type
@@ -188,7 +184,7 @@ struct MeshoptRAdaptApp
 
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
-    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
+    meshopt_ctrl = Control::Meshopt::ControlFactory<DT_, IT_>::create_meshopt_control(
       dom_ctrl, meshoptimizer_key_p.first, &meshopt_config, &solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
@@ -684,9 +680,6 @@ struct MeshoptRAdaptApp
 
 int run_app(int argc, char* argv[])
 {
-  // Even though this *looks* configurable, it is not: All HyperelasticityFunctionals are implemented for Mem::Main
-  // only
-  typedef Mem::Main MemType;
   // Floating point type
   typedef double DataType;
   // Index type
@@ -855,22 +848,22 @@ int run_app(int argc, char* argv[])
   // Call the appropriate class' run() function
   if(mesh_type == "conformal:hypercube:2:2")
   {
-    ret = MeshoptRAdaptApp<MemType, DataType, IndexType, H2M2D>::run(
+    ret = MeshoptRAdaptApp<DataType, IndexType, H2M2D>::run(
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
   //else if(mesh_type == "conformal:hypercube:3:3")
   //{
-  //  ret = MeshoptRAdaptApp<MemType, DataType, IndexType, H3M3D>::run(
+  //  ret = MeshoptRAdaptApp<DataType, IndexType, H3M3D>::run(
   //    args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   //}
   else if(mesh_type == "conformal:simplex:2:2")
   {
-    ret = MeshoptRAdaptApp<MemType, DataType, IndexType, S2M2D>::run(
+    ret = MeshoptRAdaptApp<DataType, IndexType, S2M2D>::run(
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
   //else if(mesh_type == "conformal:simplex:3:3")
   //{
-  //  ret = MeshoptRAdaptApp<MemType, DataType, IndexType, S3M3D>::run(
+  //  ret = MeshoptRAdaptApp<DataType, IndexType, S3M3D>::run(
   //    args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   //}
   else

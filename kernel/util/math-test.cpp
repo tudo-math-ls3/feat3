@@ -17,12 +17,12 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-class BasicMathTest
-  : public TaggedTest<Archs::None, Archs::None>
+class BasicMathTest :
+  public TestSystem::UnitTest
 {
 public:
   BasicMathTest() :
-    TaggedTest<Archs::None, Archs::None>("BasicMathTest")
+    TestSystem::UnitTest("BasicMathTest")
   {
   }
 
@@ -110,8 +110,8 @@ public:
  * \author Peter Zajac
  */
 template<typename DT_>
-class MathTest
-  : public TaggedTest<Archs::None, DT_>
+class MathTest :
+  public TestSystem::UnitTest
 {
 public:
   const DT_ tol, tol2;
@@ -126,7 +126,7 @@ public:
    * Tolerance for sqrt, typically around sqrt(eps).
    */
   explicit MathTest(DT_ tol_, DT_ tol2_) :
-    TaggedTest<Archs::None, DT_>("MathTest"),
+    TestSystem::UnitTest("MathTest", Type::Traits<DT_>::name()),
     tol(tol_), tol2(tol2_)
   {
   }
@@ -324,11 +324,11 @@ MathTest<__float128> math_test_float128(4.5308E-31Q, 3.2648E-14Q);
  */
 template<typename DT_, typename IT_>
 class MatrixInvertTest :
-  public FullTaggedTest<Archs::None, DT_, IT_>
+  public TestSystem::UnitTest
 {
 public:
   MatrixInvertTest() :
-    FullTaggedTest<Archs::None, DT_, IT_>("MatrixInvertTest")
+    TestSystem::UnitTest("MatrixInvertTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name())
   {
   }
 

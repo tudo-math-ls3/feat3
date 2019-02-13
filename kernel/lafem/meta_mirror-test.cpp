@@ -15,26 +15,28 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::TestSystem;
 
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaMirrorTest :
-  public TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+  public UnitTest
 {
 public:
   typedef DataType_ DataType;
   typedef IndexType_ IndexType;
 
-  typedef DenseVector<Mem::Main, DataType, IndexType> BufferVector;
+  typedef DenseVector<DataType, IndexType> BufferVector;
 
-  typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
+  typedef DenseVector<DataType, IndexType> ScalarVector;
   typedef PowerVector<ScalarVector, 2> PowerVector2;
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
-  typedef VectorMirror<MemType_, DataType, IndexType> ScalarMirror;
+  typedef VectorMirror<DataType, IndexType> ScalarMirror;
   typedef PowerMirror<ScalarMirror, 2> PowerMirror2;
   typedef TupleMirror<PowerMirror2, ScalarMirror> MetaMirror;
 
-  MetaMirrorTest() :
-    TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>("MetaMirrorTest")
+  MetaMirrorTest(PreferredBackend backend) :
+    UnitTest("MetaMirrorTest", Type::Traits<DataType>::name(), Type::Traits<IndexType>::name(), backend)
   {
   }
 
@@ -118,5 +120,25 @@ public:
   }
 };
 
-MetaMirrorTest<Mem::Main, float, Index> meta_mirror_test_generic_float_index;
-MetaMirrorTest<Mem::Main, double, Index> meta_mirror_test_generic_double_index;
+MetaMirrorTest<float, unsigned long> meta_mirror_test_generic_float_ulong(PreferredBackend::generic);
+MetaMirrorTest<double, unsigned long> meta_mirror_test_generic_double_ulong(PreferredBackend::generic);
+MetaMirrorTest<float, unsigned int> meta_mirror_test_generic_float_uint(PreferredBackend::generic);
+MetaMirrorTest<double, unsigned int> meta_mirror_test_generic_double_unit(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaMirrorTest<float, unsigned long> mkl_meta_mirror_test_float_ulong(PreferredBackend::mkl);
+MetaMirrorTest<double, unsigned long> mkl_cmeta_mirror_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaMirrorTest<__float128, unsigned long> meta_mirror_test_float128_ulong(PreferredBackend::generic);
+MetaMirrorTest<__float128, unsigned int> meta_mirror_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaMirrorTest<Half, unsigned int> meta_mirror_test_half_uint(PreferredBackend::generic);
+MetaMirrorTest<Half, unsigned long> meta_mirror_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MetaMirrorTest<float, unsigned long> cuda_meta_mirror_test_float_ulong(PreferredBackend::cuda);
+MetaMirrorTest<double, unsigned long> cuda_meta_mirror_test_double_ulong(PreferredBackend::cuda);
+MetaMirrorTest<float, unsigned int> cuda_meta_mirror_test_float_uint(PreferredBackend::cuda);
+MetaMirrorTest<double, unsigned int> cuda_meta_mirror_test_double_uint(PreferredBackend::cuda);
+#endif

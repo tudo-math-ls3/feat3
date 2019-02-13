@@ -13,13 +13,13 @@ using namespace FEAT::Analytic;
 
 #ifdef FEAT_HAVE_FPARSER
 
-template<typename DT_>
+template<typename DT_, typename IT_>
 class ParsedFunctionTest :
-  public FullTaggedTest<Mem::Main, DT_, Index>
+  public UnitTest
 {
 public:
-  ParsedFunctionTest() :
-    FullTaggedTest<Mem::Main, DT_, Index>("ParsedFunctionTest")
+  ParsedFunctionTest(PreferredBackend backend) :
+    UnitTest("ParsedFunctionTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -38,34 +38,34 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     ParsedScalarFunction<2> psf;
-    psf.add_variable("t", 2.0);
-    psf.add_constant("c", 3.0);
+    psf.add_variable("t", DT_(2.0));
+    psf.add_constant("c", DT_(3.0));
     psf.parse("c*(t*x + y)");
 
-    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, 1.0, -1.0), 3.0, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, DT_(1.0), DT_(-1.0)), DT_(3.0), tol);
 
-    psf.set_variable("t", 4.0);
+    psf.set_variable("t", DT_(4.0));
 
-    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, 1.0, -1.0), 9.0, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, DT_(1.0), DT_(-1.0)), DT_(9.0), tol);
   }
 
   void test_parsed_vector_function()const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
     ParsedVectorFunction<3, 2> pvf;
-    pvf.add_variable("t", 2.0);
-    pvf.add_constant("c", 3.0);
+    pvf.add_variable("t", DT_(2.0));
+    pvf.add_constant("c", DT_(3.0));
     pvf.parse("[c*(t*x+y) ' t*x+c*z]");
 
-    Tiny::Vector<DT_, 2> v1 = Analytic::eval_value_x(pvf, 1.0, -1.0, 0.2);
-    TEST_CHECK_EQUAL_WITHIN_EPS(v1[0], 3.0, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(v1[1], 2.6, tol);
+    Tiny::Vector<DT_, 2> v1 = Analytic::eval_value_x(pvf, DT_(1.0), DT_(-1.0), DT_(0.2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(v1[0], DT_(3.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(v1[1], DT_(2.6), tol);
 
-    pvf.set_variable("t", 4.0);
+    pvf.set_variable("t", DT_(4.0));
 
-    Tiny::Vector<DT_, 2> v2 = Analytic::eval_value_x(pvf, 1.0, -1.0, 0.2);
-    TEST_CHECK_EQUAL_WITHIN_EPS(v2[0], 9.0, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(v2[1], 4.6, tol);
+    Tiny::Vector<DT_, 2> v2 = Analytic::eval_value_x(pvf, DT_(1.0), DT_(-1.0), DT_(0.2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(v2[0], DT_(9.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(v2[1], DT_(4.6), tol);
   }
 
   void test_inline_variables_1d()const
@@ -73,7 +73,7 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
     ParsedScalarFunction<2> pf;
     pf.parse("length :=sqrt(x*x + y*y); 2*length*sin(length)");
-    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(pf, 3.0, 4.0), 10.0 * Math::sin(5.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(pf, DT_(3.0), DT_(4.0)), DT_(10.0) * Math::sin(DT_(5.0)), tol);
   }
 
   void test_inline_variables_2d()const
@@ -82,10 +82,10 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
     ParsedVectorFunction<2, 2>pvf_2d;
     pvf_2d.parse("[r:= sqrt(x*x+y*y); phi:=atan(y/x);r*cos(phi)'r:= sqrt(x*x+y*y); phi:=atan(y/x);r*sin(phi)]");
-    Tiny::Vector<DT_, 2> v3 = Analytic::eval_value_x(pvf_2d, 5.0, 6.5);
+    Tiny::Vector<DT_, 2> v3 = Analytic::eval_value_x(pvf_2d, DT_(5.0), DT_(6.5));
 
-    TEST_CHECK_EQUAL_WITHIN_EPS(v3[0], 5.0, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(v3[1], 6.5, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(v3[0], DT_(5.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(v3[1], DT_(6.5), tol);
   }
 
   void combined_test_inline_variables_add_variable_add_const() const
@@ -94,18 +94,37 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     ParsedScalarFunction<2> psf;
-    psf.add_constant("R", 8.3145);
-    psf.add_variable("n", 3./2.);
+    psf.add_constant("R", DT_(8.3145));
+    psf.add_variable("n", DT_(3.)/DT_(2.));
     psf.parse("T1:=x+273.15;T2:=y+273.15;n*R*(T2-T1)");
 
-    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, 250., 270.), 20.*1.5* 8.3145, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, 270., 250.), -20. * 1.5 * 8.3145, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, DT_(250.), DT_(270.)), DT_(20.)*DT_(1.5)* DT_(8.3145), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(psf, DT_(270.), DT_(250.)), DT_(-20.) * DT_(1.5) * DT_(8.3145), tol);
   }
 
 };
 
-ParsedFunctionTest<double> parsed_function_test_double;
-
-
+ParsedFunctionTest<double, unsigned int> parsed_function_test_double_uint(PreferredBackend::generic);
+ParsedFunctionTest<float, unsigned int> parsed_function_test_float_uint(PreferredBackend::generic);
+ParsedFunctionTest<double, unsigned long> parsed_function_test_double_ulong(PreferredBackend::generic);
+ParsedFunctionTest<float, unsigned long> parsed_function_test_float_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+ParsedFunctionTest<float, unsigned long> mkl_parsed_function_test_float_ulong(PreferredBackend::mkl);
+ParsedFunctionTest<double, unsigned long> mkl_parsed_function_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+ParsedFunctionTest<__float128, unsigned long> parsed_function_test_float128_ulong(PreferredBackend::generic);
+ParsedFunctionTest<__float128, unsigned int> parsed_function_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+ParsedFunctionTest<Half, unsigned int> parsed_function_test_half_uint(PreferredBackend::generic);
+ParsedFunctionTest<Half, unsigned long> parsed_function_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+ParsedFunctionTest<float, unsigned int> cuda_parsed_function_test_float_uint(PreferredBackend::cuda);
+ParsedFunctionTest<double, unsigned int> cuda_parsed_function_test_double_uint(PreferredBackend::cuda);
+ParsedFunctionTest<float, unsigned long> cuda_parsed_function_test_float_ulong(PreferredBackend::cuda);
+ParsedFunctionTest<double, unsigned long> cuda_parsed_function_test_double_ulong(PreferredBackend::cuda);
+#endif
 
 #endif // FEAT_HAVE_FPARSER

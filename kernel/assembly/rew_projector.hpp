@@ -68,13 +68,13 @@ namespace FEAT
         typename Space_,
         typename CubatureFactory_>
       static void project(
-        LAFEM::DenseVector<Mem::Main, DT_, IT_>& vector,
+        LAFEM::DenseVector<DT_, IT_>& vector,
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         WeightType weight_type = wt_volume)
       {
-        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
         typedef Function_ FunctionType;
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;
@@ -232,46 +232,6 @@ namespace FEAT
         }
 
         // okay
-      }
-
-      /**
-       * \brief Projects an analytic function into a finite element space.
-       *
-       * \param[out] vector
-       * A \transient reference to the coefficient vector that is to be assembled.
-       * The vector is automatically allocated by this function, so it does not need to be
-       * allocated beforehand.
-       *
-       * \param[in] function
-       * A \transient reference to an object implementing the AnalyticFunction interface
-       * capable of computing function values.
-       *
-       * \param[in] space
-       * A \transient reference to the space to which to project into.
-       *
-       * \param[in] cubature_factory
-       * A cubature factory to be used for integration.
-       *
-       * \param[in] weight_type
-       * The weighting type to be used.
-       */
-      template<
-        typename Mem_,
-        typename DT_,
-        typename IT_,
-        typename Function_,
-        typename Space_,
-        typename CubatureFactory_>
-      static void project(
-        LAFEM::DenseVector<Mem_, DT_, IT_>& vector,
-        const Function_& function,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory,
-        WeightType weight_type = wt_volume)
-      {
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> vec;
-        project(vec, function, space, cubature_factory, weight_type);
-        vector.convert(vec);
       }
     }; // class RewProjector
   } // namespace Assembly

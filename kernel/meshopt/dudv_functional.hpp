@@ -8,7 +8,6 @@
 #define KERNEL_MESHOPT_DUDV_FUNCTIONAL_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/common_operators.hpp>            // for DuDvOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
@@ -32,9 +31,6 @@ namespace FEAT
     /**
      * \brief Mesh optimizer based on minimization of harmonic energy
      *
-     * \tparam Mem_
-     * Memory architecture for the solver (not the mesh)
-     *
      * \tparam DT_
      * Data type for the solver (not the mesh)
      *
@@ -49,15 +45,13 @@ namespace FEAT
      */
     template
     <
-      typename Mem_, typename DT_, typename IT_, typename TrafoType_,
-      template<typename, typename, typename, int, int> class MatrixType_ = LAFEM::SparseMatrixBCSR
+      typename DT_, typename IT_, typename TrafoType_,
+      template<typename, typename, int, int> class MatrixType_ = LAFEM::SparseMatrixBCSR
     >
     class DuDvFunctional:
       public MeshQualityFunctional<typename TrafoType_::MeshType>
     {
       public:
-        /// Memory architecture
-        typedef Mem_ MemType;
         /// Our datatype
         typedef DT_ DataType;
         /// Our index type
@@ -70,19 +64,19 @@ namespace FEAT
         typedef typename MeshType::ShapeType ShapeType;
 
         /// Type for the system matrix
-        typedef MatrixType_<Mem_, DT_, IT_, MeshType::world_dim, MeshType::world_dim> MatrixType;
+        typedef MatrixType_<DT_, IT_, MeshType::world_dim, MeshType::world_dim> MatrixType;
         /// Blockheight of the system matrix
         static constexpr int BlockHeight = MatrixType::BlockHeight;
         /// Blockwidth of the system matrix
         static constexpr int BlockWidth = MatrixType::BlockWidth;
 
         /// Our 'base' class type
-        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-        using ContainerType = DuDvFunctional<Mem2_, DT2_, IT2_, TrafoType_, MatrixType_>;
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        using ContainerType = DuDvFunctional<DT2_, IT2_, TrafoType_, MatrixType_>;
 
-        /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-        template <typename Mem2_, typename DataType2_, typename IndexType2_>
-        using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+        /// this typedef lets you create a matrix container with new Datatape and Index types
+        template <typename DataType2_, typename IndexType2_>
+        using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
         /// Our base class
         typedef MeshQualityFunctional<MeshType> BaseClass;
@@ -100,14 +94,14 @@ namespace FEAT
         /// Type for vectors from the primal space
         typedef typename MatrixType::VectorTypeR VectorTypeR;
         /// Type for i.e. cell vectors
-        typedef LAFEM::DenseVector<Mem_, DT_, IT_> ScalarVectorType;
+        typedef LAFEM::DenseVector<DT_, IT_> ScalarVectorType;
 
         /// Filter for Dirichlet boundary conditions
-        typedef LAFEM::UnitFilterBlocked<Mem_, DT_, IT_, MeshType::world_dim> DirichletFilterType;
+        typedef LAFEM::UnitFilterBlocked<DT_, IT_, MeshType::world_dim> DirichletFilterType;
         /// Sequence of Dirichlet filters for several different boundary parts
         typedef LAFEM::FilterSequence<DirichletFilterType> DirichletFilterSequence;
         /// Filter for slip boundary conditions
-        typedef LAFEM::SlipFilter<Mem_, DT_, IT_, MeshType::world_dim> SlipFilterType;
+        typedef LAFEM::SlipFilter<DT_, IT_, MeshType::world_dim> SlipFilterType;
         /// Sequence of Slip filters for several different boundary parts
         typedef LAFEM::FilterSequence<SlipFilterType> SlipFilterSequence;
         /// Combined filter
@@ -483,14 +477,14 @@ namespace FEAT
 #ifdef FEAT_EICKT
     extern template class DuDvFunctional
     <
-      Mem::Main, double, Index,
+      double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, double>>,
       LAFEM::SparseMatrixBCSR
     >;
 
     extern template class DuDvFunctional
     <
-      Mem::Main, double, Index,
+      double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>,
       LAFEM::SparseMatrixBCSR
     >;

@@ -9,8 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
-
+#include <kernel/util/runtime.hpp>
 
 namespace FEAT
 {
@@ -18,11 +17,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct Scale;
-
-      template <>
-      struct Scale<Mem::Main>
+      struct Scale
       {
         template <typename DT_>
         static void value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
@@ -30,43 +25,38 @@ namespace FEAT
           value_generic(r, x, s, size);
         }
 
-#ifdef FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_HALFMATH
+        static void value(Half * r, const Half * const x, const Half s, const Index size)
+        {
+          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, x, s, size)
+        }
+#endif
+
         static void value(float * r, const float * const x, const float s, const Index size)
         {
-          value_mkl(r, x, s, size);
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, x, s, size)
         }
 
         static void value(double * r, const double * const x, const double s, const Index size)
         {
-          value_mkl(r, x, s, size);
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, x, s, size)
         }
-#endif
 
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void value(__float128 * r, const __float128 * const x, const __float128 s, const Index size)
-        {
-          value_generic(r, x, s, size);
-        }
-#endif
 
         template <typename DT_>
         static void value_generic(DT_ * r, const DT_ * const x, const DT_ s, const Index size);
 
         static void value_mkl(float * r, const float * const x, const float, const Index size);
         static void value_mkl(double * r, const double * const x, const double, const Index size);
+
+        template <typename DT_>
+        static void value_cuda(DT_ * r, const DT_ * const x, const DT_ s, const Index size);
       };
 
 #ifdef FEAT_EICKT
-      extern template void Scale<Mem::Main>::value_generic(float *, const float * const, const float, const Index);
-      extern template void Scale<Mem::Main>::value_generic(double *, const double * const, const double, const Index);
+      extern template void Scale::value_generic(float *, const float * const, const float, const Index);
+      extern template void Scale::value_generic(double *, const double * const, const double, const Index);
 #endif
-
-      template <>
-      struct Scale<Mem::CUDA>
-      {
-        template <typename DT_>
-        static void value(DT_ * r, const DT_ * const x, const DT_, const Index size);
-      };
 
     } // namespace Arch
   } // namespace LAFEM

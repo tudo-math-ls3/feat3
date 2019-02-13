@@ -35,8 +35,6 @@ namespace FEAT
 
       /// The type of the filter that gets applied in sequence
       typedef Filter_ InnerFilterType;
-      /// The filter's memory architecture type
-      typedef typename Filter_::MemType MemType;
       /// The filter's floating point type
       typedef typename Filter_::DataType DataType;
       /// The filter's index type
@@ -51,12 +49,12 @@ namespace FEAT
       typedef typename BaseClass::const_iterator const_iterator;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      using FilterType = FilterSequence<typename Filter_::template FilterType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_, typename IT2_>
+      using FilterType = FilterSequence<typename Filter_::template FilterType<DT2_, IT2_> >;
 
       /// this typedef lets you create a filter sequence with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DT2_, IT2_>;
+      template <typename DT2_, typename IT2_>
+      using FilterTypeByDI = FilterType<DT2_, IT2_>;
 
     public:
       /// Empty default constructor

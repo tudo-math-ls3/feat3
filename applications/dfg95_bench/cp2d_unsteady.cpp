@@ -745,18 +745,17 @@ namespace NavierStokesCP2D
    */
   template<
     int dim_,
-    typename MemType_ = Mem::Main,
     typename DataType_ = Real,
     typename IndexType_ = Index,
-    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
+    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>>
   class NavierStokesBlockedSystemLevel :
-    public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+    public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
-    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+    typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     typedef typename BaseClass::GlobalVeloVector GlobalVeloVector;
     typedef typename BaseClass::LocalMatrixBlockA LocalMatrixBlockA;
@@ -871,7 +870,6 @@ namespace NavierStokesCP2D
     TimeStamp stamp_start;
 
     // our arch types
-    typedef Mem::Main MemType;
     typedef Real DataType;
     typedef Index IndexType;
 
@@ -886,7 +884,7 @@ namespace NavierStokesCP2D
     static constexpr int dim = ShapeType::dimension;
 
     // define our velocity and pressure system levels
-    typedef NavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef NavierStokesBlockedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
@@ -1668,7 +1666,7 @@ namespace NavierStokesCP2D
 
         // project pressure
         Cubature::DynamicFactory cub("gauss-legendre:2");
-        LAFEM::DenseVector<Mem::Main, double, Index> vtx_p, vtx_der_p;
+        LAFEM::DenseVector<double, Index> vtx_p, vtx_der_p;
         Assembly::DiscreteCellProjector::project(vtx_p, vec_sol_p.local(), the_domain_level.space_pres, cub);
 
         // write pressure

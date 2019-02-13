@@ -56,8 +56,8 @@ namespace FEAT
         typename DataType_, typename IndexType_, int dim_,
         typename SpaceVelo_, typename SpacePres_>
       static void assemble(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, 1>& matrix_b,
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 1, dim_>& matrix_d,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>& matrix_b,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>& matrix_d,
         const SpaceVelo_& space_velo,
         const SpacePres_& space_pres,
         const String& cubature_name,
@@ -92,8 +92,8 @@ namespace FEAT
         typename DataType_, typename IndexType_, int dim_,
         typename SpaceVelo_, typename SpacePres_>
       static void assemble(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, 1>& matrix_b,
-        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 1, dim_>& matrix_d,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>& matrix_b,
+        LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>& matrix_d,
         const SpaceVelo_& space_velo,
         const SpacePres_& space_pres,
         const Cubature::DynamicFactory& cubature_factory,
@@ -110,8 +110,8 @@ namespace FEAT
         XASSERTM((&space_velo.get_trafo()) == (&space_pres.get_trafo()),
           "Velocity and Pressure spaces must be defined on the same trafo!");
 
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, 1> MatrixB;
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 1, dim_> MatrixD;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1> MatrixB;
+        typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_> MatrixD;
 
         // assembly traits
         typedef AsmTraits2<

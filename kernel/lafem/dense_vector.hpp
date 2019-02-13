@@ -5,36 +5,35 @@
 
 #pragma once
 #ifndef KERNEL_LAFEM_DENSE_VECTOR_HPP
-  #define KERNEL_LAFEM_DENSE_VECTOR_HPP 1
+#define KERNEL_LAFEM_DENSE_VECTOR_HPP 1
 
-  // includes, FEAT
-  #include <kernel/base_header.hpp>
-  #include <kernel/lafem/forward.hpp>
-  #include <kernel/util/assertion.hpp>
-  #include <kernel/util/type_traits.hpp>
-  #include <kernel/util/math.hpp>
-  #include <kernel/util/random.hpp>
-  #include <kernel/lafem/container.hpp>
-  #include <kernel/lafem/dense_vector_blocked.hpp>
-  #include <kernel/lafem/edi.hpp>
-  #include <kernel/lafem/arch/component_invert.hpp>
-  #include <kernel/lafem/arch/dot_product.hpp>
-  #include <kernel/lafem/arch/norm.hpp>
-  #include <kernel/lafem/arch/max_abs_index.hpp>
-  #include <kernel/lafem/arch/min_abs_index.hpp>
-  #include <kernel/lafem/arch/max_index.hpp>
-  #include <kernel/lafem/arch/min_index.hpp>
-  #include <kernel/lafem/arch/scale.hpp>
-  #include <kernel/lafem/arch/axpy.hpp>
-  #include <kernel/lafem/arch/component_product.hpp>
-  #include <kernel/adjacency/permutation.hpp>
-  #include <kernel/util/statistics.hpp>
-  #include <kernel/util/time_stamp.hpp>
+// includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/lafem/forward.hpp>
+#include <kernel/util/assertion.hpp>
+#include <kernel/util/type_traits.hpp>
+#include <kernel/util/math.hpp>
+#include <kernel/util/random.hpp>
+#include <kernel/lafem/container.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/lafem/arch/component_invert.hpp>
+#include <kernel/lafem/arch/dot_product.hpp>
+#include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/max_abs_index.hpp>
+#include <kernel/lafem/arch/min_abs_index.hpp>
+#include <kernel/lafem/arch/max_index.hpp>
+#include <kernel/lafem/arch/min_index.hpp>
+#include <kernel/lafem/arch/scale.hpp>
+#include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/component_product.hpp>
+#include <kernel/adjacency/permutation.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
 
-  #include <iostream>
-  #include <fstream>
-  #include <string>
-  #include <stdint.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdint.h>
 
 namespace FEAT
 {
@@ -43,7 +42,6 @@ namespace FEAT
     /**
      * \brief Dense data vector class template.
      *
-     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.
      *
@@ -56,8 +54,8 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_ = Index>
-    class DenseVector : public Container<Mem_, DT_, IT_>
+    template <typename DT_, typename IT_ = Index>
+    class DenseVector : public Container<DT_, IT_>
     {
     public:
       /**
@@ -68,8 +66,7 @@ namespace FEAT
       class ScatterAxpy
       {
       public:
-        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
 
@@ -108,8 +105,7 @@ namespace FEAT
       class GatherAxpy
       {
       public:
-        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
-        typedef Mem::Main MemType;
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
 
@@ -145,17 +141,15 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Our value type
       typedef DT_ ValueType;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = DenseVector<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = DenseVector<DT2_, IT2_>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /**
        * \brief Constructor
@@ -163,7 +157,7 @@ namespace FEAT
        * Creates an empty non dimensional vector.
        */
       explicit DenseVector() :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_> (0)
       {
       }
 
@@ -171,33 +165,16 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] size_in The size of the created vector.
-       * \param[in] pinning True if the memory should be allocated in a pinned manner.
-       *
-       * \warning Pinned memory allocation is only possible in main memory and needs cuda support.
        *
        * Creates a vector with a given size.
        */
-      explicit DenseVector(Index size_in, Pinning pinning = Pinning::disabled) :
-        Container<Mem_, DT_, IT_>(size_in)
+      explicit DenseVector(Index size_in) :
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
 
-        XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
-
-        if (pinning == Pinning::enabled)
-        {
-  #ifdef FEAT_HAVE_CUDA
-          this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size_in));
-  #else
-          // no cuda support enabled - we cannot serve and do not need pinned memory support
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
-  #endif
-        }
-        else
-        {
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
-        }
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size_in));
 
         this->_elements_size.push_back(size_in);
       }
@@ -211,15 +188,15 @@ namespace FEAT
        * Creates a vector with given size and value.
        */
       explicit DenseVector(Index size_in, DT_ value) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size_in));
         this->_elements_size.push_back(size_in);
 
-        MemoryPool<Mem_>::set_memory(this->_elements.at(0), value, size_in);
+        MemoryPool::set_memory(this->_elements.at(0), value, size_in);
       }
 
       /**
@@ -238,7 +215,7 @@ namespace FEAT
        * as they share one and the same array.
        */
       explicit DenseVector(Index size_in, DT_ * data) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
@@ -246,10 +223,10 @@ namespace FEAT
         this->_elements.push_back(data);
         this->_elements_size.push_back(size_in);
 
-        for (Index i(0); i < this->_elements.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
-        for (Index i(0); i < this->_indices.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool::increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -264,7 +241,7 @@ namespace FEAT
        * \note The created DenseVector has no own memory management nor own allocated memory and should be used carefully!
        */
       explicit DenseVector(const DenseVector & dv_in, Index size_in, Index offset_in) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         XASSERT(size_in > Index(0));
         XASSERTM(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds original vector size!");
@@ -284,8 +261,8 @@ namespace FEAT
        * Creates a vector from a given source blocked vector
        */
       template <int BS_>
-      explicit DenseVector(const DenseVectorBlocked<Mem_, DT_, IT_, BS_> & other) :
-        Container<Mem_, DT_, IT_>(other.template size<Perspective::pod>())
+      explicit DenseVector(const DenseVectorBlocked<DT_, IT_, BS_> & other) :
+        Container<DT_, IT_>(other.template size<Perspective::pod>())
       {
         convert(other);
       }
@@ -299,7 +276,7 @@ namespace FEAT
        * Creates a vector from the given source file.
        */
       explicit DenseVector(FileMode mode, String filename) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
       }
@@ -312,8 +289,8 @@ namespace FEAT
        *
        * Creates a vector from the given source file.
        */
-      explicit DenseVector(FileMode mode, std::istream & file) :
-        Container<Mem_, DT_, IT_>(0)
+      explicit DenseVector(FileMode mode, std::istream& file) :
+        Container<DT_, IT_>(0)
       {
         read_from(mode, file);
       }
@@ -327,7 +304,7 @@ namespace FEAT
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       explicit DenseVector(std::vector<char> input) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         deserialize<DT2_, IT2_>(input);
       }
@@ -343,12 +320,12 @@ namespace FEAT
        * Creates a vector from the given random number generator.
        */
       explicit DenseVector(Random & rng, Index size_in, DataType min, DataType max) :
-        Container<Mem_, DT_, IT_>(size_in)
+        Container<DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
           return;
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size_in));
         this->_elements_size.push_back(size_in);
 
         this->format(rng, min, max);
@@ -362,7 +339,7 @@ namespace FEAT
        * Moves another vector to this vector.
        */
       DenseVector(DenseVector && other) :
-        Container<Mem_, DT_, IT_>(std::forward<DenseVector>(other))
+        Container<DT_, IT_>(std::forward<DenseVector>(other))
       {
       }
 
@@ -410,10 +387,10 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const DenseVector<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep)
+      template <typename DT2_, typename IT2_>
+      void clone(const DenseVector<DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -423,8 +400,8 @@ namespace FEAT
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const DenseVector<Mem2_, DT2_, IT2_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const DenseVector<DT2_, IT2_> & other)
       {
         this->assign(other);
       }
@@ -436,8 +413,8 @@ namespace FEAT
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_, int BS2_>
-      void convert(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BS2_> & other)
+      template <typename DT2_, typename IT2_, int BS2_>
+      void convert(const DenseVectorBlocked< DT2_, IT2_, BS2_> & other)
       {
         this->clear();
 
@@ -445,10 +422,10 @@ namespace FEAT
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(this->size());
 
-        for (Index i(0); i < this->_elements.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
-        for (Index i(0); i < this->_indices.size(); ++i)
-          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool::increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -461,22 +438,9 @@ namespace FEAT
       template <typename VT_>
       void convert(const VT_ & a)
       {
-        typedef typename VT_::MemType Mem2_;
-
-        if (std::is_same<Mem_, Mem2_>::value)
-        {
-          DenseVector vec(a.template size<Perspective::pod>());
-          a.set_vec(vec.elements());
-          this->assign(vec);
-        }
-        else
-        {
-          typename VT_::template ContainerType<Mem_, DT_, IT_> ta;
-          ta.convert(a);
-          DenseVector vec(ta.template size<Perspective::pod>());
-          ta.set_vec(vec.elements());
-          this->assign(vec);
-        }
+        DenseVector vec(a.template size<Perspective::pod>());
+        a.set_vec(vec.elements());
+        this->assign(vec);
       }
 
       /**
@@ -518,20 +482,16 @@ namespace FEAT
        * \note The resulting DenseVectorBlocked will have size == DenseVector.size() * BlockSize_.
        */
       template <int BlockSize_>
-      DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> inflate_to_blocks()
+      DenseVectorBlocked<DT_, IT_, BlockSize_> inflate_to_blocks()
       {
-        DenseVector<Mem::Main, DT_, IT_> main;
-        main.convert(*this);
-        DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> result_main(main.size());
+        DenseVectorBlocked<DT_, IT_, BlockSize_> result(this->size());
 
-        const auto * mp = main.elements();
-        auto * rmp = result_main.template elements<Perspective::native>();
-        for (Index i(0); i < main.size(); ++i)
+        const auto* p = elements();
+        auto* rp = result.template elements<Perspective::native>();
+        for (Index i(0) ; i < this->size() ; ++i)
         {
-          rmp[i] = typename decltype(result_main)::ValueType(mp[i]);
+          rp[i] = typename decltype(result)::ValueType(p[i]);
         }
-        DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> result;
-        result.convert(result_main);
         return result;
       }
 
@@ -545,19 +505,7 @@ namespace FEAT
       {
         XASSERTM(this->template size<Perspective::pod>() == a.template size<Perspective::pod>(), "Vectors have not the same size!");
 
-        typedef typename VT_::MemType Mem2_;
-        typedef typename VT_::IndexType IT2_;
-
-        if (std::is_same<Mem_, Mem2_>::value)
-        {
-          a.set_vec(this->elements());
-        }
-        else
-        {
-          typename VT_::template ContainerType<Mem_, DT_, IT2_> ta;
-          ta.convert(a);
-          ta.set_vec(this->elements());
-        }
+        a.set_vec(this->elements());
       }
 
       /**
@@ -570,17 +518,7 @@ namespace FEAT
       {
         XASSERTM(this->template size<Perspective::pod>() == a.template size<Perspective::pod>(), "Vectors have not the same size!");
 
-        typedef typename VT_::MemType Mem2_;
-        if (std::is_same<Mem_, Mem2_>::value)
-        {
-          a.set_vec_inv(this->elements());
-        }
-        else
-        {
-          DenseVector<Mem2_, DT_, IT_> t_this;
-          t_this.convert(*this);
-          a.set_vec_inv(t_this.elements());
-        }
+        a.set_vec_inv(this->elements());
       }
 
       /**
@@ -651,7 +589,7 @@ namespace FEAT
             XASSERTM(cols == 1, "Input-file is no dense-vector-file");
           }
 
-          DenseVector<Mem::Main, DT_, IT_> tmp(rows);
+          DenseVector<DT_, IT_> tmp(rows);
           DT_ * pval(tmp.elements());
 
           while (! file.eof())
@@ -704,9 +642,9 @@ namespace FEAT
           }
 
           this->_scalar_index.at(0) = Index(data.size());
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(Index(data.size())));
+          this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(Index(data.size())));
           this->_elements_size.push_back(Index(data.size()));
-          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+          MemoryPool::copy(this->_elements.at(0), &data[0], Index(data.size()));
           break;
         }
         case FileMode::fm_dv:
@@ -749,7 +687,7 @@ namespace FEAT
         {
         case FileMode::fm_mtx:
         {
-          DenseVector<Mem::Main, DT_, IT_> temp;
+          DenseVector<DT_, IT_> temp;
           temp.convert(*this);
 
           const Index tsize(temp.size());
@@ -765,14 +703,14 @@ namespace FEAT
         }
         case FileMode::fm_exp:
         {
-          DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->size()));
-          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->size());
+          DT_ * temp = MemoryPool::template allocate_memory<DT_>((this->size()));
+          MemoryPool::copy(temp, this->_elements.at(0), this->size());
 
           for (Index i(0); i < this->size(); ++i)
           {
             file << std::scientific << temp[i] << std::endl;
           }
-          MemoryPool<Mem::Main>::release_memory(temp);
+          MemoryPool::release_memory(temp);
           break;
         }
         case FileMode::fm_dv:
@@ -817,7 +755,10 @@ namespace FEAT
       const DT_ operator()(Index index) const
       {
         ASSERT(index < this->size());
-        return MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
+
+        MemoryPool::synchronize();
+
+        return elements()[index];
       }
 
       /**
@@ -829,19 +770,8 @@ namespace FEAT
       void operator()(Index index, DT_ value)
       {
         ASSERT(index < this->size());
-        MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
-      }
-
-      /**
-       * \brief Create temporary object for direct data manipulation.
-       * \warning Be aware, that any synchronization only takes place, when the object is destroyed!
-       *
-       * \param[in] index The index of the vector element.
-       */
-      EDI<Mem_, DT_> edi(Index index)
-      {
-        EDI<Mem_, DT_> t(MemoryPool<Mem_>::get_element(this->_elements.at(0), index), this->_elements.at(0) + index);
-        return t;
+        elements()[index] = value;
+        MemoryPool::synchronize();
       }
 
       /**
@@ -861,18 +791,6 @@ namespace FEAT
        * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
       void copy(const DenseVector & x, bool full = false)
-      {
-        this->_copy_content(x, full);
-      }
-
-      /**
-       * \brief Performs \f$this \leftarrow x\f$.
-       *
-       * \param[in] x The vector to be copied.
-       * \param[in] full Shall we create a full copy, including scalars and index arrays?
-       */
-      template <typename Mem2_>
-      void copy(const DenseVector<Mem2_, DT_, IT_> & x, bool full = false)
       {
         this->_copy_content(x, full);
       }
@@ -904,7 +822,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 2);
-        Arch::Axpy<Mem_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
+        Arch::Axpy::value(this->elements(), alpha, x.elements(), y.elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -924,7 +842,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
-        Arch::ComponentProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
+        Arch::ComponentProduct::value(this->elements(), x.elements(), y.elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -946,7 +864,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
-        Arch::ComponentInvert<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
+        Arch::ComponentInvert::value(this->elements(), x.elements(), alpha, this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -965,7 +883,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
-        Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
+        Arch::Scale::value(this->elements(), x.elements(), alpha, this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -988,7 +906,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 3);
-        DataType result = Arch::TripleDotProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
+        DataType result = Arch::TripleDotProduct::value(this->elements(), x.elements(), y.elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1010,7 +928,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 2);
-        DataType result = Arch::DotProduct<Mem_>::value(this->elements(), x.elements(), this->size());
+        DataType result = Arch::DotProduct::value(this->elements(), x.elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1027,7 +945,7 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops(this->size() * 2);
 
-        DT_ result = Arch::Norm2<Mem_>::value(this->elements(), this->size());
+        DT_ result = Arch::Norm2::value(this->elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1056,10 +974,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(max_abs_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
+        MemoryPool::copy(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
         result = Math::abs(result);
 
         TimeStamp ts_stop;
@@ -1077,10 +995,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(min_abs_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + min_abs_index, 1);
+        MemoryPool::copy(&result, this->template elements<Perspective::pod>() + min_abs_index, 1);
         result = Math::abs(result);
 
         TimeStamp ts_stop;
@@ -1098,10 +1016,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(max_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + max_index, 1);
+        MemoryPool::copy(&result, this->template elements<Perspective::pod>() + max_index, 1);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1118,10 +1036,10 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex<Mem_>::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
         ASSERT(min_index < this->template size<Perspective::pod>());
         DT_ result;
-        MemoryPool<Mem_>::template download<DT_>(&result, this->template elements<Perspective::pod>() + min_index, 1);
+        MemoryPool::copy(&result, this->template elements<Perspective::pod>() + min_index, 1);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1139,23 +1057,20 @@ namespace FEAT
 
         XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
-        DenseVector<Mem::Main, DT_, IT_> local;
-        local.convert(*this);
-        perm.apply(local.elements());
-        this->assign(local);
+        perm.apply(elements());
       }
 
       /// \cond internal
       /// Writes the vector-entries in an allocated array
       void set_vec(DT_ * const pval_set) const
       {
-        MemoryPool<Mem_>::copy(pval_set, this->elements(), this->size());
+        MemoryPool::copy(pval_set, this->elements(), this->size());
       }
 
       /// Writes data of an array in the vector
       void set_vec_inv(const DT_ * const pval_set)
       {
-        MemoryPool<Mem_>::copy(this->elements(), pval_set, this->size());
+        MemoryPool::copy(this->elements(), pval_set, this->size());
       }
       /// \endcond
 
@@ -1165,8 +1080,7 @@ namespace FEAT
        * \param[in] a A vector to compare with.
        * \param[in] b A vector to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator==(const DenseVector & a, const DenseVector<Mem2_, DT_, IT_> & b)
+      friend bool operator== (const DenseVector & a, const DenseVector<DT_, IT_> & b)
       {
         if (a.size() != b.size())
           return false;
@@ -1180,42 +1094,14 @@ namespace FEAT
 
         bool ret(true);
 
-        DT_ * ta;
-        DT_ * tb;
-
-        if (std::is_same<Mem::Main, Mem_>::value)
-        {
-          ta = const_cast<DT_ *>(a.elements());
-        }
-        else
-        {
-          ta = new DT_[a.size()];
-          MemoryPool<Mem_>::template download<DT_>(ta, a.elements(), a.size());
-        }
-
-        if (std::is_same<Mem::Main, Mem2_>::value)
-        {
-          tb = const_cast<DT_ *>(b.elements());
-        }
-        else
-        {
-          tb = new DT_[b.size()];
-          MemoryPool<Mem2_>::template download<DT_>(tb, b.elements(), b.size());
-        }
-
         for (Index i(0); i < a.size(); ++i)
         {
-          if (ta[i] != tb[i])
+          if (a(i) != b(i))
           {
             ret = false;
             break;
           }
         }
-
-        if (! std::is_same<Mem::Main, Mem_>::value)
-          delete[] ta;
-        if (! std::is_same<Mem::Main, Mem2_>::value)
-          delete[] tb;
 
         return ret;
       }
@@ -1240,16 +1126,10 @@ namespace FEAT
     }; // class DenseVector<...>
 
   #ifdef FEAT_EICKT
-    extern template class DenseVector<Mem::Main, float, unsigned int>;
-    extern template class DenseVector<Mem::Main, double, unsigned int>;
-    extern template class DenseVector<Mem::Main, float, unsigned long>;
-    extern template class DenseVector<Mem::Main, double, unsigned long>;
-    #ifdef FEAT_HAVE_CUDA
-    extern template class DenseVector<Mem::CUDA, float, unsigned int>;
-    extern template class DenseVector<Mem::CUDA, double, unsigned int>;
-    extern template class DenseVector<Mem::CUDA, float, unsigned long>;
-    extern template class DenseVector<Mem::CUDA, double, unsigned long>;
-    #endif
+    extern template class DenseVector<float, unsigned int>;
+    extern template class DenseVector<double, unsigned int>;
+    extern template class DenseVector<float, unsigned long>;
+    extern template class DenseVector<double, unsigned long>;
   #endif
 
   } // namespace LAFEM

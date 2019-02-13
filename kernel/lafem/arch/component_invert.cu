@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/component_invert.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -22,7 +21,8 @@ namespace FEAT
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
-        r[idx] = s / x[idx];
+        ///\todo skip conversion step
+        r[idx] = float(s / x[idx]);
       }
     }
   }
@@ -34,9 +34,9 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-void ComponentInvert<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
+void ComponentInvert::value_cuda(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
+  Index blocksize = Util::cuda_blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -50,6 +50,8 @@ void ComponentInvert<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-
-template void ComponentInvert<Mem::CUDA>::value(float *, const float * const, const float, const Index);
-template void ComponentInvert<Mem::CUDA>::value(double *, const double * const, const double, const Index);
+#ifdef FEAT_HAVE_HALFMATH
+template void ComponentInvert::value_cuda(Half *, const Half * const, const Half, const Index);
+#endif
+template void ComponentInvert::value_cuda(float *, const float * const, const float, const Index);
+template void ComponentInvert::value_cuda(double *, const double * const, const double, const Index);

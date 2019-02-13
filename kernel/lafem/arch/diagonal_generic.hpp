@@ -18,7 +18,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename IT_>
-      void Diagonal<Mem::Main>::csr_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
+      void Diagonal::csr_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
       {
         for (Index row(0); row < rows; row++)
         {
@@ -31,46 +31,6 @@ namespace FEAT
               break;
             }
             diag[row] = row_ptr[rows];
-          }
-        }
-      }
-
-      template <typename IT_>
-      void Diagonal<Mem::Main>::csrb_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
-      {
-        for (Index row(0); row < rows; row++)
-        {
-          const Index end = row_ptr[row + 1];
-
-          for (Index col = row_ptr[row]; col < end; col++)
-          {
-            if (row == col_ind[col])
-            {
-              diag[row] = IT_(col);
-              break;
-            }
-          }
-        }
-      }
-
-      template <typename DT_, typename IT_>
-      void Diagonal<Mem::Main>::ell_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
-        const IT_ * const cs, const IT_ * const /*cl*/, const Index C, const Index rows)
-      {
-        for (Index row(0) ; row < rows ; ++row)
-        {
-          const Index chunk(row / C);
-          const Index local_row(row % C);
-          const Index chunk_end(cs[chunk+1]);
-
-          diag[row] = DT_(0);
-          for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
-          {
-            if (col_ind[pcol] == row)
-            {
-              diag[row] = val[pcol];
-              break;
-            }
           }
         }
       }

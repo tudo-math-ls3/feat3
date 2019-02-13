@@ -13,7 +13,6 @@ if (FEAT_EICKT)
     ${kernel-lafem-arch-list}
     axpy_generic-eickt.cpp
     apply_generic-eickt.cpp
-    apply_generic_ell-eickt.cpp
     apply_generic_banded-eickt.cpp
     component_invert_generic-eickt.cpp
     component_product_generic-eickt.cpp
@@ -81,7 +80,7 @@ if (FEAT_HAVE_CUDA)
     unit_filter_blocked.cu
     STATIC
   )
-  CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
-  target_link_libraries(kernel-lafem-arch-cuda ${CUDA_cusparse_LIBRARY})
+  #CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
+  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_CUBLAS_LIBRARRIES} ${CUDA_TOOLKIT_ROOT_DIR}/lib64/libcublasLt.so)
   TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)
 endif(FEAT_HAVE_CUDA)

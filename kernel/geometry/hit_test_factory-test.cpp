@@ -21,13 +21,12 @@ using namespace FEAT::Geometry;
  *
  * \author Stefan Wahlers
  */
-
 class HitTestFactoryTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   HitTestFactoryTest() :
-    TaggedTest<Archs::None, Archs::None>("hit_test_factory-test")
+    UnitTest("hit_test_factory-test")
   {
   }
 
@@ -56,11 +55,11 @@ public:
     MeshType mesh_fine(refinery);
 
     // create a sphere hit function
-    SphereHitTestFunction<double,Index(2)> hit_func(mid_point,radius);
+    SphereHitTestFunction<double, 2> hit_func(mid_point,radius);
     // apply the hit test to the mesh and refined mesh
-    HitTestFactory<SphereHitTestFunction<double,Index(2)>, MeshType> hit_test(hit_func, mesh);
+    HitTestFactory<SphereHitTestFunction<double,2>, MeshType> hit_test(hit_func, mesh);
     BoundaryType sphere(hit_test);
-    HitTestFactory<SphereHitTestFunction<double,Index(2)>, MeshType> hit_test_fine(hit_func, mesh_fine);
+    HitTestFactory<SphereHitTestFunction<double,2>, MeshType> hit_test_fine(hit_func, mesh_fine);
     BoundaryType sphere_fine(hit_test_fine);
 
     // number of nodes, edges, quads
@@ -95,4 +94,6 @@ public:
     // run test #0
     test_0();
   }
-} hit_test_factory_test;
+};
+
+HitTestFactoryTest hit_test_factory_test;

@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/unit_filter.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -44,9 +43,9 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
-void UnitFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+void UnitFilter::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_misc;
+  Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -61,15 +60,15 @@ void UnitFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, c
 #endif
 }
 
-template void UnitFilter<Mem::CUDA>::filter_rhs(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_rhs(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_rhs(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_rhs(double *, const double * const, const unsigned int * const, const Index);
+template void UnitFilter::filter_rhs_cuda(float *, const float * const, const unsigned long * const, const Index);
+template void UnitFilter::filter_rhs_cuda(double *, const double * const, const unsigned long * const, const Index);
+template void UnitFilter::filter_rhs_cuda(float *, const float * const, const unsigned int * const, const Index);
+template void UnitFilter::filter_rhs_cuda(double *, const double * const, const unsigned int * const, const Index);
 
 template <typename DT_, typename IT_>
-void UnitFilter<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
+void UnitFilter::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_misc;
+  Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -84,9 +83,9 @@ void UnitFilter<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, co
 #endif
 }
 
-template void UnitFilter<Mem::CUDA>::filter_def(float *, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_def(double *, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_def(float *, const unsigned int * const, const Index);
-template void UnitFilter<Mem::CUDA>::filter_def(double *, const unsigned int * const, const Index);
+template void UnitFilter::filter_def_cuda(float *, const unsigned long * const, const Index);
+template void UnitFilter::filter_def_cuda(double *, const unsigned long * const, const Index);
+template void UnitFilter::filter_def_cuda(float *, const unsigned int * const, const Index);
+template void UnitFilter::filter_def_cuda(double *, const unsigned int * const, const Index);
 
 /// \endcond

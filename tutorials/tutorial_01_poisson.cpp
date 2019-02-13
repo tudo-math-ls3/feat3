@@ -188,41 +188,35 @@ namespace Tutorial01
   // class. Again, the reason is modularity: FEAT has much more to offer than just the standard
   // types, although that is all that we want to consider in this tutorial.
 
-  // First, we have to choose the "Memory-Data-Index" type triplet, which specifies the basic types
+  // First, we have to choose the "Data-Index" type duo, which specifies the basic types
   // that our linear algebra containers will use for their elements.
 
-  // The first one is the memory type: This "tag class" specifies in which type of memory our
-  // matrices and vectors will operate. In this tutorial, we want to stick with the main memory,
-  // which is simply the RAM that the CPU has access to. FEAT also supports linear algebra
-  // containers which work on GPUs using CUDA, but this will be covered another time.
-  typedef Mem::Main MemType;
-
-  // The second type is the data type: This is simply the type of the matrix and vector elements,
+  // The first type is the data type: This is simply the type of the matrix and vector elements,
   // which is typically the double-precision floating point type aka "double". FEAT also supports
   // other data types as single or even quadruple precision, but we want to avoid that for now.
   typedef double DataType;
 
-  // The third type is the index type: This is used by various containers which also store arrays
+  // The second type is the index type: This is used by various containers which also store arrays
   // of indices, such as the row-pointer and column-index arrays of the CSR matrix format.
   // In particular, any (sufficiently large) integer type will do, so we stick to the "Index" type,
   // which corresponds to "unsigned long" by default.
   typedef Index IndexType;
 
 
-  // Based on the three memory, data and index typedefs, we can now define the vector type.
+  // Based on the two data and index typedefs, we can now define the vector type.
   // In this tutorial, we want to solve a simple scalar PDE, so we require just a "standard"
   // vector class, which is implemented by the "LAFEM::DenseVector" class template:
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
 
   // Furthermore, for the discretized Poisson operator, we require a scalar sparse matrix type.
   // We choose the famous CSR format here, because it is pretty much standard for unstructured FEM:
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
 
   // Finally, we need a filter. Filters are responsible for "enforcing" simple linear constraints
   // such as boundary conditions and are required by the linear solver framework. In this tutorial,
   // we have a scalar PDE with Dirichlet boundary conditions and for this type of problem, we
   // require a so-called "unit-filter":
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   // That's it for the linear algebra types.
 
@@ -457,7 +451,7 @@ namespace Tutorial01
     // process. The returned object is a 'std::shared_ptr<SolverType>', where 'SolverType' is
     // an instance of the actual solver class template with the corresponding template arguments
     // that are deducted from the input arguments of the following function call:
-    auto precond = Solver::new_ssor_precond(matrix, filter);
+    auto precond = Solver::new_ssor_precond(PreferredBackend::generic, matrix, filter);
 
     // Now we create a PCG solver and pass the preconditioner as an additional argument:
     auto solver = Solver::new_pcg(matrix, filter, precond);

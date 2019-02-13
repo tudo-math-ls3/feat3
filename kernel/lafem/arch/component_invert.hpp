@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
 
 namespace FEAT
 {
@@ -17,11 +17,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template<typename Mem_>
-      struct ComponentInvert;
-
-      template<>
-      struct ComponentInvert<Mem::Main>
+      struct ComponentInvert
       {
         template<typename DT_>
         static void value(DT_* r, const DT_* const x, const DT_ s, const Index size)
@@ -29,21 +25,35 @@ namespace FEAT
           value_generic(r, x, s, size);
         }
 
+#ifdef FEAT_HAVE_HALFMATH
+        static void value(Half * r, const Half * const x, const Half s, const Index size)
+        {
+          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, x, s, size)
+        }
+#endif
+
+        static void value(float * r, const float * const x, const float s, const Index size)
+        {
+          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, x, s, size)
+        }
+
+        static void value(double * r, const double * const x, const double s, const Index size)
+        {
+          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, x, s, size)
+        }
+
         template<typename DT_>
         static void value_generic(DT_* r, const DT_* const x, const DT_ s, const Index size);
+
+        template<typename DT_>
+        static void value_cuda(DT_* r, const DT_* const x, const DT_ s, const Index size);
       };
 
 #ifdef FEAT_EICKT
-      extern template void ComponentInvert<Mem::Main>::value_generic(float*, const float* const, const float, const Index);
-      extern template void ComponentInvert<Mem::Main>::value_generic(double*, const double* const, const double, const Index);
+      extern template void ComponentInvert::value_generic(float*, const float* const, const float, const Index);
+      extern template void ComponentInvert::value_generic(double*, const double* const, const double, const Index);
 #endif
 
-      template<>
-      struct ComponentInvert<Mem::CUDA>
-      {
-        template<typename DT_>
-        static void value(DT_* r, const DT_* const x, const DT_ s, const Index size);
-      };
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

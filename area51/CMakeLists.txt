@@ -95,6 +95,9 @@ TARGET_LINK_LIBRARIES(dbg-vanka feat)
 ADD_EXECUTABLE(dbg-parti-domain-control dbg_parti_domain_control.cpp)
 TARGET_LINK_LIBRARIES(dbg-parti-domain-control feat)
 
+ADD_EXECUTABLE(hfem-direct hfem_direct.cpp)
+TARGET_LINK_LIBRARIES(hfem-direct feat)
+
 if(FEAT_HAVE_UMFPACK)
    ADD_EXECUTABLE(feti-seq-usquare feti_seq_usquare.cpp)
    TARGET_LINK_LIBRARIES(feti-seq-usquare feat)

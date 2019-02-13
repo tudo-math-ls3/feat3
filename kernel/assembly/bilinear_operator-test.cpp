@@ -27,14 +27,14 @@ template<typename Trafo_>
 using MyP0 = Space::Discontinuous::Element<Trafo_, Space::Discontinuous::Variant::StdPolyP<0>>;
 
 
-template<typename MatrixType_>
+template<typename DT_, typename IT_>
 class BilinearOperatorTest :
-  public TestSystem::FullTaggedTest<typename MatrixType_::MemType, typename MatrixType_::DataType, typename MatrixType_::IndexType>
+  public UnitTest
 {
-  typedef typename MatrixType_::MemType MemType_;
-  typedef typename MatrixType_::DataType DataType_;
-  typedef typename MatrixType_::IndexType IndexType_;
-  typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
+  typedef DT_ DataType_;
+  typedef IT_ IndexType_;
+  typedef LAFEM::SparseMatrixCSR<DataType_, IndexType_> MatrixType;
+  typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral, 2, DataType_> QuadMesh;
 
@@ -44,8 +44,8 @@ class BilinearOperatorTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  BilinearOperatorTest() :
-    TestSystem::FullTaggedTest<typename MatrixType_::MemType, DataType_, IndexType_>("BilinearOperatorTest<" + MatrixType_::name() + ">")
+  BilinearOperatorTest(PreferredBackend backend) :
+    UnitTest("BilinearOperatorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -83,7 +83,7 @@ public:
     SpaceType my_space(my_trafo);
 
     // create a matrix
-    MatrixType_ matrix;
+    MatrixType matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, my_space);
     matrix.format();
 
@@ -138,7 +138,7 @@ public:
     TrialSpaceType my_trial_space(my_trafo);
 
     // create a matrix
-    MatrixType_ matrix;
+    MatrixType matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std2(matrix, my_test_space, my_trial_space);
     matrix.format();
 
@@ -199,7 +199,7 @@ public:
     QuadSpaceQ0 space(trafo);
 
     // create a matrix
-    MatrixType_ matrix;
+    MatrixType matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
     matrix.format();
 
@@ -211,7 +211,7 @@ public:
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, operat, space, cubature_factory);
 
     // create CSR-matrix of matrix
-    LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_matrix;
+    LAFEM::SparseMatrixCSR<DataType_, IndexType_> tmp_matrix;
     tmp_matrix.convert(matrix);
     // fetch the matrix arrays
     DataType_* data = tmp_matrix.val();
@@ -238,7 +238,7 @@ public:
     QuadSpaceQ1 space(trafo);
 
     // create two matrices
-    MatrixType_ matrix_1, matrix_2;
+    MatrixType matrix_1, matrix_2;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_1, space);
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_2, space);
     matrix_1.format();
@@ -260,7 +260,7 @@ public:
     const Geometry::IndexSet<4>& vatq(mesh.template get_index_set<2,0>());
 
     // create a temporary array to count the number of quads adjacent to a vertex
-    LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
+    LAFEM::DenseVector<Index> qatv(num_verts, Index(0));
     for(Index i(0); i < num_quads; ++i)
     {
       for(int j(0); j < 4; ++j)
@@ -272,7 +272,7 @@ public:
 
     // create local matrix data
     Tiny::Matrix<DataType_,4,4> lmd1, lmd2;
-    typename MatrixType_::GatherAxpy gather1(matrix_1), gather2(matrix_2);
+    typename MatrixType::GatherAxpy gather1(matrix_1), gather2(matrix_2);
 
     // some constants
     static const DataType_ zero = DataType_(0);
@@ -331,39 +331,35 @@ public:
 
 };
 
-BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, float, unsigned int> > bilinear_operator_test_csr_float_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, float, unsigned long> > bilinear_operator_test_csr_float_ulong;
-BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned int> > bilinear_operator_test_csr_double_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned long> > bilinear_operator_test_csr_double_ulong;
-
-BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, float, unsigned int> > bilinear_operator_test_coo_float_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, float, unsigned long> > bilinear_operator_test_coo_float_ulong;
-BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, double, unsigned int> > bilinear_operator_test_coo_double_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, double, unsigned long> > bilinear_operator_test_coo_double_ulong;
-
-BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned int> > bilinear_operator_test_ell_float_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned long> > bilinear_operator_test_ell_float_ulong;
-BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned int> > bilinear_operator_test_ell_double_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned long> > bilinear_operator_test_ell_double_ulong;
-
+BilinearOperatorTest<float, unsigned int> bilinear_operator_test_float_uint(PreferredBackend::generic);
+BilinearOperatorTest<float, unsigned long> bilinear_operator_test_float_ulong(PreferredBackend::generic);
+BilinearOperatorTest<double, unsigned int> bilinear_operator_test_double_uint(PreferredBackend::generic);
+BilinearOperatorTest<double, unsigned long> bilinear_operator_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+BilinearOperatorTest<float, unsigned long> mkl_bilinear_operator_test_float_ulong(PreferredBackend::mkl);
+BilinearOperatorTest<double, unsigned long> mkl_bilinear_operator_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned int> > bilinear_operator_test_csr_float128_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned long> > bilinear_operator_test_csr_float128_ulong;
-
-BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned int> > bilinear_operator_test_coo_float128_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned long> > bilinear_operator_test_coo_float128_ulong;
-
-BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned int> > bilinear_operator_test_ell_float128_uint;
-BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned long> > bilinear_operator_test_ell_float128_ulong;
+BilinearOperatorTest<__float128, unsigned int> bilinear_operator_test_float128_uint(PreferredBackend::generic);
+BilinearOperatorTest<__float128, unsigned long> bilinear_operator_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+BilinearOperatorTest<Half, unsigned int> bilinear_operator_test_half_uint(PreferredBackend::generic);
+BilinearOperatorTest<Half, unsigned long> bilinear_operator_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+BilinearOperatorTest<float, unsigned int> cuda_bilinear_operator_test_float_uint(PreferredBackend::cuda);
+BilinearOperatorTest<double, unsigned int> cuda_bilinear_operator_test_double_uint(PreferredBackend::cuda);
+BilinearOperatorTest<float, unsigned long> cuda_bilinear_operator_test_float_ulong(PreferredBackend::cuda);
+BilinearOperatorTest<double, unsigned long> cuda_bilinear_operator_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<typename DataType_, typename IndexType_>
 class BandedBilinearOperatorTest :
-  public TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+  public UnitTest
 {
-  typedef LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
-  typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
+  typedef LAFEM::SparseMatrixBanded<DataType_, IndexType_> MatrixType;
+  typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
 
   typedef Geometry::StructuredMesh<2, 2, DataType_> QuadMesh;
 
@@ -373,8 +369,8 @@ class BandedBilinearOperatorTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  BandedBilinearOperatorTest() :
-    TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>("BandedBilinearOperatorTest")
+  BandedBilinearOperatorTest(PreferredBackend backend) :
+    UnitTest("BandedBilinearOperatorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -482,7 +478,7 @@ public:
     const auto& vatq(mesh.template get_index_set<2,0>());
 
     // create a temporary array to count the number of quads adjacent to a vertex
-    LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
+    LAFEM::DenseVector<Index> qatv(num_verts, Index(0));
     for(Index i(0); i < num_quads; ++i)
     {
       for(int j(0); j < 4; ++j)
@@ -552,12 +548,25 @@ public:
   }
 };
 
-BandedBilinearOperatorTest<Mem::Main, float, unsigned int> banded_bilinear_operator_test_float_uint;
-BandedBilinearOperatorTest<Mem::Main, float, unsigned long> banded_bilinear_operator_test_float_ulong;
-BandedBilinearOperatorTest<Mem::Main, double, unsigned int> banded_bilinear_operator_test_double_uint;
-BandedBilinearOperatorTest<Mem::Main, double, unsigned long> banded_bilinear_operator_test_double_ulong;
-
+BandedBilinearOperatorTest<float, unsigned int> banded_bilinear_operator_test_float_uint(PreferredBackend::generic);
+BandedBilinearOperatorTest<float, unsigned long> banded_bilinear_operator_test_float_ulong(PreferredBackend::generic);
+BandedBilinearOperatorTest<double, unsigned int> banded_bilinear_operator_test_double_uint(PreferredBackend::generic);
+BandedBilinearOperatorTest<double, unsigned long> banded_bilinear_operator_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+BandedBilinearOperatorTest<float, unsigned long> mkl_banded_bilinear_operator_test_float_ulong(PreferredBackend::mkl);
+BandedBilinearOperatorTest<double, unsigned long> mkl_banded_bilinear_operator_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-BandedBilinearOperatorTest<Mem::Main, __float128, unsigned int> banded_bilinear_operator_test_float128_uint;
-BandedBilinearOperatorTest<Mem::Main, __float128, unsigned long> banded_bilinear_operator_test_float128_ulong;
+BandedBilinearOperatorTest<__float128, unsigned int> banded_bilinear_operator_test_float128_uint(PreferredBackend::generic);
+BandedBilinearOperatorTest<__float128, unsigned long> banded_bilinear_operator_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+BandedBilinearOperatorTest<Half, unsigned int> banded_bilinear_operator_test_half_uint(PreferredBackend::generic);
+BandedBilinearOperatorTest<Half, unsigned long> banded_bilinear_operator_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+BandedBilinearOperatorTest<float, unsigned int> cuda_banded_bilinear_operator_test_float_uint(PreferredBackend::cuda);
+BandedBilinearOperatorTest<double, unsigned int> cuda_banded_bilinear_operator_test_double_uint(PreferredBackend::cuda);
+BandedBilinearOperatorTest<float, unsigned long> cuda_banded_bilinear_operator_test_float_ulong(PreferredBackend::cuda);
+BandedBilinearOperatorTest<double, unsigned long> cuda_banded_bilinear_operator_test_double_ulong(PreferredBackend::cuda);
 #endif

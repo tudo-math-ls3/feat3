@@ -163,11 +163,11 @@ namespace CCND_FIBER
     //     typedef Space::Lagrange1::Element<typename DomainLevelType::TrafoType> SpaceOrientationType;
     typedef typename MeshType::ShapeType ShapeType;
     static constexpr int dim = ShapeType::dimension;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim*(dim+1)/2> DenseVectorBlocked2ndMoment;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> DenseVectorBlocked4thMoment;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim*(dim+1)/2> DenseVectorBlocked2ndMoment;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> DenseVectorBlocked4thMoment;
 
     // define our system level
-    typedef ModNavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef ModNavierStokesBlockedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     // get our global solver system types
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
@@ -363,7 +363,7 @@ namespace CCND_FIBER
         */
 
       template<typename SpaceOrientationType>
-      Solver::Status solve_basic_navier(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& vec_sol_orient, SpaceOrientationType& orient_space)
+      Solver::Status solve_basic_navier(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vec_sol_orient, SpaceOrientationType& orient_space)
       {
         XASSERTM(vec_sol_orient.size() == orient_space.get_num_dofs(), "ERROR: Space Orientation type does not fit orient vector");
         watch_total_run.start();
@@ -438,7 +438,7 @@ namespace CCND_FIBER
         * \author Maximilian Esser
         */
         template<typename SpaceOrientationType>
-        Solver::Status solve_time_step(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType& orient_space, const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
+        Solver::Status solve_time_step(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType& orient_space, const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
         {
           XASSERTM(vec_sol_orient.size() == orient_space.get_num_dofs(), "ERROR: Space Orientation type does not fit orient vector");
           watch_total_run.start();
@@ -641,7 +641,7 @@ namespace CCND_FIBER
         }
 
         template<typename SpaceOrientationType>
-        void joined_interpolate(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& output, const GlobalSystemVector& input, const SpaceOrientationType* orient_ptr)
+        void joined_interpolate(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& output, const GlobalSystemVector& input, const SpaceOrientationType* orient_ptr)
         {
           if(this->is_root_process())
             XASSERTM(orient_ptr != nullptr, "No orient space on root process");
@@ -688,7 +688,7 @@ namespace CCND_FIBER
         */
 
       template<typename SpaceOrientationType>
-      Solver::Status joined_solve_basic_navier(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType* orient_space_ptr)
+      Solver::Status joined_solve_basic_navier(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType* orient_space_ptr)
       {
         if(this->is_root_process())
             XASSERTM(orient_space_ptr != nullptr, "No orient space on root process");
@@ -780,7 +780,7 @@ namespace CCND_FIBER
         * \author Maximilian Esser
         */
         template<typename SpaceOrientationType>
-        Solver::Status joined_solve_time_step(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType* orient_space_ptr, const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
+        Solver::Status joined_solve_time_step(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType* orient_space_ptr, const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
         {
           if(this->is_root_process())
             XASSERTM(orient_space_ptr != nullptr, "No orient space on root process");
@@ -921,7 +921,7 @@ namespace CCND_FIBER
 
             // project pressure
             Cubature::DynamicFactory cub("gauss-legendre:2");
-            LAFEM::DenseVector<Mem::Main, DataType, Index> vtx_p, der_p;
+            LAFEM::DenseVector<DataType, Index> vtx_p, der_p;
             Assembly::DiscreteCellProjector::project(vtx_p, _vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
             //           Assembly::DiscreteCellProjector::project(der_p, vec_def.local().template at<1>(), the_domain_level.space_pres, cub);
 
@@ -1028,11 +1028,11 @@ namespace CCND_FIBER
     //     typedef Space::Lagrange1::Element<typename DomainLevelType::TrafoType> SpaceOrientationType;
     typedef typename MeshType::ShapeType ShapeType;
     static constexpr int dim = ShapeType::dimension;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim*(dim+1)/2> DenseVectorBlocked2ndMoment;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> DenseVectorBlocked4thMoment;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim*(dim+1)/2> DenseVectorBlocked2ndMoment;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> DenseVectorBlocked4thMoment;
 
     // define our system level
-    typedef ModNavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef ModNavierStokesBlockedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     // get our global solver system types
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
@@ -1132,7 +1132,7 @@ namespace CCND_FIBER
     }
 
     template<typename SpaceOrientationType>
-    Solver::Status solve_basic_navier(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& vec_sol_orient, SpaceOrientationType& orient_space)
+    Solver::Status solve_basic_navier(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vec_sol_orient, SpaceOrientationType& orient_space)
     {
       XASSERTM(vec_sol_orient.size() == orient_space.get_num_dofs(), "ERROR: Space Orientation type does not fit orient vector");
       watch_total_run.start();
@@ -1150,7 +1150,7 @@ namespace CCND_FIBER
     }
 
     template<typename SpaceOrientationType>
-    Solver::Status solve_navier(LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType& orient_space, const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
+    Solver::Status solve_navier(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vec_sol_orient, const SpaceOrientationType& orient_space, const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
     {
       XASSERTM(vec_sol_orient.size() == orient_space.get_num_dofs(), "ERROR: Space Orientation type does not fit orient vector");
       watch_total_run.start();
@@ -1223,12 +1223,12 @@ namespace CCND_FIBER
     typedef typename DomainLevelType::SpacePresType SpacePresType;
     typedef typename MeshType::ShapeType ShapeType;
     static constexpr int dim = ShapeType::dimension;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> LocalVeloVectorType;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim*(dim+1)/2> DenseVectorBlocked2ndMoment;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> DenseVectorBlocked4thMoment;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> LocalVeloVectorType;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim*(dim+1)/2> DenseVectorBlocked2ndMoment;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> DenseVectorBlocked4thMoment;
 
     // define our system level
-    typedef ModNavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef ModNavierStokesBlockedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     // get our global solver system types
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
@@ -2116,8 +2116,8 @@ void truncate_orientation_moment_vectors(const DenseVectorBlocked2ndMoment& seco
 
 
     //some transfer typedefs...
-    typedef LAFEM::SparseMatrixBWrappedCSR<MemType, DataType, IndexType, dim*(dim+1)/2> LocalOrient2TransferMatrix;
-    typedef LAFEM::SparseMatrixBWrappedCSR<MemType, DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> LocalOrient4TransferMatrix;
+    typedef LAFEM::SparseMatrixBWrappedCSR<DataType, IndexType, dim*(dim+1)/2> LocalOrient2TransferMatrix;
+    typedef LAFEM::SparseMatrixBWrappedCSR<DataType, IndexType, dim*(dim+1)*(dim+2)*(dim+3)/24> LocalOrient4TransferMatrix;
     typedef LAFEM::Transfer<LocalOrient2TransferMatrix> LocalOrient2Transfer;
     typedef LAFEM::Transfer<LocalOrient4TransferMatrix> LocalOrient4Transfer;
 

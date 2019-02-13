@@ -9,9 +9,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
-
-
 
 namespace FEAT
 {
@@ -19,11 +16,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct MaxIndex;
-
-      template <>
-      struct MaxIndex<Mem::Main>
+      struct MaxIndex
       {
         template <typename DT_>
         static Index value(const DT_ * const x, const Index size)
@@ -31,28 +24,14 @@ namespace FEAT
           return value_generic(x, size);
         }
 
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static Index value(const __float128 * const x, const Index size)
-        {
-          return value_generic(x, size);
-        }
-#endif
-
         template <typename DT_>
         static Index value_generic(const DT_ * const x, const Index size);
       };
 
 #ifdef FEAT_EICKT
-      extern template Index MaxIndex<Mem::Main>::value_generic(const float * const, const Index);
-      extern template Index MaxIndex<Mem::Main>::value_generic(const double * const, const Index);
+      extern template Index MaxIndex::value_generic(const float * const, const Index);
+      extern template Index MaxIndex::value_generic(const double * const, const Index);
 #endif
-
-      template <>
-      struct MaxIndex<Mem::CUDA>
-      {
-        template <typename DT_>
-        static Index value(const DT_ * const /*x*/, const Index /*size*/) {return Index(0);} /// \todo Placeholder;
-      };
 
     } // namespace Arch
   } // namespace LAFEM

@@ -25,16 +25,18 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaMatrixApplyTest
-  : public MetaMatrixTestBase<MemType_, DataType_, IndexType_>
+  : public MetaMatrixTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaMatrixTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaMatrixTestBase<DataType_, IndexType_> BaseClass;
 
-   MetaMatrixApplyTest() :
-    BaseClass("MetaMatrixApplyTest")
+   MetaMatrixApplyTest(PreferredBackend backend) :
+    BaseClass("MetaMatrixApplyTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -68,10 +70,10 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // generate densevectors
-    DenseVector<MemType_, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
+    DenseVector<DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
     vec_sol_dense.convert(vec_sol);
     vec_rhs_dense.convert(vec_rhs);
-    DenseVector<MemType_, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
+    DenseVector<DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
 
     // test t <- b - A*x with densevectors
     mat_sys.apply(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
@@ -103,10 +105,10 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // generate densevectors
-    DenseVector<MemType_, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
+    DenseVector<DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
     vec_sol_dense.convert(vec_sol);
     vec_rhs_dense.convert(vec_rhs);
-    DenseVector<MemType_, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
+    DenseVector<DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
 
     // test t <- b - A*x with densevectors
     mat_sys.apply(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
@@ -119,9 +121,25 @@ public:
   }
 };
 
-MetaMatrixApplyTest<Mem::Main, float, Index> meta_matrix_apply_test_generic_float;
-MetaMatrixApplyTest<Mem::Main, double, Index> meta_matrix_apply_test_generic_double;
+MetaMatrixApplyTest<float, unsigned long> meta_matrix_apply_test_generic_float_ulong(PreferredBackend::generic);
+MetaMatrixApplyTest<double, unsigned long> meta_matrix_apply_test_generic_double_ulong(PreferredBackend::generic);
+MetaMatrixApplyTest<float, unsigned int> meta_matrix_apply_test_generic_float_uint(PreferredBackend::generic);
+MetaMatrixApplyTest<double, unsigned int> meta_matrix_apply_test_generic_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaMatrixApplyTest<float, unsigned long> mkl_meta_matrix_apply_test_float_ulong(PreferredBackend::mkl);
+MetaMatrixApplyTest<double, unsigned long> mkl_meta_matrix_apply_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaMatrixApplyTest<__float128, unsigned long> meta_matrix_apply_test_float128_ulong(PreferredBackend::generic);
+MetaMatrixApplyTest<__float128, unsigned int> meta_matrix_apply_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaMatrixApplyTest<Half, unsigned int> meta_matrix_apply_test_half_uint(PreferredBackend::generic);
+MetaMatrixApplyTest<Half, unsigned long> meta_matrix_apply_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-MetaMatrixApplyTest<Mem::CUDA, float, Index> meta_matrix_apply_test_cuda_float;
-MetaMatrixApplyTest<Mem::CUDA, double, Index> meta_matrix_apply_test_cuda_double;
+MetaMatrixApplyTest<float, unsigned long> cuda_meta_matrix_apply_test_float_ulong(PreferredBackend::cuda);
+MetaMatrixApplyTest<double, unsigned long> cuda_meta_matrix_apply_test_double_ulong(PreferredBackend::cuda);
+MetaMatrixApplyTest<float, unsigned int> cuda_meta_matrix_apply_test_float_uint(PreferredBackend::cuda);
+MetaMatrixApplyTest<double, unsigned int> cuda_meta_matrix_apply_test_double_uint(PreferredBackend::cuda);
 #endif

@@ -23,6 +23,6 @@ int main(int argc, char ** argv)
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixCSR<Mem::Main, double> matrix(FileMode::fm_csr, input);
+    SparseMatrixCSR<double> matrix(FileMode::fm_csr, input);
     ExportTGA::write(output, matrix);
 }

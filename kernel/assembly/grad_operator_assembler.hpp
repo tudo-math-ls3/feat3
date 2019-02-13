@@ -69,7 +69,7 @@ namespace FEAT
         typename SpaceTest_, typename SpaceTrial_,
         typename CubatureFactory_>
       static void assemble(
-        LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, 1>& matrix_g,
+        LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, 1>& matrix_g,
         const SpaceTest_& test_space,
         const SpaceTrial_& trial_space,
         const CubatureFactory_& cubature_factory,
@@ -87,7 +87,7 @@ namespace FEAT
         XASSERTM((&test_space.get_trafo()) == (&trial_space.get_trafo()),
           "Trial and test spaces must be defined on the same trafo!");
 
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType, IndexType, dim, 1> MatrixG;
+        typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, 1> MatrixG;
 
         // assembly traits
         typedef AsmTraits2<
@@ -253,8 +253,8 @@ namespace FEAT
         typename SpaceTest_, typename SpaceTrial_,
         typename CubatureFactory_>
       static void assemble(
-        LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>& vec_asm,
-        const LAFEM::DenseVector<Mem::Main, DT_, IT_>& vec_in,
+        LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vec_asm,
+        const LAFEM::DenseVector<DT_, IT_>& vec_in,
         const SpaceTest_& test_space,
         const SpaceTrial_& trial_space,
         const CubatureFactory_& cubature_factory,
@@ -272,8 +272,8 @@ namespace FEAT
         XASSERTM((&test_space.get_trafo()) == (&trial_space.get_trafo()),
           "Trial and test spaces must be defined on the same trafo!");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, IndexType, dim> VectorAsm;
-        typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> VectorIn;
+        typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> VectorAsm;
+        typedef LAFEM::DenseVector<DataType, IndexType> VectorIn;
 
         // assembly traits
         typedef AsmTraits2<

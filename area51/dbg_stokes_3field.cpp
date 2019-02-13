@@ -48,7 +48,6 @@ using namespace FEAT;
 
 namespace Stokes3Field
 {
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
@@ -206,7 +205,7 @@ namespace Stokes3Field
 
   // 2D version with 4 stress components
   template<typename Mesh_>
-  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, 4>& vs)
+  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<DataType, IndexType, 4>& vs)
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n), s21(n);
@@ -226,7 +225,7 @@ namespace Stokes3Field
 
   // 2D version with 3 stress components
   template<typename Mesh_>
-  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, 3>& vs)
+  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<DataType, IndexType, 3>& vs)
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n);
@@ -244,7 +243,7 @@ namespace Stokes3Field
 
   // 3D version with 6 stress components
   template<typename Mesh_>
-  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, 6>& vs)
+  void add_stress_to_vtk(Geometry::ExportVTK<Mesh_>& exp, const LAFEM::DenseVectorBlocked<DataType, IndexType, 6>& vs)
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s33(n), s12(n), s23(n), s31(n);
@@ -317,9 +316,9 @@ namespace Stokes3Field
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VectorVeloType;
-    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorPresType;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, nsc> VectorStressType;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> VectorVeloType;
+    typedef LAFEM::DenseVector<DataType, IndexType> VectorPresType;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, nsc> VectorStressType;
 
     // tuple vector: (v,s,p)
     typedef LAFEM::TupleVector<VectorVeloType, VectorPresType, VectorStressType> SystemVectorType;
@@ -329,20 +328,20 @@ namespace Stokes3Field
     //    [ K  .  M ]   [ s ]   [ 0 ]
 
     // matrices A, B and D for the stokes part
-    typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> MatrixTypeA;
-    typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim,   1> MatrixTypeB;
-    typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType,   1, dim> MatrixTypeD;
+    typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> MatrixTypeA;
+    typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim,   1> MatrixTypeB;
+    typedef LAFEM::SparseMatrixBCSR<DataType, IndexType,   1, dim> MatrixTypeD;
 
     // matrices M, K and R for the stress part
-    typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, nsc, nsc> MatrixTypeM;
-    typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, nsc, dim> MatrixTypeK;
-    typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, nsc> MatrixTypeR;
+    typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, nsc, nsc> MatrixTypeM;
+    typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, nsc, dim> MatrixTypeK;
+    typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, nsc> MatrixTypeR;
 
     // null matrices to fill up the empty parts of the system matrix
-    //typedef LAFEM::NullMatrix<MemType, DataType, IndexType, dim, dim> NullMatrixTypeVxV;
-    typedef LAFEM::NullMatrix<MemType, DataType, IndexType,   1,   1> NullMatrixTypePxP;
-    typedef LAFEM::NullMatrix<MemType, DataType, IndexType, nsc,   1> NullMatrixTypeSxP;
-    typedef LAFEM::NullMatrix<MemType, DataType, IndexType,   1, nsc> NullMatrixTypePxS;
+    //typedef LAFEM::NullMatrix<DataType, IndexType, dim, dim> NullMatrixTypeVxV;
+    typedef LAFEM::NullMatrix<DataType, IndexType,   1,   1> NullMatrixTypePxP;
+    typedef LAFEM::NullMatrix<DataType, IndexType, nsc,   1> NullMatrixTypeSxP;
+    typedef LAFEM::NullMatrix<DataType, IndexType,   1, nsc> NullMatrixTypePxS;
 
     // our system matrix
     typedef LAFEM::TupleMatrix<
@@ -351,9 +350,9 @@ namespace Stokes3Field
       LAFEM::TupleMatrixRow<MatrixTypeK, NullMatrixTypeSxP,       MatrixTypeM>
     > SystemMatrixType;
 
-    typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, dim> FilterVeloType;
-    typedef LAFEM::NoneFilter<MemType, DataType, IndexType> FilterPresType;
-    typedef LAFEM::NoneFilterBlocked<MemType, DataType, IndexType, nsc> FilterStressType;
+    typedef LAFEM::UnitFilterBlocked<DataType, IndexType, dim> FilterVeloType;
+    typedef LAFEM::NoneFilter<DataType, IndexType> FilterPresType;
+    typedef LAFEM::NoneFilterBlocked<DataType, IndexType, nsc> FilterStressType;
 
     typedef LAFEM::TupleFilter<FilterVeloType, FilterPresType, FilterStressType> SystemFilterType;
 

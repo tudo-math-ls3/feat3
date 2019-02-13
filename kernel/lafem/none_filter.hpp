@@ -25,29 +25,26 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<
-      typename MemType_,
       typename DataType_,
       typename IndexType_ = Index>
     class NoneFilter
     {
     public:
-      /// mem-type typedef
-      typedef MemType_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
       /// index-type typedef
       typedef IndexType_ IndexType;
 
       /// our supported vector type
-      typedef DenseVector<MemType, DataType, IndexType> VectorType;
+      typedef DenseVector<DataType, IndexType> VectorType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType_, typename IT2_ = IndexType_>
-      using FilterType = NoneFilter<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DataType_, typename IT2_ = IndexType_>
+      using FilterType = NoneFilter<DT2_, IT2_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
@@ -64,8 +61,8 @@ namespace FEAT
         // do nothing
       }
 
-      template<typename MT2_, typename DT2_, typename IT2_>
-      void convert(const NoneFilter<MT2_, DT2_, IT2_>&)
+      template<typename DT2_, typename IT2_>
+      void convert(const NoneFilter<DT2_, IT2_>&)
       {
       }
 
@@ -137,7 +134,6 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<
-      typename MemType_,
       typename DataType_,
       typename IndexType_,
       int BlockSize_
@@ -145,8 +141,6 @@ namespace FEAT
     class NoneFilterBlocked
     {
     public:
-      /// mem-type typedef
-      typedef MemType_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
       /// index-type typedef
@@ -155,15 +149,15 @@ namespace FEAT
       static constexpr int BlockSize = BlockSize_;
 
       /// our supported vector type
-      typedef DenseVectorBlocked<MemType, DataType, IndexType, BlockSize> VectorType;
+      typedef DenseVectorBlocked<DataType, IndexType, BlockSize> VectorType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType_, typename IT2_ = IndexType_, int BS_ = BlockSize_>
-      using FilterType = NoneFilterBlocked<Mem2_, DT2_, IT2_, BS_>;
+      template <typename DT2_ = DataType_, typename IT2_ = IndexType_, int BS_ = BlockSize_>
+      using FilterType = NoneFilterBlocked<DT2_, IT2_, BS_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_, int BlockSize2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_, BlockSize2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_, int BlockSize2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_, BlockSize2_>;
 
       /// \brief Creates a (empty) clone of itself
       NoneFilterBlocked clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
@@ -177,8 +171,8 @@ namespace FEAT
         // do nothing
       }
 
-      template<typename MT2_, typename DT2_, typename IT2_>
-      void convert(const NoneFilterBlocked<MT2_, DT2_, IT2_, BlockSize>&)
+      template<typename DT2_, typename IT2_>
+      void convert(const NoneFilterBlocked<DT2_, IT2_, BlockSize>&)
       {
       }
 

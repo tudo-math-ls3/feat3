@@ -3,9 +3,10 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_matrix.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_factory.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -16,26 +17,25 @@ using namespace FEAT::TestSystem;
  *
  * \test test description missing
  *
- * \tparam Mem_
+ * \tparam DT_
  * description missing
  *
- * \tparam DT_
+ * \tparam IT_
  * description missing
  *
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
-class DenseMatrixTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  class DenseMatrixTest
+  : public UnitTest
 {
 
 public:
 
-  DenseMatrixTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixTest")
+  DenseMatrixTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -45,50 +45,48 @@ public:
 
   virtual void run() const override
   {
-    DenseMatrix<Mem_, DT_, IT_> zero1;
-    DenseMatrix<Mem::Main, DT_, IT_> zero2;
+    DenseMatrix<DT_, IT_> zero1;
+    DenseMatrix<DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    DenseMatrix<Mem_, DT_, IT_> a(10, 11);
+    DenseMatrix<DT_, IT_> a(10, 11);
     TEST_CHECK_EQUAL(a.rows(), 10);
     TEST_CHECK_EQUAL(a.columns(), 11);
-    TEST_CHECK_EQUAL(a.size() , 110);
-    DenseMatrix<Mem_, DT_, IT_> b(10, 10, 5.);
+    TEST_CHECK_EQUAL(a.size(), 110);
+    DenseMatrix<DT_, IT_> b(10, 10, 5.);
     b(7, 6, DT_(42));
-    DenseMatrix<Mem_, DT_, IT_> c;
+    DenseMatrix<DT_, IT_> c;
     c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
-    TEST_CHECK_EQUAL(c(7,6), b(7,6));
+    TEST_CHECK_EQUAL(c(7, 6), b(7, 6));
     TEST_CHECK_EQUAL(c, b);
 
-    DenseMatrix<Mem_, DT_, IT_> e(11, 12, 5.);
+    DenseMatrix<DT_, IT_> e(11, 12, 5.);
     TEST_CHECK_EQUAL(e.rows(), 11ul);
     TEST_CHECK_EQUAL(e.columns(), 12ul);
 
-    DenseMatrix<Mem_, DT_, IT_> h;
+    DenseMatrix<DT_, IT_> h;
     h.clone(c);
     TEST_CHECK_EQUAL(h, c);
-    h(1,2,3);
+    h(1, 2, 3);
     TEST_CHECK_NOT_EQUAL(h, c);
-    TEST_CHECK_NOT_EQUAL((void *)h.elements(), (void *)c.elements());
-
-
+    TEST_CHECK_NOT_EQUAL((void*)h.elements(), (void*)c.elements());
 
     // Lehmer matrix inverse test
-    DenseMatrix<Mem_, DT_, IT_> l(11, 11);
-    for(Index i(0) ; i < l.rows() ; ++i)
+    DenseMatrix<DT_, IT_> l(11, 11);
+    for (Index i(0); i < l.rows(); ++i)
     {
-      for(Index j(0) ; j < l.rows() ; ++j)
+      for (Index j(0); j < l.rows(); ++j)
       {
-        l(i,j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
+        l(i, j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
       }
     }
     auto m = l.inverse();
     m.invert();
-    for(Index i(0) ; i < l.rows() ; ++i)
+    for (Index i(0); i < l.rows(); ++i)
     {
-      for(Index j(0) ; j < l.rows() ; ++j)
+      for (Index j(0); j < l.rows(); ++j)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(m(i, j), l(i, j), Math::template eps<DT_>() * DT_(100));
       }
@@ -96,33 +94,44 @@ public:
 
   }
 };
-DenseMatrixTest<Mem::Main, float, unsigned int> cpu_dense_matrix_test_float_uint;
-DenseMatrixTest<Mem::Main, double, unsigned int> cpu_dense_matrix_test_double_uint;
-DenseMatrixTest<Mem::Main, float, unsigned long> cpu_dense_matrix_test_float_ulong;
-DenseMatrixTest<Mem::Main, double, unsigned long> cpu_dense_matrix_test_double_ulong;
+DenseMatrixTest<float, unsigned int> cpu_dense_matrix_test_float_uint(PreferredBackend::generic);
+DenseMatrixTest<double, unsigned int> cpu_dense_matrix_test_double_uint(PreferredBackend::generic);
+DenseMatrixTest<float, unsigned long> cpu_dense_matrix_test_float_ulong(PreferredBackend::generic);
+DenseMatrixTest<double, unsigned long> cpu_dense_matrix_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixTest<float, unsigned long> mkl_cpu_dense_matrix_test_float_ulong(PreferredBackend::mkl);
+DenseMatrixTest<double, unsigned long> mkl_cpu_dense_matrix_test_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixTest<Mem::Main, __float128, unsigned int> cpu_dense_matrix_test_float128_uint;
-DenseMatrixTest<Mem::Main, __float128, unsigned long> cpu_dense_matrix_test_float128_ulong;
+DenseMatrixTest<__float128, unsigned int> cpu_dense_matrix_test_float128_uint(PreferredBackend::generic);
+DenseMatrixTest<__float128, unsigned long> cpu_dense_matrix_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixTest<Half, unsigned int> cpu_dense_matrix_test_half_uint(PreferredBackend::generic);
+DenseMatrixTest<Half, unsigned long> cpu_dense_matrix_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixTest<Half, unsigned int> cuda_dense_matrix_test_half_uint(PreferredBackend::cuda);
+DenseMatrixTest<Half, unsigned long> cuda_dense_matrix_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_test_float_uint;
-DenseMatrixTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_test_double_uint;
-DenseMatrixTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_test_float_ulong;
-DenseMatrixTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_test_double_ulong;
+DenseMatrixTest<float, unsigned int> cuda_dense_matrix_test_float_uint(PreferredBackend::cuda);
+DenseMatrixTest<double, unsigned int> cuda_dense_matrix_test_double_uint(PreferredBackend::cuda);
+DenseMatrixTest<float, unsigned long> cuda_dense_matrix_test_float_ulong(PreferredBackend::cuda);
+DenseMatrixTest<double, unsigned long> cuda_dense_matrix_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
-class DenseMatrixSerializeTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  class DenseMatrixSerializeTest
+  : public UnitTest
 {
 
 public:
 
-  DenseMatrixSerializeTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixSerializeTest")
+  DenseMatrixSerializeTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -132,28 +141,28 @@ public:
 
   virtual void run() const override
   {
-    DenseMatrix<Mem_, DT_, IT_> test_mat(40, 40);
-    for(Index i(0) ; i < test_mat.rows() ; ++i)
+    DenseMatrix<DT_, IT_> test_mat(40, 40);
+    for (Index i(0); i < test_mat.rows(); ++i)
     {
-      for(Index j(0) ; j < test_mat.rows() ; ++j)
+      for (Index j(0); j < test_mat.rows(); ++j)
       {
-        test_mat(i,j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
+        test_mat(i, j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
       }
     }
     auto kp = test_mat.serialize(LAFEM::SerialConfig(false, false));
-    DenseMatrix<Mem_, DT_, IT_> k(kp);
+    DenseMatrix<DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, test_mat);
 #ifdef FEAT_HAVE_ZLIB
     auto zl = test_mat.serialize(LAFEM::SerialConfig(true, false));
-    DenseMatrix<Mem_, DT_, IT_> k1(zl);
+    DenseMatrix<DT_, IT_> k1(zl);
     TEST_CHECK_EQUAL(k1, test_mat);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zfp = test_mat.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-6)));
-    DenseMatrix<Mem_, DT_, IT_> k2(zfp);
-    for(Index i(0) ; i < k2.rows() ; ++i)
+    DenseMatrix<DT_, IT_> k2(zfp);
+    for (Index i(0); i < k2.rows(); ++i)
     {
-      for(Index j(0) ; j < k2.rows() ; ++j)
+      for (Index j(0); j < k2.rows(); ++j)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(k2(i, j), test_mat(i, j), (DT_)1e-6);
       }
@@ -161,10 +170,10 @@ public:
 #endif
 
     // DenseMatrix write_out test
-    DenseMatrix<Mem_, DT_, IT_> u(11, 11);
-    for(Index i(0) ; i < u.rows() ; ++i)
+    DenseMatrix<DT_, IT_> u(11, 11);
+    for (Index i(0); i < u.rows(); ++i)
     {
-      for(Index j(0) ; j < u.columns() ; ++j)
+      for (Index j(0); j < u.columns(); ++j)
       {
         u(i, j, DT_(i + j + 1));
       }
@@ -174,10 +183,10 @@ public:
       BinaryStream bs;
       u.write_out(FileMode::fm_dm, bs);
       bs.seekg(0);
-      DenseMatrix<Mem_, DT_, IT_> test(FileMode::fm_dm, bs);
-      for(Index i(0) ; i < u.rows() ; ++i)
+      DenseMatrix<DT_, IT_> test(FileMode::fm_dm, bs);
+      for (Index i(0); i < u.rows(); ++i)
       {
-        for(Index j(0) ; j < u.columns() ; ++j)
+        for (Index j(0); j < u.columns(); ++j)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test(i, j), Math::template eps<DT_>() * DT_(100));
         }
@@ -187,25 +196,25 @@ public:
     {
       std::stringstream ts;
       u.write_out(FileMode::fm_mtx, ts);
-      DenseMatrix<Mem_, DT_, IT_> test2(FileMode::fm_mtx, ts);
-      for(Index i(0) ; i < u.rows() ; ++i)
+      DenseMatrix<DT_, IT_> test2(FileMode::fm_mtx, ts);
+      for (Index i(0); i < u.rows(); ++i)
       {
-        for(Index j(0) ; j < u.columns() ; ++j)
+        for (Index j(0); j < u.columns(); ++j)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test2(i, j), Math::template eps<DT_>() * DT_(100));
         }
       }
     }
-    /*
+    //*
     //FileTest-> for now... problem if write rights arent given...
     {
       String filename = "test_dense_matrix_file_bin.txt";
-      std::ofstream (filename.c_str());
+      std::ofstream(filename.c_str());
       u.write_out(FileMode::fm_dm, filename);
-      DenseMatrix<Mem_, DT_, IT_> test3(FileMode::fm_dm, filename);
-      for(Index i(0) ; i < u.rows() ; ++i)
+      DenseMatrix<DT_, IT_> test3(FileMode::fm_dm, filename);
+      for (Index i(0); i < u.rows(); ++i)
       {
-        for(Index j(0) ; j < u.columns() ; ++j)
+        for (Index j(0); j < u.columns(); ++j)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test3(i, j), Math::template eps<DT_>() * DT_(100));
         }
@@ -214,44 +223,55 @@ public:
     }
     {
       String filename = "test_dense_matrix_file_mtx.txt";
-      std::ofstream (filename.c_str());
+      std::ofstream(filename.c_str());
       u.write_out(FileMode::fm_mtx, filename);
-      DenseMatrix<Mem_, DT_, IT_> test4(FileMode::fm_mtx, filename);
-      for(Index i(0) ; i < u.rows() ; ++i)
+      DenseMatrix<DT_, IT_> test4(FileMode::fm_mtx, filename);
+      for (Index i(0); i < u.rows(); ++i)
       {
-        for(Index j(0) ; j < u.columns() ; ++j)
+        for (Index j(0); j < u.columns(); ++j)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test4(i, j), Math::template eps<DT_>() * DT_(100));
         }
       }
       std::remove(filename.c_str());
     }
-    */
+    //*/
   }
 };
-DenseMatrixSerializeTest<Mem::Main, float, unsigned int> cpu_dense_matrix_serialize_test_float_uint;
-DenseMatrixSerializeTest<Mem::Main, double, unsigned int> cpu_dense_matrix_serialize_test_double_uint;
-DenseMatrixSerializeTest<Mem::Main, float, unsigned long> cpu_dense_matrix_serialize_test_float_ulong;
-DenseMatrixSerializeTest<Mem::Main, double, unsigned long> cpu_dense_matrix_serialize_test_double_ulong;
+DenseMatrixSerializeTest<float, unsigned int> cpu_dense_matrix_serialize_test_float_uint(PreferredBackend::generic);
+DenseMatrixSerializeTest<double, unsigned int> cpu_dense_matrix_serialize_test_double_uint(PreferredBackend::generic);
+DenseMatrixSerializeTest<float, unsigned long> cpu_dense_matrix_serialize_test_float_ulong(PreferredBackend::generic);
+DenseMatrixSerializeTest<double, unsigned long> cpu_dense_matrix_serialize_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixSerializeTest<float, unsigned long> mkl_cpu_dense_matrix_serialize_test_float_ulong(PreferredBackend::mkl);
+DenseMatrixSerializeTest<double, unsigned long> mkl_cpu_dense_matrix_serialize_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixSerializeTest<__float128, unsigned int> cpu_dense_matrix_serialize_test_float128_uint(PreferredBackend::generic);
+DenseMatrixSerializeTest<__float128, unsigned long> cpu_dense_matrix_serialize_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+//DenseMatrixSerializeTest<__half, unsigned int> cpu_dense_matrix_serialize_test_half_uint(PreferredBackend::generic);
+//DenseMatrixSerializeTest<__half, unsigned long> cpu_dense_matrix_serialize_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixSerializeTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_serialize_test_float_uint;
-DenseMatrixSerializeTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_serialize_test_double_uint;
-DenseMatrixSerializeTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_serialize_test_float_ulong;
-DenseMatrixSerializeTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_serialize_test_double_ulong;
+DenseMatrixSerializeTest<float, unsigned int> cuda_dense_matrix_serialize_test_float_uint(PreferredBackend::cuda);
+DenseMatrixSerializeTest<double, unsigned int> cuda_dense_matrix_serialize_test_double_uint(PreferredBackend::cuda);
+DenseMatrixSerializeTest<float, unsigned long> cuda_dense_matrix_serialize_test_float_ulong(PreferredBackend::cuda);
+DenseMatrixSerializeTest<double, unsigned long> cuda_dense_matrix_serialize_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
-class DenseMatrixApplyTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  class DenseMatrixApplyTest
+  : public UnitTest
 {
 public:
   double _eps;
 
-  explicit DenseMatrixApplyTest(double eps)
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixApplyTest"),
+  explicit DenseMatrixApplyTest(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
     _eps(eps)
   {
   }
@@ -263,115 +283,206 @@ public:
   virtual void run() const override
   {
     DT_ s(DT_(0.123));
-    for (Index size(1) ; size < 100 ; size*=2)
+    for (Index size(16); size < 100; size *= 2)
     {
-      DenseMatrix<Mem::Main, DT_, IT_> a_local(size, size + 1, DT_(0));
-      DenseVector<Mem::Main, DT_, IT_> x_local(size + 1);
+      DenseMatrix<DT_, IT_> a(size, size + 1, DT_(0));
+      DenseVector<DT_, IT_> x(size + 1);
 
-      DenseVector<Mem::Main, DT_, IT_> y_local(size);
-      DenseVector<Mem::Main, DT_, IT_> ref_local(size);
-      DenseVector<Mem_, DT_, IT_> ref(size);
-      DenseVector<Mem::Main, DT_, IT_> result_local(size);
+      DenseVector<DT_, IT_> y(size);
+      DenseVector<DT_, IT_> ref(size);
+      DenseVector<DT_, IT_> result(size, DT_(4711));
 
-      for (Index i(0) ; i < x_local.size() ; ++i)
+      for (Index i(0); i < x.size(); ++i)
       {
-        x_local(i, DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234))));
+        x(i, DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234))));
       }
-      for (Index i(0) ; i < y_local.size() ; ++i)
+      for (Index i(0); i < y.size(); ++i)
       {
-        y_local(i, DT_(DT_(2) - DT_(i % 42)));
+        y(i, DT_(DT_(2) - DT_(i % 42)));
       }
-      DenseVector<Mem_, DT_, IT_> x(x_local.size());
-      x.copy(x_local);
-      DenseVector<Mem_, DT_, IT_> y(y_local.size());
-      y.copy(y_local);
 
-      for (Index i(0) ; i < a_local.size() ; ++i)
+      for (Index i(0); i < a.size(); ++i)
       {
-        a_local.elements()[i] = DT_(DT_(i % 100) * DT_(1.234));
+        a.elements()[i] = DT_(DT_(i % 100) * DT_(1.234));
       }
-      DenseMatrix<Mem_, DT_, IT_> a(a_local.rows(), a_local.columns());
-      a.copy(a_local);
-
-      DenseVector<Mem_, DT_, IT_> r(result_local.size());
 
       // apply-test for alpha = 0.0
-      a.apply(r, x, y, DT_(0.0));
-      result_local.copy(r);
-      for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y_local(i), result_local(i), DT_(_eps));
+      a.apply(result, x, y, DT_(0.0));
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), result(i), DT_(_eps));
 
-      a.apply(r, x);
-      result_local.copy(r);
-      for (Index i(0) ; i < a_local.rows() ; ++i)
+      //apply-test for reduced apply call
+      a.apply(result, x);
+      for (Index i(0); i < a.rows(); ++i)
       {
         DT_ sum(0);
-        for (Index j(0) ; j < a_local.columns() ; ++j)
+        for (Index j(0); j < a.columns(); ++j)
         {
-          sum += a_local(i, j) * x_local(j);
+          sum += a(i, j) * x(j);
         }
-        ref_local(i, sum);
+        ref(i, sum);
       }
-      for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(_eps));
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
 
-      // apply-test for alpha = -1.0
-      a.apply(r, x, y, DT_(-1.0));
-      result_local.copy(r);
-      for (Index i(0) ; i < a_local.rows() ; ++i)
+      //apply-test for alpha = -1.0
+      a.apply(result, x, y, DT_(-1.0));
+      for (Index i(0); i < a.rows(); ++i)
       {
         DT_ sum(0);
-        for (Index j(0) ; j < a_local.columns() ; ++j)
+        for (Index j(0); j < a.columns(); ++j)
         {
-          sum += a_local(i, j) * x_local(j);
+          sum += a(i, j) * x(j);
         }
-        ref_local(i, y_local(i) - sum);
+        ref(i, y(i) - sum);
       }
 
-      for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(_eps));
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
 
       // apply-test for s = 0.123
-      a.apply(r, x, y, s);
-      result_local.copy(r);
+      a.apply(result, x, y, s);
 
+      Runtime::set_preferred_backend(PreferredBackend::generic);
       a.apply(ref, x);
       ref.axpy(ref, y, s);
-      ref_local.copy(ref);
 
-      for (Index i(0) ; i < r.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(_eps));
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
     }
   }
 };
 
-DenseMatrixApplyTest<Mem::Main, float, unsigned int> dense_matrix_apply_test_float_uint(1e-3);
-DenseMatrixApplyTest<Mem::Main, double, unsigned int> dense_matrix_apply_test_double_uint(1e-5);
-DenseMatrixApplyTest<Mem::Main, float, unsigned long> dense_matrix_apply_test_float_ulong(1e-3);
-DenseMatrixApplyTest<Mem::Main, double, unsigned long> dense_matrix_apply_test_double_ulong(1e-5);
+DenseMatrixApplyTest<float, unsigned int> dense_matrix_apply_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixApplyTest<double, unsigned int> dense_matrix_apply_test_double_uint(PreferredBackend::generic, 1e-5);
+DenseMatrixApplyTest<float, unsigned long> dense_matrix_apply_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixApplyTest<double, unsigned long> dense_matrix_apply_test_double_ulong(PreferredBackend::generic, 1e-5);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixApplyTest<float, unsigned long> mkl_dense_matrix_apply_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixApplyTest<double, unsigned long> mkl_dense_matrix_apply_test_double_ulong(PreferredBackend::mkl, 1e-5);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixApplyTest<Mem::Main, __float128, unsigned int> dense_matrix_apply_test_float128_uint(1e-6);
-DenseMatrixApplyTest<Mem::Main, __float128, unsigned long> dense_matrix_apply_test_float128_ulong(1e-6);
+DenseMatrixApplyTest<__float128, unsigned int> dense_matrix_apply_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixApplyTest<__float128, unsigned long> dense_matrix_apply_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixApplyTest<Half, unsigned int> dense_matrix_apply_test_half_uint(PreferredBackend::generic, 5e-2);
+DenseMatrixApplyTest<Half, unsigned long> dense_matrix_apply_test_half_ulong(PreferredBackend::generic, 5e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixApplyTest<Half, unsigned int> cuda_dense_matrix_apply_test_half_uint(PreferredBackend::cuda, 5e-1);
+DenseMatrixApplyTest<Half, unsigned long> cuda_dense_matrix_apply_test_half_ulong(PreferredBackend::cuda, 5e-1);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixApplyTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_apply_test_float_uint(1e-2);
-DenseMatrixApplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_apply_test_double_uint(1e-4);
-DenseMatrixApplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_apply_test_float_ulong(1e-2);
-DenseMatrixApplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_apply_test_double_ulong(1e-4);
+DenseMatrixApplyTest<float, unsigned int> cuda_dense_matrix_apply_test_float_uint(PreferredBackend::cuda, 1e-2);
+DenseMatrixApplyTest<double, unsigned int> cuda_dense_matrix_apply_test_double_uint(PreferredBackend::cuda, 1e-4);
+DenseMatrixApplyTest<float, unsigned long> cuda_dense_matrix_apply_test_float_ulong(PreferredBackend::cuda, 1e-2);
+DenseMatrixApplyTest<double, unsigned long> cuda_dense_matrix_apply_test_double_ulong(PreferredBackend::cuda, 1e-4);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
-class DenseMatrixMultiplyTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  class DenseMatrixAxpyTest
+  : public UnitTest
 {
 public:
-   double _eps;
+  double _eps;
 
-  explicit DenseMatrixMultiplyTest(double eps)
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixMultiplyTest"),
+  explicit DenseMatrixAxpyTest(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
+    _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixAxpyTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    double eps(_eps);
+
+    for (Index size(1); size < 65; size *= 2)
+    {
+      DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0.));
+      DenseMatrix<DT_, IT_> y(size, size + 2, DT_(0.));
+      DenseMatrix<DT_, IT_> ref(size, size + 2, DT_(4711.));
+      DenseMatrix<DT_, IT_> result(size, size + 2, DT_(1234.));
+      DT_ alpha(DT_(1.5));
+
+      for (Index i(0); i < x.size(); ++i)
+      {
+        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+	y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+      }
+
+      for (Index i(0); i < ref.rows(); ++i)
+      {
+        for (Index k(0); k < ref.columns(); ++k)
+        {
+          ref(i,k, alpha * x(i,k) + y(i,k));
+        }
+      }
+
+      result.axpy(x, y, alpha);
+
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.rows(); ++i)
+      {
+        for (Index j(0); j < result.columns(); ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+      }
+#ifdef FEAT_HAVE_HALFMATH
+      if (typeid(DT_) == typeid(Half))
+        eps *= 4.;
+#endif
+    }
+  }
+};
+
+DenseMatrixAxpyTest<float, unsigned int> dense_matrix_axpy_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixAxpyTest<double, unsigned int> dense_matrix_axpy_test_double_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixAxpyTest<float, unsigned long> dense_matrix_axpy_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixAxpyTest<double, unsigned long> dense_matrix_axpy_test_double_ulong(PreferredBackend::generic, 1e-6);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixAxpyTest<float, unsigned long> mkl_dense_matrix_axpy_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixAxpyTest<double, unsigned long> mkl_dense_matrix_axpy_test_double_ulong(PreferredBackend::mkl, 1e-6);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixAxpyTest<__float128, unsigned int> dense_matrix_axpy_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixAxpyTest<__float128, unsigned long> dense_matrix_axpy_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixAxpyTest<Half, unsigned int> dense_matrix_axpy_test_half_uint(PreferredBackend::generic, 1e-2);
+DenseMatrixAxpyTest<Half, unsigned long> dense_matrix_axpy_test_half_ulong(PreferredBackend::generic, 1e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixAxpyTest<Half, unsigned int> cuda_dense_matrix_axpy_test_half_uint(PreferredBackend::cuda, 1e-2);
+DenseMatrixAxpyTest<Half, unsigned long> cuda_dense_matrix_axpy_test_half_ulong(PreferredBackend::cuda, 1e-2);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixAxpyTest<float, unsigned int> cuda_dense_matrix_axpy_test_float_uint(PreferredBackend::cuda, 1e-3);
+DenseMatrixAxpyTest<double, unsigned int> cuda_dense_matrix_axpy_test_double_uint(PreferredBackend::cuda, 1e-6);
+DenseMatrixAxpyTest<float, unsigned long> cuda_dense_matrix_axpy_test_float_ulong(PreferredBackend::cuda, 1e-3);
+DenseMatrixAxpyTest<double, unsigned long> cuda_dense_matrix_axpy_test_double_ulong(PreferredBackend::cuda, 1e-6);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class DenseMatrixMultiplyTest
+  : public UnitTest
+{
+public:
+  double _eps;
+
+  explicit DenseMatrixMultiplyTest(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixMultiplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
     _eps(eps)
   {
   }
@@ -382,80 +493,405 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 100 ; size*=2)
+    double eps(_eps);
+
+    for (Index size(1); size < 32; size *= 2)
     {
-      DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size+2, DT_(0));
-      DenseMatrix<Mem::Main, DT_, IT_> y_local(size+2, size+1, DT_(0));
-      DenseMatrix<Mem::Main, DT_, IT_> ref_local(size, size+1, DT_(4711));
-      DenseMatrix<Mem::Main, DT_, IT_> result_local(size, size+1, DT_(0));
-      DenseMatrix<Mem_, DT_, IT_> result(size, size+1, DT_(1234));
+      DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0.));
+      DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
+      DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
+      DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
 
-      for (Index i(0) ; i < x_local.size() ; ++i)
+      for (Index i(0); i < x.size(); ++i)
       {
-        x_local.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
       }
-      for (Index i(0) ; i < y_local.size() ; ++i)
+      for (Index i(0); i < y.size(); ++i)
       {
-        y_local.elements()[i] = DT_(1) / (DT_(1) + DT_(i % 42));
+        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
       }
-      DenseMatrix<Mem_, DT_, IT_> x(x_local.rows(), x_local.columns());
-      DenseMatrix<Mem_, DT_, IT_> y(y_local.rows(), y_local.columns());
-      x.copy(x_local);
-      y.copy(y_local);
 
-      for (Index i(0) ; i < result_local.rows() ; ++i)
+      for (Index i(0); i < ref.rows(); ++i)
       {
-        for (Index k(0) ; k < result_local.columns() ; ++k)
+        for (Index k(0); k < ref.columns(); ++k)
         {
-          DT_ sum(0);
-          for (Index j(0) ; j < x_local.columns() ; ++j)
+          DT_ sum(0.);
+          for (Index j(0); j < x.columns(); ++j)
           {
-            sum += x_local(i, j) * y_local(j, k);
+            sum = sum + x(i, j) * y(j, k);
           }
-          ref_local(i, k, sum);
+          ref(i, k, sum);
         }
       }
 
       result.multiply(x, y);
-      result_local.copy(result);
 
-      for (Index i(0) ; i < result.rows() ; ++i)
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.rows(); ++i)
       {
-        for (Index j(0) ; j < result.columns() ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i, j), ref_local(i, j), DT_(_eps));
+        for (Index j(0); j < result.columns(); ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
       }
+#ifdef FEAT_HAVE_HALFMATH
+      if (typeid(DT_) == typeid(Half))
+        eps *= 4.;
+#endif
     }
   }
 };
 
-DenseMatrixMultiplyTest<Mem::Main, float, unsigned int> dense_matrix_multiply_test_float_uint(1e-3);
-DenseMatrixMultiplyTest<Mem::Main, double, unsigned int> dense_matrix_multiply_test_double_uint(1e-6);
-DenseMatrixMultiplyTest<Mem::Main, float, unsigned long> dense_matrix_multiply_test_float_ulong(1e-3);
-DenseMatrixMultiplyTest<Mem::Main, double, unsigned long> dense_matrix_multiply_test_double_ulong(1e-6);
+DenseMatrixMultiplyTest<float, unsigned int> dense_matrix_multiply_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixMultiplyTest<double, unsigned int> dense_matrix_multiply_test_double_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixMultiplyTest<float, unsigned long> dense_matrix_multiply_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixMultiplyTest<double, unsigned long> dense_matrix_multiply_test_double_ulong(PreferredBackend::generic, 1e-6);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixMultiplyTest<float, unsigned long> mkl_dense_matrix_multiply_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixMultiplyTest<double, unsigned long> mkl_dense_matrix_multiply_test_double_ulong(PreferredBackend::mkl, 1e-6);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixMultiplyTest<Mem::Main, __float128, unsigned int> dense_matrix_multiply_test_float128_uint(1e-6);
-DenseMatrixMultiplyTest<Mem::Main, __float128, unsigned long> dense_matrix_multiply_test_float128_ulong(1e-6);
+DenseMatrixMultiplyTest<__float128, unsigned int> dense_matrix_multiply_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixMultiplyTest<__float128, unsigned long> dense_matrix_multiply_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixMultiplyTest<Half, unsigned int> dense_matrix_multiply_test_half_uint(PreferredBackend::generic, 1e-2);
+DenseMatrixMultiplyTest<Half, unsigned long> dense_matrix_multiply_test_half_ulong(PreferredBackend::generic, 1e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixMultiplyTest<Half, unsigned int> cuda_dense_matrix_multiply_test_half_uint(PreferredBackend::cuda, 1e-2);
+DenseMatrixMultiplyTest<Half, unsigned long> cuda_dense_matrix_multiply_test_half_ulong(PreferredBackend::cuda, 1e-2);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMultiplyTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_multiply_test_float_uint(1e-1);
-DenseMatrixMultiplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_multiply_test_double_uint(1e-6);
-DenseMatrixMultiplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_multiply_test_float_ulong(1e-1);
-DenseMatrixMultiplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_multiply_test_double_ulong(1e-6);
+DenseMatrixMultiplyTest<float, unsigned int> cuda_dense_matrix_multiply_test_float_uint(PreferredBackend::cuda, 1e-3);
+DenseMatrixMultiplyTest<double, unsigned int> cuda_dense_matrix_multiply_test_double_uint(PreferredBackend::cuda, 1e-6);
+DenseMatrixMultiplyTest<float, unsigned long> cuda_dense_matrix_multiply_test_float_ulong(PreferredBackend::cuda, 1e-3);
+DenseMatrixMultiplyTest<double, unsigned long> cuda_dense_matrix_multiply_test_double_ulong(PreferredBackend::cuda, 1e-6);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
-class DenseMatrixTranposeTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  class DenseMatrixCSRMultiplyTest
+  : public UnitTest
 {
 public:
-   double _eps;
+  double _eps;
 
-  explicit DenseMatrixTranposeTest(double eps)
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixTranposeTest"),
+  explicit DenseMatrixCSRMultiplyTest(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixCSRMultiplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
+    _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixCSRMultiplyTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    double eps(_eps);
+
+    for (Index size(1); size < 32; size *= 2)
+    {
+      SparseMatrixFactory<DT_, IT_> xfac(size, size + 2);
+      DenseMatrix<DT_, IT_> x_dense(size, size + 2, DT_(0.));
+      for (IT_ row(0); row < xfac.rows(); ++row)
+      {
+        for (IT_ col(0); col < xfac.columns(); ++col)
+        {
+          if (row == col)
+          {
+            xfac.add(row, col, DT_(2));
+            x_dense.elements()[row * xfac.columns() + col] = DT_(2);
+          }
+          else if ((row == col + 1) || (row + 1 == col))
+          {
+            xfac.add(row, col, DT_(-1));
+            x_dense.elements()[row * xfac.columns() + col] = DT_(-1);
+          }
+        }
+      }
+      SparseMatrixCSR<DT_, IT_> x(xfac.make_csr());
+      DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
+      DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
+      DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
+      for (Index i(0); i < y.size(); ++i)
+      {
+        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+      }
+
+      ref.multiply(x_dense, y);
+      result.multiply(x, y);
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.rows(); ++i)
+      {
+        for (Index j(0); j < result.columns(); ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+      }
+#ifdef FEAT_HAVE_HALFMATH
+      if (typeid(DT_) == typeid(Half))
+        eps *= 4.;
+#endif
+    }
+  }
+};
+
+DenseMatrixCSRMultiplyTest<float, unsigned int> dense_matrix_csr_multiply_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixCSRMultiplyTest<double, unsigned int> dense_matrix_csr_multiply_test_double_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixCSRMultiplyTest<float, unsigned long> dense_matrix_csr_multiply_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixCSRMultiplyTest<double, unsigned long> dense_matrix_csr_multiply_test_double_ulong(PreferredBackend::generic, 1e-6);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixCSRMultiplyTest<float, unsigned long> mkl_dense_matrix_csr_multiply_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixCSRMultiplyTest<double, unsigned long> mkl_dense_matrix_csr_multiply_test_double_ulong(PreferredBackend::mkl, 1e-6);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixCSRMultiplyTest<__float128, unsigned int> dense_csr_matrix_multiply_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixCSRMultiplyTest<__float128, unsigned long> dense_csr_matrix_multiply_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixCSRMultiplyTest<Half, unsigned int> dense_matrix_csr_multiply_test_half_uint(PreferredBackend::generic, 1e-2);
+DenseMatrixCSRMultiplyTest<Half, unsigned long> dense_matrix_csr_multiply_test_half_ulong(PreferredBackend::generic, 1e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixCSRMultiplyTest<Half, unsigned int> cuda_dense_matrix_csr_multiply_test_half_uint(PreferredBackend::cuda, 1e-2);
+DenseMatrixCSRMultiplyTest<Half, unsigned long> cuda_dense_matrix_csr_multiply_test_half_ulong(PreferredBackend::cuda, 1e-2);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixCSRMultiplyTest<float, unsigned int> cuda_dense_matrix_csr_multiply_test_float_uint(PreferredBackend::cuda, 1e-3);
+DenseMatrixCSRMultiplyTest<double, unsigned int> cuda_dense_matrix_csr_multiply_test_double_uint(PreferredBackend::cuda, 1e-6);
+DenseMatrixCSRMultiplyTest<float, unsigned long> cuda_dense_matrix_csr_multiply_test_float_ulong(PreferredBackend::cuda, 1e-3);
+DenseMatrixCSRMultiplyTest<double, unsigned long> cuda_dense_matrix_csr_multiply_test_double_ulong(PreferredBackend::cuda, 1e-6);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class DenseMatrixMultiply2Test
+  : public UnitTest
+{
+public:
+  double _eps;
+
+  explicit DenseMatrixMultiply2Test(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixMultiply2Test", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
+    _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixMultiply2Test()
+  {
+  }
+
+  virtual void run() const override
+  {
+    double eps(_eps);
+
+    for (Index size(1); size < 65; size *= 2)
+    {
+      DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0.));
+      DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
+      DenseMatrix<DT_, IT_> z(size, size + 1, DT_(0.));
+      DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
+      DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
+      DT_ alpha = DT_(3);
+      DT_ beta = DT_(1.5);
+
+      for (Index i(0); i < x.size(); ++i)
+      {
+        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+      }
+      for (Index i(0); i < y.size(); ++i)
+      {
+        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+      }
+      for (Index i(0); i < z.size(); ++i)
+      {
+        z.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 37));
+      }
+
+      for (Index i(0); i < ref.rows(); ++i)
+      {
+        for (Index k(0); k < ref.columns(); ++k)
+        {
+          DT_ sum(0.);
+          for (Index j(0); j < x.columns(); ++j)
+          {
+            sum = sum + alpha * x(i, j) * y(j, k);
+          }
+          sum += beta * z(i,k);
+          ref(i, k, sum);
+        }
+      }
+
+      result.multiply(x, y, z, alpha, beta);
+
+      MemoryPool::synchronize();
+      for (Index i(0); i < result.rows(); ++i)
+      {
+        for (Index j(0); j < result.columns(); ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+      }
+#ifdef FEAT_HAVE_HALFMATH
+      if (typeid(DT_) == typeid(Half))
+        eps *= 4.;
+#endif
+    }
+  }
+};
+
+DenseMatrixMultiply2Test<float, unsigned int> dense_matrix_multiply_2_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixMultiply2Test<double, unsigned int> dense_matrix_multiply_2_test_double_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixMultiply2Test<float, unsigned long> dense_matrix_multiply_2_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixMultiply2Test<double, unsigned long> dense_matrix_multiply_2_test_double_ulong(PreferredBackend::generic, 1e-6);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixMultiply2Test<float, unsigned long> mkl_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixMultiply2Test<double, unsigned long> mkl_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixMultiply2Test<__float128, unsigned int> dense_matrix_multiply_2_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixMultiply2Test<__float128, unsigned long> dense_matrix_multiply_2_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixMultiply2Test<Half, unsigned int> dense_matrix_multiply_2_test_half_uint(PreferredBackend::generic, 1e-2);
+DenseMatrixMultiply2Test<Half, unsigned long> dense_matrix_multiply_2_test_half_ulong(PreferredBackend::generic, 1e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixMultiply2Test<Half, unsigned int> cuda_dense_matrix_multiply_2_test_half_uint(PreferredBackend::cuda, 1e-2);
+DenseMatrixMultiply2Test<Half, unsigned long> cuda_dense_matrix_multiply_2_test_half_ulong(PreferredBackend::cuda, 1e-2);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixMultiply2Test<float, unsigned int> cuda_dense_matrix_multiply_2_test_float_uint(PreferredBackend::cuda, 1e-3);
+DenseMatrixMultiply2Test<double, unsigned int> cuda_dense_matrix_multiply_2_test_double_uint(PreferredBackend::cuda, 1e-6);
+DenseMatrixMultiply2Test<float, unsigned long> cuda_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::cuda, 1e-3);
+DenseMatrixMultiply2Test<double, unsigned long> cuda_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::cuda, 1e-6);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class DenseMatrixCSRMultiply2Test
+  : public UnitTest
+{
+public:
+  double _eps;
+
+  explicit DenseMatrixCSRMultiply2Test(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixCSRMultiply2Test", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
+    _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixCSRMultiply2Test()
+  {
+  }
+
+  virtual void run() const override
+  {
+    double eps(_eps);
+
+    for (Index size(1); size < 65; size *= 2)
+    {
+      SparseMatrixFactory<DT_, IT_> xfac(size, size + 2);
+      DenseMatrix<DT_, IT_> x_dense(size, size + 2, DT_(0.));
+      for (IT_ row(0); row < xfac.rows(); ++row)
+      {
+        for (IT_ col(0); col < xfac.columns(); ++col)
+        {
+          if (row == col)
+          {
+            xfac.add(row, col, DT_(2));
+            x_dense.elements()[row * xfac.columns() + col] = DT_(2);
+          }
+          else if ((row == col + 1) || (row + 1 == col))
+          {
+            xfac.add(row, col, DT_(-1));
+            x_dense.elements()[row * xfac.columns() + col] = DT_(-1);
+          }
+        }
+      }
+      SparseMatrixCSR<DT_, IT_> x(xfac.make_csr());
+      DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
+      DenseMatrix<DT_, IT_> z(size, size + 1, DT_(0.));
+      DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
+      DT_ alpha = DT_(3);
+      DT_ beta = DT_(1.5);
+
+      for (Index i(0); i < y.size(); ++i)
+      {
+        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+      }
+      for (Index i(0); i < z.size(); ++i)
+      {
+        z.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 37));
+      }
+
+      for (Index i(0); i < ref.rows(); ++i)
+      {
+        for (Index k(0); k < ref.columns(); ++k)
+        {
+          DT_ sum(0.);
+          for (Index j(0); j < x_dense.columns(); ++j)
+          {
+            sum = sum + alpha * x_dense(i, j) * y(j, k);
+          }
+          sum += beta * z(i,k);
+          ref(i, k, sum);
+        }
+      }
+
+      z.multiply(x, y, alpha, beta);
+
+      MemoryPool::synchronize();
+      for (Index i(0); i < z.rows(); ++i)
+      {
+        for (Index j(0); j < z.columns(); ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(z(i, j), ref(i, j), DT_(eps));
+      }
+#ifdef FEAT_HAVE_HALFMATH
+      if (typeid(DT_) == typeid(Half))
+        eps *= 4.;
+#endif
+    }
+  }
+};
+
+DenseMatrixCSRMultiply2Test<float, unsigned int> dense_matrix_csr_multiply_2_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixCSRMultiply2Test<double, unsigned int> dense_matrix_csr_multiply_2_test_double_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixCSRMultiply2Test<float, unsigned long> dense_matrix_csr_multiply_2_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixCSRMultiply2Test<double, unsigned long> dense_matrix_csr_multiply_2_test_double_ulong(PreferredBackend::generic, 1e-6);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixCSRMultiply2Test<float, unsigned long> mkl_dense_matrix_csr_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixCSRMultiply2Test<double, unsigned long> mkl_dense_matrix_csr_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixCSRMultiply2Test<__float128, unsigned int> dense_matrix_csr_multiply_2_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixCSRMultiply2Test<__float128, unsigned long> dense_matrix_csr_multiply_2_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixCSRMultiply2Test<Half, unsigned int> dense_matrix_csr_multiply_2_test_half_uint(PreferredBackend::generic, 1e-2);
+DenseMatrixCSRMultiply2Test<Half, unsigned long> dense_matrix_csr_multiply_2_test_half_ulong(PreferredBackend::generic, 1e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixCSRMultiply2Test<Half, unsigned int> cuda_dense_matrix_csr_multiply_2_test_half_uint(PreferredBackend::cuda, 1e-2);
+DenseMatrixCSRMultiply2Test<Half, unsigned long> cuda_dense_matrix_csr_multiply_2_test_half_ulong(PreferredBackend::cuda, 1e-2);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixCSRMultiply2Test<float, unsigned int> cuda_dense_matrix_csr_multiply_2_test_float_uint(PreferredBackend::cuda, 1e-3);
+DenseMatrixCSRMultiply2Test<double, unsigned int> cuda_dense_matrix_csr_multiply_2_test_double_uint(PreferredBackend::cuda, 1e-6);
+DenseMatrixCSRMultiply2Test<float, unsigned long> cuda_dense_matrix_csr_multiply_2_test_float_ulong(PreferredBackend::cuda, 1e-3);
+DenseMatrixCSRMultiply2Test<double, unsigned long> cuda_dense_matrix_csr_multiply_2_test_double_ulong(PreferredBackend::cuda, 1e-6);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class DenseMatrixTranposeTest
+  : public UnitTest
+{
+public:
+  double _eps;
+
+  explicit DenseMatrixTranposeTest(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixTranposeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
     _eps(eps)
   {
   }
@@ -466,40 +902,35 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 100 ; size*=2)
+    for (Index size(1); size < 100; size *= 2)
     {
-      DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size+2, DT_(0));
-      DenseMatrix<Mem::Main, DT_, IT_> result_local;
-      DenseMatrix<Mem_, DT_, IT_> x;
-      DenseMatrix<Mem_, DT_, IT_> result;
+      DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0));
+      DenseMatrix<DT_, IT_> result;
 
-      for (Index i(0) ; i < x_local.size() ; ++i)
+      for (Index i(0); i < x.size(); ++i)
       {
-        x_local.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
       }
-      x.convert(x_local);
 
       result.transpose(x);
-      result_local.convert(result);
 
-      for (Index i(0) ; i < result.rows() ; ++i)
+      for (Index i(0); i < result.rows(); ++i)
       {
-        for (Index j(0) ; j < result.columns() ; ++j)
+        for (Index j(0); j < result.columns(); ++j)
         {
-          TEST_CHECK_EQUAL(result_local(i, j), x_local(j, i));
+          TEST_CHECK_EQUAL(result(i, j), x(j, i));
         }
       }
 
-      if (typeid(Mem_) != typeid(Mem::CUDA))
+      if (Runtime::get_preferred_backend() != PreferredBackend::cuda)
       {
         result.transpose_inplace();
-        result_local.convert(result);
 
-        for (Index i(0) ; i < result.rows() ; ++i)
+        for (Index i(0); i < result.rows(); ++i)
         {
-          for (Index j(0) ; j < result.columns() ; ++j)
+          for (Index j(0); j < result.columns(); ++j)
           {
-            TEST_CHECK_EQUAL(result_local(i, j), x_local(i, j));
+            TEST_CHECK_EQUAL(result(i, j), x(i, j));
           }
         }
       }
@@ -507,13 +938,25 @@ public:
   }
 };
 
-DenseMatrixTranposeTest<Mem::Main, float, unsigned long> dense_matrix_transpose_test_float_ulong(1e-3);
-DenseMatrixTranposeTest<Mem::Main, double, unsigned long> dense_matrix_transpose_test_double_ulong(1e-6);
+DenseMatrixTranposeTest<float, unsigned int> dense_matrix_transpose_test_float_uint(PreferredBackend::generic, 1e-3);
+DenseMatrixTranposeTest<double, unsigned int> dense_matrix_transpose_test_double_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixTranposeTest<float, unsigned long> dense_matrix_transpose_test_float_ulong(PreferredBackend::generic, 1e-3);
+DenseMatrixTranposeTest<double, unsigned long> dense_matrix_transpose_test_double_ulong(PreferredBackend::generic, 1e-6);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixTranposeTest<float, unsigned long> mkl_dense_matrix_transpose_test_float_ulong(PreferredBackend::mkl, 1e-3);
+DenseMatrixTranposeTest<double, unsigned long> mkl_dense_matrix_transpose_test_double_ulong(PreferredBackend::mkl, 1e-6);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixTranposeTest<Mem::Main, __float128, unsigned int> dense_matrix_transpose_test_float128_uint(1e-6);
-DenseMatrixTranposeTest<Mem::Main, __float128, unsigned long> dense_matrix_transpose_test_float128_ulong(1e-6);
+DenseMatrixTranposeTest<__float128, unsigned int> dense_matrix_transpose_test_float128_uint(PreferredBackend::generic, 1e-6);
+DenseMatrixTranposeTest<__float128, unsigned long> dense_matrix_transpose_test_float128_ulong(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+//DenseMatrixTranposeTest<__half, unsigned int> dense_matrix_transpose_test_half_uint(PreferredBackend::generic, 1e-6);
+//DenseMatrixTranposeTest<__half, unsigned long> dense_matrix_transpose_test_half_ulong(PreferredBackend::generic, 1e-6);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTranposeTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_transpose_test_float_ulong(1e-1);
-DenseMatrixTranposeTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_transpose_test_double_ulong(1e-6);
+DenseMatrixTranposeTest<float, unsigned int> cuda_dense_matrix_transpose_test_float_uint(PreferredBackend::cuda, 1e-1);
+DenseMatrixTranposeTest<double, unsigned int> cuda_dense_matrix_transpose_test_double_uint(PreferredBackend::cuda, 1e-6);
+DenseMatrixTranposeTest<float, unsigned long> cuda_dense_matrix_transpose_test_float_ulong(PreferredBackend::cuda, 1e-1);
+DenseMatrixTranposeTest<double, unsigned long> cuda_dense_matrix_transpose_test_double_ulong(PreferredBackend::cuda, 1e-6);
 #endif

@@ -4,13 +4,11 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/lafem/pointstar_structure.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -26,13 +24,12 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/sor_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
-#include <kernel/solver/spai_precond.hpp>
+//#include <kernel/solver/spai_precond.hpp>
 #include <kernel/solver/polynomial_precond.hpp>
 #include <kernel/solver/matrix_precond.hpp>
 #include <kernel/solver/pcgnr.hpp>
 #include <kernel/solver/pcgnrilu.hpp>
 #include <kernel/solver/idrs.hpp>
-#include <kernel/solver/amg.hpp>
 #include <kernel/solver/multigrid.hpp>
 
 using namespace FEAT;
@@ -41,23 +38,21 @@ using namespace FEAT::Solver;
 using namespace FEAT::TestSystem;
 
 template<
-  template<typename,typename,typename> class ScalarMatrix_,
-  typename MemType_,
   typename DataType_,
   typename IndexType_>
-class BasicSolverTest :
-  public FullTaggedTest<MemType_, DataType_, IndexType_>
+  class BasicSolverTest :
+  public UnitTest
 {
 public:
   typedef DataType_ DataType;
   typedef IndexType_ IndexType;
-  typedef ScalarMatrix_<MemType_, DataType, IndexType> MatrixType;
+  typedef SparseMatrixCSR<DataType, IndexType> MatrixType;
   typedef typename MatrixType::VectorTypeR VectorType;
-  typedef NoneFilter<MemType_, DataType, IndexType> FilterType;
+  typedef NoneFilter<DataType, IndexType> FilterType;
 
 public:
-  BasicSolverTest() :
-    FullTaggedTest<MemType_, DataType, IndexType>("BasicSolverTest-" + MatrixType::name())
+  BasicSolverTest(PreferredBackend backend) :
+    UnitTest("BasicSolverTest", Type::Traits<DataType>::name(), Type::Traits<IndexType>::name(), backend)
   {
   }
 
@@ -93,7 +88,7 @@ public:
 
     // check number of iterations
     const Index n = solver.get_num_iter();
-    TEST_CHECK_MSG((n <= ref_iters+iter_tol) && (n+iter_tol >= ref_iters),
+    TEST_CHECK_MSG((n <= ref_iters + iter_tol) && (n + iter_tol >= ref_iters),
       name + ": performed " + stringify(n) + " iterations; expected "
       + stringify(ref_iters) + " +/- " + stringify(iter_tol));
   }
@@ -107,10 +102,10 @@ public:
     PointstarFactoryFD<DataType, IndexType> psf(m, d);
 
     // create 5-point star CSR matrix
-    SparseMatrixCSR<Mem::Main, DataType, IndexType> csr_mat(psf.matrix_csr());
+    SparseMatrixCSR<DataType, IndexType> csr_mat(psf.matrix_csr());
 
     // create a Q2 bubble vector
-    DenseVector<Mem::Main, DataType, IndexType> q2b_vec(psf.vector_q2_bubble());
+    DenseVector<DataType, IndexType> q2b_vec(psf.vector_q2_bubble());
 
     // create a NoneFilter
     FilterType filter;
@@ -150,11 +145,11 @@ public:
       test_solver("PCG-POLY(3)", *solver, vec_sol, vec_ref, vec_rhs, 11);
     }
 
-    // test PCG-SSOR
+    // test BICGSTAB-SSOR
     {
-      auto precon = Solver::new_ssor_precond(matrix, filter);
-      auto solver = Solver::new_pcg(matrix, filter, precon);
-      test_solver("PCG-SSOR", *solver, vec_sol, vec_ref, vec_rhs, 19);
+      auto precon = Solver::new_ssor_precond(this->get_preferred_backend(), matrix, filter);
+      auto solver = Solver::new_bicgstab(matrix, filter, precon);
+      test_solver("BICGSTAB-SSOR", *solver, vec_sol, vec_ref, vec_rhs, this->get_preferred_backend() == PreferredBackend::cuda ? 20 : 13);
     }
 
     // test plain CR
@@ -165,6 +160,7 @@ public:
     }
 
     // test PCR-JAC
+    if (this->get_preferred_backend() != PreferredBackend::cuda)
     {
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_pcr(matrix, filter, precon);
@@ -172,64 +168,81 @@ public:
     }
 
     // test PCR-SSOR
+    if (this->get_preferred_backend() != PreferredBackend::cuda)
     {
-      auto precon = Solver::new_ssor_precond(matrix, filter);
+      auto precon = Solver::new_ssor_precond(this->get_preferred_backend(), matrix, filter);
       auto solver = Solver::new_pcr(matrix, filter, precon);
       test_solver("PCR-SSOR", *solver, vec_sol, vec_ref, vec_rhs, 19);
     }
 
     // test BICGStab-left-SPAI
+//     {
+//       auto precon = Solver::new_spai_precond(matrix, filter);
+//       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::left);
+//       test_solver("BiCGStab-left-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 12);
+//     }
+
+    // test Richardson-JAC
     {
-      auto precon = Solver::new_spai_precond(matrix, filter);
-      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::left);
-      test_solver("BiCGStab-left-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 12);
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      auto solver = Solver::new_richardson(matrix, filter, DataType(1.0), precon);
+      solver->set_max_iter(1500);
+      test_solver("Richardson-JAC", *solver, vec_sol, vec_ref, vec_rhs, 1175);
     }
 
     // test Richardson-SOR
     {
-      auto precon = Solver::new_sor_precond(matrix, filter, DataType(1.7));
+      auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1.7));
       auto solver = Solver::new_richardson(matrix, filter, DataType(1.0), precon);
       test_solver("Richardson-SOR(1.7)", *solver, vec_sol, vec_ref, vec_rhs, 71);
     }
 
     // test BiCGStab-left-ILU(0)
     {
-      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      auto precon = Solver::new_ilu_precond(this->get_preferred_backend(), matrix, filter, Index(0));
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::left);
       test_solver("BiCGStab-Left-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
     // test BiCGStab-right-SOR(1) aka GS
     {
-      auto precon = Solver::new_sor_precond(matrix, filter, DataType(1));
+      auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1));
       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
       test_solver("BiCGStab-right-SOR(1)", *solver, vec_sol, vec_ref, vec_rhs, 29);
     }
 
     // test BiCGStabL-ILU(0) L=1 -> BiCGStab
     {
-      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      auto precon = Solver::new_ilu_precond(this->get_preferred_backend(), matrix, filter, Index(0));
       auto solver = Solver::new_bicgstabl(matrix, filter, 1, precon, BiCGStabLPreconVariant::left);
       test_solver("BiCGStabL(1)-left-ILU", *solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
     // test BiCGStabL-ILU(0) L=4
     {
-      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      auto precon = Solver::new_ilu_precond(this->get_preferred_backend(), matrix, filter, Index(0));
       auto solver = Solver::new_bicgstabl(matrix, filter, 4, precon, BiCGStabLPreconVariant::right);
       test_solver("BiCGStabL(4)-right-ILU", *solver, vec_sol, vec_ref, vec_rhs, 3);
     }
 
     // test IDR(4)-ILU(0)
     {
-      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
+      auto precon = Solver::new_ilu_precond(this->get_preferred_backend(), matrix, filter, Index(0));
       auto solver = Solver::new_idrs(matrix, filter, 4, precon);
       solver->reset_shadow_space(false);
       test_solver("IDR(4)-ILU(0)", *solver, vec_sol, vec_ref, vec_rhs, 20);
     }
-    // test PCG-jac-matrix
+
+    // test FGMRES-JAC
     {
-      SparseMatrixCOO<Mem::Main, DataType, IndexType> coo_jac(csr_mat.rows(), csr_mat.columns());
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      auto solver = Solver::new_fgmres(matrix, filter, 16, DataType(0), precon);
+      test_solver("FGMRES(16)-JAC", *solver, vec_sol, vec_ref, vec_rhs, 48);
+    }
+
+    // test PCG-jac-matrix
+    /*{
+      SparseMatrixCOO<:Main, DataType, IndexType> coo_jac(csr_mat.rows(), csr_mat.columns());
       for (Index i(0) ; i < csr_mat.rows() ; ++i)
       {
         coo_jac(i, i, DataType(1) / csr_mat(i,i));
@@ -240,7 +253,7 @@ public:
       auto precon = Solver::new_matrix_precond(jac_matrix, filter);
       auto solver = Solver::new_pcg(matrix, filter, precon);
       test_solver("PCG-MATRIX(JAC)", *solver, vec_sol, vec_ref, vec_rhs, 28);
-    }
+    }*/
 
     // test PCGNR-Jac-Jac
     {
@@ -262,14 +275,71 @@ public:
       auto solver = Solver::new_rgcr(matrix, filter, precon);
       test_solver("RGCR-JAC", *solver, vec_sol, vec_ref, vec_rhs, 28);
     }
+    /*
+   #if defined(FEAT_CUDA_VERSION_MAJOR) && (FEAT_CUDA_VERSION_MAJOR >= 8)
+       // test FGMRES-SPAI
+       {
+         auto precon = Solver::new_spai_precond(matrix, filter);
+         auto solver = Solver::new_fgmres(matrix, filter, 16, 0.0, precon);
+         test_solver("FGMRES(16)-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 32);
+       }
+
+       // test RGCR-SPAI
+       {
+         auto precon = Solver::new_spai_precond(matrix, filter);
+         auto solver = Solver::new_rgcr(matrix, filter, precon);
+         test_solver("RGCR-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 17);
+       }
+   #endif*/
+
+   // test BiCGStab-Jacobi
+    {
+      auto precon = Solver::new_jacobi_precond(matrix, filter, DataType(0.5));
+      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
+      test_solver("BiCGStab-right-Jacobi(0.5)", *solver, vec_sol, vec_ref, vec_rhs, 21);
+    }
+
+    // test BiCGStab-SOR
+    {
+      auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1));
+      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::left);
+      test_solver("BiCGStab-left-SOR", *solver, vec_sol, vec_ref, vec_rhs, 29);
+    }
+
+    // test BiCGStab-SSOR
+    {
+      auto precon = Solver::new_ssor_precond(this->get_preferred_backend(), matrix, filter);
+      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
+      test_solver("BiCGStab-right-SSOR", *solver, vec_sol, vec_ref, vec_rhs, 13);
+    }
   }
 };
 
-BasicSolverTest<SparseMatrixCSR, Mem::Main, double, unsigned int> basic_solver_csr_generic_double_uint;
-BasicSolverTest<SparseMatrixELL, Mem::Main, double, unsigned int> basic_solver_ell_generic_double_uint;
-BasicSolverTest<SparseMatrixCSR, Mem::Main, double, unsigned long> basic_solver_csr_generic_double_ulong;
-BasicSolverTest<SparseMatrixELL, Mem::Main, double, unsigned long> basic_solver_ell_generic_double_ulong;
+BasicSolverTest<double, unsigned int> basic_solver_test_double_uint(PreferredBackend::generic);
+BasicSolverTest<double, unsigned long> basic_solver_test_double_ulong(PreferredBackend::generic);
+//BasicSolverTest<float, unsigned int> basic_solver_test_float_uint(PreferredBackend::generic);
+//BasicSolverTest<float, unsigned long> basic_solver_test_float_ulong(PreferredBackend::generic);
 
+#ifdef FEAT_HAVE_MKL
+//BasicSolverTest<float, unsigned long> mkl_basic_solver_test_float_ulong(PreferredBackend::mkl);
+BasicSolverTest<double, unsigned long> mkl_basic_solver_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+BasicSolverTest<__float128, unsigned int> basic_solver_test_float128_uint(PreferredBackend::generic);
+BasicSolverTest<__float128, unsigned long> basic_solver_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+//BasicSolverTest<Half, unsigned int> basic_solver_test_half_uint(PreferredBackend::generic);
+//BasicSolverTest<Half, unsigned long> basic_solver_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+//BasicSolverTest<float, unsigned int> cuda_basic_solver_test_float_uint(PreferredBackend::cuda);
+BasicSolverTest<double, unsigned int> cuda_basic_solver_test_double_uint(PreferredBackend::cuda);
+//BasicSolverTest<float, unsigned long> cuda_basic_solver_test_float_ulong(PreferredBackend::cuda);
+//BasicSolverTest<double, unsigned long> cuda_basic_solver_test_double_ulong(PreferredBackend::cuda);
+#endif
+
+/*
 template<
   template<typename,typename,typename> class ScalarMatrix_,
   typename MemType_,
@@ -491,9 +561,7 @@ public:
 
 #ifdef FEAT_HAVE_CUDA
 //CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
-//CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned long> cuda_solver_ell_generic_double_ulong;
 CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned int> cuda_solver_csr_generic_double_uint;
-//CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned int> cuda_solver_ell_generic_double_uint;
 #endif
 
 template<
@@ -749,4 +817,4 @@ public:
     }
   }
 };
-BCSRSolverTest<Mem::Main, double, Index> bcsr_solver_test_main_double_index;
+BCSRSolverTest<Mem::Main, double, Index> bcsr_solver_test_main_double_index; */

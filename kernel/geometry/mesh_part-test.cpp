@@ -44,11 +44,11 @@ bool check_target_set_consistency(const TargetSet& ts_1, const TargetSet& ts_2)
  * \author Jordi Paul
  */
 class MeshPartTest
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   MeshPartTest() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("mesh_part-test")
+    UnitTest("mesh_part-test")
   {
   }
 

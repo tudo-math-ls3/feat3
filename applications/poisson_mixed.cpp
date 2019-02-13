@@ -251,7 +251,6 @@ namespace PoissonMixed
     const Dist::Comm& comm = domain.comm();
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
@@ -271,7 +270,7 @@ namespace PoissonMixed
     Analytic::Common::CosineWaveFunction<dim> sol_func;
 
     // define our system level
-    typedef Control::ScalarMixedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::ScalarMixedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 

@@ -9,7 +9,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 
@@ -19,9 +18,6 @@ namespace FEAT
   {
     /**
      * \brief Wraps a SparseMatrixCSR to SparseMatrixBCSR
-     *
-     * \tparam Mem_
-     * The memory architecture
      *
      * \tparam DT_
      * Floating point datatype
@@ -41,12 +37,10 @@ namespace FEAT
      * \author Jordi Paul
      *
      */
-    template<typename Mem_, typename DT_, typename IT_, int BlockSize_>
-    class SparseMatrixBWrappedCSR : public LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>
+    template<typename DT_, typename IT_, int BlockSize_>
+    class SparseMatrixBWrappedCSR : public LAFEM::SparseMatrixCSR<DT_, IT_>
     {
     public:
-      /// The memory architecture
-      typedef Mem_ MemType;
       /// The floating point datatype
       typedef DT_ DataType;
       /// The index type
@@ -58,9 +52,9 @@ namespace FEAT
       static constexpr int BlockWidth = BlockSize_;
 
       /// The real type of the underlying matrix
-      typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> BaseClass;
+      typedef LAFEM::SparseMatrixCSR<DT_, IT_> BaseClass;
       /// What this matrix pretends to be
-      typedef LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, BlockSize_, BlockSize_> PretendType;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockSize_> PretendType;
 
       /// Vector type accepted for multiplication form the left
       typedef typename PretendType::VectorTypeL VectorTypeL;
@@ -71,12 +65,12 @@ namespace FEAT
       using BaseClass::BaseClass;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = SparseMatrixBWrappedCSR<Mem2_, DT2_, IT2_, BlockSize_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = SparseMatrixBWrappedCSR<DT2_, IT2_, BlockSize_>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /**
        * \brief Empty standard constructor
@@ -119,8 +113,8 @@ namespace FEAT
         return VectorTypeR(this->columns());
       }
 
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const SparseMatrixCSR<DT2_, IT2_> & other)
       {
         BaseClass::convert(other);
       }
@@ -138,13 +132,13 @@ namespace FEAT
       }
 
       /// \returns A base-class reference to the actual CSR matrix object
-      LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>& unwrap()
+      LAFEM::SparseMatrixCSR<DT_, IT_>& unwrap()
       {
         return *this;
       }
 
       /// \returns A const base-class reference to the actual CSR matrix object
-      const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>& unwrap() const
+      const LAFEM::SparseMatrixCSR<DT_, IT_>& unwrap() const
       {
         return *this;
       }

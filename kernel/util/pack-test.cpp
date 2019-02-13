@@ -12,12 +12,12 @@
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
-class PackTest
-  : public TaggedTest<Archs::None, Archs::None>
+class PackTest :
+  public TestSystem::UnitTest
 {
 public:
   PackTest() :
-    TaggedTest<Archs::None, Archs::None>("PackTest")
+    TestSystem::UnitTest("PackTest")
   {
   }
 

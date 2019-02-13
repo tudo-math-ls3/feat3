@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -23,29 +22,28 @@ using namespace FEAT::TestSystem;
  * \author Peter Zajac
  */
 template<
-  typename MemType_,
   typename DT_,
   typename IT_>
 class VectorMirrorTest
-  : public FullTaggedTest<MemType_, DT_, IT_>
+  : public UnitTest
 {
   static constexpr int block_size = 3;
 
-  typedef DenseVector<Mem::Main, DT_, IT_> BufferVectorType;
+  typedef DenseVector<DT_, IT_> BufferVectorType;
 
-  typedef DenseVector<MemType_, DT_, IT_> VectorType;
-  typedef SparseVector<MemType_, DT_, IT_> SparseVectorType;
-  typedef DenseVectorBlocked<MemType_, DT_, IT_, block_size> BlockedVectorType;
-  typedef SparseVectorBlocked<MemType_, DT_, IT_, block_size> BlockedSparseVectorType;
+  typedef DenseVector<DT_, IT_> VectorType;
+  typedef SparseVector<DT_, IT_> SparseVectorType;
+  typedef DenseVectorBlocked<DT_, IT_, block_size> BlockedVectorType;
+  typedef SparseVectorBlocked<DT_, IT_, block_size> BlockedSparseVectorType;
 
 
-  //typedef DenseVector<MemType_, IT_, IT_> IVectorType;
-  typedef SparseMatrixCSR<MemType_, DT_, IT_> MatrixType;
-  typedef VectorMirror<MemType_, DT_, IT_> MirrorType;
+  //typedef DenseVector<IT_, IT_> IVectorType;
+  typedef SparseMatrixCSR<DT_, IT_> MatrixType;
+  typedef VectorMirror<DT_, IT_> MirrorType;
 
 public:
-  VectorMirrorTest()
-    : FullTaggedTest<MemType_, DT_, IT_>("VectorMirrorTest")
+  VectorMirrorTest(PreferredBackend backend)
+    : UnitTest("VectorMirrorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -223,41 +221,31 @@ public:
       mirror1.scatter_axpy(c1, vec_buf_bc_b);
       mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
-      // There is no axpy for SparseVector yet, so for now download the vectors (if necessary) and do it by hand.
-      LAFEM::SparseVector<Mem::Main, DT_, IT_> a1_main; a1_main.convert(a1);
-      LAFEM::SparseVector<Mem::Main, DT_, IT_> a2_main; a2_main.convert(a2);
-
-      TEST_CHECK_MSG(a1_main.used_elements() == a2_main.used_elements(),"Wrong number of nonzeros.");
-      for(Index i(0); i < a1_main.used_elements(); ++i)
+      TEST_CHECK_MSG(a1.used_elements() == a2.used_elements(),"Wrong number of nonzeros.");
+      for(Index i(0); i < a1.used_elements(); ++i)
       {
-        Index i1(a1_main.indices()[i]);
-        Index i2(a2_main.indices()[i]);
+        Index i1(a1.indices()[i]);
+        Index i2(a2.indices()[i]);
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-        TEST_CHECK_EQUAL_WITHIN_EPS(a1_main.elements()[i], a2_main.elements()[i], tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(a1.elements()[i], a2.elements()[i], tol);
       }
 
-      LAFEM::SparseVector<Mem::Main, DT_, IT_> b1_main; b1_main.convert(b1);
-      LAFEM::SparseVector<Mem::Main, DT_, IT_> b2_main; b2_main.convert(b2);
-
-      TEST_CHECK_MSG(b1_main.used_elements() == b2_main.used_elements(),"Wrong number of nonzeros.");
-      for(Index i(0); i < b1_main.used_elements(); ++i)
+      TEST_CHECK_MSG(b1.used_elements() == b2.used_elements(),"Wrong number of nonzeros.");
+      for(Index i(0); i < b1.used_elements(); ++i)
       {
-        Index i1(b1_main.indices()[i]);
-        Index i2(b2_main.indices()[i]);
+        Index i1(b1.indices()[i]);
+        Index i2(b2.indices()[i]);
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-        TEST_CHECK_EQUAL_WITHIN_EPS(b1_main.elements()[i], b2_main.elements()[i], tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(b1.elements()[i], b2.elements()[i], tol);
       }
 
-      LAFEM::SparseVector<Mem::Main, DT_, IT_> c1_main; c1_main.convert(c1);
-      LAFEM::SparseVector<Mem::Main, DT_, IT_> c2_main; c2_main.convert(c2);
-
-      TEST_CHECK_MSG(c1_main.used_elements() == c2_main.used_elements(),"Wrong number of nonzeros.");
-      for(Index i(0); i < c1_main.used_elements(); ++i)
+      TEST_CHECK_MSG(c1.used_elements() == c2.used_elements(),"Wrong number of nonzeros.");
+      for(Index i(0); i < c1.used_elements(); ++i)
       {
-        Index i1(c1_main.indices()[i]);
-        Index i2(c2_main.indices()[i]);
+        Index i1(c1.indices()[i]);
+        Index i2(c2.indices()[i]);
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-        TEST_CHECK_EQUAL_WITHIN_EPS(c1_main.elements()[i], c2_main.elements()[i], tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(c1.elements()[i], c2.elements()[i], tol);
       }
 
     } // End of test for SparseVector
@@ -461,48 +449,59 @@ public:
       mirror1.scatter_axpy(c1, vec_buf_bc_b);
       mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
-      // There is no axpy for SparseVector yet, so for now download the vectors (if necessary) and do it by hand.
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> a1_main; a1_main.convert(a1);
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> a2_main; a2_main.convert(a2);
-
-      TEST_CHECK_MSG(a1_main.used_elements() == a2_main.used_elements(),"Wrong number of nonzeros.");
-      for(Index i(0); i < a1_main.used_elements(); ++i)
+      TEST_CHECK_MSG(a1.used_elements() == a2.used_elements(),"Wrong number of nonzeros.");
+      for(Index i(0); i < a1.used_elements(); ++i)
       {
-        Index i1(a1_main.indices()[i]);
-        Index i2(a2_main.indices()[i]);
+        Index i1(a1.indices()[i]);
+        Index i2(a2.indices()[i]);
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-        TEST_CHECK_EQUAL_WITHIN_EPS((a1_main.elements()[i]-a2_main.elements()[i]).norm_euclid(), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS((a1.elements()[i]-a2.elements()[i]).norm_euclid(), DT_(0), tol);
       }
 
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> b1_main; b1_main.convert(b1);
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> b2_main; b2_main.convert(b2);
-
-      TEST_CHECK_MSG(b1_main.used_elements() == b2_main.used_elements(),"Wrong number of nonzeros.");
-      for(Index i(0); i < b1_main.used_elements(); ++i)
+      TEST_CHECK_MSG(b1.used_elements() == b2.used_elements(),"Wrong number of nonzeros.");
+      for(Index i(0); i < b1.used_elements(); ++i)
       {
-        Index i1(b1_main.indices()[i]);
-        Index i2(b2_main.indices()[i]);
+        Index i1(b1.indices()[i]);
+        Index i2(b2.indices()[i]);
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-        TEST_CHECK_EQUAL_WITHIN_EPS((b1_main.elements()[i]-b2_main.elements()[i]).norm_euclid(), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS((b1.elements()[i]-b2.elements()[i]).norm_euclid(), DT_(0), tol);
       }
 
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> c1_main; c1_main.convert(c1);
-      LAFEM::SparseVectorBlocked<Mem::Main, DT_, IT_, block_size> c2_main; c2_main.convert(c2);
-
-      TEST_CHECK_MSG(c1_main.used_elements() == c2_main.used_elements(),"Wrong number of nonzeros.");
-      for(Index i(0); i < c1_main.used_elements(); ++i)
+      TEST_CHECK_MSG(c1.used_elements() == c2.used_elements(),"Wrong number of nonzeros.");
+      for(Index i(0); i < c1.used_elements(); ++i)
       {
-        Index i1(c1_main.indices()[i]);
-        Index i2(c2_main.indices()[i]);
+        Index i1(c1.indices()[i]);
+        Index i2(c2.indices()[i]);
         TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-        TEST_CHECK_EQUAL_WITHIN_EPS((c1_main.elements()[i]-c2_main.elements()[i]).norm_euclid(), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS((c1.elements()[i]-c2.elements()[i]).norm_euclid(), DT_(0), tol);
       }
     }
   }
 };
 
-VectorMirrorTest<Mem::Main, double, unsigned long> vector_mirror_test_main_d_ul;
-VectorMirrorTest<Mem::Main, float, unsigned int> vector_mirror_test_main_f_ui;
-/// \todo Add cuda vector mirror tests
-//VectorMirrorTest<Mem::CUDA, double, unsigned long> vector_mirror_test_cuda_d_ul;
-//VectorMirrorTest<Mem::CUDA, float, unsigned int> vector_mirror_test_cuda_f_ui;
+VectorMirrorTest<double, unsigned int> vector_mirror_test_main_double_uint(PreferredBackend::generic);
+VectorMirrorTest<float, unsigned int> vector_mirror_test_main_float_uint(PreferredBackend::generic);
+VectorMirrorTest<double, unsigned long> vector_mirror_test_main_double_ulong(PreferredBackend::generic);
+VectorMirrorTest<float, unsigned long> vector_mirror_test_main_float_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+VectorMirrorTest<float, unsigned long> mkl_vector_mirror_test_float_ulong(PreferredBackend::mkl);
+VectorMirrorTest<double, unsigned long> mkl_vector_mirror_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+VectorMirrorTest<__float128, unsigned long> vector_mirror_test_float128_ulong(PreferredBackend::generic);
+VectorMirrorTest<__float128, unsigned int> vector_mirror_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+VectorMirrorTest<Half, unsigned int> vector_mirror_test_half_uint(PreferredBackend::generic);
+VectorMirrorTest<Half, unsigned long> vector_mirror_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+VectorMirrorTest<float, unsigned int> cuda_vector_mirror_test_float_uint(PreferredBackend::cuda);
+VectorMirrorTest<double, unsigned int> cuda_vector_mirror_test_double_uint(PreferredBackend::cuda);
+VectorMirrorTest<float, unsigned long> cuda_vector_mirror_test_float_ulong(PreferredBackend::cuda);
+VectorMirrorTest<double, unsigned long> cuda_vector_mirror_test_double_ulong(PreferredBackend::cuda);
+#ifdef FEAT_HAVE_HALFMATH
+VectorMirrorTest<Half, unsigned int> cuda_vector_mirror_test_half_uint(PreferredBackend::cuda);
+VectorMirrorTest<Half, unsigned long> cuda_vector_mirror_test_half_ulong(PreferredBackend::cuda);
+#endif
+#endif

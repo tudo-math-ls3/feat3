@@ -52,13 +52,13 @@ namespace FEAT
      * \author Jordi Paul
      *
      */
-    template<typename Mem_, typename DT_, typename IT_, typename Function_, typename Filter_>
-    class HessianPrecond<AnalyticFunctionOperator<Mem_, DT_, IT_, Function_>, Filter_>
-    : public NLOptPrecond<typename AnalyticFunctionOperator<Mem_, DT_, IT_, Function_>::VectorTypeL, Filter_>
+    template<typename DT_, typename IT_, typename Function_, typename Filter_>
+    class HessianPrecond<AnalyticFunctionOperator<DT_, IT_, Function_>, Filter_>
+    : public NLOptPrecond<typename AnalyticFunctionOperator<DT_, IT_, Function_>::VectorTypeL, Filter_>
     {
       public:
         /// The operator whose Hessian we use for preconditioning
-        typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+        typedef AnalyticFunctionOperator<DT_, IT_, Function_> OperatorType;
         /// Our filter type
         typedef Filter_ FilterType;
 
@@ -201,13 +201,13 @@ namespace FEAT
      * \author Jordi Paul
      *
      */
-    template<typename Mem_, typename DT_, typename IT_, typename Function_, typename Filter_>
-    class ApproximateHessianPrecond<AnalyticFunctionOperator<Mem_, DT_, IT_, Function_>, Filter_>
-    : public NLOptPrecond<typename AnalyticFunctionOperator<Mem_, DT_, IT_, Function_>::VectorTypeL, Filter_>
+    template<typename DT_, typename IT_, typename Function_, typename Filter_>
+    class ApproximateHessianPrecond<AnalyticFunctionOperator<DT_, IT_, Function_>, Filter_>
+    : public NLOptPrecond<typename AnalyticFunctionOperator<DT_, IT_, Function_>::VectorTypeL, Filter_>
     {
       public:
         /// The operator whose Hessian we use for preconditioning
-        typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+        typedef AnalyticFunctionOperator<DT_, IT_, Function_> OperatorType;
         /// Our filter type
         typedef Filter_ FilterType;
 

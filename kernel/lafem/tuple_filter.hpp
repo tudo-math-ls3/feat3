@@ -43,16 +43,12 @@ namespace FEAT
       /// number of vector blocks
       static constexpr int num_blocks = TupleFilter<Rest_...>::num_blocks + 1;
 
-      /// sub-filter mem-type
-      typedef typename First_::MemType MemType;
       /// sub-filter data-type
       typedef typename First_::DataType DataType;
       /// sub-filter index-type
       typedef typename First_::IndexType IndexType;
 
-      // ensure that all sub-vector have the same mem- and data-type
-      static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
-                    "sub-filters have different mem-types");
+      // ensure that all sub-vector have the same data-type
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
                     "sub-filters have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
@@ -62,14 +58,14 @@ namespace FEAT
       typedef TupleVector<typename First_::VectorType, typename Rest_::VectorType...> VectorType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using FilterType = TupleFilter<
-        typename First_::template FilterType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template FilterType<Mem2_, DT2_, IT2_>...>;
+        typename First_::template FilterType<DT2_, IT2_>,
+        typename Rest_::template FilterType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
     protected:
       /// the first sub-filter
@@ -217,8 +213,6 @@ namespace FEAT
     public:
       static constexpr int num_blocks = 1;
 
-      /// sub-filter mem-type
-      typedef typename First_::MemType MemType;
       /// sub-filter data-type
       typedef typename First_::DataType DataType;
       /// sub-filter index-type
@@ -226,12 +220,12 @@ namespace FEAT
 
       typedef TupleVector<typename First_::VectorType> VectorType;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using FilterType = TupleFilter<typename First_::template FilterType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = TupleFilter<typename First_::template FilterType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
     protected:
       /// the first sub-filter

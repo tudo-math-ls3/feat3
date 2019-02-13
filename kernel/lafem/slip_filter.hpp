@@ -21,9 +21,6 @@ namespace FEAT
     /**
      * \brief Slip Filter class template.
      *
-     * \tparam Mem_
-     * Memory architecture
-     *
      * \tparam DT_
      * Data type, i.e. double
      *
@@ -65,15 +62,12 @@ namespace FEAT
      * \author Jordi Paul
      */
     template<
-      typename Mem_,
       typename DT_,
       typename IT_,
       int BlockSize_>
     class SlipFilter
     {
       public:
-        /// mem-type typedef
-        typedef Mem_ MemType;
         /// data-type typedef
         typedef DT_ DataType;
         /// index-type typedef
@@ -83,23 +77,23 @@ namespace FEAT
         /// Value type
         typedef Tiny::Vector<DataType, BlockSize> ValueType;
         /// Our supported vector type
-        typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> VectorType;
+        typedef DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
 
         /// Our 'base' class type
-        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-        using FilterType = SlipFilter<Mem2_, DT2_, IT2_, BlockSize_>;
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        using FilterType = SlipFilter<DT2_, IT2_, BlockSize_>;
 
-        /// For creating filter with different Mem, DT, IT
-        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-        using FilterTypeByMDI = FilterType<Mem2_, DT2_, IT2_>;
+        /// For creating filter with different DT, IT
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        using FilterTypeByDI = FilterType<DT2_, IT2_>;
 
         static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
 
       private:
         /// This will contain the pointwise outer unit normal in all vertices
-        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _nu;
+        SparseVectorBlocked<DT_, IT_, BlockSize_> _nu;
         /// This will contain the data for filtering
-        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _sv;
+        SparseVectorBlocked<DT_, IT_, BlockSize_> _sv;
 
       public:
         /// default constructor
@@ -164,8 +158,8 @@ namespace FEAT
         }
 
         /// \brief Converts data from another UnitFilter
-        template<typename Mem2_, typename DT2_, typename IT2_, int BS_>
-        void convert(const SlipFilter<Mem2_, DT2_, IT2_, BS_>& other)
+        template<typename DT2_, typename IT2_, int BS_>
+        void convert(const SlipFilter<DT2_, IT2_, BS_>& other)
         {
           _nu.convert(other.get_nu());
           _sv.convert(other.get_filter_vector());
@@ -185,20 +179,20 @@ namespace FEAT
         }
 
         /// \cond internal
-        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector()
+        SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector()
         {
           return _sv;
         }
-        const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector() const
+        const SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector() const
         {
           return _sv;
         }
 
-        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_nu()
+        SparseVectorBlocked<DT_, IT_, BlockSize>& get_nu()
         {
           return _nu;
         }
-        const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_nu() const
+        const SparseVectorBlocked<DT_, IT_, BlockSize>& get_nu() const
         {
           return _nu;
         }
@@ -264,7 +258,7 @@ namespace FEAT
             return;
           XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
-            Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
+            Arch::SlipFilter::template filter_rhs<DT_, IT_, BlockSize_>
               (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
         }
 
@@ -294,7 +288,7 @@ namespace FEAT
             return;
           XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
-            Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
+            Arch::SlipFilter::template filter_rhs<DT_, IT_, BlockSize_>
               (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
         }
 

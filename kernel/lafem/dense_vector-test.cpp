@@ -5,9 +5,9 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/binary_stream.hpp>
+#include <kernel/util/type_traits.hpp>
 
 #include <list>
 #include <sstream>
@@ -22,24 +22,17 @@ using namespace FEAT::TestSystem;
  *
  * \test test description missing
  *
- * \tparam Mem_
- * description missing
- *
- * \tparam DT_
- * description missing
- *
  * \author Dirk Ribbrock
  */
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorTest")
+  DenseVectorTest(PreferredBackend backend)
+    : UnitTest("DenseVectorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -50,44 +43,40 @@ public:
 
   virtual void run() const override
   {
-    DenseVector<Mem_, DT_, IT_> zero1;
-    DenseVector<Mem::Main, DT_, IT_> zero2;
+    DenseVector<DT_, IT_> zero1;
+    DenseVector<DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
     zero2.convert(zero1);
 
-    if (typeid(Mem::CUDA) != typeid(Mem_))
-    {
-      DenseVector<Mem::Main, DT_, IT_> pinned(10, Pinning::enabled);
-      pinned(5, DT_(42));
-      TEST_CHECK_EQUAL(pinned(5), DT_(42));
-    }
-
-    DenseVector<Mem_, DT_, IT_> a(16, DT_(7)); //use multiple of 4 to circumanivate memory padding in MemoryPool
+    DenseVector<DT_, IT_> a(16, DT_(7)); //use multiple of 4 to circumanivate memory padding in MemoryPool
     TEST_CHECK_EQUAL(a.bytes(), 16 * sizeof(DT_) + 1 * sizeof(Index));
-    TEST_CHECK_EQUAL(MemoryPool<Mem_>::allocated_memory(), a.bytes() - sizeof(Index));
-    DenseVector<Mem_, DT_, IT_> b(16, DT_(5));
+
+    TEST_CHECK_EQUAL(MemoryPool::allocated_memory(), a.bytes() - sizeof(Index));
+    DenseVector<DT_, IT_> b(16, DT_(5));
     b(7, DT_(42));
+    MemoryPool::synchronize();
     TEST_CHECK_EQUAL(b(7), DT_(42));
     TEST_CHECK_EQUAL(b(3), DT_(5));
 
-    DenseVector<Mem_, DT_, IT_> b_r(b, 5, 3);
+    DenseVector<DT_, IT_> b_r(b, 5, 3);
     TEST_CHECK_EQUAL(b_r(0), b(0+3));
     TEST_CHECK_EQUAL(b_r(4), b(4+3));
     auto b_rc = b_r.clone();
     TEST_CHECK_EQUAL(b_rc(0), b(0+3));
     TEST_CHECK_EQUAL(b_rc(4), b(4+3));
 
-    DenseVector<Mem_, DT_, IT_> c(b.clone());
+    DenseVector<DT_, IT_> c(b.clone());
     TEST_CHECK_EQUAL(c.size(), b.size());
-    TEST_CHECK_EQUAL(c(7), b(7));
+    for (Index i(0) ; i < c.size() ; ++i)
+      TEST_CHECK_EQUAL(c(i), b(i));
     TEST_CHECK_EQUAL(c, b);
     c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));
     TEST_CHECK_EQUAL(c, b);
-    DenseVector<Mem::Main, float, unsigned int> d;
+    DenseVector<float, unsigned int> d;
     d.convert(c);
-    DenseVector<Mem::Main, float, unsigned int> e;
+    DenseVector<float, unsigned int> e;
     e.convert(b);
     TEST_CHECK_EQUAL(e.size(), d.size());
     TEST_CHECK_EQUAL(e(7), d(7));
@@ -102,23 +91,11 @@ public:
     TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
     TEST_CHECK_EQUAL(b, c);
 
-    DenseVector<Mem_, DT_, IT_> g(b.size(), b.elements());
+    DenseVector<DT_, IT_> g(b.size(), b.elements());
     TEST_CHECK_EQUAL(g, b);
     TEST_CHECK_EQUAL((void*)g.elements(), (void*)b.elements());
 
-    {
-      EDI<Mem_, DT_> t(a.edi(2));
-      t = DT_(41);
-      TEST_CHECK_NOT_EQUAL(a(2), DT_(41));
-      a.edi(1) = DT_(4);
-      TEST_CHECK_EQUAL(a(1), DT_(4));
-      a.edi(1) += DT_(4);
-      TEST_CHECK_EQUAL(a(1), DT_(8));
-    }
-    TEST_CHECK_EQUAL(a(1), DT_(8));
-    TEST_CHECK_EQUAL(a(2), DT_(41));
-
-    DenseVector<Mem_, DT_, IT_> ap(a.clone());
+    DenseVector<DT_, IT_> ap(a.clone());
     Adjacency::Permutation prm_nil;
     ap.permute(prm_nil);
     Random::SeedType seed(Random::SeedType(time(nullptr)));
@@ -135,7 +112,7 @@ public:
     IT_ rnd_size = 1234;
     rnd_range[0] = DT_(-10);
     rnd_range[1] = DT_(+10);
-    DenseVector<Mem_, DT_, IT_> rnd_vec(rng, rnd_size, rnd_range[0], rnd_range[1]);
+    DenseVector<DT_, IT_> rnd_vec(rng, rnd_size, rnd_range[0], rnd_range[1]);
     TEST_CHECK_EQUAL(rnd_vec.size(), rnd_size);
     DT_ rnd_max = rnd_vec.max_abs_element();
     TEST_CHECK_IN_RANGE(rnd_max, rnd_range[0], rnd_range[1]);
@@ -149,16 +126,16 @@ public:
     clone1(7, DT_(132));
     TEST_CHECK_NOT_EQUAL(clone1, a);
     TEST_CHECK_NOT_EQUAL((void*)clone1.elements(), (void*)a.elements());
-    DenseVector<Mem_, DT_, IT_> clone2 = clone1.clone(CloneMode::Layout);
-    MemoryPool<Mem_>::set_memory(clone2.elements(), DT_(4713), clone2.size());
+    DenseVector<DT_, IT_> clone2 = clone1.clone(CloneMode::Layout);
+    MemoryPool::set_memory(clone2.elements(), DT_(4713), clone2.size());
     TEST_CHECK_NOT_EQUAL(clone2(7), clone1(7));
     TEST_CHECK_NOT_EQUAL((void*)clone2.elements(), (void*)clone1.elements());
-    DenseVector<Mem_, DT_, IT_> clone3 = clone1.clone(CloneMode::Weak);
+    DenseVector<DT_, IT_> clone3 = clone1.clone(CloneMode::Weak);
     TEST_CHECK_EQUAL(clone3, clone1);
     clone3(7, DT_(133));
     TEST_CHECK_NOT_EQUAL(clone3, clone1);
     TEST_CHECK_NOT_EQUAL((void*)clone3.elements(), (void*)clone1.elements());
-    DenseVector<Mem_, DT_, IT_> clone4 = clone1.clone(CloneMode::Shallow);
+    DenseVector<DT_, IT_> clone4 = clone1.clone(CloneMode::Shallow);
     TEST_CHECK_EQUAL(clone4, clone1);
     clone4(7, DT_(134));
     TEST_CHECK_EQUAL(clone4, clone1);
@@ -168,35 +145,42 @@ public:
     TEST_CHECK_EQUAL(clone5.size(), a.size());
   }
 };
-DenseVectorTest<Mem::Main, float, unsigned int> cpu_dense_vector_test_float_uint;
-DenseVectorTest<Mem::Main, double, unsigned int> cpu_dense_vector_test_double_uint;
-DenseVectorTest<Mem::Main, float, unsigned long> cpu_dense_vector_test_float_ulong;
-DenseVectorTest<Mem::Main, double, unsigned long> cpu_dense_vector_test_double_ulong;
+DenseVectorTest<float, unsigned int> dv_test_float_uint(PreferredBackend::generic);
+DenseVectorTest<double, unsigned int> dv_test_double_uint(PreferredBackend::generic);
+DenseVectorTest<float, unsigned long> dv_test_float_ulong(PreferredBackend::generic);
+DenseVectorTest<double, unsigned long> dv_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_test_float128_uint;
-DenseVectorTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_test_float128_ulong;
+DenseVectorTest<__float128, unsigned int> dv_test_float128_uint(PreferredBackend::generic);
+DenseVectorTest<__float128, unsigned long> dv_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorTest<float, unsigned long> mkl_dv_test_float_ulong(PreferredBackend::mkl);
+DenseVectorTest<double, unsigned long> mkl_dv_test_double_ulong(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorTest<Mem::Main, half_float::half, unsigned int> cpu_dense_vector_test_half_uint;
-DenseVectorTest<Mem::Main, half_float::half, unsigned long> cpu_dense_vector_test_half_ulong;
+DenseVectorTest<Half, unsigned int> dv_test_half_uint(PreferredBackend::generic);
+DenseVectorTest<Half, unsigned long> dv_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorTest<Half, unsigned int> cuda_dv_test_half_uint(PreferredBackend::cuda);
+DenseVectorTest<Half, unsigned long> cuda_dv_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_test_float_uint;
-DenseVectorTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_test_double_uint;
-DenseVectorTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_test_float_ulong;
-DenseVectorTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_test_double_ulong;
+DenseVectorTest<float, unsigned int> cuda_dv_test_float_uint(PreferredBackend::cuda);
+DenseVectorTest<double, unsigned int> cuda_dv_test_double_uint(PreferredBackend::cuda);
+DenseVectorTest<float, unsigned long> cuda_dv_test_float_ulong(PreferredBackend::cuda);
+DenseVectorTest<double, unsigned long> cuda_dv_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorSerializeTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorSerializeTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorSerializeTest")
+  DenseVectorSerializeTest(PreferredBackend backend)
+    : UnitTest("DenseVectorSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -209,14 +193,14 @@ public:
   {
     Index io_vector_size = 1234;
 
-    DenseVector<Mem_, DT_, IT_> k(io_vector_size);
+    DenseVector<DT_, IT_> k(io_vector_size);
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
 
     {
       std::stringstream mts;
       k.write_out(FileMode::fm_mtx, mts);
-      DenseVector<Mem_, DT_, IT_> l(FileMode::fm_mtx, mts);
+      DenseVector<DT_, IT_> l(FileMode::fm_mtx, mts);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), DT_(1e-4));
     }
@@ -224,7 +208,7 @@ public:
     {
       std::stringstream ts;
       k.write_out(FileMode::fm_exp, ts);
-      DenseVector<Mem_, DT_, IT_> m(FileMode::fm_exp, ts);
+      DenseVector<DT_, IT_> m(FileMode::fm_exp, ts);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), DT_(1e-4));
     }
@@ -233,25 +217,25 @@ public:
       BinaryStream bs;
       k.write_out(FileMode::fm_dv, bs);
       bs.seekg(0);
-      DenseVector<Mem_, DT_, IT_> n(FileMode::fm_dv, bs);
+      DenseVector<DT_, IT_> n(FileMode::fm_dv, bs);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), DT_(1e-5));
     }
 
     {
       auto op = k.serialize(LAFEM::SerialConfig(false,false));
-      DenseVector<Mem_, DT_, IT_> o(op);
+      DenseVector<DT_, IT_> o(op);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), DT_(1e-5));
 #ifdef FEAT_HAVE_ZLIB
       auto zb = k.serialize(LAFEM::SerialConfig(true,false));
-      DenseVector<Mem_, DT_, IT_> zlib(zb);
+      DenseVector<DT_, IT_> zlib(zb);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), k(i), DT_(1e-5));
 #endif
 #ifdef FEAT_HAVE_ZFP
       auto zp = k.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-5)));
-      DenseVector<Mem_, DT_, IT_> zfp(zp);
+      DenseVector<DT_, IT_> zfp(zp);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), k(i), DT_(1e-5));
 #endif
@@ -259,27 +243,42 @@ public:
   }
 };
 
-DenseVectorSerializeTest<Mem::Main, float, unsigned int> cpu_dense_vector_serialize_test_float_uint;
-DenseVectorSerializeTest<Mem::Main, double, unsigned int> cpu_dense_vector_serialize_test_double_uint;
-DenseVectorSerializeTest<Mem::Main, float, unsigned long> cpu_dense_vector_serialize_test_float_ulong;
-DenseVectorSerializeTest<Mem::Main, double, unsigned long> cpu_dense_vector_serialize_test_double_ulong;
+DenseVectorSerializeTest<float, unsigned int> dv_serialize_test_float_uint(PreferredBackend::generic);
+DenseVectorSerializeTest<double, unsigned int> dv_serialize_test_double_uint(PreferredBackend::generic);
+DenseVectorSerializeTest<float, unsigned long> dv_serialize_test_float_ulong(PreferredBackend::generic);
+DenseVectorSerializeTest<double, unsigned long> dv_serialize_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorSerializeTest<__float128, unsigned int> dv_serialize_test_float128_uint(PreferredBackend::generic);
+DenseVectorSerializeTest<__float128, unsigned long> dv_serialize_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorSerializeTest<float, unsigned long> mkl_dv_serialize_test_float_ulong(PreferredBackend::mkl);
+DenseVectorSerializeTest<double, unsigned long> mkl_dv_serialize_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorSerializeTest<Half, unsigned int> dv_serialize_test_half_uint(PreferredBackend::generic);
+DenseVectorSerializeTest<Half, unsigned long> dv_serialize_test_half_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorSerializeTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_serialize_test_float_uint;
-DenseVectorSerializeTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_serialize_test_double_uint;
-DenseVectorSerializeTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_serialize_test_float_ulong;
-DenseVectorSerializeTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_serialize_test_double_ulong;
+DenseVectorSerializeTest<Half, unsigned int> cuda_dv_serialize_test_half_uint(PreferredBackend::cuda);
+DenseVectorSerializeTest<Half, unsigned long> cuda_dv_serialize_test_half_ulong(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorSerializeTest<float, unsigned int> cuda_dv_serialize_test_float_uint(PreferredBackend::cuda);
+DenseVectorSerializeTest<double, unsigned int> cuda_dv_serialize_test_double_uint(PreferredBackend::cuda);
+DenseVectorSerializeTest<float, unsigned long> cuda_dv_serialize_test_float_ulong(PreferredBackend::cuda);
+DenseVectorSerializeTest<double, unsigned long> cuda_dv_serialize_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorAxpyTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorAxpyTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorAxpyTest")
+  DenseVectorAxpyTest(PreferredBackend backend)
+    : UnitTest("DenseVectorAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -289,68 +288,86 @@ public:
 
   virtual void run() const override
   {
-    DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
+
+    DT_ s(DT_(47.11));
+    Index max_size(1e3);
+#ifdef FEAT_HAVE_HALFMATH
+    if (typeid(DT_) == typeid(Half))
+      max_size = 129;
+#endif
+
+    for (Index size(1) ; size < max_size ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
-      DenseVector<Mem::Main, DT_, IT_> b_local(size);
-      DenseVector<Mem::Main, DT_, IT_> ref(size);
-      DenseVector<Mem::Main, DT_, IT_> result_local(size);
+      DenseVector<DT_, IT_> a(size);
+      DenseVector<DT_, IT_> b(size);
+      DenseVector<DT_, IT_> ref(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i % 100 * DT_(1.234)));
-        b_local(i, DT_(2 - DT_(i % 42)));
-        ref(i, s * a_local(i) + b_local(i));
+        a(i, DT_(i % 100 * DT_(1.234)));
+        b(i, DT_(2 - DT_(i % 42)));
+        ref(i, s * a(i) + b(i));
       }
-      DenseVector<Mem_, DT_, IT_> a(size);
-      a.copy(a_local);
-      DenseVector<Mem_, DT_, IT_> b(size);
-      b.copy(b_local);
 
-      DenseVector<Mem_, DT_, IT_> c(size);
-      c.axpy(a, b, s);
-      result_local.copy(c);
+      DenseVector<DT_, IT_> c(size);
+      c.axpy(a, b, s); //a != b != r
+      MemoryPool::synchronize();
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(c(i), ref(i), DT_(eps));
 
-      a.axpy(a, b, s);
-      result_local.copy(a);
+      a.axpy(a, b, s); //r == a
+      MemoryPool::synchronize();
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(a(i), ref(i), DT_(eps));
 
-      a.copy(a_local);
-      b.axpy(a, b, s);
-      result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), DT_(1e-2));
+      {
+        ref(i, s * a(i) + b(i));
+      }
+
+      b.axpy(a, b, s); //r == b
+      MemoryPool::synchronize();
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(b(i), ref(i), DT_(eps));
     }
   }
 };
-DenseVectorAxpyTest<Mem::Main, float, unsigned int> dv_axpy_test_float_uint;
-DenseVectorAxpyTest<Mem::Main, double, unsigned int> dv_axpy_test_double_uint;
-DenseVectorAxpyTest<Mem::Main, float, unsigned long> dv_axpy_test_float_ulong;
-DenseVectorAxpyTest<Mem::Main, double, unsigned long> dv_axpy_test_double_ulong;
+DenseVectorAxpyTest<float, unsigned int> dv_axpy_test_float_uint(PreferredBackend::generic);
+DenseVectorAxpyTest<double, unsigned int> dv_axpy_test_double_uint(PreferredBackend::generic);
+DenseVectorAxpyTest<float, unsigned long> dv_axpy_test_float_ulong(PreferredBackend::generic);
+DenseVectorAxpyTest<double, unsigned long> dv_axpy_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorAxpyTest<Mem::Main, __float128, unsigned int> dv_axpy_test_float128_uint;
-DenseVectorAxpyTest<Mem::Main, __float128, unsigned long> dv_axpy_test_float128_ulong;
+DenseVectorAxpyTest<__float128, unsigned int> dv_axpy_test_float128_uint(PreferredBackend::generic);
+DenseVectorAxpyTest<__float128, unsigned long> dv_axpy_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorAxpyTest<float, unsigned long> mkl_dv_axpy_test_float_ulong(PreferredBackend::mkl);
+DenseVectorAxpyTest<double, unsigned long> mkl_dv_axpy_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorAxpyTest<Half, unsigned int> dv_axpy_test_half_uint(PreferredBackend::generic);
+DenseVectorAxpyTest<Half, unsigned long> dv_axpy_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorAxpyTest<Half, unsigned int> cuda_dv_axpy_test_half_uint(PreferredBackend::cuda);
+DenseVectorAxpyTest<Half, unsigned long> cuda_dv_axpy_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorAxpyTest<Mem::CUDA, float, unsigned int> cuda_dv_axpy_test_float_uint;
-DenseVectorAxpyTest<Mem::CUDA, double, unsigned int> cuda_dv_axpy_test_double_uint;
-DenseVectorAxpyTest<Mem::CUDA, float, unsigned long> cuda_dv_axpy_test_float_ulong;
-DenseVectorAxpyTest<Mem::CUDA, double, unsigned long> cuda_dv_axpy_test_double_ulong;
+DenseVectorAxpyTest<float, unsigned int> cuda_dv_axpy_test_float_uint(PreferredBackend::cuda);
+DenseVectorAxpyTest<double, unsigned int> cuda_dv_axpy_test_double_uint(PreferredBackend::cuda);
+DenseVectorAxpyTest<float, unsigned long> cuda_dv_axpy_test_float_ulong(PreferredBackend::cuda);
+DenseVectorAxpyTest<double, unsigned long> cuda_dv_axpy_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorDotTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorDotTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorDotTest")
+  DenseVectorDotTest(PreferredBackend backend)
+    : UnitTest("DenseVectorDotTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -364,19 +381,14 @@ public:
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
-      DenseVector<Mem::Main, DT_, IT_> b_local(size);
+      DenseVector<DT_, IT_> a(size);
+      DenseVector<DT_, IT_> b(size);
       const DT_ den(DT_(1) / DT_(size));
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i+1) * den);    // a[i] = (i+1) / n
-        b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
+        a(i, DT_(i+1) * den);    // a[i] = (i+1) / n
+        b(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
       }
-
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
-      DenseVector<Mem_, DT_, IT_> b;
-      b.convert(b_local);
 
       // a*b = 1
       DT_ ref(DT_(1));
@@ -391,41 +403,42 @@ public:
     }
   }
 };
-DenseVectorDotTest<Mem::Main, float, unsigned int> dv_dot_product_test_float_uint;
-DenseVectorDotTest<Mem::Main, double, unsigned int> dv_dot_product_test_double_uint;
-DenseVectorDotTest<Mem::Main, float, unsigned long> dv_dot_product_test_float_ulong;
-DenseVectorDotTest<Mem::Main, double, unsigned long> dv_dot_product_test_double_ulong;
+DenseVectorDotTest<float, unsigned int> dv_dot_product_test_float_uint(PreferredBackend::generic);
+DenseVectorDotTest<double, unsigned int> dv_dot_product_test_double_uint(PreferredBackend::generic);
+DenseVectorDotTest<float, unsigned long> dv_dot_product_test_float_ulong(PreferredBackend::generic);
+DenseVectorDotTest<double, unsigned long> dv_dot_product_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorDotTest<Mem::Main, __float128, unsigned int> dv_dot_product_test_float128_uint;
-DenseVectorDotTest<Mem::Main, __float128, unsigned long> dv_dot_product_test_float128_ulong;
+DenseVectorDotTest<__float128, unsigned int> dv_dot_product_test_float128_uint(PreferredBackend::generic);
+DenseVectorDotTest<__float128, unsigned long> dv_dot_product_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorDotTest<float, unsigned long> mkl_dv_dot_product_test_float_ulong(PreferredBackend::mkl);
+DenseVectorDotTest<double, unsigned long> mkl_dv_dot_product_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorDotTest<Half, unsigned int> dv_dot_product_test_half_uint(PreferredBackend::generic);
+DenseVectorDotTest<Half, unsigned long> dv_dot_product_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorDotTest<Half, unsigned int> cuda_dv_dot_product_test_half_uint(PreferredBackend::cuda);
+DenseVectorDotTest<Half, unsigned long> cuda_dv_dot_product_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorDotTest<Mem::CUDA, float, unsigned int> cuda_dv_dot_product_test_float_uint;
-DenseVectorDotTest<Mem::CUDA, double, unsigned int> cuda_dv_dot_product_test_double_uint;
-DenseVectorDotTest<Mem::CUDA, float, unsigned long> cuda_dv_dot_product_test_float_ulong;
-DenseVectorDotTest<Mem::CUDA, double, unsigned long> cuda_dv_dot_product_test_double_ulong;
+DenseVectorDotTest<float, unsigned int> cuda_dv_dot_product_test_float_uint(PreferredBackend::cuda);
+DenseVectorDotTest<double, unsigned int> cuda_dv_dot_product_test_double_uint(PreferredBackend::cuda);
+DenseVectorDotTest<float, unsigned long> cuda_dv_dot_product_test_float_ulong(PreferredBackend::cuda);
+DenseVectorDotTest<double, unsigned long> cuda_dv_dot_product_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
-/**
- * \brief DenseVector triple_dot test class
- *
- * \test The triple_dot routines
- *
- * \author Jordi Paul
- *
- **/
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorTripleDotTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorTripleDotTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorTripleDotTest")
+  DenseVectorTripleDotTest(PreferredBackend backend)
+    : UnitTest("DenseVectorTripleDotTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -436,31 +449,24 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    if (Runtime::get_preferred_backend() == PreferredBackend::cuda)
+      eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
-      DenseVector<Mem::Main, DT_, IT_> b_local(size);
-      DenseVector<Mem::Main, DT_, IT_> c_local(size);
+      DenseVector<DT_, IT_> a(size);
+      DenseVector<DT_, IT_> b(size);
+      DenseVector<DT_, IT_> c(size);
 
       const DT_ den( DT_(1) / Math::sqrt(DT_(size)) );
 
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i+1) * den);    // a[i] = (i+1) / n
-        b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
-        c_local(i, den);
+        a(i, DT_(i+1) * den);    // a[i] = (i+1) / n
+        b(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
+        c(i, den);
       }
-
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
-
-      DenseVector<Mem_, DT_, IT_> b;
-      b.convert(b_local);
-
-      DenseVector<Mem_, DT_, IT_> c;
-      c.convert(c_local);
 
       // a^T diag(c) b = 1
       DT_ ref(DT_(1));
@@ -483,32 +489,42 @@ public:
     }
   }
 };
-DenseVectorTripleDotTest<Mem::Main, float, unsigned int> dv_triple_dot_product_test_float_uint;
-DenseVectorTripleDotTest<Mem::Main, double, unsigned int> dv_triple_dot_product_test_double_uint;
-DenseVectorTripleDotTest<Mem::Main, float, unsigned long> dv_triple_dot_product_test_float_ulong;
-DenseVectorTripleDotTest<Mem::Main, double, unsigned long> dv_triple_dot_product_test_double_ulong;
+DenseVectorTripleDotTest<float, unsigned int> dv_triple_dot_product_test_float_uint(PreferredBackend::generic);
+DenseVectorTripleDotTest<double, unsigned int> dv_triple_dot_product_test_double_uint(PreferredBackend::generic);
+DenseVectorTripleDotTest<float, unsigned long> dv_triple_dot_product_test_float_ulong(PreferredBackend::generic);
+DenseVectorTripleDotTest<double, unsigned long> dv_triple_dot_product_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorTripleDotTest<Mem::Main, __float128, unsigned int> dv_triple_dot_product_test_float128_uint;
-DenseVectorTripleDotTest<Mem::Main, __float128, unsigned long> dv_triple_dot_product_test_float128_ulong;
+DenseVectorTripleDotTest<__float128, unsigned int> dv_triple_dot_product_test_float128_uint(PreferredBackend::generic);
+DenseVectorTripleDotTest<__float128, unsigned long> dv_triple_dot_product_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorTripleDotTest<float, unsigned long> mkl_dv_triple_dot_product_test_float_ulong(PreferredBackend::mkl);
+DenseVectorTripleDotTest<double, unsigned long> mkl_dv_triple_dot_product_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorTripleDotTest<Half, unsigned int> dv_triple_dot_product_test_half_uint(PreferredBackend::generic);
+DenseVectorTripleDotTest<Half, unsigned long> dv_triple_dot_product_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorTripleDotTest<Half, unsigned int> cuda_dv_triple_dot_product_test_half_uint(PreferredBackend::cuda);
+DenseVectorTripleDotTest<Half, unsigned long> cuda_dv_triple_dot_product_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorTripleDotTest<Mem::CUDA, float, unsigned int> cuda_dv_triple_dot_product_test_float_uint;
-DenseVectorTripleDotTest<Mem::CUDA, double, unsigned int> cuda_dv_triple_dot_product_test_double_uint;
-DenseVectorTripleDotTest<Mem::CUDA, float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong;
-DenseVectorTripleDotTest<Mem::CUDA, double, unsigned long> cuda_dv_triple_dot_product_test_double_ulong;
+DenseVectorTripleDotTest<float, unsigned int> cuda_dv_triple_dot_product_test_float_uint(PreferredBackend::cuda);
+DenseVectorTripleDotTest<double, unsigned int> cuda_dv_triple_dot_product_test_double_uint(PreferredBackend::cuda);
+DenseVectorTripleDotTest<float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong(PreferredBackend::cuda);
+DenseVectorTripleDotTest<double, unsigned long> cuda_dv_triple_dot_product_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorComponentProductTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorComponentProductTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorComponentProductTest")
+  DenseVectorComponentProductTest(PreferredBackend backend)
+    : UnitTest("DenseVectorComponentProductTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -516,80 +532,89 @@ public:
   {
   }
 
-  void run1() const
+  virtual void run() const override
   {
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
-      DenseVector<Mem::Main, DT_, IT_> b_local(size);
-      DenseVector<Mem::Main, DT_, IT_> ref(size);
-      DenseVector<Mem::Main, DT_, IT_> ref2(size);
-      DenseVector<Mem::Main, DT_, IT_> result_local(size);
+      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+      if (Runtime::get_preferred_backend() == PreferredBackend::cuda)
+        eps = Math::pow(Math::eps<DT_>(), DT_(0.2));
+
+      DenseVector<DT_, IT_> a(size);
+      DenseVector<DT_, IT_> b(size);
+      DenseVector<DT_, IT_> ref(size);
+      DenseVector<DT_, IT_> ref2(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(DT_(i) * DT_(1.234)));
-        b_local(i, DT_(size*2 - i));
-        ref(i, a_local(i) * b_local(i));
-        ref2(i, a_local(i) * a_local(i));
+        a(i, DT_(DT_(i)/DT_(100) * DT_(1.234)));
+        b(i, DT_(size*2 - i));
+        ref(i, a(i) * b(i));
+        ref2(i, a(i) * a(i));
       }
 
-      DenseVector<Mem_, DT_, IT_> a(size);
-      a.copy(a_local);
-      DenseVector<Mem_, DT_, IT_> b(size);
-      b.copy(b_local);
-      DenseVector<Mem_, DT_, IT_> c(size);
-
+      DenseVector<DT_, IT_> c(size);
       c.component_product(a, b);
-      result_local.copy(c);
-      TEST_CHECK_EQUAL(result_local, ref);
+      MemoryPool::synchronize();
+      for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+      }
+      //TEST_CHECK_EQUAL(c, ref);
 
-      a.component_product(a, b);
-      result_local.copy(a);
-      TEST_CHECK_EQUAL(result_local, ref);
-
-      a.copy(a_local);
       b.component_product(a, b);
-      result_local.copy(b);
-      TEST_CHECK_EQUAL(result_local, ref);
+      MemoryPool::synchronize();
+      for (Index i(0); i < b.template size<Perspective::pod>(); ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+      }
+      //TEST_CHECK_EQUAL(b, ref);
 
-      b.copy(b_local);
       a.component_product(a, a);
-      result_local.copy(a);
-      TEST_CHECK_EQUAL(result_local, ref2);
+      MemoryPool::synchronize();
+      for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
+      }
+      //TEST_CHECK_EQUAL(a, ref2);
     }
   }
-
-  virtual void run() const override
-  {
-    run1();
-  }
 };
-DenseVectorComponentProductTest<Mem::Main, float, unsigned int> dv_component_product_test_float_uint;
-DenseVectorComponentProductTest<Mem::Main, double, unsigned int> dv_component_product_test_double_uint;
-DenseVectorComponentProductTest<Mem::Main, float, unsigned long> dv_component_product_test_float_ulong;
-DenseVectorComponentProductTest<Mem::Main, double, unsigned long> dv_component_product_test_double_ulong;
+DenseVectorComponentProductTest<float, unsigned int> dv_component_product_test_float_uint(PreferredBackend::generic);
+DenseVectorComponentProductTest<double, unsigned int> dv_component_product_test_double_uint(PreferredBackend::generic);
+DenseVectorComponentProductTest<float, unsigned long> dv_component_product_test_float_ulong(PreferredBackend::generic);
+DenseVectorComponentProductTest<double, unsigned long> dv_component_product_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorComponentProductTest<Mem::Main, __float128, unsigned int> dv_component_product_test_float128_uint;
-DenseVectorComponentProductTest<Mem::Main, __float128, unsigned long> dv_component_product_test_float128_ulong;
+DenseVectorComponentProductTest<__float128, unsigned int> dv_component_product_test_float128_uint(PreferredBackend::generic);
+DenseVectorComponentProductTest<__float128, unsigned long> dv_component_product_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorComponentProductTest<float, unsigned long> mkl_dv_component_product_test_float_ulong(PreferredBackend::mkl);
+DenseVectorComponentProductTest<double, unsigned long> mkl_dv_component_product_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorComponentProductTest<Half, unsigned int> dv_component_product_test_half_uint(PreferredBackend::generic);
+DenseVectorComponentProductTest<Half, unsigned long> dv_component_product_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorComponentProductTest<Half, unsigned int> cuda_dv_component_product_test_half_uint(PreferredBackend::cuda);
+DenseVectorComponentProductTest<Half, unsigned long> cuda_dv_component_product_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorComponentProductTest<Mem::CUDA, float, unsigned int> cuda_dv_component_product_test_float_uint;
-DenseVectorComponentProductTest<Mem::CUDA, double, unsigned int> cuda_dv_component_product_test_double_uint;
-DenseVectorComponentProductTest<Mem::CUDA, float, unsigned long> cuda_dv_component_product_test_float_ulong;
-DenseVectorComponentProductTest<Mem::CUDA, double, unsigned long> cuda_dv_component_product_test_double_ulong;
+DenseVectorComponentProductTest<float, unsigned int> cuda_dv_component_product_test_float_uint(PreferredBackend::cuda);
+DenseVectorComponentProductTest<double, unsigned int> cuda_dv_component_product_test_double_uint(PreferredBackend::cuda);
+DenseVectorComponentProductTest<float, unsigned long> cuda_dv_component_product_test_float_ulong(PreferredBackend::cuda);
+DenseVectorComponentProductTest<double, unsigned long> cuda_dv_component_product_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorScaleTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorScaleTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorScaleTest")
+  DenseVectorScaleTest(PreferredBackend backend)
+    : UnitTest("DenseVectorScaleTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -602,55 +627,61 @@ public:
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
-      DenseVector<Mem::Main, DT_, IT_> ref(size);
-      DenseVector<Mem::Main, DT_, IT_> result_local(size);
+      DenseVector<DT_, IT_> a(size);
+      DenseVector<DT_, IT_> ref(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(DT_(i) * DT_(1.234)));
-        ref(i, a_local(i) * s);
+        a(i, DT_(DT_(i) * DT_(1.234)));
+        ref(i, a(i) * s);
       }
 
-      DenseVector<Mem_, DT_, IT_> a(size);
-      a.copy(a_local);
-      DenseVector<Mem_, DT_, IT_> b(size);
-
+      DenseVector<DT_, IT_> b(size);
       b.scale(a, s);
-      result_local.copy(b);
-      TEST_CHECK_EQUAL(result_local, ref);
+      MemoryPool::synchronize();
+      TEST_CHECK_EQUAL(b, ref);
 
       a.scale(a, s);
-      result_local.copy(a);
-      TEST_CHECK_EQUAL(result_local, ref);
+      MemoryPool::synchronize();
+      TEST_CHECK_EQUAL(a, ref);
     }
   }
 };
-DenseVectorScaleTest<Mem::Main, float, unsigned int> dv_scale_test_float_uint;
-DenseVectorScaleTest<Mem::Main, double, unsigned int> dv_scale_test_double_uint;
-DenseVectorScaleTest<Mem::Main, float, unsigned long> dv_scale_test_float_ulong;
-DenseVectorScaleTest<Mem::Main, double, unsigned long> dv_scale_test_double_ulong;
+DenseVectorScaleTest<float, unsigned int> dv_scale_test_float_uint(PreferredBackend::generic);
+DenseVectorScaleTest<double, unsigned int> dv_scale_test_double_uint(PreferredBackend::generic);
+DenseVectorScaleTest<float, unsigned long> dv_scale_test_float_ulong(PreferredBackend::generic);
+DenseVectorScaleTest<double, unsigned long> dv_scale_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorScaleTest<Mem::Main, __float128, unsigned int> dv_scale_test_float128_uint;
-DenseVectorScaleTest<Mem::Main, __float128, unsigned long> dv_scale_test_float128_ulong;
+DenseVectorScaleTest<__float128, unsigned int> dv_scale_test_float128_uint(PreferredBackend::generic);
+DenseVectorScaleTest<__float128, unsigned long> dv_scale_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorScaleTest<float, unsigned long> mkl_dv_scale_product_test_float_ulong(PreferredBackend::mkl);
+DenseVectorScaleTest<double, unsigned long> mkl_dv_scale_product_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorScaleTest<Half, unsigned int> dv_scale_product_test_half_uint(PreferredBackend::generic);
+DenseVectorScaleTest<Half, unsigned long> dv_scale_product_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorScaleTest<Half, unsigned int> cuda_dv_scale_product_test_half_uint(PreferredBackend::cuda);
+DenseVectorScaleTest<Half, unsigned long> cuda_dv_scale_product_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorScaleTest<Mem::CUDA, float, unsigned int> cuda_dv_scale_test_float_uint;
-DenseVectorScaleTest<Mem::CUDA, double, unsigned int> cuda_dv_scale_test_double_uint;
-DenseVectorScaleTest<Mem::CUDA, float, unsigned long> cuda_dv_scale_test_float_ulong;
-DenseVectorScaleTest<Mem::CUDA, double, unsigned long> cuda_dv_scale_test_double_ulong;
+DenseVectorScaleTest<float, unsigned int> cuda_dv_scale_test_float_uint(PreferredBackend::cuda);
+DenseVectorScaleTest<double, unsigned int> cuda_dv_scale_test_double_uint(PreferredBackend::cuda);
+DenseVectorScaleTest<float, unsigned long> cuda_dv_scale_test_float_ulong(PreferredBackend::cuda);
+DenseVectorScaleTest<double, unsigned long> cuda_dv_scale_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorNorm2Test
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorNorm2Test()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorNorm2Test")
+  DenseVectorNorm2Test(PreferredBackend backend)
+    : UnitTest("DenseVectorNorm2Test", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -664,18 +695,16 @@ public:
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      DenseVector<DT_, IT_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
         // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
-        a_local(i, Math::pow(DT_(0.5), DT_(0.5) * DT_(i)));
+        a(i, Math::pow(DT_(0.5), DT_(0.5) * DT_(i)));
       }
 
       // ||a||_2 = sqrt(2 - 2^{1-n})
       const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
 
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
       DT_ c = a.norm2();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 
@@ -684,33 +713,42 @@ public:
     }
   }
 };
-DenseVectorNorm2Test<Mem::Main, float, unsigned int> dv_norm2_test_float_uint;
-DenseVectorNorm2Test<Mem::Main, double, unsigned int> dv_norm2_test_double_uint;
-DenseVectorNorm2Test<Mem::Main, float, unsigned long> dv_norm2_test_float_ulong;
-DenseVectorNorm2Test<Mem::Main, double, unsigned long> dv_norm2_test_double_ulong;
+DenseVectorNorm2Test<float, unsigned int> dv_norm2_test_float_uint(PreferredBackend::generic);
+DenseVectorNorm2Test<double, unsigned int> dv_norm2_test_double_uint(PreferredBackend::generic);
+DenseVectorNorm2Test<float, unsigned long> dv_norm2_test_float_ulong(PreferredBackend::generic);
+DenseVectorNorm2Test<double, unsigned long> dv_norm2_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorNorm2Test<Mem::Main, __float128, unsigned int> dv_norm2_test_float128_uint;
-DenseVectorNorm2Test<Mem::Main, __float128, unsigned long> dv_norm2_test_float128_ulong;
+DenseVectorNorm2Test<__float128, unsigned int> dv_norm2_test_float128_uint(PreferredBackend::generic);
+DenseVectorNorm2Test<__float128, unsigned long> dv_norm2_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorNorm2Test<float, unsigned long> mkl_dv_norm2_test_float_ulong(PreferredBackend::mkl);
+DenseVectorNorm2Test<double, unsigned long> mkl_dv_norm2_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorNorm2Test<Half, unsigned int> dv_norm2_test_half_uint(PreferredBackend::generic);
+DenseVectorNorm2Test<Half, unsigned long> dv_norm2_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorNorm2Test<Half, unsigned int> cuda_dv_norm2_test_half_uint(PreferredBackend::cuda);
+DenseVectorNorm2Test<Half, unsigned long> cuda_dv_norm2_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorNorm2Test<Mem::CUDA, float, unsigned int> cuda_dv_norm2_test_float_uint;
-DenseVectorNorm2Test<Mem::CUDA, double, unsigned int> cuda_dv_norm2_test_double_uint;
-DenseVectorNorm2Test<Mem::CUDA, float, unsigned long> cuda_dv_norm2_test_float_ulong;
-DenseVectorNorm2Test<Mem::CUDA, double, unsigned long> cuda_dv_norm2_test_double_ulong;
+DenseVectorNorm2Test<float, unsigned int> cuda_dv_norm2_test_float_uint(PreferredBackend::cuda);
+DenseVectorNorm2Test<double, unsigned int> cuda_dv_norm2_test_double_uint(PreferredBackend::cuda);
+DenseVectorNorm2Test<float, unsigned long> cuda_dv_norm2_test_float_ulong(PreferredBackend::cuda);
+DenseVectorNorm2Test<double, unsigned long> cuda_dv_norm2_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorComponentInvertTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  typedef DenseVector<Mem_, DT_, IT_> VectorType;
-
-  DenseVectorComponentInvertTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorComponentInvertTest")
+  DenseVectorComponentInvertTest(PreferredBackend backend)
+    : UnitTest("DenseVectorComponentInvertTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -720,21 +758,22 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    if (Runtime::get_preferred_backend() == PreferredBackend::cuda)
+      eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
+
     const DT_ alpha(Math::pi<DT_>());
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       // create a vector
-      DenseVector<Mem::Main, DT_, IT_> tvec(size);
+      DenseVector<DT_, IT_>  vec(size);
       for (Index i(0); i < size; ++i)
       {
-        tvec(i, DT_(7.63) * DT_(i % 3 + 1) - DT_(9.3));
+        vec(i, DT_(7.63) * DT_(i % 3 + 1) - DT_(9.3));
       }
-      VectorType vec;
-      vec.convert(tvec);
 
-      VectorType vec2(vec.clone());
+      DenseVector<DT_, IT_>  vec2(vec.clone());
       vec2.component_invert(vec2, alpha);
       vec2.component_product(vec2, vec);
       for (Index i(0); i < size; ++i)
@@ -742,7 +781,7 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS(vec2(i), alpha, eps);
       }
 
-      VectorType vec3(size);
+      DenseVector<DT_, IT_>  vec3(size);
       vec3.component_invert(vec);
       for (Index i(0); i < size; ++i)
       {
@@ -752,27 +791,35 @@ public:
   }
 };
 
-DenseVectorComponentInvertTest<Mem::Main, float, Index> dv_component_invert_test_float;
-DenseVectorComponentInvertTest<Mem::Main, double, Index> dv_component_invert_test_double;
+DenseVectorComponentInvertTest<float, Index> dv_component_invert_test_float(PreferredBackend::generic);
+DenseVectorComponentInvertTest<double, Index> dv_component_invert_test_double(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorComponentInvertTest<Mem::Main, __float128, Index> dv_component_invert_test_float128;
+DenseVectorComponentInvertTest<__float128, Index> dv_component_invert_test_float128(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorComponentInvertTest<float, Index> mkl_dv_component_invert_test_float(PreferredBackend::mkl);
+DenseVectorComponentInvertTest<double, Index> mkl_dv_component_invert_test_double(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorComponentInvertTest<Half, Index> dv_component_invert_test_half(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorComponentInvertTest<Half, Index> cuda_dv_component_invert_test_half(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorComponentInvertTest<Mem::CUDA, float, Index> cuda_dv_component_invert_test_float;
-DenseVectorComponentInvertTest<Mem::CUDA, double, Index> cuda_dv_component_invert_test_double;
+DenseVectorComponentInvertTest<float, Index> cuda_dv_component_invert_test_float(PreferredBackend::cuda);
+DenseVectorComponentInvertTest<double, Index> cuda_dv_component_invert_test_double(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorMaxAbsElementTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorMaxAbsElementTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMaxAbsElementTest")
+  DenseVectorMaxAbsElementTest(PreferredBackend backend)
+    : UnitTest("DenseVectorMaxAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -784,14 +831,12 @@ public:
   {
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      DenseVector<DT_, IT_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        a(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
       }
 
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
       Random rng(seed);
@@ -804,31 +849,42 @@ public:
     }
   }
 };
-DenseVectorMaxAbsElementTest<Mem::Main, float, unsigned int> dv_max_abs_element_test_float_uint;
-DenseVectorMaxAbsElementTest<Mem::Main, double, unsigned int> dv_max_abs_element_test_double_uint;
-DenseVectorMaxAbsElementTest<Mem::Main, float, unsigned long> dv_max_abs_element_test_float_ulong;
-DenseVectorMaxAbsElementTest<Mem::Main, double, unsigned long> dv_max_abs_element_test_double_ulong;
+DenseVectorMaxAbsElementTest<float, unsigned int> dv_max_abs_element_test_float_uint(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest<double, unsigned int> dv_max_abs_element_test_double_uint(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest<float, unsigned long> dv_max_abs_element_test_float_ulong(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest<double, unsigned long> dv_max_abs_element_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMaxAbsElementTest<Mem::Main, __float128, unsigned int> dv_max_abs_element_test_float128_uint;
-DenseVectorMaxAbsElementTest<Mem::Main, __float128, unsigned long> dv_max_abs_element_test_float128_ulong;
+DenseVectorMaxAbsElementTest<__float128, unsigned int> dv_max_abs_element_test_float128_uint(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest<__float128, unsigned long> dv_max_abs_element_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorMaxAbsElementTest<float, unsigned long> mkl_dv_max_abs_test_float_ulong(PreferredBackend::mkl);
+DenseVectorMaxAbsElementTest<double, unsigned long> mkl_dv_max_abs_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorMaxAbsElementTest<Half, unsigned int> dv_max_abs_test_half_uint(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest<Half, unsigned long> dv_max_abs_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMaxAbsElementTest<Half, unsigned int> cuda_dv_max_abs_test_half_uint(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest<Half, unsigned long> cuda_dv_max_abs_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMaxAbsElementTest<Mem::CUDA, float, unsigned int> cuda_dv_max_abs_element_test_float_uint;
-DenseVectorMaxAbsElementTest<Mem::CUDA, double, unsigned int> cuda_dv_max_abs_element_test_double_uint;
-DenseVectorMaxAbsElementTest<Mem::CUDA, float, unsigned long> cuda_dv_max_abs_element_test_float_ulong;
-DenseVectorMaxAbsElementTest<Mem::CUDA, double, unsigned long> cuda_dv_max_abs_element_test_double_ulong;
+DenseVectorMaxAbsElementTest<float, unsigned int> cuda_dv_max_abs_element_test_float_uint(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest<double, unsigned int> cuda_dv_max_abs_element_test_double_uint(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest<float, unsigned long> cuda_dv_max_abs_element_test_float_ulong(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest<double, unsigned long> cuda_dv_max_abs_element_test_double_ulong(PreferredBackend::cuda);
 #endif
 
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorMinAbsElementTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorMinAbsElementTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMinAbsElementTest")
+  DenseVectorMinAbsElementTest(PreferredBackend backend)
+    : UnitTest("DenseVectorMinAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -840,14 +896,12 @@ public:
   {
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      DenseVector<DT_, IT_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        a(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
       }
 
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
       Random rng(seed);
@@ -860,32 +914,42 @@ public:
     }
   }
 };
-DenseVectorMinAbsElementTest<Mem::Main, float, unsigned int> dv_min_abs_element_test_float_uint;
-DenseVectorMinAbsElementTest<Mem::Main, double, unsigned int> dv_min_abs_element_test_double_uint;
-DenseVectorMinAbsElementTest<Mem::Main, float, unsigned long> dv_min_abs_element_test_float_ulong;
-DenseVectorMinAbsElementTest<Mem::Main, double, unsigned long> dv_min_abs_element_test_double_ulong;
+DenseVectorMinAbsElementTest<float, unsigned int> dv_min_abs_element_test_float_uint(PreferredBackend::generic);
+DenseVectorMinAbsElementTest<double, unsigned int> dv_min_abs_element_test_double_uint(PreferredBackend::generic);
+DenseVectorMinAbsElementTest<float, unsigned long> dv_min_abs_element_test_float_ulong(PreferredBackend::generic);
+DenseVectorMinAbsElementTest<double, unsigned long> dv_min_abs_element_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMinAbsElementTest<Mem::Main, __float128, unsigned int> dv_min_abs_element_test_float128_uint;
-DenseVectorMinAbsElementTest<Mem::Main, __float128, unsigned long> dv_min_abs_element_test_float128_ulong;
+DenseVectorMinAbsElementTest<__float128, unsigned int> dv_min_abs_element_test_float128_uint(PreferredBackend::generic);
+DenseVectorMinAbsElementTest<__float128, unsigned long> dv_min_abs_element_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorMinAbsElementTest<float, unsigned long> mkl_dv_min_abs_test_float_ulong(PreferredBackend::mkl);
+DenseVectorMinAbsElementTest<double, unsigned long> mkl_dv_min_abs_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorMinAbsElementTest<Half, unsigned int> dv_min_abs_test_half_uint(PreferredBackend::generic);
+DenseVectorMinAbsElementTest<Half, unsigned long> dv_min_abs_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMinAbsElementTest<Half, unsigned int> cuda_dv_min_abs_test_half_uint(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest<Half, unsigned long> cuda_dv_min_abs_test_half_ulong(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMinAbsElementTest<Mem::CUDA, float, unsigned int> cuda_dv_min_abs_element_test_float_uint;
-DenseVectorMinAbsElementTest<Mem::CUDA, double, unsigned int> cuda_dv_min_abs_element_test_double_uint;
-DenseVectorMinAbsElementTest<Mem::CUDA, float, unsigned long> cuda_dv_min_abs_element_test_float_ulong;
-DenseVectorMinAbsElementTest<Mem::CUDA, double, unsigned long> cuda_dv_min_abs_element_test_double_ulong;
+DenseVectorMinAbsElementTest<float, unsigned int> cuda_dv_min_abs_element_test_float_uint(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest<double, unsigned int> cuda_dv_min_abs_element_test_double_uint(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest<float, unsigned long> cuda_dv_min_abs_element_test_float_ulong(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest<double, unsigned long> cuda_dv_min_abs_element_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorMaxElementTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorMaxElementTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMaxElementTest")
+  DenseVectorMaxElementTest(PreferredBackend backend)
+    : UnitTest("DenseVectorMaxElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -897,15 +961,13 @@ public:
   {
     for (Index size(5) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      DenseVector<DT_, IT_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i));
+        a(i, DT_(i));
       }
-      a_local(0, DT_(-5));
+      a(0, DT_(-5));
 
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
       Random rng(seed);
@@ -918,26 +980,42 @@ public:
     }
   }
 };
-DenseVectorMaxElementTest<Mem::Main, float, unsigned int> dv_max_element_test_float_uint;
-DenseVectorMaxElementTest<Mem::Main, double, unsigned int> dv_max_element_test_double_uint;
-DenseVectorMaxElementTest<Mem::Main, float, unsigned long> dv_max_element_test_float_ulong;
-DenseVectorMaxElementTest<Mem::Main, double, unsigned long> dv_max_element_test_double_ulong;
+DenseVectorMaxElementTest<float, unsigned int> dv_max_element_test_float_uint(PreferredBackend::generic);
+DenseVectorMaxElementTest<double, unsigned int> dv_max_element_test_double_uint(PreferredBackend::generic);
+DenseVectorMaxElementTest<float, unsigned long> dv_max_element_test_float_ulong(PreferredBackend::generic);
+DenseVectorMaxElementTest<double, unsigned long> dv_max_element_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMaxElementTest<Mem::Main, __float128, unsigned int> dv_max_element_test_float128_uint;
-DenseVectorMaxElementTest<Mem::Main, __float128, unsigned long> dv_max_element_test_float128_ulong;
+DenseVectorMaxElementTest<__float128, unsigned int> dv_max_element_test_float128_uint(PreferredBackend::generic);
+DenseVectorMaxElementTest<__float128, unsigned long> dv_max_element_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorMaxElementTest<float, unsigned long> mkl_dv_max_test_float_ulong(PreferredBackend::mkl);
+DenseVectorMaxElementTest<double, unsigned long> mkl_dv_max_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorMaxElementTest<Half, unsigned int> dv_max_test_half_uint(PreferredBackend::generic);
+DenseVectorMaxElementTest<Half, unsigned long> dv_max_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMaxElementTest<Half, unsigned int> cuda_dv_max_test_half_uint(PreferredBackend::cuda);
+DenseVectorMaxElementTest<Half, unsigned long> cuda_dv_max_test_half_ulong(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMaxElementTest<float, unsigned int> cuda_dv_max_element_test_float_uint(PreferredBackend::cuda);
+DenseVectorMaxElementTest<double, unsigned int> cuda_dv_max_element_test_double_uint(PreferredBackend::cuda);
+DenseVectorMaxElementTest<float, unsigned long> cuda_dv_max_element_test_float_ulong(PreferredBackend::cuda);
+DenseVectorMaxElementTest<double, unsigned long> cuda_dv_max_element_test_double_ulong(PreferredBackend::cuda);
 #endif
 
-
 template<
-  typename Mem_,
   typename DT_,
   typename IT_>
 class DenseVectorMinElementTest
-  : public FullTaggedTest<Mem_, DT_, IT_>
+  : public UnitTest
 {
 public:
-  DenseVectorMinElementTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMinElementTest")
+  DenseVectorMinElementTest(PreferredBackend backend)
+    : UnitTest("DenseVectorMinElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -949,14 +1027,12 @@ public:
   {
     for (Index size(5) ; size < Index(1e3) ; size*=2)
     {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      DenseVector<DT_, IT_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(DT_(i) - DT_(3)));
+        a(i, DT_(DT_(i) - DT_(3)));
       }
 
-      DenseVector<Mem_, DT_, IT_> a;
-      a.convert(a_local);
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
       Random rng(seed);
@@ -969,11 +1045,29 @@ public:
     }
   }
 };
-DenseVectorMinElementTest<Mem::Main, float, unsigned int> dv_min_element_test_float_uint;
-DenseVectorMinElementTest<Mem::Main, double, unsigned int> dv_min_element_test_double_uint;
-DenseVectorMinElementTest<Mem::Main, float, unsigned long> dv_min_element_test_float_ulong;
-DenseVectorMinElementTest<Mem::Main, double, unsigned long> dv_min_element_test_double_ulong;
+DenseVectorMinElementTest<float, unsigned int> dv_min_element_test_float_uint(PreferredBackend::generic);
+DenseVectorMinElementTest<double, unsigned int> dv_min_element_test_double_uint(PreferredBackend::generic);
+DenseVectorMinElementTest<float, unsigned long> dv_min_element_test_float_ulong(PreferredBackend::generic);
+DenseVectorMinElementTest<double, unsigned long> dv_min_element_test_double_ulong(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMinElementTest<Mem::Main, __float128, unsigned int> dv_min_element_test_float128_uint;
-DenseVectorMinElementTest<Mem::Main, __float128, unsigned long> dv_min_element_test_float128_ulong;
+DenseVectorMinElementTest<__float128, unsigned int> dv_min_element_test_float128_uint(PreferredBackend::generic);
+DenseVectorMinElementTest<__float128, unsigned long> dv_min_element_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorMinElementTest<float, unsigned long> mkl_dv_min_test_float_ulong(PreferredBackend::mkl);
+DenseVectorMinElementTest<double, unsigned long> mkl_dv_min_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorMinElementTest<Half, unsigned int> dv_min_test_half_uint(PreferredBackend::generic);
+DenseVectorMinElementTest<Half, unsigned long> dv_min_test_half_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMinElementTest<Half, unsigned int> cuda_dv_min_test_half_uint(PreferredBackend::cuda);
+DenseVectorMinElementTest<Half, unsigned long> cuda_dv_min_test_half_ulong(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMinElementTest<float, unsigned int> cuda_dv_min_element_test_float_uint(PreferredBackend::cuda);
+DenseVectorMinElementTest<double, unsigned int> cuda_dv_min_element_test_double_uint(PreferredBackend::cuda);
+DenseVectorMinElementTest<float, unsigned long> cuda_dv_min_element_test_float_ulong(PreferredBackend::cuda);
+DenseVectorMinElementTest<double, unsigned long> cuda_dv_min_element_test_double_ulong(PreferredBackend::cuda);
 #endif

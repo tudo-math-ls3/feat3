@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -20,18 +19,17 @@ using namespace FEAT::TestSystem;
  * \author Peter Zajac
  */
 template<
-  typename MemType_,
   typename DT_,
   typename IT_>
 class UnitFilterVectorTest
-  : public FullTaggedTest<MemType_, DT_, IT_>
+  : public UnitTest
 {
-  typedef DenseVector<MemType_, DT_, IT_> VectorType;
-  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
-  typedef UnitFilter<MemType_, DT_, IT_> FilterType;
+  typedef DenseVector<DT_, IT_> VectorType;
+  typedef DenseVector<IT_, IT_> IVectorType;
+  typedef UnitFilter<DT_, IT_> FilterType;
 public:
-  UnitFilterVectorTest()
-    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterVectorTest")
+  UnitFilterVectorTest(PreferredBackend backend)
+    : UnitTest("UnitFilterVectorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -95,11 +93,27 @@ public:
   }
 };
 
-UnitFilterVectorTest<Mem::Main, float, Index> unit_filter_vector_test_generic_fi;
-UnitFilterVectorTest<Mem::Main, double, Index> unit_filter_vector_test_generic_di;
+UnitFilterVectorTest<float, unsigned int> unit_filter_vector_test_generic_float_uint(PreferredBackend::generic);
+UnitFilterVectorTest<double, unsigned int> unit_filter_vector_test_generic_double_uint(PreferredBackend::generic);
+UnitFilterVectorTest<float, unsigned long> unit_filter_vector_test_generic_float_ulong(PreferredBackend::generic);
+UnitFilterVectorTest<double, unsigned long> unit_filter_vector_test_generic_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+UnitFilterVectorTest<float, unsigned long> mkl_unit_filter_vector_test_float_ulong(PreferredBackend::mkl);
+UnitFilterVectorTest<double, unsigned long> mkl_unit_filter_vector_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+UnitFilterVectorTest<__float128, unsigned long> unit_filter_vector_test_float128_ulong(PreferredBackend::generic);
+UnitFilterVectorTest<__float128, unsigned int> unit_filter_vector_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+UnitFilterVectorTest<Half, unsigned int> unit_filter_vector_test_half_uint(PreferredBackend::generic);
+UnitFilterVectorTest<Half, unsigned long> unit_filter_vector_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-UnitFilterVectorTest<Mem::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
-UnitFilterVectorTest<Mem::CUDA, double, Index> unit_filter_vector_test_cuda_di;
+UnitFilterVectorTest<float, unsigned int> unit_filter_vector_test_cuda_float_uint(PreferredBackend::cuda);
+UnitFilterVectorTest<double, unsigned int> unit_filter_vector_test_cuda_double_uint(PreferredBackend::cuda);
+UnitFilterVectorTest<float, unsigned long> unit_filter_vector_test_cuda_float_ulong(PreferredBackend::cuda);
+UnitFilterVectorTest<double, unsigned long> unit_filter_vector_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif
 
 /**
@@ -108,18 +122,17 @@ UnitFilterVectorTest<Mem::CUDA, double, Index> unit_filter_vector_test_cuda_di;
  * \author Peter Zajac
  */
 template<
-  typename MemType_,
   typename DT_,
   typename IT_>
 class UnitFilterMatrixTest
-  : public FullTaggedTest<MemType_, DT_, IT_>
+  : public UnitTest
 {
-  typedef DenseVector<MemType_, DT_, IT_> VectorType;
-  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
-  typedef UnitFilter<MemType_, DT_, IT_> FilterType;
+  typedef DenseVector<DT_, IT_> VectorType;
+  typedef DenseVector<IT_, IT_> IVectorType;
+  typedef UnitFilter<DT_, IT_> FilterType;
 public:
-  UnitFilterMatrixTest()
-    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterMatrixTest")
+  UnitFilterMatrixTest(PreferredBackend backend)
+    : UnitTest("UnitFilterMatrixTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -131,7 +144,7 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-    typedef SparseMatrixCSR<MemType_, DT_, IT_> MatrixType;
+    typedef SparseMatrixCSR<DT_, IT_> MatrixType;
     IVectorType row_ptr(IT_(8));
     IVectorType col_idx(IT_(18));
 
@@ -194,8 +207,25 @@ public:
   }
 };
 
-UnitFilterMatrixTest<Mem::Main, float, unsigned long> unit_filter_matrix_test_generic_ful;
-UnitFilterMatrixTest<Mem::Main, double, unsigned long> unit_filter_matrix_test_generic_dul;
-UnitFilterMatrixTest<Mem::Main, float, unsigned int> unit_filter_matrix_test_generic_fui;
-UnitFilterMatrixTest<Mem::Main, double, unsigned int> unit_filter_matrix_test_generic_dui;
-///TODO cuda tests?
+UnitFilterMatrixTest<float, unsigned long> unit_filter_matrix_test_generic_float_ulong(PreferredBackend::generic);
+UnitFilterMatrixTest<double, unsigned long> unit_filter_matrix_test_generic_double_ulong(PreferredBackend::generic);
+UnitFilterMatrixTest<float, unsigned int> unit_filter_matrix_test_generic_float_uint(PreferredBackend::generic);
+UnitFilterMatrixTest<double, unsigned int> unit_filter_matrix_test_generic_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+UnitFilterMatrixTest<float, unsigned long> mkl_unit_filter_matrix_test_float_ulong(PreferredBackend::mkl);
+UnitFilterMatrixTest<double, unsigned long> mkl_unit_filter_matrix_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+UnitFilterMatrixTest<__float128, unsigned long> unit_filter_matrix_test_float128_ulong(PreferredBackend::generic);
+UnitFilterMatrixTest<__float128, unsigned int> unit_filter_matrix_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+UnitFilterMatrixTest<Half, unsigned int> unit_filter_matrix_test_half_uint(PreferredBackend::generic);
+UnitFilterMatrixTest<Half, unsigned long> unit_filter_matrix_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+UnitFilterMatrixTest<float, unsigned long> cuda_unit_filter_matrix_test_float_ulong(PreferredBackend::cuda);
+UnitFilterMatrixTest<double, unsigned long> cuda_unit_filter_matrix_test_double_ulong(PreferredBackend::cuda);
+UnitFilterMatrixTest<float, unsigned int> cuda_unit_filter_matrix_test_float_uint(PreferredBackend::cuda);
+UnitFilterMatrixTest<double, unsigned int> cuda_unit_filter_matrix_test_double_uint(PreferredBackend::cuda);
+#endif

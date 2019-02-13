@@ -38,12 +38,12 @@ inline std::ostream& operator<<(std::ostream& os, MyPrecon p)
  *
  * \author Peter Zajac
  */
-class SimpleArgParserTest
-  : public TaggedTest<Archs::None, Archs::None>
+class SimpleArgParserTest :
+  public TestSystem::UnitTest
 {
 public:
   SimpleArgParserTest() :
-    TaggedTest<Archs::None, Archs::None>("SimpleArgParserTest")
+    TestSystem::UnitTest("SimpleArgParserTest")
   {
   }
 

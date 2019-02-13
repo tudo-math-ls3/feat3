@@ -397,9 +397,9 @@ namespace FEAT
       }
 
       /// specialization for NullMatrix
-      template<typename Mem_, typename DT_, typename IT_, int BH_, int BW_, typename TestSpace_, typename TrialSpace_>
+      template<typename DT_, typename IT_, int BH_, int BW_, typename TestSpace_, typename TrialSpace_>
       static void assemble_matrix_std2(
-        LAFEM::NullMatrix<Mem_, DT_, IT_, BH_, BW_>& matrix,
+        LAFEM::NullMatrix<DT_, IT_, BH_, BW_>& matrix,
         const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         // only the dimensions are required here
@@ -422,9 +422,9 @@ namespace FEAT
       }
 
       /// specialization for NullMatrix
-      template<typename Mem_, typename DT_, typename IT_, int BH_, int BW_, typename Space_>
+      template<typename DT_, typename IT_, int BH_, int BW_, typename Space_>
       static void assemble_matrix_std1(
-        LAFEM::NullMatrix<Mem_, DT_, IT_, BH_, BW_>& matrix, const Space_& space)
+        LAFEM::NullMatrix<DT_, IT_, BH_, BW_>& matrix, const Space_& space)
       {
         // only the dimensions are required here
         matrix.resize(space.get_num_dofs(), space.get_num_dofs());

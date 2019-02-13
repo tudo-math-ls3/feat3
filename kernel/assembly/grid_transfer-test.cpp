@@ -16,14 +16,14 @@
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
-template<typename MatrixType_>
+template<typename DT_, typename IT_>
 class GridTransferTest :
-  public TestSystem::FullTaggedTest<Archs::None, typename MatrixType_::DataType, typename MatrixType_::IndexType>
+  public UnitTest
 {
-  typedef typename MatrixType_::MemType MemType_;
-  typedef typename MatrixType_::DataType DataType_;
-  typedef typename MatrixType_::IndexType IndexType_;
-  typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
+  typedef DT_ DataType_;
+  typedef IT_ IndexType_;
+  typedef LAFEM::SparseMatrixCSR<DataType_, IndexType_> MatrixType_;
+  typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -33,8 +33,8 @@ class GridTransferTest :
   typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceQ1T;
 
 public:
-  GridTransferTest() :
-    TestSystem::FullTaggedTest<Archs::None, DataType_, IndexType_>("GridTransferTest<" + MatrixType_::name() + ">")
+  GridTransferTest(PreferredBackend backend) :
+    UnitTest("GridTransferTest<" + MatrixType_::name() + ">", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -86,7 +86,7 @@ public:
     TEST_CHECK_EQUAL(prol_matrix.used_elements(), 36u);
 
     // fetch matrix arrays of matrix in CSR-format
-    LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
+    LAFEM::SparseMatrixCSR<DataType_, IndexType_> tmp_prol_matrix;
     tmp_prol_matrix.convert(prol_matrix);
     const IndexType_ * row_ptr = tmp_prol_matrix.row_ptr();
     const IndexType_ * col_idx = tmp_prol_matrix.col_ind();
@@ -165,7 +165,7 @@ public:
     TEST_CHECK_EQUAL(prol_matrix.used_elements(), 48u);
 
     // fetch matrix arrays of matrix in CSR-format
-    LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
+    LAFEM::SparseMatrixCSR<DataType_, IndexType_> tmp_prol_matrix;
     tmp_prol_matrix.convert(prol_matrix);
     const IndexType_ * row_ptr = tmp_prol_matrix.row_ptr();
     const IndexType_ * col_idx = tmp_prol_matrix.col_ind();
@@ -224,28 +224,25 @@ public:
   }
 };
 
-GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, float, unsigned int> > grid_transfer_test_csr_float_uint;
-GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, float, unsigned long> > grid_transfer_test_csr_float_ulong;
-GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned int> > grid_transfer_test_csr_double_uint;
-GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned long> > grid_transfer_test_csr_double_ulong;
-
-GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, float, unsigned int> > grid_transfer_test_coo_float_uint;
-GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, float, unsigned long> > grid_transfer_test_coo_float_ulong;
-GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, double, unsigned int> > grid_transfer_test_coo_double_uint;
-GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, double, unsigned long> > grid_transfer_test_coo_double_ulong;
-
-GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned int> > grid_transfer_test_ell_float_uint;
-GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned long> > grid_transfer_test_ell_float_ulong;
-GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned int> > grid_transfer_test_ell_double_uint;
-GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned long> > grid_transfer_test_ell_double_ulong;
-
+GridTransferTest<float, unsigned int> grid_transfer_test_csr_float_uint(PreferredBackend::generic);
+GridTransferTest<float, unsigned long> grid_transfer_test_csr_float_ulong(PreferredBackend::generic);
+GridTransferTest<double, unsigned int> grid_transfer_test_csr_double_uint(PreferredBackend::generic);
+GridTransferTest<double, unsigned long> grid_transfer_test_csr_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+GridTransferTest<float, unsigned long> mkl_grid_transfer_test_csr_float_ulong(PreferredBackend::mkl);
+GridTransferTest<double, unsigned long> mkl_grid_transfer_test_csr_double_ulong(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_QUADMATH
-GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned int> > grid_transfer_test_csr_float128_uint;
-GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned long> > grid_transfer_test_csr_float128_ulong;
-
-GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned int> > grid_transfer_test_coo_float128_uint;
-GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned long> > grid_transfer_test_coo_float128_ulong;
-
-GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned int> > grid_transfer_test_ell_float128_uint;
-GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned long> > grid_transfer_test_ell_float128_ulong;
+GridTransferTest<__float128, unsigned int> grid_transfer_test_csr_float128_uint(PreferredBackend::generic);
+GridTransferTest<__float128, unsigned long> grid_transfer_test_csr_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+GridTransferTest<Half, unsigned int> grid_transfer_test_csr_half_uint(PreferredBackend::generic);
+GridTransferTest<Half, unsigned long> grid_transfer_test_csr_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+GridTransferTest<float, unsigned int> cuda_grid_transfer_test_csr_float_uint(PreferredBackend::cuda);
+GridTransferTest<double, unsigned int> cuda_grid_transfer_test_csr_double_uint(PreferredBackend::cuda);
+GridTransferTest<float, unsigned long> cuda_grid_transfer_test_csr_float_ulong(PreferredBackend::cuda);
+GridTransferTest<double, unsigned long> cuda_grid_transfer_test_csr_double_ulong(PreferredBackend::cuda);
 #endif

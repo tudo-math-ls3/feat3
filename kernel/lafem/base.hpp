@@ -90,16 +90,6 @@ namespace FEAT
     };
 
     /**
-     * Supported memory pinning modes
-     *
-     * \note This enum is mainly used to prevent any compiler from missusing the intuitive bool parameter for fancy implicit conversion tricks.
-     */
-    enum class Pinning
-    {
-      disabled = 0, /**< do not use memory pinning */
-      enabled /** < enable memory pinning (for fast device <-> host transfers) */
-    };
-        /**
      * Supported Compression modes.
      *
      */

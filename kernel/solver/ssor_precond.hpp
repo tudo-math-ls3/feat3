@@ -32,36 +32,66 @@ namespace FEAT
         int* & colored_row_ptr, int* & rows_per_color, int* & inverse_row_ptr);
     }
 
-    template<typename Matrix_, typename Filter_>
-    class SSORPrecond;
+    /**
+     * \brief Inheritances inside sor_precond.hpp
+     *
+     * SSORPrecondBase <- SSORPrecondWithBackend.
+     * Both for internal use only.
+     *
+     * SolverBase <- SSORPrecond.
+     * SORPrecond uses the internal classes.
+     *
+     * \author Dirk Ribbrock
+     * \author Lisa-Marie Walter
+     */
+
+    /// SSOR preconditioner base class for internal use
+    template<typename Matrix_>
+    class SSORPrecondBase
+    {
+    public:
+      typedef typename Matrix_::DataType DataType;
+      typedef typename Matrix_::VectorTypeL VectorType;
+
+      virtual void set_omega(DataType omega) = 0;
+
+      virtual void init_symbolic() = 0;
+
+      virtual void done_symbolic() = 0;
+
+      virtual String name() const = 0;
+
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) = 0;
+
+      virtual ~SSORPrecondBase() {}
+    }; // SSORPrecondBase class
+
+    template<PreferredBackend backend_, typename Matrix_, typename Filter_>
+    class SSORPrecondWithBackend;
 
     /**
-     * \brief SSOR preconditioner implementation
+     * \brief SSOR preconditioner internal implementation
      *
      * This class implements a simple SSOR preconditioner,
      * e.g. zero fill-in and no pivoting.
      *
      * This implementation works for the following matrix types and combinations thereof:
      * - LAFEM::SparseMatrixCSR
-     * - LAFEM::SparseMatrixELL
      *
      * Moreover, this implementation supports only Mem::Main
      *
      * \author Dirk Ribbrock
      */
-    template<template<class,class,class> class ScalarMatrix_, typename DT_, typename IT_, typename Filter_>
-    class SSORPrecond<ScalarMatrix_<Mem::Main, DT_, IT_>, Filter_> :
-      public SolverBase<typename ScalarMatrix_<Mem::Main, DT_, IT_>::VectorTypeL>
+    template<typename Filter_, typename DT_, typename IT_>
+    class SSORPrecondWithBackend<PreferredBackend::generic, LAFEM::SparseMatrixCSR<DT_, IT_>, Filter_> :
+      public SSORPrecondBase<typename LAFEM::SparseMatrixCSR<DT_, IT_>>
     {
     public:
-      typedef ScalarMatrix_<Mem::Main, DT_, IT_> MatrixType;
-      typedef Mem::Main MemType;
+      typedef LAFEM::SparseMatrixCSR<DT_, IT_> MatrixType;
       typedef DT_ DataType;
       typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
-      /// Our base class
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -82,7 +112,7 @@ namespace FEAT
        * Damping
        *
        */
-      explicit SSORPrecond(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
+      explicit SSORPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
         _matrix(matrix),
         _filter(filter),
         _omega(omega)
@@ -93,9 +123,8 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecond(const String& section_name, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& section_name, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _omega(1)
@@ -123,10 +152,18 @@ namespace FEAT
        * The new damping parameter.
        *
        */
-      void set_omega(DataType omega)
+      virtual void set_omega(DataType omega) override
       {
         XASSERT(omega > DataType(0));
         _omega = omega;
+      }
+
+       virtual void init_symbolic() override
+      {
+      }
+
+      virtual void done_symbolic() override
+      {
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
@@ -153,7 +190,7 @@ namespace FEAT
       }
 
     protected:
-      void _apply_intern(const LAFEM::SparseMatrixCSR<Mem::Main, DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
+      void _apply_intern(const LAFEM::SparseMatrixCSR<DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
       {
         // create pointers
         DataType * pout(vec_cor.elements());
@@ -192,64 +229,19 @@ namespace FEAT
           pout[i] -= _omega * d / pval[col];
         }
       }
-
-      void _apply_intern(const LAFEM::SparseMatrixELL<Mem::Main, DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
-      {
-        // create pointers
-        DataType * pout(vec_cor.elements());
-        const DataType * pin(vec_def.elements());
-        const DataType * pval(matrix.val());
-        const IndexType * pcol_ind(matrix.col_ind());
-        const IndexType * pcs(matrix.cs());
-        const IndexType * prl(matrix.rl());
-        const IndexType C((IndexType(matrix.C())));
-        const IndexType n((IndexType(matrix.rows())));
-
-        // __forward-insertion__
-        // iteration over all rows
-        for (IndexType i(0); i < n; ++i)
-        {
-          IndexType col;
-          DataType d(0);
-          // iteration over all elements on the left side of the main-diagonal
-          for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
-          {
-            d += pval[col] * pout[pcol_ind[col]];
-          }
-          pout[i] = (pin[i] - _omega * d) / pval[col];
-        }
-
-        // __backward-insertion__
-        // iteration over all rows
-        for (IndexType i(n); i > 0;)
-        {
-          --i;
-          IndexType col;
-          DataType d(0);
-          // iteration over all elements on the right side of the main-diagonal
-          for (col = pcs[i/C] + i%C + C * (prl[i] - 1); pcol_ind[col] > i; col -= C)
-          {
-            d += pval[col] * pout[pcol_ind[col]];
-          }
-          pout[i] -= _omega * d / pval[col];
-        }
-      }
-
-    }; // class SSORPrecond<SparseMatrixCSR<Mem::Main>>
+    }; // class SSORPrecondWithBackend<generic, SparseMatrixCSR>
 
     template<typename Filter_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-    class SSORPrecond<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>, Filter_> :
-      public SolverBase<typename LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>::VectorTypeL>
+    class SSORPrecondWithBackend<PreferredBackend::generic, LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>, Filter_> :
+      public SSORPrecondBase<typename LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>>
     {
       static_assert(BlockHeight_ == BlockWidth_, "only square blocks are supported!");
     public:
-      typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
       typedef typename MatrixType::IndexType IndexType;
-      /// Our base class
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -315,7 +307,7 @@ namespace FEAT
        * Damping
        *
        */
-      explicit SSORPrecond(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
+      explicit SSORPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
         _matrix(matrix),
         _filter(filter),
         _omega(omega)
@@ -326,9 +318,8 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecond(const String& section_name, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _omega(1)
@@ -359,10 +350,18 @@ namespace FEAT
        * The new damping parameter.
        *
        */
-      void set_omega(DataType omega)
+      virtual void set_omega(DataType omega) override
       {
         XASSERT(omega > DataType(0));
         _omega = omega;
+      }
+
+       virtual void init_symbolic() override
+      {
+      }
+
+      virtual void done_symbolic() override
+      {
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
@@ -385,10 +384,11 @@ namespace FEAT
 
         return Status::success;
       }
-    }; // class SSORPrecond<SparseMatrixBCSR<Mem::Main>>
+    }; // class SSORPrecondWithBackend<generic, SparseMatrixBCSR>
 
+#ifdef FEAT_HAVE_CUDA
     /**
-     * \brief SSOR preconditioner implementation
+     * \brief SSOR preconditioner internal implementation
      *
      * This class implements a simple SSOR preconditioner,
      * e.g. zero fill-in and no pivoting.
@@ -404,16 +404,14 @@ namespace FEAT
      * \author Dirk Ribbrock
      */
     template<typename Filter_>
-    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int>, Filter_> :
-      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int>::VectorTypeL>
+    class SSORPrecondWithBackend<PreferredBackend::cuda, LAFEM::SparseMatrixCSR<double, unsigned int>, Filter_> :
+      public SSORPrecondBase<LAFEM::SparseMatrixCSR<double, unsigned int>>
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<double, unsigned int> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
-      /// Our base class
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -442,7 +440,7 @@ namespace FEAT
        * Damping
        *
        */
-      explicit SSORPrecond(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
+      explicit SSORPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
         _matrix(matrix),
         _filter(filter),
         _omega(omega),
@@ -457,9 +455,8 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecond(const String& section_name, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
       const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _omega(1),
@@ -494,7 +491,7 @@ namespace FEAT
        * The new damping parameter.
        *
        */
-      void set_omega(DataType omega)
+      virtual void set_omega(DataType omega) override
       {
         XASSERT(omega > DataType(0));
         _omega = omega;
@@ -531,20 +528,18 @@ namespace FEAT
 
         return (status == 0) ? Status::success :  Status::aborted;
       }
-    }; // class SSORPrecond<SparseMatrixCSR<Mem::CUDA>>
+    }; // class SSORPrecondWithBackend<cuda, SparseMatrixCSR>
 
     template<typename Filter_, int BlockHeight_, int BlockWidth_>
-    class SSORPrecond<LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, BlockHeight_, BlockWidth_>, Filter_> :
-      public SolverBase<typename LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, BlockHeight_, BlockWidth_>::VectorTypeL>
+    class SSORPrecondWithBackend<PreferredBackend::cuda, LAFEM::SparseMatrixBCSR<double, unsigned int, BlockHeight_, BlockWidth_>, Filter_> :
+      public SSORPrecondBase<typename LAFEM::SparseMatrixBCSR<double, unsigned int, BlockHeight_, BlockWidth_>>
     {
       static_assert(BlockHeight_ == BlockWidth_, "only square blocks are supported!");
     public:
-      typedef LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, BlockHeight_, BlockWidth_> MatrixType;
+      typedef LAFEM::SparseMatrixBCSR<double, unsigned int, BlockHeight_, BlockWidth_> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
-      /// Our base class
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -573,7 +568,7 @@ namespace FEAT
        * Damping
        *
        */
-      explicit SSORPrecond(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
+      explicit SSORPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const DataType omega = DataType(1)) :
         _matrix(matrix),
         _filter(filter),
         _omega(omega),
@@ -588,9 +583,8 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecond(const String& section_name, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
       const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _omega(1),
@@ -625,7 +619,7 @@ namespace FEAT
        * The new damping parameter.
        *
        */
-      void set_omega(DataType omega)
+      virtual void set_omega(DataType omega) override
       {
         XASSERT(omega > DataType(0));
         _omega = omega;
@@ -662,40 +656,192 @@ namespace FEAT
 
         return (status == 0) ? Status::success :  Status::aborted;
       }
-    }; // class SSORPrecond<SparseMatrixBCSR<Mem::CUDA>>
+    }; // class SSORPrecondWithBackend<cuda, SparseMatrixBCSR>
+#endif //FEAT_HAVE_CUDA
 
     /// Dummy class for not implemented specializations
-    template<typename Matrix_, typename Filter_>
-    class SSORPrecond :
-      public SolverBase<typename Matrix_::VectorTypeL>
+    template<PreferredBackend backend_, typename Matrix_, typename Filter_>
+    class SSORPrecondWithBackend :
+      public SSORPrecondBase<Matrix_>
     {
     public:
       template<typename DT_>
-      explicit SSORPrecond(const Matrix_&, const Filter_&, const DT_)
+      explicit SSORPrecondWithBackend(const Matrix_&, const Filter_&, const DT_)
       {
       }
 
-      explicit SSORPrecond(const Matrix_&, const Filter_&)
+      explicit SSORPrecondWithBackend(const Matrix_&, const Filter_&)
       {
       }
 
-      explicit SSORPrecond(const String&, PropertyMap*, const Matrix_&, const Filter_&)
+      explicit SSORPrecondWithBackend(const String&, PropertyMap*, const Matrix_&, const Filter_&)
       {
       }
 
-      Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
+      virtual Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
           XABORTM("not implemented yet!");
       }
 
-      String name() const override
+      virtual String name() const override
       {
           XABORTM("not implemented yet!");
+      }
+
+      virtual void init_symbolic() override
+      {
+        XABORTM("not implemented yet!");
+      }
+
+      virtual void done_symbolic() override
+      {
+        XABORTM("not implemented yet!");
+      }
+
+      virtual void set_omega(typename Matrix_::DataType /*omega*/) override
+      {
+        XABORTM("not implemented yet!");
       }
     };
 
     /**
+     * \brief SSOR preconditioner implementation
+     *
+     * This class implements a simple SSOR preconditioner,
+     * e.g. zero fill-in and no pivoting.
+     *
+     * This implementation works for the following matrix types and combinations thereof:
+     * - LAFEM::SparseMatrixCSR
+     * - LAFEM::SparseMatrixBCSR
+     *
+     * \author Dirk Ribbrock
+     */
+    template<typename Matrix_, typename Filter_>
+    class SSORPrecond : public SolverBase<typename Matrix_::VectorTypeL>
+    {
+    private:
+      std::shared_ptr<SSORPrecondBase<Matrix_>> _impl;
+
+    public:
+      typedef Matrix_ MatrixType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef typename MatrixType::DataType DataType;
+
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] backend
+       * The backend to be preferred. This implementation works with generic and cuda.
+       *
+       * \param[in] matrix
+       * The matrix to be used.
+       *
+       * \param[in] filter
+       * The filter to be used for the correction vector.
+       *
+       * \param[in] omega
+       * Damping
+       *
+       */
+      SSORPrecond(const PreferredBackend backend, const MatrixType& matrix, const FilterType& filter, DataType omega = DataType(1))
+      {
+        switch (backend)
+        {
+          case PreferredBackend::cuda:
+            _impl = std::make_shared<SSORPrecondWithBackend<PreferredBackend::cuda, Matrix_, Filter_>>(matrix, filter, omega);
+            break;
+          case PreferredBackend::mkl:
+          case PreferredBackend::generic:
+          default:
+            _impl = std::make_shared<SSORPrecondWithBackend<PreferredBackend::generic, Matrix_, Filter_>>(matrix, filter, omega);
+        }
+      }
+
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] backend
+       * The backend to be preferred. This implementation works with generic and cuda.
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       */
+      SSORPrecond(const PreferredBackend backend, const String& section_name, PropertyMap* section, const MatrixType& matrix, const FilterType& filter, DataType omega = DataType(1)) :
+        BaseClass(section_name, section)
+      {
+        switch (backend)
+        {
+          case PreferredBackend::cuda:
+            _impl = std::make_shared<SSORPrecondWithBackend<PreferredBackend::cuda, Matrix_, Filter_>>(section_name, section, matrix, filter, omega);
+            break;
+          case PreferredBackend::mkl:
+          case PreferredBackend::generic:
+          default:
+            _impl = std::make_shared<SSORPrecondWithBackend<PreferredBackend::generic, Matrix_, Filter_>>(section_name, section, matrix, filter, omega);
+        }
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~SSORPrecond()
+      {
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return _impl->name();
+      }
+
+      /**
+       * \brief Sets the damping parameter
+       *
+       * \param[in] omega
+       * The new damping parameter.
+       *
+       */
+      virtual void set_omega(DataType omega)
+      {
+        _impl->set_omega(omega);
+      }
+
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+      {
+        return _impl->apply(vec_cor, vec_def);
+      }
+
+      virtual void init_symbolic() override
+      {
+        _impl->init_symbolic();
+      }
+
+      virtual void done_symbolic() override
+      {
+        _impl->done_symbolic();
+      }
+    }; // class SSORPrecond
+
+    /**
      * \brief Creates a new SSORPrecond solver object
+     *
+     * \param[in] backend
+     * The backend to be preferred. This implementation works with generic and cuda.
      *
      * \param[in] matrix
      * The system matrix.
@@ -711,11 +857,11 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<SSORPrecond<Matrix_, Filter_>> new_ssor_precond(
-      const Matrix_& matrix, const Filter_& filter,
+      const PreferredBackend backend, const Matrix_& matrix, const Filter_& filter,
       const typename Matrix_::DataType omega = typename Matrix_::DataType(1))
     {
       return std::make_shared<SSORPrecond<Matrix_, Filter_>>
-        (matrix, filter, omega);
+        (backend, matrix, filter, omega);
     }
 
     /**
@@ -726,6 +872,9 @@ namespace FEAT
      *
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] backend
+     * The backend to be preferred. This implementation works with generic and cuda.
      *
      * \param[in] matrix
      * The system matrix.
@@ -738,11 +887,11 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<SSORPrecond<Matrix_, Filter_>> new_ssor_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, PropertyMap* section, PreferredBackend backend,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<SSORPrecond<Matrix_, Filter_>>
-        (section_name, section, matrix, filter);
+        (backend, section_name, section, matrix, filter);
     }
   } // namespace Solver
 } // namespace FEAT

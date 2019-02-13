@@ -80,7 +80,7 @@
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
 // FEAT-Solver includes
-#include <kernel/solver/spai_precond.hpp>                  // for SPAIPrrecond
+#include <kernel/solver/jacobi_precond.hpp>                  // for JacobiPrecond
 #include <kernel/solver/bicgstab.hpp>                      // for BiCGStab
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -108,19 +108,17 @@ namespace Tutorial03
   // Use the Lagrange-1 element
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Use the standard dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
   // Use the standard CSR matrix format
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
   // Use the unit-filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -559,7 +557,7 @@ namespace Tutorial03
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SPAI preconditioner
-    auto precond = Solver::new_spai_precond(matrix, filter);
+    auto precond = Solver::new_jacobi_precond(matrix, filter);
 
     // Create a preconditioned BiCGStab solver
     auto solver = Solver::new_bicgstab(matrix, filter, precond);

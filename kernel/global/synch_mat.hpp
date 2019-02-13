@@ -39,9 +39,9 @@ namespace FEAT
     {
     public:
       /// the matrix mirror type
-      typedef LAFEM::MatrixMirror<Mem::Main, typename MT_::DataType, typename MT_::IndexType> MatrixMirrorType;
+      typedef LAFEM::MatrixMirror<typename MT_::DataType, typename MT_::IndexType> MatrixMirrorType;
       /// the buffer matrix type
-      typedef LAFEM::MatrixMirrorBuffer<Mem::Main, typename MT_::DataType, typename MT_::IndexType> BufferMatrixType;
+      typedef LAFEM::MatrixMirrorBuffer<typename MT_::DataType, typename MT_::IndexType> BufferMatrixType;
 
     protected:
       bool _initialized;

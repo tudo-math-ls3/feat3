@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 
 #include <cstring>
@@ -17,7 +16,7 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-void Axpy<Mem::Main>::dv_mkl(float * r, const float a, const float * const x, const float * const y, const Index size)
+void Axpy::value_mkl(float * r, const float a, const float * const x, const float * const y, const Index size)
 {
   if (r == y)
   {
@@ -38,7 +37,7 @@ void Axpy<Mem::Main>::dv_mkl(float * r, const float a, const float * const x, co
   }
 }
 
-void Axpy<Mem::Main>::dv_mkl(double * r, const double a, const double * const x, const double * const y, const Index size)
+void Axpy::value_mkl(double * r, const double a, const double * const x, const double * const y, const Index size)
 {
   if (r == y)
   {

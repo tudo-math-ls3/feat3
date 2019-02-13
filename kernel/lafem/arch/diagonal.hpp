@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
 
 
 namespace FEAT
@@ -18,11 +18,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct Diagonal;
-
-      template <>
-      struct Diagonal<Mem::Main>
+      struct Diagonal
       {
         template <typename IT_>
         static void csr(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
@@ -30,57 +26,28 @@ namespace FEAT
           csr_generic(diag, col_ind, row_ptr, rows);
         }
 
+        static void csr(unsigned long * diag, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, diag, col_ind, row_ptr, rows)
+        }
+
+        static void csr(unsigned int * diag, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, diag, col_ind, row_ptr, rows)
+        }
+
         template <typename IT_>
         static void csr_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
         template <typename IT_>
-        static void csrb(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
-        {
-          csrb_generic<IT_>(diag, col_ind, row_ptr, rows);
-        }
-
-        template <typename IT_>
-        static void csrb_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
-
-        template <typename DT_ , typename IT_>
-        static void ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
-          const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
-        {
-          ell_generic(diag, val, col_ind, cs, cl, C, rows);
-        }
-
-        template <typename DT_, typename IT_>
-        static void ell_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
-          const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
+        static void csr_cuda(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
       };
 
 #ifdef FEAT_EICKT
-      extern template void Diagonal<Mem::Main>::csr_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
-      extern template void Diagonal<Mem::Main>::csr_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
-
-      extern template void Diagonal<Mem::Main>::csrb_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
-      extern template void Diagonal<Mem::Main>::csrb_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
-
-      extern template void Diagonal<Mem::Main>::ell_generic(float *, const float * const, const Index * const,
-        const Index * const, const Index * const, Index, const Index);
-      extern template void Diagonal<Mem::Main>::ell_generic(double *, const double * const, const Index * const,
-        const Index * const, const Index * const, Index, const Index);
+      extern template void Diagonal::csr_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
+      extern template void Diagonal::csr_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
 #endif
-
-      template <>
-      struct Diagonal<Mem::CUDA>
-      {
-        template <typename IT_>
-        static void csr(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
-
-        template <typename IT_>
-        static void csrb(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
-
-        template <typename DT_, typename IT_>
-        static void ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
-          const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
-      };
 
     } // namespace Arch
   } // namespace LAFEM

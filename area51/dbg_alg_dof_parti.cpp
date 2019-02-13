@@ -75,14 +75,13 @@ namespace Tutorial06
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
   typedef Geometry::RootMeshNode<MeshType> RootMeshNodeType;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> LocalFilterType;
+  typedef LAFEM::VectorMirror<DataType, IndexType> VectorMirrorType;
   typedef Global::Gate<LocalVectorType, VectorMirrorType> GateType;
   typedef Global::Matrix<LocalMatrixType, VectorMirrorType, VectorMirrorType> GlobalMatrixType;
   typedef Global::Vector<LocalVectorType, VectorMirrorType> GlobalVectorType;

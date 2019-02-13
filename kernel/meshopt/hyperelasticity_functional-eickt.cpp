@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/shape.hpp>
 
 #include <kernel/meshopt/rumpf_functional.hpp>
@@ -18,7 +17,7 @@ using namespace FEAT;
 // HyperelasticityFunctionals
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
-  Mem::Main, double, Index,
+  double, Index,
   Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double >>,
   Meshopt::RumpfFunctional
   <
@@ -29,7 +28,7 @@ template class FEAT::Meshopt::HyperelasticityFunctional
 
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
-  Mem::Main, double, Index,
+  double, Index,
   Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double >>,
   Meshopt::RumpfFunctional
   <
@@ -40,7 +39,7 @@ template class FEAT::Meshopt::HyperelasticityFunctional
 
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
-  Mem::Main, double, Index,
+  double, Index,
   Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, double>>,
   Meshopt::RumpfFunctional
   <
@@ -51,7 +50,7 @@ template class FEAT::Meshopt::HyperelasticityFunctional
 
 template class FEAT::Meshopt::HyperelasticityFunctional
 <
-  Mem::Main, double, Index,
+  double, Index,
   Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<3>, 3, double>>,
   Meshopt::RumpfFunctional
   <

@@ -197,7 +197,7 @@ namespace DFG95
     static constexpr int dim = ShapeType::dimension;
 
     // define our system level
-    typedef NavierStokesBlockedSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef NavierStokesBlockedSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     BenchmarkSummary<DataType, dim> summary;
     BenchmarkStats statistics;
@@ -525,11 +525,11 @@ namespace DFG95
 
     // create characteristic function vector for circle boundary
     // this is needed for the volumetric drag/lift computation
-    LAFEM::DenseVector<Mem::Main, DataType, IndexType> vec_char(vec_sol.local().template at<0>().size());
+    LAFEM::DenseVector<DataType, IndexType> vec_char(vec_sol.local().template at<0>().size());
     vec_char.format(DataType(0));
     if(mesh_part_bnd_c != nullptr)
     {
-      LAFEM::UnitFilter<Mem::Main, DataType, IndexType> filter_char;
+      LAFEM::UnitFilter<DataType, IndexType> filter_char;
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
       unit_asm.add_mesh_part(*mesh_part_bnd_c);
       unit_asm.assemble(filter_char, the_domain_level.space_velo);
@@ -1169,7 +1169,7 @@ namespace DFG95
 
         // project pressure
         Cubature::DynamicFactory cub("gauss-legendre:2");
-        LAFEM::DenseVector<Mem::Main, DataType, Index> vtx_p;
+        LAFEM::DenseVector<DataType, Index> vtx_p;
         Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
         // write pressure

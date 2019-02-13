@@ -74,11 +74,7 @@ namespace FEAT
       /// type of sub-matrix D
       typedef MatrixD_ MatrixTypeD;
 
-      // ensure that all matrices have the same mem- and data-types
-      static_assert(std::is_same<typename MatrixA_::MemType, typename MatrixB_::MemType>::value,
-                    "A and B have different mem-types");
-      static_assert(std::is_same<typename MatrixA_::MemType, typename MatrixD_::MemType>::value,
-                    "A and D have different mem-types");
+      // ensure that all matrices have the same and data-types
       static_assert(std::is_same<typename MatrixA_::DataType, typename MatrixB_::DataType>::value,
                     "A and B have different data-types");
       static_assert(std::is_same<typename MatrixA_::DataType, typename MatrixD_::DataType>::value,
@@ -90,8 +86,6 @@ namespace FEAT
       static_assert(std::is_same<typename MatrixA_::VectorTypeR, typename MatrixD_::VectorTypeR>::value,
                     "A and D have different compatible R-vectors");
 
-      /// memory type
-      typedef typename MatrixTypeA::MemType MemType;
       /// data type
       typedef typename MatrixTypeA::DataType DataType;
       /// index type
@@ -102,14 +96,14 @@ namespace FEAT
       /// Compatible R-vector type
       typedef TupleVector<typename MatrixTypeA::VectorTypeR, typename MatrixTypeB::VectorTypeR> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = SaddlePointMatrix<typename MatrixA_::template ContainerType<Mem2_, DT2_, IT2_>,
-                                              typename MatrixB_::template ContainerType<Mem2_, DT2_, IT2_>,
-                                              typename MatrixD_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = SaddlePointMatrix<typename MatrixA_::template ContainerType<DT2_, IT2_>,
+                                              typename MatrixB_::template ContainerType<DT2_, IT2_>,
+                                              typename MatrixD_::template ContainerType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = 2;
@@ -456,16 +450,16 @@ namespace FEAT
         block_d().apply(r.template at<1>(), x.template at<0>());
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
-        DenseVector<MemType, DataType, IndexType> r_first(r, block_a().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> r_first(r, block_a().rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
 
-        DenseVector<MemType, DataType, IndexType> x_first(x, block_a().columns(), 0);
-        DenseVector<MemType, DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> x_first(x, block_a().columns(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
 
         block_a().apply(r_first, x_first);
         block_b().apply(r_first, x_rest, r_first, DataType(1));
@@ -496,21 +490,21 @@ namespace FEAT
         block_d().apply(r.template at<1>(), x.template at<0>(), y.template at<1>(), alpha);
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
-                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+                 const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
         XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
-        DenseVector<MemType, DataType, IndexType> r_first(r, block_a().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> r_first(r, block_a().rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
 
-        DenseVector<MemType, DataType, IndexType> x_first(x, block_a().columns(), 0);
-        DenseVector<MemType, DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> x_first(x, block_a().columns(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
 
-        DenseVector<MemType, DataType, IndexType> y_first(y, block_a().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> y_rest(y, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> y_first(y, block_a().rows(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, block_d().rows(), block_a().rows());
 
         block_a().apply(r_first, x_first, y_first, alpha);
         block_b().apply(r_first, x_rest, r_first, alpha);
@@ -564,7 +558,7 @@ namespace FEAT
         }
       }
 
-      void set_line_reverse(const Index row, typename MatrixA_::DataType * const pval_set, const Index stride = 1)
+      void set_line_reverse(const Index row, const typename MatrixA_::DataType * const pval_set, const Index stride = 1)
       {
         const Index arows(this->block_a().template rows<Perspective::pod>());
 
@@ -663,8 +657,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const SaddlePointMatrix & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const SaddlePointMatrix & a, const SaddlePointMatrix & b)
       {
         return (a.name() == b.name()) && (a.block_a() == b.block_a())
           && (a.block_b() == b.block_b()) && (a.block_d() == b.block_d());

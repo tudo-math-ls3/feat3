@@ -22,11 +22,11 @@ typedef CompositeAdjactor<Graph,Graph> CAGG;
  * \author Peter Zajac
  */
 class GraphTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   GraphTest() :
-    TaggedTest<Archs::None, Archs::None>("graph_test")
+    UnitTest("graph_test")
   {
   }
 

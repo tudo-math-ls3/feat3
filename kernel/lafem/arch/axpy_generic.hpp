@@ -22,7 +22,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_>
-      void Axpy<Mem::Main>::dv_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
+      void Axpy::value_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
       {
         if (r == y)
         {

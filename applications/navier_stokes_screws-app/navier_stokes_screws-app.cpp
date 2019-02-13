@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 #include <kernel/assembly/analytic_projector.hpp>
 #include <kernel/assembly/burgers_assembler.hpp>
@@ -116,25 +115,24 @@ static inline void dump_time(const Dist::Comm& comm, String s, double t, double 
 template
 <
   int dim_,
-  typename MemType_ = Mem::Main,
   typename DataType_ = Real,
   typename IndexType_ = Index,
-  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
 >
 class NavierStokesBlockedSystemLevel :
-  public Control::StokesBlockedSlipUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+  public Control::StokesBlockedSlipUnitVeloMeanPresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
 {
   public:
-    typedef Control::StokesBlockedSlipUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+    typedef Control::StokesBlockedSlipUnitVeloMeanPresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 }; // class NavierStokesBlockedSystemLevel
 //class NavierStokesBlockedSystemLevel :
-//  public Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+//  public Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
 //{
 //  public:
-//    typedef Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
+//    typedef Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 //
 //}; // class NavierStokesBlockedSystemLevel
 
@@ -279,8 +277,8 @@ class ExtrudedPartiDomainControl :
      * \brief Extrudes a 2d vertex vector to 3d
      */
     template<typename DT_, typename IT_>
-    void extrude_vertex_vector(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, MeshType::world_dim>& v,
-    const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, Mesh2d::world_dim>& v_in)
+    void extrude_vertex_vector(LAFEM::DenseVectorBlocked<DT_, IT_, MeshType::world_dim>& v,
+    const LAFEM::DenseVectorBlocked<DT_, IT_, Mesh2d::world_dim>& v_in)
     {
       Tiny::Vector<DT_, MeshType::world_dim> tmp(DT_(0));
 
@@ -296,14 +294,11 @@ class ExtrudedPartiDomainControl :
     }
 };
 
-template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
+template<typename DT_, typename IT_, typename Mesh_>
 struct NavierStokesScrewsApp
 {
   static constexpr bool extrude = false;
 
-  /// The memory architecture. Although this looks freely chosable, it has to be Mem::Main for now because all the
-  /// Hyperelasticity functionals are implemented for Mem::Main only
-  typedef Mem_ MemType;
   /// The floating point type
   typedef DT_ DataType;
   /// The index type
@@ -639,7 +634,7 @@ struct NavierStokesScrewsApp
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
 
-    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
+    meshopt_ctrl = Control::Meshopt::ControlFactory<DT_, IT_>::create_meshopt_control(
       dom_ctrl, meshoptimizer_key_p.first, &meshopt_config, &solver_config);
 
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_preproc(nullptr);
@@ -650,7 +645,7 @@ struct NavierStokesScrewsApp
       auto preproc_p = meshopt_settings_section->query("preprocessor_config");
       if(preproc_p.second)
       {
-        meshopt_preproc = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
+        meshopt_preproc = Control::Meshopt::ControlFactory<DT_, IT_>::create_meshopt_control(
           dom_ctrl, preproc_p.first, &meshopt_config, &solver_config);
         XASSERT(meshopt_preproc != nullptr);
         comm.print("Using "+preproc_p.first+" for meshopt preprocessing");
@@ -848,7 +843,7 @@ struct NavierStokesScrewsApp
     // define our velocity and pressure system levels
     typedef NavierStokesBlockedSystemLevel
     <
-      ExtrudedShapeType::dimension, MemType, DataType, IndexType
+      ExtrudedShapeType::dimension, DataType, IndexType
     > SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
@@ -934,7 +929,7 @@ struct NavierStokesScrewsApp
     matrix_m_p.local().format();
     Assembly::Common::IdentityOperator mass_p_op;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_m_p.local(), mass_p_op, extruded_dom_ctrl.front()->space_pres, cubature);
-    typedef Global::Filter<LAFEM::NoneFilter<MemType, DataType, IndexType>, typename SystemLevelType::ScalarMirror> MassPFilter;
+    typedef Global::Filter<LAFEM::NoneFilter<DataType, IndexType>, typename SystemLevelType::ScalarMirror> MassPFilter;
 
     /* ***************************************************************************************** */
 
@@ -2307,9 +2302,6 @@ struct NavierStokesScrewsApp
 
 int run_app(int argc, char* argv[])
 {
-  // Even though this *looks* configurable, it is not: All HyperelasticityFunctionals are implemented for Mem::Main
-  // only
-  typedef Mem::Main MemType;
   // Floating point type
   typedef double DataType;
   // Index type
@@ -2465,12 +2457,12 @@ int run_app(int argc, char* argv[])
   // Call the appropriate class' run() function
   if(mesh_type == "conformal:hypercube:2:2")
   {
-    ret = NavierStokesScrewsApp<MemType, DataType, IndexType, H2M2D>::run(
+    ret = NavierStokesScrewsApp<DataType, IndexType, H2M2D>::run(
       args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   }
   //else if(mesh_type == "conformal:simplex:2:2")
   //{
-  //  ret = NavierStokesScrewsApp<MemType, DataType, IndexType, S2M2D>::run(
+  //  ret = NavierStokesScrewsApp<DataType, IndexType, S2M2D>::run(
   //    args, comm, application_config, meshopt_config, solver_config, mesh_file_reader);
   //}
   else

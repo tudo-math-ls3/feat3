@@ -28,11 +28,8 @@ namespace FEAT
     class SynchVectorTicket
     {
     public:
-      /// the buffer vector type (possibly in device memory)
-      using BufferType = LAFEM::DenseVector<typename VT_::MemType, typename VT_::DataType, typename VT_::IndexType>;
-
-      /// the buffer vector type in main memory
-      using BufferMain = LAFEM::DenseVector<Mem::Main, typename VT_::DataType, typename VT_::IndexType>;
+      /// the buffer vector type
+      using BufferType = LAFEM::DenseVector<typename VT_::DataType, typename VT_::IndexType>;
 
     protected:
       /// signals, whether wait was already called
@@ -48,7 +45,7 @@ namespace FEAT
       /// send and receive request vectors
       Dist::RequestVector _send_reqs, _recv_reqs;
       /// send and receive buffers
-      std::vector<BufferMain> _send_bufs, _recv_bufs;
+      std::vector<BufferType> _send_bufs, _recv_bufs;
 #endif // FEAT_HAVE_MPI || DOXYGEN
 
     public:
@@ -102,7 +99,7 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer vector in main memory
-          _recv_bufs.at(i) = BufferMain(_mirrors->at(i).buffer_size(target), LAFEM::Pinning::disabled);
+          _recv_bufs.at(i) = BufferType(_mirrors->at(i).buffer_size(*_target));
 
           // post receive
           _recv_reqs.push_back(_comm->irecv(_recv_bufs.at(i).elements(), _recv_bufs.at(i).size(), ranks.at(i)));
@@ -114,13 +111,10 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer in device memory
-          BufferType buffer(_mirrors->at(i).buffer_size(target), LAFEM::Pinning::disabled);
+          _send_bufs.at(i) = BufferType(_mirrors->at(i).buffer_size(*_target));
 
           // gather from mirror
-          _mirrors->at(i).gather(buffer, *_target);
-
-          // convert buffer to main memory
-          _send_bufs.at(i).convert(buffer);
+          _mirrors->at(i).gather(_send_bufs.at(i), *_target);
 
           // post send
           _send_reqs.push_back(_comm->isend(_send_bufs.at(i).elements(), _send_bufs.at(i).size(), ranks.at(i)));
@@ -149,8 +143,8 @@ namespace FEAT
         _mirrors(other->_mirrors),
         _send_reqs(std::forward<Dist::RequestVector>(other._send_reqs)),
         _recv_reqs(std::forward<Dist::RequestVector>(other._recv_reqs)),
-        _send_bufs(std::forward<Dist::RequestVector>(other._send_bufs)),
-        _recv_bufs(std::forward<Dist::RequestVector>(other._recv_bufs))
+        _send_bufs(std::forward<std::vector<BufferType>>(other._send_bufs)),
+        _recv_bufs(std::forward<std::vector<BufferType>>(other._recv_bufs))
       {
         other->_finished = true;
         other->_comm = nullptr;
@@ -177,8 +171,8 @@ namespace FEAT
         _mirrors = other->_mirrors;
         _send_reqs = std::forward<Dist::RequestVector>(other._send_reqs);
         _recv_reqs = std::forward<Dist::RequestVector>(other._recv_reqs);
-        _send_bufs = std::forward<Dist::RequestVector>(other._send_bufs);
-        _recv_bufs = std::forward<Dist::RequestVector>(other._recv_bufs);
+        _send_bufs = std::forward<std::vector<BufferType>>(other._send_bufs);
+        _recv_bufs = std::forward<std::vector<BufferType>>(other._recv_bufs);
 
         other->_finished = true;
         other->_comm = nullptr;
@@ -208,12 +202,8 @@ namespace FEAT
         // process all pending receives
         for(std::size_t idx(0u); _recv_reqs.wait_any(idx); )
         {
-          // convert buffer to device memory
-          BufferType buffer;
-          buffer.convert(_recv_bufs.at(idx));
-
           // scatter the receive buffer
-          _mirrors->at(idx).scatter_axpy(*_target, buffer);
+          _mirrors->at(idx).scatter_axpy(*_target, _recv_bufs.at(idx));
         }
 
         // wait for all sends to finish

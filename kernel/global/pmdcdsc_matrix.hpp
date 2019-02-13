@@ -58,11 +58,10 @@ namespace FEAT
      */
     template<typename DT_, typename IT_, int dim_, typename MirrorV_, typename MirrorP_>
     class PMDCDSCMatrix<
-      Global::Matrix<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, 1>, MirrorV_, MirrorP_>,
-      Global::Matrix<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, dim_>, MirrorV_, MirrorP_>>
+      Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, 1>, MirrorV_, MirrorP_>,
+      Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim_>, MirrorV_, MirrorP_>>
     {
     public:
-      typedef Mem::Main MemType;
       typedef DT_ DataType;
       typedef IT_ IndexType;
       static constexpr int dim = dim_;
@@ -70,17 +69,17 @@ namespace FEAT
       typedef MirrorV_ MirrorTypeV;
       typedef MirrorP_ MirrorTypeP;
 
-      typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, 1> LocalMatrixTypeB;
-      typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 1, dim> LocalMatrixTypeD;
-      typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixTypeS;
-      typedef LAFEM::SparseMatrixCSCR<MemType, DataType, IndexType> NeighMatrixTypeS;
+      typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, 1> LocalMatrixTypeB;
+      typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, 1, dim> LocalMatrixTypeD;
+      typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixTypeS;
+      typedef LAFEM::SparseMatrixCSCR<DataType, IndexType> NeighMatrixTypeS;
 
       typedef Global::Matrix<LocalMatrixTypeB, MirrorTypeV, MirrorTypeP> GlobalMatrixTypeB;
       typedef Global::Matrix<LocalMatrixTypeD, MirrorTypeP, MirrorTypeV> GlobalMatrixTypeD;
 
-      typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> LocalVectorTypeV;
-      typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorTypeP;
-      typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferVectorType;
+      typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> LocalVectorTypeV;
+      typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorTypeP;
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
 
       typedef Global::Vector<LocalVectorTypeV, MirrorTypeV> GlobalVectorTypeV;
       typedef Global::Vector<LocalVectorTypeP, MirrorTypeP> GlobalVectorTypeP;

@@ -12,7 +12,6 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/solver/legacy_preconditioners.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/analytic/common.hpp>
@@ -36,7 +35,6 @@ namespace PoissonNeumann
     const Dist::Comm& comm = domain.comm();
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef Real DataType;
     typedef Index IndexType;
 
@@ -52,7 +50,7 @@ namespace PoissonNeumann
     Analytic::Common::CosineWaveFunction<ShapeType::dimension> sol_func;
 
     // define our system level
-    typedef Control::ScalarMeanFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::ScalarMeanFilterSystemLevel<DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 

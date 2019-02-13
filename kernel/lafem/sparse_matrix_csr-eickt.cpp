@@ -11,15 +11,9 @@ namespace FEAT
 {
   namespace LAFEM
   {
-     template class SparseMatrixCSR<Mem::Main, float, unsigned int>;
-     template class SparseMatrixCSR<Mem::Main, double, unsigned int>;
-     template class SparseMatrixCSR<Mem::Main, float, unsigned long>;
-     template class SparseMatrixCSR<Mem::Main, double, unsigned long>;
-#ifdef FEAT_HAVE_CUDA
-     template class SparseMatrixCSR<Mem::CUDA, float, unsigned int>;
-     template class SparseMatrixCSR<Mem::CUDA, double, unsigned int>;
-     template class SparseMatrixCSR<Mem::CUDA, float, unsigned long>;
-     template class SparseMatrixCSR<Mem::CUDA, double, unsigned long>;
-#endif
+     template class SparseMatrixCSR<float, unsigned int>;
+     template class SparseMatrixCSR<double, unsigned int>;
+     template class SparseMatrixCSR<float, unsigned long>;
+     template class SparseMatrixCSR<double, unsigned long>;
   }
 }

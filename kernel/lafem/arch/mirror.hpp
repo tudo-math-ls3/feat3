@@ -9,7 +9,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 namespace FEAT
 {
@@ -17,11 +16,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template<typename Mem_>
-      struct Mirror;
-
-      template<>
-      struct Mirror<Mem::Main>
+      struct Mirror
       {
         template<typename DT_, typename IT_>
         static void gather_dv(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
@@ -97,25 +92,22 @@ namespace FEAT
         template<typename DT_, typename IT_>
         static void scatter_svb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, const Index nvec, DT_* vval, const IT_* vidx, const DT_ alpha);
 
-      }; // struct Mirror<Mem::Main>
-
-      template<>
-      struct Mirror<Mem::CUDA>
-      {
         template<typename DT_, typename IT_>
-        static void gather_dv(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec);
+        static void gather_dv_cuda(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec);
 
         template<typename DT_, typename IT_>
-        static void scatter_dv(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha);
+        static void scatter_dv_cuda(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha);
 
         template<typename DT_, typename IT_>
-        static void gather_dvb(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec);
+        static void gather_dvb_cuda(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec);
 
         template<typename DT_, typename IT_>
-        static void scatter_dvb(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha);
+        static void scatter_dvb_cuda(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha);
 
-        /// \todo implement operations for SparseVector(Blocked) if required
-      };
+        /// \todo implement cuda operations for SparseVector(Blocked) if required
+
+      }; // struct Mirror
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

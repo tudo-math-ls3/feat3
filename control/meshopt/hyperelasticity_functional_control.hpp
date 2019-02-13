@@ -7,7 +7,6 @@
 #ifndef FEAT_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP
 #define FEAT_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/nonlinear_functional.hpp>
@@ -33,9 +32,6 @@ namespace FEAT
       /**
        * \brief Control class for HyperelasticityFunctionals
        *
-       * \tparam Mem_
-       * The memory architecture of the local HyperelasticityFunctional
-       *
        * \tparam DT_
        * The floating point precision for the solver
        *
@@ -52,7 +48,6 @@ namespace FEAT
        * \tparam Hyperelasticity_
        * The (patch-) local HyperelasticityFunctional to use.
        *
-       * \note Local Hyperelastiticy functionals are only implemented for Mem::Main,
        * \see FEAT::Meshopt::HyperElasticityFunctionalBase
        *
        * \author Jordi Paul
@@ -60,15 +55,13 @@ namespace FEAT
        */
       template
       <
-        typename Mem_, typename DT_, typename IT_, typename DomainControl_,
-        template<typename, typename, typename, typename> class Hyperelasticity_
+        typename DT_, typename IT_, typename DomainControl_,
+        template<typename, typename, typename> class Hyperelasticity_
       >
       class HyperelasticityFunctionalControl
       : public MeshoptControlBase<DomainControl_>
       {
         public:
-          /// Our memory architecture
-          typedef Mem_ MemType;
           /// The floating point type
           typedef DT_ DataType;
           /// The index type
@@ -88,11 +81,11 @@ namespace FEAT
           typedef typename DomainLevelType::TrafoType TrafoType;
 
           /// Type of the "system matrix" for the solver
-          template<typename A, typename B, typename C>
-          using LocalQualityFunctionalType = Hyperelasticity_<A, B, C, TrafoType>;
+          template<typename DT2_, typename IT2_>
+          using LocalQualityFunctionalType = Hyperelasticity_<DT2_, IT2_, TrafoType>;
 
           /// The FE space the transformation lives in
-          typedef typename LocalQualityFunctionalType<Mem_, DT_, IT_>::SpaceType TrafoSpace;
+          typedef typename LocalQualityFunctionalType<DT_, IT_>::SpaceType TrafoSpace;
 
           /// The underlying mesh type
           typedef typename DomainControl_::MeshType MeshType;
@@ -100,12 +93,12 @@ namespace FEAT
           typedef typename MeshType::CoordType CoordType;
 
           /// Inter level transfer matrix
-          typedef LAFEM::SparseMatrixBWrappedCSR<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
+          typedef LAFEM::SparseMatrixBWrappedCSR<DT_, IT_, MeshType::world_dim> TransferMatrixType;
 
           /// The system level type, holding all information about the nonlinear system of equations
           typedef NonlinearSystemLevel
           <
-            Mem_, DT_, IT_,
+            DT_, IT_,
             LocalQualityFunctionalType
           > SystemLevelType;
 

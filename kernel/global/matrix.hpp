@@ -45,7 +45,6 @@ namespace FEAT
       typedef RowMirror_ RowMirrorType;
       typedef ColMirror_ ColMirrorType;
 
-      typedef typename LocalMatrix_::MemType MemType;
       typedef typename LocalMatrix_::DataType DataType;
       typedef typename LocalMatrix_::IndexType IndexType;
 
@@ -62,12 +61,12 @@ namespace FEAT
       template <typename LocalMatrix2_, typename RowMirror2_ = RowMirror_, typename ColMirror2_ = ColMirror_>
       using ContainerType = Matrix<LocalMatrix2_, RowMirror2_, ColMirror2_>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatype and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      /// this typedef lets you create a matrix container with new Datatype and Index types
+      template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByMDI = Matrix<
-        typename LocalMatrix_::template ContainerType<Mem2_, DataType2_, IndexType2_>,
-        typename RowMirror_::template MirrorType<Mem2_, DataType2_, IndexType2_>,
-        typename ColMirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
+        typename LocalMatrix_::template ContainerType<DataType2_, IndexType2_>,
+        typename RowMirror_::template MirrorType<DataType2_, IndexType2_>,
+        typename ColMirror_::template MirrorType<DataType2_, IndexType2_> >;
 
       /// this is a global matrix class
       static constexpr bool is_global = true;

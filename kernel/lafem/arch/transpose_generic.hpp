@@ -21,7 +21,7 @@ namespace FEAT
     {
       /// \todo cache blocking https://stackoverflow.com/questions/16737298/what-is-the-fastest-way-to-transpose-a-matrix-in-c
       template <typename DT_>
-      void Transpose<Mem::Main>::value_generic(DT_ * r, const DT_ * const x, const Index rows_x, const Index columns_x)
+      void Transpose::value_generic(DT_ * r, const DT_ * const x, const Index rows_x, const Index columns_x)
       {
         if (r == x)
         {

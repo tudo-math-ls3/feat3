@@ -832,8 +832,8 @@ namespace FEAT
         typename CubatureFactory_>
       void assemble_flow_accum(
         Accum_& accum,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector_v,
-        const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& vector_p,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector_v,
+        const LAFEM::DenseVector<DataType_, IndexType_>& vector_p,
         const SpaceV_& space_v,
         const SpaceP_& space_p,
         const CubatureFactory_& cubature_factory)
@@ -842,8 +842,8 @@ namespace FEAT
         XASSERTM(vector_v.size() == space_v.get_num_dofs(), "invalid velocity vector size");
         XASSERTM(vector_p.size() == space_p.get_num_dofs(), "invalid pressure vector size");
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VeloVector;
-        typedef LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> PresVector;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VeloVector;
+        typedef LAFEM::DenseVector<DataType_, IndexType_> PresVector;
 
         // assembly traits
         typedef Assembly::AsmTraits2<

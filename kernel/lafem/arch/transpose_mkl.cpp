@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/transpose.hpp>
 
 #include <cstring>
@@ -15,7 +14,7 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-void Transpose<Mem::Main>::value_mkl(float * r, const float * const x, const Index rows_x, const Index columns_x)
+void Transpose::value_mkl(float * r, const float * const x, const Index rows_x, const Index columns_x)
 {
   if (r != x)
   {
@@ -27,7 +26,7 @@ void Transpose<Mem::Main>::value_mkl(float * r, const float * const x, const Ind
   }
 }
 
-void Transpose<Mem::Main>::value_mkl(double * r, const double * const x, const Index rows_x, const Index columns_x)
+void Transpose::value_mkl(double * r, const double * const x, const Index rows_x, const Index columns_x)
 {
   if (r != x)
   {

@@ -49,21 +49,19 @@ namespace FEAT
     template
     <
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     class StokesBlockedSystemLevel
     {
     public:
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
       static constexpr int dim = dim_;
@@ -95,7 +93,7 @@ namespace FEAT
       typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       // define mirror types
-      typedef LAFEM::VectorMirror<MemType, DataType, IndexType> ScalarMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> ScalarMirror;
       typedef ScalarMirror VeloMirror;
       typedef ScalarMirror PresMirror;
       typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
@@ -202,8 +200,8 @@ namespace FEAT
         transfer_sys.compile();
       }
 
-      template<typename M_, typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
-      void convert(const StokesBlockedSystemLevel<dim_, M_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
+      template<typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
+      void convert(const StokesBlockedSystemLevel<dim_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
       {
         gate_velo.convert(other.gate_velo);
         gate_pres.convert(other.gate_pres);
@@ -817,27 +815,26 @@ namespace FEAT
     template
     <
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     class StokesBlockedUnitVeloNonePresSystemLevel :
-      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
     public:
-      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
       MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
-      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
-      typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloFilter;
+      typedef LAFEM::NoneFilter<DataType_, IndexType_> LocalPresFilter;
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
@@ -866,29 +863,28 @@ namespace FEAT
     template
     <
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     class StokesBlockedSlipUnitVeloNonePresSystemLevel :
-      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
     public:
-      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
       MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
-      typedef LAFEM::SlipFilter<MemType_, DataType_, IndexType_, dim_> LocalVeloSlipFilter;
-      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloUnitFilter;
+      typedef LAFEM::SlipFilter<DataType_, IndexType_, dim_> LocalVeloSlipFilter;
+      typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloUnitFilter;
       typedef LAFEM::FilterChain<LocalVeloSlipFilter, LocalVeloUnitFilter> LocalVeloFilter;
-      typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef LAFEM::NoneFilter<DataType_, IndexType_> LocalPresFilter;
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
@@ -922,26 +918,25 @@ namespace FEAT
     template
     <
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     struct StokesBlockedUnitVeloMeanPresSystemLevel :
-      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
-      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
       MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
-      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloFilter;
-      typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloFilter;
+      typedef Global::MeanFilter<DataType_, IndexType_> LocalPresFilter;
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
@@ -973,8 +968,8 @@ namespace FEAT
        * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
        *
        */
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);
@@ -1014,29 +1009,28 @@ namespace FEAT
     template
     <
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<MemType_, DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     class StokesBlockedSlipUnitVeloMeanPresSystemLevel :
-      public StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
     public:
-      typedef StokesBlockedSystemLevel<dim_, MemType_, DataType_, IndexType_,
+      typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
       MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
-      typedef LAFEM::SlipFilter<MemType_, DataType_, IndexType_, dim_> LocalVeloSlipFilter;
-      typedef LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, dim_> LocalVeloUnitFilter;
+      typedef LAFEM::SlipFilter<DataType_, IndexType_, dim_> LocalVeloSlipFilter;
+      typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloUnitFilter;
       typedef LAFEM::FilterChain<LocalVeloSlipFilter, LocalVeloUnitFilter> LocalVeloFilter;
-      typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef Global::MeanFilter<DataType_, IndexType_> LocalPresFilter;
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
@@ -1068,8 +1062,8 @@ namespace FEAT
         * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
         *
         */
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);

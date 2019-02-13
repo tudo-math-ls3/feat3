@@ -40,7 +40,7 @@ namespace FEAT
        * The m^d x m^d FE-stye pointstar matrix.
        */
       template<typename DataType_, typename IndexType_>
-      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const Index fe_degree,
+      static SparseMatrixBanded<DataType_, IndexType_> value(const Index fe_degree,
                                                                         const std::vector<IndexType_> & num_of_subintervalls)
       {
         const IndexType_ * const pnos(num_of_subintervalls.data());
@@ -76,8 +76,8 @@ namespace FEAT
         }
 
         // allocate memory for vectors of matrix
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_offsets(noo);
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(noo * Index(size));
+        DenseVector<IndexType_, IndexType_> vec_offsets(noo);
+        DenseVector<DataType_, IndexType_> vec_val(noo * Index(size));
 
         // fill offsets-vector
         IndexType_ * const poffsets(vec_offsets.elements());
@@ -101,7 +101,7 @@ namespace FEAT
         }
 
         // return the matrix
-        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
+        return SparseMatrixBanded<DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
       }
     }; // struct PointstarStructureFE
 
@@ -124,7 +124,7 @@ namespace FEAT
        * The m^d x m^d FD-stye pointstar matrix.
        */
       template<typename DataType_, typename IndexType_>
-      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const std::vector<IndexType_> & num_of_subintervalls)
+      static SparseMatrixBanded<DataType_, IndexType_> value(const std::vector<IndexType_> & num_of_subintervalls)
       {
         const IndexType_ * const pnos(num_of_subintervalls.data());
 
@@ -141,8 +141,8 @@ namespace FEAT
         const Index num_of_offsets(2 * d + 1);
 
         // allocate memory for vectors of matrix
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(Index(size) * num_of_offsets);
-        DenseVector<Mem::Main, IndexType_, IndexType_> vec_offsets(num_of_offsets);
+        DenseVector<DataType_, IndexType_> vec_val(Index(size) * num_of_offsets);
+        DenseVector<IndexType_, IndexType_> vec_offsets(num_of_offsets);
 
         // fill vec_offsets
         IndexType_ * const poffsets(vec_offsets.elements());
@@ -158,7 +158,7 @@ namespace FEAT
         }
 
         // return the matrix
-        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
+        return SparseMatrixBanded<DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
       }
     }; // struct PointstarStructureFD
 

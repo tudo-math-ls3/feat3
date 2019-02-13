@@ -16,12 +16,12 @@
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class MeanFilterTest :
-  public TestSystem::TaggedTest<Archs::None, DataType_>
+  public UnitTest
 {
-  typedef LAFEM::MeanFilter<Mem::Main, DataType_, Index> FilterType;
-  typedef LAFEM::DenseVector<Mem::Main, DataType_, Index> VectorType;
+  typedef LAFEM::MeanFilter<DataType_, IndexType_> FilterType;
+  typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -30,8 +30,8 @@ class MeanFilterTest :
   typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
 
 public:
-  MeanFilterTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("MeanFilterTest")
+  MeanFilterTest(PreferredBackend backend) :
+    UnitTest("MeanFilterTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -46,7 +46,23 @@ public:
 
   void test_unit_2d() const
   {
-    const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.75));
+    //const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.75));
+    DataType_ tol;
+    if (typeid(DataType_) == typeid(double))
+    {
+      tol = Math::pow(Math::eps<DataType_>(), DataType_(0.75));
+    }
+    #ifdef FEAT_HAVE_QUADMATH
+    else if (typeid(DataType_) == typeid(__float128))
+    {
+      tol = Math::pow(Math::eps<DataType_>(), DataType_(0.75));
+    }
+    #endif
+    else
+    {
+      tol = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+    }
+
     // create coarse mesh
     Geometry::RefinedUnitCubeFactory<QuadMesh> unit_factory(3);
     QuadMesh mesh(unit_factory);
@@ -90,4 +106,25 @@ public:
   }
 };
 
-MeanFilterTest<double> mean_filter_test_double;
+MeanFilterTest<float, unsigned int> mean_filter_test_float_uint(PreferredBackend::generic);
+MeanFilterTest<double, unsigned int> mean_filter_test_double_uint(PreferredBackend::generic);
+MeanFilterTest<float, unsigned long> mean_filter_test_float_ulong(PreferredBackend::generic);
+MeanFilterTest<double, unsigned long> mean_filter_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MeanFilterTest<float, unsigned long> mkl_mean_filter_test_float_ulong(PreferredBackend::mkl);
+MeanFilterTest<double, unsigned long> mkl_mean_filter_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MeanFilterTest<__float128, unsigned int> mean_filter_test_float128_uint(PreferredBackend::generic);
+MeanFilterTest<__float128, unsigned long> mean_filter_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MeanFilterTest<Half, unsigned int> mean_filter_test_half_uint(PreferredBackend::generic);
+MeanFilterTest<Half, unsigned long> mean_filter_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MeanFilterTest<float, unsigned int> cuda_mean_filter_test_float_uint(PreferredBackend::cuda);
+MeanFilterTest<double, unsigned int> cuda_mean_filter_test_double_uint(PreferredBackend::cuda);
+MeanFilterTest<float, unsigned long> cuda_mean_filter_test_float_ulong(PreferredBackend::cuda);
+MeanFilterTest<double, unsigned long> cuda_mean_filter_test_double_ulong(PreferredBackend::cuda);
+#endif

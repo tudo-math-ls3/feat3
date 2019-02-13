@@ -40,10 +40,10 @@ namespace FEAT
        * \param[in] cubature_name
        * The name of the cubature rule to use for integration
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      template<typename DataType_, typename IndexType_, typename Space_>
       static void assemble(
-        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_prim,
-        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_dual,
+        LAFEM::DenseVector<DataType_, IndexType_>& vec_prim,
+        LAFEM::DenseVector<DataType_, IndexType_>& vec_dual,
         const Space_& space, const String& cubature_name)
       {
         Cubature::DynamicFactory cubature_factory(cubature_name);
@@ -63,29 +63,25 @@ namespace FEAT
        * \param[in] cubature_factory
        * A cubature factory for integration.
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      template<typename DataType_, typename IndexType_, typename Space_>
       static void assemble(
-        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_prim,
-        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_dual,
+        LAFEM::DenseVector<DataType_, IndexType_>& vec_prim,
+        LAFEM::DenseVector<DataType_, IndexType_>& vec_dual,
         const Space_& space, const Cubature::DynamicFactory& cubature_factory)
       {
         // allocate primal and dual vectors
-        LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> vec_v(space.get_num_dofs(), DataType_(0));
-        LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> vec_w(space.get_num_dofs(), DataType_(0));
+        vec_prim = LAFEM::DenseVector<DataType_, IndexType_>(space.get_num_dofs(), DataType_(0));
+        vec_dual = LAFEM::DenseVector<DataType_, IndexType_>(space.get_num_dofs(), DataType_(0));
 
         // create a constant 1-function and its corresponding force functional
         Analytic::Common::ConstantFunction<Space_::world_dim, DataType_> one_func(DataType_(1));
         Assembly::Common::ForceFunctional<decltype(one_func)> one_force(one_func);
 
         // interpolate 1-function into vector v
-        Assembly::Interpolator::project(vec_v, one_func, space);
+        Assembly::Interpolator::project(vec_prim, one_func, space);
 
         // assemble 1-function force into vector w
-        Assembly::LinearFunctionalAssembler::assemble_vector(vec_w, one_force, space, cubature_factory);
-
-        // convert mem types
-        vec_prim.convert(vec_v);
-        vec_dual.convert(vec_w);
+        Assembly::LinearFunctionalAssembler::assemble_vector(vec_dual, one_force, space, cubature_factory);
       }
 
       /**
@@ -106,9 +102,9 @@ namespace FEAT
        *
        * \warning This function does not work for global mean filters!
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      template<typename DataType_, typename IndexType_, typename Space_>
       static void assemble(
-        LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
+        LAFEM::MeanFilter<DataType_, IndexType_>& filter,
         const Space_& space, const String& cubature_name,
         const DataType_ sol_mean = DataType_(0))
       {
@@ -134,21 +130,20 @@ namespace FEAT
        *
        * \warning This function does not work for global mean filters!
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      template<typename DataType_, typename IndexType_, typename Space_>
       static void assemble(
-        LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
+        LAFEM::MeanFilter<DataType_, IndexType_>& filter,
         const Space_& space, const Cubature::DynamicFactory& cubature_factory,
         const DataType_ sol_mean = DataType_(0))
       {
         // allocate primal and dual vectors
-        LAFEM::DenseVector<MemType_, DataType_, IndexType_> vec_prim, vec_dual;
+        LAFEM::DenseVector<DataType_, IndexType_> vec_prim, vec_dual;
 
         // assemble vectors
         assemble(vec_prim, vec_dual, space, cubature_factory);
 
         // create the filter
-        filter = LAFEM::MeanFilter<MemType_, DataType_, IndexType_>
-          (std::move(vec_prim), std::move(vec_dual), sol_mean);
+        filter = LAFEM::MeanFilter<DataType_, IndexType_>(std::move(vec_prim), std::move(vec_dual), sol_mean);
       }
     }; // class MeanFilterAssembler
   } // namespace Assembly

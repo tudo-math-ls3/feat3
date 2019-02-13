@@ -56,20 +56,17 @@ namespace FEAT
   {
     template<
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
     struct StokesPowerSystemLevel
     {
-      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType mismatch!");
       static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType mismatch!");
       static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType mismatch!");
 
       // basic types
       static constexpr int dim = dim_;
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
@@ -98,7 +95,7 @@ namespace FEAT
       typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       // define mirror types
-      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> ScalarMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> ScalarMirror;
       typedef LAFEM::PowerMirror<ScalarMirror, dim> VeloMirror;
       typedef ScalarMirror PresMirror;
       typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
@@ -189,8 +186,8 @@ namespace FEAT
         matrix_sys.local().block_d() = matrix_d.local().clone(LAFEM::CloneMode::Shallow);
       }
 
-      template<typename M_, typename D_, typename I_, typename SM_, typename TM_>
-      void convert(const StokesPowerSystemLevel<dim_, M_, D_, I_, SM_, TM_> & other)
+      template<typename D_, typename I_, typename SM_, typename TM_>
+      void convert(const StokesPowerSystemLevel<dim_, D_, I_, SM_, TM_> & other)
       {
         gate_velo.convert(other.gate_velo);
         gate_pres.convert(other.gate_pres);
@@ -764,19 +761,18 @@ namespace FEAT
 
     template<
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
     struct StokesPowerUnitVeloNonePresSystemLevel :
-      public StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
+      public StokesPowerSystemLevel<dim_, DataType_, IndexType_, ScalarMatrix_>
     {
-      typedef StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
+      typedef StokesPowerSystemLevel<dim_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
       // define local filter types
-      typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> UnitVeloFilter;
+      typedef LAFEM::UnitFilter<DataType_, IndexType_> UnitVeloFilter;
       typedef LAFEM::PowerFilter<UnitVeloFilter, dim_> LocalVeloFilter;
-      typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef LAFEM::NoneFilter<DataType_, IndexType_> LocalPresFilter;
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
@@ -804,8 +800,8 @@ namespace FEAT
       /**
        * \brief Conversion method
        */
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesPowerUnitVeloNonePresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const StokesPowerUnitVeloNonePresSystemLevel<dim_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);
@@ -818,20 +814,19 @@ namespace FEAT
 
     template<
       int dim_,
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
     struct StokesPowerUnitVeloMeanPresSystemLevel :
-      public StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
+      public StokesPowerSystemLevel<dim_, DataType_, IndexType_, ScalarMatrix_>
     {
-      typedef StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
+      typedef StokesPowerSystemLevel<dim_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
       // define local filter types
-      typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> UnitVeloFilter;
+      typedef LAFEM::UnitFilter<DataType_, IndexType_> UnitVeloFilter;
       typedef LAFEM::PowerFilter<UnitVeloFilter, dim_> LocalVeloFilter;
-      typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
-      //typedef LAFEM::NoneFilter<MemType_, DataType_, IndexType_> LocalPresFilter;
+      typedef Global::MeanFilter<DataType_, IndexType_> LocalPresFilter;
+      //typedef LAFEM::NoneFilter<DataType_, IndexType_> LocalPresFilter;
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
@@ -859,8 +854,8 @@ namespace FEAT
       /**
        * \brief Conversion method
        */
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesPowerUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const StokesPowerUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);

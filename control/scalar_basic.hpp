@@ -46,20 +46,17 @@ namespace FEAT
   namespace Control
   {
     template<
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
-      typename TransferMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
     class ScalarBasicSystemLevel
     {
     public:
-      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType mismatch!");
       static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType mismatch!");
       static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType mismatch!");
 
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
@@ -79,7 +76,7 @@ namespace FEAT
       typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> SystemMirror;
 
       /// define system gate
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
@@ -134,8 +131,8 @@ namespace FEAT
           + this->transfer_sys.bytes() + this->matrix_sys.local().bytes();
       }
 
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const ScalarBasicSystemLevel<M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const ScalarBasicSystemLevel<D_, I_, SM_> & other)
       {
         gate_sys.convert(other.gate_sys);
         coarse_muxer_sys.convert(other.coarse_muxer_sys);
@@ -459,33 +456,31 @@ namespace FEAT
     }; // class ScalarBasicSystemLevel<...>
 
     template<
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
     class ScalarUnitFilterSystemLevel :
-      public ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_>
+      public ScalarBasicSystemLevel<DataType_, IndexType_, ScalarMatrix_>
     {
     public:
-      typedef ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
+      typedef ScalarBasicSystemLevel<DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> SystemMirror;
 
       /// define local filter type
-      typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> LocalSystemFilter;
+      typedef LAFEM::UnitFilter<DataType_, IndexType_> LocalSystemFilter;
 
       /// define global filter type
       typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
 
       /// Our class base type
-      template <typename Mem2_, typename DT2_, typename IT2_, typename ScalarMatrix2_>
-      using BaseType = ScalarUnitFilterSystemLevel<Mem2_, DT2_, IT2_, ScalarMatrix2_>;
+      template <typename DT2_, typename IT2_, typename ScalarMatrix2_>
+      using BaseType = ScalarUnitFilterSystemLevel<DT2_, IT2_, ScalarMatrix2_>;
 
       /// our global system filter
       GlobalSystemFilter filter_sys;
@@ -509,8 +504,8 @@ namespace FEAT
        * Use source ScalarUnitFilterSystemLevel content as content of current ScalarUnitFilterSystemLevel.
        *
        */
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const ScalarUnitFilterSystemLevel<M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const ScalarUnitFilterSystemLevel<D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_sys.convert(other.filter_sys);
@@ -547,33 +542,31 @@ namespace FEAT
     }; // class ScalarUnitFilterSystemLevel<...>
 
     template<
-      typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
     class ScalarMeanFilterSystemLevel :
-      public ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_>
+      public ScalarBasicSystemLevel<DataType_, IndexType_, ScalarMatrix_>
     {
     public:
-      typedef ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
+      typedef ScalarBasicSystemLevel<DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
       // basic types
-      typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<DataType, IndexType> SystemMirror;
 
       /// define local filter type
-      typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalSystemFilter;
+      typedef Global::MeanFilter<DataType_, IndexType_> LocalSystemFilter;
 
       /// define global filter type
       typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
 
       /// Our class base type
-      template <typename Mem2_, typename DT2_, typename IT2_, typename ScalarMatrix2_>
-      using BaseType = ScalarMeanFilterSystemLevel<Mem2_, DT2_, IT2_, ScalarMatrix2_>;
+      template <typename DT2_, typename IT2_, typename ScalarMatrix2_>
+      using BaseType = ScalarMeanFilterSystemLevel<DT2_, IT2_, ScalarMatrix2_>;
 
       /// our global system filter
       GlobalSystemFilter filter_sys;
@@ -597,8 +590,8 @@ namespace FEAT
        * Use source ScalarMeanFilterSystemLevel content as content of current ScalarMeanFilterSystemLevel.
        *
        */
-      template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const ScalarMeanFilterSystemLevel<M_, D_, I_, SM_> & other)
+      template<typename D_, typename I_, typename SM_>
+      void convert(const ScalarMeanFilterSystemLevel<D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_sys.convert(other.filter_sys);

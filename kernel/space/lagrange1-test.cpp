@@ -26,9 +26,9 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class Lagrange1Test
-  : public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public UnitTest
 {
   typedef Shape::Quadrilateral ShapeType;
   typedef Geometry::ConformalMesh<ShapeType> QuadMesh;
@@ -48,8 +48,8 @@ class Lagrange1Test
   static constexpr SpaceTags tetris_space_config = SpaceTags::grad;
 
 public:
-  Lagrange1Test() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("Lagrange-1 Test")
+  Lagrange1Test(PreferredBackend backend) :
+    UnitTest("Lagrange-1 Test", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -186,9 +186,9 @@ public:
     QuadSpaceQ1* space = new QuadSpaceQ1(*trafo);
 
     // create matrix structure
-    Index neq = 0, nnze = 0;
-    Index* row_ptr = nullptr;
-    Index* col_idx = nullptr;
+    IndexType_ neq = 0, nnze = 0;
+    IndexType_* row_ptr = nullptr;
+    IndexType_* col_idx = nullptr;
 
     // assemble matrix structure
     asm_mat_struct(*space, neq, nnze, row_ptr, col_idx);
@@ -198,7 +198,7 @@ public:
     TEST_CHECK_EQUAL(nnze, 52u);
 
     // validate row-pointer
-    Index row_ptr_ref[11] =
+    IndexType_ row_ptr_ref[11] =
     {
       0,
       4,
@@ -212,13 +212,13 @@ public:
       48,
       52
     };
-    for(Index i(0); i < 11; ++i)
+    for(IndexType_ i(0); i < 11; ++i)
     {
       TEST_CHECK_EQUAL(row_ptr[i], row_ptr_ref[i]);
     }
 
     // validate column-indices
-    Index col_idx_ref[52] =
+    IndexType_ col_idx_ref[52] =
     {
       0, 1,       4, 5,
       0, 1, 2,    4, 5, 6,
@@ -231,14 +231,14 @@ public:
                3, 4, 5,    7, 8, 9,
                   4, 5,       8, 9
     };
-    for(Index i(0); i < 52; ++i)
+    for(IndexType_ i(0); i < 52; ++i)
     {
       TEST_CHECK_EQUAL(col_idx[i], col_idx_ref[i]);
     }
 
     // create data array
     DataType_* data = new DataType_[nnze];
-    for(Index i(0); i < nnze; ++i)
+    for(IndexType_ i(0); i < nnze; ++i)
     {
       data[i] = DataType_(0);
     }
@@ -266,7 +266,7 @@ public:
                           q13, q16,           q16, d23
     };
 
-    for(Index i(0); i < 52; ++i)
+    for(IndexType_ i(0); i < 52; ++i)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(data[i], data_ref[i], eps);
     }
@@ -282,13 +282,13 @@ public:
     delete mesh;
   }
 
-  void asm_mat_struct(const QuadSpaceQ1& space, Index& neq, Index& nnze, Index*& row_ptr, Index*& col_idx) const
+  void asm_mat_struct(const QuadSpaceQ1& space, IndexType_& neq, IndexType_& nnze, IndexType_*& row_ptr, IndexType_*& col_idx) const
   {
     // create a dof-mapper
     Adjacency::Graph dof_mapping(Space::DofMappingRenderer::render(space));
 
     // fetch number of dofs
-    neq = space.get_num_dofs();
+    neq = IndexType_(space.get_num_dofs());
 
     // render transposed dof-mapper to graph
     Adjacency::Graph dof_support(Adjacency::RenderType::transpose, dof_mapping);
@@ -301,32 +301,32 @@ public:
     const Index* img_idx = dof_adjactor.get_image_idx();
 
     // fetch number of adjacencies
-    nnze = dom_ptr[neq];
+    nnze = IndexType_(dom_ptr[neq]);
 
     // allocate arrays
-    row_ptr = new Index[neq+1];
-    col_idx = new Index[nnze];
+    row_ptr = new IndexType_[neq+1];
+    col_idx = new IndexType_[nnze];
 
     // copy arrays
-    for(Index i(0); i <= neq; ++i)
+    for(IndexType_ i(0); i <= neq; ++i)
     {
-      row_ptr[i] = dom_ptr[i];
+      row_ptr[i] = IndexType_(dom_ptr[i]);
     }
-    for(Index i(0); i < nnze; ++i)
+    for(IndexType_ i(0); i < nnze; ++i)
     {
-      col_idx[i] = img_idx[i];
+      col_idx[i] = IndexType_(img_idx[i]);
     }
 
     // apply linear insertion sort on col_idx
-    for(Index i(0); i < neq; ++i)
+    for(IndexType_ i(0); i < neq; ++i)
     {
-      for(Index j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+      for(IndexType_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
       {
-        for(Index k(j+1); k < row_ptr[i+1]; ++k)
+        for(IndexType_ k(j+1); k < row_ptr[i+1]; ++k)
         {
           if(col_idx[j] > col_idx[k])
           {
-            Index m = col_idx[j];
+            IndexType_ m = col_idx[j];
             col_idx[j] = col_idx[k];
             col_idx[k] = m;
           }
@@ -335,7 +335,7 @@ public:
     }
   }
 
-  void asm_laplace(const QuadSpaceQ1& space, Index* row_ptr, Index* col_idx, DataType_* data) const
+  void asm_laplace(const QuadSpaceQ1& space, IndexType_* row_ptr, IndexType_* col_idx, DataType_* data) const
   {
     const QuadTrafo& trafo = space.get_trafo();
 
@@ -359,9 +359,9 @@ public:
     Tiny::Matrix<DataType_, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs> Lx;
 
     // allocate column pointer array
-    Index* col_ptr = new Index[space.get_num_dofs()];
+    IndexType_* col_ptr = new IndexType_[space.get_num_dofs()];
 
-    for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
+    for(IndexType_ cell(0); cell < trafo_eval.get_num_cells(); ++cell)
     {
       // prepare trafo evaluator
       trafo_eval.prepare(cell);
@@ -412,10 +412,10 @@ public:
       for(int i(0); i < num_loc_dofs; ++i)
       {
         // fetch test function dof index
-        Index idof = dof_mapping.get_index(i);
+        IndexType_ idof = IndexType_(dof_mapping.get_index(i));
 
         // build column pointer for this test function contribution
-        for(Index k(row_ptr[idof]); k < row_ptr[idof+1]; ++k)
+        for(IndexType_ k(row_ptr[idof]); k < row_ptr[idof+1]; ++k)
         {
           col_ptr[col_idx[k]] = k;
         }
@@ -424,7 +424,7 @@ public:
         for(int j(0); j < num_loc_dofs; ++j)
         {
           // fetch trial function dof index
-          Index jdof = dof_mapping.get_index(j);
+          IndexType_ jdof = IndexType_(dof_mapping.get_index(j));
 
           // incorporate data into global matrix
           data[col_ptr[jdof]] += Lx(i,j);
@@ -445,5 +445,21 @@ public:
   }
 };
 
-Lagrange1Test<double> lagrange1_test_double;
-Lagrange1Test<float> lagrange1_test_float;
+Lagrange1Test<double, unsigned long> lagrange1_test_double_ulong(PreferredBackend::generic);
+Lagrange1Test<float, unsigned long> lagrange1_test_float_ulong(PreferredBackend::generic);
+//Lagrange1Test<double, unsigned int> lagrange1_test_double_uint(PreferredBackend::generic);
+//Lagrange1Test<float, unsigned int> lagrange1_test_float_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+Lagrange1Test<float, unsigned long> mkl_lagrange1_test_float_ulong(PreferredBackend::mkl);
+Lagrange1Test<double, unsigned long> mkl_lagrange1_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+Lagrange1Test<__float128, unsigned long> lagrange1_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+Lagrange1Test<Half, unsigned long> lagrange1_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+Lagrange1Test<float, unsigned long> cuda_lagrange1_test_float_ulong(PreferredBackend::cuda);
+Lagrange1Test<double, unsigned long> cuda_lagrange1_test_double_ulong(PreferredBackend::cuda);
+#endif

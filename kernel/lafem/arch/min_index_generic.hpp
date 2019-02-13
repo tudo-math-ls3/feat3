@@ -20,7 +20,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_>
-      Index MinIndex<Mem::Main>::value_generic(const DT_ * const x, const Index size)
+      Index MinIndex::value_generic(const DT_ * const x, const Index size)
       {
         DT_ min(x[0]);
         Index min_i(0);

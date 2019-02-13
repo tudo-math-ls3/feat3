@@ -15,14 +15,14 @@ using namespace FEAT::Solver;
 using namespace FEAT::TestSystem;
 
 class UmfpackTest :
-  public TestSystem::FullTaggedTest<Mem::Main, double, Index>
+  public TestSystem::UnitTest
 {
 public:
-  typedef SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
-  typedef DenseVector<Mem::Main, double, Index> VectorType;
+  typedef SparseMatrixCSR<double, Index> MatrixType;
+  typedef DenseVector<double, Index> VectorType;
 
   UmfpackTest() :
-    TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackTest")
+    TestSystem::UnitTest("UmfpackTest")
   {
   }
 
@@ -35,7 +35,7 @@ public:
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
     // create a pointstar factory
-    PointstarFactoryFD<double> psf(17);
+    PointstarFactoryFD<double, Index> psf(17);
 
     // create a CSR matrix
     MatrixType mat_sys(psf.matrix_csr());
@@ -77,14 +77,14 @@ UmfpackTest umfpack_test;
 
 
 class UmfpackMeanTest :
-  public TestSystem::FullTaggedTest<Mem::Main, double, Index>
+  public TestSystem::UnitTest
 {
 public:
-  typedef SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
-  typedef DenseVector<Mem::Main, double, Index> VectorType;
+  typedef SparseMatrixCSR<double, Index> MatrixType;
+  typedef DenseVector<double, Index> VectorType;
 
   UmfpackMeanTest() :
-    TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackMeanTest")
+    TestSystem::UnitTest("UmfpackMeanTest")
   {
   }
 
@@ -101,7 +101,7 @@ public:
     const Index n = 17;
 
     // create a 1D pointstar factory
-    PointstarFactoryFD<double> psf(n, 1);
+    PointstarFactoryFD<double,Index> psf(n, 1);
 
     // create a CSR matrix
     MatrixType mat_sys(psf.matrix_csr());
@@ -155,16 +155,16 @@ public:
 
 UmfpackMeanTest umfpack_mean_test;
 
-template<typename DT_>
+template<typename DT_, typename IT_>
 class GenericUmfpackTest :
-  public TestSystem::FullTaggedTest<Mem::Main, DT_, Index>
+  public TestSystem::UnitTest
 {
 public:
-  typedef SparseMatrixCSR<Mem::Main, DT_, Index> MatrixType;
-  typedef DenseVector<Mem::Main, DT_, Index> VectorType;
+  typedef SparseMatrixCSR<DT_, IT_> MatrixType;
+  typedef DenseVector<DT_, IT_> VectorType;
 
   GenericUmfpackTest() :
-    TestSystem::FullTaggedTest<Mem::Main, DT_, Index>("GenericUmfpackTest")
+    TestSystem::UnitTest("GenericUmfpackTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name())
   {
   }
 
@@ -178,7 +178,7 @@ public:
     const DT_ tol = DT_(1E-8);
 
     // create a pointstar factory
-    PointstarFactoryFD<DT_> psf(17);
+    PointstarFactoryFD<DT_, IT_> psf(17);
 
     // create a CSR matrix
     MatrixType mat_sys(psf.matrix_csr());
@@ -216,8 +216,5 @@ public:
   }
 };
 
-GenericUmfpackTest<double> generic_umfpack_test_double;
-#ifdef FEAT_HAVE_QUADMATH
-GenericUmfpackTest<__float128> generic_umfpack_test_float128;
-#endif
+GenericUmfpackTest<double, Index> generic_umfpack_test_double;
 #endif // FEAT_HAVE_UMFPACK

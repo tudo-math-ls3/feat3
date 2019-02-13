@@ -19,26 +19,24 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename Mem_, typename DT_, typename IT_>
+    template<typename DT_, typename IT_>
     class MeanFilter
     {
     public:
       /// vector-type typedef
-      typedef DenseVector<Mem_, DT_, IT_> VectorType;
-      /// mem-type typedef
-      typedef typename VectorType::MemType MemType;
+      typedef DenseVector<DT_, IT_> VectorType;
       /// data-type typedef
       typedef typename VectorType::DataType DataType;
       /// index-type typedef
       typedef typename VectorType::IndexType IndexType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using FilterType = MeanFilter<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using FilterType = MeanFilter<DT2_, IT2_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
     protected:
       /// primal weighting vector
@@ -154,8 +152,8 @@ namespace FEAT
       }
 
       /// Conversion method
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const MeanFilter<Mem2_, DT2_, IT2_>& other)
+      template<typename DT2_, typename IT2_>
+      void convert(const MeanFilter<DT2_, IT2_>& other)
       {
         _vec_prim.convert(other.get_vec_prim());
         _vec_dual.convert(other.get_vec_dual());

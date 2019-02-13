@@ -97,7 +97,7 @@ namespace CCND_FIBER
 
     //create solution space and vector
     SpaceOrientationType orient_space(unsteady_solver._inner_solver._domain_ptr->front()->trafo);
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim_> orient_sol(orient_space.get_num_dofs());
+    LAFEM::DenseVectorBlocked<DataType, IndexType, dim_> orient_sol(orient_space.get_num_dofs());
     orient_sol.format();
 
     //get our starting solution, solves the basic, steady Navier-Stokes system

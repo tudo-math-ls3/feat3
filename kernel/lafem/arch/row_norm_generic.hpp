@@ -11,6 +11,8 @@
 #error "Do not include this implementation-only header file directly!"
 #endif
 
+#include <kernel/util/math.hpp>
+
 namespace FEAT
 {
   namespace LAFEM
@@ -18,7 +20,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::csr_generic_norm2(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
+      void RowNorm::csr_generic_norm2(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
         const IT_* const row_ptr, const Index rows)
       {
         for (Index row(0); row < rows; row++)
@@ -38,7 +40,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::csr_generic_norm2sqr(DT_* row_norms, const DT_* const val,
+      void RowNorm::csr_generic_norm2sqr(DT_* row_norms, const DT_* const val,
       const IT_* const /*col_ind*/, const IT_* const row_ptr, const Index rows)
       {
         for (Index row(0); row < rows; row++)
@@ -57,7 +59,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::csr_generic_scaled_norm2sqr(DT_* row_norms, const DT_* const scal,
+      void RowNorm::csr_generic_scaled_norm2sqr(DT_* row_norms, const DT_* const scal,
       const DT_* const val, const IT_* const /*col_ind*/, const IT_* const row_ptr, const Index rows)
       {
         for (Index row(0); row < rows; row++)
@@ -76,7 +78,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::bcsr_generic_norm2(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
+      void RowNorm::bcsr_generic_norm2(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
         const IT_* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
       {
         Index block_height = Index(BlockHeight);
@@ -108,7 +110,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::bcsr_generic_norm2sqr(DT_* row_norms, const DT_* const val,
+      void RowNorm::bcsr_generic_norm2sqr(DT_* row_norms, const DT_* const val,
       const IT_* const /*col_ind*/, const IT_* const row_ptr, const Index rows,
       const int BlockHeight, const int BlockWidth)
       {
@@ -140,7 +142,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::bcsr_generic_scaled_norm2sqr(DT_* row_norms, const DT_* const scal,
+      void RowNorm::bcsr_generic_scaled_norm2sqr(DT_* row_norms, const DT_* const scal,
       const DT_* const val, const IT_* const col_ind, const IT_* const row_ptr, const Index rows,
       const int BlockHeight, const int BlockWidth)
       {
@@ -168,68 +170,6 @@ namespace FEAT
               }
             }
           }
-        }
-      }
-
-      template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::ell_generic_norm2(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
-        const IT_* const cs, const IT_* const /*cl*/, const Index C, const Index rows)
-      {
-        for (Index row(0) ; row < rows ; ++row)
-        {
-          const Index chunk(row / C);
-          const Index local_row(row % C);
-          const Index chunk_end(cs[chunk+1]);
-
-          DT_ norm(0);
-          // Manually compute norm2 of row
-          for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
-          {
-            norm += Math::sqr(val[pcol]);
-          }
-          // Take the square root
-          row_norms[row] = Math::sqrt(norm);
-        }
-      }
-
-      template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::ell_generic_norm2sqr(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
-        const IT_* const cs, const IT_* const /*cl*/, const Index C, const Index rows)
-      {
-        for (Index row(0) ; row < rows ; ++row)
-        {
-          const Index chunk(row / C);
-          const Index local_row(row % C);
-          const Index chunk_end(cs[chunk+1]);
-
-          DT_ norm(0);
-          // Manually compute norm2 of row
-          for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
-          {
-            norm += Math::sqr(val[pcol]);
-          }
-          // Do not take the square root
-          row_norms[row] = norm;
-        }
-      }
-      template <typename DT_, typename IT_>
-      void RowNorm<Mem::Main>::ell_generic_scaled_norm2sqr(DT_* row_norms, const DT_* const scal,
-      const DT_* const val, const IT_* const /*col_ind*/, const IT_* const cs, const IT_* const /*cl*/,
-      const Index C, const Index rows)
-      {
-        for (Index row(0) ; row < rows ; ++row)
-        {
-          const Index chunk(row / C);
-          const Index local_row(row % C);
-          const Index chunk_end(cs[chunk+1]);
-
-          DT_ norm(0);
-          // Manually compute norm2 of row
-          for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
-          {
-            norm += scal[row]*Math::sqr(val[pcol]);
-          }
-          row_norms[row] = norm;
         }
       }
     } // namespace Arch

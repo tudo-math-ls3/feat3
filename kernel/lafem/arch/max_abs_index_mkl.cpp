@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/max_abs_index.hpp>
 
 #include <mkl.h>
@@ -15,12 +14,12 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-Index MaxAbsIndex<Mem::Main>::value_mkl(const float * const x, const Index size)
+Index MaxAbsIndex::value_mkl(const float * const x, const Index size)
 {
   return cblas_isamax((MKL_INT)size, x, 1);
 }
 
-Index MaxAbsIndex<Mem::Main>::value_mkl(const double * const x, const Index size)
+Index MaxAbsIndex::value_mkl(const double * const x, const Index size)
 {
   return cblas_idamax((MKL_INT)size, x, 1);
 }

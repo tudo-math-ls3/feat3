@@ -82,16 +82,10 @@ namespace FEAT
        * \note This explicitly uses that the DoF for shape dim 0 are numbered like the mesh's vertices. Without this,
        * it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation.
        *
-       * \warning As this uses the emplacement operator for inserting into the Lagrange2 DoF Vector_, this is only
-       * intended to be used with Mem::Main. The calling class should just convert to this beforehand.
-       *
        */
       template<typename Vector_>
       static void recurse(Vector_& to_coeffs, const Vector_& from_coeffs, const ToSpace& to_space)
       {
-
-        static_assert(std::is_same<typename Vector_::MemType, Mem::Main>::value, "convert to Mem::Main before using this!");
-
         typedef typename Vector_::DataType DataType;
 
         const auto& mesh = to_space.get_trafo().get_mesh();
@@ -161,9 +155,6 @@ namespace FEAT
        * \note This explicitly uses that the DoF for shape dim 0 are numbered like the mesh's vertices. Without this,
        * it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation.
        *
-       * \warning As this uses the emplacement operator for inserting into the Lagrange2 DoF Vector_, this is only
-       * intended to be used with Mem::Main. The calling class should just convert to this beforehand.
-       *
        */
       template<typename Vector_>
       static void recurse(Vector_& to_coeffs, const Vector_& from_coeffs, const ToSpace& to_space)
@@ -220,80 +211,8 @@ namespace FEAT
        * corresponding mesh instead of the DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_>
-      static void interpolate(LAFEM::DenseVector<Mem::Main, DT_, IT_>& to_coeffs,
-      const LAFEM::DenseVector<Mem::Main, DT_, IT_>& from_coeffs,
-      const ToSpace& to_space,
-      const FromSpace& DOXY(from_space))
-      {
-        Lagrange1To2DofAtEntity<TrafoType>::recurse(to_coeffs, from_coeffs, to_space);
-      }
-
-      /**
-       * \brief Interpolates a scalar Lagrange1 to Lagrange2 FE function
-       *
-       * \tparam DT_
-       * Floating point precision of the DoF vector
-       *
-       * \tparam IT_
-       * Index type of the DoF vector
-       *
-       * \param[out] to_coeffs
-       * The \transient coefficient vector of the Lagrange2 FE function
-       *
-       * \param[in] from_coeffs
-       * The \transient coefficient vector of the Lagrange1 FE function
-       *
-       * \param[in] to_space
-       * The \transient space we map to, needed for the DofMapping and DofAssignment
-       *
-       * \param[in] from_space
-       * The \transient space we map from, unused here because we use the IndexSet of the
-       * corresponding mesh instead of the DofMapping and DofAssignment
-       *
-       * This is the Mem::CUDA version that converts the coefficient vectors to Mem::Main for the interpolator.
-       */
-      template<typename DT_, typename IT_>
-      static void interpolate(LAFEM::DenseVector<Mem::CUDA, DT_, IT_>& to_coeffs,
-      const LAFEM::DenseVector<Mem::CUDA, DT_, IT_>& from_coeffs,
-      const ToSpace& to_space,
-      const FromSpace& DOXY(from_space))
-      {
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> to_coeffs_main;
-        to_coeffs_main.convert(to_coeffs);
-
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> from_coeffs_main;
-        from_coeffs_main.convert(from_coeffs);
-
-        Lagrange1To2DofAtEntity<TrafoType>::recurse(to_coeffs, from_coeffs, to_space);
-
-        to_coeffs.convert(to_coeffs_main);
-      }
-
-      /**
-       * \brief Interpolates a vector valued Lagrange1 to Lagrange2 FE function
-       *
-       * \tparam DT_
-       * Floating point precision of the DoF vector
-       *
-       * \tparam IT_
-       * Index type of the DoF vector
-       *
-       * \param[out] to_coeffs
-       * The \transient coefficient vector of the Lagrange2 FE function
-       *
-       * \param[in] from_coeffs
-       * The \transient coefficient vector of the Lagrange1 FE function
-       *
-       * \param[in] to_space
-       * The \transient space we map to, needed for the DofMapping and DofAssignment
-       *
-       * \param[in] from_space
-       * The \transient space we map from, unused here because we use the IndexSet of the
-       * corresponding mesh instead of the DofMapping and DofAssignment
-       */
-      template<typename DT_, typename IT_, int blocksize_>
-      static void interpolate(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& to_coeffs,
-      const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& from_coeffs,
+      static void interpolate(LAFEM::DenseVector<DT_, IT_>& to_coeffs,
+      const LAFEM::DenseVector<DT_, IT_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
@@ -323,20 +242,12 @@ namespace FEAT
        * corresponding mesh instead of the DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_, int blocksize_>
-      static void interpolate(LAFEM::DenseVectorBlocked<Mem::CUDA, DT_, IT_, blocksize_>& to_coeffs,
-      const LAFEM::DenseVectorBlocked<Mem::CUDA, DT_, IT_, blocksize_>& from_coeffs,
+      static void interpolate(LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& to_coeffs,
+      const LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
-        LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_> to_coeffs_main;
-        to_coeffs_main.convert(to_coeffs);
-
-        LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_> from_coeffs_main;
-        from_coeffs_main.convert(from_coeffs);
-
         Lagrange1To2DofAtEntity<TrafoType>::recurse(to_coeffs, from_coeffs, to_space);
-
-        to_coeffs.convert(to_coeffs_main);
       }
     }; //FEInterpolator Lagrange1 to Lagrange2
 
@@ -381,8 +292,8 @@ namespace FEAT
        * DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_>
-      static void interpolate(LAFEM::DenseVector<Mem::Main, DT_, IT_>& to_coeffs,
-      const LAFEM::DenseVector<Mem::Main, DT_, IT_>& from_coeffs,
+      static void interpolate(LAFEM::DenseVector<DT_, IT_>& to_coeffs,
+      const LAFEM::DenseVector<DT_, IT_>& from_coeffs,
       const ToSpace& DOXY(to_space),
       const FromSpace& DOXY(from_space))
       {
@@ -419,8 +330,8 @@ namespace FEAT
        * DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_, int blocksize_>
-      static void interpolate(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& to_coeffs,
-      const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& from_coeffs,
+      static void interpolate(LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& to_coeffs,
+      const LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& from_coeffs,
       const ToSpace& DOXY(to_space),
       const FromSpace& DOXY(from_space))
       {

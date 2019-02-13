@@ -113,9 +113,6 @@ namespace FEAT
     /**
      * \brief Baseclass for a family of variational mesh optimization algorithms.
      *
-     * \tparam Mem_
-     * Memory architecture for solving.
-     *
      * \tparam DT_
      * Floating point type for solving.
      *
@@ -134,45 +131,7 @@ namespace FEAT
      * Mesh optimization algorithms derived from Martin Rumpf's paper \cite Rum96.
      *
      * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
-     * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
-     * family of mesh optimization algorithms is implemented for Mem::Main only.
-     *
-     * See the specialization for Mem::Main.
-     *
-     */
-    template
-    <
-      typename Mem_,
-      typename DT_,
-      typename IT_,
-      typename Trafo_,
-      typename CellFunctionalType_,
-      typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
-    >
-    class HyperelasticityFunctional;
-    /**
-     * \brief Baseclass for a family of variational mesh optimization algorithms.
-     *
-     * \tparam DT_
-     * Floating point type for solving.
-     *
-     * \tparam IT_
-     * Index type for solver vectors etc.
-     *
-     * \tparam Trafo_
-     * Type of the underlying transformation.
-     *
-     * \tparam CellFunctionalType_
-     * (Cell-)local functional used for defining mesh quality. \see RumpfFunctional
-     *
-     * \tparam RefCellTrafo_
-     * Basically choses the reference cell according to which to optimize the mesh quality for.
-     *
-     * Mesh optimization algorithms derived from Martin Rumpf's paper \cite Rum96.
-     *
-     * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
-     * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
-     * family of mesh optimization algorithms is implemented for Mem::Main only.
+     * assembly of an operator into a matrix.
      *
      * Assume we have a regular, conforming mesh \f$ \mathcal{T} \f$ and each cell \f$ K \in \mathcal{T} \f$ can
      * be expressed as the image of an (optimal) reference cell \f$ \hat{K} \f$ such that
@@ -211,10 +170,10 @@ namespace FEAT
       typename IT_,
       typename Trafo_,
       typename CellFunctionalType_,
-      typename RefCellTrafo_
+      typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
     >
-    class HyperelasticityFunctional<Mem::Main, DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_>:
-    public MeshQualityFunctional<typename Trafo_::MeshType>
+    class HyperelasticityFunctional :
+      public MeshQualityFunctional<typename Trafo_::MeshType>
     {
       public :
         /// Type for the transformation
@@ -229,8 +188,6 @@ namespace FEAT
         /// Type of the reference cell trafo for the mesh quality
         typedef RefCellTrafo_ RefCellTrafo;
 
-        /// Only Mem::Main is supported atm
-        typedef Mem::Main MemType;
         /// We always use the precision of the mesh
         typedef CoordType DataType;
         /// We always use Index for now
@@ -248,15 +205,15 @@ namespace FEAT
         typedef typename MeshType::ShapeType ShapeType;
 
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
+        typedef LAFEM::DenseVector<CoordType, IndexType> ScalarVectorType;
         /// Vector type for coordinate vectors etc.
-        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<CoordType, IndexType, MeshType::world_dim> VectorType;
         /// Filter for Dirichlet boundary conditions
-        typedef LAFEM::UnitFilterBlocked<MemType, DT_, IT_, MeshType::world_dim> DirichletFilterType;
+        typedef LAFEM::UnitFilterBlocked<DT_, IT_, MeshType::world_dim> DirichletFilterType;
         /// Sequence of Dirichlet filters for several different boundary parts
         typedef LAFEM::FilterSequence<DirichletFilterType> DirichletFilterSequence;
         /// Filter for slip boundary conditions
-        typedef LAFEM::SlipFilter<MemType, DT_, IT_, MeshType::world_dim> SlipFilterType;
+        typedef LAFEM::SlipFilter<DT_, IT_, MeshType::world_dim> SlipFilterType;
         /// Sequence of Slip filters for several different boundary parts
         typedef LAFEM::FilterSequence<SlipFilterType> SlipFilterSequence;
         /// Combined filter
@@ -266,9 +223,9 @@ namespace FEAT
         typedef typename Intern::TrafoFE<TrafoType>::Space SpaceType;
 
         /// Output vector type of the operator
-        typedef LAFEM::DenseVectorBlocked<MemType, DT_, IT_, MeshType::world_dim> VectorTypeL;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, MeshType::world_dim> VectorTypeL;
         /// Input vector type of the operator
-        typedef LAFEM::DenseVectorBlocked<MemType, DT_, IT_, MeshType::world_dim> VectorTypeR;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, MeshType::world_dim> VectorTypeR;
         /// Type of the gradient vector
         typedef VectorTypeR GradientType;
         /// Type for exchanging information between state variable and mesh
@@ -1347,7 +1304,7 @@ namespace FEAT
     /// \cond internal
     extern template class HyperelasticityFunctional
     <
-      Mem::Main, double, Index,
+      double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, double >>,
       Meshopt::RumpfFunctional
       <
@@ -1358,7 +1315,7 @@ namespace FEAT
 
     extern template class HyperelasticityFunctional
     <
-      Mem::Main, double, Index,
+      double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<3>, 3, double >>,
       Meshopt::RumpfFunctional
       <
@@ -1369,7 +1326,7 @@ namespace FEAT
 
     extern template class HyperelasticityFunctional
     <
-      Mem::Main, double, Index,
+      double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, double >>,
       Meshopt::RumpfFunctional
       <
@@ -1380,7 +1337,7 @@ namespace FEAT
 
     extern template class HyperelasticityFunctional
     <
-      Mem::Main, double, Index,
+      double, Index,
       Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<3>, 3, double >>,
       Meshopt::RumpfFunctional
       <

@@ -607,17 +607,15 @@ namespace FEAT
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
 
-        /// Only Mem::Main is supported atm
-        typedef Mem::Main MemType;
         /// The index type
         typedef Index IndexType;
 
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
+        typedef LAFEM::DenseVector<CoordType, IndexType> ScalarVectorType;
         /// Vector type for element scales etc.
-        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<CoordType, IndexType, MeshType::world_dim> VectorType;
         /// Vector type for the gradient of h wrt. the DoF
-        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType,
+        typedef LAFEM::DenseVectorBlocked<CoordType, IndexType,
         MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> GradHType;
         /// Type of a mesh vertex
         typedef Tiny::Vector<CoordType, MeshType::world_dim> WorldPoint;
@@ -843,20 +841,18 @@ namespace FEAT
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
 
-        /// Only Mem::Main is supported atm
-        typedef Mem::Main MemType;
         /// The index type
         typedef Index IndexType;
 
         /// ShapeType of said mesh
         typedef typename MeshType::ShapeType ShapeType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
+        typedef LAFEM::DenseVector<CoordType, IndexType> ScalarVectorType;
         /// Vector type for element scales etc.
-        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<CoordType, IndexType, MeshType::world_dim> VectorType;
         /// Vector type for the gradient of h wrt. the DoF
         typedef LAFEM::DenseVectorBlocked
-        <MemType, CoordType, Index, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> GradHType;
+        <CoordType, Index, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> GradHType;
         /// Type for one mesh vertex
         typedef Tiny::Vector<CoordType, MeshType::world_dim> WorldPoint;
         /// Surface alignment penalty function
@@ -1303,17 +1299,15 @@ namespace FEAT
         typedef MeshConcentrationFunction<ElementalFunction_, Trafo_, RefCellTrafo_> DirectBaseClass;
         /// Our base class
         typedef MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_> BaseClass;
-        /// Only Mem::Main is supported atm
-        typedef Mem::Main MemType;
         /// The index type
         typedef Index IndexType;
 
         /// ShapeType of said mesh
         typedef typename MeshType::ShapeType ShapeType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
+        typedef LAFEM::DenseVector<CoordType, IndexType> ScalarVectorType;
         /// Vector type for element scales etc.
-        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<CoordType, IndexType, MeshType::world_dim> VectorType;
 
       protected:
         /// List of charts to compute the distance to

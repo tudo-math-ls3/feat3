@@ -29,7 +29,6 @@ namespace FEAT
     /**
      * \brief Dense data matrix class template.
      *
-     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
@@ -45,8 +44,8 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_ = Index>
-    class DenseMatrix : public Container<Mem_, DT_, IT_>
+    template <typename DT_, typename IT_ = Index>
+    class DenseMatrix : public Container<DT_, IT_>
     {
     private:
       Index & _rows()
@@ -64,15 +63,13 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
       /// Compatible L-vector type
-      typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
+      typedef DenseVector<DT_, IT_> VectorTypeL;
       /// Compatible R-vector type
-      typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
+      typedef DenseVector<DT_, IT_> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = DenseMatrix<Mem2_, DT2_, IT2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = DenseMatrix<DT2_, IT2_>;
 
       /**
        * \brief Constructor
@@ -80,7 +77,7 @@ namespace FEAT
        * Creates an empty non dimensional matrix.
        */
       explicit DenseMatrix() :
-        Container<Mem_, DT_, IT_> (0)
+        Container< DT_, IT_> (0)
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -95,14 +92,14 @@ namespace FEAT
        * Creates a matrix with given dimensions.
        */
       explicit DenseMatrix(Index rows_in, Index columns_in) :
-        Container<Mem_, DT_, IT_>(rows_in * columns_in)
+        Container<DT_, IT_>(rows_in * columns_in)
       {
         XASSERT(rows_in != Index(0) && columns_in != Index(0));
         this->_scalar_index.at(0) = rows_in * columns_in;
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(this->_scalar_index.at(0)));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_scalar_index.at(0)));
         this->_elements_size.push_back(this->_scalar_index.at(0));
       }
 
@@ -116,15 +113,15 @@ namespace FEAT
        * Creates a matrix with given dimensions and value.
        */
       explicit DenseMatrix(Index rows_in, Index columns_in, DT_ value) :
-        Container<Mem_, DT_, IT_>(rows_in * columns_in)
+        Container<DT_, IT_>(rows_in * columns_in)
       {
         XASSERT(rows_in != Index(0) && columns_in != Index(0));
         this->_scalar_index.at(0) = rows_in * columns_in;
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(this->_scalar_index.at(0)));
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_scalar_index.at(0)));
         this->_elements_size.push_back(this->_scalar_index.at(0));
-        MemoryPool<Mem_>::set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
+        MemoryPool::set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
       }
 
       /**
@@ -136,7 +133,7 @@ namespace FEAT
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       explicit DenseMatrix(std::vector<char> input) :
-        Container<Mem_, DT_, IT_>(0)
+        Container<DT_, IT_>(0)
       {
         deserialize<DT2_, IT2_>(input);
       }
@@ -149,7 +146,7 @@ namespace FEAT
        * \param[in] filename The source file.
        */
       explicit DenseMatrix(FileMode mode, String filename) :
-      Container<Mem_, DT_, IT_>(0)
+      Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
       }
@@ -161,7 +158,7 @@ namespace FEAT
        * \param[in] filename The source filestream.
        */
       explicit DenseMatrix(FileMode mode, std::istream& file) :
-      Container<Mem_, DT_, IT_>(0)
+      Container<DT_, IT_>(0)
       {
         read_from(mode, file);
       }
@@ -174,7 +171,7 @@ namespace FEAT
        * Moves a given matrix to this matrix.
        */
       DenseMatrix(DenseMatrix && other) :
-        Container<Mem_, DT_, IT_>(std::forward<DenseMatrix>(other))
+        Container<DT_, IT_>(std::forward<DenseMatrix>(other))
       {
       }
 
@@ -215,10 +212,10 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
-      void clone(const DenseMatrix<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep)
+      template<typename DT2_, typename IT2_>
+      void clone(const DenseMatrix<DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        Container<Mem_, DT_, IT_>::clone(other, clone_mode);
+        Container<DT_, IT_>::clone(other, clone_mode);
       }
 
       /**
@@ -228,8 +225,8 @@ namespace FEAT
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const DenseMatrix<Mem2_, DT2_, IT2_> & other)
+      template <typename DT2_, typename IT2_>
+      void convert(const DenseMatrix<DT2_, IT2_> & other)
       {
         this->assign(other);
       }
@@ -261,7 +258,8 @@ namespace FEAT
       {
         ASSERT(row < this->rows());
         ASSERT(col < this->columns());
-        return MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
+        MemoryPool::synchronize();
+        return this->elements()[row * this->columns() + col];
       }
 
       /**
@@ -275,7 +273,8 @@ namespace FEAT
       {
         ASSERT(row < this->rows());
         ASSERT(col < this->columns());
-        MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
+        MemoryPool::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
+        MemoryPool::synchronize();
       }
 
       /**
@@ -324,7 +323,7 @@ namespace FEAT
           bin = std::ifstream::in;
         std::ifstream file(filename.c_str(), bin);
         if(! file.is_open())
-          XABORTM("Unable to open Vector file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
         read_from(mode, file);
         file.close();
       }
@@ -337,22 +336,21 @@ namespace FEAT
       */
       void read_from(FileMode mode, std::istream& file)
       {
+        this->clear();
+
         switch(mode)
         {
           case FileMode::fm_mtx:
           {
-            std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
 
-            IT_ trows;
-            Index tcols, ue(0); //ue is not needed...
+            Index trows, tcols;
             String line;
             std::getline(file, line); // !!? Test on overflow error... could be an enormous matrix... !??
-            //for now, just symmetric and general matrices...
-            const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
-            const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
-            if (symmetric == false && general == false)
+            //for now, just array real general (aka dense) matrices
+            const bool array_format((line.find("%%MatrixMarket matrix array real general") != String::npos) ? true : false);
+            if (array_format == false)
             {
-              XABORTM("Input-file is not a compatible mtx-file");
+              XABORTM("Input-file is not a compatible array real mtx-file");
             }
 
             while(!file.eof())
@@ -371,7 +369,7 @@ namespace FEAT
               line.erase(0, begin);
               String::size_type end(line.find_first_of(" "));
               String srow(line, 0, end);
-              trows = IT_(atol(srow.c_str()));
+              trows = Index(atol(srow.c_str()));
               line.erase(0, end);
 
               begin = line.find_first_not_of(" ");
@@ -381,55 +379,32 @@ namespace FEAT
               tcols = Index(atol(scol.c_str()));
               line.erase(0, end);
             }
-            //Read in row, column and value of lines:
+
+            DenseMatrix<DT_, IT_> result(Index(trows), tcols);
+            Index i(0);
+
+            //Read in value of lines:
             while(!file.eof())
             {
               std::getline(file, line);
               if(file.eof())
                 break;
 
-              String::size_type begin(line.find_first_not_of(" "));
+              String::size_type begin = line.find_first_not_of(" ");
               line.erase(0, begin);
-              String::size_type end(line.find_first_of(" "));
-              String srow(line, 0, end);
-              IT_ row((IT_)atol(srow.c_str()));
-              --row;
-              line.erase(0, end);
-
-              begin = line.find_first_not_of(" ");
-              line.erase(0, begin);
-              end = line.find_first_of(" ");
-              String scol(line, 0, end);
-              IT_ col((IT_)atol(scol.c_str()));
-              --col;
-              line.erase(0, end);
-
-              begin = line.find_first_not_of(" ");
-              line.erase(0, begin);
-              end = line.find_first_of(" ");
+              String::size_type end = line.find_first_of(" ");
               String sval(line, 0, end);
               DT_ tval((DT_)atof(sval.c_str()));
 
-              entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
-              ++ue;
-              if (symmetric == true && row != col)
-              {
-                entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
-                ++ue;
-              }
+              Index row(i / tcols);
+              Index col(i % tcols);
+              result(row, col, tval);
+
+              ++i;
             }
-            //create temp Matrix, write in values, assign temp to this
-            {
-              DenseMatrix<Mem::Main, DT_, IT_> swapMat(Index(trows), tcols);
-              for(auto row : entries)
-              {
-                for(auto col : row.second)
-                {
-                  swapMat(Index(row.first),Index(col.first), col.second);
-                }
-              }
-              this->assign(swapMat);
-            }
+            XASSERTM(i == trows * tcols, "Dense MTX file did not contain enough entries!");
+
+            this->assign(result);
             break;
 
           }
@@ -472,16 +447,14 @@ namespace FEAT
         {
           case FileMode::fm_mtx:
           {
-            DenseMatrix<Mem::Main, DT_, IT_> temp;
-            temp.convert(*this);
-            file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-            file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
+            file << "%%MatrixMarket matrix array real general" << std::endl;
+            file << this->rows() << " " << this->columns() << " " << this->used_elements() << std::endl;
 
             for(IT_ row(0) ; row < rows(); ++row)
             {
               for(IT_ col(0) ; col < columns() ; ++col)
               {
-                file << row + 1 << " " << col + 1 << " " << std::scientific << temp(row, col) << std::endl;
+                file << std::scientific << (*this)(row, col) << std::endl;
               }
             }
             break;
@@ -537,18 +510,6 @@ namespace FEAT
         this->_copy_content(x, full);
       }
 
-      /**
-       * \brief Performs \f$this \leftarrow x\f$.
-       *
-       * \param[in] x The Matrix to be copied.
-       * \param[in] full Shall we create a full copy, including scalars and index arrays?
-       */
-      template <typename Mem2_>
-      void copy(const DenseMatrix<Mem2_, DT_, IT_> & x, bool full = false)
-      {
-        this->_copy_content(x, full);
-      }
-
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
@@ -584,7 +545,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
-        Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->used_elements());
+        Arch::Scale::value(this->elements(), x.elements(), alpha, this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -600,7 +561,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
-        DT_ result = Arch::Norm2<Mem_>::value(this->elements(), this->used_elements());
+        DT_ result = Arch::Norm2::value(this->elements(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -609,12 +570,43 @@ namespace FEAT
       }
 
       /**
+       * \brief Calculate \f$this \leftarrow \alpha~ x + y\f$
+       *
+       * \param[in] x The first summand vector to be scaled.
+       * \param[in] y The second summand vector.
+       * \param[in] alpha A scalar to multiply x with.
+       */
+      void axpy(
+        const DenseMatrix & x,
+        const DenseMatrix & y,
+        const DT_ alpha = DT_(1))
+      {
+        XASSERTM(x.size() == y.size(), "Vector size does not match!");
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+
+        if (Math::abs(alpha) < Math::eps<DT_>())
+        {
+          this->copy(y);
+          //y.scale(beta);
+          return;
+        }
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size() * 2);
+        Arch::Axpy::value(this->elements(), alpha, x.elements(), y.elements(), this->size());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
@@ -624,7 +616,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::Apply<Mem_>::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
+        Arch::Apply::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
                                  x.elements(), this->rows(), this->columns());
 
         TimeStamp ts_stop;
@@ -640,9 +632,9 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVector<Mem_,DT_, IT_> & r,
-                 const DenseVector<Mem_, DT_, IT_> & x,
-                 const DenseVector<Mem_, DT_, IT_> & y,
+                 DenseVector<DT_, IT_> & r,
+                 const DenseVector<DT_, IT_> & x,
+                 const DenseVector<DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
@@ -660,12 +652,13 @@ namespace FEAT
         }
 
         Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
-        Arch::Apply<Mem_>::dense(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
+        Arch::Apply::dense(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
                                  x.elements(), this->rows(), this->columns());
 
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
+
 
       /**
        * \brief Calculate \f$ this \leftarrow x \cdot y \f$
@@ -679,12 +672,89 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops(x.used_elements() * y.columns()*2);
 
-        Arch::ProductMatMat<Mem_>::dense(this->elements(), x.elements(),
+        Arch::ProductMatMat::dense(this->elements(), DT_(1.0), DT_(0.0), x.elements(),
+                                         y.elements(), this->elements(), this->rows(), this->columns(), x.columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Calculate \f$ this \leftarrow x \cdot y \f$
+       */
+      void multiply(SparseMatrixCSR<DT_, IT_> & x, DenseMatrix & y)
+      {
+        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
+        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
+        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+
+        TimeStamp ts_start;
+        //Statistics::add_flops(x.used_elements() * y.columns()*2);
+
+        Arch::ProductMatMat::dsd(this->elements(), DT_(1.0), DT_(0.0), x.val(), x.col_ind(), x.row_ptr(), x.used_elements(),
                                          y.elements(), this->rows(), this->columns(), x.columns());
 
         TimeStamp ts_stop;
         Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
+      }
 
+      /**
+       * \brief Calculate \f$this \leftarrow \alpha~ x y + \beta~ z\f$
+       *
+       * \param[in] x The first matrix to be scaled with alpha.
+       * \param[in] y The second matrix to be multiplied with x.
+       * \param[in] z A summand matrix to be scaled with beta.
+       * \param[in] alpha A scalar to multiply x with.
+       * \param[in] beta A scalar to multiply z with.
+       */
+      void multiply(
+        const DenseMatrix & x,
+        const DenseMatrix & y,
+        const DenseMatrix & z,
+        const DT_ alpha = DT_(1),
+        const DT_ beta = DT_(1))
+      {
+        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
+        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
+        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+        XASSERTM(this->rows() == z.rows(), "dimension mismatch!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size() * 2);
+        Arch::ProductMatMat::dense(this->elements(), alpha, beta, x.elements(),
+                                         y.elements(), z.elements(), this->rows(), this->columns(), x.columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Calculate \f$this \leftarrow \alpha~ x y + \beta~ this\f$
+       *
+       * \param[in] x The first matrix to be scaled with alpha.
+       * \param[in] y The second matrix to be multiplied with x.
+       * \param[in] alpha A scalar to multiply x with.
+       * \param[in] beta A scalar to multiply this with.
+       */
+      void multiply(
+        const SparseMatrixCSR<DT_, IT_> & x,
+        const DenseMatrix & y,
+        const DT_ alpha = DT_(1),
+        const DT_ beta = DT_(1))
+      {
+        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
+        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
+        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(x.used_elements() * y.columns()*2);
+        Arch::ProductMatMat::dsd(this->elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.used_elements(),
+                                         y.elements(), this->rows(), this->columns(), x.columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /// Invert the matrix insitu
@@ -695,12 +765,9 @@ namespace FEAT
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements() * this->columns()*2);
 
-        DenseMatrix<Mem::Main, DT_, IT_> m_main;
-        m_main.convert(*this);
         IT_ * temp = new IT_[this->rows()];
-        Math::invert_matrix((IT_)this->rows(), (IT_)this->rows(), m_main.elements(), temp);
+        Math::invert_matrix((IT_)this->rows(), (IT_)this->rows(), this->elements(), temp);
         delete[] temp;
-        this->convert(m_main);
 
         TimeStamp ts_stop;
         Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
@@ -738,12 +805,12 @@ namespace FEAT
       {
         if (rows() == x.columns() && columns() == x.rows())
         {
-          Arch::Transpose<Mem_>::value(this->elements(), x.elements(), x.rows(), x.columns());
+          Arch::Transpose::value(this->elements(), x.elements(), x.rows(), x.columns());
         }
         else
         {
           DenseMatrix r(x.columns(), x.rows());
-          Arch::Transpose<Mem_>::value(r.elements(), x.elements(), x.rows(), x.columns());
+          Arch::Transpose::value(r.elements(), x.elements(), x.rows(), x.columns());
           this->assign(r);
         }
       }
@@ -755,7 +822,7 @@ namespace FEAT
        */
       void transpose_inplace()
       {
-        Arch::Transpose<Mem_>::value(this->elements(), this->elements(), this->rows(), this->columns());
+        Arch::Transpose::value(this->elements(), this->elements(), this->rows(), this->columns());
 
         Index t(this->rows());
         this->_rows() = this->columns();
@@ -796,7 +863,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_> friend bool operator== (const DenseMatrix & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
+      friend bool operator== (const DenseMatrix & a, const DenseMatrix<DT_, IT_> & b)
       {
         if (a.size() != b.size())
           return false;
@@ -817,25 +884,8 @@ namespace FEAT
         DT_ * ta;
         DT_ * tb;
 
-        if(std::is_same<Mem::Main, Mem_>::value)
-        {
-          ta = const_cast<DT_*>(a.elements());
-        }
-        else
-        {
-          ta = new DT_[a.size()];
-          MemoryPool<Mem_>::template download<DT_>(ta, a.elements(), a.size());
-        }
-
-        if(std::is_same<Mem::Main, Mem2_>::value)
-        {
-          tb = const_cast<DT_*>(b.elements());
-        }
-        else
-        {
-          tb = new DT_[b.size()];
-          MemoryPool<Mem2_>::template download<DT_>(tb, b.elements(), b.size());
-        }
+        ta = const_cast<DT_*>(a.elements());
+        tb = const_cast<DT_*>(b.elements());
 
         for (Index i(0) ; i < a.size() ; ++i)
         {
@@ -845,11 +895,6 @@ namespace FEAT
             break;
           }
         }
-
-        if(! std::is_same<Mem::Main, Mem_>::value)
-          delete[] ta;
-        if(! std::is_same<Mem::Main, Mem2_>::value)
-          delete[] tb;
 
         return ret;
       }

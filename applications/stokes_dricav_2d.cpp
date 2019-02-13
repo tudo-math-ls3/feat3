@@ -50,7 +50,6 @@ namespace StokesDriCav2D
     const Dist::Comm& comm = domain.comm();
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
@@ -64,7 +63,7 @@ namespace StokesDriCav2D
     static constexpr int dim = ShapeType::dimension;
 
     // define our system level
-    typedef Control::StokesPowerUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::StokesPowerUnitVeloMeanPresSystemLevel<dim, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
@@ -235,7 +234,7 @@ namespace StokesDriCav2D
     {
       // create a local ILU(0) for S
       /// \todo do not use global pressure filter here...
-      auto loc_ilu = Solver::new_ilu_precond(the_system_level.matrix_s.local(), the_system_level.filter_pres.local(), Index(0));
+      auto loc_ilu = Solver::new_ilu_precond(PreferredBackend::generic, the_system_level.matrix_s.local(), the_system_level.filter_pres.local(), Index(0));
 
       // make it Schwarz...
       auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level.filter_pres);
@@ -313,14 +312,14 @@ namespace StokesDriCav2D
       Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
       // project velocity and pressure
-      LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy;
+      LAFEM::DenseVector<double, Index> vtx_vx, vtx_vy;
       Assembly::DiscreteVertexProjector::project(vtx_vx, vec_sol.local().template at<0>().get(0), the_domain_level.space_velo);
       Assembly::DiscreteVertexProjector::project(vtx_vy, vec_sol.local().template at<0>().get(1), the_domain_level.space_velo);
       exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
 
       // project pressure
       Cubature::DynamicFactory cub("auto-degree:2");
-      LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
+      LAFEM::DenseVector<double, Index> vtx_p;
       Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure

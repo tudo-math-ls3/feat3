@@ -71,7 +71,6 @@ namespace FEAT
     public:
       typedef Gate<LocalVector_, Mirror_> GateType;
 
-      typedef typename LocalVector_::MemType MemType;
       typedef typename LocalVector_::DataType DataType;
       typedef typename LocalVector_::IndexType IndexType;
       typedef LocalVector_ LocalVectorType;
@@ -80,11 +79,11 @@ namespace FEAT
       template <typename LocalVector2_, typename Mirror2_ = Mirror_>
       using ContainerType = Vector<LocalVector2_, Mirror2_>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatype and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
+      /// this typedef lets you create a vector container with new Datatype and Index types
+      template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByMDI = Vector<
-        typename LocalVector_::template ContainerType<Mem2_, DataType2_, IndexType2_>,
-        typename Mirror_::template MirrorType<Mem2_, DataType2_, IndexType2_> >;
+        typename LocalVector_::template ContainerType<DataType2_, IndexType2_>,
+        typename Mirror_::template MirrorType<DataType2_, IndexType2_> >;
 
     protected:
       /// a pointer to the gate responsible for synchronization

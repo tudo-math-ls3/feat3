@@ -19,7 +19,7 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_, typename IT_, int BlockSize_>
-      void UnitFilterBlocked<Mem::Main>::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+      void UnitFilterBlocked::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
       {
         Index block_size = Index(BlockSize_);
         for(Index i(0); i < ue; ++i)
@@ -30,7 +30,7 @@ namespace FEAT
       }
 
       template <typename DT_, typename IT_, int BlockSize_>
-      void UnitFilterBlocked<Mem::Main>::filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue)
+      void UnitFilterBlocked::filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue)
       {
         Index block_size = Index(BlockSize_);
         for(Index i(0); i < ue; ++i)

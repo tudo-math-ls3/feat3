@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
@@ -22,22 +21,21 @@ using namespace FEAT::TestSystem;
  **/
 template
 <
-  typename MemType_,
   typename DT_,
   typename IT_,
   int BlockSize_
   >
 class UnitFilterBlockedVectorTest
-  : public FullTaggedTest<MemType_, DT_, IT_>
+  : public UnitTest
 {
   typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-  typedef DenseVectorBlocked<MemType_, DT_, IT_, BlockSize_> VectorType;
-  typedef DenseVectorBlocked<MemType_, IT_, IT_, BlockSize_> IVectorType;
-  typedef UnitFilterBlocked<MemType_, DT_, IT_, BlockSize_> FilterType;
+  typedef DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
+  typedef DenseVectorBlocked<IT_, IT_, BlockSize_> IVectorType;
+  typedef UnitFilterBlocked<DT_, IT_, BlockSize_> FilterType;
 
 public:
-  UnitFilterBlockedVectorTest()
-    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterBlockedVectorTest")
+  UnitFilterBlockedVectorTest(PreferredBackend backend)
+    : UnitTest("UnitFilterBlockedVectorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -52,12 +50,9 @@ public:
     const int n = 7;
     VectorType a1(n, DT_(1));
     VectorType a2(n, DT_(1));
-
     VectorType ar(n, DT_(1));
-
     VectorType b1(n, DT_(1));
     VectorType b2(n, DT_(1));
-
     VectorType br(n, DT_(1));
 
     // modify reference results
@@ -117,19 +112,37 @@ public:
   }
 };
 
-UnitFilterBlockedVectorTest<Mem::Main, float, Index, 2> unit_filter_vector_test_generic_fi_2;
-UnitFilterBlockedVectorTest<Mem::Main, double, Index, 2> unit_filter_vector_test_generic_di_2;
-UnitFilterBlockedVectorTest<Mem::Main, float, Index, 3> unit_filter_vector_test_generic_fi_3;
-UnitFilterBlockedVectorTest<Mem::Main, double, Index, 3> unit_filter_vector_test_generic_di_3;
-UnitFilterBlockedVectorTest<Mem::Main, float, Index, 4> unit_filter_vector_test_generic_fi_4;
-UnitFilterBlockedVectorTest<Mem::Main, double, Index, 4> unit_filter_vector_test_generic_di_4;
+UnitFilterBlockedVectorTest<float, Index, 2> unit_filter_blocked_vector_test_generic_fi_2(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<double, Index, 2> unit_filter_blocked_vector_test_generic_di_2(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<float, Index, 3> unit_filter_blocked_vector_test_generic_fi_3(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<double, Index, 3> unit_filter_blocked_vector_test_generic_di_3(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<float, Index, 4> unit_filter_blocked_vector_test_generic_fi_4(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<double, Index, 4> unit_filter_blocked_vector_test_generic_di_4(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+UnitFilterBlockedVectorTest<float, unsigned long, 2> mkl_unit_filter_blocked_vector_test_float_ulong_2(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest<double, unsigned long, 2> mkl_unit_filter_blocked_vector_test_double_ulong_2(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest<float, unsigned long, 3> mkl_unit_filter_blocked_vector_test_float_ulong_3(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest<double, unsigned long, 3> mkl_unit_filter_blocked_vector_test_double_ulong_3(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest<float, unsigned long, 4> mkl_unit_filter_blocked_vector_test_float_ulong_4(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest<double, unsigned long, 4> mkl_unit_filter_blocked_vector_test_double_ulong_4(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+UnitFilterBlockedVectorTest<__float128, Index, 2> unit_filter_blocked_vector_test_float128_index_2(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<__float128, Index, 3> unit_filter_blocked_vector_test_float128_index_3(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<__float128, Index, 4> unit_filter_blocked_vector_test_float128_index_4(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+UnitFilterBlockedVectorTest<Half, Index, 2> unit_filter_blocked_vector_test_half_index_2(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<Half, Index, 3> unit_filter_blocked_vector_test_half_index_3(PreferredBackend::generic);
+UnitFilterBlockedVectorTest<Half, Index, 4> unit_filter_blocked_vector_test_half_index_4(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 2> unit_filter_vector_test_cuda_fi_2;
-UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 3> unit_filter_vector_test_cuda_fi_3;
-UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 4> unit_filter_vector_test_cuda_fi_4;
-UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 2> unit_filter_vector_test_cuda_di_2;
-UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 3> unit_filter_vector_test_cuda_di_3;
-UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 4> unit_filter_vector_test_cuda_di_4;
+UnitFilterBlockedVectorTest<float, Index, 2> unit_filter_blocked_vector_test_cuda_fi_2(PreferredBackend::cuda);
+UnitFilterBlockedVectorTest<float, Index, 3> unit_filter_blocked_vector_test_cuda_fi_3(PreferredBackend::cuda);
+UnitFilterBlockedVectorTest<float, Index, 4> unit_filter_blocked_vector_test_cuda_fi_4(PreferredBackend::cuda);
+UnitFilterBlockedVectorTest<double, Index, 2> unit_filter_blocked_vector_test_cuda_di_2(PreferredBackend::cuda);
+UnitFilterBlockedVectorTest<double, Index, 3> unit_filter_blocked_vector_test_cuda_di_3(PreferredBackend::cuda);
+UnitFilterBlockedVectorTest<double, Index, 4> unit_filter_blocked_vector_test_cuda_di_4(PreferredBackend::cuda);
 #endif
 
 /**
@@ -139,28 +152,27 @@ UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 4> unit_filter_vector_test
  */
 template
 <
-  typename MemType_,
   typename DT_,
   typename IT_,
   int BlockHeight_,
   int BlockWidth_
   >
 class UnitFilterBlockedMatrixTest
-  : public FullTaggedTest<MemType_, DT_, IT_>
+  : public UnitTest
 {
-  typedef SparseMatrixBCSR<MemType_, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
+  typedef SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
   typedef typename MatrixType::VectorTypeL VectorTypeR;
   typedef typename MatrixType::ValueType ValueType;
-  typedef DenseVector<MemType_, DT_, IT_> VectorType;
-  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
-  typedef UnitFilterBlocked<MemType_, DT_, IT_, BlockHeight_> FilterType;
+  typedef DenseVector<DT_, IT_> VectorType;
+  typedef DenseVector<IT_, IT_> IVectorType;
+  typedef UnitFilterBlocked<DT_, IT_, BlockHeight_> FilterType;
 
   static constexpr int BlockHeight = BlockHeight_;
   static constexpr int BlockWidth = BlockWidth_;
 
 public:
-  UnitFilterBlockedMatrixTest()
-    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterBlockedMatrixTest")
+  UnitFilterBlockedMatrixTest(PreferredBackend backend)
+    : UnitTest("UnitFilterBlockedMatrixTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -254,15 +266,54 @@ public:
   }
 };
 
-UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 2, 2> unit_filter_matrix_test_generic_fi_22;
-UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 3, 3> unit_filter_matrix_test_generic_fi_33;
-UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 4, 4> unit_filter_matrix_test_generic_fi_44;
-UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 2, 3> unit_filter_matrix_test_generic_fi_23;
-UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 4, 3> unit_filter_matrix_test_generic_fi_43;
+UnitFilterBlockedMatrixTest<float, Index, 2, 2> unit_filter_matrix_test_generic_fi_22(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<float, Index, 3, 3> unit_filter_matrix_test_generic_fi_33(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<float, Index, 4, 4> unit_filter_matrix_test_generic_fi_44(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<float, Index, 2, 3> unit_filter_matrix_test_generic_fi_23(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<float, Index, 4, 3> unit_filter_matrix_test_generic_fi_43(PreferredBackend::generic);
 
-UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 2, 2> unit_filter_matrix_test_generic_di_22;
-UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 3, 3> unit_filter_matrix_test_generic_di_33;
-UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 4, 4> unit_filter_matrix_test_generic_di_44;
-UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 3, 2> unit_filter_matrix_test_generic_di_32;
-UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 3, 4> unit_filter_matrix_test_generic_di_34;
-///TODO cuda tests?
+UnitFilterBlockedMatrixTest<double, Index, 2, 2> unit_filter_matrix_test_generic_di_22(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<double, Index, 3, 3> unit_filter_matrix_test_generic_di_33(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<double, Index, 4, 4> unit_filter_matrix_test_generic_di_44(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<double, Index, 3, 2> unit_filter_matrix_test_generic_di_32(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<double, Index, 3, 4> unit_filter_matrix_test_generic_di_34(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+UnitFilterBlockedMatrixTest<float, unsigned long, 2, 2> mkl_unit_filter_blocked_matrix_test_float_ulong_22(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<float, unsigned long, 3, 3> mkl_unit_filter_blocked_matrix_test_float_ulong_33(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<float, unsigned long, 4, 4> mkl_unit_filter_blocked_matrix_test_float_ulong_44(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<float, unsigned long, 2, 3> mkl_unit_filter_blocked_matrix_test_float_ulong_23(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<float, unsigned long, 4, 3> mkl_unit_filter_blocked_matrix_test_float_ulong_43(PreferredBackend::mkl);
+
+UnitFilterBlockedMatrixTest<double, unsigned long, 2, 2> mkl_unit_filter_blocked_matrix_test_double_ulong_22(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<double, unsigned long, 3, 3> mkl_unit_filter_blocked_matrix_test_double_ulong_33(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<double, unsigned long, 4, 4> mkl_unit_filter_blocked_matrix_test_double_ulong_44(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<double, unsigned long, 2, 3> mkl_unit_filter_blocked_matrix_test_double_ulong_23(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest<double, unsigned long, 4, 3> mkl_unit_filter_blocked_matrix_test_double_ulong_43(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+UnitFilterBlockedMatrixTest<__float128, Index, 2, 2> unit_filter_blocked_matrix_test_float128_index_22(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<__float128, Index, 3, 3> unit_filter_blocked_matrix_test_float128_index_33(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<__float128, Index, 4, 4> unit_filter_blocked_matrix_test_float128_index_44(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<__float128, Index, 2, 3> unit_filter_blocked_matrix_test_float128_index_23(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<__float128, Index, 4, 3> unit_filter_blocked_matrix_test_float128_index_43(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+UnitFilterBlockedMatrixTest<Half, Index, 2, 2> unit_filter_blocked_matrix_test_half_index_22(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<Half, Index, 3, 3> unit_filter_blocked_matrix_test_half_index_33(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<Half, Index, 4, 4> unit_filter_blocked_matrix_test_half_index_44(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<Half, Index, 2, 3> unit_filter_blocked_matrix_test_half_index_23(PreferredBackend::generic);
+UnitFilterBlockedMatrixTest<Half, Index, 4, 3> unit_filter_blocked_matrix_test_half_index_43(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+UnitFilterBlockedMatrixTest<float, Index, 2, 2> unit_filter_blocked_matrix_test_cuda_fi_22(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<float, Index, 3, 3> unit_filter_blocked_matrix_test_cuda_fi_33(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<float, Index, 4, 4> unit_filter_blocked_matrix_test_cuda_fi_44(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<float, Index, 2, 3> unit_filter_blocked_matrix_test_cuda_fi_23(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<float, Index, 4, 3> unit_filter_blocked_matrix_test_cuda_fi_43(PreferredBackend::cuda);
+
+UnitFilterBlockedMatrixTest<double, Index, 2, 2> unit_filter_blocked_matrix_test_cuda_di_22(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<double, Index, 3, 3> unit_filter_blocked_matrix_test_cuda_di_33(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<double, Index, 4, 4> unit_filter_blocked_matrix_test_cuda_di_44(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<double, Index, 2, 3> unit_filter_blocked_matrix_test_cuda_di_23(PreferredBackend::cuda);
+UnitFilterBlockedMatrixTest<double, Index, 4, 3> unit_filter_blocked_matrix_test_cuda_di_43(PreferredBackend::cuda);
+#endif

@@ -16,87 +16,62 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::Benchmark;
 
-template<typename Algo_, typename DT_, typename IT_>
-struct ProductMatVecBench;
-
-template<typename DT_, typename IT_>
-struct ProductMatVecBench<Algo::Generic, DT_, IT_>
+template <typename DM_>
+void run(PreferredBackend backend)
 {
-  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
-    DenseMatrix<Mem::Main, DT_, IT_> & A)
+  Runtime::set_preferred_backend(PreferredBackend::generic);
+  typedef typename DM_::DataType DT_;
+
+  //Index size(4096);
+  Index size(16384);
+  //Index size(32768);
+  //Index size(65536);
+
+  DenseMatrix<DT_, Index> x(size, size);
+  DenseVector<DT_, Index> y(size);
+  for (Index i(0) ; i < size ; ++i)
   {
-    Arch::Apply<Mem::Main>::dense_generic(x.elements(), DT_(1), DT_(0), b.elements(), A.elements(), b.elements(), A.rows(), A.columns());
+    y.elements()[i]= DT_(-(i%100) * DT_(0.1) * (i%10));
   }
-};
-
-template<typename DT_, typename IT_>
-struct ProductMatVecBench<Algo::MKL, DT_, IT_>
-{
-  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
-    DenseMatrix<Mem::Main, DT_, IT_> & A)
+  for (Index i(0) ; i < size * size ; ++i)
   {
-    Arch::Apply<Mem::Main>::dense(x.elements(), DT_(1), DT_(0), b.elements(), A.elements(), b.elements(), A.rows(), A.columns());
+    x.elements()[i] = DT_((i%100) * DT_(0.5) * (i%10));
   }
-};
 
-template<typename DT_, typename IT_>
-struct ProductMatVecBench<Algo::CUDA, DT_, IT_>
-{
-  static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
-    DenseMatrix<Mem::CUDA, DT_, IT_> & A)
-  {
-    Arch::Apply<Mem::CUDA>::dense(x.elements(), DT_(1), DT_(0), b.elements(), A.elements(), b.elements(), A.rows(), A.columns());
-  }
-};
+  DenseVector<DT_, Index> r(size, 4711.);
 
-template <typename Mem_, typename Algo_, typename DT_>
-void run()
-{
-  using IT_ = Index;
-  DenseMatrix<Mem::Main, DT_, IT_> sys_main(4096, 4096);
-  for (Index i(0) ; i < sys_main.used_elements() ; ++i)
-  {
-    sys_main.elements()[i] = DT_(sys_main.used_elements() / (i % sys_main.rows() + 1));
-  }
-  DenseMatrix<Mem_, DT_, IT_> sys;
-  sys.convert(sys_main);
+  Runtime::set_preferred_backend(backend);
+  std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << std::endl;
 
-  Index size(sys.rows());
-  std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<Type::Traits<DT_>::name()<<std::endl;
-  std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
-  DenseVector<Mem::Main, DT_, IT_> bmain(size);
-  for (Index i (0) ; i < bmain.size() ; ++i)
-    bmain(i, DT_(i%100) / DT_(100));
-  DenseVector<Mem_, DT_, IT_> b;
-  b.convert(bmain);
-  DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
-
-  double flops(double(sys.used_elements()));
+  double flops(double(x.used_elements()));
   flops *= 2;
 
-  double bytes(double(sys.used_elements()));
+  double bytes(double(x.used_elements()));
   bytes *= double(sizeof(DT_));
-  bytes += double(sys.used_elements() * sizeof(IT_));
   bytes += double(size * sizeof(DT_));
 
-  auto func = [&] () { ProductMatVecBench<Algo_, DT_, IT_>::f(x, b, sys); };
-  run_bench<Mem_>(func, flops, bytes);
 
-  std::cout<<"control norm: "<<x.norm2()<<std::endl;
+  auto func = [&] () { x.apply(r, y); };
+  run_bench(func, flops, bytes);
+
+  MemoryPool::synchronize();
+  std::cout<<"control norm: "<<r.norm2()<<std::endl;
 }
 
 int main(int argc, char ** argv)
 {
   Runtime::initialize(argc, argv);
-#ifdef FEAT_HAVE_CUDA
-  run<Mem::CUDA, Algo::CUDA, double>();
-  run<Mem::CUDA, Algo::CUDA, float>();
-#endif
+/*  run<DenseMatrix<Half, Index> >(PreferredBackend::generic);
+  run<DenseMatrix<float, Index> >(PreferredBackend::generic);
+  run<DenseMatrix<double, Index> >(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-  run<Mem::Main, Algo::MKL, double>();
-  run<Mem::Main, Algo::MKL, float>();
+  run<DenseMatrix<float, Index> >(PreferredBackend::mkl);
+  run<DenseMatrix<double, Index> >(PreferredBackend::mkl);
+#endif*/
+#ifdef FEAT_HAVE_CUDA
+  run<DenseMatrix<FEAT::Half, Index> >(PreferredBackend::cuda);
+  run<DenseMatrix<float, Index> >(PreferredBackend::cuda);
+  run<DenseMatrix<double, Index> >(PreferredBackend::cuda);
 #endif
-  run<Mem::Main, Algo::Generic, double>();
-  run<Mem::Main, Algo::Generic, float>();
   Runtime::finalize();
 }

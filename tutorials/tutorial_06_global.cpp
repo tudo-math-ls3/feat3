@@ -152,8 +152,6 @@ namespace Tutorial06
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // Linear System type definitions
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
@@ -169,13 +167,13 @@ namespace Tutorial06
   // refers to "local to this process".
 
   // Our local matrix type: a standard CSR matrix
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
 
   // Our local vector type: the usual dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
 
   // Our local filter type: the unit filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> LocalFilterType;
 
   // The first new type that we require is a "vector mirror".
   // A mirror is one of the core components of a distributed linear algebra system
@@ -185,8 +183,8 @@ namespace Tutorial06
   // however, we still need to define the types for the definition of our global
   // containers, which will then use the mirrors internally.
 
-  // The vector mirror takes the usual memory, data and index types as template parameters:
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
+  // The vector mirror takes the usual data and index types as template parameters:
+  typedef LAFEM::VectorMirror<DataType, IndexType> VectorMirrorType;
 
   // Now comes the second core component of a global linear algebra system: the "gate".
   // A gate is responsible for providing basic parallel synchronization and communication
@@ -714,7 +712,7 @@ namespace Tutorial06
     // As usual, we have to set up the solver in a bottom-up manner, so let's start with
     // with the local ILU preconditioner, which is applied onto the local type-1 matrix
     // (aka Schwarz matrix) and using the local unit-filter:
-    auto precond = Solver::new_ilu_precond(schwarz_matrix, filter_local);
+    auto precond = Solver::new_ilu_precond(PreferredBackend::generic, schwarz_matrix, filter_local);
 
     // This ILU is used as a local solver for the (global) Schwarz preconditioner,
     // which is using the global filter:

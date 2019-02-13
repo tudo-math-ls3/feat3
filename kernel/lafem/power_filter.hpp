@@ -48,8 +48,6 @@ namespace FEAT
     public:
       /// sub-filter type
       typedef SubFilter_ SubFilterType;
-      /// sub-filter mem-type
-      typedef typename SubFilter_::MemType MemType;
       /// sub-filter data-type
       typedef typename SubFilter_::DataType DataType;
       /// sub-filter index-type
@@ -62,12 +60,12 @@ namespace FEAT
       typedef PowerVector<typename SubFilter_::VectorType, count_> VectorType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using FilterType = PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, count_>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = PowerFilter<typename SubFilterType::template FilterType<DT2_, IT2_>, count_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
     protected:
       /// the first sub-filter
@@ -229,7 +227,6 @@ namespace FEAT
 
     public:
       typedef SubFilter_ SubFilterType;
-      typedef typename SubFilter_::MemType MemType;
       typedef typename SubFilter_::DataType DataType;
       typedef typename SubFilter_::IndexType IndexType;
 
@@ -237,12 +234,12 @@ namespace FEAT
 
       typedef PowerVector<typename SubFilter_::VectorType, 1> VectorType;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using FilterType = PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, Index(1)>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using FilterType = PowerFilter<typename SubFilterType::template FilterType<DT2_, IT2_>, Index(1)>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
     protected:
       SubFilterType _first;

@@ -6,8 +6,8 @@
 #pragma once
 #ifndef KERNEL_MESHOPT_RUMPF_TRAFO_HPP
 #define KERNEL_MESHOPT_RUMPF_TRAFO_HPP 1
+
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
@@ -57,9 +57,9 @@ namespace FEAT
         /// Type for the material tensor
         typedef Tiny::Matrix<DataType_, MeshType::world_dim, MeshType::world_dim> MatTensorType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        typedef LAFEM::DenseVector<DataType, Index> ScalarVectorType;
         /// Vector type for coordinate vectors etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType, Index, MeshType::world_dim> VectorType;
 
       /**
        * \brief Compute the transformation's determinant on a cell
@@ -187,9 +187,9 @@ namespace FEAT
         /// Type for the material tensor
         typedef Tiny::Matrix<DataType_, MeshType::world_dim, MeshType::world_dim> MatTensorType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        typedef LAFEM::DenseVector<DataType, Index> ScalarVectorType;
         /// Vector type for coordinate vectors etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType, Index, MeshType::world_dim> VectorType;
 
       private:
         /**
@@ -335,9 +335,9 @@ namespace FEAT
         /// Type for the material tensor
         typedef Tiny::Matrix<DataType_, MeshType::world_dim, MeshType::world_dim> MatTensorType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        typedef LAFEM::DenseVector<DataType, Index> ScalarVectorType;
         /// Vector type for coordinate vectors etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType, Index, MeshType::world_dim> VectorType;
 
       private:
         /**
@@ -510,9 +510,9 @@ namespace FEAT
         /// Type for the material tensor
         typedef Tiny::Matrix<DataType_, MeshType::world_dim, MeshType::world_dim> MatTensorType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        typedef LAFEM::DenseVector<DataType, Index> ScalarVectorType;
         /// Vector type for coordinate vectors etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType, Index, MeshType::world_dim> VectorType;
 
       private:
         /**
@@ -660,9 +660,9 @@ namespace FEAT
         /// Type for the material tensor
         typedef Tiny::Matrix<DataType_, MeshType::world_dim, MeshType::world_dim> MatTensorType;
         /// Vector type for element sizes etc.
-        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        typedef LAFEM::DenseVector<DataType, Index> ScalarVectorType;
         /// Vector type for coordinate vectors etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType, Index, MeshType::world_dim> VectorType;
 
       private:
         /**

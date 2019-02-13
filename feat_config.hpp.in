@@ -125,7 +125,7 @@
 /// CUDA SDK Version
 #define FEAT_CUDA_VERSION "${CUDA_VERSION}"
 /// CUDA major version
-#define FEAT_CUDA_VERSION_MAJOR ${CUDA_VERSION_MAJOR}
+#define FEAT_CUDA_VERSION_MAJOR "${CUDA_VERSION_MAJOR}"
 /// compile for this CUDA device architecture
 #define FEAT_CUDA_ARCH "${FEAT_CUDA_ARCH}"
 #endif
@@ -165,5 +165,8 @@
 
 /// Should we use separate threads for asynchronous mpi communication?
 #cmakedefine FEAT_MPI_THREAD_MULTIPLE
+
+/// Shall we use sanitizer features of our compilers?
+#cmakedefine FEAT_SANITIZER
 
 #endif // FEAT_CONFIG_HPP

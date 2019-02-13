@@ -8,13 +8,11 @@
 #define KERNEL_LAFEM_META_MATRIX_TEST_BASE_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+//#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/power_diag_matrix.hpp>
 #include <kernel/lafem/power_col_matrix.hpp>
 #include <kernel/lafem/power_row_matrix.hpp>
@@ -28,32 +26,32 @@ namespace FEAT
   {
     /// \cond internal
     // Helper class: selects the matrix and vector types
-    template<typename MemType_, typename DataType_, typename IndexType_>
+    template<typename DataType_, typename IndexType_>
     struct MetaMatrixTestHelper
     {
       /// scalar vector type
-      typedef DenseVector<MemType_, DataType_, IndexType_> ScalarVector;
+      typedef DenseVector<DataType_, IndexType_> ScalarVector;
       /// scalar matrix type A
-      typedef SparseMatrixCSR<MemType_, DataType_, IndexType_> ScalarMatrixA;
+      typedef SparseMatrixCSR<DataType_, IndexType_> ScalarMatrixA;
       /// scalar matrix type B
-      typedef SparseMatrixELL<MemType_, DataType_, IndexType_> ScalarMatrixB;
+      typedef SparseMatrixCSR<DataType_, IndexType_> ScalarMatrixB;
       /// scalar matrix type D
-      typedef SparseMatrixCOO<MemType_, DataType_, IndexType_> ScalarMatrixD;
+      typedef SparseMatrixCSR<DataType_, IndexType_> ScalarMatrixD;
     };
 
-    // CUDA specialization: There is no COO implementation, so we choose ELL for D matrices
-    template<typename DataType_, typename IndexType_>
-    struct MetaMatrixTestHelper<Mem::CUDA, DataType_, IndexType_>
-    {
-      /// scalar vector type
-      typedef DenseVector<Mem::CUDA, DataType_, IndexType_> ScalarVector;
-      /// scalar matrix type A
-      typedef SparseMatrixCSR<Mem::CUDA, DataType_, IndexType_> ScalarMatrixA;
-      /// scalar matrix type B
-      typedef SparseMatrixELL<Mem::CUDA, DataType_, IndexType_> ScalarMatrixB;
-      /// scalar matrix type D
-      typedef SparseMatrixELL<Mem::CUDA, DataType_, IndexType_> ScalarMatrixD;
-    };
+//     // CUDA specialization: There is no COO implementation, so we choose ELL for D matrices
+//     template<typename DataType_, typename IndexType_>
+//     struct MetaMatrixTestHelper<DataType_, IndexType_>
+//     {
+//       /// scalar vector type
+//       typedef DenseVector<DataType_, IndexType_> ScalarVector;
+//       /// scalar matrix type A
+//       typedef SparseMatrixCSR<DataType_, IndexType_> ScalarMatrixA;
+//       /// scalar matrix type B
+//       typedef SparseMatrixCSR<DataType_, IndexType_> ScalarMatrixB;
+//       /// scalar matrix type D
+//       typedef SparseMatrixCSR<DataType_, IndexType_> ScalarMatrixD;
+//     };
     /// \endcond
 
     /**
@@ -93,14 +91,14 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename MemType_, typename DataType_, typename IndexType_>
+    template<typename DataType_, typename IndexType_>
     class MetaMatrixTestBase
-      : public FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+      : public FEAT::TestSystem::UnitTest
     {
     public:
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
-      typedef MetaMatrixTestHelper<MemType_, DataType, IndexType> Helper;
+      typedef MetaMatrixTestHelper<DataType, IndexType> Helper;
 
       /// scalar vector type
       typedef typename Helper::ScalarVector ScalarVector;
@@ -131,8 +129,8 @@ namespace FEAT
       typedef SaddlePointMatrix<VeloDiagMatrix, GradMatrix, DiveMatrix> SystemDiagMatrix;
       typedef SaddlePointMatrix<VeloFullMatrix, GradMatrix, DiveMatrix> SystemFullMatrix;
 
-      explicit MetaMatrixTestBase(const String & name) :
-        FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
+      explicit MetaMatrixTestBase(const String& id_in, const String datatype_name = "none", const String index_name = "none", PreferredBackend preferred_backend = PreferredBackend::generic)
+       : FEAT::TestSystem::UnitTest(id_in, datatype_name, index_name, preferred_backend)
       {
       }
 
@@ -144,13 +142,13 @@ namespace FEAT
         PointstarFactoryFE<DataType_, IndexType_> ps_fe(m);
 
         /// generate the corresponding CSR matrices
-        const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fd(ps_fd.matrix_csr());
-        const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
+        const SparseMatrixCSR<DataType_, IndexType_> mat_fd(ps_fd.matrix_csr());
+        const SparseMatrixCSR<DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
 
         // generate Q2-bubble and eigenvector
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen1(ps_fd.eigenvector_min());
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen2(ps_fd.eigenvector_min());
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
+        const DenseVector<DataType_, IndexType_> vec_eigen1(ps_fd.eigenvector_min());
+        const DenseVector<DataType_, IndexType_> vec_eigen2(ps_fd.eigenvector_min());
+        const DenseVector<DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
         mat_sys.template at<0,0>().template at<0,0>().convert(mat_fe);
@@ -166,9 +164,9 @@ namespace FEAT
         vec_sol.template at<1>().convert(vec_eigen2); // p
 
         // create vectors for rhs computation
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs2(vec_bubble.size());
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs3(vec_bubble.size());
+        DenseVector<DataType_, IndexType_> vec_rhs1(vec_bubble.size());
+        DenseVector<DataType_, IndexType_> vec_rhs2(vec_bubble.size());
+        DenseVector<DataType_, IndexType_> vec_rhs3(vec_bubble.size());
 
         // compute rhs vector (by exploiting the eigenvector property)
         mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
@@ -187,17 +185,17 @@ namespace FEAT
       static void gen_system(Index m, SystemFullMatrix& mat_sys, SystemVector& vec_sol, SystemVector& vec_rhs)
       {
         /// create two pointstars
-        PointstarFactoryFD<DataType_> ps_fd(m, Index(2));
-        PointstarFactoryFE<DataType_> ps_fe(m);
+        PointstarFactoryFD<DataType_, IndexType_> ps_fd(m, Index(2));
+        PointstarFactoryFE<DataType_, IndexType_> ps_fe(m);
 
         /// generate the corresponding CSR matrices
-        const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fd(ps_fd.matrix_csr());
-        const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
+        const SparseMatrixCSR<DataType_, IndexType_> mat_fd(ps_fd.matrix_csr());
+        const SparseMatrixCSR<DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
 
         // generate Q2-bubble and eigenvector
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen1(ps_fd.eigenvector_min());
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen2(ps_fd.eigenvector_min());
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
+        const DenseVector<DataType_, IndexType_> vec_eigen1(ps_fd.eigenvector_min());
+        const DenseVector<DataType_, IndexType_> vec_eigen2(ps_fd.eigenvector_min());
+        const DenseVector<DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
         mat_sys.template at<0,0>().template at<0,0>().convert(mat_fe);
@@ -215,9 +213,9 @@ namespace FEAT
         vec_sol.template at<1>().convert(vec_eigen2); // p
 
         // create vectors for rhs computation
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs2(vec_bubble.size());
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs3(vec_bubble.size());
+        DenseVector<DataType_, IndexType_> vec_rhs1(vec_bubble.size());
+        DenseVector<DataType_, IndexType_> vec_rhs2(vec_bubble.size());
+        DenseVector<DataType_, IndexType_> vec_rhs3(vec_bubble.size());
 
         // compute rhs vector (by exploiting the eigenvector property)
         mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1

@@ -12,6 +12,7 @@
 #include <kernel/util/random.hpp>
 
 using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 inline int isqrt(const int n)
 {
@@ -19,17 +20,16 @@ inline int isqrt(const int n)
   return (m*m == n ? m : -1);
 }
 
-template<typename Mem_, typename DT_, typename IT_>
+template<typename DT_, typename IT_>
 class AlgDofPartiTest :
-  public TestSystem::FullTaggedTest<Mem_, DT_, IT_>
+  public UnitTest
 {
-  typedef Mem_ MemType;
   typedef DT_ DataType;
   typedef IT_ IndexType;
 
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> MirrorType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::VectorMirror<DataType, IndexType> MirrorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
 
   typedef Global::Gate<LocalVectorType, MirrorType> GateType;
   typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
@@ -41,24 +41,24 @@ class AlgDofPartiTest :
 
 
 public:
-  AlgDofPartiTest() :
-    TestSystem::FullTaggedTest<Mem_, DT_, IT_>("AlgDofPartiTest")
+  AlgDofPartiTest(PreferredBackend backend) :
+    UnitTest("AlgDofPartiTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   static MirrorType create_mirror_0(const int n, const int k)
   {
-    MirrorType mirror((Index)n, 1);
-    mirror.indices()[0] = Index(k);
+    MirrorType mirror((IT_)n, 1);
+    mirror.indices()[0] = IT_(k);
     return mirror;
   }
 
   static MirrorType create_mirror_1(const int n, const int m, const int o, const int p)
   {
-    MirrorType mirror((Index)n, (Index)m);
+    MirrorType mirror((IT_)n, (IT_)m);
     IndexType* idx = mirror.indices();
     for(int i(0); i < m; ++i)
-      idx[Index(i)] = Index(o + i * p);
+      idx[IT_(i)] = IT_(o + i * p);
     return mirror;
   }
 
@@ -115,7 +115,7 @@ public:
     }
 
     // compile gate
-    gate.compile(LocalVectorType(Index(m*m)));
+    gate.compile(LocalVectorType(IT_(m*m)));
 
     return true;
   }
@@ -196,7 +196,7 @@ public:
     TEST_CHECK(download_error < tol);
   }
 
-  void test_matrix(/*const*/ GateType& gate, const AlgDofPartiType& adp, const Index m) const
+  void test_matrix(/*const*/ GateType& gate, const AlgDofPartiType& adp, const IT_ m) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.9));
     Random rng(257ull + 17ull * (unsigned long long)gate.get_comm()->rank());
@@ -249,4 +249,25 @@ public:
   }
 };
 
-AlgDofPartiTest<Mem::Main, double, Index> alg_dof_parti_test_main_double_index;
+AlgDofPartiTest<float, unsigned int> alg_dof_parti_test_float_uint(PreferredBackend::generic);
+AlgDofPartiTest<double, unsigned int> alg_dof_parti_test_double_uint(PreferredBackend::generic);
+AlgDofPartiTest<float, unsigned long> alg_dof_parti_test_float_ulong(PreferredBackend::generic);
+AlgDofPartiTest<double, unsigned long> alg_dof_parti_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+AlgDofPartiTest<float, unsigned long> mkl_alg_dof_parti_test_float_ulong(PreferredBackend::mkl);
+AlgDofPartiTest<double, unsigned long> mkl_alg_dof_parti_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+AlgDofPartiTest<__float128, unsigned int> alg_dof_parti_test_float128_uint(PreferredBackend::generic);
+AlgDofPartiTest<__float128, unsigned long> alg_dof_parti_test_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+AlgDofPartiTest<Half, unsigned int> alg_dof_parti_test_half_uint(PreferredBackend::generic);
+AlgDofPartiTest<Half, unsigned long> alg_dof_parti_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+AlgDofPartiTest<float, unsigned int> cuda_alg_dof_parti_test_float_uint(PreferredBackend::cuda);
+AlgDofPartiTest<double, unsigned int> cuda_alg_dof_parti_test_double_uint(PreferredBackend::cuda);
+AlgDofPartiTest<float, unsigned long> cuda_alg_dof_parti_test_float_ulong(PreferredBackend::cuda);
+AlgDofPartiTest<double, unsigned long> cuda_alg_dof_parti_test_double_ulong(PreferredBackend::cuda);
+#endif

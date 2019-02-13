@@ -6,7 +6,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 
-#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
@@ -152,7 +151,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseDestroyColorInfo failed with status code: " + stringify(status));
 
         //std::cout<<"pre colors: "<<ncolors<<" rows: "<<m<<std::endl;
-        int * coloring = MemoryPool<Mem::Main>::template allocate_pinned_memory<int>(m);
+        int * coloring = MemoryPool::template allocate_memory<int>(m);
         cudaMemcpy(coloring, d_coloring, m * sizeof(int), cudaMemcpyDeviceToHost);
         cudaFree(d_coloring);
 
@@ -193,7 +192,7 @@ namespace FEAT
         //std::cout<<"colors: "<<ncolors<<" rows: "<<m<<std::endl;
 
         // count rows per color
-        rows_per_color = MemoryPool<Mem::Main>::template allocate_memory<int>(ncolors);
+        rows_per_color = MemoryPool::template allocate_memory<int>(ncolors);
         for (int i(0) ; i < ncolors ; ++i)
         {
           rows_per_color[i] = 0;
@@ -203,7 +202,7 @@ namespace FEAT
           rows_per_color[coloring[i]] += 1;
         }
 
-        int * colors_ascending = MemoryPool<Mem::Main>::template allocate_memory<int>(ncolors);
+        int * colors_ascending = MemoryPool::template allocate_memory<int>(ncolors);
         //vector of pair<rows, color>
         std::vector<std::pair<int, int>> temp;
         for (int i(0) ; i < ncolors ; ++i)
@@ -234,9 +233,9 @@ namespace FEAT
         }
         std::cout<<std::endl;*/
 
-        int * host_irp = MemoryPool<Mem::Main>::template allocate_pinned_memory<int>(m);
-        int * host_crp = MemoryPool<Mem::Main>::template allocate_pinned_memory<int>(2*m);
-        int * host_row_ptr = MemoryPool<Mem::Main>::template allocate_pinned_memory<int>(m+1);
+        int * host_irp = MemoryPool::template allocate_memory<int>(m);
+        int * host_crp = MemoryPool::template allocate_memory<int>(2*m);
+        int * host_row_ptr = MemoryPool::template allocate_memory<int>(m+1);
         cudaMemcpy(host_row_ptr, csrRowPtr, (m+1) * sizeof(int), cudaMemcpyDeviceToHost);
 
         //iterate over all colors, by ascending row count
@@ -257,7 +256,7 @@ namespace FEAT
           }
         }
 
-        MemoryPool<Mem::Main>::release_memory(host_row_ptr);
+        MemoryPool::release_memory(host_row_ptr);
 
         cudaMalloc(&inverse_row_ptr, m * sizeof(unsigned int));
         cudaMemcpy(inverse_row_ptr, host_irp, m * sizeof(int), cudaMemcpyHostToDevice);
@@ -265,10 +264,10 @@ namespace FEAT
         cudaMalloc(&colored_row_ptr, 2 * m * sizeof(int));
         cudaMemcpy(colored_row_ptr, host_crp, 2 * m * sizeof(int), cudaMemcpyHostToDevice);
 
-        MemoryPool<Mem::Main>::release_memory(coloring);
-        MemoryPool<Mem::Main>::release_memory(colors_ascending);
-        MemoryPool<Mem::Main>::release_memory(host_irp);
-        MemoryPool<Mem::Main>::release_memory(host_crp);
+        MemoryPool::release_memory(coloring);
+        MemoryPool::release_memory(colors_ascending);
+        MemoryPool::release_memory(host_irp);
+        MemoryPool::release_memory(host_crp);
 
 #ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
@@ -282,7 +281,7 @@ namespace FEAT
       {
         cudaFree(colored_row_ptr);
         cudaFree(inverse_row_ptr);
-        MemoryPool<Mem::Main>::release_memory(rows_per_color);
+        MemoryPool::release_memory(rows_per_color);
 
 #ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
@@ -300,7 +299,7 @@ namespace FEAT
         int row_offset(0);
         for (int i(0) ; i < ncolors ; ++i)
         {
-          Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+          Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
           block.x = blocksize;
@@ -329,7 +328,7 @@ namespace FEAT
         int row_offset(0);
         for (int i(0) ; i < ncolors ; ++i)
         {
-          Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+          Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
           block.x = blocksize;

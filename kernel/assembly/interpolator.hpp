@@ -140,13 +140,12 @@ namespace FEAT
        * A \transient reference to the Finite-Element space into which the function is to be projected.
        */
       template<
-        typename Mem_,
         typename DT_,
         typename IT_,
         typename Function_,
         typename Space_>
       static void project(
-        LAFEM::DenseVector<Mem_, DT_, IT_>& vector,
+        LAFEM::DenseVector<DT_, IT_>& vector,
         const Function_& function,
         const Space_& space)
       {
@@ -157,14 +156,9 @@ namespace FEAT
         static_assert(Function_::domain_dim == TrafoType::world_dim, "invalid function domain dimension");
         static_assert(ImageType::is_scalar, "only scalar functions can be interpolated to scalar vectors");
 
-        // create vector in Mem::Main
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> vec(space.get_num_dofs(), DT_(0));
-
         // project function
-        Intern::InterpolatorWrapper<Space_>::project(vec, function, space);
-
-        // convert to output vector
-        vector.convert(vec);
+        vector = LAFEM::DenseVector<DT_, IT_>(space.get_num_dofs(), DT_(0));
+        Intern::InterpolatorWrapper<Space_>::project(vector, function, space);
       }
 
       /**
@@ -182,14 +176,13 @@ namespace FEAT
        * A \transient reference to the Finite-Element space into which the function is to be projected.
        */
       template<
-        typename Mem_,
         typename DT_,
         typename IT_,
         int block_size_,
         typename Function_,
         typename Space_>
       static void project(
-        LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, block_size_>& vector,
+        LAFEM::DenseVectorBlocked<DT_, IT_, block_size_>& vector,
         const Function_& function,
         const Space_& space)
       {
@@ -201,14 +194,9 @@ namespace FEAT
         static_assert(ImageType::is_vector, "only vector fields can be interpolated to blocked vectors");
         static_assert(ImageType::image_dim == block_size_, "invalid vector field size");
 
-        // create vector in Mem::Main
-        LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, block_size_> vec(space.get_num_dofs(), DT_(0));
-
         // project function
-        Intern::InterpolatorWrapper<Space_>::project(vec, function, space);
-
-        // convert to output vector
-        vector.convert(vec);
+        vector = LAFEM::DenseVectorBlocked<DT_, IT_, block_size_>(space.get_num_dofs(), DT_(0));
+        Intern::InterpolatorWrapper<Space_>::project(vector, function, space);
       }
     }; // class Interpolator
   } // namespace Assembly

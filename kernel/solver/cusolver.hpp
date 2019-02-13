@@ -35,15 +35,13 @@ namespace FEAT
      * \attention
      * This class is only declared if FEAT was configured to build and link against
      * cuda and the cuda sdk ships with the cusolver library (cuda version >= 7).
-     *
-     * \note CuSolverLU need its input data in Mem::Main memory
      */
     class CuSolverLU :
-      public SolverBase<LAFEM::DenseVector<Mem::Main, double, unsigned int>>
+      public SolverBase<LAFEM::DenseVector<double, unsigned int>>
     {
       private:
         /// system matrix
-        const LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned int> & _system_matrix;
+        const LAFEM::SparseMatrixCSR<double, unsigned int> & _system_matrix;
 
       public:
         /**
@@ -52,7 +50,7 @@ namespace FEAT
          * \param[in] system_matrix
          * A reference to the system matrix to be factorized.
          */
-        explicit CuSolverLU(const LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned int> & system_matrix) :
+        explicit CuSolverLU(const LAFEM::SparseMatrixCSR<double, unsigned int> & system_matrix) :
           _system_matrix(system_matrix)
           {
           }
@@ -73,7 +71,7 @@ namespace FEAT
          * \param[in] b
          * A reference to the right-hand-side of the linear system.
          */
-        virtual Status apply(LAFEM::DenseVector<Mem::Main, double, unsigned int> & x, const LAFEM::DenseVector<Mem::Main, double, unsigned int> & b) override
+        virtual Status apply(LAFEM::DenseVector<double, unsigned int> & x, const LAFEM::DenseVector<double, unsigned int> & b) override
           {
             int status = Intern::cuda_lu((int)x.size(), (int)_system_matrix.used_elements(), _system_matrix.val(), (const int*) _system_matrix.row_ptr(), (const int*) _system_matrix.col_ind(), b.elements(), x.elements());
 
@@ -92,11 +90,11 @@ namespace FEAT
      * cuda and the cuda sdk ships with the cusolver library (cuda version >= 7).
      */
     class CuSolverQR :
-      public SolverBase<LAFEM::DenseVector<Mem::CUDA, double, unsigned int>>
+      public SolverBase<LAFEM::DenseVector<double, unsigned int>>
     {
       private:
         /// system matrix
-        const LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> & _system_matrix;
+        const LAFEM::SparseMatrixCSR<double, unsigned int> & _system_matrix;
       public:
         /**
          * \brief Constructor
@@ -104,7 +102,7 @@ namespace FEAT
          * \param[in] system_matrix
          * A reference to the system matrix to be factorized.
          */
-        explicit CuSolverQR(const LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> & system_matrix) :
+        explicit CuSolverQR(const LAFEM::SparseMatrixCSR<double, unsigned int> & system_matrix) :
           _system_matrix(system_matrix)
         {
         }
@@ -115,7 +113,7 @@ namespace FEAT
           return "CuSolverQR";
         }
 
-        virtual Status apply(LAFEM::DenseVector<Mem::CUDA, double, unsigned int> & x, const LAFEM::DenseVector<Mem::CUDA, double, unsigned int> & b) override
+        virtual Status apply(LAFEM::DenseVector<double, unsigned int> & x, const LAFEM::DenseVector<double, unsigned int> & b) override
         {
           int status = Intern::cuda_qr((int)x.size(), (int)_system_matrix.used_elements(), _system_matrix.val(), (const int*) _system_matrix.row_ptr(), (const int*) _system_matrix.col_ind(), b.elements(), x.elements());
 

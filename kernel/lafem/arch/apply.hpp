@@ -9,9 +9,9 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
+#include <kernel/lafem/arch/product_matmat.hpp>
 
 #include <typeinfo>
 
@@ -21,11 +21,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct Apply;
-
-      template <>
-      struct Apply<Mem::Main>
+      struct Apply
       {
         template <typename DT_, typename IT_>
         static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
@@ -35,30 +31,51 @@ namespace FEAT
           csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
         }
 
-#ifdef FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_HALFMATH
+        static void csr(Half * r, const Half a, const Half * const x, const Half b, const Half * const y, const Half * const val,
+                        const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                        const Index used_elements, const bool transposed)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
+        }
+#endif
+
         static void csr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
-          csr_mkl(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          BACKEND_SKELETON_VOID(csr_cuda, csr_mkl, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
         }
 
         static void csr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
-          csr_mkl(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          BACKEND_SKELETON_VOID(csr_cuda, csr_mkl, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
+        }
+
+#ifdef FEAT_HAVE_HALFMATH
+        static void csr(Half * r, const Half a, const Half * const x, const Half b, const Half * const y, const Half * const val,
+                        const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                        const Index used_elements, const bool transposed)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
         }
 #endif
 
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void csr(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
-                        const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
+        static void csr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
+                        const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
-          csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
         }
-#endif
+
+        static void csr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+                        const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                        const Index used_elements, const bool transposed)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
+        }
 
         template <typename DT_, typename IT_>
         static void cscr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
@@ -69,46 +86,68 @@ namespace FEAT
         }
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+        static void bcsr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
-        }
-
-#ifdef FEAT_HAVE_MKL
-        template <int BlockHeight_, int BlockWidth_>
-        static void csrb(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
-                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
-                         const Index used_elements)
-        {
-          if (BlockHeight_ == BlockWidth_)
-            csrb_mkl(r, a, x, b, y, val, (const unsigned long*)col_ind, (const unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
-          else
-            csrb_generic<float, unsigned long, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+          bcsr_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
 
         template <int BlockHeight_, int BlockWidth_>
-        static void csrb(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+        static void bcsr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
                          const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
+          constexpr auto bcsr_generic_float_ulong = &bcsr_generic<float, unsigned long, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_float_ulong = &bcsr_mkl<float, unsigned long, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_float_ulong = &bcsr_cuda<float, unsigned long, BlockHeight_, BlockWidth_>;
           if (BlockHeight_ == BlockWidth_)
-            csrb_mkl(r, a, x, b, y, val, (const unsigned long*)col_ind, (const unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
+            BACKEND_SKELETON_VOID(bcsr_generic_float_ulong, bcsr_mkl_float_ulong, bcsr_cuda_float_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
           else
-            csrb_generic<double, unsigned long, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+            BACKEND_SKELETON_VOID(bcsr_generic_float_ulong, bcsr_generic_float_ulong, bcsr_cuda_float_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
         }
-#endif
 
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
-                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
+        template <int BlockHeight_, int BlockWidth_>
+        static void bcsr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          csrb_generic<__float128, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+          constexpr auto bcsr_generic_double_ulong = &bcsr_generic<double, unsigned long, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_double_ulong = &bcsr_mkl<double, unsigned long, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_double_ulong = &bcsr_cuda<double, unsigned long, BlockHeight_, BlockWidth_>;
+          if (BlockHeight_ == BlockWidth_)
+            BACKEND_SKELETON_VOID(bcsr_generic_double_ulong, bcsr_mkl_double_ulong, bcsr_cuda_double_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+          else
+            BACKEND_SKELETON_VOID(bcsr_generic_double_ulong, bcsr_generic_double_ulong, bcsr_cuda_double_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
         }
-#endif
+
+        template <int BlockHeight_, int BlockWidth_>
+        static void bcsr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
+                         const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                         const Index used_elements)
+        {
+          constexpr auto bcsr_generic_float_uint = &bcsr_generic<float, unsigned int, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_float_uint = &bcsr_mkl<float, unsigned int, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_float_uint = &bcsr_cuda<float, unsigned int, BlockHeight_, BlockWidth_>;
+          if (BlockHeight_ == BlockWidth_)
+            BACKEND_SKELETON_VOID(bcsr_generic_float_uint, bcsr_mkl_float_uint, bcsr_cuda_float_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+          else
+            BACKEND_SKELETON_VOID(bcsr_generic_float_uint, bcsr_generic_float_uint, bcsr_cuda_float_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+        }
+
+        template <int BlockHeight_, int BlockWidth_>
+        static void bcsr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+                         const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                         const Index used_elements)
+        {
+          constexpr auto bcsr_generic_double_uint = &bcsr_generic<double, unsigned int, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_double_uint = &bcsr_mkl<double, unsigned int, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_double_uint = &bcsr_cuda<double, unsigned int, BlockHeight_, BlockWidth_>;
+          if (BlockHeight_ == BlockWidth_)
+            BACKEND_SKELETON_VOID(bcsr_generic_double_uint, bcsr_mkl_double_uint, bcsr_cuda_double_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+          else
+            BACKEND_SKELETON_VOID(bcsr_generic_double_uint, bcsr_generic_double_uint, bcsr_cuda_double_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+        }
 
         template <typename DT_, typename IT_, int BlockSize_>
         static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
@@ -117,51 +156,29 @@ namespace FEAT
         }
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
-        {
-          ell_generic(r, a, x, b, y, val, col_ind, cs, cl, C, rows);
-        }
-
-        template <typename DT_, typename IT_>
-        static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
-                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index columns, const Index used_elements)
-        {
-          coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-        }
-
-        template <typename DT_>
-        static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
-                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
-        {
-          coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-        }
-
-#ifdef FEAT_HAVE_MKL
-        static void coo(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
-                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
-        {
-          coo_mkl(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-        }
-
-        static void coo(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
-                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
-        {
-          coo_mkl(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-        }
-#endif
-
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void coo(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
-                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
-        {
-          coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-        }
-#endif
-
-        template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
           banded_generic(r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns);
+        }
+
+        static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const unsigned long * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        {
+          BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
+        }
+
+        static void banded(double * r, const double alpha, const double * const x, const double beta, const double * const y, const double * const val, const unsigned long * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        {
+          BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
+        }
+
+        static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const unsigned int * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        {
+          BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
+        }
+
+        static void banded(double * r, const double alpha, const double * const x, const double beta, const double * const y, const double * const val, const unsigned int * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        {
+          BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
         }
 
         template <typename DT_>
@@ -170,24 +187,32 @@ namespace FEAT
           dense_generic(r, alpha, beta, y, val, x, rows, columns);
         }
 
-#ifdef FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_HALFMATH
+        static void dense(Half * r, const Half alpha, const Half beta, const Half * const y, const Half * const val, const Half * const x, const Index rows, const Index columns)
+        {
+          switch(Runtime::get_preferred_backend())
+          {
+            //no cuda half implementation exists, thus we use the gemm version
+            case PreferredBackend::cuda:
+              //ProductMatMat::dense_cuda(r, alpha, beta, x, val, y, rows, 1, columns);
+              ProductMatMat::dense_cuda(r, alpha, beta, val, x, y, rows, 1, columns);
+              break;
+            case PreferredBackend::generic:
+            default:
+              dense_generic(r, alpha, beta, y, val, x, rows, columns);
+          }
+        }
+#endif
+
         static void dense(float * r, const float alpha, const float beta, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns)
         {
-          dense_mkl(r, alpha, beta, y, val, x, rows, columns);
+          BACKEND_SKELETON_VOID(dense_cuda, dense_mkl, dense_generic, r, alpha, beta, y, val, x, rows, columns)
         }
 
         static void dense(double * r, const double alpha, const double beta, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns)
         {
-          dense_mkl(r, alpha, beta, y, val, x, rows, columns);
+          BACKEND_SKELETON_VOID(dense_cuda, dense_mkl, dense_generic, r, alpha, beta, y, val, x, rows, columns)
         }
-#endif
-
-#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
-        static void dense(__float128 * r, const __float128 alpha, const __float128 beta, const __float128 * const y, const __float128 * const val, const __float128 * const x, const Index rows, const Index columns)
-        {
-          dense_generic(r, alpha, beta, y, val, x, rows, columns);
-        }
-#endif
 
 
         template <typename DT_, typename IT_>
@@ -200,18 +225,11 @@ namespace FEAT
                         const Index rows, const Index, const Index, const bool);
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+        static void bcsr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_, int BlockSize_>
         static void csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
-
-        template <typename DT_, typename IT_>
-        static void ell_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
-
-        template <typename DT_, typename IT_>
-        static void coo_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
-                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_, typename IT_>
         static void banded_generic(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns);
@@ -222,85 +240,67 @@ namespace FEAT
         static void csr_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
         static void csr_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
 
-        static void csrb_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
-        static void csrb_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+        static void bcsr_mkl(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          XASSERTM(BlockHeight_ == BlockWidth_, "MKL only supports square blocks!");
+          bcsr_mkl(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_);
+        }
 
-        static void coo_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows,
-        const Index columns, const Index used_elements);
-        static void coo_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr,
-        const Index rows, const Index columns, const Index used_elements);
+        static void bcsr_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
+        static void bcsr_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
 
         static void dense_mkl(float * r, const float alpha, const float beta, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns);
         static void dense_mkl(double * r, const double alpha, const double beta, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns);
-      };
 
-#ifdef FEAT_EICKT
-      extern template void Apply<Mem::Main>::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-      extern template void Apply<Mem::Main>::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
-      extern template void Apply<Mem::Main>::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-      extern template void Apply<Mem::Main>::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
-
-      extern template void Apply<Mem::Main>::cscr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
-      extern template void Apply<Mem::Main>::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
-      extern template void Apply<Mem::Main>::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
-      extern template void Apply<Mem::Main>::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
-
-      extern template void Apply<Mem::Main>::ell_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-      extern template void Apply<Mem::Main>::ell_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-      extern template void Apply<Mem::Main>::ell_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-      extern template void Apply<Mem::Main>::ell_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-
-      extern template void Apply<Mem::Main>::coo_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::coo_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::coo_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::coo_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-
-      extern template void Apply<Mem::Main>::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Apply<Mem::Main>::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
-
-      extern template void Apply<Mem::Main>::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
-      extern template void Apply<Mem::Main>::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);
-#endif
-
-      template <>
-      struct Apply<Mem::CUDA>
-      {
-        template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
-
-        template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
+        template <typename DT_, typename IT_>
+        static void csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const bool transposed);
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        static void bcsr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements)
         {
           XASSERTM(BlockHeight_ < 10, "The generic cuda bcsr kernel does not support BlockHeight greather than 9!");
-          csrb_wrapper(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_, BlockWidth_);
+          bcsr_wrapper(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight_, BlockWidth_);
         }
 
         template <typename DT_, typename IT_>
-        static void csrb_wrapper(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth);
+        static void bcsr_wrapper_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth);
 
         template <typename DT_, typename IT_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockSize);
+        static void bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockSize);
 
         template <typename DT_, typename IT_>
-        static void csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth);
+        static void bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth);
 
         template <typename DT_, typename IT_, int BlockSize_>
-        static void csrsb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements);
+        static void csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
-
-        template <typename DT_, typename IT_>
-        static void banded(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const Index num_of_offsets, const Index rows, const Index columns);
+        static void banded_cuda(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const Index num_of_offsets, const Index rows, const Index columns);
 
         template <typename DT_>
-        static void dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
+        static void dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
       };
+
+#ifdef FEAT_EICKT
+      extern template void Apply::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+
+      extern template void Apply::cscr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
+
+      extern template void Apply::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
+
+      extern template void Apply::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
+      extern template void Apply::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);
+#endif
 
     } // namespace Arch
   } // namespace LAFEM

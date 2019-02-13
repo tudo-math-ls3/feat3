@@ -14,11 +14,11 @@ using namespace FEAT::Geometry;
 
 
 class CGALTest
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   CGALTest() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("CGALTest")
+    UnitTest("CGALTest")
   {
   }
 

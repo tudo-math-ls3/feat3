@@ -10,11 +10,11 @@ import os
 class CGAL(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.version = "4.14"
+    self.version = "5.5"
     self.names = ["cgal"]
     self.dirname = "CGAL-" + self.version
     self.filename = "CGAL-" + self.version + ".zip"
-    self.url = "https://github.com/CGAL/cgal/releases/download/releases/CGAL-" + self.version + "/" + self.filename
+    self.url = "https://github.com/CGAL/cgal/releases/download/v" + self.version + "/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_CGAL:BOOL=ON -DFEAT_DIRNAME_CGAL:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname

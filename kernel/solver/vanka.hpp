@@ -44,7 +44,7 @@ namespace FEAT
        * - Scatter the local correction vector entries.
        *
        * Currently, the following specializations exist:
-       * - LAFEM::DenseVector<Mem::Main,...>
+       * - LAFEM::DenseVector<...>
        * - LAFEM::PowerVector<...>
        *
        * \author Peter Zajac
@@ -60,7 +60,7 @@ namespace FEAT
        * - Compute the local defect vector entries.
        *
        * Currently, the following specializations exist:
-       * - LAFEM::SparseMatrixCSR<Mem::Main,...>
+       * - LAFEM::SparseMatrixCSR<...>
        * - LAFEM::PowerDiagMatrix<...>
        * - LAFEM::PowerFullMatrix<...>
        * - LAFEM::PowerRowMatrix<...>
@@ -72,10 +72,10 @@ namespace FEAT
       class VankaMatrix;
 
       template<typename DT_, typename IT_>
-      class VankaVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>>
+      class VankaVector<LAFEM::DenseVector<DT_, IT_>>
       {
       public:
-        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
         static constexpr int dim = 1;
 
       protected:
@@ -109,10 +109,10 @@ namespace FEAT
       };
 
       template<typename DT_, typename IT_, int dim_>
-      class VankaVector<LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>>
+      class VankaVector<LAFEM::DenseVectorBlocked<DT_, IT_, dim_>>
       {
       public:
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim_> VectorType;
         typedef typename VectorType::ValueType ValueType;
         static constexpr int dim = dim_;
 
@@ -222,11 +222,11 @@ namespace FEAT
       };
 
       template<typename DT_, typename IT_>
-      class VankaMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>>
+      class VankaMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>>
       {
       public:
-        typedef LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
-        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorTypeR;
+        typedef LAFEM::SparseMatrixCSR<DT_, IT_> MatrixType;
+        typedef LAFEM::DenseVector<DT_, IT_> VectorTypeR;
 
         static constexpr int row_dim = 1;
         static constexpr int col_dim = 1;
@@ -335,10 +335,10 @@ namespace FEAT
       // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
       template<typename DT_, typename IT_, int row_dim_, int col_dim_>
-      class VankaMatrix<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, row_dim_, col_dim_>>
+      class VankaMatrix<LAFEM::SparseMatrixBCSR<DT_, IT_, row_dim_, col_dim_>>
       {
       public:
-        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, row_dim_, col_dim_> MatrixType;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, row_dim_, col_dim_> MatrixType;
 
         typedef typename MatrixType::ValueType MatVal;
 
@@ -438,13 +438,13 @@ namespace FEAT
           return mo + m;
         }
 
-        IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, col_dim_>& vec_cor,
+        IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVectorBlocked<DT_, IT_, col_dim_>& vec_cor,
           const IT_* idx, const IT_ m, const IT_ off) const
         {
           if(_mat_val == nullptr)
             return off + m;
 
-          typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, col_dim_> VectorType;
+          typedef LAFEM::DenseVectorBlocked<DT_, IT_, col_dim_> VectorType;
           typedef typename VectorType::ValueType VecVal;
           const VecVal* v = vec_cor.elements();
 
@@ -476,7 +476,7 @@ namespace FEAT
           return off + m* IT_(row_dim);
         }
 
-        IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVector<Mem::Main, DT_, IT_>& vec_cor,
+        IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVector<DT_, IT_>& vec_cor,
           const IT_* idx, const IT_ m, const IT_ off) const
         {
           if(_mat_val == nullptr)
@@ -838,20 +838,20 @@ namespace FEAT
       };
 
       template<typename DT_, typename IT_>
-      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix)
+      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
       {
         return std::make_pair(matrix.row_ptr(), matrix.col_ind());
       }
 
       template<typename DT_, typename IT_, int m_, int n_>
-      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, m_, n_>& matrix)
+      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixBCSR<DT_, IT_, m_, n_>& matrix)
       {
         return std::make_pair(matrix.row_ptr(), matrix.col_ind());
       }
 
       template<typename DT_, typename IT_, int dim_>
       std::pair<const IT_*, const IT_*> vanka_graph(
-        const LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, dim_>& matrix)
+        const LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
       {
         const auto& m = matrix.first();
         return std::make_pair(m.row_ptr(), m.col_ind());
@@ -859,7 +859,7 @@ namespace FEAT
 
       template<typename DT_, typename IT_, int dim_>
       std::pair<const IT_*, const IT_*> vanka_graph(
-        const LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, dim_>& matrix)
+        const LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
       {
         const auto& m = matrix.first();
         return std::make_pair(m.row_ptr(), m.col_ind());
@@ -867,7 +867,7 @@ namespace FEAT
 
       template<typename DT_, typename IT_, int dim_>
       std::pair<const IT_*, const IT_*> vanka_graph(
-        const LAFEM::PowerDiagMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, dim_>& matrix)
+        const LAFEM::PowerDiagMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
       {
         const auto& m = matrix.first();
         return std::make_pair(m.row_ptr(), m.col_ind());
@@ -875,7 +875,7 @@ namespace FEAT
 
       template<typename DT_, typename IT_, int row_dim_, int col_dim_>
       std::pair<const IT_*, const IT_*> vanka_graph(
-        const LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, row_dim_, col_dim_>& matrix)
+        const LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, row_dim_, col_dim_>& matrix)
       {
         const auto& m = matrix.template at<0,0>();
         return std::make_pair(m.row_ptr(), m.col_ind());

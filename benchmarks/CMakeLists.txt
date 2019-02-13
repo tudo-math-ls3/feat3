@@ -10,9 +10,12 @@ set(benchmarks
   axpy-bench
   block_product_matvec-bench
   meshperm_assembly-bench
+  dot_product-bench
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
   product_matmat-bench
+  product_matcsrmat-bench
+  product_matcsrmat-file-bench
   product_matvec-bench
   product_matvec_dense-bench
 )

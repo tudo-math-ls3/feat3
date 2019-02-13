@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
@@ -16,16 +15,18 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::TestSystem;
 
-template<typename DT_, typename IT_>
+template<
+  typename DT_,
+  typename IT_>
 class MatrixMultTest
-  : public FullTaggedTest<Mem::Main, DT_, IT_>
+  : public UnitTest
 {
-  typedef SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
-  typedef DenseVector<Mem::Main, DT_, IT_> VectorType;
+  typedef SparseMatrixCSR<DT_, IT_> MatrixType;
+  typedef DenseVector<DT_, IT_> VectorType;
 
 public:
-  MatrixMultTest()
-    : FullTaggedTest<Mem::Main, DT_, IT_>("MatrixMultTest")
+  MatrixMultTest(PreferredBackend backend)
+    : UnitTest("MatrixMultTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -163,21 +164,41 @@ public:
   }
 };
 
-MatrixMultTest<float, unsigned int> matrix_mult_test_float_uint;
-MatrixMultTest<double, unsigned int> matrix_mult_test_double_uint;
-MatrixMultTest<float, unsigned long> matrix_mult_test_float_ulong;
-MatrixMultTest<double, unsigned long> matrix_mult_test_double_ulong;
+MatrixMultTest<float, unsigned int> matrix_mult_test_float_uint(PreferredBackend::generic);
+MatrixMultTest<double, unsigned int> matrix_mult_test_double_uint(PreferredBackend::generic);
+MatrixMultTest<float, unsigned long> matrix_mult_test_float_ulong(PreferredBackend::generic);
+MatrixMultTest<double, unsigned long> matrix_mult_test_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MatrixMultTest<float, unsigned long> mkl_matrix_mult_test_float_ulong(PreferredBackend::mkl);
+MatrixMultTest<double, unsigned long> mkl_matrix_mult_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MatrixMultTest<__float128, unsigned long> matrix_mult_test_float128_ulong(PreferredBackend::generic);
+MatrixMultTest<__float128, unsigned int> matrix_mult_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MatrixMultTest<Half, unsigned int> matrix_mult_test_half_uint(PreferredBackend::generic);
+MatrixMultTest<Half, unsigned long> matrix_mult_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MatrixMultTest<float, unsigned long> cuda_matrix_mult_test_float_ulong(PreferredBackend::cuda);
+MatrixMultTest<double, unsigned long> cuda_matrix_mult_test_double_ulong(PreferredBackend::cuda);
+MatrixMultTest<float, unsigned int> cuda_matrix_mult_test_float_uint(PreferredBackend::cuda);
+MatrixMultTest<double, unsigned int> cuda_matrix_mult_test_double_uint(PreferredBackend::cuda);
+#endif
 
-template<typename DT_, typename IT_>
+template<
+  typename DT_,
+  typename IT_>
 class MatrixMultTest2
-  : public FullTaggedTest<Mem::Main, DT_, IT_>
+  : public UnitTest
 {
-  typedef SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
-  typedef DenseVector<Mem::Main, DT_, IT_> VectorType;
+  typedef SparseMatrixCSR<DT_, IT_> MatrixType;
+  typedef DenseVector<DT_, IT_> VectorType;
 
 public:
-  MatrixMultTest2()
-    : FullTaggedTest<Mem::Main, DT_, IT_>("MatrixMultTest")
+  MatrixMultTest2(PreferredBackend backend)
+    : UnitTest("MatrixMultTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -245,7 +266,25 @@ public:
   }
 };
 
-MatrixMultTest2<float, unsigned int> matrix_mult_test2_float_uint;
-MatrixMultTest2<double, unsigned int> matrix_mult_test2_double_uint;
-MatrixMultTest2<float, unsigned long> matrix_mult_test2_float_ulong;
-MatrixMultTest2<double, unsigned long> matrix_mult_test2_double_ulong;
+MatrixMultTest2<float, unsigned int> matrix_mult_test2_float_uint(PreferredBackend::generic);
+MatrixMultTest2<double, unsigned int> matrix_mult_test2_double_uint(PreferredBackend::generic);
+MatrixMultTest2<float, unsigned long> matrix_mult_test2_float_ulong(PreferredBackend::generic);
+MatrixMultTest2<double, unsigned long> matrix_mult_test2_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MatrixMultTest2<float, unsigned long> mkl_matrix_mult_test2_float_ulong(PreferredBackend::mkl);
+MatrixMultTest2<double, unsigned long> mkl_matrix_mult_test2_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MatrixMultTest2<__float128, unsigned long> matrix_mult_test2_float128_ulong(PreferredBackend::generic);
+MatrixMultTest2<__float128, unsigned int> matrix_mult_test2_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MatrixMultTest2<Half, unsigned int> matrix_mult_test2_half_uint(PreferredBackend::generic);
+MatrixMultTest2<Half, unsigned long> matrix_mult_test2_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MatrixMultTest2<float, unsigned long> cuda_matrix_mult_test2_float_ulong(PreferredBackend::cuda);
+MatrixMultTest2<double, unsigned long> cuda_matrix_mult_test2_double_ulong(PreferredBackend::cuda);
+MatrixMultTest2<float, unsigned int> cuda_matrix_mult_test2_float_uint(PreferredBackend::cuda);
+MatrixMultTest2<double, unsigned int> cuda_matrix_mult_test2_double_uint(PreferredBackend::cuda);
+#endif

@@ -10,13 +10,13 @@ using namespace FEAT;
 using namespace FEAT::TestSystem;
 using namespace FEAT::Analytic;
 
-template<typename DT_>
+template<typename DT_, typename IT_>
 class LambdaFunctionTest :
-  public FullTaggedTest<Mem::Main, DT_, Index>
+  public UnitTest
 {
 public:
-  LambdaFunctionTest() :
-    FullTaggedTest<Mem::Main, DT_, Index>("LambdaFunctionTest")
+  LambdaFunctionTest(PreferredBackend backend) :
+    UnitTest("LambdaFunctionTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -653,4 +653,4 @@ public:
   }
 };
 
-LambdaFunctionTest<double> lambda_function_test_double;
+LambdaFunctionTest<double, Index> lambda_function_test_double(PreferredBackend::generic);

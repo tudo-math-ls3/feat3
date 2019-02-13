@@ -16,12 +16,12 @@ using namespace FEAT::TestSystem;
  *
  * \author Dirk Ribbrock
  */
-class MemoryUsageTest
-  : public TaggedTest<Archs::None, Archs::None>
+class MemoryUsageTest :
+  public TestSystem::UnitTest
 {
 public:
   MemoryUsageTest() :
-    TaggedTest<Archs::None, Archs::None>("memory_usage_test")
+    TestSystem::UnitTest("memory_usage_test")
   {
   }
 

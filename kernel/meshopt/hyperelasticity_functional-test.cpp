@@ -53,10 +53,9 @@ template
   template<typename ... > class MeshQualityFunctional_
   >
   class HyperelasticityFunctionalTest
-  : public TestSystem::FullTaggedTest<Mem::Main, DT_, Index>
+  : public TestSystem::UnitTest
 {
   public:
-    typedef Mem::Main MemType;
     typedef Index IndexType;
     typedef DT_ DataType;
 
@@ -69,11 +68,11 @@ template
     /// Our functional type
     typedef CellFunctionalType_<DataType, TrafoType> CellFunctionalType;
     /// The Rumpf smoother
-    typedef MeshQualityFunctional_<MemType, DataType, IndexType, TrafoType, CellFunctionalType> MeshQualityFunctional;
+    typedef MeshQualityFunctional_<DataType, IndexType, TrafoType, CellFunctionalType> MeshQualityFunctional;
     /// Filter for Dirichlet boundary conditions
-    typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> DirichletFilterType;
+    typedef LAFEM::UnitFilterBlocked<DataType, IndexType, MeshType::world_dim> DirichletFilterType;
     /// Filter for slip boundary conditions
-    typedef LAFEM::SlipFilter<MemType, DataType, IndexType, MeshType::world_dim> SlipFilterType;
+    typedef LAFEM::SlipFilter<DataType, IndexType, MeshType::world_dim> SlipFilterType;
     /// Combined filter
     typedef LAFEM::FilterChain<LAFEM::FilterSequence<SlipFilterType>, LAFEM::FilterSequence<DirichletFilterType>> FilterType;
 
@@ -81,10 +80,11 @@ template
     const int _exponent_det;
 
   public:
-    explicit HyperelasticityFunctionalTest(int exponent_det) : TestSystem::FullTaggedTest<MemType, DataType, IndexType>
-    ("hyperelasticity_functional_test-"+CellFunctionalType::name()), _exponent_det(exponent_det)
-      {
-      }
+    explicit HyperelasticityFunctionalTest(int exponent_det) :
+      TestSystem::UnitTest("hyperelasticity_functional_test-"+CellFunctionalType::name(), Type::Traits<DT_>::name()),
+      _exponent_det(exponent_det)
+    {
+    }
 
     virtual ~HyperelasticityFunctionalTest()
     {
@@ -206,8 +206,8 @@ template
 };
 
 // Use template alias to make everything more readable
-template<typename A, typename B, typename C, typename D, typename E>
-using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
+template<typename A, typename B, typename C, typename D>
+using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D>;
 
 HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_1(1);
 HyperelasticityFunctionalTest<double, Shape::Hypercube<2>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_hc_1_u(1);

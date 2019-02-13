@@ -67,8 +67,6 @@ namespace MultiPrecHierarchBench
   // Use the Lagrange-1 element
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   //typedef double DataType;
   // Use the default index type for indexing.
@@ -124,7 +122,7 @@ namespace MultiPrecHierarchBench
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   template<typename DT_, typename IT_>
-  LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> expand_prol(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& prol,
+  LAFEM::SparseMatrixCSR<DT_, IT_> expand_prol(const LAFEM::SparseMatrixCSR<DT_, IT_>& prol,
     const Index n, const DT_ alpha = DT_(1))
   {
     XASSERT(prol.rows() <= n);
@@ -138,7 +136,7 @@ namespace MultiPrecHierarchBench
     const DT_* val_p = prol.val();
 
     // allocate expanded matrix
-    LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> ex_prol(n, n, pnz + n - pnc);
+    LAFEM::SparseMatrixCSR<DT_, IT_> ex_prol(n, n, pnz + n - pnc);
     IT_* row_ptr_q = ex_prol.row_ptr();
     IT_* col_idx_q = ex_prol.col_ind();
     DT_* val_q = ex_prol.val();
@@ -184,16 +182,16 @@ namespace MultiPrecHierarchBench
 
   template<typename DT_, typename IT_>
   void reduce_system(
-    LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
-    LAFEM::DenseVector<Mem::Main, DT_, IT_>& vector,
-    const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& prol,
+    LAFEM::SparseMatrixCSR<DT_, IT_>& matrix,
+    LAFEM::DenseVector<DT_, IT_>& vector,
+    const LAFEM::SparseMatrixCSR<DT_, IT_>& prol,
     const DT_ alpha = DT_(1))
   {
     const Index n = matrix.rows();
 
     // expand prolongation matrix
-    LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> mprol = expand_prol(prol, matrix.rows(), alpha);
-    LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> mrest = mprol.transpose();
+    LAFEM::SparseMatrixCSR<DT_, IT_> mprol = expand_prol(prol, matrix.rows(), alpha);
+    LAFEM::SparseMatrixCSR<DT_, IT_> mrest = mprol.transpose();
 
     // (R*A*P) * (P^-1x) = R*b
 
@@ -202,7 +200,7 @@ namespace MultiPrecHierarchBench
     Adjacency::Graph grap(Adjacency::RenderType::injectify_sorted, mrest, gap);
 
     // compute matrix
-    LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> matrix_r(grap);
+    LAFEM::SparseMatrixCSR<DT_, IT_> matrix_r(grap);
     matrix_r.format();
     matrix_r.add_double_mat_product(mrest, matrix, mprol);
 
@@ -216,7 +214,7 @@ namespace MultiPrecHierarchBench
     }
 
     // compute rhs
-    LAFEM::DenseVector<Mem::Main, DT_, IT_> vector_r(n);
+    LAFEM::DenseVector<DT_, IT_> vector_r(n);
     mrest.apply(vector_r, vector);
 
     // overwrite input
@@ -226,9 +224,9 @@ namespace MultiPrecHierarchBench
 
   template<typename DT_, typename IT_, typename Mesh_>
   void solve_by_thomas(
-    LAFEM::DenseVector<Mem::Main, DT_, IT_>& vec_sol,
-    const LAFEM::DenseVector<Mem::Main, DT_, IT_>& vec_rhs,
-    const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
+    LAFEM::DenseVector<DT_, IT_>& vec_sol,
+    const LAFEM::DenseVector<DT_, IT_>& vec_rhs,
+    const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix,
     const Mesh_& mesh)
   {
     const auto& vtx = mesh.get_vertex_set();
@@ -307,13 +305,13 @@ namespace MultiPrecHierarchBench
   template<typename DataType, typename DTI_>
   void main(const Index level_max, const Index level_min, bool reduce = false)
   {
-    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+    typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
+    typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
+    typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
-    typedef LAFEM::DenseVector<MemType, DTI_, IndexType> VectorTypeI;
-    typedef LAFEM::SparseMatrixCSR<MemType, DTI_, IndexType> MatrixTypeI;
-    typedef LAFEM::UnitFilter<MemType, DTI_, IndexType> FilterTypeI;
+    typedef LAFEM::DenseVector<DTI_, IndexType> VectorTypeI;
+    typedef LAFEM::SparseMatrixCSR<DTI_, IndexType> MatrixTypeI;
+    typedef LAFEM::UnitFilter<DTI_, IndexType> FilterTypeI;
 
     Cubature::DynamicFactory cubature_factory("auto-degree:5");
 
@@ -390,7 +388,7 @@ namespace MultiPrecHierarchBench
         unit_asm.assemble(filter, level->space);
       }
 
-      // create vectors
+      // create vectorscl
       VectorType vec_sol = matrix.create_vector_r();
       VectorType vec_rhs = matrix.create_vector_r();
       vec_sol.format();

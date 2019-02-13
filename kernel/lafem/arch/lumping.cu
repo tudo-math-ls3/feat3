@@ -5,10 +5,9 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/lumping.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 namespace FEAT
 {
@@ -87,9 +86,9 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
-void Lumping<Mem::CUDA>::csr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
+void Lumping::csr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+  Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -103,38 +102,15 @@ void Lumping<Mem::CUDA>::csr(DT_ * lump, const DT_ * const val, const IT_ * cons
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Lumping<Mem::CUDA>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index);
-template void Lumping<Mem::CUDA>::csr(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index);
-template void Lumping<Mem::CUDA>::csr(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index);
-template void Lumping<Mem::CUDA>::csr(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index);
-
-
-template <typename DT_, typename IT_>
-void Lumping<Mem::CUDA>::ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
-{
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
-  dim3 grid;
-  dim3 block;
-  block.x = blocksize;
-  grid.x = (unsigned)ceil((rows)/(double)(block.x));
-
-  FEAT::LAFEM::Intern::cuda_lumping_ell<<<grid, block>>>(lump, val, col_ind, cs, cl, C, rows);
-#ifdef FEAT_DEBUG_MODE
-  cudaDeviceSynchronize();
-  cudaError_t last_error(cudaGetLastError());
-  if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
-#endif
-}
-template void Lumping<Mem::CUDA>::ell(float *, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-template void Lumping<Mem::CUDA>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-template void Lumping<Mem::CUDA>::ell(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-template void Lumping<Mem::CUDA>::ell(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+template void Lumping::csr_cuda(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index);
+template void Lumping::csr_cuda(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index);
+template void Lumping::csr_cuda(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index);
+template void Lumping::csr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index);
 
 template <typename DT_, typename IT_>
-void Lumping<Mem::CUDA>::bcsr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+void Lumping::bcsr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
 {
-  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
+  Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -148,7 +124,7 @@ void Lumping<Mem::CUDA>::bcsr(DT_ * lump, const DT_ * const val, const IT_ * con
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Lumping<Mem::CUDA>::bcsr(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void Lumping<Mem::CUDA>::bcsr(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void Lumping<Mem::CUDA>::bcsr(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
-template void Lumping<Mem::CUDA>::bcsr(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);

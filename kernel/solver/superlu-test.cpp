@@ -30,18 +30,17 @@ inline int isqrt(const int n)
  *
  * \author Peter Zajac
  */
-template<typename Mem_, typename DT_, typename IT_>
+template<typename DT_, typename IT_>
 class SuperLUTest :
-  public TestSystem::FullTaggedTest<Mem_, DT_, IT_>
+  public TestSystem::UnitTest
 {
-  typedef Mem_ MemType;
   typedef DT_ DataType;
   typedef IT_ IndexType;
 
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> MirrorType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
+  typedef LAFEM::VectorMirror<DataType, IndexType> MirrorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> LocalFilterType;
 
   typedef Global::Gate<LocalVectorType, MirrorType> GateType;
   typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
@@ -50,7 +49,7 @@ class SuperLUTest :
 
 public:
   SuperLUTest() :
-    TestSystem::FullTaggedTest<Mem_, DT_, IT_>("SuperLUTest")
+    TestSystem::UnitTest("SuperLUTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name())
   {
   }
 
@@ -264,6 +263,6 @@ public:
   }
 }; // class SuperLUTest<...>
 
-SuperLUTest<Mem::Main, double, Index> superlu_test_main_double_index;
+SuperLUTest<double, Index> superlu_test_double_index;
 
 #endif // defined(FEAT_HAVE_SUPERLU_DIST) && defined(FEAT_HAVE_MPI)

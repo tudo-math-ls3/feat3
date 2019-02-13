@@ -113,19 +113,17 @@ using namespace FEAT;
 // We're opening a new namespace for our tutorial.
 namespace Tutorial08
 {
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Use the standard dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
   // Use the standard CSR matrix format
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
   // Use the unit-filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   // In the previous tutorials, we have defined the shape-type of the mesh as a (compile-time
   // constant) typedef at this point prior to defining the actual application code.
@@ -574,7 +572,7 @@ namespace Tutorial08
     std::cout << std::endl << "Solving System..." << std::endl;
 
     // Create an ILU(0) preconditioner
-    auto precond = Solver::new_ilu_precond(matrix, filter);
+    auto precond = Solver::new_ilu_precond(PreferredBackend::generic, matrix, filter);
 
     // Create a PCG solver
     auto solver = Solver::new_pcg(matrix, filter, precond);

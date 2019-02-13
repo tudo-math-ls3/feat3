@@ -122,8 +122,6 @@ namespace Tutorial07
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // Linear System type definitions
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
@@ -137,19 +135,19 @@ namespace Tutorial07
   // which we have to define here.
 
   // For vector fields, there is a specialized vector class available, namely the DenseVectorBlocked.
-  // In addition to the usual Memory-Data-Index type triplet, which we have already used before,
+  // In addition to the usual Data-Index type duo, which we have already used before,
   // we also have to specify the dimension of the vector field as the fourth template parameter.
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VectorVeloType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> VectorVeloType;
 
   // Next, we need the vector type for the pressure, which is a scalar function, so we can
   // use the already well-known DenseVector here:
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorPresType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorPresType;
 
   // Finally, we need to "concatenate" the velocity and pressure vector types to one so-called
   // "meta-vector" type. A "meta-vector" is, generally speaking, a "vector of vectors".
   // There are two class templates which can be used to define such meta-vectors and the one
   // that we will be using here is the "TupleVector", which can concatenate two (or more)
-  // vectors of an arbitrary vector type, as long as the Memory-Data-Index type triplets are
+  // vectors of an arbitrary vector type, as long as the Data-Index type duos are
   // the same. We call this new type the "system vector type", indicating that this vector
   // type contains all the sub-vector of our full PDE system, which is the velocity-pressure
   // vector pair in this case.
@@ -175,9 +173,9 @@ namespace Tutorial07
   // 'blocked' matrices instead of 'scalar' ones as in the previous tutorials.
   // The corresponding matrix type is the 'SparseMatrixBCSR' (note the 'B'), and it expects
   // the dimensions of the blocks as the two additional template parameters:
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> MatrixTypeA;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim,   1> MatrixTypeB;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType,   1, dim> MatrixTypeD;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> MatrixTypeA;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim,   1> MatrixTypeB;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType,   1, dim> MatrixTypeD;
 
   // Finally, we have to build the 'full matrix', which is a saddle-point matrix consisting
   // of the three above defined matrix blocks.
@@ -199,14 +197,14 @@ namespace Tutorial07
   // word: Dirichlet boundary conditions on the whole boundary. Now since the velocity is
   // a vector field and not a scalar function, we now also require a "blocked" version of
   // the unit-filter, which is the "UnitFilterBlocked":
-  typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, dim> FilterVeloType;
+  typedef LAFEM::UnitFilterBlocked<DataType, IndexType, dim> FilterVeloType;
 
   // As there is no Neumann boundary region for the velocity, the pressure is only defined
   // up to an additive constant (update your Stokes solution theory knowledge if this is
   // not clear to you), so we need to fix that. One elegant possibility to circumvent this
   // problem is to enforce that the pressure will have a mean value of zero. For this, we
   // employ a "MeanFilter", which is defined as follows:
-  typedef LAFEM::MeanFilter<MemType, DataType, IndexType> FilterPresType;
+  typedef LAFEM::MeanFilter<DataType, IndexType> FilterPresType;
 
   // Now in analogy to the vector types, we need to combine the velocity and pressure filters
   // by concatenating them with a "TupleFilter":

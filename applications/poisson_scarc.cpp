@@ -31,12 +31,12 @@ namespace PoissonScaRC
 {
   using namespace FEAT;
 
-  template<typename MemType_, typename DataType_, typename IndexType_>
+  template<typename DataType_, typename IndexType_>
   class PoissonScarcSystemLevel :
-    public Control::ScalarUnitFilterSystemLevel<MemType_, DataType_, IndexType_>
+    public Control::ScalarUnitFilterSystemLevel<DataType_, IndexType_>
   {
   public:
-    typedef Control::ScalarUnitFilterSystemLevel<MemType_, DataType_, IndexType_> BaseClass;
+    typedef Control::ScalarUnitFilterSystemLevel<DataType_, IndexType_> BaseClass;
 
     /// the local system matrix
     typename BaseClass::LocalSystemMatrix local_matrix_sys;
@@ -81,7 +81,6 @@ namespace PoissonScaRC
     const Dist::Comm& comm = domain.comm();
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
@@ -97,7 +96,7 @@ namespace PoissonScaRC
     Analytic::Common::ExpBubbleFunction<ShapeType::dimension> sol_func;
 
     // define our system level
-    typedef PoissonScarcSystemLevel<MemType, DataType, IndexType> SystemLevelType;
+    typedef PoissonScarcSystemLevel<DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 

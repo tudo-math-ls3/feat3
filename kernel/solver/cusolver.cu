@@ -7,7 +7,6 @@
 #include <kernel/base_header.hpp>
 
 #ifdef FEAT_HAVE_CUSOLVER
-#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 
 #include <cusolverSp.h>

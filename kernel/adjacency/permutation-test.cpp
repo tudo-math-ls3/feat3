@@ -22,11 +22,11 @@ using namespace FEAT::Adjacency;
  * \author Peter Zajac
  */
 class PermutationTest
-  : public TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   PermutationTest() :
-    TaggedTest<Archs::None, Archs::None>("PermutationTest")
+    UnitTest("PermutationTest")
   {
   }
 

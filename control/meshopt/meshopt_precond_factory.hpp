@@ -8,7 +8,6 @@
 #define CONTROL_MESHOPT_MESHOPT_PRECOND_FACTORY_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 
 #include <kernel/solver/nlopt_precond.hpp>
 
@@ -102,7 +101,6 @@ namespace FEAT
 
               typedef DuDvFunctionalControl
               <
-                typename MeshoptCtrl_::MemType,
                 typename MeshoptCtrl_::DataType,
                 typename MeshoptCtrl_::IndexType,
                 DomCtrl_

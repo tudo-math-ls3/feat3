@@ -11,7 +11,6 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 
 // includes, system
 #include <vector>
@@ -153,75 +152,13 @@ namespace FEAT
         }
 
         /**
-         * \brief Initializes the ILU(0) structure from an ELL input matrix
-         *
-         * \param[in] n
-         * The size of the matrix.
-         *
-         * \param[in] c
-         * The chunk size of the ELL input matrix.
-         *
-         * \param[in] ci_a
-         * The column-index array of the ELL input matrix.
-         *
-         * \param[in] cs_a
-         * The column-start array of the ELL input matrix.
-         *
-         * \param[in] rl_a
-         * The row-length array of the ELL input matrix.
-         */
-        void set_struct_ell(const IT_ n, const IT_ c, const IT_* ci_a, const IT_* cs_a, const IT_* rl_a)
-        {
-          // First of all, let's guess the number of non-zeros for L and U:
-          // In most of our cases, the sparsity pattern of A is symmetric,
-          // so we have a guess of (nz(A)-n)/2 for both L and U:
-          //const IT_ nzul = (row_ptr_a[n] - n) / IT_(2);
-
-          // store size and clear containers
-          _n = n;
-          _row_ptr_l.clear();
-          _col_idx_l.clear();
-          _row_ptr_u.clear();
-          _col_idx_u.clear();
-
-          // reserve our non-zero guess
-          //_row_ptr_l.reserve(n+1);
-          //_row_ptr_u.reserve(n+1);
-          //_col_idx_l.reserve(nzul);
-          //_col_idx_u.reserve(nzul);
-
-          // initialize row-pointers
-          _row_ptr_l.push_back(0);
-          _row_ptr_u.push_back(0);
-
-          // loop over all matrix rows
-          for(IT_ i(0); i < n; ++i)
-          {
-            const IT_ co = cs_a[i / c] + (i % c);
-            for(IT_ j(0); j < rl_a[i]; ++j)
-            {
-              const IT_ k = ci_a[co + c*j];
-              if(k < i)
-                _col_idx_l.push_back(k);
-              else if(k > i)
-                _col_idx_u.push_back(k);
-            }
-            _row_ptr_l.push_back(IT_(_col_idx_l.size()));
-            _row_ptr_u.push_back(IT_(_col_idx_u.size()));
-          }
-
-          //_lvl_l.resize(_col_idx_l.size(), IT_(0));
-          //_lvl_u.resize(_col_idx_u.size(), IT_(0));
-        }
-
-        /**
          * \brief Initializes the ILU(0) structure from a CSR input matrix
          *
          * \param[in] matrix
          * The CSR input matrix.
          */
         template<typename DT_>
-        void set_struct(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix)
+        void set_struct(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
         {
           this->set_struct_csr(IT_(matrix.rows()), matrix.row_ptr(), matrix.col_ind());
         }
@@ -233,21 +170,9 @@ namespace FEAT
          * The BCSR input matrix.
          */
         template<typename DT_, int m_, int n_>
-        void set_struct(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, m_, n_>& matrix)
+        void set_struct(const LAFEM::SparseMatrixBCSR<DT_, IT_, m_, n_>& matrix)
         {
           this->set_struct_csr(IT_(matrix.rows()), matrix.row_ptr(), matrix.col_ind());
-        }
-
-        /**
-         * \brief Initializes the ILU(0) structure from a ELL input matrix
-         *
-         * \param[in] matrix
-         * The ELL input matrix.
-         */
-        template<typename DT_>
-        void set_struct(const LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>& matrix)
-        {
-          this->set_struct_ell(IT_(matrix.rows()), IT_(matrix.C()), matrix.col_ind(), matrix.cs(), matrix.rl());
         }
 
         /**
@@ -509,81 +434,14 @@ namespace FEAT
         }
 
         /**
-         * \brief Copies the data arrays from an ELL input matrix
-         *
-         * \param[in] c
-         * The chunk size of the ELL input matrix.
-         *
-         * \param[in] ci_a
-         * The column-index array of the ELL input matrix.
-         *
-         * \param[in] cs_a
-         * The column-start array of the ELL input matrix.
-         *
-         * \param[in] rl_a
-         * The row-length array of the ELL input matrix.
-         *
-         * \param[in] data_a
-         * The data array if the ELL input matrix.
-         */
-        void copy_data_ell(const IT_ c, const IT_* ci_a, const IT_* cs_a, const IT_* rl_a, const DT_* data_a)
-        {
-          // loop over all rows
-          for(IT_ i(0); i < this->_n; ++i)
-          {
-            IT_ ra = cs_a[i / c] + (i % c);
-            const IT_ xa = ra + c*rl_a[i];
-
-            // fetch row i of L
-            for(IT_ j(this->_row_ptr_l[i]); j < this->_row_ptr_l[i+1]; ++j)
-            {
-              if(this->_col_idx_l[j] == ci_a[ra])
-              {
-                _data_l[j] = data_a[ra];
-                ra += c;
-              }
-              else
-                _data_l[j] = DT_(0);
-            }
-
-            // fetch diagonal
-            _data_d[i] = data_a[ra];
-            ra += c;
-
-            // fetch row i of U
-            for(IT_ j(this->_row_ptr_u[i]); j < this->_row_ptr_u[i+1]; ++j)
-            {
-              if((ra < xa) && (this->_col_idx_u[j] == ci_a[ra]))
-              {
-                _data_u[j] = data_a[ra];
-                ra += c;
-              }
-              else
-                _data_u[j] = DT_(0);
-            }
-          }
-        }
-
-        /**
          * \brief Copies the data arrays from a CSR input matrix
          *
          * \param[in] matrix
          * The input matrix.
          */
-        void copy_data(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix)
+        void copy_data(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
         {
           this->copy_data_csr(matrix.row_ptr(), matrix.col_ind(), matrix.val());
-        }
-
-        /**
-         * \brief Copies the data arrays from an ELL input matrix
-         *
-         * \param[in] matrix
-         * The input matrix.
-         */
-        void copy_data(const LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>& matrix)
-        {
-          this->copy_data_ell(IT_(matrix.C()), matrix.col_ind(), matrix.cs(), matrix.rl(), matrix.val());
         }
 
         /**
@@ -905,7 +763,7 @@ namespace FEAT
          * \param[in] matrix
          * The input matrix.
          */
-        void copy_data(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_>& matrix)
+        void copy_data(const LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_>& matrix)
         {
           this->copy_data_bcsr(matrix.row_ptr(), matrix.col_ind(), matrix.val());
         }
@@ -1063,40 +921,69 @@ namespace FEAT
     /// \endcond
 
     /**
-     * \brief ILU(0) and ILU(p) preconditioner implementation
+     * \brief Inheritances inside ilu_precond.hpp
+     *
+     * ILUPrecondBase <- ILUPrecondWithBackend.
+     * Both for internal use only.
+     *
+     * SolverBase <- ILUPrecond.
+     * ILUPrecond uses the internal classes.
+     *
+     * \author Dirk Ribbrock
+     * \author Lisa-Marie Walter
+     */
+
+    /// ILU preconditioner base class for internal use
+    template<typename Matrix_>
+    class ILUPrecondBase
+    {
+    public:
+      typedef typename Matrix_::DataType DataType;
+      typedef typename Matrix_::VectorTypeL VectorType;
+
+      virtual void set_fill_in_param(int p) = 0;
+
+      virtual void init_symbolic() = 0;
+
+      virtual void done_symbolic() = 0;
+
+      virtual void init_numeric() = 0;
+
+      virtual String name() const = 0;
+
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) = 0;
+
+      virtual ~ILUPrecondBase() {}
+    }; // ILUPrecondBase class
+
+    /**
+     * \brief ILU(0) and ILU(p) preconditioner internal implementation
      *
      * This class implements a simple ILU(0) and ILU(p) preconditioner.
-     *
-     * This implementation works for the following matrix types:
-     * - LAFEM::SparseMatrixCSR in Mem::Main and Mem::CUDA
-     * - LAFEM::SparseMatrixELL in Mem::Main and Mem::CUDA
-     * - LAFEM::SparseMatrixBSCR in Mem::Main and Mem::CUDA
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
      */
-    template<typename Matrix_, typename Filter_>
-    class ILUPrecond;
+    template<PreferredBackend backend_, typename Matrix_, typename Filter_>
+    class ILUPrecondWithBackend;
 
     /**
-     * \brief ILU(p) specialization for SparseMatrixCSR/ELL<Mem::Main,...>
+     * \brief ILU(p) specialization for SparseMatrixCSR
      *
-     * This specialization takes care of all scalar matrix containers residing in main memory.
+     * This specialization works for the LAFEM::SparseMatrixCSR matrix type
      *
      * \author Peter Zajac
      */
-    template<template<class,class,class> class ScalarMatrix_, typename DT_, typename IT_, typename Filter_>
-    class ILUPrecond<ScalarMatrix_<Mem::Main, DT_, IT_>, Filter_> :
-      public SolverBase<typename ScalarMatrix_<Mem::Main, DT_, IT_>::VectorTypeL>
+    template<typename DT_, typename IT_, typename Filter_>
+    class ILUPrecondWithBackend<PreferredBackend::generic, LAFEM::SparseMatrixCSR<DT_, IT_>, Filter_> :
+      public ILUPrecondBase<typename LAFEM::SparseMatrixCSR<DT_, IT_>>
     {
     public:
-      typedef ScalarMatrix_<Mem::Main, DT_, IT_> MatrixType;
-      typedef Mem::Main MemType;
+      typedef LAFEM::SparseMatrixCSR<DT_, IT_> MatrixType;
       typedef DT_ DataType;
       typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -1114,16 +1001,15 @@ namespace FEAT
        * \param[in] p
        * Maximum level of fillin.
        */
-      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const int p = 0) :
+      explicit ILUPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const int p = 0) :
         _matrix(matrix),
         _filter(filter),
         _p(p)
       {
       }
 
-      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _p(-1)
@@ -1136,7 +1022,7 @@ namespace FEAT
       /**
        * \brief Empty virtual destructor
        */
-      virtual ~ILUPrecond()
+      virtual ~ILUPrecondWithBackend()
       {
       }
 
@@ -1146,7 +1032,7 @@ namespace FEAT
        * \param[in] p
        * The new fill-in parameter
        */
-      void set_fill_in_param(int p)
+      virtual void set_fill_in_param(int p) override
       {
         XASSERT(p > 0);
         _p = p;
@@ -1215,25 +1101,23 @@ namespace FEAT
 
         return Status::success;
       }
-    }; // class ILUPrecond<ScalarMatrix_<Mem::Main,...>,...>
+    }; // class ILUPrecondWithBackend<generic, SparseMatrixCSR,...>
 
     /**
-     * \brief ILU(p) specialization for SparseMatrixBCSR<Mem::Main,...>
+     * \brief ILU(p) specialization for SparseMatrixBCSR<...>
      *
      * \author Peter Zajac
      */
     template<typename DT_, typename IT_, int dim_, typename Filter_>
-    class ILUPrecond<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_>, Filter_> :
-      public SolverBase<LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>>
+    class ILUPrecondWithBackend<PreferredBackend::generic, LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_>, Filter_> :
+      public ILUPrecondBase<typename LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_>>
     {
     public:
-      typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, dim_, dim_> MatrixType;
-      typedef Mem::Main MemType;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_> MatrixType;
       typedef DT_ DataType;
       typedef IT_ IndexType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -1251,16 +1135,15 @@ namespace FEAT
        * \param[in] p
        * Maximum level of fillin.
        */
-      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const int p = 0) :
+      explicit ILUPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const int p = 0) :
         _matrix(matrix),
         _filter(filter),
         _p(p)
       {
       }
 
-      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter),
         _p(-1)
@@ -1273,7 +1156,7 @@ namespace FEAT
       /**
        * \brief Empty virtual destructor
        */
-      virtual ~ILUPrecond()
+      virtual ~ILUPrecondWithBackend()
       {
       }
 
@@ -1283,7 +1166,7 @@ namespace FEAT
        * \param[in] p
        * The new fill-in parameter
        */
-      void set_fill_in_param(int p)
+      virtual void set_fill_in_param(int p) override
       {
         XASSERT(p > 0);
         _p = p;
@@ -1352,10 +1235,11 @@ namespace FEAT
 
         return Status::success;
       }
-    }; // class ILUPrecond<SparseMatrixBCSR<Mem::Main,...>,...>
+    }; // class ILUPrecondWithBackend<generic, SparseMatrixBCSR<...>,...>
 
+#ifdef FEAT_HAVE_CUDA
     /**
-     * \brief ILU(0) preconditioner implementation
+     * \brief ILU(0) preconditioner internal implementation
      *
      * This class implements a simple ILU(0) preconditioner,
      * e.g. zero fill-in and no pivoting.
@@ -1368,16 +1252,14 @@ namespace FEAT
      * \author Dirk Ribbrock
      */
     template<typename Filter_>
-    class ILUPrecond<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int>, Filter_> :
-      public SolverBase<LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int>::VectorTypeL>
+    class ILUPrecondWithBackend<PreferredBackend::cuda, LAFEM::SparseMatrixCSR<double, unsigned int>, Filter_> :
+      public ILUPrecondBase<LAFEM::SparseMatrixCSR<double, unsigned int>>
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<double, unsigned int> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
-      /// Our base class
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -1397,15 +1279,14 @@ namespace FEAT
        *
        * \note The parameter p is not active in CUDA, i.e. only ILU(0) is supported.
        */
-      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const int = 0) :
+      explicit ILUPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const int = 0) :
         _matrix(matrix),
         _filter(filter)
       {
       }
 
-      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter)
       {
@@ -1413,14 +1294,14 @@ namespace FEAT
         auto fill_in_param_p = section->query("fill_in_param");
         if(fill_in_param_p.second)
         {
-          XASSERTM(std::stoi(fill_in_param_p.first) == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
+          XASSERTM(std::stoi(fill_in_param_p.first) == 0, "For PreferredBackend::cuda, the fill in parameter has to be == 0!");
         }
       }
 
       /**
        * \brief Empty virtual destructor
        */
-      virtual ~ILUPrecond()
+      virtual ~ILUPrecondWithBackend()
       {
       }
 
@@ -1430,9 +1311,9 @@ namespace FEAT
        * \param[in] p
        * The new fill-in parameter
        */
-      void set_fill_in_param(int p)
+      virtual void set_fill_in_param(int p) override
       {
-        XASSERTM(p == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
+        XASSERTM(p == 0, "For PreferredBackend::cuda, the fill in parameter has to be == 0!");
       }
 
       /// Returns the name of the solver.
@@ -1497,7 +1378,7 @@ namespace FEAT
 
         return (status == 0) ? Status::success :  Status::aborted;
       }
-    }; // class ILUPrecond<SparseMatrixCSR<Mem::CUDA,...>,...>
+    }; // class ILUPrecondWithBackend<cuda, SparseMatrixCSR<...>,...>
 
     /*
     template<typename Filter_>
@@ -1573,7 +1454,7 @@ namespace FEAT
     };*/
 
     /**
-     * \brief ILU(0) preconditioner implementation
+     * \brief ILU(0) preconditioner internal implementation
      *
      * This class implements a simple ILU(0) preconditioner,
      * e.g. zero fill-in and no pivoting.
@@ -1586,16 +1467,14 @@ namespace FEAT
      * \author Dirk Ribbrock
      */
     template<typename Filter_, int blocksize_>
-    class ILUPrecond<LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, blocksize_, blocksize_>, Filter_> :
-      public SolverBase<typename LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, blocksize_, blocksize_>::VectorTypeL>
+    class ILUPrecondWithBackend<PreferredBackend::cuda, LAFEM::SparseMatrixBCSR<double, unsigned int, blocksize_, blocksize_>, Filter_> :
+      public ILUPrecondBase<typename LAFEM::SparseMatrixBCSR<double, unsigned int, blocksize_, blocksize_>>
     {
     public:
-      typedef LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, blocksize_, blocksize_> MatrixType;
+      typedef LAFEM::SparseMatrixBCSR<double, unsigned int, blocksize_, blocksize_> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
-      /// Our base class
-      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -1615,7 +1494,7 @@ namespace FEAT
        *
        * \note The parameter p is not active in CUDA, i.e. only ILU(0) is supported.
        */
-      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const int = 0) :
+      explicit ILUPrecondWithBackend(const MatrixType& matrix, const FilterType& filter, const int = 0) :
         _matrix(matrix),
         _filter(filter)
       {
@@ -1637,9 +1516,8 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit ILUPrecond(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
-        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter)
         {
@@ -1647,14 +1525,14 @@ namespace FEAT
           auto fill_in_param_p = section->query("fill_in_param");
           if(fill_in_param_p.second)
           {
-            XASSERTM(std::stoi(fill_in_param_p.first) == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
+            XASSERTM(std::stoi(fill_in_param_p.first) == 0, "For PreferredBackend::cuda, the fill in parameter has to be == 0!");
           }
         }
 
       /**
        * \brief Empty virtual destructor
        */
-      virtual ~ILUPrecond()
+      virtual ~ILUPrecondWithBackend()
       {
       }
 
@@ -1664,9 +1542,9 @@ namespace FEAT
        * \param[in] p
        * The new fill-in parameter
        */
-      void set_fill_in_param(int p)
+      virtual void set_fill_in_param(int p) override
       {
-        XASSERTM(p == 0, "For Mem::CUDA, the fill in parameter has to be == 0!");
+        XASSERTM(p == 0, "For PreferredBackend::cuda, the fill in parameter has to be == 0!");
       }
 
       /// Returns the name of the solver.
@@ -1728,36 +1606,202 @@ namespace FEAT
 
         return (status == 0) ? Status::success :  Status::aborted;
       }
-    }; // class ILUPrecond<SparseMatrixBCSR<Mem::CUDA,...>,...>
+    }; // class ILUPrecondWithBackend<cuda, SparseMatrixBCSR<...>,...>
+#endif //FEAT_HAVE_CUDA
 
     /// Dummy class for not implemented specializations
-    template<typename Matrix_, typename Filter_>
-    class ILUPrecond :
-      public SolverBase<typename Matrix_::VectorTypeL>
+    template<PreferredBackend backend_, typename Matrix_, typename Filter_>
+    class ILUPrecondWithBackend :
+      public ILUPrecondBase<Matrix_>
     {
       public:
 
-      explicit ILUPrecond(const Matrix_&, const Filter_&, const int = 0)
+      explicit ILUPrecondWithBackend(const Matrix_&, const Filter_&, const int = 0)
       {
       }
 
-      explicit ILUPrecond(const String& , PropertyMap*, const Matrix_& , const Filter_& )
+      explicit ILUPrecondWithBackend(const String& , PropertyMap*, const Matrix_& , const Filter_& )
       {
       }
 
-      Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
+      virtual Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
           XABORTM("not implemented yet!");
       }
 
-      String name() const override
+      virtual String name() const override
       {
           XABORTM("not implemented yet!");
+      }
+
+      virtual void init_symbolic() override
+      {
+        XABORTM("not implemented yet!");
+      }
+
+      virtual void done_symbolic() override
+      {
+        XABORTM("not implemented yet!");
+      }
+
+      virtual void set_fill_in_param(int /*p*/) override
+      {
+        XABORTM("not implemented yet!");
+      }
+
+      virtual void init_numeric() override
+      {
+        XABORTM("not implemented yet!");
       }
     };
 
     /**
+     * \brief ILU(0) and ILU(p) preconditioner implementation
+     *
+     * This class implements a simple ILU(0) and ILU(p) preconditioner.
+     *
+     * This implementation works for the following matrix types and combinations thereof:
+     * - LAFEM::SparseMatrixCSR
+     * - LAFEM::SparseMatrixBCSR
+     *
+     * \author Dirk Ribbrock
+     */
+    template<typename Matrix_, typename Filter_>
+    class ILUPrecond : public SolverBase<typename Matrix_::VectorTypeL>
+    {
+    private:
+      std::shared_ptr<ILUPrecondBase<Matrix_>> _impl;
+
+    public:
+      typedef Matrix_ MatrixType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef typename MatrixType::DataType DataType;
+
+      /// Our base class
+      typedef SolverBase<VectorType> BaseClass;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] backend
+       * The backend to be preferred. This implementation works with generic and cuda.
+       *
+       * \param[in] matrix
+       * The matrix to be used.
+       *
+       * \param[in] filter
+       * The filter to be used for the correction vector.
+       *
+       * \param[in] p
+       * Maximum level of fillin.
+       *
+       */
+      ILUPrecond(PreferredBackend backend, const MatrixType& matrix, const FilterType& filter, const int p = 0)
+      {
+        switch (backend)
+        {
+          case PreferredBackend::cuda:
+            _impl = std::make_shared<ILUPrecondWithBackend<PreferredBackend::cuda, Matrix_, Filter_>>(matrix, filter);
+            break;
+          case PreferredBackend::mkl:
+          case PreferredBackend::generic:
+          default:
+            _impl = std::make_shared<ILUPrecondWithBackend<PreferredBackend::generic, Matrix_, Filter_>>(matrix, filter, p);
+        }
+      }
+
+      /**
+       * \brief Constructor using a PropertyMap
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] backend
+       * The backend to be preferred. This implementation works with generic and cuda.
+       *
+       * \param[in] matrix
+       * The system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       */
+      ILUPrecond(const String& section_name, PropertyMap* section, PreferredBackend backend, const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section)
+      {
+        switch (backend)
+        {
+          case PreferredBackend::cuda:
+            _impl = std::make_shared<ILUPrecondWithBackend<PreferredBackend::cuda, Matrix_, Filter_>>(section_name, section, matrix, filter);
+            break;
+          case PreferredBackend::mkl:
+          case PreferredBackend::generic:
+          default:
+            _impl = std::make_shared<ILUPrecondWithBackend<PreferredBackend::generic, Matrix_, Filter_>>(section_name, section, matrix, filter);
+        }
+      }
+
+      /**
+       * \brief Empty virtual destructor
+       */
+      virtual ~ILUPrecond()
+      {
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return _impl->name();
+      }
+
+      /**
+       * \brief Sets the fill-in parameter
+       *
+       * \param[in] p
+       * The new fill-in parameter
+       */
+      virtual void set_fill_in_param(int p)
+      {
+        _impl->set_fill_in_param(p);
+      }
+
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector to be preconditioned.
+       */
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+      {
+        return _impl->apply(vec_cor, vec_def);
+      }
+
+      virtual void init_symbolic() override
+      {
+        _impl->init_symbolic();
+      }
+
+      virtual void done_symbolic() override
+      {
+        _impl->done_symbolic();
+      }
+
+      virtual void init_numeric() override
+      {
+        _impl->init_numeric();
+      }
+    }; // class ILUPrecond
+
+    /**
      * \brief Creates a new ILUPrecond solver object
+     *
+     * \param[in] backend
+     * The backend to be preferred. This implementation works with generic and cuda.
      *
      * \param[in] matrix
      * The system matrix.
@@ -1772,10 +1816,10 @@ namespace FEAT
      * A shared pointer to a new ILUPrecond object.
      */
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<ILUPrecond<Matrix_, Filter_>> new_ilu_precond(
+    inline std::shared_ptr<ILUPrecond<Matrix_, Filter_>> new_ilu_precond(PreferredBackend backend,
       const Matrix_& matrix, const Filter_& filter, const int p = 0)
     {
-      return std::make_shared<ILUPrecond<Matrix_, Filter_>>(matrix, filter, p);
+      return std::make_shared<ILUPrecond<Matrix_, Filter_>>(backend, matrix, filter, p);
     }
 
     /**
@@ -1786,6 +1830,9 @@ namespace FEAT
      *
      * \param[in] section
      * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] backend
+     * The backend to be preferred. This implementation works with generic and cuda.
      *
      * \param[in] matrix
      * The system matrix.
@@ -1798,10 +1845,10 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<ILUPrecond<Matrix_, Filter_>> new_ilu_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, PropertyMap* section, PreferredBackend backend,
       const Matrix_& matrix, const Filter_& filter)
     {
-      return std::make_shared<ILUPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);
+      return std::make_shared<ILUPrecond<Matrix_, Filter_>>(section_name, section, backend, matrix, filter);
     }
   } // namespace Solver
 } // namespace FEAT

@@ -167,8 +167,8 @@ namespace Tutorial07
 
   template<typename DataType_, typename IndexType_, typename SpaceVelo_, typename SpaceStress_>
   void assemble_stress_matrix(
-    LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 4, 4>& matrix,
-    const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, 2>& convect,
+    LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 4, 4>& matrix,
+    const LAFEM::DenseVectorBlocked<DataType_, IndexType_, 2>& convect,
     const SpaceVelo_& space_velo,
     const SpaceStress_& space_stress,
     const Cubature::DynamicFactory& cubature_factory,
@@ -181,8 +181,8 @@ namespace Tutorial07
     XASSERTM(matrix.columns() == space_stress.get_num_dofs(), "invalid matrix dimensions");
     XASSERTM(convect.size() == space_velo.get_num_dofs(), "invalid vector size");
 
-    typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, 2> VectorType;
-    typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 4, 4> MatrixType;
+    typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, 2> VectorType;
+    typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 4, 4> MatrixType;
 
     // define our assembly traits
     typedef Assembly::AsmTraits2<
@@ -371,34 +371,32 @@ namespace Tutorial07
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // Linear System type definitions
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VectorVeloType;
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, 4> VectorStressType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorPresType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> VectorVeloType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, 4> VectorStressType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorPresType;
 
   typedef LAFEM::TupleVector<VectorVeloType, VectorPresType, VectorStressType> SystemVectorType;
 
 
-  //typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixTypeS;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> MatrixTypeA;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim,   1> MatrixTypeB;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType,   1, dim> MatrixTypeD;
+  //typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixTypeS;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> MatrixTypeA;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, dim,   1> MatrixTypeB;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType,   1, dim> MatrixTypeD;
 
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 4, 2> MatrixTypeK;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 2, 4> MatrixTypeR;
-  typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 4, 4> MatrixTypeM;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, 4, 2> MatrixTypeK;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, 2, 4> MatrixTypeR;
+  typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, 4, 4> MatrixTypeM;
 
-  typedef LAFEM::NullMatrix<MemType, DataType, IndexType, 1, 1> Matrix0_1x1;
-  typedef LAFEM::NullMatrix<MemType, DataType, IndexType, 4, 1> Matrix0_4x1;
-  typedef LAFEM::NullMatrix<MemType, DataType, IndexType, 1, 4> Matrix0_1x4;
-  //typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 4, 1> MatrixType4x1;
-  //typedef LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, 1, 4> MatrixType1x4;
+  typedef LAFEM::NullMatrix<DataType, IndexType, 1, 1> Matrix0_1x1;
+  typedef LAFEM::NullMatrix<DataType, IndexType, 4, 1> Matrix0_4x1;
+  typedef LAFEM::NullMatrix<DataType, IndexType, 1, 4> Matrix0_1x4;
+  //typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, 4, 1> MatrixType4x1;
+  //typedef LAFEM::SparseMatrixBCSR<DataType, IndexType, 1, 4> MatrixType1x4;
 
   typedef LAFEM::TupleMatrix
   <
@@ -407,9 +405,9 @@ namespace Tutorial07
     LAFEM::TupleMatrixRow<MatrixTypeK, Matrix0_4x1, MatrixTypeM>
   > SystemMatrixType;
 
-  typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, dim> FilterVeloType;
-  typedef LAFEM::NoneFilter<MemType, DataType, IndexType> FilterPresType;
-  typedef LAFEM::NoneFilterBlocked<MemType, DataType, IndexType, 4> FilterStressType;
+  typedef LAFEM::UnitFilterBlocked<DataType, IndexType, dim> FilterVeloType;
+  typedef LAFEM::NoneFilter<DataType, IndexType> FilterPresType;
+  typedef LAFEM::NoneFilterBlocked<DataType, IndexType, 4> FilterStressType;
 
   typedef LAFEM::TupleFilter<FilterVeloType, FilterPresType, FilterStressType> SystemFilterType;
 

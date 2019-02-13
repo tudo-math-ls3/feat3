@@ -40,7 +40,6 @@ namespace Tutorial01
 {
   typedef Shape::Quadrilateral ShapeType;
   typedef double DataType;
-  typedef Mem::Main MemType;
 
   static double PI = Math::pi<double>();
 
@@ -103,9 +102,9 @@ namespace Tutorial01
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
     SpaceType space(trafo);
 
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType> MatrixType;
-    typedef LAFEM::NoneFilter<MemType, DataType, Index> FilterType;
+    typedef LAFEM::DenseVector<DataType> VectorType;
+    typedef LAFEM::SparseMatrixCSR<DataType> MatrixType;
+    typedef LAFEM::NoneFilter<DataType, Index> FilterType;
 
     FilterType filter;
 

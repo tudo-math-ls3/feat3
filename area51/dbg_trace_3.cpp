@@ -100,7 +100,6 @@ namespace DbgTrace3
     //typedef Shape::Quadrilateral ShapeType;
     typedef double DataType;
     typedef Index IndexType;
-    typedef Mem::Main MemType;
 
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Geometry::MeshPart<MeshType> BoundaryType;
@@ -127,8 +126,8 @@ namespace DbgTrace3
     typedef Space::Discontinuous::ElementP0<TrafoType> SpaceType;
     SpaceType space(trafo);
 
-    //typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> BVectorType;
+    //typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
+    typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BVectorType;
 
 
     std::cout << "Allocating and initializing vectors and matrix..." << std::endl;

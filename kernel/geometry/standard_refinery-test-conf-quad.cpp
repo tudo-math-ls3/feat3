@@ -28,11 +28,11 @@ typedef StandardRefinery<SubMesh> SubMeshRefinery;
  * \author Peter Zajac
  */
 class StandardRefineryTestConfQuad
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   StandardRefineryTestConfQuad() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-conf-quad")
+    UnitTest("standard_refinery-test-conf-quad")
   {
   }
 

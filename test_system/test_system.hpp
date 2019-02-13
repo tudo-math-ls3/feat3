@@ -12,7 +12,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
 
 // includes, system
 #include <string>
@@ -40,9 +40,9 @@ namespace FEAT
   namespace TestSystem
   {
     // Forwared declaration
-    class BaseTest;
+    class UnitTest;
 
-    /// exception thrown by the check method in BaseTest
+    /// exception thrown by the check method in UnitTest
     class TestFailedException
       : public std::exception
     {
@@ -143,7 +143,7 @@ namespace FEAT
       }
 
       /// internal STL list representation of TestList
-      std::list<BaseTest*> _tests;
+      std::list<UnitTest*> _tests;
 
       /// default CTOR
       TestList()
@@ -181,7 +181,7 @@ namespace FEAT
       }
 
       /// TestList forward iterator.
-      typedef std::list<BaseTest*>::iterator Iterator;
+      typedef std::list<UnitTest*>::iterator Iterator;
 
       /**
         * \brief adds a test to the TestList
@@ -189,7 +189,7 @@ namespace FEAT
         * \param[in] test
         * the test that will be added
         */
-      void register_test(BaseTest* const test)
+      void register_test(UnitTest* const test)
       {
         _tests.push_back(test);
       }
@@ -225,18 +225,18 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    class BaseTest
+    class UnitTest
     {
     protected:
 
       /// test description String
       const String _id;
-      /// memory description String
-      String _mem_name;
       /// precision description String
-      String _prec_name;
+      String _datatype_name;
       /// index type description String
       String _index_name;
+      /// preferred compute intensive backend
+      PreferredBackend _preferred_backend;
 
 
     public:
@@ -247,17 +247,17 @@ namespace FEAT
         * \param[in] id_in
         * the testcase's id string
         */
-      explicit BaseTest(const String& id_in)
+      explicit UnitTest(const String& id_in, const String datatype_name = "none", const String index_name = "none", PreferredBackend preferred_backend = PreferredBackend::generic)
         : _id(id_in),
-        _mem_name(Type::Traits<Archs::None>::name()),
-        _prec_name(Type::Traits<Archs::None>::name()),
-        _index_name(Type::Traits<Archs::None>::name())
+        _datatype_name(datatype_name),
+        _index_name(index_name),
+        _preferred_backend(preferred_backend)
       {
         TestList::instance()->register_test(this);
       }
 
       /// DTOR
-      virtual ~BaseTest() {}
+      virtual ~UnitTest() {}
 
       /// returns our id string
       virtual const String id() const
@@ -281,15 +281,9 @@ namespace FEAT
       virtual void run() const = 0;
 
       /// returns our target platform
-      virtual String get_memory_name()
+      virtual String get_datatype_name()
       {
-        return _mem_name;
-      }
-
-      /// returns our target platform
-      virtual String get_prec_name()
-      {
-        return _prec_name;
+        return _datatype_name;
       }
 
       /// returns our target platform
@@ -297,80 +291,18 @@ namespace FEAT
       {
         return _index_name;
       }
-    }; // class BaseTest
 
-    struct NotSet
-    {
-      static String name()
+      virtual PreferredBackend get_preferred_backend() const
       {
-        return "not-set";
-      }
-    };
-
-    /**
-     * \brief abstract base class for all memory tagged test classes
-     *
-     * \author Dirk Ribbrock
-     */
-    template<
-      typename Mem_,
-      typename DataType_>
-    class TaggedTest
-      : public BaseTest
-    {
-    public:
-      /**
-      * \brief CTOR
-      *
-      * \param[in] id_id
-      * the testcase's id string
-      */
-      explicit TaggedTest(const String & id_in)
-        : BaseTest(id_in)
-      {
-        _mem_name = Type::Traits<Mem_>::name();
-        _prec_name = Type::Traits<DataType_>::name();
-        _index_name = NotSet::name();
+        return _preferred_backend;
       }
 
-      /// DTOR
-      virtual ~TaggedTest()
+      virtual String get_preferred_backend_name() const
       {
+        return stringify(_preferred_backend);
       }
-    }; // class TaggedTest
+    }; // class UnitTest
 
-    /**
-     * \brief abstract base class for all full tagged test classes
-     *
-     * \author Dirk Ribbrock
-     */
-    template<
-      typename Mem_,
-      typename DT_,
-      typename IT_>
-    class FullTaggedTest
-      : public BaseTest
-    {
-    public:
-      /**
-      * \brief CTOR
-      *
-      * \param[in] id_in
-      * the testcase's id string
-      */
-      explicit FullTaggedTest(const String & id_in)
-        : BaseTest(id_in)
-      {
-        _mem_name = Type::Traits<Mem_>::name();
-        _prec_name = Type::Traits<DT_>::name();
-        _index_name = Type::Traits<IT_>::name();
-      }
-
-      /// DTOR
-      virtual ~FullTaggedTest()
-      {
-      }
-    }; // class FullTaggedTest
   } // namespace TestSystem
 } // namespace FEAT
 /// checks if a == b

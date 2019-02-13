@@ -18,10 +18,11 @@ ADD_SUBDIRECTORY( trafo )
 ADD_SUBDIRECTORY( util )
 
 # list of kernel source files
-ADD_LIBRARY(feat STATIC archs.cpp)
+ADD_LIBRARY(feat INTERFACE)
 
 # list of libraries to include in feat lib
-TARGET_LINK_LIBRARIES (feat
+TARGET_LINK_LIBRARIES (feat INTERFACE
+  kernel-util
   kernel-adjacency
 # kernel-assembly
   kernel-cubature
@@ -31,7 +32,6 @@ TARGET_LINK_LIBRARIES (feat
 # kernel-space
   kernel-solver
 # kernel-trafo
-  kernel-util
 )
 
 if (FEAT_HAVE_TRILINOS)
@@ -40,53 +40,53 @@ if (FEAT_HAVE_TRILINOS)
 endif (FEAT_HAVE_TRILINOS)
 
 if (FEAT_HAVE_ALGLIB)
-  TARGET_LINK_LIBRARIES (feat thirdparty-alglib)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-alglib)
 endif(FEAT_HAVE_ALGLIB)
 
 if (FEAT_HAVE_FPARSER)
-  TARGET_LINK_LIBRARIES (feat thirdparty-fparser)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-fparser)
 endif(FEAT_HAVE_FPARSER)
 
 if (FEAT_HAVE_UMFPACK)
-  TARGET_LINK_LIBRARIES (feat thirdparty-umfpack)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-umfpack)
 endif(FEAT_HAVE_UMFPACK)
 
 if (FEAT_HAVE_PARMETIS)
-  TARGET_LINK_LIBRARIES (feat thirdparty-parmetis)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-parmetis)
 endif (FEAT_HAVE_PARMETIS)
 
 if (FEAT_HAVE_ZLIB)
-  TARGET_LINK_LIBRARIES(feat thirdparty-zlib)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-zlib)
 endif (FEAT_HAVE_ZLIB)
 
 if (FEAT_HAVE_TRIANGLE)
-  TARGET_LINK_LIBRARIES(feat thirdparty-triangle)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-triangle)
 endif (FEAT_HAVE_TRIANGLE)
 
 if (FEAT_HAVE_HYPRE)
-  TARGET_LINK_LIBRARIES(feat thirdparty-hypre)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-hypre)
 endif (FEAT_HAVE_HYPRE)
 
 if (FEAT_HAVE_SUPERLU_DIST)
-  TARGET_LINK_LIBRARIES (feat thirdparty-superlu)
+  TARGET_LINK_LIBRARIES (feat INTERFACE thirdparty-superlu)
 endif(FEAT_HAVE_SUPERLU_DIST)
 
 if (FEAT_HAVE_CGAL)
-  target_link_libraries(feat ${Boost_LIBRARIES})
+  target_link_libraries(feat INTERFACE ${Boost_LIBRARIES})
 endif(FEAT_HAVE_CGAL)
 
 if (FEAT_HAVE_DEATH_HANDLER)
-  TARGET_LINK_LIBRARIES(feat thirdparty-deathhandler)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-deathhandler)
 endif (FEAT_HAVE_DEATH_HANDLER)
 
 if (FEAT_HAVE_ZFP)
-  TARGET_LINK_LIBRARIES(feat thirdparty-zfp)
+  TARGET_LINK_LIBRARIES(feat INTERFACE thirdparty-zfp)
 endif (FEAT_HAVE_ZFP)
 
 
 #libquadmath needs to be the last library linked against
 if (FEAT_HAVE_QUADMATH)
-  TARGET_LINK_LIBRARIES (feat -lquadmath)
+  TARGET_LINK_LIBRARIES(feat INTERFACE -lquadmath)
 endif (FEAT_HAVE_QUADMATH)
 
 # list of kernel tests

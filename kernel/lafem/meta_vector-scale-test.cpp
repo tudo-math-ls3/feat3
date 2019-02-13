@@ -17,17 +17,19 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorScaleTest
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorScaleTest() :
-    BaseClass("MetaVectorScaleTest")
+   MetaVectorScaleTest(PreferredBackend backend) :
+    BaseClass("MetaVectorScaleTest", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -92,9 +94,25 @@ public:
   }
 };
 
-MetaVectorScaleTest<Mem::Main, float, Index> meta_vector_scale_test_generic_float;
-MetaVectorScaleTest<Mem::Main, double, Index> meta_vector_scale_test_generic_double;
+MetaVectorScaleTest<float, unsigned int> meta_vector_scale_test_generic_float_uint(PreferredBackend::generic);
+MetaVectorScaleTest<double, unsigned int> meta_vector_scale_test_generic_double_uint(PreferredBackend::generic);
+MetaVectorScaleTest<float, unsigned long> meta_vector_scale_test_generic_float_ulong(PreferredBackend::generic);
+MetaVectorScaleTest<double, unsigned long> meta_vector_scale_test_generic_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorScaleTest<float, unsigned long> mkl_meta_vector_scale_test_float_ulong(PreferredBackend::mkl);
+MetaVectorScaleTest<double, unsigned long> mkl_meta_vector_scale_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaVectorScaleTest<__float128, unsigned int> meta_vector_scale_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorScaleTest<__float128, unsigned long> meta_vector_scale_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorScaleTest<Half, unsigned int> meta_vector_scale_test_half_uint(PreferredBackend::generic);
+MetaVectorScaleTest<Half, unsigned long> meta_vector_scale_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorScaleTest<Mem::CUDA, float, Index> meta_vector_scale_test_cuda_float;
-MetaVectorScaleTest<Mem::CUDA, double, Index> meta_vector_scale_test_cuda_double;
+MetaVectorScaleTest<float, unsigned int> meta_vector_scale_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorScaleTest<double, unsigned int> meta_vector_scale_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorScaleTest<float, unsigned long> meta_vector_scale_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorScaleTest<double, unsigned long> meta_vector_scale_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif

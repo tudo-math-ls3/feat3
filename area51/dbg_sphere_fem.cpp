@@ -33,13 +33,12 @@ namespace DbgSphereFem
 {
   using namespace FEAT;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  typedef LAFEM::MeanFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
+  typedef LAFEM::MeanFilter<DataType, IndexType> FilterType;
   typedef LAFEM::Transfer<MatrixType> TransferType;
 
   typedef std::shared_ptr<Solver::SolverBase<VectorType>> SolverTypePtr;

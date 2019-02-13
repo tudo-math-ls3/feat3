@@ -51,14 +51,13 @@ namespace Andicore
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
   //typedef Space::Lagrange2::Element<TrafoType> SpaceType;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> BlockedVectorType;
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BlockedVectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
 
   template<typename Mesh_>

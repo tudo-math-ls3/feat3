@@ -831,14 +831,6 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
-    template<>
-    inline half_float::half nan<half_float::half>()
-    {
-      return half_float::nanh("");
-    }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
-
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     /*template<int exp_bits_, int sig_bits_, typename Backend_>
     inline flx::floatx<exp_bits_, sig_bits_, Backend_> nan<flx::floatx<exp_bits_, sig_bits_, Backend_>>()
@@ -847,7 +839,7 @@ namespace FEAT
       // so create a backend type NaN and convert it to FloatX
       return flx::floatx<exp_bits_, sig_bits_, Backend_>(Math::nan<Backend_>());
     }*/
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+#endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
     /// \endcond
 
     /**
@@ -910,13 +902,6 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
-    inline bool isfinite(half_float::half x)
-    {
-      return half_float::isfinite(x);
-    }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
-
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     template<int exp_bits_, int sig_bits_, typename Backend_>
     inline bool isfinite(const flx::floatx<exp_bits_, sig_bits_, Backend_>& x)
@@ -925,7 +910,7 @@ namespace FEAT
       // so test its backend implementation instead
       return isfinite(static_cast<Backend_>(x));
     }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+#endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is infinite.
@@ -949,13 +934,6 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
-    inline bool isinf(half_float::half x)
-    {
-      return half_float::isinf(x);
-    }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
-
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     template<int exp_bits_, int sig_bits_, typename Backend_>
     inline bool isinf(const flx::floatx<exp_bits_, sig_bits_, Backend_>& x)
@@ -964,7 +942,7 @@ namespace FEAT
       // so test its backend implementation instead
       return isinf(static_cast<Backend_>(x));
     }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+#endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is Not-A-Number.
@@ -988,13 +966,6 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
-    inline bool isnan(half_float::half x)
-    {
-      return half_float::isnan(x);
-    }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
-
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     template<int exp_bits_, int sig_bits_, typename Backend_>
     inline bool isnan(const flx::floatx<exp_bits_, sig_bits_, Backend_>& x)
@@ -1003,7 +974,7 @@ namespace FEAT
       // so test its backend implementation instead
       return isnan(static_cast<Backend_>(x));
     }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+#endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is normal.
@@ -1032,13 +1003,6 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
-#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
-    inline bool isnormal(half_float::half x)
-    {
-      return half_float::isnormal(x);
-    }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
-
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     template<int exp_bits_, int sig_bits_, typename Backend_>
     inline bool isnormal(const flx::floatx<exp_bits_, sig_bits_, Backend_>& x)
@@ -1047,7 +1011,7 @@ namespace FEAT
       // so test its backend implementation instead
       return isnormal(static_cast<Backend_>(x));
     }
-#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+#endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
 
     /**
      * \brief Calculates the (partial) factorial.

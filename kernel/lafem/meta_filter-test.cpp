@@ -5,7 +5,6 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
@@ -18,25 +17,27 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::TestSystem;
 
-template<typename MemType_, typename DataType_, typename IndexType_>
-class MetaFilterTest :
-  public FullTaggedTest<MemType_, DataType_, IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
+class MetaFilterTest
+  : public UnitTest
 {
 public:
   typedef DataType_ DataType;
   typedef IndexType_ IndexType;
 
-  typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
+  typedef DenseVector<DataType, IndexType> ScalarVector;
   typedef PowerVector<ScalarVector, 2> PowerVector2;
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
-  typedef UnitFilter<MemType_, DataType, IndexType> ScalarFilter1;
-  typedef MeanFilter<MemType_, DataType, IndexType> ScalarFilter2;
+  typedef UnitFilter<DataType, IndexType> ScalarFilter1;
+  typedef MeanFilter<DataType, IndexType> ScalarFilter2;
   typedef PowerFilter<ScalarFilter1, 2> PowerFilter2;
   typedef TupleFilter<PowerFilter2, ScalarFilter2> MetaFilter;
 
-   MetaFilterTest() :
-    FullTaggedTest<MemType_, DataType_, IndexType_>("MetaFilterTest")
+   MetaFilterTest(PreferredBackend backend)
+    : UnitTest("MetaFilterTest", Type::Traits<DataType>::name(), Type::Traits<IndexType>::name(), backend)
   {
   }
 
@@ -47,22 +48,23 @@ public:
   static MetaFilter gen_filter(Index m)
   {
     // create a unit-filter
-    DenseVector<Mem::Main, DataType, IndexType> fv(2);
+    ScalarVector fv(2);
     fv(0, DataType(1));
     fv(1, DataType(5));
-    DenseVector<Mem::Main, IndexType, IndexType> idx(2);
+    DenseVector<IndexType, IndexType> idx(2);
     idx(0, 0);
-    idx(1, m-1);
-    UnitFilter<Mem::Main, DataType, IndexType> unit_filter(m, fv, idx);
+    XASSERT(m > 0);
+    idx(1, IndexType(m-1));
+    ScalarFilter1 unit_filter(m, fv, idx);
 
     // create vectors for mean-filter
-    DenseVector<Mem::Main, DataType, IndexType> mfv(m, DataType(1)), mfw(m, DataType(0));
+    ScalarVector mfv(m, DataType(1)), mfw(m, DataType(0));
     DataType* fw(mfw.elements());
     for(Index i(0); i < m; ++i)
       fw[i] = DataType(i+1);
 
     // create a mean-filter
-    MeanFilter<Mem::Main, DataType, IndexType> mean_filter(std::move(mfv), std::move(mfw), DataType(0), DataType(((m+1)*(m+2))/2));
+    ScalarFilter2 mean_filter(std::move(mfv), std::move(mfw), DataType(0), DataType(((m+1)*(m+2))/2));
 
     // create a power-filer
     PowerFilter2 power_filter;
@@ -84,13 +86,14 @@ public:
 
   static MetaVector gen_vector_sol(Index m)
   {
-    DenseVector<Mem::Main, DataType, IndexType> vx(m, DataType(2));
-    DenseVector<Mem::Main, DataType, IndexType> vy(m, DataType(3));
-    DenseVector<Mem::Main, DataType, IndexType> vz(m, DataType(2) / DataType(7));
+    ScalarVector vx(m, DataType(2));
+    ScalarVector vy(m, DataType(3));
+    ScalarVector vz(m, DataType(2) / DataType(7));
 
     DataType* fx(vx.elements());
     DataType* fy(vy.elements());
     fx[0] = fy[0] = DataType(1);
+    XASSERT(m > 0);
     fx[m-1] = fy[m-1] = DataType(5);
 
     // create a power-vector
@@ -105,13 +108,14 @@ public:
 
   static MetaVector gen_vector_def(Index m)
   {
-    DenseVector<Mem::Main, DataType, IndexType> vx(m, DataType(2));
-    DenseVector<Mem::Main, DataType, IndexType> vy(m, DataType(3));
-    DenseVector<Mem::Main, DataType, IndexType> vz(m, DataType(0));
+    ScalarVector vx(m, DataType(2));
+    ScalarVector vy(m, DataType(3));
+    ScalarVector vz(m, DataType(0));
 
     DataType* fx(vx.elements());
     DataType* fy(vy.elements());
     DataType* fz(vz.elements());
+    XASSERT(m > 0);
     fx[0] = fy[0] = fx[m-1] = fy[m-1] = DataType(0);
     for(Index i(0); i < m; ++i)
     {
@@ -159,5 +163,25 @@ public:
   }
 };
 
-MetaFilterTest<Mem::Main, double, Index> meta_filter_test_generic_double;
-MetaFilterTest<Mem::Main, float, Index> meta_filter_test_generic_float;
+MetaFilterTest<float, unsigned long> meta_filter_test_float_ulong(PreferredBackend::generic);
+MetaFilterTest<double, unsigned long> meta_filter_test_double_ulong(PreferredBackend::generic);
+MetaFilterTest<float, unsigned int> meta_filter_test_float_uint(PreferredBackend::generic);
+MetaFilterTest<double, unsigned int> meta_filter_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaFilterTest<float, unsigned long> mkl_meta_filter_test_float_ulong(PreferredBackend::mkl);
+MetaFilterTest<double, unsigned long> mkl_meta_filter_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaFilterTest<__float128, unsigned long> meta_filter_test_float128_ulong(PreferredBackend::generic);
+MetaFilterTest<__float128, unsigned int> meta_filter_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaFilterTest<Half, unsigned int> meta_filter_test_half_uint(PreferredBackend::generic);
+MetaFilterTest<Half, unsigned long> meta_filter_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MetaFilterTest<float, unsigned long> cuda_meta_filter_test_float_ulong(PreferredBackend::cuda);
+MetaFilterTest<double, unsigned long> cuda_meta_filter_test_double_ulong(PreferredBackend::cuda);
+MetaFilterTest<float, unsigned int> cuda_meta_filter_test_float_uint(PreferredBackend::cuda);
+MetaFilterTest<double, unsigned int> cuda_meta_filter_test_double_uint(PreferredBackend::cuda);
+#endif

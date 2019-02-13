@@ -15,12 +15,14 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   minor2 = int(version["__GNUC_PATCHLEVEL__"])
   print ("Detected gcc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
-  if major < 4  or (major == 4 and minor < 8):
-    print ("Error: GNU Compiler version less then 4.8 is not supported, please update your compiler or choose another one!")
+  if major < 7:
+    print ("Error: GNU Compiler version less then 7 is not supported, please update your compiler or choose another one!")
     sys.exit(1)
 
   cmake_flags = ""
-  cxxflags = "-std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2 -Wnonnull"
+  cxxflags = "-std=c++17 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2 -Wnonnull"
+
+  cxxflags += " -pthread"
 
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
@@ -60,6 +62,9 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   if (major <= 6) and (cpu == "sandybridge" or cpu == "ivybridge"):
     cpu="westmere"
 
+  if "deathhandler" in buildid:
+    cxxflags += " -ldl"
+
   if "debug" in buildid or "noop" in buildid:
     if "debug" in buildid:
       cxxflags += " -Og "
@@ -76,14 +81,18 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     if platform.system() != "Windows":
       cxxflags += " -lpthread -ldl"
       if (major >= 4 and minor >= 9) or major > 4:
-        cxxflags += " -fsanitize=undefined"
+        if "sanitizer" in buildid:
+          cxxflags += " -fsanitize=undefined"
       if major >= 5:
-        cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
-        cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
+        if "sanitizer" in buildid:
+          cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
+          cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
       if major >= 6:
-        cxxflags += " -fsanitize=bounds-strict"
+        if "sanitizer" in buildid:
+          cxxflags += " -fsanitize=bounds-strict"
       if major >= 6 and major != 9 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
-        cxxflags += " -fsanitize=address"
+        if "sanitizer" in buildid:
+          cxxflags += " -fsanitize=address"
       if major >= 9:
         cxxflags += " -lrt"
 

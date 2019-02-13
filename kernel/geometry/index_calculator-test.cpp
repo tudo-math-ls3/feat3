@@ -24,11 +24,11 @@ using namespace FEAT::Geometry::TestAux;
  */
 
 class IndexCalculatorTest
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   IndexCalculatorTest() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("index_calculator-test")
+    UnitTest("index_calculator-test")
   {
   }
 
@@ -286,7 +286,7 @@ public:
  */
 template<template<int> class Shape_, int ShapeDim, int SubshapeDim>
 class IndexCalculatorVertexTest
-: public TestSystem::TaggedTest<Archs::None, Archs::None>
+: public UnitTest
 {
   public:
     /// The complete shape type for the mesh cells
@@ -295,7 +295,7 @@ class IndexCalculatorVertexTest
     typedef Shape_<SubshapeDim> SubshapeType;
 
     IndexCalculatorVertexTest() :
-      TestSystem::TaggedTest<Archs::None, Archs::None>("index_calculator_vertex-test")
+      UnitTest("index_calculator_vertex-test")
       {
       }
 

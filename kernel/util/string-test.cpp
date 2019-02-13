@@ -16,12 +16,12 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-class StringTest
-  : public TaggedTest<Archs::None, Archs::None>
+class StringTest :
+  public TestSystem::UnitTest
 {
 public:
   StringTest() :
-    TaggedTest<Archs::None, Archs::None>("string_test")
+    TestSystem::UnitTest("string_test")
   {
   }
 

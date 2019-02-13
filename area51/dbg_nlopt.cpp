@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/analytic/wrappers.hpp>
 #include <kernel/assembly/analytic_projector.hpp>
@@ -56,7 +55,6 @@ template<typename Solver_, typename Operator_>
 int run(Solver_& solver, Operator_& op)
 {
   typedef Operator_ OperatorType;
-  typedef typename OperatorType::MemType MemType;
   typedef typename OperatorType::DataType DataType;
   typedef typename OperatorType::IndexType IndexType;
 
@@ -64,8 +62,8 @@ int run(Solver_& solver, Operator_& op)
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
 
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VertexVectorType;
-  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VertexFieldVectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VertexVectorType;
+  typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> VertexFieldVectorType;
 
   typedef OptimizationTestTraits<DataType, FunctionType> TestTraitsType;
 
@@ -266,7 +264,6 @@ int main(int argc, char* argv[])
 {
   Runtime::initialize(argc, argv);
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef unsigned int IndexType;
 
@@ -274,11 +271,11 @@ int main(int argc, char* argv[])
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
   typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
-  typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
+  typedef AnalyticFunctionOperator<DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
 
-  typedef LAFEM::NoneFilterBlocked<MemType, DataType, IndexType, dim> FilterType;
+  typedef LAFEM::NoneFilterBlocked<DataType, IndexType, dim> FilterType;
 
   // The analytic function
   AnalyticFunctionType my_function;

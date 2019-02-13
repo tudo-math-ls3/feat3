@@ -4,26 +4,33 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_factory.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the sparse matrix factory class
  *
- *\author Gesa Pottbrock
+ * \tparam DT_
+ * description missing
  *
+ * \tparam IT_
+ * description missing
+ *
+ *\author Gesa Pottbrock
  */
-template<typename Mem_, typename DT_, typename IT_>
-class SparseMatrixFactoryTest :
-  public TestSystem::FullTaggedTest<Mem_, DT_, IT_>
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixFactoryTest
+  : public UnitTest
 {
 public:
-  SparseMatrixFactoryTest() :
-    TestSystem::FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixFactoryTest")
+  SparseMatrixFactoryTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixFactoryTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -51,7 +58,7 @@ public:
     factory.add(IT_(1), IT_(1), DT_(3));
     factory.add(IT_(7), IT_(0), DT_(1034.5));
     //Converting  Factory to CSR Matrix
-    SparseMatrixCSR<Mem_, DT_, IT_> matrix_csr(factory.make_csr());
+    SparseMatrixCSR<DT_, IT_> matrix_csr(factory.make_csr());
 
     //Testing if CSR Matrixs has the correct dimension and NNZ
     TEST_CHECK_EQUAL(matrix_csr.rows(),8);
@@ -107,4 +114,25 @@ public:
   }
 }; // class SparseMatrixFactoryTest<...>
 
-SparseMatrixFactoryTest<Mem::Main, double, Index> sparse_matrix_factory_test_main_double_index;
+SparseMatrixFactoryTest<float, unsigned long> sparse_matrix_factory_test_float_ulong(PreferredBackend::generic);
+SparseMatrixFactoryTest<double, unsigned long> sparse_matrix_factory_test_double_ulong(PreferredBackend::generic);
+SparseMatrixFactoryTest<float, unsigned int> sparse_matrix_factory_test_float_uint(PreferredBackend::generic);
+SparseMatrixFactoryTest<double, unsigned int> sparse_matrix_factory_test_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixFactoryTest<float, unsigned long> mkl_cpu_sparse_matrix_factory_test_float_ulong(PreferredBackend::mkl);
+SparseMatrixFactoryTest<double, unsigned long> mkl_cpu_sparse_matrix_factory_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixFactoryTest<__float128, unsigned long> sparse_matrix_factory_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixFactoryTest<__float128, unsigned int> sparse_matrix_factory_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixFactoryTest<Half, unsigned int> sparse_matrix_factory_test_half_uint(PreferredBackend::generic);
+SparseMatrixFactoryTest<Half, unsigned long> sparse_matrix_factory_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixFactoryTest<float, unsigned long> cuda_sparse_matrix_factory_test_float_ulong(PreferredBackend::cuda);
+SparseMatrixFactoryTest<double, unsigned long> cuda_sparse_matrix_factory_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixFactoryTest<float, unsigned int> cuda_sparse_matrix_factory_test_float_uint(PreferredBackend::cuda);
+SparseMatrixFactoryTest<double, unsigned int> cuda_sparse_matrix_factory_test_double_uint(PreferredBackend::cuda);
+#endif

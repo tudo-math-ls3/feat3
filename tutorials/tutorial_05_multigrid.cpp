@@ -104,19 +104,17 @@ namespace Tutorial05
   // Use the Lagrange-1 element
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Use the standard dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
   // Use the standard CSR matrix format
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
   // Use the unit-filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   // The next one is new: this is the class that is responsible for the grid transfer.
   // In contrast to the other LAFEM containers that we have typedefed before, the 'Transfer'

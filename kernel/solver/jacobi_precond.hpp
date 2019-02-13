@@ -27,8 +27,7 @@ namespace FEAT
      * - LAFEM::TupleDiagMatrix
      * - Global::Matrix
      *
-     * Moreover, this implementation supports all Mem architectures, as well as all
-     * data and index types.
+     * Moreover, this implementation supports all data and index types.
      *
      * \author Peter Zajac
      */

@@ -15,43 +15,37 @@ namespace FEAT
   namespace LAFEM
   {
     //forward declarations
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class DenseVector;
 
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class SparseVector;
 
-    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
+    template <typename DT_, typename IT_, int BlockSize_>
     class DenseVectorBlocked;
 
-    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
+    template <typename DT_, typename IT_, int BlockSize_>
     class SparseVectorBlocked;
 
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class DenseMatrix;
 
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class SparseMatrixCSR;
 
-    template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+    template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
     class SparseMatrixBCSR;
 
-    template <typename Mem_, typename DT_, typename IT_>
-    class SparseMatrixCOO;
-
-    template <typename Mem_, typename DT_, typename IT_>
-    class SparseMatrixELL;
-
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class SparseMatrixBanded;
 
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename DT_, typename IT_>
     class SparseMatrixCSCR;
 
-    template<typename Mem_, typename DT_, typename IT_>
+    template<typename DT_, typename IT_>
     class VectorMirror;
 
-    template<typename Mem_, typename DT_, typename IT_>
+    template<typename DT_, typename IT_>
     class MatrixMirror;
 
   } // namespace LAFEM

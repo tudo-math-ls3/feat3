@@ -17,13 +17,13 @@ using namespace FEAT::MetaMath;
  *
  * \author Peter Zajac
  */
-class MetaMathTest
-  : public TaggedTest<Archs::None, Archs::None>
+class MetaMathTest :
+  public TestSystem::UnitTest
 {
 public:
 
   MetaMathTest() :
-    TaggedTest<Archs::None, Archs::None>("MetaMathTest")
+    TestSystem::UnitTest("MetaMathTest")
   {
   }
 

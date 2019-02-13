@@ -26,11 +26,11 @@ typedef MeshPartNode<RootMeshType> MeshPartNodeType;
  * \author Peter Zajac
  */
 class MeshNodeTestConfQuad
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public TestSystem::UnitTest
 {
 public:
   MeshNodeTestConfQuad() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("mesh_node-test-conf-quad")
+    TestSystem::UnitTest("mesh_node-test-conf-quad")
   {
   }
 

@@ -25,16 +25,18 @@ using namespace FEAT::TestSystem;
  *
  * \author Christoph Lohmann
  */
-template<typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaMatrixIOTest
-  : public MetaMatrixTestBase<Mem::Main, DataType_, IndexType_>
+  : public MetaMatrixTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaMatrixTestBase<Mem::Main, DataType_, IndexType_> BaseClass;
+  typedef MetaMatrixTestBase<DataType_, IndexType_> BaseClass;
 
-   MetaMatrixIOTest() :
-    BaseClass("MetaMatrixIOTest")
+   MetaMatrixIOTest(PreferredBackend backend) :
+    BaseClass("MetaMatrixIOTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -66,5 +68,25 @@ public:
   }
 };
 
-//MetaMatrixIOTest<float, Index> meta_matrix_io_test_generic_float;
-//MetaMatrixIOTest<double, Index> meta_matrix_io_test_generic_double;
+MetaMatrixIOTest<float, unsigned long> meta_matrix_io_test_generic_float_ulong(PreferredBackend::generic);
+MetaMatrixIOTest<double, unsigned long> meta_matrix_io_test_generic_double_ulong(PreferredBackend::generic);
+MetaMatrixIOTest<float, unsigned int> meta_matrix_io_test_generic_float_uint(PreferredBackend::generic);
+MetaMatrixIOTest<double, unsigned int> meta_matrix_io_test_generic_double_uint(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaMatrixIOTest<float, unsigned long> mkl_meta_matrix_io_test_float_ulong(PreferredBackend::mkl);
+MetaMatrixIOTest<double, unsigned long> mkl_meta_matrix_io_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaMatrixIOTest<__float128, unsigned long> meta_matrix_io_test_float128_ulong(PreferredBackend::generic);
+MetaMatrixIOTest<__float128, unsigned int> meta_matrix_io_test_float128_uint(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaMatrixIOTest<Half, unsigned int> meta_matrix_io_test_half_uint(PreferredBackend::generic);
+MetaMatrixIOTest<Half, unsigned long> meta_matrix_io_test_half_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+MetaMatrixIOTest<float, unsigned long> cuda_meta_matrix_io_test_float_ulong(PreferredBackend::cuda);
+MetaMatrixIOTest<double, unsigned long> cuda_meta_matrix_io_test_double_ulong(PreferredBackend::cuda);
+MetaMatrixIOTest<float, unsigned int> cuda_meta_matrix_io_test_float_uint(PreferredBackend::cuda);
+MetaMatrixIOTest<double, unsigned int> cuda_meta_matrix_io_test_double_uint(PreferredBackend::cuda);
+#endif

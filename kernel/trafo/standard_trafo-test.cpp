@@ -27,13 +27,13 @@ using namespace FEAT::TestSystem;
  */
 template<typename DataType_>
 class StandardTrafoTest
-  : public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public TestSystem::UnitTest
 {
   static constexpr TrafoTags unit_config = static_cast<TrafoTags>(~0);
 
 public:
   StandardTrafoTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("StandardTrafoTest")
+    TestSystem::UnitTest("StandardTrafoTest", Type::Traits<DataType_>::name())
     {
     }
 
@@ -636,11 +636,11 @@ StandardTrafoTest<float> standard_trafo_test_float;
  */
 template<typename DT_>
 class InverseMappingTest
-: public TestSystem::TaggedTest<Mem::Main, DT_>
+: public TestSystem::UnitTest
 {
   public:
     InverseMappingTest() :
-      TestSystem::TaggedTest<Mem::Main, DT_>("InverseMappingTest")
+      TestSystem::UnitTest("InverseMappingTest", Type::Traits<DT_>::name())
       {
       }
 
@@ -1010,11 +1010,11 @@ InverseMappingTest<__float128> btq;
  * */
 template<typename DataType_>
 class StandardTrafoVolumeTest
-: public TestSystem::TaggedTest<Archs::None, DataType_>
+: public TestSystem::UnitTest
 {
   public:
     StandardTrafoVolumeTest() :
-      TestSystem::TaggedTest<Archs::None, DataType_>("standard_trafo_volume_test")
+      TestSystem::UnitTest("standard_trafo_volume_test", Type::Traits<DataType_>::name())
       {
       }
 

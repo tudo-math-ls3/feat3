@@ -380,9 +380,6 @@ namespace FEAT
          * \tparam Trafo_
          * The transformation
          *
-         * \tparam MemType_
-         * Memory type for the filter, i.e. Mem::Main or Mem::CUDA
-         *
          * \tparam DataType_
          * Data type for the filter
          *
@@ -395,18 +392,15 @@ namespace FEAT
          * \param[in,out] space
          * The filter gets applied of functions of this FE space
          */
-        template<typename Trafo_, typename MemType_, typename DataType_, typename IndexType_>
-        void assemble(LAFEM::SlipFilter<MemType_, DataType_, IndexType_, world_dim>& filter, const Space::Lagrange1::Element<Trafo_>& space)
+        template<typename Trafo_, typename DataType_, typename IndexType_>
+        void assemble(LAFEM::SlipFilter<DataType_, IndexType_, world_dim>& filter, const Space::Lagrange1::Element<Trafo_>& space)
         {
           // Allocate the filter if necessary
           if(filter.get_nu().size() == Index(0))
           {
-            filter = LAFEM::SlipFilter<MemType_, DataType_, IndexType_, world_dim>
+            filter = LAFEM::SlipFilter<DataType_, IndexType_, world_dim>
               (space.get_trafo().get_mesh().get_num_entities(0), space.get_num_dofs());
           }
-
-          LAFEM::SlipFilter<Mem::Main, DataType_, IndexType_, world_dim> buffer;
-          buffer.convert(filter);
 
           // Compute orientations if necessary
           if(recompute)
@@ -416,13 +410,10 @@ namespace FEAT
 
           // Compute the weighted outer unit normal field
           OuterNormalComputer<Trafo_>::compute_outer_unit_normal(
-            buffer.get_nu(), _facets, _orientation, space.get_trafo());
+            filter.get_nu(), _facets, _orientation, space.get_trafo());
 
           // Generate the filter vector. For the Lagrange 1 with standard trafo case, this is just a clone operation
-          buffer.get_filter_vector().clone(buffer.get_nu());
-
-          // Upload assembled result
-          filter.convert(buffer);
+          filter.get_filter_vector().clone(filter.get_nu());
         }
 
         /**
@@ -430,9 +421,6 @@ namespace FEAT
          *
          * \tparam Trafo_
          * The transformation
-         *
-         * \tparam MemType_
-         * Memory type for the filter, i.e. Mem::Main or Mem::CUDA
          *
          * \tparam DataType_
          * Data type for the filter
@@ -453,8 +441,8 @@ namespace FEAT
          * possible).
          *
          */
-        template<typename Trafo_, typename MemType_, typename DataType_, typename IndexType_>
-        void assemble(LAFEM::SlipFilter<MemType_, DataType_, IndexType_, world_dim>& filter, const Space::Lagrange2::Element<Trafo_>& space)
+        template<typename Trafo_, typename DataType_, typename IndexType_>
+        void assemble(LAFEM::SlipFilter<DataType_, IndexType_, world_dim>& filter, const Space::Lagrange2::Element<Trafo_>& space)
         {
           typedef Space::Lagrange2::Element<Trafo_> SpaceType;
 
@@ -464,13 +452,9 @@ namespace FEAT
           // Allocate the filter if necessary
           if(filter.get_nu().size() == Index(0))
           {
-            filter = LAFEM::SlipFilter<MemType_, DataType_, IndexType_, world_dim>
+            filter = LAFEM::SlipFilter<DataType_, IndexType_, world_dim>
               (mesh.get_num_entities(0), space.get_num_dofs());
           }
-
-          // Always assemble the filter in Mem::Main and convert it to prevent excessive GPU up/downloading
-          LAFEM::SlipFilter<Mem::Main, DataType_, IndexType_, world_dim> buffer;
-          buffer.convert(filter);
 
           // Compute orientations if necessary
           if(recompute)
@@ -481,19 +465,15 @@ namespace FEAT
 
           // Compute the weighted outer unit normal field
           OuterNormalComputer<Trafo_>::compute_outer_unit_normal(
-            buffer.get_nu(), _facets, _orientation, space.get_trafo());
+            filter.get_nu(), _facets, _orientation, space.get_trafo());
 
           // We only have something to do if the filter is not empty after recompute_target_set_holder()
-          if(buffer.get_nu().used_elements() > Index(0))
+          if(filter.get_nu().used_elements() > Index(0))
           {
             Intern::Lagrange2InterpolatorWrapper<SpaceType>::project(
-              buffer.get_filter_vector(), buffer.get_nu(), space, _target_set_holder);
+              filter.get_filter_vector(), filter.get_nu(), space, _target_set_holder);
           }
-          // Upload assembled result
-          filter.convert(buffer);
-
         }
-
     }; // class SlipFilterAssembler
 
     /// \cond internal

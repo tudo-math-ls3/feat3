@@ -19,7 +19,7 @@ namespace FEAT
     namespace Arch
     {
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::gather_dv_generic(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
+      void Mirror::gather_dv_generic(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
       {
         for(Index i(0); i < nidx; ++i)
         {
@@ -28,7 +28,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::scatter_dv_generic(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
+      void Mirror::scatter_dv_generic(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
       {
         for(Index i(0); i < nidx; ++i)
         {
@@ -37,7 +37,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::gather_dvb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
+      void Mirror::gather_dvb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const DT_* vec)
       {
         for(Index i(0); i < nidx; ++i)
         {
@@ -49,7 +49,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::scatter_dvb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
+      void Mirror::scatter_dvb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
       {
         for(Index i(0); i < nidx; ++i)
         {
@@ -61,7 +61,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::gather_sv_generic(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const Index nvec, const DT_* vval, const IT_* vidx)
+      void Mirror::gather_sv_generic(const Index boff, const Index nidx, const IT_* idx, DT_* buf, const Index nvec, const DT_* vval, const IT_* vidx)
       {
         // loop over all mirror indices
         for(Index i(0); i < nidx; ++i)
@@ -81,7 +81,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::scatter_sv_generic(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, const Index nvec, DT_* vval, const IT_* vidx, const DT_ alpha)
+      void Mirror::scatter_sv_generic(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, const Index nvec, DT_* vval, const IT_* vidx, const DT_ alpha)
       {
         // loop over all mirror indices
         for(Index i(0); i < nidx; ++i)
@@ -99,7 +99,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::gather_svb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const Index nvec, const DT_* vval, const IT_* vidx)
+      void Mirror::gather_svb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, DT_* buf, const Index nvec, const DT_* vval, const IT_* vidx)
       {
         for(Index i(0); i < nidx; ++i)
         {
@@ -119,7 +119,7 @@ namespace FEAT
       }
 
       template<typename DT_, typename IT_>
-      void Mirror<Mem::Main>::scatter_svb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, const Index nvec, DT_* vval, const IT_* vidx, const DT_ alpha)
+      void Mirror::scatter_svb_generic(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, const Index nvec, DT_* vval, const IT_* vidx, const DT_ alpha)
       {
         for(Index i(0); i < nidx; ++i)
         {

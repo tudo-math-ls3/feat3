@@ -17,17 +17,19 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename MemType_, typename DataType_, typename IndexType_>
+template<
+  typename DataType_,
+  typename IndexType_>
 class MetaVectorAxpyTest
-  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
+  : public MetaVectorTestBase<DataType_, IndexType_>
 {
 public:
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
-   MetaVectorAxpyTest() :
-    BaseClass("MetaVectorAxpyTest")
+   MetaVectorAxpyTest(PreferredBackend backend) :
+    BaseClass("MetaVectorAxpyTest", Type::Traits<DataType>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
@@ -108,9 +110,25 @@ public:
   }
 };
 
-MetaVectorAxpyTest<Mem::Main, float, Index> meta_vector_axpy_test_generic_float;
-MetaVectorAxpyTest<Mem::Main, double, Index> meta_vector_axpy_test_generic_double;
+MetaVectorAxpyTest<float, unsigned int> meta_vector_axpy_test_generic_float_uint(PreferredBackend::generic);
+MetaVectorAxpyTest<double, unsigned int> meta_vector_axpy_test_generic_double_uint(PreferredBackend::generic);
+MetaVectorAxpyTest<float, unsigned long> meta_vector_axpy_test_generic_float_ulong(PreferredBackend::generic);
+MetaVectorAxpyTest<double, unsigned long> meta_vector_axpy_test_generic_double_ulong(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+MetaVectorAxpyTest<float, unsigned long> mkl_meta_vector_axpy_test_float_ulong(PreferredBackend::mkl);
+MetaVectorAxpyTest<double, unsigned long> mkl_meta_vector_axpy_test_double_ulong(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+MetaVectorAxpyTest<__float128, unsigned int> meta_vector_axpy_test_generic_float128_uint(PreferredBackend::generic);
+MetaVectorAxpyTest<__float128, unsigned long> meta_vector_axpy_test_generic_float128_ulong(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+MetaVectorAxpyTest<Half, unsigned int> meta_vector_axpy_test_half_uint(PreferredBackend::generic);
+MetaVectorAxpyTest<Half, unsigned long> meta_vector_axpy_test_half_ulong(PreferredBackend::generic);
+#endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorAxpyTest<Mem::CUDA, float, Index> meta_vector_axpy_test_cuda_float;
-MetaVectorAxpyTest<Mem::CUDA, double, Index> meta_vector_axpy_test_cuda_double;
+MetaVectorAxpyTest<float, unsigned int> meta_vector_axpy_test_cuda_float_uint(PreferredBackend::cuda);
+MetaVectorAxpyTest<double, unsigned int> meta_vector_axpy_test_cuda_double_uint(PreferredBackend::cuda);
+MetaVectorAxpyTest<float, unsigned long> meta_vector_axpy_test_cuda_float_ulong(PreferredBackend::cuda);
+MetaVectorAxpyTest<double, unsigned long> meta_vector_axpy_test_cuda_double_ulong(PreferredBackend::cuda);
 #endif

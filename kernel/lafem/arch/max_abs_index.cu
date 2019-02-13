@@ -5,7 +5,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/max_abs_index.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -26,7 +25,7 @@ namespace FEAT
         cublasStatus_t status;
         status = cublasIsamax(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasmax failed with status code "+ stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
         return (Index)result - 1;
       }
 
@@ -36,7 +35,7 @@ namespace FEAT
         cublasStatus_t status;
         status = cublasIdamax(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasmax failed with status code "+ stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
         return (Index)result - 1;
       }
     }
@@ -48,7 +47,7 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-Index MaxAbsIndex<Mem::CUDA>::value(const DT_ * const x, const Index size)
+Index MaxAbsIndex::value_cuda(const DT_ * const x, const Index size)
 {
   Index result = Intern::cuda_max_abs_index(x, size);
 #ifdef FEAT_DEBUG_MODE
@@ -60,5 +59,5 @@ Index MaxAbsIndex<Mem::CUDA>::value(const DT_ * const x, const Index size)
   return result;
 }
 
-template Index MaxAbsIndex<Mem::CUDA>::value(const float * const, const Index);
-template Index MaxAbsIndex<Mem::CUDA>::value(const double * const, const Index);
+template Index MaxAbsIndex::value_cuda(const float * const, const Index);
+template Index MaxAbsIndex::value_cuda(const double * const, const Index);

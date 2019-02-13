@@ -40,27 +40,24 @@ namespace FEAT
       /// number of mirror blocks
       static constexpr int num_blocks = RestClass::num_blocks + 1;
 
-      /// sub-mirror mem-type
-      typedef typename First_::MemType MemType;
       /// sub-mirror data-type
       typedef typename First_::DataType DataType;
       /// sub-mirror index-type
       typedef typename First_::IndexType IndexType;
 
-      // ensure that all sub-vector have the same mem- and data-type
-      static_assert(std::is_same<MemType, typename RestClass::MemType>::value, "sub-mirrors have different mem-types");
+      // ensure that all sub-vector have the same data-type
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value, "sub-mirrors have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value, "sub-mirrors have different index-types");
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using MirrorType = TupleMirror<
-        typename First_::template MirrorType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template MirrorType<Mem2_, DT2_, IT2_>...>;
+        typename First_::template MirrorType<DT2_, IT2_>,
+        typename Rest_::template MirrorType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a mirror with new Memory, Data and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a mirror with new Data and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using MirrorTypeByDI = MirrorType<DataType2_, IndexType2_>;
 
     protected:
       /// the first sub-mirror
@@ -186,9 +183,9 @@ namespace FEAT
        * The vector for which the buffer is to be created.
        */
       template<typename Tv_, typename... Tw_>
-      DenseVector<MemType, DataType, IndexType> create_buffer(const TupleVector<Tv_, Tw_...>& vector) const
+      DenseVector<DataType, IndexType> create_buffer(const TupleVector<Tv_, Tw_...>& vector) const
       {
-        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<DataType, IndexType>(buffer_size(vector));
       }
 
       /**
@@ -216,7 +213,7 @@ namespace FEAT
       /** \copydoc VectorMirror::gather() */
       template<typename Tv_, typename... Tw_>
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
         const LAFEM::TupleVector<Tv_, Tw_...>& vector,
         const Index buffer_offset = Index(0)) const
       {
@@ -228,7 +225,7 @@ namespace FEAT
       template<typename Tv_, typename... Tw_>
       void scatter_axpy(
         LAFEM::TupleVector<Tv_, Tw_...>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const LAFEM::DenseVector<DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {
@@ -258,16 +255,15 @@ namespace FEAT
       /// number of mirror blocks
       static constexpr int num_blocks = 1;
 
-      typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using MirrorType = TupleMirror<typename First_::template MirrorType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using MirrorType = TupleMirror<typename First_::template MirrorType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a mirror with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using MirrorTypeByMDI = MirrorType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a mirror with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using MirrorTypeByDI = MirrorType<DataType2_, IndexType2_>;
 
     protected:
       First_ _first;
@@ -339,9 +335,9 @@ namespace FEAT
       }
 
       template<typename Tv_>
-      DenseVector<MemType, DataType, IndexType> create_buffer(const TupleVector<Tv_>& vector) const
+      DenseVector<DataType, IndexType> create_buffer(const TupleVector<Tv_>& vector) const
       {
-        return DenseVector<MemType, DataType, IndexType>(buffer_size(vector), Pinning::disabled);
+        return DenseVector<DataType, IndexType>(buffer_size(vector));
       }
 
       template<int i_>
@@ -360,7 +356,7 @@ namespace FEAT
 
       template<typename Tv_>
       void gather(
-        LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
         const LAFEM::TupleVector<Tv_>& vector,
         const Index buffer_offset = Index(0)) const
       {
@@ -370,7 +366,7 @@ namespace FEAT
       template<typename Tv_>
       void scatter_axpy(
         LAFEM::TupleVector<Tv_>& vector,
-        const LAFEM::DenseVector<MemType, DataType, IndexType>& buffer,
+        const LAFEM::DenseVector<DataType, IndexType>& buffer,
         const DataType alpha = DataType(1),
         const Index buffer_offset = Index(0)) const
       {

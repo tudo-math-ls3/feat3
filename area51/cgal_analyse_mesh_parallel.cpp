@@ -64,7 +64,6 @@ namespace AnalyseMeshCGALParallel
   using namespace FEAT;
 
   // define our arch types
-  typedef Mem::Main MemType;
   typedef Real DataType;
   typedef Index IndexType;
 
@@ -107,7 +106,7 @@ namespace AnalyseMeshCGALParallel
     comm.print(domain.get_chosen_parti_info());
 
     // define our system level
-    typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::ScalarUnitFilterSystemLevel<DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 

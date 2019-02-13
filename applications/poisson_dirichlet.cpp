@@ -39,7 +39,6 @@ namespace PoissonDirichlet
     const Dist::Comm& comm = domain.comm();
 
     // define our arch types
-    typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
 
@@ -55,7 +54,7 @@ namespace PoissonDirichlet
     Analytic::Common::ExpBubbleFunction<ShapeType::dimension> sol_func;
 
     // define our system level
-    typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::ScalarUnitFilterSystemLevel<DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 

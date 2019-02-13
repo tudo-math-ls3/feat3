@@ -21,9 +21,6 @@ namespace FEAT
     /**
      * \brief Unit Filter Blocked class template.
      *
-     * \tparam Mem_
-     * Memory architecture
-     *
      * \tparam DT_
      * Data type, i.e. double
      *
@@ -38,15 +35,12 @@ namespace FEAT
      * \author Jordi Paul
      */
     template<
-      typename Mem_,
       typename DT_,
       typename IT_,
       int BlockSize_>
     class UnitFilterBlocked
     {
     public:
-      /// mem-type typedef
-      typedef Mem_ MemType;
       /// data-type typedef
       typedef DT_ DataType;
       /// index-type typedef
@@ -56,15 +50,15 @@ namespace FEAT
       /// Value type
       typedef Tiny::Vector<DataType, BlockSize> ValueType;
       /// Our supported vector type
-      typedef DenseVectorBlocked<MemType, DataType, IndexType, BlockSize> VectorType;
+      typedef DenseVectorBlocked<DataType, IndexType, BlockSize> VectorType;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using FilterType = UnitFilterBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      using FilterType = UnitFilterBlocked<DT2_, IT2_, BlockSize_>;
 
-      /// this typedef lets you create a filter with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using FilterTypeByMDI = FilterType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a filter with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
@@ -73,7 +67,7 @@ namespace FEAT
 
     private:
       /// SparseVector, containing all entries of the unit filter
-      SparseVectorBlocked<MemType, DataType, IndexType, BlockSize> _sv;
+      SparseVectorBlocked<DataType, IndexType, BlockSize> _sv;
 
     public:
       /// default constructor
@@ -101,8 +95,8 @@ namespace FEAT
        * \param[in] indices DenseVector containing element indices
        */
       explicit UnitFilterBlocked(Index size_in,
-                                 DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & values,
-                                 DenseVector<Mem_, IT_, IT_> & indices) :
+                                 DenseVectorBlocked<DT_, IT_, BlockSize_> & values,
+                                 DenseVector<IT_, IT_> & indices) :
         _sv(size_in, values, indices)
       {
         XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
@@ -144,8 +138,8 @@ namespace FEAT
       }
 
       /// \brief Converts data from another UnitFilter
-      template<typename Mem2_, typename DT2_, typename IT2_, int BS_>
-      void convert(const UnitFilterBlocked<Mem2_, DT2_, IT2_, BS_>& other)
+      template<typename DT2_, typename IT2_, int BS_>
+      void convert(const UnitFilterBlocked<DT2_, IT2_, BS_>& other)
       {
         _sv.convert(other.get_filter_vector());
       }
@@ -163,11 +157,11 @@ namespace FEAT
       }
 
       /// \cond internal
-      SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector()
+      SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector()
       {
         return _sv;
       }
-      const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector() const
+      const SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector() const
       {
         return _sv;
       }
@@ -285,13 +279,13 @@ namespace FEAT
 #endif
       /// \cond internal
       template<int BlockWidth_>
-      void filter_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
+      void filter_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IT_* row_ptr(matrix.row_ptr());
         const IT_* col_idx(matrix.col_ind());
-        typename SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
+        typename SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
@@ -310,7 +304,7 @@ namespace FEAT
       }
 
       template<int BlockWidth_>
-      void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
@@ -329,7 +323,7 @@ namespace FEAT
       }
 
       template<int BlockWidth_>
-      void filter_offdiag_col_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
+      void filter_offdiag_col_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> &) const
       {
         // nothing to do here
       }
@@ -345,7 +339,7 @@ namespace FEAT
       {
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilterBlocked<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
+          Arch::UnitFilterBlocked::template filter_rhs<DT_, IT_, BlockSize_>
             (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
       }
 
@@ -371,7 +365,7 @@ namespace FEAT
       {
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilterBlocked<Mem_>::template filter_def<DT_, IT_, BlockSize_>
+          Arch::UnitFilterBlocked::template filter_def<DT_, IT_, BlockSize_>
             (vector.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
       }
 

@@ -20,8 +20,6 @@
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
@@ -39,18 +37,16 @@ namespace MatrixCond
   using namespace FEAT;
   using namespace FEAT::LAFEM;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef DenseVector<MemType, DataType, IndexType> VectorType;
-  typedef SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  typedef NoneFilter<MemType, DataType, IndexType> FilterType;
+  typedef DenseVector<DataType, IndexType> VectorType;
+  typedef SparseMatrixCSR<DataType, IndexType> MatrixType;
+  typedef NoneFilter<DataType, IndexType> FilterType;
 
   class MatrixATA
   {
   public:
-    typedef MatrixCond::MemType MemType;
     typedef MatrixCond::DataType DataType;
     typedef MatrixCond::IndexType IndexType;
     typedef MatrixCond::VectorType VectorTypeL;
@@ -111,25 +107,9 @@ namespace MatrixCond
         matrix.read_from(file_mode, filename);
         return true;
 
-      case FileMode::fm_ell:
-        {
-          SparseMatrixELL<MemType, DataType, IndexType> mtmp;
-          mtmp.read_from(file_mode, filename);
-          matrix.convert(mtmp);
-          return true;
-        }
-
-      case FileMode::fm_coo:
-        {
-          SparseMatrixCOO<MemType, DataType, IndexType> mtmp;
-          mtmp.read_from(file_mode, filename);
-          matrix.convert(mtmp);
-          return true;
-        }
-
       case FileMode::fm_bm:
         {
-          SparseMatrixBanded<MemType, DataType, IndexType> mtmp;
+          SparseMatrixBanded<DataType, IndexType> mtmp;
           mtmp.read_from(file_mode, filename);
           matrix.convert(mtmp);
           return true;

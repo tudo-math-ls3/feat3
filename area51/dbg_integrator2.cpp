@@ -38,13 +38,12 @@ namespace Tutorial01
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-  typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
 
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   void run(Index level, int cores, MeshType& mesh)
   {

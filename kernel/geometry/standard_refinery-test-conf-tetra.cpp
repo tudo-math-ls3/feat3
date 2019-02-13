@@ -26,11 +26,11 @@ typedef StandardRefinery<SubMesh> SubMeshRefinery;
  */
 
 class StandardRefineryTestConfTetrahedron
-  : public TestSystem::TaggedTest<Archs::None, Archs::None>
+  : public UnitTest
 {
 public:
   StandardRefineryTestConfTetrahedron() :
-    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-conf-tetrahedron")
+    UnitTest("standard_refinery-test-conf-tetrahedron")
   {
   }
 

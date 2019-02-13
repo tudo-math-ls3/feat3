@@ -46,11 +46,11 @@ public:
 
 template<typename DataType_>
 class InverseMappingTest :
-  public TestSystem::TaggedTest<Mem::Main, DataType_>
+  public TestSystem::UnitTest
 {
 public:
   InverseMappingTest() :
-    TestSystem::TaggedTest<Mem::Main, DataType_>("InverseMappingTest")
+    TestSystem::UnitTest("InverseMappingTest", Type::Traits<DataType_>::name())
   {
   }
 

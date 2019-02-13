@@ -10,21 +10,6 @@ SET (kernel-solver-list
   umfpack.cpp
   )
 
-if (FEAT_EICKT)
-  SET (kernel-solver-list
-    ${kernel-solver-list}
-    matrix_stock-eickt.cpp
-    solver_factory-eickt1.cpp
-    solver_factory-eickt2.cpp
-    )
-endif(FEAT_EICKT)
-
-if (FEAT_HAVE_MKL)
-  SET (kernel-solver-list ${kernel-solver-list}
-    spai_precond_mkl.cpp
-  )
-endif(FEAT_HAVE_MKL)
-
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
 if (FEAT_COTIRE)
   cotire(kernel-solver)
@@ -60,7 +45,6 @@ if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-solver-cuda
     cusolver.cu
     ilu_precond.cu
-    spai_precond.cu
     sor_precond.cu
     ssor_precond.cu
     STATIC
@@ -78,7 +62,6 @@ endif(FEAT_HAVE_CUDA)
 # list of solver tests
 SET (test_list
   amavanka-test
-  amg-test
   basic_solver-test
   cusolver-test
   hypre-test

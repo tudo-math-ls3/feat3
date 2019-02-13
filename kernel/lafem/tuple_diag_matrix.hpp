@@ -43,8 +43,6 @@ namespace FEAT
       typedef TupleDiagMatrix<Rest_...> RestClass;
 
     public:
-      /// sub-matrix memory type
-      typedef typename First_::MemType MemType;
       /// sub-matrix data type
       typedef typename First_::DataType DataType;
       /// sub-matrix index type
@@ -56,16 +54,16 @@ namespace FEAT
       typedef TupleVector<typename First_::VectorTypeR, typename Rest_::VectorTypeR...> VectorTypeR;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = TupleDiagMatrix<
-        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+        typename First_::template ContainerType<DT2_, IT2_>,
+        typename Rest_::template ContainerType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      using ContainerTypeByMDI = TupleDiagMatrix<
-        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
-        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+      /// this typedef lets you create a matrix container with new Datatape and Index types
+      template <typename DT2_, typename IT2_>
+      using ContainerTypeByDI = TupleDiagMatrix<
+        typename First_::template ContainerType<DT2_, IT2_>,
+        typename Rest_::template ContainerType<DT2_, IT2_>...>;
 
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = RestClass::num_row_blocks + 1;
@@ -408,16 +406,16 @@ namespace FEAT
         rest().apply(r.rest(), x.rest());
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
-        DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> r_first(r, first().rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().rows(), first().rows());
 
-        DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
-        DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
+        DenseVector<DataType, IndexType> x_first(x, first().columns(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().columns(), first().columns());
 
         first().apply(r_first, x_first);
         rest().apply(r_rest, x_rest);
@@ -445,21 +443,21 @@ namespace FEAT
         rest().apply(r.rest(), x.rest(), y.rest(), alpha);
       }
 
-      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
-                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+                 const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
         XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
-        DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> r_first(r, first().rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().rows(), first().rows());
 
-        DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
-        DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
+        DenseVector<DataType, IndexType> x_first(x, first().columns(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().columns(), first().columns());
 
-        DenseVector<MemType, DataType, IndexType> y_first(y, first().rows(), 0);
-        DenseVector<MemType, DataType, IndexType> y_rest(y, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> y_first(y, first().rows(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, rest().rows(), first().rows());
 
         first().apply(r_first, x_first, y_first, alpha);
         rest().apply(r_rest, x_rest, y_rest, alpha);
@@ -599,8 +597,7 @@ namespace FEAT
        * \param[in] b A matrix to compare with.
        *
        */
-      template <typename Mem2_>
-      friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix & b)
       {
         return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
@@ -614,7 +611,6 @@ namespace FEAT
       friend class TupleDiagMatrix;
 
     public:
-      typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
       /// Compatible L-vector type
@@ -622,8 +618,8 @@ namespace FEAT
       /// Compatible R-vector type
       typedef TupleVector<typename First_::VectorTypeR> VectorTypeR;
 
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = TupleDiagMatrix<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = TupleDiagMatrix<typename First_::template ContainerType<DT2_, IT2_> >;
 
       static constexpr int num_row_blocks = 1;
       static constexpr int num_col_blocks = 1;
@@ -926,8 +922,7 @@ namespace FEAT
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix & b)
       {
         return (a.name() == b.name()) && (a.first() == b.first());
       }

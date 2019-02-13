@@ -17,12 +17,12 @@ using namespace FEAT::TestSystem;
  *
  * \author Peter Zajac
  */
-class BinaryStreamTest
-  : public TaggedTest<Archs::None, Archs::None>
+class BinaryStreamTest :
+  public TestSystem::UnitTest
 {
 public:
   BinaryStreamTest() :
-    TaggedTest<Archs::None, Archs::None>("binary_stream_test")
+    TestSystem::UnitTest("binary_stream_test")
   {
   }
 

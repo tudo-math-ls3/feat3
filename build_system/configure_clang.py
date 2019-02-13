@@ -18,12 +18,14 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     print ("Error: Clang Compiler version less then 3.3 is not supported, please update your compiler!")
     sys.exit(1)
 
-  standard = "-std=c++11"
-  stdlibuse = "-stdlib=libc++"
+  standard = "-std=c++17"
   if(platform.system() == "Windows"):
     standard = "-std=c++14"
-    stdlibuse = ""
-  cxxflags = standard + " -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic " + stdlibuse
+  cxxflags = standard + " -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic"
+
+  if(platform.system() != "Windows"):
+    cxxflags += " -pthread"
+
 
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
@@ -53,12 +55,10 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     cxxflags += " -Wpointer-to-int-cast"
 
   if major >= 13:
-    cxxflags += " -Wreserved-identifier -Wunused-but-set-parameter -Wunused-but-set-variable -Wnull-pointer-subtraction"
+    cxxflags += " -Wunused-but-set-parameter -Wunused-but-set-variable -Wnull-pointer-subtraction"
 
-  if major >= 14:
-    print("System is {}".format(platform.system()))
-    if platform.system() != "Windows":
-      cxxflags += " -fminimize-whitespace"
+  if major >= 16:
+    cxxflags += " -Wno-gnu-line-marker"
 
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
@@ -66,23 +66,31 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if "ccache" in buildid:
     cxxflags += " -Qunused-arguments"
 
+  if "deathhandler" in buildid:
+    cxxflags += " -ldl"
+
   if "debug" in buildid or "noop" in buildid:
+
     if major < 4:
       cxxflags += " -O0"
     else:
       cxxflags += " -Og"
 
     if major >= 5:
-      cxxflags += " -fsanitize=pointer-overflow -fsanitize=nullability"
+      if "sanitizer" in buildid:
+        cxxflags += " -fsanitize=pointer-overflow -fsanitize=nullability"
 
     if major >= 7:
-      cxxflags += " -fsanitize=implicit-conversion"
+      if "sanitizer" in buildid:
+        cxxflags += " -fsanitize=implicit-conversion"
 
     cxxflags += " -ftemplate-backtrace-limit=0 -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     if platform.system() != "Darwin":
-      cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
-    if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid and platform.system() != "Windows":
-      cxxflags += " -fsanitize=address" #" -fsanitize=memory" #-fsanitize=address-full  #Problem with clang LLVM on windows with VS22..
+      if "sanitizer" in buildid:
+        cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
+    if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
+      if "sanitizer" in buildid:
+        cxxflags += " -fsanitize=address" #" -fsanitize=memory" #-fsanitize=address-full  #Problem with clang LLVM on windows with VS22..
       #see https://github.com/llvm/llvm-project/issues/56300
 
   elif "opt" in buildid or "fast" in buildid:

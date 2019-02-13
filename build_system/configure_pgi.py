@@ -8,7 +8,7 @@ from build_system.feat_util import get_output
 def configure_pgi(cpu, buildid, compiler, restrict_errors):
   # TODO min versiong 16.4
 
-  cxxflags = "--c++11"
+  cxxflags = "--c++17"
 
   if restrict_errors:
     cxxflags += " -e1"

@@ -237,7 +237,7 @@ namespace FEAT
        */
       template<typename DataType_, typename IndexType_, int dim_, typename Space_>
       static VelocityInfo<DataType_, dim_> compute(
-        const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>, dim_>& vector,
+        const LAFEM::PowerVector<LAFEM::DenseVector<DataType_, IndexType_>, dim_>& vector,
         const Space_& space, const String& cubature_name)
       {
         Cubature::DynamicFactory cubature_factory(cubature_name);
@@ -261,7 +261,7 @@ namespace FEAT
        */
       template<typename DataType_, typename IndexType_, int dim_, typename Space_>
       static VelocityInfo<DataType_, dim_> compute(
-        const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>, dim_>& vector,
+        const LAFEM::PowerVector<LAFEM::DenseVector<DataType_, IndexType_>, dim_>& vector,
         const Space_& space, const Cubature::DynamicFactory& cubature_factory)
       {
         // first of all, verify the dimensions
@@ -270,7 +270,7 @@ namespace FEAT
         /// space type
         typedef Space_ SpaceType;
 
-        typedef LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>, dim_> VectorType;
+        typedef LAFEM::PowerVector<LAFEM::DenseVector<DataType_, IndexType_>, dim_> VectorType;
 
         /// assembly traits
         typedef AsmTraits1<DataType_, SpaceType, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
@@ -428,7 +428,7 @@ namespace FEAT
        */
       template<typename DataType_, typename IndexType_, int dim_, typename Space_>
       static VelocityInfo<DataType_, dim_> compute(
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
         const Space_& space, const String& cubature_name)
       {
         Cubature::DynamicFactory cubature_factory(cubature_name);
@@ -452,7 +452,7 @@ namespace FEAT
        */
       template<typename DataType_, typename IndexType_, int dim_, typename Space_>
       static VelocityInfo<DataType_, dim_> compute(
-        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
         const Space_& space, const Cubature::DynamicFactory& cubature_factory)
       {
         // first of all, verify the dimensions
@@ -464,7 +464,7 @@ namespace FEAT
         /// space type
         typedef Space_ SpaceType;
 
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
 
         /// assembly traits
         typedef AsmTraits1<DataType_, SpaceType, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
@@ -603,14 +603,14 @@ namespace FEAT
     namespace Intern
     {
       template<typename DT_, typename IT_, int dim_>
-      struct MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, dim_> >
+      struct MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<DT_, IT_>, dim_> >
       {
-        typedef MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, dim_-1> > RestClass;
+        typedef MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<DT_, IT_>, dim_-1> > RestClass;
 
-        typename LAFEM::DenseVector<Mem::Main, DT_, IT_>::GatherAxpy _first_gather;
+        typename LAFEM::DenseVector<DT_, IT_>::GatherAxpy _first_gather;
         RestClass _rest_gather;
 
-        MultiGather(const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, dim_>& vector) :
+        MultiGather(const LAFEM::PowerVector<LAFEM::DenseVector<DT_, IT_>, dim_>& vector) :
           _first_gather(vector.first()), _rest_gather(vector.rest())
         {
         }
@@ -627,11 +627,11 @@ namespace FEAT
       };
 
       template<typename DT_, typename IT_>
-      struct MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, 1> >
+      struct MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<DT_, IT_>, 1> >
       {
-        typename LAFEM::DenseVector<Mem::Main, DT_, IT_>::GatherAxpy _first_gather;
+        typename LAFEM::DenseVector<DT_, IT_>::GatherAxpy _first_gather;
 
-        MultiGather(const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, 1>& vector) :
+        MultiGather(const LAFEM::PowerVector<LAFEM::DenseVector<DT_, IT_>, 1>& vector) :
           _first_gather(vector.first())
         {
         }

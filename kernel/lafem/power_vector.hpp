@@ -73,19 +73,17 @@ namespace FEAT
     public:
       /// sub-vector type
       typedef SubType_ SubVectorType;
-      /// sub-vector memory type
-      typedef typename SubVectorType::MemType MemType;
       /// sub-vector data type
       typedef typename SubVectorType::DataType DataType;
       /// sub-vector index type
       typedef typename SubVectorType::IndexType IndexType;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = PowerVector<typename SubType_::template ContainerType<DT2_, IT2_>, count_>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// number of vector blocks
       static constexpr int num_blocks = count_;
@@ -674,8 +672,7 @@ namespace FEAT
        * \param[in] a A vector to compare with.
        * \param[in] b A vector to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const PowerVector & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const PowerVector & a, const PowerVector & b)
       {
         return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
@@ -712,15 +709,14 @@ namespace FEAT
     public:
       typedef SubType_ SubVectorType;
 
-      typedef typename SubVectorType::MemType MemType;
       typedef typename SubVectorType::DataType DataType;
       typedef typename SubVectorType::IndexType IndexType;
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
+      template <typename DT2_ = DataType, typename IT2_ = IndexType>
+      using ContainerType = PowerVector<typename SubType_::template ContainerType<DT2_, IT2_>, Index(1)>;
 
-      /// this typedef lets you create a vector container with new Memory, Datatape and Index types
-      template <typename Mem2_, typename DataType2_, typename IndexType2_>
-      using ContainerTypeByMDI = ContainerType<Mem2_, DataType2_, IndexType2_>;
+      /// this typedef lets you create a vector container with new Datatape and Index types
+      template <typename DataType2_, typename IndexType2_>
+      using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       static constexpr int num_blocks = 1;
 
@@ -1150,8 +1146,7 @@ namespace FEAT
        * \param[in] a A vector to compare with.
        * \param[in] b A vector to compare with.
        */
-      template <typename Mem2_>
-      friend bool operator== (const PowerVector & a, const ContainerType<Mem2_> & b)
+      friend bool operator== (const PowerVector & a, const PowerVector & b)
       {
         return (a.name() == b.name()) && (a.first() == b.first());
       }

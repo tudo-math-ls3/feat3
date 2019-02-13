@@ -10,7 +10,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/util/assertion.hpp>
 
 // includes, system
@@ -41,11 +40,11 @@ namespace FEAT
     {
     private:
       /// Number of rows for the created matrix.
-      IT_ _num_row;
+      Index _num_row;
       /// Number of columns for the created matrix.
-      IT_ _num_col;
+      Index _num_col;
       /// Maximal size of matrix.
-      static constexpr IT_ max_size= IT_(100000);
+      static constexpr IT_ max_size = IT_(100000u);
       /// Map collecting the input for the matrix.
       std::map<IT_, DT_> memory;
 
@@ -57,10 +56,11 @@ namespace FEAT
        * \param[in] num_rows The number of rows for the matrix.
        * \param[in] num_cols The number of columns for the matrix.
        */
-      explicit SparseMatrixFactory(IT_ num_rows, IT_ num_cols):_num_row(num_rows), _num_col(num_cols)
+      explicit SparseMatrixFactory(Index num_rows, Index num_cols) :
+        _num_row(num_rows), _num_col(num_cols)
       {
-        XASSERTM(num_rows <= max_size, "User tried to generate a Matrix with more than 100000 rows!");
-        XASSERTM(num_cols <= max_size, "User tried to generate a Matrix with more than 100000 colums!");
+        XASSERTM(num_rows <= Index(max_size), "User tried to generate a Matrix with more than 100000 rows!");
+        XASSERTM(num_cols <= Index(max_size), "User tried to generate a Matrix with more than 100000 colums!");
       }
 
       /**
@@ -70,11 +70,11 @@ namespace FEAT
        * \param[in] j The column-index of the entry to be added.
        * \param[in] a_ij The value of the entry to be added.
        */
-      void add(IT_ i, IT_ j, DT_ a_ij)
+      void add(Index i, Index j, DT_ a_ij)
       {
-        XASSERTM(i < _num_row, "User tried to add input out of bounds of the matrix" );
-        XASSERTM(j < _num_col, "User tried to add input out of bounds of the matrix");
-        memory.emplace(i * max_size + j, a_ij);
+        ASSERTM(i < _num_row, "User tried to add input out of bounds of the matrix" );
+        ASSERTM(j < _num_col, "User tried to add input out of bounds of the matrix");
+        memory.emplace(IT_(i) * max_size + IT_(j), a_ij);
       }
 
       /**
@@ -82,7 +82,7 @@ namespace FEAT
        *
        * \returns Number of matrix columns.
        */
-      IT_ columns() const
+      Index columns() const
       {
         return _num_col;
       }
@@ -91,7 +91,7 @@ namespace FEAT
        *
        * \returns Number of matrix rows.
        */
-      IT_ rows() const
+      Index rows() const
       {
         return _num_row;
       }
@@ -100,7 +100,7 @@ namespace FEAT
        *
        * \returns Number of possible matrix entries.
        */
-      IT_ size() const
+      Index size() const
       {
         return _num_col*_num_row;
       }
@@ -110,9 +110,9 @@ namespace FEAT
        *
        * \returns  Number of  used elements.
        */
-      IT_ used_elements() const
+      Index used_elements() const
       {
-        return IT_(memory.size());
+        return Index(memory.size());
       }
 
       /**
@@ -120,10 +120,10 @@ namespace FEAT
        *
        * \returns CSR Matrix.
        */
-      SparseMatrixCSR<Mem::Main, DT_, IT_> make_csr() const
+      SparseMatrixCSR<DT_, IT_> make_csr() const
       {
         //Creates CSR matrix with dimensions and number of NNZ of map.
-        FEAT::LAFEM::SparseMatrixCSR< Mem::Main, DT_, IT_ > matrix (_num_row, _num_col,IT_( memory.size()));
+        FEAT::LAFEM::SparseMatrixCSR<DT_, IT_ > matrix(_num_row, _num_col, Index( memory.size()));
         // pointer on the empty arrays of the CSR matrix structure
         IT_* row_ptr = matrix.row_ptr();
         IT_* col_ind = matrix.col_ind();

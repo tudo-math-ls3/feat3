@@ -46,8 +46,8 @@ int main(int argc, char** argv)
       // any_filter: run test if any one label matches
       if (all_filter == false)
       {
-        if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
-            (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) &&
+        if((find(labels.begin(), labels.end(), (*i)->get_preferred_backend_name()) == labels.end()) &&
+            (find(labels.begin(), labels.end(), (*i)->get_datatype_name()) == labels.end()) &&
             (find(labels.begin(), labels.end(), (*i)->get_index_name()) == labels.end()) )
         {
           i = TestList::instance()->erase(i);
@@ -61,8 +61,8 @@ int main(int argc, char** argv)
         bool deleted(false);
         for (auto li(labels.begin()) ; li != labels.end() ; ++li)
         {
-          if(*li != (*i)->get_memory_name() &&
-              *li != (*i)->get_prec_name() &&
+          if(*li != (*i)->get_preferred_backend_name() &&
+              *li != (*i)->get_datatype_name() &&
               *li != (*i)->get_index_name())
           {
             i = TestList::instance()->erase(i);
@@ -86,10 +86,11 @@ int main(int argc, char** argv)
     try
     {
       std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id()
-        << " [Memory: " << (*i)->get_memory_name() << "]"
-        << " [Precision: "<< (*i)->get_prec_name() << "]"
+        << " [Preferred Backend: " << (*i)->get_preferred_backend_name() << "]"
+        << " [Precision: "<< (*i)->get_datatype_name() << "]"
         << " [Indexing: "<< (*i)->get_index_name() << "]"
         << std::endl;
+      Runtime::set_preferred_backend((*i)->get_preferred_backend());
       (*i)->run();
       std::cout << "PASSED" << std::endl;
       ++tests_passed;

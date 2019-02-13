@@ -380,7 +380,7 @@ namespace FEAT
       template<typename DT_, typename DTP_, typename IT_, int dim_, int s_, typename Space_>
       static ScalarDiscreteEvalData<DT_, dim_> eval_fe_function(
         const Tiny::Vector<DTP_, dim_, s_>& point,
-        const LAFEM::DenseVector<Mem::Main, DT_, IT_>& vector,
+        const LAFEM::DenseVector<DT_, IT_>& vector,
         const Space_& space)
       {
         // create inverse trafo mapping
@@ -412,11 +412,11 @@ namespace FEAT
       template<typename DT_, typename DTP_, typename IT_, int dim_, typename Space_>
       static ScalarDiscreteEvalData<DT_, dim_> eval_fe_function(
         const Trafo::InverseMappingData<DTP_, dim_, dim_>& inv_map_data,
-        const LAFEM::DenseVector<Mem::Main, DT_, IT_>& vector,
+        const LAFEM::DenseVector<DT_, IT_>& vector,
         const Space_& space)
       {
         // vector type
-        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
         // space type
         typedef Space_ SpaceType;
         // assembly traits
@@ -527,7 +527,7 @@ namespace FEAT
       template<typename DT_, typename DTP_, typename IT_, int dim_, int s_, typename Space_>
       static VectorDiscreteEvalData<DT_, dim_> eval_fe_function(
         const Tiny::Vector<DTP_, dim_, s_>& point,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vector,
         const Space_& space)
       {
         // create inverse trafo mapping
@@ -559,11 +559,11 @@ namespace FEAT
       template<typename DT_, typename DTP_, typename IT_, int dim_, typename Space_>
       static VectorDiscreteEvalData<DT_, dim_> eval_fe_function(
         const Trafo::InverseMappingData<DTP_, dim_, dim_>& inv_map_data,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vector,
         const Space_& space)
       {
         // vector type
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim_> VectorType;
         // space type
         typedef Space_ SpaceType;
         // assembly traits
@@ -681,7 +681,7 @@ namespace FEAT
       template<typename DT_, typename DTP_, typename IT_, int dim_, int s_, typename Space_>
       static MatrixDiscreteEvalData<DT_, dim_, dim_> eval_fe_gradient_function(
         const Tiny::Vector<DTP_, dim_, s_>& point,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vector,
         const Space_& space)
       {
         // create inverse trafo mapping
@@ -713,11 +713,11 @@ namespace FEAT
       template<typename DT_, typename DTP_, typename IT_, int dim_, typename Space_>
       static MatrixDiscreteEvalData<DT_, dim_, dim_> eval_fe_gradient_function(
         const Trafo::InverseMappingData<DTP_, dim_, dim_>& inv_map_data,
-        const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>& vector,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vector,
         const Space_& space)
       {
         // vector type
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> VectorType;
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim_> VectorType;
         // space type
         typedef Space_ SpaceType;
         // assembly traits

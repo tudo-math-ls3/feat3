@@ -11,8 +11,8 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <map>
 #include <cstring>
@@ -24,10 +24,6 @@
 #include <mkl.h>
 #endif
 
-#ifdef __CUDACC__
-#include "cusparse_v2.h"
-#include <cublas_v2.h>
-#endif
 
 namespace FEAT
 {
@@ -36,11 +32,6 @@ namespace FEAT
     /// \cond internal
     namespace Intern
     {
-#ifdef __CUDACC__
-      extern cusparseHandle_t cusparse_handle;
-      extern cublasHandle_t cublas_handle;
-#endif
-
       struct MemoryInfo
       {
         Index counter;
@@ -50,86 +41,6 @@ namespace FEAT
     /// \endcond
   } // namespace Util
 
-    template <typename Mem_>
-    class MemoryPool;
-
-    template <>
-    class MemoryPool<Mem::CUDA>
-    {
-      private:
-        /// Map of allocated device memory patches
-        static std::map<void*, Util::Intern::MemoryInfo> _pool;
-
-      public:
-        /// Setup memory pools
-        static void initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
-
-        /// Shutdown memory pool and clean up allocated memory pools
-        static void finalize();
-
-        /// allocate new memory
-        template <typename DT_>
-        static DT_ * allocate_memory(const Index count);
-
-        /// increase memory counter
-        static void increase_memory(void * address);
-
-        /// release memory or decrease reference counter
-        static void release_memory(void * address);
-
-        /// download memory chunk to host memory
-        template <typename DT_>
-        static void download(DT_ * dest, const DT_ * const src, const Index count);
-
-        /// upload memory chunk from host memory to device memory
-        template <typename DT_>
-        static void upload(DT_ * dest, const DT_ * const src, const Index count);
-
-        /// receive element
-        template <typename DT_>
-        static DT_ get_element(const DT_ * data, const Index index);
-
-        /// set memory to specific value
-        template <typename DT_>
-        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
-
-        /// Copy memory area from src to dest
-        template <typename DT_>
-        static void copy(DT_ * dest, const DT_ * src, const Index count);
-
-        /// Copy memory area from src to dest
-        template <typename DT_>
-        static void convert(DT_ * dest, const DT_ * src, const Index count);
-
-        /// Convert datatype DT2_ from src into DT1_ in dest
-        template <typename DT1_, typename DT2_>
-        static void convert(DT1_ * dest, const DT2_ * src, const Index count);
-
-        static void synchronize();
-
-        static void reset_device();
-
-        static void set_blocksize(Index misc, Index reduction, Index spmv, Index axpy);
-
-        /// cuda threading grid blocksize for miscellaneous ops
-        static Index blocksize_misc;
-
-        /// cuda threading grid blocksize for reduction type ops
-        static Index blocksize_reduction;
-
-        /// cuda threading grid blocksize for blas-2 type ops
-        static Index blocksize_spmv;
-
-        /// cuda threading grid blocksize for blas-1 type ops
-        static Index blocksize_axpy;
-
-        /// return the overall amount of memory allocated in bytes
-        static Index allocated_memory();
-
-        /// return allocated size in bytes of a given array by memory address
-        static Index allocated_size(void * address);
-    };
-
     /**
      * \brief Memory management.
      *
@@ -137,15 +48,11 @@ namespace FEAT
      *
      * \author Dirk Ribbrock
      */
-    template <>
-    class MemoryPool<Mem::Main>
+    class MemoryPool
     {
       private:
         /// Map of all memory chunks in use.
         static std::map<void*, Util::Intern::MemoryInfo> _pool;
-
-        /// Map of allocated pinned main memory patches
-        static std::map<void*, Util::Intern::MemoryInfo> _pinned_pool;
 
       public:
 
@@ -157,9 +64,9 @@ namespace FEAT
         /// Shutdown memory pool and clean up allocated memory pools
         static void finalize()
         {
-          if (_pool.size() > 0 || _pinned_pool.size() > 0)
+          if (_pool.size() > 0)
           {
-            std::cout << stderr << " Error: MemoryPool<CPU> still contains memory chunks on deconstructor call" << std::endl;
+            std::cout << stderr << " Error: MemoryPool still contains memory chunks on deconstructor call" << std::endl;
             std::exit(1);
           }
 
@@ -173,15 +80,20 @@ namespace FEAT
         static DT_ * allocate_memory(Index count)
         {
           DT_ * memory(nullptr);
+
           if (count == 0)
             return memory;
 
           if (count%4 != 0)
             count = count + (4ul - count%4);
 
+#ifdef FEAT_HAVE_CUDA
+          memory = (DT_*)Util::cuda_malloc_managed(count * sizeof(DT_));
+#else
           memory = (DT_*)::malloc(count * sizeof(DT_));
+#endif
           if (memory == nullptr)
-            XABORTM("MemoryPool<CPU> allocation error!");
+            XABORTM("MemoryPool allocation error!");
 
           Util::Intern::MemoryInfo mi;
           mi.counter = 1;
@@ -190,29 +102,6 @@ namespace FEAT
 
           return memory;
         }
-
-#ifdef FEAT_HAVE_CUDA
-        /// allocate new pinned memory
-        template <typename DT_>
-        static DT_ * allocate_pinned_memory(Index count)
-        {
-          DT_ * memory(nullptr);
-          if (count == 0)
-            return memory;
-
-          if (count%4 != 0)
-            count = count + (4ul - count%4);
-
-          memory = (DT_*)Util::cuda_malloc_host(count * sizeof(DT_));
-
-          Util::Intern::MemoryInfo mi;
-          mi.counter = 1;
-          mi.size = count * sizeof(DT_);
-          _pinned_pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
-
-          return memory;
-        }
-#endif
 
         /// increase memory counter
         static void increase_memory(void * address)
@@ -226,16 +115,7 @@ namespace FEAT
             return;
           }
 
-#ifdef FEAT_HAVE_CUDA
-          it = _pinned_pool.find(address);
-          if (it != _pinned_pool.end())
-          {
-            it->second.counter = it->second.counter + 1;
-            return;
-          }
-#endif
-
-          XABORTM("MemoryPool<CPU>::increase_memory: Memory address not found!");
+          XABORTM("MemoryPool::increase_memory: Memory address not found!");
         }
 
         /// release memory or decrease reference counter
@@ -249,7 +129,11 @@ namespace FEAT
           {
             if(it->second.counter == 1)
             {
+#ifdef FEAT_HAVE_CUDA
+              Util::cuda_free(address);
+#else
               ::free(address);
+#endif
               _pool.erase(it);
             }
             else
@@ -259,28 +143,12 @@ namespace FEAT
             return;
           }
 
-#ifdef FEAT_HAVE_CUDA
-          it = _pinned_pool.find(address);
-          if (it != _pinned_pool.end())
-          {
-            if(it->second.counter == 1)
-            {
-              Util::cuda_free_host(address);
-              _pinned_pool.erase(it);
-            }
-            else
-            {
-              it->second.counter = it->second.counter - 1;
-            }
-            return;
-          }
-#endif
-
-          XABORTM("MemoryPool<CPU>::release_memory: Memory address not found!");
+          XABORTM("MemoryPool::release_memory: Memory address not found!");
         }
 
         /// download memory chunk to host memory
         template <typename DT_>
+        [[deprecated("no download necessary in unified memory environment.")]]
         inline static void download(DT_ * dest, const DT_ * const src, const Index count)
         {
           if (dest == src)
@@ -291,6 +159,7 @@ namespace FEAT
 
         /// upload memory chunk from host memory to device memory
         template <typename DT_>
+        [[deprecated("no upload necessary in unified memory environment.")]]
         inline static void upload(DT_ * dest, const DT_ * const src, const Index count)
         {
           if (dest == src)
@@ -301,6 +170,7 @@ namespace FEAT
 
         /// receive element
         template <typename DT_>
+        [[deprecated("no get_element necessary in unified memory environment.")]]
         inline static const DT_ & get_element(const DT_ * data, const Index index)
         {
           return data[index];
@@ -310,9 +180,20 @@ namespace FEAT
         template <typename DT_>
         static void set_memory(DT_ * address, const DT_ val, const Index count = 1)
         {
-          for (Index i(0) ; i < count ; ++i)
+          switch(Runtime::get_preferred_backend())
           {
-            address[i] = val;
+#ifdef FEAT_HAVE_CUDA
+            case PreferredBackend::cuda:
+              FEAT::Util::cuda_set_memory(address, val, count);
+              return;
+#endif
+            case PreferredBackend::generic:
+            default:
+              for (Index i(0) ; i < count ; ++i)
+              {
+                address[i] = val;
+              }
+              return;
           }
         }
 
@@ -323,7 +204,18 @@ namespace FEAT
           if (dest == src)
             return;
 
-          ::memcpy(dest, src, count * sizeof(DT_));
+          switch(Runtime::get_preferred_backend())
+          {
+#ifdef FEAT_HAVE_CUDA
+            case PreferredBackend::cuda:
+              FEAT::Util::cuda_copy(dest, src, count * sizeof(DT_));
+              return;
+#endif
+            case PreferredBackend::generic:
+            default:
+              ::memcpy(dest, src, count * sizeof(DT_));
+              return;
+          }
         }
 
         /// Copy memory area from src to dest
@@ -340,24 +232,35 @@ namespace FEAT
         template <typename DT1_, typename DT2_>
         static void convert(DT1_ * dest, const DT2_ * src, const Index count)
         {
-          for (Index i(0) ; i < count ; ++i)
+
+          switch(Runtime::get_preferred_backend())
           {
-            dest[i] = DT1_(src[i]);
+#ifdef FEAT_HAVE_CUDA
+            case PreferredBackend::cuda:
+              FEAT::Util::cuda_convert(dest, src, count);
+              return;
+#endif
+            case PreferredBackend::generic:
+            default:
+              for (Index i(0) ; i < count ; ++i)
+              {
+                dest[i] = DT1_(src[i]);
+              }
+              return;
           }
         }
 
-        static void synchronize()
+        NOINLINE static void synchronize()
         {
+#ifdef FEAT_HAVE_CUDA
+          FEAT::Util::cuda_synchronize();
+#endif
         }
 
         static Index allocated_memory()
         {
           Index bytes(0);
           for (auto& i : _pool)
-          {
-            bytes += i.second.size;
-          }
-          for (auto& i : _pinned_pool)
           {
             bytes += i.second.size;
           }
@@ -372,7 +275,7 @@ namespace FEAT
             return it->second.size;
           }
           else
-            XABORTM("MemoryPool<CPU>::allocated_size: Memory address not found!");
+            XABORTM("MemoryPool::allocated_size: Memory address not found!");
         }
     };
 

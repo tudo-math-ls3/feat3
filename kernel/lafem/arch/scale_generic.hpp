@@ -19,7 +19,7 @@ namespace FEAT
     {
 
       template <typename DT_>
-      void Scale<Mem::Main>::value_generic(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
+      void Scale::value_generic(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
       {
         if (x == r)
         {

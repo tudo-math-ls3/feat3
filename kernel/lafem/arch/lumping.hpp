@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
+#include <kernel/util/runtime.hpp>
 
 
 namespace FEAT
@@ -18,16 +18,32 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_>
-      struct Lumping;
-
-      template <>
-      struct Lumping<Mem::Main>
+      struct Lumping
       {
         template <typename DT_, typename IT_>
         static void csr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
         {
           csr_generic(lump, val, col_ind, row_ptr, rows);
+        }
+
+        static void csr(float * lump, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
+        }
+
+        static void csr(double * lump, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
+        }
+
+        static void csr(float * lump, const float * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
+        }
+
+        static void csr(double * lump, const double * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows)
+        {
+          BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
         }
 
         template <typename DT_, typename IT_>
@@ -39,48 +55,43 @@ namespace FEAT
           bcsr_generic(lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
         }
 
-        template <typename DT_, typename IT_>
-        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth);
-
-        template <typename DT_ , typename IT_>
-        static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
-          const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
+        static void bcsr(float * lump, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
-          ell_generic(lump, val, col_ind, cs, cl, C, rows);
+          BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
+        }
+
+        static void bcsr(double * lump, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        {
+          BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
+        }
+
+        static void bcsr(float * lump, const float * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        {
+          BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
+        }
+
+        static void bcsr(double * lump, const double * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        {
+          BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
         template <typename DT_, typename IT_>
-        static void ell_generic(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
-          const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
+        static void bcsr_generic(DT_* lump, const DT_* const val, const IT_* const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth);
+
+        template <typename DT_, typename IT_>
+        static void csr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+
+        template <typename DT_, typename IT_>
+        static void bcsr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth);
       };
 
 #ifdef FEAT_EICKT
-      extern template void Lumping<Mem::Main>::csr_generic(float *, const float * const, const Index * const, const Index * const, const Index);
-      extern template void Lumping<Mem::Main>::csr_generic(double *, const double * const, const Index * const, const Index * const, const Index);
+      extern template void Lumping::csr_generic(float *, const float * const, const Index * const, const Index * const, const Index);
+      extern template void Lumping::csr_generic(double *, const double * const, const Index * const, const Index * const, const Index);
 
-      extern template void Lumping<Mem::Main>::bcsr_generic(float *, const float * const, const Index * const, const Index * const, const Index, const int, const int);
-      extern template void Lumping<Mem::Main>::bcsr_generic(double *, const double * const, const Index * const, const Index * const, const Index, const int, const int);
-
-      extern template void Lumping<Mem::Main>::ell_generic(float *, const float * const, const Index * const,
-        const Index * const, const Index * const, Index, const Index);
-      extern template void Lumping<Mem::Main>::ell_generic(double *, const double * const, const Index * const,
-        const Index * const, const Index * const, Index, const Index);
+      extern template void Lumping::bcsr_generic(float *, const float * const, const Index * const, const Index * const, const Index, const int, const int);
+      extern template void Lumping::bcsr_generic(double *, const double * const, const Index * const, const Index * const, const Index, const int, const int);
 #endif
-
-
-      template <>
-      struct Lumping<Mem::CUDA>
-      {
-        template <typename DT_, typename IT_>
-        static void csr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
-
-        template <typename DT_, typename IT_>
-        static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
-          const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
-
-        template <typename DT_, typename IT_>
-        static void bcsr(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth);
-      };
 
     } // namespace Arch
   } // namespace LAFEM

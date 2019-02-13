@@ -29,16 +29,16 @@ using namespace FEAT::TestSystem;
  * for all functions. Same with preconditioners.
  *
  */
-template<typename Mem_, typename DT_, typename IT_, typename Function_>
+template<typename DT_, typename IT_, typename Function_>
 class NLCGTest:
-  public FullTaggedTest<Mem_, DT_, IT_>
+  public TestSystem::UnitTest
 {
   public:
-    typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+    typedef AnalyticFunctionOperator<DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
     typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
-    typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
+    typedef LAFEM::NoneFilterBlocked<DT_, IT_, 2> FilterType;
 
   private:
     const DT_ _tol;
@@ -49,9 +49,9 @@ class NLCGTest:
     NLCGDirectionUpdate _update;
 
   public:
-    explicit NLCGTest(const DT_ exponent_, const Index max_iter_, const Index max_func_evals_, const String& linesearch_type_, const String& precon_type_,
-    NLCGDirectionUpdate update_) :
-      FullTaggedTest<Mem_, DT_, IT_>("NLCGTest"),
+    explicit NLCGTest(const DT_ exponent_, const Index max_iter_, const Index max_func_evals_, const String& linesearch_type_,
+      const String& precon_type_, NLCGDirectionUpdate update_, PreferredBackend backend) :
+      UnitTest("NLCGTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_),
       _max_func_evals(max_func_evals_),
@@ -186,50 +186,48 @@ class NLCGTest:
 };
 
 // The first three are for comparison with ALGLIBMinCG
-NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f(float(0.6),Index(14), Index(80),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+NLCGTest<float, Index, Analytic::Common::HimmelblauFunction>
+nlcg_sw_hb_f(float(0.6),Index(14), Index(80),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan, PreferredBackend::generic);
 
-NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_rb_d(double(0.8),Index(40), Index(118),"MQCLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
+NLCGTest<double, Index, Analytic::Common::RosenbrockFunction>
+nlcg_sw_rb_d(double(0.8),Index(40), Index(118),"MQCLinesearch","none", NLCGDirectionUpdate::DYHSHybrid, PreferredBackend::generic);
 
-NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.31),Index(64), Index(240),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+NLCGTest<double, Index, Analytic::Common::BazaraaShettyFunction>
+nlcg_sw_bs_d(double(0.31),Index(64), Index(240),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan, PreferredBackend::generic);
 
 // This is the weird Hager-Zhang update
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
-nlcg_s_hb_d(double(0.4),Index(27) ,Index(132),
-"NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::HagerZhang);
+NLCGTest<double, Index, Analytic::Common::HimmelblauFunction>
+nlcg_s_hb_d(double(0.4),Index(27) ,Index(132), "NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::HagerZhang, PreferredBackend::generic);
 
-NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d(double(0.19), Index(31), Index(97), "SecantLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
+NLCGTest<double, unsigned int, Analytic::Common::BazaraaShettyFunction>
+nlcg_s_bs_d(double(0.19), Index(31), Index(97), "SecantLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel, PreferredBackend::generic);
 
-NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_d(double(0.5), Index(47), Index(231),"NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::FletcherReeves);
+NLCGTest<double, unsigned int, Analytic::Common::RosenbrockFunction>
+nlcg_nr_rb_d(double(0.5), Index(47), Index(231),"NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::FletcherReeves, PreferredBackend::generic);
 
-NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_hessian_rb_d(double(0.95), Index(25), Index(42), "MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
+NLCGTest<double, Index, Analytic::Common::RosenbrockFunction>
+nlcg_sw_hessian_rb_d(double(0.95), Index(25), Index(42), "MQCLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid, PreferredBackend::generic);
 
 /// \todo test stagnates with AVX512 active
-/*NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
+/*NLCGTest<double, Index, Analytic::Common::GoldsteinPriceFunction>
 nlcg_sw_hessian_gp_d(double(0.5), Index(16), Index(117), "MQCLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);*/
 
 #ifdef FEAT_HAVE_QUADMATH
-NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_q(__float128(0.55), Index(33), Index(137), "NewtonRaphsonLinesearch", "Hessian",
-NLCGDirectionUpdate::PolakRibiere);
+NLCGTest<__float128, Index, Analytic::Common::RosenbrockFunction>
+nlcg_nr_rb_q(__float128(0.55), Index(33), Index(137), "NewtonRaphsonLinesearch", "Hessian", NLCGDirectionUpdate::PolakRibiere, PreferredBackend::generic);
 
-NLCGTest<Mem::Main, __float128, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_bs_q(__float128(1), Index(23), Index(74), "MQCLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
+NLCGTest<__float128, Index, Analytic::Common::HimmelblauFunction>
+nlcg_sw_bs_q(__float128(1), Index(23), Index(74), "MQCLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel, PreferredBackend::generic);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(0.9), Index(11), Index(23), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_sw_hb_f_cuda(float(0.9), Index(11), Index(23), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves, PreferredBackend::generic);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none", NLCGDirectionUpdate::PolakRibiere);
+nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none", NLCGDirectionUpdate::PolakRibiere, PreferredBackend::generic);
 #endif
 
 /**
@@ -239,16 +237,16 @@ nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none"
  * for all functions. Same with preconditioners.
  *
  */
-template < typename Mem_, typename DT_, typename IT_, typename Function_ >
+template <typename DT_, typename IT_, typename Function_ >
 class NLSDTest:
-  public FullTaggedTest<Mem_, DT_, IT_>
+  public TestSystem::UnitTest
 {
   public:
-    typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+    typedef AnalyticFunctionOperator<DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
     typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
-    typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
+    typedef LAFEM::NoneFilterBlocked<DT_, IT_, 2> FilterType;
 
   private:
     DT_ _tol;
@@ -259,8 +257,8 @@ class NLSDTest:
 
   public:
     explicit NLSDTest(const DT_ exponent_, const Index max_iter_, const Index max_func_evals_,
-    const String& linesearch_type_, const String& precon_type_) :
-      FullTaggedTest<Mem_, DT_, IT_>("NLSDTest"),
+      const String& linesearch_type_, const String& precon_type_, PreferredBackend backend) :
+      TestSystem::UnitTest("NLSDTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_),
       _max_func_evals(max_func_evals_),
@@ -398,26 +396,26 @@ class NLSDTest:
     }
 };
 
-NLSDTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f(float(0.5), Index(19), Index(56), "SecantLinesearch", "ApproximateHessian");
+NLSDTest<float, Index, Analytic::Common::HimmelblauFunction>
+nlsd_hb_f(float(0.5), Index(19), Index(56), "SecantLinesearch", "ApproximateHessian", PreferredBackend::generic);
 
-NLSDTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
-nlsd_rb_d(double(0.75), Index(20), Index(87), "MQCLinesearch", "Hessian");
+NLSDTest<double, unsigned int, Analytic::Common::RosenbrockFunction>
+nlsd_rb_d(double(0.75), Index(20), Index(87), "MQCLinesearch", "Hessian", PreferredBackend::generic);
 
 /// \todo test reaches max-iter(100) with avx2 active
-/*NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
-nlsd_rb_d_sw(double(0.6), Index(17), Index(77), "NewtonRaphsonLinesearch", "none");*/
+/*NLSDTest<double, Index, Analytic::Common::HimmelblauFunction>
+nlsd_rb_d_sw(double(0.6), Index(17), Index(77), "NewtonRaphsonLinesearch", "none", PreferredBackend::generic);*/
 
 #ifdef FEAT_HAVE_QUADMATH
-NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlsd_rb_q(__float128(0.55), Index(96), Index(158), "SecantLinesearch", "Hessian");
+NLSDTest<__float128, Index, Analytic::Common::RosenbrockFunction>
+nlsd_rb_q(__float128(0.55), Index(96), Index(158), "SecantLinesearch", "Hessian", PreferredBackend::generic);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian");
+nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian", PreferredBackend::generic);
 #endif
 
 #ifdef FEAT_HAVE_ALGLIB
@@ -425,16 +423,16 @@ nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian");
  * \brief Test class template for ALGLIB's lBFGS optimizer
  *
  */
-template < typename Mem_, typename DT_, typename IT_, typename Function_ >
+template <typename DT_, typename IT_, typename Function_ >
 class ALGLIBMinLBFGSTest:
-  public FullTaggedTest<Mem_, DT_, IT_>
+  public TestSystem::UnitTest
 {
   public:
-    typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+    typedef AnalyticFunctionOperator<DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
     typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
-    typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
+    typedef LAFEM::NoneFilterBlocked<DT_, IT_, 2> FilterType;
 
   private:
     const DT_ _tol;
@@ -443,7 +441,7 @@ class ALGLIBMinLBFGSTest:
 
   public:
     explicit ALGLIBMinLBFGSTest(const DT_ exponent_, const Index max_iter_, const Index max_func_evals_) :
-      FullTaggedTest<Mem_, DT_, IT_>("ALGLIBMinLBFGSTest"),
+      TestSystem::UnitTest("ALGLIBMinLBFGSTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name()),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_),
       _max_func_evals(max_func_evals_)
@@ -535,32 +533,32 @@ class ALGLIBMinLBFGSTest:
     }
 };
 
-ALGLIBMinLBFGSTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
+ALGLIBMinLBFGSTest<float, Index, Analytic::Common::HimmelblauFunction>
 alg_lbfgs_hb_f(float(0.9), Index(12), Index(17));
 
-ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
+ALGLIBMinLBFGSTest<double, unsigned int, Analytic::Common::RosenbrockFunction>
 alg_lbfgs_rb_d(double(1), Index(36), Index(72));
 
-ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
+ALGLIBMinLBFGSTest<double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 alg_lbfgs_bs_d(double(0.48), Index(38), Index(87));
 
-ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::GoldsteinPriceFunction>
+ALGLIBMinLBFGSTest<double, unsigned int, Analytic::Common::GoldsteinPriceFunction>
 alg_lbfgs_gp_d(double(0.65), Index(15), Index(79));
 
 /**
  * \brief Test class template for ALGLIB's mincg optimizer
  *
  */
-template < typename Mem_, typename DT_, typename IT_, typename Function_ >
+template < typename DT_, typename IT_, typename Function_ >
 class ALGLIBMinCGTest:
-  public FullTaggedTest<Mem_, DT_, IT_>
+  public TestSystem::UnitTest
 {
   public:
-    typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+    typedef AnalyticFunctionOperator<DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
     typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
-    typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
+    typedef LAFEM::NoneFilterBlocked<DT_, IT_, 2> FilterType;
 
   private:
     DT_ _tol;
@@ -571,7 +569,7 @@ class ALGLIBMinCGTest:
   public:
     explicit ALGLIBMinCGTest(const DT_ exponent_, const Index max_iter_, const Index max_func_evals_,
     NLCGDirectionUpdate direction_update_) :
-      FullTaggedTest<Mem_, DT_, IT_>("ALGLIBMinCGTest"),
+      TestSystem::UnitTest("ALGLIBMinCGTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name()),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _max_iter(max_iter_),
       _max_func_evals(max_func_evals_),
@@ -664,12 +662,12 @@ class ALGLIBMinCGTest:
     }
 };
 
-ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
+ALGLIBMinCGTest<float, Index, Analytic::Common::HimmelblauFunction>
 alg_mincg_hb_f(float(0.6), Index(14), Index(60), NLCGDirectionUpdate::DaiYuan);
 
-ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
+ALGLIBMinCGTest<double, unsigned int, Analytic::Common::RosenbrockFunction>
 alg_mincg_rb_d(double(0.8), Index(41), Index(118), NLCGDirectionUpdate::DYHSHybrid);
 
-ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
+ALGLIBMinCGTest<double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 alg_mincg_bs_d(double(0.33), Index(65), Index(220), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAT_HAVE_ALGLIB

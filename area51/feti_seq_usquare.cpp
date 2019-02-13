@@ -93,30 +93,28 @@ namespace FETI{
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // Linear System type definitions
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Our local matrix type: a standard CSR matrix
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> LocalMatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
 
   // Our local vector type: the usual dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> LocalVectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
 
   // Our local filter type: the unit filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> LocalFilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> LocalFilterType;
 
   // The vector mirror takes the usual memory, data and index types as template parameters:
-  typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
+  typedef LAFEM::VectorMirror<DataType, IndexType> VectorMirrorType;
 
   //The two umfpack types we will use:
   typedef Solver::Umfpack RegularUmfpack;
   typedef Solver::UmfpackMean FloatingUmfpack;
   //see synch_vec regarding memory...
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferMain;
+  typedef LAFEM::DenseVector<DataType, IndexType> BufferMain;
 
   //This class handles the local information on each subdomain:
   class LocalDomain

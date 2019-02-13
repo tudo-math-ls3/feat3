@@ -172,19 +172,17 @@ namespace Tutorial04
   // Use the Lagrange-1 element
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-  // Our LAFEM containers work in main memory.
-  typedef Mem::Main MemType;
   // Our data arrays should be double precision.
   typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
 
   // Use the standard dense vector
-  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
+  typedef LAFEM::DenseVector<DataType, IndexType> VectorType;
   // Use the standard CSR matrix format
-  typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> MatrixType;
   // Use the unit-filter for Dirichlet boundary conditions
-  typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
+  typedef LAFEM::UnitFilter<DataType, IndexType> FilterType;
 
   // Here's our main function
   void main(int argc, char* argv[])
@@ -659,7 +657,7 @@ namespace Tutorial04
     std::cout << "Solving System..." << std::endl;
 
     // Create a SSOR preconditioner
-    auto precond = Solver::new_ssor_precond(matrix, filter);
+    auto precond = Solver::new_ssor_precond(PreferredBackend::generic, matrix, filter);
 
     // Create a PCG solver
     auto solver = Solver::new_pcg(matrix, filter, precond);

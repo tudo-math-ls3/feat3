@@ -19,7 +19,7 @@ int main (int /*argc*/, char** /*argv*/)
     std::cerr << "CUDA ERROR (cudaGetDeviceCount): " << cudaGetErrorString(error) << ". Exiting..." << std::endl;
     return 1;
   }
-  std::cout << "Number of devices in this machine: " << numDevices << std::endl;
+  std::cout << "Number of devices in this machine: " << numDevices << std::endl << std::endl;
 
   //
   // manually treat the case that this is run on a system without a CUDA-capable
@@ -55,8 +55,12 @@ int main (int /*argc*/, char** /*argv*/)
     // print out device name and compute capabilities
     std::cout << "Device " << idevice << ": " << prop.name;
     std::cout << " (cc " << prop.major << "." << prop.minor << ")" << std::endl;
+    std::cout << "Managed Memory Support: " << ((prop.managedMemory == 1) ? "yes" : "no") << std::endl;
     std::cout << "Important: configure all future builds with \" --cuda_arch=sm_";
     std::cout << prop.major << prop.minor << "\" on this machine." << std::endl;
+
+    if (idevice + 1 < numDevices)
+      std::cout<<std::endl;
   }
   return 0;
 }

@@ -17,7 +17,6 @@ if (FEAT_EICKT)
     sparse_vector-eickt.cpp
     sparse_matrix_csr-eickt.cpp
     sparse_matrix_cscr-eickt.cpp
-    sparse_matrix_ell-eickt.cpp
     )
 endif(FEAT_EICKT)
 
@@ -34,7 +33,6 @@ endif(FEAT_HAVE_CUDA)
 
 # list of lafem tests
 SET (test_list
-  container_main_wrapper-test
   dense_matrix-test
   dense_vector-test
   dense_vector_blocked-test
@@ -55,15 +53,12 @@ SET (test_list
   slip_filter-test
   sparse_matrix_conversion-test
   sparse_matrix_banded-test
-  sparse_matrix_coo-test
   sparse_matrix_csr-test
   sparse_matrix_cscr-test
-  sparse_matrix_ell-test
   sparse_matrix_bcsr-test
   sparse_matrix_factory-test
   sparse_vector-test
   sparse_vector_blocked-test
-  tuning-test
   unit_filter-test
   unit_filter_blocked-test
   vector_mirror-test
