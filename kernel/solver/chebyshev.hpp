@@ -187,7 +187,7 @@ namespace FEAT
         const MatrixType& matrix(this->_system_matrix);
         v.format(DataType(3));
         DataType tolerance(DataType(1e-4));
-        Index max_iters(7);
+        Index max_iters(40);
         v.scale(v, DataType(1) / v.norm2());
         DataType lambda_old(0), lambda(0);
         for (Index i(0) ; i < max_iters ; ++i)
@@ -300,8 +300,8 @@ namespace FEAT
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<Chebyshev<Matrix_, Filter_>> new_chebyshev(
       const Matrix_& matrix, const Filter_& filter,
-      const typename Matrix_::DataType fraction_min_ev = typename Matrix_::DataType(0.5),
-      const typename Matrix_::DataType fraction_max_ev = typename Matrix_::DataType(0.8))
+      const typename Matrix_::DataType fraction_min_ev = typename Matrix_::DataType(0.03),
+      const typename Matrix_::DataType fraction_max_ev = typename Matrix_::DataType(1.1))
     {
       return std::make_shared<Chebyshev<Matrix_, Filter_>>(matrix, filter, fraction_min_ev, fraction_max_ev);
     }
