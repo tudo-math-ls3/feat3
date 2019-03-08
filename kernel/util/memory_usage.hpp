@@ -39,11 +39,11 @@ namespace FEAT
   class MemoryUsage
   {
   private:
-    Index _current_physical;
-    Index _peak_physical;
-    Index _current_virtual;
-    Index _peak_virtual;
-    Index _current_swap;
+    std::size_t _current_physical;
+    std::size_t _peak_physical;
+    std::size_t _current_virtual;
+    std::size_t _peak_virtual;
+    std::size_t _current_swap;
 
   public:
     MemoryUsage() :
@@ -98,7 +98,7 @@ namespace FEAT
           std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size() - 1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
-          _current_physical = std::stoul(v.at(v.size() - 2));
+          v.at(v.size() - 2).parse(_current_physical);
           _current_physical *= 1024;
           continue;
         }
@@ -108,7 +108,7 @@ namespace FEAT
           std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size() - 1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
-          _peak_physical = std::stoul(v.at(v.size() - 2));
+          v.at(v.size() - 2).parse(_peak_physical);
           _peak_physical *= 1024;
           continue;
         }
@@ -118,7 +118,7 @@ namespace FEAT
           std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size() - 1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
-          _current_virtual = std::stoul(v.at(v.size() - 2));
+          v.at(v.size() - 2).parse(_current_virtual);
           _current_virtual *= 1024;
           continue;
         }
@@ -128,7 +128,7 @@ namespace FEAT
           std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size() - 1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
-          _peak_virtual = std::stoul(v.at(v.size() - 2));
+          v.at(v.size() - 2).parse(_peak_virtual);
           _peak_virtual *= 1024;
           continue;
         }
@@ -138,7 +138,7 @@ namespace FEAT
           std::deque<String> v = line.split_by_whitespaces();
           if (v.at(v.size() - 1) != "kB")
             throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
-          _current_swap = std::stoul(v.at(v.size() - 2));
+          v.at(v.size() - 2).parse(_current_swap);
           _current_swap *= 1024;
           continue;
         }
@@ -151,11 +151,11 @@ namespace FEAT
 
       Windows::query_memory_usage(work_set_size, work_set_size_peak, page_file_usage, page_file_usage_peak);
 
-      _current_physical = Index(work_set_size);
-      _current_virtual = Index(page_file_usage);
-      _peak_physical = Index(work_set_size_peak);
-      _peak_virtual = Index(page_file_usage_peak);
-      _current_swap = Index(0);
+      _current_physical = std::size_t(work_set_size);
+      _current_virtual = std::size_t(page_file_usage);
+      _peak_physical = std::size_t(work_set_size_peak);
+      _peak_virtual = std::size_t(page_file_usage_peak);
+      _current_swap = std::size_t(0);
 
 #elif defined(__unix__)
       // see:
@@ -164,11 +164,11 @@ namespace FEAT
       struct rusage r_usage;
       if (0 != getrusage(RUSAGE_SELF, &r_usage))
         throw InternalError(__func__, __FILE__, __LINE__, "Error in getrusage call!");
-      _peak_physical = (Index)r_usage.ru_maxrss;
-      _peak_virtual = (Index)r_usage.ru_maxrss;
-      _current_physical = (Index)r_usage.ru_maxrss;
-      _current_virtual = (Index)r_usage.ru_maxrss;
-      _current_swap = Index(0);
+      _peak_physical = (std::size_t)r_usage.ru_maxrss;
+      _peak_virtual = (std::size_t)r_usage.ru_maxrss;
+      _current_physical = (std::size_t)r_usage.ru_maxrss;
+      _current_virtual = (std::size_t)r_usage.ru_maxrss;
+      _current_swap = std::size_t(0);
       // 'ru_maxrss' is given in kilobytes
       _peak_physical *= 1024u;
       _peak_virtual *= 1024u;
@@ -178,31 +178,31 @@ namespace FEAT
     }
 
     /// Returns current (last stamp call) physical memory
-    Index get_current_physical() const
+    std::size_t get_current_physical() const
     {
       return _current_physical;
     }
 
     /// Returns peak physical memory
-    Index get_peak_physical() const
+    std::size_t get_peak_physical() const
     {
       return _peak_physical;
     }
 
     /// Returns current (last stamp call) virtual memory
-    Index get_current_virtual() const
+    std::size_t get_current_virtual() const
     {
       return _current_virtual;
     }
 
     /// Returns peak virtual memory
-    Index get_peak_virtual() const
+    std::size_t get_peak_virtual() const
     {
       return _peak_virtual;
     }
 
     /// Returns current (last stamp call) swap memory
-    Index get_current_swap() const
+    std::size_t get_current_swap() const
     {
       return _current_swap;
     }
