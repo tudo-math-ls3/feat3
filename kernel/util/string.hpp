@@ -791,10 +791,10 @@ namespace FEAT
     }
 
     /**
-     * \brief Parses the string.
+     * \brief Parses the string and stores its value in the provided variable.
      *
      * \param[out] t
-     * The value that is to be parsed.
+     * The parsed value, if the parse succeeded.
      *
      * \returns
      * \c true, if the parse succeeds, otherwise \c false.
