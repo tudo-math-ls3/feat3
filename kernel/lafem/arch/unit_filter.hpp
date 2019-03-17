@@ -25,15 +25,17 @@ namespace FEAT
           filter_rhs_generic(v, sv_elements, sv_indices, ue);
         }
 
-        template <typename DT_>
-        static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const unsigned long * const sv_indices, const Index ue)
-        {
 #ifdef FEAT_HAVE_MKL
+        static void filter_rhs(float * v, const float * const sv_elements, const unsigned long * const sv_indices, const Index ue)
+        {
           filter_rhs_mkl(v, sv_elements, sv_indices, ue);
-#else
-          filter_rhs_generic(v, sv_elements, sv_indices, ue);
-#endif
         }
+
+        static void filter_rhs(double * v, const double* const sv_elements, const unsigned long * const sv_indices, const Index ue)
+        {
+          filter_rhs_mkl(v, sv_elements, sv_indices, ue);
+        }
+#endif // FEAT_HAVE_MKL
 
         template <typename DT_, typename IT_>
         static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
