@@ -477,8 +477,12 @@ namespace FEAT
       {
         yl = y;
         y += ((z *= x) /= T_(++n));
-      } while(yl != y);
-      return y;
+        // Note about the stopping criterion:
+        // For x > 0, the sequence y_k must be strictly increasing.
+        // For x < 0, the sequence y_k must be alternating.
+        // And encode this into the most beautiful crypto-expression C++ has to offer ^_^
+      } while(x > T_(0) ? yl < y : n & 1 ? y < yl : yl < y);
+      return yl;
     }
 
     // wrap std::exp
@@ -504,8 +508,12 @@ namespace FEAT
         yl = y;
         T_ ey(Math::exp(y));
         y += T_(2) * (x - ey) / (x + ey);
-      } while(yl != y);
-      return y;
+        // Note about the stopping criterion:
+        // For x > 1, the sequence y_k must be strictly increasing.
+        // For x < 1, the sequence y_k must be strictly decreasing.
+        // Again, encode this into one beautiful expression
+      } while(x < T_(1) ? y < yl : yl < y);
+      return yl;
     }
 
     // wrap std::log

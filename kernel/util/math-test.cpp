@@ -73,11 +73,20 @@ class MathTest
   : public TaggedTest<Archs::None, DT_>
 {
 public:
-  const DT_ tol;
+  const DT_ tol, tol2;
 
-  MathTest() :
+  /**
+   * \brief Constructor
+   *
+   * \param[in] tol_
+   * Tolerance for all functions except sqrt, typically around eps.
+   *
+   * \param[in] tol2_
+   * Tolerance for sqrt, typically around sqrt(eps).
+   */
+  explicit MathTest(DT_ tol_, DT_ tol2_) :
     TaggedTest<Archs::None, DT_>("MathTest"),
-    tol(Math::pow(Math::eps<DT_>(), DT_(0.9)))
+    tol(tol_), tol2(tol2_)
   {
   }
 
@@ -87,8 +96,6 @@ public:
 
   virtual void run() const override
   {
-    // print tolerance
-    std::cout << "TOL: " << std::scientific << tol << std::endl;
     test_sqrt();
     test_sin();
     test_cos();
@@ -107,11 +114,9 @@ public:
 
   void test_sqrt() const
   {
-    // we need a weaker tolerance for sqrt
-    const DT_ tol2(Math::pow(Math::eps<DT_>(), DT_(0.4)));
-
     // exact root tests
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(0)), DT_(0), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(0.25)), DT_(0.5), tol2);
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(1)), DT_(1), tol2);
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(64)), DT_(8), tol2);
 
@@ -246,14 +251,14 @@ public:
   }
 };
 
-//MathTest<float> math_test_float;
-MathTest<double> math_test_double;
+MathTest<float> math_test_float(5.8706E-07F, 1.7003E-03F);
+MathTest<double> math_test_double(8.1620E-15, 5.4774E-07);
 #ifdef FEAT_HAVE_QUADMATH
-MathTest<__float128> math_test_float128;
+MathTest<__float128> math_test_float128(4.5308E-31Q, 3.2648E-14Q);
 #endif // FEAT_HAVE_QUADMATH
 #ifdef FEAT_HAVE_FLOATX
 // test emulated single precision
-//MathTest<flx::floatx<8, 23, double>> math_test_floatx_f32;
+MathTest<flx::floatx<8, 23, double>> math_test_floatx_f32(5.8706E-07, 1.7003E-03);
 #endif // FEAT_HAVE_FLOATX
 
 
