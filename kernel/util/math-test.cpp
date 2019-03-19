@@ -87,6 +87,8 @@ public:
 
   virtual void run() const override
   {
+    // print tolerance
+    std::cout << "TOL: " << std::scientific << tol << std::endl;
     test_sqrt();
     test_sin();
     test_cos();
@@ -244,10 +246,15 @@ public:
   }
 };
 
+//MathTest<float> math_test_float;
 MathTest<double> math_test_double;
 #ifdef FEAT_HAVE_QUADMATH
 MathTest<__float128> math_test_float128;
 #endif // FEAT_HAVE_QUADMATH
+#ifdef FEAT_HAVE_FLOATX
+// test emulated single precision
+//MathTest<flx::floatx<8, 23, double>> math_test_floatx_f32;
+#endif // FEAT_HAVE_FLOATX
 
 
 /**

@@ -76,6 +76,10 @@
   <PropertyGroup Condition="Exists('..\..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveFParser>true</FeatHaveFParser>
   </PropertyGroup>
+  <!-- Note: FloatX is a pure header library -->
+  <PropertyGroup Condition="Exists('..\..\thirdparty\FloatX\src\floatx.hpp')">
+    <FeatHaveFloatX>true</FeatHaveFloatX>
+  </PropertyGroup>
   <!-- Note: half is a pure header library -->
   <PropertyGroup Condition="Exists('..\..\thirdparty\half\include\half.hpp')">
     <FeatHaveHalfMath>true</FeatHaveHalfMath>
@@ -125,6 +129,8 @@
       Include="FEAT_HAVE_ALGLIB" />
     <FeatDef Condition="'$(FeatHaveFParser)'=='true'"
       Include="FEAT_HAVE_FPARSER" />
+    <FeatDef Condition="'$(FeatHaveFloatX)'=='true'"
+      Include="FEAT_HAVE_FLOATX" />
     <FeatDef Condition="'$(FeatHaveHalfMath)'=='true'"
       Include="FEAT_HAVE_HALFMATH" />
     <FeatDef Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='false'"
@@ -155,6 +161,8 @@
       Include="$(FeatRootPath)\thirdparty\ALGLIB\cpp\src;" />
     <FeatIncDir Condition="'$(FeatHaveFParser)'=='true'"
       Include="$(FeatRootPath)\thirdparty\fparser;" />
+    <FeatIncDir Condition="'$(FeatHaveFloatX)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\FloatX\src;" />
     <FeatIncDir Condition="'$(FeatHaveHalfMath)'=='true'"
       Include="$(FeatRootPath)\thirdparty\half\include;" />
     <FeatIncDir Condition="'$(FeatHaveHypre)'=='true'"

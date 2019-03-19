@@ -16,6 +16,12 @@ FEAT_DISABLE_WARNINGS
 FEAT_RESTORE_WARNINGS
 #endif // FEAT_HAVE_HALFMATH $$ !defined(__CUDACC__)
 
+#if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
+FEAT_DISABLE_WARNINGS
+#include <floatx.hpp>
+FEAT_RESTORE_WARNINGS
+#endif // FEAT_HAVE_FLOATX && !defined(__CUDACC__)
+
 namespace FEAT
 {
   /**
@@ -623,7 +629,45 @@ namespace FEAT
         return uint64_t(sizeof(half_float::half)) | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
       }
     };
-#endif // FEAT_HAVE_HALFMATH $$ !__CUDACC__
+#endif // FEAT_HAVE_HALFMATH && !__CUDACC__
+
+#if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
+    /**
+     * \brief Type Traits specialisation for FloatX class
+     *
+     * \author Peter Zajac
+     */
+    template<int exp_bits_, int sig_bits_, typename Backend_>
+    struct Traits<flx::floatx<exp_bits_, sig_bits_, Backend_>>
+    {
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is floating
+      static constexpr bool is_float = true;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
+
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return String("floatx<") + stringify(exp_bits_) + "," + stringify(sig_bits_) + "," + Traits<Backend_>::name() + ">";
+      }
+
+      /// returns composition of datatype size, int-, float- and signed feature
+      static uint64_t feature_hash()
+      {
+        // This one is more tricky, because we also have to encode
+        // the chosen number of exponent and significant bits
+        return uint64_t(sizeof(Backend_)) | uint64_t(exp_bits_) << 16 | uint64_t(sig_bits_) << 24
+          | uint64_t(is_int) << 32 | uint64_t(is_float) << 33 | uint64_t(is_signed) << 34;
+      }
+    };
+#endif // FEAT_HAVE_FLOATX && !__CUDACC__
   } // namespace Type
 } // namespace FEAT
 

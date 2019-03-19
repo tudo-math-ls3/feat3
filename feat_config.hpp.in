@@ -46,6 +46,9 @@
 /// Do we have fparser support enabled?
 #cmakedefine FEAT_HAVE_FPARSER
 
+/// Do we have FloatX support enabled?
+#cmakedefine FEAT_HAVE_FLOATX
+
 /// Do we have UMFPACK support enabled?
 #cmakedefine FEAT_HAVE_UMFPACK
 

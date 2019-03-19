@@ -98,6 +98,10 @@ This macro is defined by the build system detects a cuda sdk version equal or gr
 This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
 
 <hr>
+\subsection ppm_feat_have_floatx FEAT_HAVE_FLOATX
+This macro is defined by the build system if the FEAT kernel has support for datatypes offered by the FloatX library.
+
+<hr>
 \subsection ppm_feat_have_halfmath FEAT_HAVE_HALFMATH
 This macro is defined by the build system if the FEAT kernel has support for halfmath datatypes.
 The datatypes name is half_float::half.

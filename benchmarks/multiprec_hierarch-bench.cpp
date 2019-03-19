@@ -29,6 +29,16 @@
 // We are using FEAT
 using namespace FEAT;
 
+
+#ifdef FEAT_HAVE_FLOATX
+  // IEEE 754-2008 binary16 aka half-precision
+  // must use double as backend type because float is not supported
+  typedef flx::floatx<5, 10, double> flx_f16;  // half-prec
+  typedef flx::floatx<8, 7, double> flx_bf16;  // bfloat 16
+  //typedef flx::floatx<8, 23, double> flx_f16;  // single-prec
+#endif
+
+
 // We're opening a new namespace for our tutorial.
 namespace MultiPrecHierarchBench
 {
@@ -50,6 +60,34 @@ namespace MultiPrecHierarchBench
   //typedef double DataType;
   // Use the default index type for indexing.
   typedef Index IndexType;
+
+  double choose_tol(double)
+  {
+    return 1E-14;
+  }
+
+  float choose_tol(float)
+  {
+    return 1E-6F;
+  }
+
+#ifdef FEAT_HAVE_QUADMATH
+  __float128 choose_tol(__float128)
+  {
+    return 1E-31Q;
+  }
+#endif
+
+#ifdef FEAT_HAVE_FLOATX
+  flx_f16 choose_tol(flx_f16)
+  {
+    return flx_f16(1E-2);
+  }
+  flx_bf16 choose_tol(flx_bf16)
+  {
+    return flx_f16(5E-2);
+  }
+#endif
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   class Level
@@ -258,9 +296,6 @@ namespace MultiPrecHierarchBench
   template<typename DataType, typename DTI_>
   void main(const Index level_max, const Index level_min, bool reduce = false)
   {
-    std::cout << std::endl << String(80, '#') << std::endl;
-    std::cout << "DataType Outer / Inner: " << Type::Traits<DataType>::name() << " / " << Type::Traits<DTI_>::name() << std::endl;
-
     typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
     typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
     typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
@@ -289,6 +324,16 @@ namespace MultiPrecHierarchBench
     std::vector<MatrixType> prol_mats;
     prol_mats.reserve(level_max);
 
+    // print header line
+    std::cout << std::endl;
+    std::cout << "Lvl      Norm2(RHS)";
+    if(reduce)
+      std::cout << "       #DOFs     #NZE(A)  #NZE(H[A])";
+    if((MeshType::shape_dim > 1) || reduce)
+      std::cout << "   Iter";
+    std::cout << "   Abs-Def-Norm   Rel-Def-Norm       H0-Error       H1-Error     Time";
+    std::cout << std::endl;
+
     // Now, let's refine up to the maximum level
     for(Index ilevel(1); ilevel <= level_max; ++ilevel)
     {
@@ -314,8 +359,7 @@ namespace MultiPrecHierarchBench
       if(ilevel < level_min)
         continue;
 
-      //std::cout << "Processing Level " << ilevel << "..." << std::endl;
-      std::cout << stringify(ilevel).pad_front(2) << ": ";
+      std::cout << stringify(ilevel).pad_front(3) << ":";
 
       // Assemble the Laplace matrix:
       MatrixType matrix;
@@ -348,7 +392,8 @@ namespace MultiPrecHierarchBench
       filter.filter_sol(vec_sol);
       filter.filter_rhs(vec_rhs);
 
-      std::cout << stringify_fp_sci(vec_rhs.norm2()) << "   ";
+      const DataType rhs_norm = vec_rhs.norm2();
+      std::cout << stringify_fp_sci(rhs_norm).pad_front(15);
 
       // reduced system
       MatrixType matrix_r = matrix.clone(LAFEM::CloneMode::Deep);
@@ -362,9 +407,9 @@ namespace MultiPrecHierarchBench
           reduce_system(matrix_r, vec_rhs_r, *it);
           filter.filter_rhs(vec_rhs_r);
         }
-        std::cout << stringify(matrix.rows()).pad_front(15) << "   ";
-        std::cout << stringify(matrix.used_elements()).pad_front(15) << "   ";
-        std::cout << stringify(matrix_r.used_elements()).pad_front(15) << "   ";
+        std::cout << stringify(matrix.rows()).pad_front(12);
+        std::cout << stringify(matrix.used_elements()).pad_front(12);
+        std::cout << stringify(matrix_r.used_elements()).pad_front(12);
       }
 
       // SOLVER
@@ -388,13 +433,16 @@ namespace MultiPrecHierarchBench
         auto jacobi = Solver::new_jacobi_precond(matrix_i, filter_i);
         auto solver = Solver::new_pcg(matrix_i, filter_i, jacobi);
 
-        //solver->set_plot_mode(Solver::PlotMode::summary);
+        //solver->set_plot_mode(Solver::PlotMode::iter);
         solver->set_max_iter(100000);
-        solver->set_tol_rel(DTI_(0.001) * Math::eps<DTI_>());
+        //solver->set_tol_rel(DTI_(0.001) * Math::eps<DTI_>());
+        //solver->set_tol_rel(Math::pow(Math::eps<DTI_>(), DTI_(0.7)));
+        //solver->set_tol_rel(DTI_(10.0) * Math::eps<DTI_>());
+        solver->set_tol_rel(choose_tol(DTI_(0)));
         solver->init();
         solver->apply(vec_sol_i, vec_rhs_i);
         solver->done();
-        std::cout << stringify(solver->get_num_iter()).pad_front(6) << "   ";
+        std::cout << stringify(solver->get_num_iter()).pad_front(7);
       }
       vec_sol_r.convert(vec_sol_i);
       // END OF SOLVER
@@ -417,17 +465,19 @@ namespace MultiPrecHierarchBench
       VectorType vec_def = matrix.create_vector_r();
       matrix.apply(vec_def, vec_sol, vec_rhs, -DataType(1));
       filter.filter_def(vec_def);
+      const DataType def_norm = vec_def.norm2();
 
       // Compute and print errors
       Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
         vec_sol, sol_function, level->space, cubature_factory);
 
       std::cout
-        << stringify_fp_sci(vec_def.norm2()) << "   "
-        << stringify_fp_sci(errors.norm_h0) << "   "
-        << stringify_fp_sci(errors.norm_h1) << "   ";
-
-      std::cout << stamp.elapsed_string_now() << std::endl;
+        << stringify_fp_sci(def_norm).pad_front(15)
+        << stringify_fp_sci(def_norm/rhs_norm).pad_front(15)
+        << stringify_fp_sci(errors.norm_h0).pad_front(15)
+        << stringify_fp_sci(errors.norm_h1).pad_front(15)
+        << stamp.elapsed_string_now().pad_front(9)
+        << std::endl;
     } // end of level loop
   } // void main(...)
 } // namespace MultiPrecHierarchBench
@@ -511,13 +561,19 @@ int main(int argc, char* argv[])
   if(precs == "dp:dp") MultiPrecHierarchBench::main<double, double>(level_max, level_min, reduce); else
   if(precs == "dp:sp") MultiPrecHierarchBench::main<double, float>(level_max, level_min, reduce); else
   if(precs == "sp:sp") MultiPrecHierarchBench::main<float, float>(level_max, level_min, reduce); else
+#ifdef FEAT_HAVE_FLOATX
+  if(precs == "dp:hp") MultiPrecHierarchBench::main<double, flx_f16>(level_max, level_min, reduce); else
+  if(precs == "sp:hp") MultiPrecHierarchBench::main<float, flx_f16>(level_max, level_min, reduce); else
+  if(precs == "dp:bp") MultiPrecHierarchBench::main<double, flx_bf16>(level_max, level_min, reduce); else
+  if(precs == "sp:bp") MultiPrecHierarchBench::main<float, flx_bf16>(level_max, level_min, reduce); else
+#endif
   {
     std::cout << "ERROR: unsupported precision combo " << precs << std::endl;
     Runtime::abort();
   }
 
   MemoryUsage mem_use;
-  std::cout << mem_use.get_formatted_memory_usage() << std::endl;
+  std::cout << std::endl << mem_use.get_formatted_memory_usage() << std::endl;
 
   // Finalise our runtime environment
   return Runtime::finalise();

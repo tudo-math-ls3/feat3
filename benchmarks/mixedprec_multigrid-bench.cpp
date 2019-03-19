@@ -59,6 +59,13 @@ namespace MixedPrecMultiGridBench
   typedef float            f_sp;
   template<> struct Typo<f_sp> {static const char* name() {return "sp";} };
 
+  // half precision (requires FloatX third-party library)
+#ifdef FEAT_HAVE_FLOATX
+  // Note: 'float' as backend is bugged
+  typedef flx::floatx<5, 10, double> f_hp;
+  template<> struct Typo<f_hp> {static const char* name() {return "hp";} };
+#endif
+
   // use long long int for sizes
   // Note: we cannot use 'std::size_t' because OpenMP doesn't like that
   typedef long long int llint;
@@ -579,6 +586,11 @@ namespace MixedPrecMultiGridBench
     if(precs == "dp sp") run<f_dp, f_dp, f_sp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
 #endif
     if(precs == "sp sp") run<f_dp, f_sp, f_sp>(level, max_iter, num_inner, num_smooth, omega); else
+#ifdef FEAT_HAVE_FLOATX
+    if(precs == "dp hp") run<f_dp, f_dp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else
+    if(precs == "sp hp") run<f_dp, f_sp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else
+    if(precs == "hp hp") run<f_dp, f_hp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
+#endif
     {
       std::cout << "ERROR: unsupported precision combo " << precs << std::endl;
       Runtime::abort();

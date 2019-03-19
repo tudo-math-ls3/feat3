@@ -55,6 +55,7 @@ thirdparty/*.zip
 thirdparty/alglib
 thirdparty/cgal
 thirdparty/fparser
+thirdparty/floatx
 thirdparty/half
 thirdparty/hypre
 thirdparty/parmetis
