@@ -477,7 +477,6 @@ namespace FEAT
           // compute coarse matrix sparsity pattern
           Adjacency::Graph graph_tmp(Adjacency::RenderType::injectify, matrix_fine_local, prolongation_main);
           Adjacency::Graph graph_crs(Adjacency::RenderType::injectify, restriction_main, graph_tmp);
-          graph_crs.sort_indices();
           typename LocalMatrixType::template ContainerTypeByMDI<Mem::Main, DataType, IndexType> matrix_coarse_main(graph_crs);
 
           // compute coarse matrix entries
@@ -612,7 +611,6 @@ namespace FEAT
           // compute coarse matrix sparsity pattern
           Adjacency::Graph graph_tmp(Adjacency::RenderType::injectify, matrix_fine_local, transfer_fine_local.get_mat_prol());
           Adjacency::Graph graph_crs(Adjacency::RenderType::injectify, transfer_fine_local.get_mat_rest(), graph_tmp);
-          graph_crs.sort_indices();
           typename LocalMatrixType::template ContainerTypeByMDI<Mem::Main, DataType, IndexType> matrix_coarse_main(graph_crs);
 
           // compute coarse matrix entries

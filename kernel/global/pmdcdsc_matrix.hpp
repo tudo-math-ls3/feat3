@@ -437,8 +437,6 @@ namespace FEAT
 
           // compose structures of D and B
           Adjacency::Graph graph_s(Adjacency::RenderType::injectify, _matrix_d.local(), _matrix_b.local());
-          // sort column indices
-          graph_s.sort_indices();
           // create the matrix layout of S
           _matrix_s = LocalMatrixTypeS(graph_s);
 
@@ -580,7 +578,6 @@ namespace FEAT
 
           // S = (D*M^T) * B'
           Adjacency::Graph graph_s(Adjacency::RenderType::injectify, graph_dm, this->_neighbour_graphs.at(i));
-          graph_s.sort_indices();
 
           // allocate Schur-matrix
           this->_neighbour_matrices.at(i).convert(NeighMatrixTypeS(graph_s));

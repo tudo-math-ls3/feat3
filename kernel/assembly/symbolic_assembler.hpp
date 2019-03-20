@@ -107,9 +107,6 @@ namespace FEAT
         // render composite test-dof-mapping/trial-dof-support graph
         Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_support, trial_dof_graph);
 
-        // sort the dof-adjactor graph
-        dof_adjactor.sort_indices();
-
         // return the graph
         return dof_adjactor;
       }
@@ -134,9 +131,6 @@ namespace FEAT
 
         // render composite dof-mapping/dof-support graph
         Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_support, dof_graph);
-
-        // sort the sof-adjactor graph
-        dof_adjactor.sort_indices();
 
         // return the graph
         return dof_adjactor;
@@ -184,9 +178,6 @@ namespace FEAT
         // render composite test-dof-mapping/trial-dof-support graph
         Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_ext_sup, trial_dof_ext_graph);
 
-        // sort the dof-adjactor graph
-        dof_adjactor.sort_indices();
-
         // return the graph
         return dof_adjactor;
       }
@@ -224,9 +215,6 @@ namespace FEAT
 
         // render composite dof-mapping/dof-support graph
         Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_ext_sup, dof_ext_graph);
-
-        // sort the sof-adjactor graph
-        dof_adjactor.sort_indices();
 
         // return the graph
         return dof_adjactor;
@@ -307,9 +295,6 @@ namespace FEAT
 
         // render composite test-dof-mapping/trial-dof-support graph
         Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_support, trial_dof_mapping);
-
-        // sort the dof-adjactor graph
-        dof_adjactor.sort_indices();
 
         // return the graph
         return dof_adjactor;

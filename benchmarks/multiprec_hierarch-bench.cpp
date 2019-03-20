@@ -186,9 +186,7 @@ namespace MultiPrecHierarchBench
 
     // compute matrix structure
     Adjacency::Graph gap(Adjacency::RenderType::injectify, matrix, mprol);
-    gap.sort_indices();
     Adjacency::Graph grap(Adjacency::RenderType::injectify, mrest, gap);
-    grap.sort_indices();
 
     // compute matrix
     LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> matrix_r(grap);

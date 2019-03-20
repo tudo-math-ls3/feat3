@@ -669,7 +669,6 @@ namespace FEAT
           XASSERT(row_block < Index(dof_macros.size()));
           XASSERT(col_block < Index(macro_dofs.size()));
           Adjacency::Graph graph(Adjacency::RenderType::injectify, dof_macros.at(row_block), macro_dofs.at(col_block));
-          graph.sort_indices();
           LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> matrix_main(graph);
           matrix.convert(matrix_main);
         }
@@ -683,7 +682,6 @@ namespace FEAT
           XASSERT(row_block < Index(dof_macros.size()));
           XASSERT(col_block < Index(macro_dofs.size()));
           Adjacency::Graph graph(Adjacency::RenderType::injectify, dof_macros.at(row_block), macro_dofs.at(col_block));
-          graph.sort_indices();
           LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_> matrix_main(graph);
           matrix.convert(matrix_main);
         }

@@ -36,6 +36,7 @@ namespace FEAT
        * In this mode, the adjactor passed to the constructor will be rendered "injective", i.e.
        * each domain node will contain at most one adjacency to a specific image node - in other
        * words: the graph will not contain adjacency duplicates.
+       * As a side effect, all image indices adjacent to a domain node are stored in ascending order.
        */
       injectify = 1,
 
@@ -54,6 +55,8 @@ namespace FEAT
        *
        * In this mode, the transpose of the adjactor passed to the constructor will be rendered
        * "injective".
+       * As a side effect, all image indices adjacent to a domain node are stored in ascending order.
+       *
        * \see RenderType::transpose, RenderType::injectify
        */
       injectify_transpose = 3

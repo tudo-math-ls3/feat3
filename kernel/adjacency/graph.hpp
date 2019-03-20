@@ -8,6 +8,9 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/exception.hpp>
 
+// includes, system
+#include <set>
+
 namespace FEAT
 {
   namespace Adjacency
@@ -379,7 +382,7 @@ namespace FEAT
       /* *************************************************** */
     private:
       /// \cond internal
-      template<typename Adjactor_>
+      /*template<typename Adjactor_>
       static Index _aux_inj(const Adjactor_& adj, Index i, Index idx[])
       {
         Index num_idx = 0;
@@ -404,7 +407,7 @@ namespace FEAT
           }
         }
         return num_idx;
-      }
+      }*/
 
       /// renders adjactor
       template<typename Adjactor_>
@@ -445,8 +448,6 @@ namespace FEAT
             *idx = *cur;
           }
         }
-
-        // okay
       }
 
       /// renders injectified adjactor
@@ -462,27 +463,28 @@ namespace FEAT
         _domain_ptr = new Index[_num_nodes_domain + 1];
 
         // allocate auxiliary index array
-        Index* aux = new Index[_num_nodes_image];
+        std::set<Index> idx_set;
 
         // count number of adjacencies and build pointer array
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           _domain_ptr[i] = _num_indices_image;
-          _num_indices_image += _aux_inj(adj, i, aux);
+          idx_set.clear();
+          idx_set.insert(adj.image_begin(i), adj.image_end(i));
+          _num_indices_image += Index(idx_set.size());
         }
         _domain_ptr[_num_nodes_domain] = _num_indices_image;
-
-        // delete auxiliary array
-        delete [] aux;
 
         // allocate and build index array
         _image_idx = new Index[_num_indices_image];
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
-          _aux_inj(adj, i, &_image_idx[_domain_ptr[i]]);
+          idx_set.clear();
+          idx_set.insert(adj.image_begin(i), adj.image_end(i));
+          Index k = _domain_ptr[i];
+          for(auto it = idx_set.begin(); it != idx_set.end(); ++it, ++k)
+            _image_idx[k] = *it;
         }
-
-        // okay
       }
 
       /// renders transposed adjactor
@@ -542,8 +544,6 @@ namespace FEAT
         }
 
         delete [] image_ptr;
-
-        // okay
       }
 
       /// renders transposed injectified adjactor
@@ -561,19 +561,17 @@ namespace FEAT
         {
           _domain_ptr[i] = 0;
         }
-
         // allocate auxiliary index array
-        Index* aux = new Index[_num_nodes_domain];
+        std::set<Index> idx_set;
 
         // loop over all image nodes
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          Index num_aux = _aux_inj(adj, j, aux);
-          for(Index k(0); k < num_aux; ++k)
-          {
-            ++_domain_ptr[aux[k]+1];
-          }
-          _num_indices_image += num_aux;
+          idx_set.clear();
+          idx_set.insert(adj.image_begin(j), adj.image_end(j));
+          for(auto i : idx_set)
+            ++_domain_ptr[i+1];
+          _num_indices_image += Index(idx_set.size());
         }
 
         _image_idx = new Index[_num_indices_image];
@@ -589,10 +587,11 @@ namespace FEAT
         // build image index array
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          Index num_aux = _aux_inj(adj, j, aux);
-          for(Index k(0); k < num_aux; ++k)
+          idx_set.clear();
+          idx_set.insert(adj.image_begin(j), adj.image_end(j));
+          for(auto i : idx_set)
           {
-            Index*& idx = image_ptr[aux[k]];
+            Index*& idx = image_ptr[i];
             *idx = j;
             ++idx;
           }
@@ -600,12 +599,9 @@ namespace FEAT
 
         // delete auxiliary arrays
         delete [] image_ptr;
-        delete [] aux;
-
-        // okay
       }
 
-      template<
+      /*template<
         typename Adjactor1_,
         typename Adjactor2_>
       static Index _aux_inj(const Adjactor1_& adj1, const Adjactor2_& adj2, Index i, Index idx[])
@@ -642,7 +638,7 @@ namespace FEAT
           }
         }
         return num_idx;
-      }
+      }*/
 
       /// renders adjactor composition
       template<
@@ -701,8 +697,6 @@ namespace FEAT
             }
           }
         }
-
-        // okay
       }
 
       /// renders injectified adjactor composition
@@ -724,28 +718,31 @@ namespace FEAT
         // allocate pointer array
         _domain_ptr = new Index[_num_nodes_domain + 1];
 
-        // allocate auxiliary array
-        Index* aux = new Index[_num_nodes_image];
+        // allocate auxiliary index set
+        std::set<Index> idx_set;
 
         // count number of adjacencies and build pointer array
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           _domain_ptr[i] = _num_indices_image;
-          _num_indices_image += _aux_inj(adj1, adj2, i, aux);
+          idx_set.clear();
+          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
+          _num_indices_image += Index(idx_set.size());
         }
         _domain_ptr[_num_nodes_domain] = _num_indices_image;
-
-        // delete auxiliary array
-        delete [] aux;
 
         // allocate and build index array
         _image_idx = new Index[_num_indices_image];
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
-          _aux_inj(adj1, adj2, i, &_image_idx[_domain_ptr[i]]);
+          idx_set.clear();
+          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
+          Index k = _domain_ptr[i];
+          for(auto it = idx_set.begin(); it != idx_set.end(); ++it, ++k)
+            _image_idx[k] = *it;
         }
-
-        // okay
       }
 
       /// renders transposed adjactor composition
@@ -823,8 +820,6 @@ namespace FEAT
         }
 
         delete [] image_ptr;
-
-        // okay
       }
 
       /// renders transposed injectified adjactor composition
@@ -850,18 +845,18 @@ namespace FEAT
           _domain_ptr[i] = 0;
         }
 
-        // allocate auxiliary index array
-        Index* aux = new Index[_num_nodes_domain];
+        // allocate auxiliary index set
+        std::set<Index> idx_set;
 
         // loop over all image nodes
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          Index num_aux = _aux_inj(adj1, adj2, j, aux);
-          for(Index k(0); k < num_aux; ++k)
-          {
-            ++_domain_ptr[aux[k]+1];
-          }
-          _num_indices_image += num_aux;
+          idx_set.clear();
+          for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
+            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
+          for(auto i : idx_set)
+            ++_domain_ptr[i+1];
+          _num_indices_image += Index(idx_set.size());
         }
 
         _image_idx = new Index[_num_indices_image];
@@ -877,10 +872,12 @@ namespace FEAT
         // build image index array
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          Index num_aux = _aux_inj(adj1, adj2, j, aux);
-          for(Index k(0); k < num_aux; ++k)
+          idx_set.clear();
+          for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
+            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
+          for(auto i : idx_set)
           {
-            Index*& idx = image_ptr[aux[k]];
+            Index*& idx = image_ptr[i];
             *idx = j;
             ++idx;
           }
@@ -888,9 +885,6 @@ namespace FEAT
 
         // delete auxiliary arrays
         delete [] image_ptr;
-        delete [] aux;
-
-        // okay
       }
       /// \endcond
       /* ******************************************************************* */
