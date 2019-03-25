@@ -287,7 +287,7 @@ namespace FEAT
 
         // matrix type
         typedef Matrix_ MatrixType;
-        // functor type
+        // operator type
         typedef Operator_ OperatorType;
         // test-space type
         typedef TestSpace_ TestSpaceType;
@@ -328,7 +328,7 @@ namespace FEAT
         typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
         typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
 
-        // create a functor evaluator
+        // create a operator evaluator
         typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
@@ -380,7 +380,7 @@ namespace FEAT
           test_eval.prepare(trafo_eval);
           trial_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare operator evaluator
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -416,7 +416,7 @@ namespace FEAT
               // trial function loop
               for(int j(0); j < num_loc_trial_dofs; ++j)
               {
-                // evaluate functor and integrate
+                // evaluate operator and integrate
                 lmd(i,j) += trafo_facet_data.jac_det * cubature_rule.get_weight(k) *
                   oper_eval(trial_data.phi[j], test_data.phi[i]);
                 // continue with next trial function
@@ -426,7 +426,7 @@ namespace FEAT
             // continue with next cubature point
           }
 
-          // finish functor evaluator
+          // finish operator evaluator
           oper_eval.finish();
 
           // finish evaluators
@@ -469,7 +469,7 @@ namespace FEAT
 
         // vector type
         typedef Vector_ VectorType;
-        // functor type
+        // functional type
         typedef Functional_ FunctionalType;
         // space type
         typedef Space_ SpaceType;
@@ -504,7 +504,7 @@ namespace FEAT
         // create a dof-mapping
         typename AsmTraits::DofMapping dof_mapping(space);
 
-        // create a functor evaluator
+        // create a functional evaluator
         typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
 
         // create trafo evaluation data
@@ -554,7 +554,7 @@ namespace FEAT
           // prepare test-space evaluator
           test_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare functional evaluator
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -585,14 +585,14 @@ namespace FEAT
             // test function loop
             for(int i(0); i < num_loc_dofs; ++i)
             {
-              // evaluate functor and integrate
+              // evaluate functional and integrate
               lvad(i) += trafo_facet_data.jac_det * cubature_rule.get_weight(k) * func_eval(test_data.phi[i]);
               // continue with next trial function
             }
             // continue with next test function
           }
 
-          // finish functor evaluator
+          // finish functional evaluator
           func_eval.finish();
 
           // finish evaluators

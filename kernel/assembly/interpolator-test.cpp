@@ -74,7 +74,7 @@ public:
     // define function
     Analytic::Common::SineBubbleFunction<2> sine_bubble;
 
-    // interpolate functor into FE space
+    // interpolate function into FE space
     VectorType vector;
     Assembly::Interpolator::project(vector, sine_bubble, space);
 
@@ -113,7 +113,7 @@ public:
     // define function
     Analytic::Common::SineBubbleFunction<2> sine_bubble;
 
-    // interpolate functor into FE space
+    // interpolate function into FE space
     VectorType vector;
     Assembly::Interpolator::project(vector, sine_bubble, space);
 

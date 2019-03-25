@@ -95,7 +95,7 @@ namespace FEAT
        * The AnalyticFunction to apply the node functionals to.
        *
        * \returns
-       * The value of the node functional applied onto the functor.
+       * The value of the node functional applied onto the function.
        */
       template<
         typename NodeData_,

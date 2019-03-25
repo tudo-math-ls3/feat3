@@ -96,7 +96,7 @@ namespace FEAT
          * The test function data in the current evaluation point. \see Space::EvalData
          *
          * \returns
-         * The value of the bilinear functor.
+         * The value of the bilinear operator.
          */
         DataType operator()(const TrialBasisData& phi, const TestBasisData& psi) const;
 #endif // DOXYGEN

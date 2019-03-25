@@ -51,7 +51,7 @@ namespace FEAT
 
         // vector type
         typedef Vector_ VectorType;
-        // functor type
+        // functional type
         typedef Functional_ FunctionalType;
         // space type
         typedef Space_ SpaceType;
@@ -75,10 +75,10 @@ namespace FEAT
         // create a dof-mapping
         typename AsmTraits::DofMapping dof_mapping(space);
 
-        // create a functor evaluator
+        // create a functional evaluator
         typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
         // Type that evaluator returns
-        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType FunctorValueType;
+        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType FunctionalValueType;
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -87,7 +87,7 @@ namespace FEAT
         typename AsmTraits::TestEvalData test_data;
 
         // create local vector data
-        typename Tiny::Vector<FunctorValueType, AsmTraits::max_local_test_dofs> lvad;
+        typename Tiny::Vector<FunctionalValueType, AsmTraits::max_local_test_dofs> lvad;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -104,7 +104,7 @@ namespace FEAT
           // prepare test-space evaluator
           test_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare functional evaluator
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -128,14 +128,14 @@ namespace FEAT
             // test function loop
             for(int i(0); i < num_loc_dofs; ++i)
             {
-              // evaluate functor and integrate
+              // evaluate functional and integrate
               lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) * func_eval(test_data.phi[i]);
               // continue with next trial function
             }
             // continue with next test function
           }
 
-          // finish functor evaluator
+          // finish functional evaluator
           func_eval.finish();
 
           // finish evaluators

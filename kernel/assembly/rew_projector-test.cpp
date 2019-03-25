@@ -89,13 +89,13 @@ public:
     // create space
     Space_ space(trafo);
 
-    // define functor
+    // define function
     Analytic::Common::SineBubbleFunction<2> function;
 
     // define a cubature factory
     Cubature::DynamicFactory cubature_factory(cubature_name);
 
-    // project functor into FE space
+    // project function into FE space
     VectorType vector;
     Assembly::RewProjector::project(vector, function, space, cubature_factory);
 

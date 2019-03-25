@@ -62,7 +62,7 @@ namespace FEAT
 
         // matrix type
         typedef Matrix_ MatrixType;
-        // functor type
+        // operator type
         typedef Operator_ OperatorType;
         // test-space type
         typedef TestSpace_ TestSpaceType;
@@ -92,7 +92,7 @@ namespace FEAT
         typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
         typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
 
-        // create a functor evaluator
+        // create a operator evaluator
         typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
@@ -121,7 +121,7 @@ namespace FEAT
           test_eval.prepare(trafo_eval);
           trial_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare operator evaluator
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -150,7 +150,7 @@ namespace FEAT
               // trial function loop
               for(int j(0); j < num_loc_trial_dofs; ++j)
               {
-                // evaluate functor and integrate
+                // evaluate operator and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
                   oper_eval(trial_data.phi[j], test_data.phi[i]);
                 // continue with next trial function
@@ -160,7 +160,7 @@ namespace FEAT
             // continue with next cubature point
           }
 
-          // finish functor evaluator
+          // finish operator evaluator
           oper_eval.finish();
 
           // finish evaluators
@@ -223,7 +223,7 @@ namespace FEAT
 
         // matrix type
         typedef Matrix_ MatrixType;
-        // functor type
+        // operator type
         typedef Operator_ OperatorType;
         // space type
         typedef Space_ SpaceType;
@@ -247,7 +247,7 @@ namespace FEAT
         // create a dof-mapping
         typename AsmTraits::DofMapping dof_mapping(space);
 
-        // create a functor evaluator
+        // create a operator evaluator
         typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
@@ -274,7 +274,7 @@ namespace FEAT
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare operator evaluator
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -301,7 +301,7 @@ namespace FEAT
               // trial function loop
               for(int j(0); j < num_loc_dofs; ++j)
               {
-                // evaluate functor and integrate
+                // evaluate operator and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
                   oper_eval(space_data.phi[j], space_data.phi[i]);
                 // continue with next trial function
@@ -311,7 +311,7 @@ namespace FEAT
             // continue with next cubature point
           }
 
-          // finish functor evaluator
+          // finish operator evaluator
           oper_eval.finish();
 
           // finish evaluators
@@ -388,7 +388,7 @@ namespace FEAT
         // Type returned by the operator
         typedef Tiny::Matrix<typename MatrixType::DataType, BlockHeight, BlockWidth> OperatorValueType;
 
-        // functor type
+        // operator type
         typedef Operator_ OperatorType;
         // test-space type
         typedef TestSpace_ TestSpaceType;
@@ -421,7 +421,7 @@ namespace FEAT
         typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
         typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
 
-        // create a functor evaluator
+        // create a operator evaluator
         typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
@@ -450,7 +450,7 @@ namespace FEAT
           test_eval.prepare(trafo_eval);
           trial_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare operator evaluator
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -479,7 +479,7 @@ namespace FEAT
               // trial function loop
               for(int j(0); j < num_loc_trial_dofs; ++j)
               {
-                // evaluate functor and integrate
+                // evaluate operator and integrate
                 lmd(i,j).axpy(
                   trafo_data.jac_det * cubature_rule.get_weight(k),
                   oper_eval(trial_data.phi[j], test_data.phi[i]));
@@ -490,7 +490,7 @@ namespace FEAT
             // continue with next cubature point
           }
 
-          // finish functor evaluator
+          // finish operator evaluator
           oper_eval.finish();
 
           // finish evaluators
@@ -569,7 +569,7 @@ namespace FEAT
         // Type returned by the operator
         typedef Tiny::Matrix<typename MatrixType::DataType, BlockHeight, BlockWidth> OperatorValueType;
 
-        // functor type
+        // operator type
         typedef Operator_ OperatorType;
         // space type
         typedef Space_ SpaceType;
@@ -596,7 +596,7 @@ namespace FEAT
         // create a dof-mapping
         typename AsmTraits::DofMapping dof_mapping(space);
 
-        // create a functor evaluator
+        // create a operator evaluator
         typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
@@ -623,7 +623,7 @@ namespace FEAT
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
+          // prepare operator evaluator
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
@@ -650,7 +650,7 @@ namespace FEAT
               // trial function loop
               for(int j(0); j < num_loc_dofs; ++j)
               {
-                // evaluate functor and integrate
+                // evaluate operator and integrate
                 lmd(i,j).axpy(
                   trafo_data.jac_det * cubature_rule.get_weight(k),
                   oper_eval(space_data.phi[j], space_data.phi[i]));
@@ -661,7 +661,7 @@ namespace FEAT
             // continue with next cubature point
           }
 
-          // finish functor evaluator
+          // finish operator evaluator
           oper_eval.finish();
 
           // finish evaluators
@@ -730,7 +730,7 @@ namespace FEAT
 
           // Coefficient vector type
           typedef Vector_ VectorType;
-          // functor type
+          // operator type
           typedef Operator_ OperatorType;
           // space type
           typedef Space_ SpaceType;
@@ -756,7 +756,7 @@ namespace FEAT
           // create a dof-mapping
           typename AsmTraits::DofMapping dof_mapping(space);
 
-          // create a functor evaluator
+          // create a operator evaluator
           typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
           // create trafo evaluation data
@@ -796,7 +796,7 @@ namespace FEAT
             // prepare space evaluator
             space_eval.prepare(trafo_eval);
 
-            // prepare functor evaluator
+            // prepare operator evaluator
             oper_eval.prepare(trafo_eval);
 
             // fetch number of local dofs
@@ -830,7 +830,7 @@ namespace FEAT
               // continue with next cubature point
             }
 
-            // finish functor evaluator
+            // finish operator evaluator
             oper_eval.finish();
 
             // finish evaluators
@@ -901,7 +901,7 @@ namespace FEAT
 
           // Coefficient vector type
           typedef Vector_ VectorType;
-          // functor type
+          // operator type
           typedef Operator_ OperatorType;
           // test-space type
           typedef TestSpace_ TestSpaceType;
@@ -933,7 +933,7 @@ namespace FEAT
           typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
           typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
 
-          // create a functor evaluator
+          // create a operator evaluator
           typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
           // create trafo evaluation data
@@ -975,7 +975,7 @@ namespace FEAT
             // incorporate local vector
             gather_axpy(coeff_loc, trial_dof_mapping);
 
-            // prepare functor evaluator
+            // prepare operator evaluator
             oper_eval.prepare(trafo_eval);
 
             // fetch number of local dofs
@@ -1011,7 +1011,7 @@ namespace FEAT
               // continue with next cubature point
             }
 
-            // finish functor evaluator
+            // finish operator evaluator
             oper_eval.finish();
 
             // finish evaluators
