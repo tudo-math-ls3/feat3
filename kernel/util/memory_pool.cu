@@ -242,6 +242,16 @@ void MemoryPool<Mem::CUDA>::set_blocksize(Index misc, Index reduction, Index spm
   blocksize_axpy = axpy;
 }
 
+Index MemoryPool<Mem::CUDA>::allocated_memory()
+{
+  Index bytes(0);
+  for (auto& i : _pool)
+  {
+    bytes += i.second.size;
+  }
+  return bytes;
+}
+
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::CUDA>::allocate_memory<unsigned int>(const Index);

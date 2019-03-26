@@ -117,6 +117,9 @@ namespace FEAT
 
         /// cuda threading grid blocksize for blas-1 type ops
         static Index blocksize_axpy;
+
+        /// return the overall amount of memory allocated in bytes
+        static Index allocated_memory();
     };
 
     /**
@@ -330,6 +333,20 @@ namespace FEAT
 
         static void synchronise()
         {
+        }
+
+        static Index allocated_memory()
+        {
+          Index bytes(0);
+          for (auto& i : _pool)
+          {
+            bytes += i.second.size;
+          }
+          for (auto& i : _pinned_pool)
+          {
+            bytes += i.second.size;
+          }
+          return bytes;
         }
     };
 

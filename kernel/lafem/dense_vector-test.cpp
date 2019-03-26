@@ -59,6 +59,7 @@ public:
 
     DenseVector<Mem_, DT_, IT_> a(10, DT_(7));
     TEST_CHECK_EQUAL(a.bytes(), 10 * sizeof(DT_) + 1 * sizeof(Index));
+    TEST_CHECK_EQUAL(MemoryPool<Mem_>::allocated_memory(), a.bytes() - sizeof(Index));
     DenseVector<Mem_, DT_, IT_> b(10, DT_(5));
     b(7, DT_(42));
     TEST_CHECK_EQUAL(b(7), DT_(42));
