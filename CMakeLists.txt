@@ -157,7 +157,7 @@ if (${CMAKE_VERSION} VERSION_GREATER "3.8.99")
       [["compilerhack=\xrefitem compilerhacks \"Compiler Hack\" \"Compiler Hacks\""]]
       [["platformswitch=\xrefitem platformswitches \"Platform dependend code branching\" \"Platform depenendend code branches\""]])
     set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
-    set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/thirdparty/*" "*/tools/*" "*/tutorials/*" "*-test*.cpp")
+    set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/data/*" "*/thirdparty/*" "*/tools/*" "*/tutorials/*" "*-test*.cpp")
     set(DOXYGEN_EXPAND_AS_DEFINED "DOXY" "static_assert")
     set(DOXYGEN_EXTRA_PACKAGES "amsmath" "amssymb")
     set(DOXYGEN_FILE_PATTERS "*.c" "*.cc" "*.cxx" "*.cpp" "*.c++" "*.cu" "*.dox" "*.py" "*.h" "*.hh" "*.hpp" "*.h++" "*.f90" "*.f")
