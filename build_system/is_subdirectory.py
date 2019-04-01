@@ -1,7 +1,8 @@
-#!/usr/bin/env python
-# vim: set filetype=python sw=2 sts=2 et nofoldenable :
-# This is a python script.
-# If you encounter problemes when executing it on its own, start it with a python interpreter
+# FEAT3: Finite Element Analysis Toolbox, Version 3
+# Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
+# FEAT3 is released under the GNU General Public License version 3,
+# see the file 'copyright.txt' in the top level directory for details.
+
 # This code was taken from https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory/17624617#17624617
 import sys
 import os

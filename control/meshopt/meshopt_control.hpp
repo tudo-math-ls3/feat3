@@ -1,3 +1,8 @@
+// FEAT3: Finite Element Analysis Toolbox, Version 3
+// Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
+// FEAT3 is released under the GNU General Public License version 3,
+// see the file 'copyright.txt' in the top level directory for details.
+
 #ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
 #define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
 #include <kernel/base_header.hpp>

@@ -1,5 +1,10 @@
 FEAT 3 README
 
+=== LICENSE ===
+FEAT3 is released under the GNU General Public License version 3,
+see the file 'copyright.txt' in the top level directory for details.
+
+
 === DEPENDECIES ===
 FEAT depends on:
 cmake 2.8 or greater

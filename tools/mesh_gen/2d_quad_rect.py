@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# FEAT3: Finite Element Analysis Toolbox, Version 3
+# Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
+# FEAT3 is released under the GNU General Public License version 3,
+# see the file 'copyright.txt' in the top level directory for details.
+################################################################################
 # This tool generates a 2D rectangular mesh representing the domain
 # [x0,x1]x[y0,y1] consisting of m-by-n congruent rectangles.
 # The generated meshfile also contains four meshparts representing the

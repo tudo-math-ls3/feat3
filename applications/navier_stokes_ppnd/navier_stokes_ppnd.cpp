@@ -1,3 +1,8 @@
+// FEAT3: Finite Element Analysis Toolbox, Version 3
+// Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
+// FEAT3 is released under the GNU General Public License version 3,
+// see the file 'copyright.txt' in the top level directory for details.
+
 //
 // global MPSC aka PP2D / PP3D (Projection solution by Projection solver) for the Navier stokes equation
 //

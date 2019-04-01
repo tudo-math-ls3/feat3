@@ -1,0 +1,22 @@
+The following authors have contributed at some point
+to the main development code branch of FEAT3:
+
+
+2018 - 2019,   Mirco Arndt
+2012 - 2013,   Constantin Christof
+2016 - 2017,   Daniel Donner
+       2018,   Jonas Duennebacke
+2010 - 2016,   Markus Geveler
+2010 - 2012,   Dominik Goeddeke
+2013 - 2017,   Christoph Lohmann
+2014 - 2017,   Jordi Paul
+2010 - 2019,   Dirk Ribbrock
+2014 - 2015,   Malte Schirwon
+       2016,   David Schneider
+2018 - 2019,   Malte Schuh
+2013 - 2014,   Stefan Wahlers
+2010 - 2011,   Hilmar Wobker
+2010 - 2019,   Peter Zajac
+
+
+Note: The list is sorted alphabetically by surnames.
