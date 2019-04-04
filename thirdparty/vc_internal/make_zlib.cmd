@@ -4,13 +4,13 @@
 @rem FEAT3 is released under the GNU General Public License version 3,
 @rem see the file 'copyright.txt' in the top level directory for details.
 
-if "%2" == "" goto errcall
+if "%3" == "" goto errcall
 
 rem Check build mode
-if "%1" == "dbg" set CXXFLAGS=/Gm /Od /RTC1 /MDd
-if "%1" == "opt" set CXXFLAGS=/MP /Gy /Gm- /O2 /Ob2 /Oi /MD
-if "%2" == "x64" set LIBFLAGS=/MACHINE:X64
-if "%2" == "x86" set LIBFLAGS=/MACHINE:X86
+if "%2" == "dbg" set CXXFLAGS=/Od /RTC1 /MDd
+if "%2" == "opt" set CXXFLAGS=/MP /Gy /O2 /Ob2 /Oi /MD
+if "%3" == "x64" set LIBFLAGS=/MACHINE:X64
+if "%3" == "x86" set LIBFLAGS=/MACHINE:X86
 goto build
 
 :errcall
@@ -22,7 +22,7 @@ goto end
 
 rem ===============================================================================================
 :build
-set OBJPATH=..\obj\zlib.vc14-%1-%2
+set OBJPATH=..\obj\zlib.%1-%2-%3
 
 if exist %OBJPATH% (
   del %OBJPATH%\*.obj
@@ -34,8 +34,8 @@ rem Set Compiler flags
 set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /TC /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:none /EHsc /nologo
 set CXXFLAGS=%CXXFLAGS% /wd"4996" /wd"4267"
 set CXXFLAGS=%CXXFLAGS% /I"./zlib"
-set CXXFLAGS=%CXXFLAGS% /Fd"../obj/zlib.vc14-%1-%2/zlib.vc14-%1-%2.pdb"
-set CXXFLAGS=%CXXFLAGS% /Fp"../obj/zlib.vc14-%1-%2/zlib.vc14-%1-%2.pch"
+set CXXFLAGS=%CXXFLAGS% /Fd"../obj/zlib.%1-%2-%3/zlib.%1-%2-%3.pdb"
+set CXXFLAGS=%CXXFLAGS% /Fp"../obj/zlib.%1-%2-%3/zlib.%1-%2-%3.pch"
 
 echo Compiling zlib Sources...
 cl %CXXFLAGS% ./zlib/adler32.c    /Fo"%OBJPATH%/adler32.obj"
@@ -59,8 +59,8 @@ rem ============================================================================
 set LIBFLAGS=%LIBFLAGS% /NOLOGO
 
 echo.
-echo Linking 'zlib.vc14-%1-%2'
-lib %LIBFLAGS% /OUT:"..\lib\zlib.vc14-%1-%2.lib" ..\obj\zlib.vc14-%1-%2\*.obj
+echo Linking 'zlib.%1-%2-%3'
+lib %LIBFLAGS% /OUT:"..\lib\zlib.%1-%2-%3.lib" ..\obj\zlib.%1-%2-%3\*.obj
 echo.
 
 rem ===============================================================================================

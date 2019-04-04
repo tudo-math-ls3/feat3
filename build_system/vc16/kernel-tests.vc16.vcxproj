@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- global project properties -->
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1AAEDE40-225C-458D-8DE0-531D1E809C3B}</ProjectGuid>
@@ -7,7 +7,7 @@
     <FeatRootPath>$(ProjectDir)..\..</FeatRootPath>
   </PropertyGroup>
   <!-- import common config -->
-  <Import Project="$(FeatRootPath)\build_system\vc14\common-config.xml" />
+  <Import Project="$(FeatRootPath)\build_system\vc16\common-config.xml" />
   <!-- ********************************************************************* -->
   <!-- Header File List -->
   <!-- ********************************************************************* -->
@@ -31,9 +31,9 @@
   <!-- Final Imports -->
   <!-- ********************************************************************* -->
   <ItemGroup>
-    <ProjectReference Include="$(FeatRootPath)\build_system\vc14\kernel.vc14.vcxproj">
+    <ProjectReference Include="$(FeatRootPath)\build_system\vc16\kernel.vc16.vcxproj">
       <Project>{98608C16-F806-46BE-BDB4-77BA4023DC38}</Project>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(FeatRootPath)\build_system\vc14\target-app.xml" />
+  <Import Project="$(FeatRootPath)\build_system\vc16\target-app.xml" />
 </Project>

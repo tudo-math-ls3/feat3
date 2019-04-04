@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+################################################################################
 # FEAT3: Finite Element Analysis Toolbox, Version 3
 # Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
@@ -8,7 +9,7 @@
 # ------------------------------------------------------------------------------
 # This script generates the required HYPRE config header file and patches
 # a handful of HYPRE header files to ensure that the library can be compiled
-# under Visual Studio 14.
+# under Visual Studio 14 or higher.
 #
 # \author Peter Zajac
 ################################################################################

@@ -7,25 +7,28 @@
 rem ===========================================================================
 rem Check for Visual Studio version
 echo Checking for Visual Studio installation...
-if "%VS140COMNTOOLS%" neq "" (
+if "%VS16PATH%" neq "" (
+  echo Found Visual Studio 2019 installation
+  set VSVER=16
+  call "%VS16PATH%\Common7\Tools\VsDevCmd.bat" -arch=amd64 -host_arch=amd64
+) else if "%VS140COMNTOOLS%" neq "" (
   echo Found Visual Studio 2015 installation
   set VSVER=14
+  call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" amd64
 ) else if "%VS120COMNTOOLS%" neq "" (
   echo Found Visual Studio 2013 installation
   set VSVER=12
+  call "%VS120COMNTOOLS%..\..\VC\vcvarsall.bat" amd64
 )
 
 rem Ensure that we have a path to devenv.exe
 if "%VSVER%" == "" goto novs
 
-rem Call VC batch script
-call "%%VS%VSVER%0COMNTOOLS%%..\..\VC\vcvarsall.bat" amd64
-
 rem ===========================================================================
 echo **************************************************************************
 if exist "./ALGLIB" (
-  call ./vc_internal/make_alglib_vc%VSVER%.cmd dbg x64
-  call ./vc_internal/make_alglib_vc%VSVER%.cmd opt x64
+  call ./vc_internal/make_alglib.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_alglib.cmd vc%VSVER% opt x64
 ) else (
   echo ALGLIB not found; skipping...
   echo.
@@ -34,8 +37,8 @@ if exist "./ALGLIB" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./SuiteSparse" (
-  call ./vc_internal/make_umfpack_vc%VSVER%.cmd dbg x64
-  call ./vc_internal/make_umfpack_vc%VSVER%.cmd opt x64
+  call ./vc_internal/make_umfpack.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_umfpack.cmd vc%VSVER% opt x64
 ) else (
   echo SuiteSparse not found; skipping...
   echo.
@@ -44,8 +47,8 @@ if exist "./SuiteSparse" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./parmetis" (
-  call ./vc_internal/make_parmetis_vc%VSVER%.cmd dbg x64
-  call ./vc_internal/make_parmetis_vc%VSVER%.cmd opt x64
+  call ./vc_internal/make_parmetis.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_parmetis.cmd vc%VSVER% opt x64
 ) else (
   echo ParMETIS not found; skipping...
   echo.
@@ -54,8 +57,8 @@ if exist "./parmetis" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./fparser" (
-  call ./vc_internal/make_fparser_vc%VSVER%.cmd dbg x64
-  call ./vc_internal/make_fparser_vc%VSVER%.cmd opt x64
+  call ./vc_internal/make_fparser.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_fparser.cmd vc%VSVER% opt x64
 ) else (
   echo fparser not found; skipping...
   echo.
@@ -64,8 +67,8 @@ if exist "./fparser" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./zlib" (
-  call ./vc_internal/make_zlib_vc%VSVER%.cmd dbg x64
-  call ./vc_internal/make_zlib_vc%VSVER%.cmd opt x64
+  call ./vc_internal/make_zlib.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_zlib.cmd vc%VSVER% opt x64
 ) else (
   echo zlib not found; skipping...
   echo.
@@ -74,8 +77,8 @@ if exist "./zlib" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./triangle" (
-  call ./vc_internal/make_triangle_vc%VSVER%.cmd dbg x64
-  call ./vc_internal/make_triangle_vc%VSVER%.cmd opt x64
+  call ./vc_internal/make_triangle.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_triangle.cmd vc%VSVER% opt x64
 ) else (
   echo triangle not found; skipping...
   echo.
@@ -84,11 +87,11 @@ if exist "./triangle" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./hypre" (
-  call ./vc_internal/make_hypre_vc%VSVER%.cmd dbg x64 serial
-  call ./vc_internal/make_hypre_vc%VSVER%.cmd opt x64 serial
+  call ./vc_internal/make_hypre.cmd vc%VSVER% dbg x64 serial
+  call ./vc_internal/make_hypre.cmd vc%VSVER% opt x64 serial
   if not "%MSMPI_INC%" == "" (
-    call ./vc_internal/make_hypre_vc%VSVER%.cmd dbg x64 mpi
-    call ./vc_internal/make_hypre_vc%VSVER%.cmd opt x64 mpi
+    call ./vc_internal/make_hypre.cmd vc%VSVER% dbg x64 mpi
+    call ./vc_internal/make_hypre.cmd vc%VSVER% opt x64 mpi
   ) else (
     echo MPI not found; skipping MPI-based hypre library...
   )

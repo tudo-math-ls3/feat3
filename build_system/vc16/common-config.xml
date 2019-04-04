@@ -1,0 +1,14 @@
+<!-- *********************************************************************** -->
+<!-- FEAT configuration file for Visual Studio 2019 -->
+<!-- *********************************************************************** -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Import user-defined configuration (if it exists) -->
+  <Import Project="..\..\config-vc16.xml" Condition="Exists('..\..\config-vc16.xml')" />
+
+  <!-- ********************************************************************* -->
+  <!-- Visual Studio Import Mumbo-Jumbo -->
+  <!-- ********************************************************************* -->
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+</Project>

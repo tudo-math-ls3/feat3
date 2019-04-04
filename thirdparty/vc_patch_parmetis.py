@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+################################################################################
 # FEAT3: Finite Element Analysis Toolbox, Version 3
 # Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
@@ -7,7 +8,7 @@
 # ParMETIS 4.0.3 patch for Visual Studio
 # ------------------------------------------------------------------------------
 # This script patches two of the GKlib files to ensure that the library
-# can be compiled under Visual Studio 14.
+# can be compiled under Visual Studio 14 or higher.
 #
 # \author Peter Zajac
 ################################################################################
@@ -46,6 +47,13 @@ fo = open(gk_path1o, "wt")
 lno = 0
 for line in fi:
   lno = lno + 1
+  # replace lines 35 and 36
+  if (lno == 35):
+    fo.write("  #include <stdint.h>\n")
+    continue
+  if (lno == 36):
+    fo.write("  #include <inttypes.h>\n")
+    continue
   # insert macro before line 48
   if (lno == 48):
     fo.write("#if defined(_WIN32) && !defined(WIN32)\n")

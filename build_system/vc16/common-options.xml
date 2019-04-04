@@ -1,4 +1,4 @@
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <ItemDefinitionGroup>
     <BuildLog>
@@ -26,7 +26,8 @@
   <!-- Common Settings -->
   <ItemDefinitionGroup>
     <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <!--<WarningLevel>EnableAllWarnings</WarningLevel>-->
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;$(FeatDefList)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FeatRootPath);$(FeatIncDirList)</AdditionalIncludeDirectories>
@@ -34,6 +35,7 @@
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -50,7 +52,6 @@
       <OmitFramePointers>false</OmitFramePointers>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
   </ItemDefinitionGroup>
   <!-- Opt-Mode Settings -->
@@ -82,7 +83,7 @@
       <GPUDebugInfo>$(DebugMode)</GPUDebugInfo>
       <HostDebugInfo>$(DebugMode)</HostDebugInfo>
       <CodeGeneration>compute_30,sm_30</CodeGeneration>
-      <AdditionalCompilerOptions>/wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>
+      <AdditionalCompilerOptions>/FS /wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='Win32'">

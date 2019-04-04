@@ -65,6 +65,7 @@ thirdparty/zlib
 
 # Ignore Visual Studio symlinks
 build_system/vc14/kernel/
+build_system/vc16/kernel/
 
 # Ignore Visual Studio user/filter files
 *.vcxproj.user

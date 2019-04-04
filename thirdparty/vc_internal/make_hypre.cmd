@@ -4,27 +4,27 @@
 @rem FEAT3 is released under the GNU General Public License version 3,
 @rem see the file 'copyright.txt' in the top level directory for details.
 
-if "%3" == "" goto errcall
+if "%4" == "" goto errcall
 
 rem Check build mode
-if "%1" == "dbg" set CXXFLAGS=/FS /Od /RTC1 /MDd
-if "%1" == "opt" set CXXFLAGS=/MP /Gy /Gm- /O2 /Ob2 /Oi /MD
-if "%2" == "x64" set LIBFLAGS=/MACHINE:X64
-if "%2" == "x86" set LIBFLAGS=/MACHINE:X86
-if "%3" == "mpi" set CXXFLAGS=%CXXFLAGS% /DHYPRE_HAVE_MPI /I"%MSMPI_INC% "
-if "%3" == "serial" set CXXFLAGS=%CXXFLAGS% /DHYPRE_SEQUENTIAL
+if "%2" == "dbg" set CXXFLAGS=/FS /Od /RTC1 /MDd
+if "%2" == "opt" set CXXFLAGS=/MP /Gy /O2 /Ob2 /Oi /MD
+if "%3" == "x64" set LIBFLAGS=/MACHINE:X64
+if "%3" == "x86" set LIBFLAGS=/MACHINE:X86
+if "%4" == "mpi" set CXXFLAGS=%CXXFLAGS% /DHYPRE_HAVE_MPI /I"%MSMPI_INC% "
+if "%4" == "serial" set CXXFLAGS=%CXXFLAGS% /DHYPRE_SEQUENTIAL
 goto build
 
 :errcall
 echo.
 echo ERROR: Do not execute this script directly.
-echo        Execute 'make_win32.objmd' or 'make_win64.objmd' instead
+echo        Execute 'make_win32.cmd' or 'make_win64.cmd' instead
 echo.
 goto end
 
 rem ===============================================================================================
 :build
-set OBJPATH=..\obj\hypre.vc14-%1-%3-%2
+set OBJPATH=..\obj\hypre.%1-%2-%4-%3
 
 if exist %OBJPATH% (
   del %OBJPATH%\*.obj
@@ -35,8 +35,8 @@ if exist %OBJPATH% (
 rem Set Compiler flags
 set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:none /EHsc /nologo
 set CXXFLAGS=%CXXFLAGS% /wd"4028" /wd"4244" /wd"4293" /wd"4305" /wd"4996"
-set CXXFLAGS=%CXXFLAGS% /Fd"../obj/hypre.vc14-%1-%3-%2/hypre.vc14-%1-%2.pdb"
-set CXXFLAGS=%CXXFLAGS% /Fp"../obj/hypre.vc14-%1-%3-%2/hypre.vc14-%1-%2.pch"
+set CXXFLAGS=%CXXFLAGS% /Fd"../obj/hypre.%1-%2-%4-%3/hypre.%1-%2-%4-%3.pdb"
+set CXXFLAGS=%CXXFLAGS% /Fp"../obj/hypre.%1-%2-%4-%3/hypre.%1-%2-%4-%3.pch"
 set CXXFLAGS=%CXXFLAGS% /I"./hypre/src"
 
 echo.
@@ -406,8 +406,8 @@ rem ============================================================================
 set LIBFLAGS=%LIBFLAGS% /NOLOGO
 
 echo.
-echo Linking 'hypre.vc14-%1-%3-%2'
-lib %LIBFLAGS% /OUT:"..\lib\hypre.vc14-%1-%3-%2.lib" ..\obj\hypre.vc14-%1-%3-%2\*.obj
+echo Linking 'hypre.%1-%2-%4-%3'
+lib %LIBFLAGS% /OUT:"..\lib\hypre.%1-%2-%4-%3.lib" ..\obj\hypre.%1-%2-%4-%3\*.obj
 
 rem ===============================================================================================
 :end

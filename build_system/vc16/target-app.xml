@@ -1,0 +1,51 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- global project properties -->
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <RootNamespace>$(FeatAppName)</RootNamespace>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+
+  <!-- import common properties -->
+  <Import Project="common-props.xml" />
+
+  <!-- ********************************************************************* -->
+  <!-- Compiler / Linker Properties -->
+  <!-- ********************************************************************* -->
+
+  <!-- set output path -->
+  <PropertyGroup>
+    <OutDir>$(FeatBinPath)\</OutDir>
+  </PropertyGroup>
+
+  <!-- add link dependencies -->
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(FeatLibDirList)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(FeatLibDepList)</AdditionalDependencies>
+      <StackReserveSize>16777216</StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- copy CUDA runtime -->
+  <!--
+  <ItemDefinitionGroup Condition="'$(HaveCUDA)'=='yes' And '$(BackendCUDA)'=='true'">
+    <PostBuildEvent>
+      <Command>copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>-->
+
+  <!-- import common targets -->
+  <Import Project="common-options.xml" />
+
+</Project>

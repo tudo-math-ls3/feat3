@@ -20,8 +20,12 @@
 #  define FEAT_COMPILER_MICROSOFT _MSC_VER
 
 // detect the compiler verson and define the FEAT_COMPILER macro
-#  if (_MSC_VER >= 1900)
-#    define FEAT_COMPILER "Microsoft Visual C++ 2015 (or newer)"
+#  if (_MSC_VER >= 1920)
+#    define FEAT_COMPILER "Microsoft Visual C++ 2019"
+#  elif (_MSC_VER >= 1910)
+#    define FEAT_COMPILER "Microsoft Visual C++ 2017"
+#  elif (_MSC_VER >= 1900)
+#    define FEAT_COMPILER "Microsoft Visual C++ 2015"
 #  elif (_MSC_VER >= 1800)
 #    define FEAT_COMPILER "Microsoft Visual C++ 2013"
 #  elif (_MSC_VER >= 1700)
@@ -29,7 +33,7 @@
 #  elif (_MSC_VER >= 1600)
 #    define FEAT_COMPILER "Microsoft Visual C++ 2010"
 #  else
-  // this compiler version won't be able to compile Feat anyway...
+  // this compiler version won't be able to compile FEAT anyway...
 #    define FEAT_COMPILER "Microsoft C/C++ compiler"
 #  endif
 

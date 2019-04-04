@@ -1,11 +1,11 @@
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- include build-mode support -->
   <Import Project="build-modes.xml"/>
 
   <!-- Set platform toolset; must be defined before the following imports -->
   <PropertyGroup Label="Configuration">
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
@@ -15,11 +15,6 @@
     <FeatHaveCuda>true</FeatHaveCuda>
     <FeatCudaVersion>10.1</FeatCudaVersion>
     <FeatCudaPath>$(CUDA_PATH_V10_1)</FeatCudaPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BackendCUDA)'=='true' And '$(FeatHaveCuda)'=='' And '$(CUDA_PATH_V9_1)'!=''">
-    <FeatHaveCuda>true</FeatHaveCuda>
-    <FeatCudaVersion>9.1</FeatCudaVersion>
-    <FeatCudaPath>$(CUDA_PATH_V9_1)</FeatCudaPath>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
@@ -70,16 +65,16 @@
 
   <!-- set default build name -->
   <PropertyGroup Condition="'$(FeatBuildName)'==''">
-    <FeatBuildName>$(FeatAppName).vc14-$(Configuration)-$(FeatPlatform)</FeatBuildName>
+    <FeatBuildName>$(FeatAppName).vc16-$(Configuration)-$(FeatPlatform)</FeatBuildName>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
   <!-- FEAT Third-Party Library Detection -->
   <!-- ********************************************************************* -->
-  <PropertyGroup Condition="Exists('..\..\lib\alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\alglib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveAlgLib>true</FeatHaveAlgLib>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\fparser.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveFParser>true</FeatHaveFParser>
   </PropertyGroup>
   <!-- Note: FloatX is a pure header library -->
@@ -92,28 +87,28 @@
   </PropertyGroup>
   <!-- Note: There are two builds of HYPRE: a serial one and an MPI-based one -->
   <!--       We need to check for the one that matches our current FEAT build -->
-  <PropertyGroup Condition="Exists('..\..\lib\hypre.vc14-$(FeatDebugPrefix)-mpi-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+  <PropertyGroup Condition="Exists('..\..\lib\hypre.vc16-$(FeatDebugPrefix)-mpi-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <!-- MPI-version of hypre exists + FEAT build in MPI mode -->
     <FeatHaveHypre>true</FeatHaveHypre>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\..\lib\hypre.vc14-$(FeatDebugPrefix)-serial-$(FeatPlatform).lib') And '$(SerialMode)'=='true'">
+  <PropertyGroup Condition="Exists('..\..\lib\hypre.vc16-$(FeatDebugPrefix)-serial-$(FeatPlatform).lib') And '$(SerialMode)'=='true'">
     <!-- serial version of hypre exists + FEAT build in serial mode -->
     <FeatHaveHypre>true</FeatHaveHypre>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\..\lib\metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\metis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveMetis>true</FeatHaveMetis>
   </PropertyGroup>
   <!-- Note: ParMETIS can only be used in combination with MPI -->
-  <PropertyGroup Condition="Exists('..\..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+  <PropertyGroup Condition="Exists('..\..\lib\parmetis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
     <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\..\lib\triangle.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\triangle.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveTriangle>true</FeatHaveTriangle>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\umfpack.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveUmfpack>true</FeatHaveUmfpack>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\..\lib\zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\..\lib\zlib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveZlib>true</FeatHaveZlib>
   </PropertyGroup>
 
@@ -215,23 +210,23 @@
     <FeatLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
       Include="mkl_intel_lp64.lib" />-->
     <FeatLibDep Condition="'$(FeatHaveAlgLib)'=='true'"
-      Include="alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="alglib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveFParser)'=='true'"
-      Include="fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="fparser.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='false'"
-      Include="hypre.vc14-$(FeatDebugPrefix)-mpi-$(FeatPlatform).lib" />
+      Include="hypre.vc16-$(FeatDebugPrefix)-mpi-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveHypre)'=='true' And '$(SerialMode)'=='true'"
-      Include="hypre.vc14-$(FeatDebugPrefix)-serial-$(FeatPlatform).lib" />
+      Include="hypre.vc16-$(FeatDebugPrefix)-serial-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveMetis)'=='true'"
-      Include="metis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="metis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
-      Include="parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="parmetis.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveTriangle)'=='true'"
-      Include="triangle.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="triangle.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"
-      Include="umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="umfpack.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveZlib)'=='true'"
-      Include="zlib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+      Include="zlib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->

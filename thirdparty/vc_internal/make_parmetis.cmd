@@ -4,13 +4,13 @@
 @rem FEAT3 is released under the GNU General Public License version 3,
 @rem see the file 'copyright.txt' in the top level directory for details.
 
-if "%2" == "" goto errcall
+if "%3" == "" goto errcall
 
 rem Check build mode
-if "%1" == "dbg" set CXXFLAGS=/Gm /Od /RTC1 /MDd
-if "%1" == "opt" set CXXFLAGS=/MP /Gy /Gm- /O2 /Ob2 /Oi /MD
-if "%2" == "x64" set LIBFLAGS=/MACHINE:X64
-if "%2" == "x86" set LIBFLAGS=/MACHINE:X86
+if "%2" == "dbg" set CXXFLAGS=/Od /RTC1 /MDd
+if "%2" == "opt" set CXXFLAGS=/MP /Gy /O2 /Ob2 /Oi /MD
+if "%3" == "x64" set LIBFLAGS=/MACHINE:X64
+if "%3" == "x86" set LIBFLAGS=/MACHINE:X86
 goto build
 
 :errcall
@@ -22,9 +22,9 @@ goto end
 
 rem ===============================================================================================
 :build
-set OBJPATH1=..\obj\gklib.vc14-%1-%2
-set OBJPATH2=..\obj\metis.vc14-%1-%2
-set OBJPATH3=..\obj\parmetis.vc14-%1-%2
+set OBJPATH1=..\obj\gklib.%1-%2-%3
+set OBJPATH2=..\obj\metis.%1-%2-%3
+set OBJPATH3=..\obj\parmetis.%1-%2-%3
 
 if exist %OBJPATH1% (
   del %OBJPATH1%\*.obj
@@ -51,20 +51,20 @@ set CXXFLAGS=%CXXFLAGS% /TC /D "USE_GKREGEX"
 
 rem Set GKLib compiler flags
 set CXXFLAGS1=%CXXFLAGS% /I"./parmetis/metis/GKlib"
-set CXXFLAGS1=%CXXFLAGS1% /Fd"../obj/gklib.vc14-%1-%2/gklib.vc14-%1-%2.pdb"
-set CXXFLAGS1=%CXXFLAGS1% /Fp"../obj/gklib.vc14-%1-%2/gklib.vc14-%1-%2.pch"
+set CXXFLAGS1=%CXXFLAGS1% /Fd"../obj/gklib.%1-%2-%3/gklib.%1-%2-%3.pdb"
+set CXXFLAGS1=%CXXFLAGS1% /Fp"../obj/gklib.%1-%2-%3/gklib.%1-%2-%3.pch"
 
 rem Set METIS compiler flags
 set CXXFLAGS2=%CXXFLAGS% /I"./parmetis/metis/include" /I"./parmetis/metis/libmetis" /I"./parmetis/metis/GKlib"
-set CXXFLAGS2=%CXXFLAGS2% /Fd"../obj/metis.vc14-%1-%2/metis.vc14-%1-%2.pdb"
-set CXXFLAGS2=%CXXFLAGS2% /Fp"../obj/metis.vc14-%1-%2/metis.vc14-%1-%2.pch"
+set CXXFLAGS2=%CXXFLAGS2% /Fd"../obj/metis.%1-%2-%3/metis.%1-%2-%3.pdb"
+set CXXFLAGS2=%CXXFLAGS2% /Fp"../obj/metis.%1-%2-%3/metis.%1-%2-%3.pch"
 
 rem Set ParMETIS compiler flags
 set CXXFLAGS3=%CXXFLAGS%  /I"./parmetis/include" /I"./parmetis/libparmetis"
 set CXXFLAGS3=%CXXFLAGS3% /I"./parmetis/metis/include" /I"./parmetis/metis/libmetis"
 set CXXFLAGS3=%CXXFLAGS3% /I"./parmetis/metis/GKlib" /I"%MSMPI_INC% "
-set CXXFLAGS3=%CXXFLAGS3% /Fd"../obj/parmetis.vc14-%1-%2/parmetis.vc14-%1-%2.pdb"
-set CXXFLAGS3=%CXXFLAGS3% /Fp"../obj/parmetis.vc14-%1-%2/parmetis.vc14-%1-%2.pch"
+set CXXFLAGS3=%CXXFLAGS3% /Fd"../obj/parmetis.%1-%2-%3/parmetis.%1-%2-%3.pdb"
+set CXXFLAGS3=%CXXFLAGS3% /Fp"../obj/parmetis.%1-%2-%3/parmetis.%1-%2-%3.pch"
 
 echo.
 echo Compiling GKlib Sources...
@@ -180,12 +180,12 @@ rem ============================================================================
 set LIBFLAGS=%LIBFLAGS% /NOLOGO
 
 echo.
-echo Linking 'metis.vc14-%1-%2'
-lib %LIBFLAGS% /OUT:"..\lib\metis.vc14-%1-%2.lib" ..\obj\gklib.vc14-%1-%2\*.obj ..\obj\metis.vc14-%1-%2\*.obj
+echo Linking 'metis.%1-%2-%3'
+lib %LIBFLAGS% /OUT:"..\lib\metis.%1-%2-%3.lib" ..\obj\gklib.%1-%2-%3\*.obj ..\obj\metis.%1-%2-%3\*.obj
 
 echo.
-echo Linking 'parmetis.vc14-%1-%2'
-lib %LIBFLAGS% /OUT:"..\lib\parmetis.vc14-%1-%2.lib" ..\obj\parmetis.vc14-%1-%2\*.obj
+echo Linking 'parmetis.%1-%2-%3'
+lib %LIBFLAGS% /OUT:"..\lib\parmetis.%1-%2-%3.lib" ..\obj\parmetis.%1-%2-%3\*.obj
 echo.
 
 rem ===============================================================================================
