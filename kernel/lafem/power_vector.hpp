@@ -533,8 +533,8 @@ namespace FEAT
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template<typename SubType2_>
+      void convert(const PowerVector<SubType2_, count_>& other)
       {
         this->first().convert(other.first());
         this->rest().convert(other.rest());
@@ -995,8 +995,8 @@ namespace FEAT
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template<typename SubType2_>
+      void convert(const PowerVector<SubType2_, 1>& other)
       {
         this->first().convert(other.first());
       }

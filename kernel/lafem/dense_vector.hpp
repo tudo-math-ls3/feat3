@@ -139,64 +139,6 @@ namespace FEAT
         }
       }; // class GatherAxpy
 
-    private:
-      Index & _size()
-      {
-        return this->_scalar_index.at(0);
-      }
-
-      /// \cond internal
-      template <typename VT_, typename IT2_>
-      void _convert(const typename VT_::template ContainerType<Mem_, DT_, IT2_> & a)
-      {
-        DenseVector vec(a.template size<Perspective::pod>());
-        a.set_vec(vec.elements());
-
-        this->assign(vec);
-      }
-
-      template <typename VT_>
-      void _convert(const VT_ & a)
-      {
-        typename VT_::template ContainerType<Mem_, DT_, IT_> ta;
-        ta.convert(a);
-
-        this->convert(ta);
-      }
-
-      template <typename VT_, typename Mem2_, typename IT2_>
-      void _copy(const typename VT_::template ContainerType<Mem2_, DT_, IT2_> & a)
-      {
-        if (std::is_same<Mem_, Mem2_>::value)
-        {
-          a.set_vec(this->elements());
-        }
-        else
-        {
-          typename VT_::template ContainerType<Mem_, DT_, IT2_> ta;
-          ta.convert(a);
-
-          this->copy(ta);
-        }
-      }
-
-      template <typename VT_, typename Mem2_, typename IT2_>
-      void _copy_inv(typename VT_::template ContainerType<Mem2_, DT_, IT2_> & a) const
-      {
-        if (std::is_same<Mem_, Mem2_>::value)
-        {
-          a.set_vec_inv(this->elements());
-        }
-        else
-        {
-          DenseVector<Mem2_, DT_, IT_> t_this;
-          t_this.convert(*this);
-
-          t_this.copy_inv(a);
-        }
-      }
-      /// \endcond
-
     public:
       /// Our datatype
       typedef DT_ DataType;
@@ -513,7 +455,22 @@ namespace FEAT
       template <typename VT_>
       void convert(const VT_ & a)
       {
-        this->template _convert<VT_>(a);
+        typedef typename VT_::MemType Mem2_;
+
+        if (std::is_same<Mem_, Mem2_>::value)
+        {
+          DenseVector vec(a.template size<Perspective::pod>());
+          a.set_vec(vec.elements());
+          this->assign(vec);
+        }
+        else
+        {
+          typename VT_::template ContainerType<Mem_, DT_, IT_> ta;
+          ta.convert(a);
+          DenseVector vec(ta.template size<Perspective::pod>());
+          ta.set_vec(vec.elements());
+          this->assign(vec);
+        }
       }
 
       /**
@@ -579,7 +536,19 @@ namespace FEAT
       {
         XASSERTM(this->template size<Perspective::pod>() == a.template size<Perspective::pod>(), "Vectors have not the same size!");
 
-        this->template _copy<VT_>(a);
+        typedef typename VT_::MemType Mem2_;
+        typedef typename VT_::IndexType IT2_;
+
+        if (std::is_same<Mem_, Mem2_>::value)
+        {
+          a.set_vec(this->elements());
+        }
+        else
+        {
+          typename VT_::template ContainerType<Mem_, DT_, IT2_> ta;
+          ta.convert(a);
+          ta.set_vec(this->elements());
+        }
       }
 
       /**
@@ -592,7 +561,17 @@ namespace FEAT
       {
         XASSERTM(this->template size<Perspective::pod>() == a.template size<Perspective::pod>(), "Vectors have not the same size!");
 
-        this->template _copy_inv<VT_>(a);
+        typedef typename VT_::MemType Mem2_;
+        if (std::is_same<Mem_, Mem2_>::value)
+        {
+          a.set_vec_inv(this->elements());
+        }
+        else
+        {
+          DenseVector<Mem2_, DT_, IT_> t_this;
+          t_this.convert(*this);
+          a.set_vec_inv(t_this.elements());
+        }
       }
 
       /**
@@ -779,7 +758,7 @@ namespace FEAT
 
         }
 
-        _size() = Index(data.size());
+        this->_scalar_index.at(0) = Index(data.size());
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(Index(data.size())));
         this->_elements_size.push_back(Index(data.size()));
         MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
