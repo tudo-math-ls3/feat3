@@ -3,11 +3,8 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include <kernel/base_header.hpp>
 #include <iostream>
 #include <cuda_runtime.h>
-
-using namespace FEAT;
 
 int main (int /*argc*/, char** /*argv*/)
 {
