@@ -66,7 +66,7 @@ namespace FEAT
       typedef PowerVector<typename SubMatrixType::VectorTypeR, blocks_> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerRowMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
+      using ContainerType = PowerRowMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = 1;
@@ -604,7 +604,7 @@ namespace FEAT
       typedef PowerVector<typename SubMatrixType::VectorTypeR, 1> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerRowMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
+      using ContainerType = PowerRowMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
       static constexpr int num_row_blocks = 1;
       static constexpr int num_col_blocks = 1;

@@ -74,7 +74,7 @@ namespace FEAT
       typedef PowerVector<typename SubMatrixType::VectorTypeR, width_> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerFullMatrix<
+      using ContainerType = PowerFullMatrix<
         typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, width_, height_>;
 
       /// number of row blocks (vertical size)

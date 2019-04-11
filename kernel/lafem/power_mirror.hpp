@@ -99,7 +99,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using MirrorType = class PowerMirror<typename SubMirrorType::template MirrorType<Mem2_, DT2_, IT2_>, count_>;
+      using MirrorType = PowerMirror<typename SubMirrorType::template MirrorType<Mem2_, DT2_, IT2_>, count_>;
 
       /// this typedef lets you create a mirror with new Memory, Data and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

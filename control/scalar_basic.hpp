@@ -407,7 +407,7 @@ namespace FEAT
 
       /// Our class base type
       template <typename Mem2_, typename DT2_, typename IT2_, typename ScalarMatrix2_>
-      using BaseType = class ScalarUnitFilterSystemLevel<Mem2_, DT2_, IT2_, ScalarMatrix2_>;
+      using BaseType = ScalarUnitFilterSystemLevel<Mem2_, DT2_, IT2_, ScalarMatrix2_>;
 
       /// our global system filter
       GlobalSystemFilter filter_sys;
@@ -495,7 +495,7 @@ namespace FEAT
 
       /// Our class base type
       template <typename Mem2_, typename DT2_, typename IT2_, typename ScalarMatrix2_>
-      using BaseType = class ScalarMeanFilterSystemLevel<Mem2_, DT2_, IT2_, ScalarMatrix2_>;
+      using BaseType = ScalarMeanFilterSystemLevel<Mem2_, DT2_, IT2_, ScalarMatrix2_>;
 
       /// our global system filter
       GlobalSystemFilter filter_sys;

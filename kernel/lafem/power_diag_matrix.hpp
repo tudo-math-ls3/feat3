@@ -64,7 +64,7 @@ namespace FEAT
       typedef PowerVector<typename SubMatrixType::VectorTypeR, blocks_> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
+      using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
       /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
@@ -677,7 +677,7 @@ namespace FEAT
       typedef PowerVector<typename SubMatrixType::VectorTypeR, 1> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
+      using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
       /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

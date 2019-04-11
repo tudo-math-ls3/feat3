@@ -226,7 +226,7 @@ namespace FEAT
       typedef typename First_::IndexType IndexType;
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using FilterType = class FilterChain<typename First_::template FilterType<Mem2_, DT2_, IT2_> >;
+      using FilterType = FilterChain<typename First_::template FilterType<Mem2_, DT2_, IT2_> >;
 
     protected:
       /// the first sub-filter

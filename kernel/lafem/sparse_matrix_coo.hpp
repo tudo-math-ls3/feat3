@@ -404,7 +404,7 @@ namespace FEAT
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_coo;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = class SparseMatrixCOO<Mem2_, DT2_, IT2_>;
+      using ContainerType = SparseMatrixCOO<Mem2_, DT2_, IT2_>;
 
       /**
        * \brief Constructor

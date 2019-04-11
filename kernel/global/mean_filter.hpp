@@ -35,7 +35,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template<typename Mem2_, typename DT2_, typename IT2_>
-      using FilterType = class MeanFilter<Mem2_, DT2_, IT2_>;
+      using FilterType = MeanFilter<Mem2_, DT2_, IT2_>;
 
       /// this typedef lets you create a filter with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

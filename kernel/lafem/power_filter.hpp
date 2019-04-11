@@ -63,7 +63,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using FilterType = class PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, count_>;
+      using FilterType = PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, count_>;
 
       /// this typedef lets you create a filter with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
@@ -238,7 +238,7 @@ namespace FEAT
       typedef PowerVector<typename SubFilter_::VectorType, 1> VectorType;
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using FilterType = class PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, Index(1)>;
+      using FilterType = PowerFilter<typename SubFilterType::template FilterType<Mem2_, DT2_, IT2_>, Index(1)>;
 
       /// this typedef lets you create a filter with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

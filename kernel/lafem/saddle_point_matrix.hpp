@@ -103,9 +103,9 @@ namespace FEAT
       typedef TupleVector<typename MatrixTypeA::VectorTypeR, typename MatrixTypeB::VectorTypeR> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class SaddlePointMatrix<typename MatrixA_::template ContainerType<Mem2_, DT2_, IT2_>,
-                                                    typename MatrixB_::template ContainerType<Mem2_, DT2_, IT2_>,
-                                                    typename MatrixD_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      using ContainerType = SaddlePointMatrix<typename MatrixA_::template ContainerType<Mem2_, DT2_, IT2_>,
+                                              typename MatrixB_::template ContainerType<Mem2_, DT2_, IT2_>,
+                                              typename MatrixD_::template ContainerType<Mem2_, DT2_, IT2_> >;
 
       /// this typedef lets you create a matrix container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

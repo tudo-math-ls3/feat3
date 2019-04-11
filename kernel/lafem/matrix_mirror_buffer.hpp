@@ -55,7 +55,7 @@ namespace FEAT
       typedef DT_ ValueType;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = class MatrixMirrorBuffer<Mem2_, DT2_, IT2_>;
+      using ContainerType = MatrixMirrorBuffer<Mem2_, DT2_, IT2_>;
 
       /// this typedef lets you create a buffer container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

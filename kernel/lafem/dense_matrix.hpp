@@ -71,7 +71,7 @@ namespace FEAT
       typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = class DenseMatrix<Mem2_, DT2_, IT2_>;
+      using ContainerType = DenseMatrix<Mem2_, DT2_, IT2_>;
 
       /**
        * \brief Constructor

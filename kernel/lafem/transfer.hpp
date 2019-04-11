@@ -42,7 +42,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_>
-      using TransferTypeByMDI = class Transfer<typename Matrix_::template ContainerTypeByMDI<Mem2_, DT2_, IT2_>>;
+      using TransferTypeByMDI = Transfer<typename Matrix_::template ContainerTypeByMDI<Mem2_, DT2_, IT2_>>;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;

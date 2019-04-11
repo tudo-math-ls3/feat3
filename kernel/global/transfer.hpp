@@ -39,10 +39,9 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_>
-      using TransferTypeByMDI = class Transfer<
+      using TransferTypeByMDI = Transfer<
         typename LocalTransfer_::template TransferTypeByMDI<Mem2_, DT2_, IT2_>,
-        typename Mirror_::template MirrorType<Mem2_, DT2_, IT2_>
-        >;
+        typename Mirror_::template MirrorType<Mem2_, DT2_, IT2_> >;
 
       static constexpr bool is_global = true;
       static constexpr bool is_local = false;

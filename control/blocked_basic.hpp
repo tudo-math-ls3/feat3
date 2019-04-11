@@ -143,7 +143,7 @@ namespace FEAT
 
       /// Our class base type
       template <typename Mem2_, typename DT2_, typename IT2_, typename BlockedMatrix2_>
-      using BaseType = class BlockedUnitFilterSystemLevel<dim_, Mem2_, DT2_, IT2_, BlockedMatrix2_>;
+      using BaseType = BlockedUnitFilterSystemLevel<dim_, Mem2_, DT2_, IT2_, BlockedMatrix2_>;
 
       /// our global system filter
       GlobalSystemFilter filter_sys;

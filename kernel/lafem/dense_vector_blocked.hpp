@@ -91,7 +91,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = class DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+      using ContainerType = DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
 
       /// this typedef lets you create a vector container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

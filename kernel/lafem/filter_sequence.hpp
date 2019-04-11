@@ -52,7 +52,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_>
-      using FilterType = class FilterSequence<typename Filter_::template FilterType<Mem2_, DT2_, IT2_> >;
+      using FilterType = FilterSequence<typename Filter_::template FilterType<Mem2_, DT2_, IT2_> >;
 
       /// this typedef lets you create a filter sequence with new Memory, Datatape and Index types
       template <typename Mem2_, typename DT2_, typename IT2_>

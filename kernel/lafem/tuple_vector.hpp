@@ -586,7 +586,7 @@ namespace FEAT
       typedef typename First_::IndexType IndexType;
 
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+      using ContainerType = TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
 
       /// this typedef lets you create a vector container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>

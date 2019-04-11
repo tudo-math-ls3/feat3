@@ -81,7 +81,7 @@ namespace FEAT
       typedef typename SubVectorType::IndexType IndexType;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
+      using ContainerType = PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
 
       /// this typedef lets you create a vector container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
@@ -734,7 +734,7 @@ namespace FEAT
       typedef typename SubVectorType::DataType DataType;
       typedef typename SubVectorType::IndexType IndexType;
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
+      using ContainerType = PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
       /// this typedef lets you create a vector container with new Memory, Datatape and Index types
       template <typename Mem2_, typename DataType2_, typename IndexType2_>
