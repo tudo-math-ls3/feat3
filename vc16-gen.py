@@ -161,6 +161,7 @@ else: # normal mode
 
 print("Project Path:   " + project_path)
 print("Project Name:   " + project_name)
+print("")
 
 # define file paths
 file_path_sln = os.path.join(project_path, project_name + ".vc16.sln");
@@ -170,14 +171,13 @@ file_path_vcx = os.path.join(project_path, project_name + ".vc16.vcxproj");
 root_path = os.path.relpath(".", project_path)
 #print("Root Path: " + root_path)
 
-print("")
+# create project path
+os.makedirs(project_path, exist_ok=True)
 
 # check if the path exists
 if not os.path.isdir(project_path):
-  print("Info: project path does not exist; creating it...")
-  os.mkdir(project_path)
-  #print("ERROR: project path does not exist")
-  #sys.exit(1)
+  print("ERROR: project path does not exist")
+  sys.exit(1)
 if os.path.exists(file_path_sln):
   print("ERROR: solution file already exists: " + file_path_sln)
   sys.exit(1)
