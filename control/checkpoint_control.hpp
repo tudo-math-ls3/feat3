@@ -427,22 +427,20 @@ namespace FEAT
           std::vector<char> data;
 
           uLongf checkpoint_size = static_cast<uLongf>(_collect_checkpoint_data(data));
-          char* size_buffer = reinterpret_cast<char*>(&checkpoint_size);
 
           uLongf compressedLen = static_cast<uLongf>(compressBound(checkpoint_size));
-          char* compressedLen_buffer = reinterpret_cast<char*>(&compressedLen);
 
           Bytef *compressed = new Bytef[compressedLen];
           Bytef *uncompressed = (Bytef *) data.data();
           int c_status = ::compress(compressed, &compressedLen, uncompressed, checkpoint_size);
           XASSERTM(c_status == Z_OK, "compression of checkpoint data failed");
 
-          for (Index i = 0; i < sizeof(compressedLen_buffer); ++i)
-            bs << compressedLen_buffer[i];
-          for (Index i = 0; i < sizeof(size_buffer); ++i)
-            bs << size_buffer[i];
-          for (uLongf i = 0; i < compressedLen; ++i)
-            bs << compressed[i];
+          std::uint64_t clen = compressedLen;
+          std::uint64_t slen = checkpoint_size;
+
+          bs.write(reinterpret_cast<char*>(&clen), sizeof(clen));
+          bs.write(reinterpret_cast<char*>(&slen), sizeof(slen));
+          bs.write(reinterpret_cast<char*>(compressed), static_cast<std::streamsize>(clen));
 
           delete[] compressed;
         }
@@ -466,8 +464,8 @@ namespace FEAT
           _comm.barrier();
 
           char* data = bs.data();
-          uLongf compressed_size = static_cast<uLongf>(*(uint64_t*)(data));
-          uLongf checkpoint_size = static_cast<uLongf>(*(uint64_t*)(data + sizeof(uint64_t)));
+          uLongf compressed_size = static_cast<uLongf>(*(std::uint64_t*)(data));
+          uLongf checkpoint_size = static_cast<uLongf>(*(std::uint64_t*)(data + sizeof(uint64_t)));
 
           Bytef *compressed = (Bytef*)(data + (2 * sizeof(uint64_t)));
           _input_array = new char[checkpoint_size];
@@ -490,12 +488,10 @@ namespace FEAT
 
           std::vector<char> buffer;
           auto checkpoint_size = _collect_checkpoint_data(buffer);
-          char* size_buffer = reinterpret_cast<char*>(&checkpoint_size);
 
-          for (Index i = 0; i < sizeof(size_buffer); ++i)
-            bs << size_buffer[i];
-          for (const auto i : buffer)
-            bs << i;
+          std::uint64_t slen = checkpoint_size;
+          bs.write(reinterpret_cast<char*>(&slen), sizeof(slen));
+          bs.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
         }
 
         /**
@@ -517,7 +513,7 @@ namespace FEAT
           _comm.barrier();
 
           char* buffer = bs.data();
-          uint64_t size = *(uint64_t*)(buffer);
+          uint64_t size = *(std::uint64_t*)(buffer);
 
           _input_array = new char[size];
           std::copy(buffer + sizeof(uint64_t), buffer + sizeof(uint64_t) + size - 1, _input_array);

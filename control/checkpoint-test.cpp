@@ -1,4 +1,3 @@
-#include <test_system/test_system.hpp>
 // FEAT3: Finite Element Analysis Toolbox, Version 3
 // Copyright (C) 2010 - 2019 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
@@ -9,6 +8,7 @@
 #include <control/checkpoint_control.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/binary_stream.hpp>
+#include <test_system/test_system.hpp>
 
 using namespace FEAT;
 using namespace FEAT::TestSystem;
