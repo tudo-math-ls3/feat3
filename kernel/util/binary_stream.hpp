@@ -43,6 +43,8 @@ namespace FEAT
       public std::basic_streambuf<char>
     {
     private:
+      typedef std::basic_streambuf<char> base_class;
+      typedef typename base_class::traits_type traits_type;
       typedef std::vector<char>::size_type datasize;
       typedef std::streamsize streamsize;
 
@@ -166,7 +168,22 @@ namespace FEAT
         // move stream position
         return pos_type(std::streamoff(_data_pos = datasize(pos)));
       }
-    };
+
+      virtual int overflow(int c = EOF) override
+      {
+        if(c == EOF)
+          return EOF;
+
+        // convert to char
+        const char cc = traits_type::to_char_type(c);
+
+        // push to vector
+        _data.push_back(cc);
+
+        // return put character
+        return traits_type::to_int_type(cc);
+      }
+    }; // class BinaryBuffer
     /// \endcond
 
     // the stream's buffer
