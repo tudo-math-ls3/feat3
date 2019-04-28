@@ -653,11 +653,16 @@ namespace FEAT
       /**
        * \brief Plot the current iteration?
        *
+       * \param[in] st
+       * The status of the current iteration.
+       *
        * \returns \c true if the plot mode is set to \c iter or \c all and the plot interval matches
+       * or the solver does not continue to the next iteration
        */
-      bool _plot_iter() const
+      bool _plot_iter(Status st = Status::progress) const
       {
-        return _num_iter % _plot_interval == 0 && (_plot_mode == PlotMode::iter || _plot_mode == PlotMode::all);
+        return ((_num_iter % _plot_interval == 0) || (st != Status::progress))
+          && ((_plot_mode == PlotMode::iter) || (_plot_mode == PlotMode::all));
       }
 
       /**
@@ -862,12 +867,15 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
         }
 
+        // analyse defect
+        Status status = this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
+
         // plot defect?
-        if(this->_plot_iter())
+        if(this->_plot_iter(status))
           this->_plot_iter_line(this->_num_iter, this->_def_cur, this->_def_prev);
 
-        // analyse defect
-        return this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
+        // return status
+        return status;
       }
 
       /**
@@ -896,12 +904,15 @@ namespace FEAT
         this->_def_cur = def_cur_norm;
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
 
+        // analyse defect
+        Status status = this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
+
         // plot defect?
-        if(this->_plot_iter())
+        if(this->_plot_iter(status))
           this->_plot_iter_line(this->_num_iter, this->_def_cur, this->_def_prev);
 
-        // analyse defect
-        return this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
+        // return status
+        return status;
       }
     }; // class IterativeSolver
 
