@@ -357,8 +357,6 @@ namespace FEAT
 
           XASSERTM(name != "", "no complete filename consisting of name.extension given");
 
-          _comm.barrier();
-
           if(extension == "cp") {
             _save(name);
           }
@@ -396,8 +394,6 @@ namespace FEAT
 
           XASSERTM(name != "", "no complete filename consisting of name.extension given");
 
-          _comm.barrier();
-
           if(extension == "cp") {
             _load(name);
           }
@@ -422,8 +418,6 @@ namespace FEAT
          */
         void save(BinaryStream& bs)
         {
-          _comm.barrier();
-
           std::vector<char> data;
 
           uLongf checkpoint_size = static_cast<uLongf>(_collect_checkpoint_data(data));
@@ -461,8 +455,6 @@ namespace FEAT
         {
           XASSERTM(_input_array == nullptr, "another input file was read before");
 
-          _comm.barrier();
-
           char* data = bs.data();
           uLongf compressed_size = static_cast<uLongf>(*(std::uint64_t*)(data));
           uLongf checkpoint_size = static_cast<uLongf>(*(std::uint64_t*)(data + sizeof(uint64_t)));
@@ -484,8 +476,6 @@ namespace FEAT
          */
         void save(BinaryStream& bs)
         {
-          _comm.barrier();
-
           std::vector<char> buffer;
           auto checkpoint_size = _collect_checkpoint_data(buffer);
 
@@ -509,8 +499,6 @@ namespace FEAT
         void load (BinaryStream& bs)
         {
           XASSERTM(_input_array == nullptr, "another input file was read before");
-
-          _comm.barrier();
 
           char* buffer = bs.data();
           uint64_t size = *(std::uint64_t*)(buffer);

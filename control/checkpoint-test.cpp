@@ -49,6 +49,7 @@ public:
       BinaryStream bs;
       cp.add_object(String("dv1"), &dv1);
       cp.save(bs);
+      comm.barrier();
       bs.seekg(0);
       cp.load(bs);
       LAFEM::DenseVector<Mem_, DT_, IT_> dv2;
