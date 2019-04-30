@@ -24,6 +24,10 @@ if "%VS16PATH%" neq "" (
 rem Ensure that we have a path to devenv.exe
 if "%VSVER%" == "" goto novs
 
+rem Create output directories if necessary
+if not exist "..\lib" mkdir "..\lib"
+if not exist "..\obj" mkdir "..\obj"
+
 rem ===========================================================================
 echo **************************************************************************
 if exist "./ALGLIB" (

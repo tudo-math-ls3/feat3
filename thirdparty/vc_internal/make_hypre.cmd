@@ -9,8 +9,8 @@ if "%4" == "" goto errcall
 rem Check build mode
 if "%2" == "dbg" set CXXFLAGS=/FS /Od /RTC1 /MDd
 if "%2" == "opt" set CXXFLAGS=/MP /Gy /O2 /Ob2 /Oi /MD
-if "%3" == "x64" set LIBFLAGS=/MACHINE:X64
-if "%3" == "x86" set LIBFLAGS=/MACHINE:X86
+if "%3" == "x64" set LIBFLAGS=/MACHINE:X64 /NOLOGO
+if "%3" == "x86" set LIBFLAGS=/MACHINE:X86 /NOLOGO
 if "%4" == "mpi" set CXXFLAGS=%CXXFLAGS% /DHYPRE_HAVE_MPI /I"%MSMPI_INC% "
 if "%4" == "serial" set CXXFLAGS=%CXXFLAGS% /DHYPRE_SEQUENTIAL
 goto build
@@ -403,7 +403,6 @@ cl %CXXFLAGS1% ./hypre/src/parcsr_ls/ame.c                           /Fo"%OBJPAT
 
 rem ===============================================================================================
 :link
-set LIBFLAGS=%LIBFLAGS% /NOLOGO
 
 echo.
 echo Linking 'hypre.%1-%2-%4-%3'

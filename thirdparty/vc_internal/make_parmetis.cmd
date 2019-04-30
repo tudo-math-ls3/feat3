@@ -9,8 +9,8 @@ if "%3" == "" goto errcall
 rem Check build mode
 if "%2" == "dbg" set CXXFLAGS=/Od /RTC1 /MDd
 if "%2" == "opt" set CXXFLAGS=/MP /Gy /O2 /Ob2 /Oi /MD
-if "%3" == "x64" set LIBFLAGS=/MACHINE:X64
-if "%3" == "x86" set LIBFLAGS=/MACHINE:X86
+if "%3" == "x64" set LIBFLAGS=/MACHINE:X64 /NOLOGO
+if "%3" == "x86" set LIBFLAGS=/MACHINE:X86 /NOLOGO
 goto build
 
 :errcall
@@ -134,6 +134,19 @@ cl %CXXFLAGS2% ./parmetis/metis/libmetis/util.c         /Fo"%OBJPATH2%/util.obj
 cl %CXXFLAGS2% ./parmetis/metis/libmetis/wspace.c       /Fo"%OBJPATH2%/wspace.obj
 
 echo.
+echo Linking 'metis.%1-%2-%3'
+lib %LIBFLAGS% /OUT:"..\lib\metis.%1-%2-%3.lib" ..\obj\gklib.%1-%2-%3\*.obj ..\obj\metis.%1-%2-%3\*.obj
+
+if "%MSMPI_INC%" == "" (
+  echo.
+  echo MPI not found; skipping MPI-based ParMETIS library...
+  echo.
+  goto end
+)
+
+rem ===============================================================================================
+
+echo.
 echo Compiling ParMETIS Sources...
 cl %CXXFLAGS3% ./parmetis/libparmetis/akwayfm.c         /Fo"%OBJPATH3%/akwayfm.obj
 cl %CXXFLAGS3% ./parmetis/libparmetis/ametis.c          /Fo"%OBJPATH3%/ametis.obj
@@ -174,14 +187,6 @@ cl %CXXFLAGS3% ./parmetis/libparmetis/wave.c            /Fo"%OBJPATH3%/wave.obj
 cl %CXXFLAGS3% ./parmetis/libparmetis/weird.c           /Fo"%OBJPATH3%/weird.obj
 cl %CXXFLAGS3% ./parmetis/libparmetis/wspace.c          /Fo"%OBJPATH3%/wspace.obj
 cl %CXXFLAGS3% ./parmetis/libparmetis/xyzpart.c         /Fo"%OBJPATH3%/xyzpart.obj
-
-rem ===============================================================================================
-:link
-set LIBFLAGS=%LIBFLAGS% /NOLOGO
-
-echo.
-echo Linking 'metis.%1-%2-%3'
-lib %LIBFLAGS% /OUT:"..\lib\metis.%1-%2-%3.lib" ..\obj\gklib.%1-%2-%3\*.obj ..\obj\metis.%1-%2-%3\*.obj
 
 echo.
 echo Linking 'parmetis.%1-%2-%3'

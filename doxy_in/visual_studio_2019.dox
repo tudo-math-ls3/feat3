@@ -1,31 +1,33 @@
-/** \page feat_for_windows FEAT for Visual Studio 2015 on Windows systems
-This page describes the FEAT Visual Studio 2015 build system for Windows systems.
+/** \page feat_for_win_vs16 FEAT for Visual Studio 2019 on Windows systems
+This page describes the FEAT Visual Studio 2019 build system for Windows systems.
 
 \tableofcontents
 
-\section windows_prereqs Prerequisites
-\subsection windows_prereqs_vs Microsoft Visual Studio 2015
-To compile and use FEAT under windows, you will at lease require <b>Microsoft Visual Studio 2015</b> (any edition) as
-well as the latest update. Note that the "free" <em>Community</em> edition of Visual Studio 2015 is perfectly sufficient.
+\section win_vs16_prereqs Prerequisites
+\subsection win_vs16_prereqs_vs Microsoft Visual Studio 2019
+To compile and use FEAT under windows, you will at lease require <b>Microsoft Visual Studio 2019</b> (any edition) as
+well as the latest update. Note that the "free" <em>Community</em> edition of Visual Studio 2019 is perfectly sufficient.
 
 For information about legal ways to obtain a copy of Visual Studio, contact your supervisor or visit the following site:
-- https://www.visualstudio.com/downloads/download-visual-studio-vs
+- https://visualstudio.microsoft.com/downloads
 
-If you are a member of a university that cooperates with Microsoft (such as TU Dortmund), you may as well checkout
-Microsoft's official page https://imagine.microsoft.com to obtain a student license for Visual Studio 2015.
+\subsubsection win_vs16_pathvar Setting the Visual Studio path environment variable
+Unfortunately, Visual Studio 2019 does not set any environment variable that specifies its installation path anymore,
+so this has to be done by hand. To do so, you have to define an environment variable called <c>VS16PATH</c>. If you
+have installed Visual Studio 2019 Community in the default location, you can run the following command in a console with
+administrator rights to set the environment variable:
+\verbatim
+setx VS16PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community"
+\endverbatim
+If you have installed Visual Studio in another directory, then you have to adjust the path accordingly.
 
-\note
-If you want compile 64-bit binaries, you may also have to manually select the <em>x64 Compilers and Tools</em> option
-during the Visual Studio 2015 setup (I don't remember anymore whether this option is selected by default).
+\subsection win_vs16_prereqs_python Python 3 Interpreter
+Some minor parts of the build system are written in Python, namely the patches required for some third-party libraries
+as well as the Visual Studio project file generator script. In theory, any Python 3.x compatible interpreter should do
+the job, however, the scripts have only been tested with the official Python releases, which can be obtained here:
+- https://www.python.org/downloads
 
-Furthermore, you will need to install the latest update for Visual Studio 2015, as the original release had some
-compiler bugs that would prevent you from successfully compiling FEAT.
-- As of 2016-09-06, the lastest update is <em>Update 3</em>, which can be downloaded at
-  - https://go.microsoft.com/fwlink/?LinkId=691129
-- You may also check the official <em>Visual Studio Blog</em> for more recent updates:
-  - https://blogs.msdn.microsoft.com/visualstudio
-
-\subsection windows_prereqs_mpi Microsoft MPI
+\subsection win_vs16_prereqs_mpi Microsoft MPI
 If you want to make use of FEAT's parallel computing capability, you will also need to install the <b>Microsoft MPI</b>
 library as well as the corresponding SDK. Note that installing MPI is <b>not</b> mandatory, however, without this
 library, FEAT is limited to its "single-process" functionality.
@@ -36,7 +38,7 @@ Visual Studio have not been successful, so these (and other) implementations are
 Visual Studio build-system. Sorry for the inconvenience.
 
 You can download the latest version of the MS-MPI library here:
- - https://msdn.microsoft.com/en-us/library/bb524831.aspx
+ - https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi
  - <b>Important:</b> You need to download and install <b>both</b> files <c>MSMpiSetup.exe</c> and <c>msmpisdk.msi</c>.
 
 \note
@@ -50,7 +52,7 @@ sc config MsMpiLaunchSvc start= auto
 Once you have installed MS-MPI and setup the launch service, there is nothing more to do, as the build-system will
 automatically detect that a MPI implementation is available.
 
-\subsection windows_prereqs_cuda Nvidia CUDA
+\subsection win_vs16_prereqs_cuda Nvidia CUDA
 All that you have to do is to download and install the CUDA Toolkit from the Nvidia homepage:
 - https://developer.nvidia.com/cuda-downloads
 
@@ -58,17 +60,18 @@ Once the installation is complete, you will be able to compile FEAT with CUDA su
 by selecting one of the configurations that contain the <c>cuda</c>
 
 \note
-Currently, the only supported version of CUDA is <b>9.1</b>.
+Currently, the only supported version of CUDA is <b>10.1</b>.
 
 \attention
-CUDA can <b>not</b> be used for x86 (32-bit) builds of FEAT, as Nvidia does not provide some libraries (namely CUBLAS,
-CUSPARSE and CUSOLVER) for this platform. If you try anyway, you will end up with some unresolveable linker errors.
+CUDA can <b>not</b> be used for x86 (32-bit) builds of FEAT, because Nvidia does not provide some libraries (namely
+CUBLAS, CUSPARSE and CUSOLVER) for this platform. If you try anyway, you will end up with some unresolveable linker
+errors.
 
 
-\subsection windows_prereqs_imkl Intel MKL
+\subsection win_vs16_prereqs_imkl Intel MKL
 Intel MKL is currently not supported by the FEAT Visual Studio build system.
 
-\section windows_thirdparty Additional Third-Party Libraries
+\section win_vs16_thirdparty Additional Third-Party Libraries
 FEAT supports a set of third-party libraries, which can be included to extend the functionality offered by FEAT.
 Note that all third-party libraries are <em>opt-in</em>, i.e. you are not forced to use any of these libraries, but you
 may as well use FEAT without any additional libraries (a.k.a. "naked build") -- the drawback is that you will only have
@@ -87,7 +90,7 @@ following libraries, you will have to perform the following steps:
    detects which libraries have been compiled and enables the corresponding classes, so that no further manual setup
    is required.
 
-\subsection windows_thirdparty_alglib ALGLIB
+\subsection win_vs16_thirdparty_alglib ALGLIB
 <c>ALGLIB</c> is a library that is used by FEAT to offer an additional set of linear and non-linear solvers.
 - Lastest tested Version: 3.13.0 (C++ free GPL edition)
 - Download Link: http://www.alglib.net/download.php
@@ -104,7 +107,7 @@ thirdparty
   ...
 \endverbatim
 
-\subsection windows_thirdparty_fparser fparser
+\subsection win_vs16_thirdparty_fparser fparser
 <c>fparser</c> is a library that offers a lightweight function interpreter, which is used by the
 FEAT::Analytic::ParsedFunction class to parse and evaluate expressions specified at runtime. This library is e.g. used
 by and demonstrated in Tutorial 04.
@@ -124,7 +127,7 @@ thirdparty
   ...
 \endverbatim
 
-\subsection windows_thirdparty_half half
+\subsection win_vs16_thirdparty_half half
 <c>half</c> is a header-only library that offers a C++ implementation of the IEEE 754 half-precision data type.
 - Lastest tested Version: 1.12.0 (from 2017-03-06)
 - Download Link: http://half.sourceforge.net/#downloads
@@ -139,7 +142,7 @@ thirdparty
   ...
 \endverbatim
 
-\subsection windows_thirdparty_hypre HYPRE
+\subsection win_vs16_thirdparty_hypre HYPRE
 <c>HYPRE</c> is a library that offers a large set of parallel solvers and preconditioners, most notably the
 <c>BoomerAMG</c> solver/preconditioner.
 - Lastest tested Version: 2.11.2 (from 2017-03-13)
@@ -165,7 +168,7 @@ thirdparty
   ...
 \endverbatim
 
-\subsection windows_thirdparty_parmetis ParMETIS
+\subsection win_vs16_thirdparty_parmetis ParMETIS
 <c>ParMETIS</c> is a library that offers graph partitioning algorithms used by FEAT to compute domain decompositions for
 parallel (i.e. MPI-based) applications.
 - Lastest tested Version: 4.0.3 (from 2013-03-30)
@@ -192,7 +195,7 @@ thirdparty
   ...
 \endverbatim
 
-\subsection windows_thirdparty_suitesparse SuiteSparse (UMFPACK)
+\subsection win_vs16_thirdparty_suitesparse SuiteSparse (UMFPACK)
 <c>SuiteSparse</c> is a library collection that offers various algorithms for sparse linear systems. Currently, the
 only component of the <c>SuiteSparse</c> library is <c>UMFPACK</c>, a direct linear solver for CSR matrices, which
 is used by the FEAT::Solver::Umfpack and FEAT::Solver::UmfpackMean classes.
@@ -213,7 +216,7 @@ thirdparty
   ...
 \endverbatim
 
-\subsection windows_thirdparty_zlib zlib
+\subsection win_vs16_thirdparty_zlib zlib
 <c>zlib</c> is a library that offers functions for compression and decompression of binary data using the <c>DEFLATE</c>
 algorithm.
 - Lastest tested Version: 1.2.11 (from 2017-01-15)
@@ -235,64 +238,56 @@ thirdparty
 
 
 
-\section windows_vcgen_tool Creating Visual Studio Project and Solution files
+\section win_vs16_vcgen_tool Creating Visual Studio Project and Solution files
 Before you can compile any FEAT application, test or tutorial  with Visual Studio, you will first need generate a
 corresponding Visual Studio project and solution file. In contrast to the CMake-based build-system used under Linux,
 there is no "configure" script that will generate all required projects and solution in one step.
 
 Instead, you need to generate VS project and solution files for each desired application, tutorial or kernel test
-separately by using a tool named <c>vc14_gen</c>.
-Before you can use this tool, you need to compile it -- this step is described in the next sub-section.
+separately by using a Python script named <c>vc16-gen.py</c>, which is located in the root directory of FEAT.
 
-The usage and the behaviour of the tool depends on whether the desired target is a kernel test or any other sort of
+The usage and the behaviour of the script depends on whether the desired target is a kernel test or any other sort of
 application (this includes tutorials and tools). The usage of the tool is also described in the following sub-sections.
 
-\subsection windows_buildsys_vc_symlink Creating Kernel Symlink
+\subsection win_vs16_buildsys_vc_symlink Creating Kernel Symlink
 
 Before you can use the Visual Studio build system, you first need to perform an inconvenient but necessary step to
 circumvent Visual Studio's internal limitations by creating a symbolic link for the kernel directory. To do this,
-open a command prompt in the FEAT root directory and execute the following command:
+open a command prompt in the FEAT root directory and execute the following command (with administrator rights):
 
 \verbatim
-mklink /D build_system\vc14\kernel ..\..\kernel
+mklink /D build_system\vc16\kernel ..\..\kernel
 \endverbatim
 
-\subsection windows_vcgen_build Building the vc14_gen Tool
-Simply open the <c>vc14_gen.sln</c> solution file, which is located in the <c>tools\\vc14_gen</c> directory, and build
-the solution. There is only one platform and one configuration available, so there is nothing special to keep in mind
-here.
-
-Once compiled, the command line binary <c>vc14_gen.exe</c> will appear in the FEAT root directory.
-
-\subsection windows_vcgen_use_app Generating Application Projects
+\subsection win_vs16_vcgen_use_app Generating Application Projects
 To generate a project file for any sort of application (this includes tutorials and tools), open a console in the
 FEAT root directory. The basic command to generate a project file is:
 \verbatim
-vc14_gen.exe <project-path> <project-name>
+vc16-gen.py <project-path> <project-name>
 \endverbatim
 
 <b>Example:</b>\n
 To generate a project file for the first tutorial and compile it, you will need to perform the following steps:
 -# Open a console in the FEAT root directory.
--# Enter the following command to create the project file <c>tutorial-01-poisson.vc14.vcxproj</c> as well as the
-corresponding solution file <c>tutorial-01-poisson.vc14.sln</c> residing in the <c>tutorials</c> directory:
+-# Enter the following command to create the project file <c>tutorial-01-poisson.vc16.vcxproj</c> as well as the
+corresponding solution file <c>tutorial-01-poisson.vc16.sln</c> residing in the <c>tutorials</c> directory:
 \verbatim
-vc14_gen.exe tutorials tutorial-01-poisson
+vc16-gen.py tutorials tutorial-01-poisson
 \endverbatim
 -# Open the new solution file. This solution file will contain two projects:
-  - The application project <c>tutorial-01-poisson.vc14</c>
-  - The FEAT kernel project <c>kernel.vc14</c>
+  - The application project <c>tutorial-01-poisson.vc16</c>
+  - The FEAT kernel project <c>kernel.vc16</c>
 -# Add the corresponding source file <c>tutorial_01_poisson.cpp</c> to the application project.
 -# Choose a build target platform and configuration, e.g. the debug configuration namend <c>dbg</c> for the 32-bit
    platform <c>x86</c>.
 -# Build the solution.
--# The resulting executable application binary <c>tutorial-01-poisson.vc14-dbg-x86.exe</c> will appear in the <c>win</c>
+-# The resulting executable application binary <c>tutorial-01-poisson.vc16-dbg-x86.exe</c> will appear in the <c>win</c>
    sub-directory of the FEAT root directory.
 
-\subsection windows_vcgen_use_test Generating Kernel Test Projects
+\subsection win_vs16_vcgen_use_test Generating Kernel Test Projects
 The basic command to generate a project file for a kernel unit test is:
 \verbatim
-vc14_gen.exe -test <test-file-path>
+vc16-gen.py -test <test-file-path>
 \endverbatim
 This command will create a directory named <c>testing</c> in the FEAT root directory, which contains the corresponding
 project and solution file, possibly in a sub-directory that coincides with the path of the test source file within
@@ -302,24 +297,24 @@ the <c>kernel</c> subdirectory.
 To generate a project file for the <c>tiny_algebra-test</c>, which is implemented in the source file
 <c>kernel\\util\\tiny_algebra-test.cpp</c>, you will need to perform the following steps:
 -# Open a console in the FEAT root directory.
--# Enter the following command to create the project file <c>tiny_algebra-test.vc14.vcxproj</c> as well as the
-corresponding solution file <c>tiny_algebra-test.vc14.sln</c> residing in the <c>testing\\util</c> directory:
+-# Enter the following command to create the project file <c>tiny_algebra-test.vc16.vcxproj</c> as well as the
+corresponding solution file <c>tiny_algebra-test.vc16.sln</c> residing in the <c>testing\\util</c> directory:
 \verbatim
-vc14_gen.exe -test kernel\util\tiny_algebra-test.cpp
+vc16-gen.py -test kernel\util\tiny_algebra-test.cpp
 \endverbatim
--# Open the solution file <c>testing\\util\\tiny_algebra-test.vc14.sln</c>
+-# Open the solution file <c>testing\\util\\tiny_algebra-test.vc16.sln</c>
    - Note: In contrast to application projects, the corresponding source file is added to the project automatically.
 -# Choose a build target platform and configuration, e.g. the debug configuration namend <c>dbg</c> for the 32-bit
    platform <c>x86</c>.
 -# Build the solution.
--# The resulting executable test binary <c>tiny_algebra-test.vc14-dbg-x86.exe</c> will appear in the <c>win</c>
+-# The resulting executable test binary <c>tiny_algebra-test.vc16-dbg-x86.exe</c> will appear in the <c>win</c>
    sub-directory of the FEAT root directory.
 
-\subsection windows_kernel_project The kernel Project file
-All solution files generated by the <c>vc14_gen</c> tool contain two projects: one project for the actual target
-binary as well as one project for the FEAT kernel library named <c>kernel.vc14</c>.
-This kernel project file is \em not generated by the <c>vc14_gen</c> tool -- it is a hand-written project file that
-is located in the <c>build_system/vc14</c> directory and it is shared among all target applications.
+\subsection win_vs16_kernel_project The kernel Project file
+All solution files generated by the <c>vc16-gen.py</c> tool contain two projects: one project for the actual target
+binary as well as one project for the FEAT kernel library named <c>kernel.vc16</c>.
+This kernel project file is \em not generated by the <c>vc16-gen.py</c> tool -- it is a hand-written project file that
+is located in the <c>build_system/vc16</c> directory and it is shared among all target applications.
 
 \attention
 Do \b not add or remove files to/from the kernel project file. This project is configured to automatically include
@@ -329,8 +324,8 @@ files automatically without any explicit modification from the user.
 \attention
 Furthermore, it is highly recommended to leave the compiler options specified in the \c kernel project unchanged.
 
-\section windows_build_config Build Configurations and Platforms
-The project and solution files generated by the <c>vc14_gen</c> tool contain a set of supported build configurations
+\section win_vs16_build_config Build Configurations and Platforms
+The project and solution files generated by the <c>vc16-gen.py</c> script contain a set of supported build configurations
 and platforms, which can be selected in the Visual Studio IDE to specify the build target.
 
 Supported Platforms are:
@@ -363,9 +358,9 @@ The filename of a compiled application binary is then concatenated of the projec
 the target platform. This enables you to compile and use various build configurations for different target platforms
 side-by-side without having to recompile.
 
-For example, the application binary filename <c>tutorial-01-poisson.vc14-dbg-mpi-x86.exe</c> represents:
+For example, the application binary filename <c>tutorial-01-poisson.vc16-dbg-mpi-x86.exe</c> represents:
 - the binary of the project <c>tutorial-01-poisson</c>
-- compiled with the \c vc14 compiler (aka Visual C++ 2015)
+- compiled with the \c vc16 compiler (aka Visual C++ 2019)
 - build with the <c>dbg-mpi</c> configuration
 - for the \c x86 target platform
 

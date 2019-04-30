@@ -9,8 +9,8 @@ if "%3" == "" goto errcall
 rem Check build mode
 if "%2" == "dbg" set CXXFLAGS=/Od /RTC1 /MDd
 if "%2" == "opt" set CXXFLAGS=/MP /Gy /O2 /Ob2 /Oi /MD
-if "%3" == "x64" set LIBFLAGS=/MACHINE:X64
-if "%3" == "x86" set LIBFLAGS=/MACHINE:X86
+if "%3" == "x64" set LIBFLAGS=/MACHINE:X64 /NOLOGO
+if "%3" == "x86" set LIBFLAGS=/MACHINE:X86 /NOLOGO
 goto build
 
 :errcall
@@ -43,7 +43,6 @@ cl %CXXFLAGS% ./triangle/triangle.c    /Fo"%OBJPATH%/triangle.obj"
 
 rem ===============================================================================================
 :link
-set LIBFLAGS=%LIBFLAGS% /NOLOGO
 
 echo.
 echo Linking 'triangle.%1-%2-%3'

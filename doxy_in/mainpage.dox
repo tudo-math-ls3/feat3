@@ -2,7 +2,8 @@
 \mainpage FEAT - Finite Element Analysis Toolbox
 
 \section main_sec_buildsys Build-System
-- \ref feat_for_windows
+- \ref feat_for_win_vs16
+- \ref feat_for_win_vs14
 
 \section main_sec_subsystems Kernel Subsystems
 The subsystems are in detail:
