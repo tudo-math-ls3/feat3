@@ -290,6 +290,9 @@ namespace FEAT
       /// virtual destructor
       virtual ~Graph();
 
+      /// Clears the graph
+      void clear();
+
       /**
        * \brief Clones this graph.
        *

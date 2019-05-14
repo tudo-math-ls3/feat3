@@ -29,7 +29,30 @@ namespace FEAT
     {
     public:
       /**
-       * \brief Assembles an intergral mean filter
+       * \brief Assembles an integral mean filter
+       *
+       * \param[out] vec_prim, vec_dual
+       * The primal and dual vectors for the mean filter.
+       *
+       * \param[in] space
+       * The finite element space for which the filter is to be assembled.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to use for integration
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      static void assemble(
+        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_prim,
+        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_dual,
+        const Space_& space, const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+
+        assemble(vec_prim, vec_dual, space, cubature_factory);
+      }
+
+      /**
+       * \brief Assembles an integral mean filter
        *
        * \param[out] vec_prim, vec_dual
        * The primal and dual vectors for the mean filter.
@@ -40,11 +63,11 @@ namespace FEAT
        * \param[in] cubature_factory
        * A cubature factory for integration.
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       static void assemble(
         LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_prim,
         LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_dual,
-        const Space_& space, const CubatureFactory_& cubature_factory)
+        const Space_& space, const Cubature::DynamicFactory& cubature_factory)
       {
         // allocate primal and dual vectors
         LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> vec_v(space.get_num_dofs(), DataType_(0));
@@ -66,7 +89,34 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles an intergral mean filter
+       * \brief Assembles an integral mean filter
+       *
+       * \param[out] filter
+       * The filter to be assembled.
+       *
+       * \param[in] space
+       * The finite element space for which the filter is to be assembled.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to use for integration
+       *
+       * \param[in] sol_mean
+       * The desired integral mean of the solution vector. Defaults to 0.
+       *
+       * \warning This function does not work for global mean filters!
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      static void assemble(
+        LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
+        const Space_& space, const String& cubature_name,
+        const DataType_ sol_mean = DataType_(0))
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble(filter, space, cubature_factory, sol_mean);
+      }
+
+      /**
+       * \brief Assembles an integral mean filter
        *
        * \param[out] filter
        * The filter to be assembled.
@@ -82,10 +132,10 @@ namespace FEAT
        *
        * \warning This function does not work for global mean filters!
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       static void assemble(
         LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
-        const Space_& space, const CubatureFactory_& cubature_factory,
+        const Space_& space, const Cubature::DynamicFactory& cubature_factory,
         const DataType_ sol_mean = DataType_(0))
       {
         // allocate primal and dual vectors

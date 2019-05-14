@@ -46,6 +46,42 @@ namespace FEAT
        * \param[in] space_pres
        * The pressure space.
        *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       *
+       * \param[in] scale_b, scale_d
+       * The scaling factors for the matrices. These default to -1 due to integration by parts.
+       */
+      template<
+        typename DataType_, typename IndexType_, int dim_,
+        typename SpaceVelo_, typename SpacePres_>
+      static void assemble(
+        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, 1>& matrix_b,
+        LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 1, dim_>& matrix_d,
+        const SpaceVelo_& space_velo,
+        const SpacePres_& space_pres,
+        const String& cubature_name,
+        const DataType_ scale_b = -DataType_(1),
+        const DataType_ scale_d = -DataType_(1)
+        )
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble(matrix_b, matrix_d, space_velo, space_pres, cubature_factory, scale_b, scale_d);
+      }
+
+      /**
+       * \brief Assembles the B and D matrices
+       *
+       * \param[in,out] matrix_b, matrix_d
+       * The two matrices to be assembled. If the matrices are empty, their structure is
+       * assembled automatically.
+       *
+       * \param[in] space_velo
+       * The velocity space.
+       *
+       * \param[in] space_pres
+       * The pressure space.
+       *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.
        *
@@ -54,14 +90,13 @@ namespace FEAT
        */
       template<
         typename DataType_, typename IndexType_, int dim_,
-        typename SpaceVelo_, typename SpacePres_,
-        typename CubatureFactory_>
+        typename SpaceVelo_, typename SpacePres_>
       static void assemble(
         LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, 1>& matrix_b,
         LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 1, dim_>& matrix_d,
         const SpaceVelo_& space_velo,
         const SpacePres_& space_pres,
-        const CubatureFactory_& cubature_factory,
+        const Cubature::DynamicFactory& cubature_factory,
         const DataType_ scale_b = -DataType_(1),
         const DataType_ scale_d = -DataType_(1)
         )

@@ -19,7 +19,7 @@ namespace FEAT
     /**
      * \brief Discrete vertex projector class
      *
-     * This class interpolates a discrete finite-element function in the vertices of the space's underyling
+     * This class interpolates a discrete finite-element function in the vertices of the space's underlying
      * mesh.
      *
      * \author Peter Zajac
@@ -186,7 +186,7 @@ namespace FEAT
     /**
      * \brief Discrete cell projector class
      *
-     * This class interpolates a discrete finite-element function in the cells of the space's underyling
+     * This class interpolates a discrete finite-element function in the cells of the space's underlying
      * mesh by computing the integral mean over the cell using a cubature rule.
      *
      * \author Peter Zajac
@@ -237,13 +237,38 @@ namespace FEAT
       template<
         typename VectorOut_,
         typename VectorIn_,
-        typename Space_,
-        typename CubatureFactory_>
+        typename Space_>
       static void project(
         VectorOut_& vector,
         const VectorIn_& coeff,
         const Space_& space,
-        const CubatureFactory_& cubature_factory)
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        project(vector, coeff, space, cubature_factory);
+      }
+
+      /**
+       * \brief Projects a discrete function into the cells.
+       *
+       * \param[out] vector
+       * A reference to a vector object that shall receive the cell interpolation of the discrete function.
+       *
+       * \param[in] coeff
+       * A reference to the coefficient vector of the finite-element function.
+       *
+       * \param[in] space
+       * A reference to the finite-element space.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory that is to be used for integration.
+       */
+      template<typename VectorOut_, typename VectorIn_, typename Space_>
+      static void project(
+        VectorOut_& vector,
+        const VectorIn_& coeff,
+        const Space_& space,
+        const Cubature::DynamicFactory& cubature_factory)
       {
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;

@@ -207,7 +207,7 @@ namespace FEAT
             }
 
             // compute and check our defect
-            DataType d = def_norm_sqr(_grad[1] - _grad[0]);
+            DataType d = def_norm_sqr(_grad[1], _grad[0]);
             if(def <= d)
             {
               // The defect has increased, so we return the previous extrapolation result
@@ -262,7 +262,7 @@ namespace FEAT
             }
 
             // compute and check our defect
-            DataType d = def_norm_sqr(_hess[1] - _hess[0]);
+            DataType d = def_norm_sqr(_hess[1], _hess[0]);
             if(def <= d)
             {
               // The defect has increased, so we return the previous extrapolation result
@@ -283,19 +283,24 @@ namespace FEAT
 
       protected:
         template<int n_, int s_>
-        static DataType def_norm_sqr(const Tiny::Vector<DataType, n_, s_>& x)
+        static DataType def_norm_sqr(
+          const Tiny::Vector<DataType, n_, s_>& x, const Tiny::Vector<DataType, n_, s_>& y)
         {
-          return x.norm_euclid_sqr();
+          return (x - y).norm_euclid_sqr();
         }
 
         template<int m_, int n_, int sm_, int sn_>
-        static DataType def_norm_sqr(const Tiny::Matrix<DataType, m_, n_, sm_, sn_>& x)
+        static DataType def_norm_sqr(
+          const Tiny::Matrix<DataType, m_, n_, sm_, sn_>& x,
+          const Tiny::Matrix<DataType, m_, n_, sm_, sn_>& y)
         {
-          return x.norm_hessian_sqr();
+          return (x - y).norm_hessian_sqr();
         }
 
         template<int l_, int m_, int n_, int sl_, int sm_, int sn_>
-        static DataType def_norm_sqr(const Tiny::Tensor3<DataType, l_, m_, n_, sl_, sm_, sn_>& x)
+        static DataType def_norm_sqr(
+          const Tiny::Tensor3<DataType, l_, m_, n_, sl_, sm_, sn_>& x,
+          const Tiny::Tensor3<DataType, l_, m_, n_, sl_, sm_, sn_>& y)
         {
           DataType r(DataType(0));
           for(int i(0); i < l_; ++i)
@@ -304,7 +309,7 @@ namespace FEAT
             {
               for(int k(0); k < n_; ++k)
               {
-                r += Math::sqr(x(i,j,k));
+                r += Math::sqr(x(i,j,k) - y(i,j,k));
               }
             }
           }

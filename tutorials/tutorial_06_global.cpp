@@ -87,9 +87,8 @@
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional
@@ -141,7 +140,7 @@ namespace Tutorial06
 
   // In addition to the usual types above, we also need to define another important mesh class
   // for this tutorial: the "mesh-node" type:
-  // A mesh-node is a management object, which organises a mesh as well as a set of mesh-parts
+  // A mesh-node is a management object, which organizes a mesh as well as a set of mesh-parts
   // that refer to the corresponding mesh along with some other data that we are not interested in
   // here. We did not use mesh-nodes in the previous tutorials, as there was only just one mesh
   // and a single mesh-part for the whole domain boundary, which we have managed by ourselves.
@@ -515,8 +514,12 @@ namespace Tutorial06
 
     comm.print("Assembling system matrix...");
 
-    // Create a cubature factory:
-    Cubature::DynamicFactory cubature_factory("auto-degree:5");
+    // Create a domain assembler on all mesh elements
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:5";
 
     // The assembly of a global (distributed) system matrix is quite easy:
     // All that we have to do is to assemble the internal local matrix, which is done just the
@@ -529,7 +532,8 @@ namespace Tutorial06
     Assembly::Common::LaplaceOperator laplace_operator;
 
     // And assemble the numerical matrix content:
-    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_local, laplace_operator, space, cubature_factory);
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix_local, laplace_operator, space, cubature_name);
 
     // This is already it: we do not need to do anything else for the global matrix assembly.
 
@@ -552,7 +556,8 @@ namespace Tutorial06
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
 
     // And assemble the local rhs vector:
-    Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs_local, force_functional, space, cubature_factory);
+    Assembly::assemble_linear_functional_vector(
+      domain_assembler, vec_rhs_local, force_functional, space, cubature_name);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -730,17 +735,17 @@ namespace Tutorial06
     comm.print("\nComputing errors against reference solution...");
 
     // As usual, we want to compute the L2- and H1-errors against our reference solution.
-    // For this, we first compute the errors on our patch by analysing our local solution vector:
-    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-      vec_sol_local, sol_function, space, cubature_factory);
+    // For this, we first compute the errors on our patch by analyzing our local solution vector:
+    auto error_info = Assembly::integrate_error_function<1>(
+      domain_assembler, sol_function, vec_sol_local, space, cubature_name);
 
     // And then we need to synchronize the errors over our communicator to sum up the errors of
     // each patch to obtain the errors over the whole domain:
-    errors.synchronize(comm);
+    error_info.synchronize(comm);
 
-    // And let's print the errors to the console; we need to use the "format_string" function here,
-    // as the "print" function accepts only String objects as input:
-    comm.print(errors.format_string());
+    // And let's print the errors to the console:
+    comm.print("Error Analysis:");
+    comm.print(error_info.print_norms());
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file

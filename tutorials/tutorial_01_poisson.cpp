@@ -77,12 +77,11 @@
 
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for ScalarErrorComputer
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 
 // FEAT-LAFEM includes
@@ -276,11 +275,17 @@ namespace Tutorial01
     // so we just need to create the objects.
 
     // Let's create a trafo object now. Its only parameter is the mesh that it is defined on.
+    // At this point, it is important to mention that the trafo object will keep an internal reference
+    // to the mesh object that is passed to its constructor here, so the mesh object has to be alive
+    // as long at the trafo object exists. This is not a problem here, because both the mesh and
+    // the trafo object reside on the stack and are automatically cleaned up upon the exit of this
+    // main function, but it may require some attention when you organize the mesh and trafo objects
+    // on the heap, possibly as member variables of some class object as e.g. in tutorial 05.
     TrafoType trafo(mesh);
 
     // Create the desire finite element space. Its only parameter is the trafo that it is defined on.
+    // Again, the space keeps a reference to the trafo object throughout its whole lifetime.
     SpaceType space(trafo);
-
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
@@ -325,21 +330,34 @@ namespace Tutorial01
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
-    // Before we start assembling anything, we need create a cubature factory, which will be
-    // used to generate cubature rules for integration.
+    // In the next step we are going to assemble a bilinear form into the system matrix and a linear
+    // form into the right hand side vector. These (bi)linear forms consist of domain integrals and
+    // therefore we need to create a 'domain assembler' here, which will be responsible for the
+    // assembly of these forms and we will also use this domain assembler to perform an a posteriori
+    // error analysis by computing the H0- and H1-errors against a given reference solution.
+    // We create a domain assembler for our trafo, which internally also contains a reference to
+    // our mesh. Note that the domain assembler keeps the trafo reference internally.
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+
+    // Next, we need to tell the assembler on which elements of the mesh we want to assemble.
+    // We want to assemble on the whole mesh, which is the usual case, so we just have to call
+    // the 'compile_all_elements' function here:
+    domain_assembler.compile_all_elements();
+
+    // Before we start assembling anything, we need to chose a cubature rule, which will be
+    // used for the integration of the domain integrals.
     // There are several cubature rules available in FEAT, and a complete list can be queried
     // by compiling and executing the 'cub-list' tool in the 'tools' directory.
     // We choose the 'auto-degree:n' rule here, which will automatically choose an appropriate
     // cubature rule that can integrate polynomials up to degree n exactly. Some other possible
     // choices are also provided here, but commented out.
-    Cubature::DynamicFactory cubature_factory(
-      "auto-degree:5"          // automatic cubature rule for 5th degree polynomials
-    //"gauss-legendre:3"       // 3x3 Gauss-Legendre rule
-    //"gauss-lobatto:4"        // 4x4 Gauss-Lobatto rule
-    //"newton-cotes-open:5"    // 5x5 'open' Newton-Cotes rule
-    //"trapezoidal"            // trapezoidal rule (works for all shape types)
-    //"barycentre"             // barycentre rule (not recommended due to insufficient order)
-    );
+    String cubature_name =
+      "auto-degree:5";          // automatic cubature rule for 5th degree polynomials
+    //"gauss-legendre:3";       // 3x3 Gauss-Legendre rule
+    //"gauss-lobatto:4";        // 4x4 Gauss-Lobatto rule
+    //"newton-cotes-open:5";    // 5x5 'open' Newton-Cotes rule
+    //"trapezoidal";            // trapezoidal rule (works for all shape types)
+    //"barycentre";             // barycentre rule (not recommended due to insufficient order)
 
     std::cout << "Assembling system matrix..." << std::endl;
 
@@ -348,16 +366,14 @@ namespace Tutorial01
     // The definition of other and more complex PDE operators is discussed in another tutorial.
     Assembly::Common::LaplaceOperator laplace_operator;
 
-    // Next, we call the bilinear operator assembler to assemble the operator into a matrix.
-    // In analogy to the SymbolicAssembler class, the corresponding assemble function of the
-    // BilinearOperatorAssembler class also has a "1" suffix indicating that there is only one
-    // finite element space involved:
-    Assembly::BilinearOperatorAssembler::assemble_matrix1(
-      matrix,           // the matrix that receives the assembled operator
-      laplace_operator, // the operator that is to be assembled
-      space,            // the finite element space in use
-      cubature_factory  // the cubature factory to be used for integration
-    );
+    // Now that we have our operator, we can use the domain assembler to assemble it by using the
+    // 'assemble_bilinear_operator_matrix_1' helper function. It may seem confusing that this
+    // is a global function and not a member function of the domain assembler in the first place,
+    // but this is for technical (dependency) reasons, so you just have to get used to it.
+    // In analogy to the SymbolicAssembler class, the corresponding assemble function also has
+    // a "1" suffix indicating that there is only one finite element space involved in the process:
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix, laplace_operator, space, cubature_name);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: RHS (linear forms)
@@ -384,14 +400,11 @@ namespace Tutorial01
     // returns the class type of its argument, so that we do not have to write that out again:
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
 
-    // Now we can call the LinearFunctionalAssembler class to assemble our linear
-    // functional into a vector.
-    Assembly::LinearFunctionalAssembler::assemble_vector(
-      vec_rhs,          // the vector that receives the assembled functional
-      force_functional, // the functional that is to be assembled
-      space,            // the finite element space in use
-      cubature_factory  // the cubature factory to be used for integration
-    );
+    // Now we can use the domain assembler to assemble the linear form for us by using another
+    // helper function, just in analogy to the bilinear form assembly:
+    Assembly::assemble_linear_functional_vector(
+      domain_assembler, vec_rhs, force_functional, space, cubature_name);
+
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
@@ -473,34 +486,40 @@ namespace Tutorial01
     solver->done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Post-Processing: Computing L2/H1-Errors
+    // Post-Processing: Computing H0/H1-Errors
 
     // We have a discrete solution now, so have to do something with it.
     // Since this is a simple benchmark problem, we know the analytical solution of our PDE, so
-    // we may compute the L2- and H1-errors of our discrete solution against it.
+    // we may compute the H0- and H1-errors of our discrete solution against it.
 
+    std::cout << std::endl;
     std::cout << "Computing errors against reference solution..." << std::endl;
 
-    // The class responsible for this is the 'ScalarErrorComputer' assembly class template.
-    // The one and only template parameter is the maximum desired error derivative norm, i.e.
-    // setting the parameter to
-    //   = 0 will compute only the H0- (aka L2-) error
-    //   = 1 will compute both the H0- and H1-errors
-    //   = 2 will compute the H0-, H1- and H2-errors
-
-    // We have already created the 'sol_function' object representing our analytical solution for
-    // the assembly of the right-hand-side vector, so we may reuse it for the computation now:
-
-    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-      vec_sol,          // the coefficient vector of the discrete solution
-      sol_function,     // the analytic function object, declared for RHS assembly
-      space,            // the finite element space
-      cubature_factory  // and the cubature factory used for integration
+    // We have to use the domain assembler for the actual error computation and we are going to
+    // use another helper function here to do the job for us. This helper function returns a
+    // structure that is actually just an instance of the 'Assembly::FunctionIntegralInfo' class
+    // template, however, the template arguments are not trivial to determine and so we simply
+    // use the 'auto' keyword here to let the compile determine the correct type.
+    // Note that this helper function requires an integer template parameter which describes the
+    // maximum desired derivative to be used in the norm integral computation, i.e.
+    //   = 0 will compute only the H0- (aka L2-), L1- and Lmax-errors
+    //   = 1 will compute both the H0-, L1-, Lmax- and H1-errors
+    //   = 2 will compute the H0-, L1-, Lmax-1, H1- and H2-errors
+    auto error_info = Assembly::integrate_error_function<1>(
+      domain_assembler,      // the domain assembler
+      sol_function,          // the analytic reference solution function
+      vec_sol,               // the coefficient vector of the FEM solution
+      space,                 // the finite element space
+      cubature_name          // the cubature name used for integration
     );
 
-    // The returned ScalarErrorInfo object contains all computed error norms,
-    // so we may print the errors by simply pushing the object to cout:
-    std::cout << errors << std::endl;
+    // The error_info structure, which is an instance of the Assembly::FunctionIntegralInfo class
+    // template defined in <kernel/assembly/function_integral_jobs.hpp>, contains all the computed
+    // norms and integrals as member functions, which we could access here individually. However,
+    // we simply want to use the 'print_norms' function, which returns a formatted multi-line
+    // string containing all the error norm values and
+    std::cout << "Error Analysis:" << std::endl;
+    std::cout << error_info.print_norms() << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
@@ -510,6 +529,7 @@ namespace Tutorial01
     // First of all, build the filename string
     String vtk_name(String("./tutorial-01-poisson-lvl") + stringify(level));
 
+    std::cout << std::endl;
     std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
 
     // Next, project our solution into the vertices. This is not necessary for Q1, but in case that someone

@@ -39,8 +39,8 @@ namespace FEAT
       {
       }
 
-      explicit DynamicFactory(String name) :
-        _name(name)
+      explicit DynamicFactory(String name_) :
+        _name(name_)
       {
       }
 
@@ -53,6 +53,11 @@ namespace FEAT
       {
         _name = other._name;
         return *this;
+      }
+
+      const String& name() const
+      {
+        return _name;
       }
 
       template<typename Shape_, typename Weight_, typename Coord_, typename Point_>

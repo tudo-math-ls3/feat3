@@ -223,7 +223,31 @@ namespace FEAT
        * \brief Performs the analysis of a velocity field.
        *
        * \param[in] vector
-       * The vector representing the velocity field to be analysed.
+       * The vector representing the velocity field to be analyzed.
+       *
+       * \param[in] space
+       * The finite element space for the velocity.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       *
+       * \returns
+       * A VelocityInfo structure containing the computed information.
+       */
+      template<typename DataType_, typename IndexType_, int dim_, typename Space_>
+      static VelocityInfo<DataType_, dim_> compute(
+        const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>, dim_>& vector,
+        const Space_& space, const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        return compute(vector, space, cubature_factory);
+      }
+
+      /**
+       * \brief Performs the analysis of a velocity field.
+       *
+       * \param[in] vector
+       * The vector representing the velocity field to be analyzed.
        *
        * \param[in] space
        * The finite element space for the velocity.
@@ -234,10 +258,10 @@ namespace FEAT
        * \returns
        * A VelocityInfo structure containing the computed information.
        */
-      template<typename DataType_, typename IndexType_, int dim_, typename Space_, typename CubatureFactory_>
+      template<typename DataType_, typename IndexType_, int dim_, typename Space_>
       static VelocityInfo<DataType_, dim_> compute(
         const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>, dim_>& vector,
-        const Space_& space, const CubatureFactory_& cubature_factory)
+        const Space_& space, const Cubature::DynamicFactory& cubature_factory)
       {
         // first of all, verify the dimensions
         static_assert(Space_::shape_dim == dim_, "invalid velocity field dimension");
@@ -390,7 +414,31 @@ namespace FEAT
        * \brief Performs the analysis of a velocity field.
        *
        * \param[in] vector
-       * The vector representing the velocity field to be analysed.
+       * The vector representing the velocity field to be analyzed.
+       *
+       * \param[in] space
+       * The finite element space for the velocity.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       *
+       * \returns
+       * A VelocityInfo structure containing the computed information.
+       */
+      template<typename DataType_, typename IndexType_, int dim_, typename Space_>
+      static VelocityInfo<DataType_, dim_> compute(
+        const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
+        const Space_& space, const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        return compute(vector, space, cubature_factory);
+      }
+
+      /**
+       * \brief Performs the analysis of a velocity field.
+       *
+       * \param[in] vector
+       * The vector representing the velocity field to be analyzed.
        *
        * \param[in] space
        * The finite element space for the velocity.
@@ -401,10 +449,10 @@ namespace FEAT
        * \returns
        * A VelocityInfo structure containing the computed information.
        */
-      template<typename DataType_, typename IndexType_, int dim_, typename Space_, typename CubatureFactory_>
+      template<typename DataType_, typename IndexType_, int dim_, typename Space_>
       static VelocityInfo<DataType_, dim_> compute(
         const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
-        const Space_& space, const CubatureFactory_& cubature_factory)
+        const Space_& space, const Cubature::DynamicFactory& cubature_factory)
       {
         // first of all, verify the dimensions
         static_assert(Space_::shape_dim == dim_, "invalid velocity field dimension");

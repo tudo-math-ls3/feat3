@@ -91,8 +91,8 @@
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
 
@@ -142,7 +142,7 @@ namespace Tutorial08
   //    and abort the application.
   //
   // 2) We could out-source the actual application code into a separate function template (named e.g.
-  //    'run'), which is templatised in the mesh shape-type, and then use an if-else cascade to
+  //    'run'), which is templatized in the mesh shape-type, and then use an if-else cascade to
   //    call the corresponding shape-type specialization of that function template based on the
   //    shape-type of the input mesh file(s).
   //
@@ -151,16 +151,16 @@ namespace Tutorial08
   //
   // 1) The 'main' function, which performs most of the basic initialization prior to the actual
   //    mesh object construction. In this tutorial, this boils down to setting up the SimpleArgParser
-  //    and creating and initialising the MeshFileReader to obtain the shape-type of the input
+  //    and creating and initializing the MeshFileReader to obtain the shape-type of the input
   //    mesh files.
   //
-  // 2) The 'run' function template, which is templatised in the shape-type that is to be used.
+  // 2) The 'run' function template, which is templatized in the shape-type that is to be used.
   //    This function then contains the 'actual' application code that starts with our well-known
   //    geometry typedefs (MeshType, TrafoType, etc.) as well as the creation of the mesh object.
   //    The remainder of this function is then more or less equivalent the previous tutorials.
 
 
-  // Here comes the forward declaration of the "run" function template; it is templatised in the
+  // Here comes the forward declaration of the "run" function template; it is templatized in the
   // shape-type, which is chosen from the input mesh file(s), and expects the SimpleArgParser and
   // MeshFileReader objects as arguments, which are created in the "main" function.
   // This 'run' function template is implemented right below the following "main" function.
@@ -252,7 +252,7 @@ namespace Tutorial08
     // we can query the deque of strings that represent the parameters of the option:
     const std::deque<String>& filenames = args.query("mesh")->second;
 
-    // For convenience, we'll print the filenames to the console by utilising the
+    // For convenience, we'll print the filenames to the console by utilizing the
     // 'stringify_join' function that will stringify each item in the deque and
     // concatenate them using a separator string:
     std::cout << "Mesh Files: " << stringify_join(filenames, " ") << std::endl;
@@ -383,7 +383,7 @@ namespace Tutorial08
     // a sphere or a surface triangulation. At this point, we could provide a typedef
     // for the mesh atlas type, but we can also skip this, as we require the actual
     // type only for the one following variable declaration.
-    // The mesh atlas class is templatised in the mesh type and we do not have to pass
+    // The mesh atlas class is templatized in the mesh type and we do not have to pass
     // anything to its constructor:
     Geometry::MeshAtlas<MeshType> mesh_atlas;
 
@@ -488,8 +488,12 @@ namespace Tutorial08
     VectorType vec_sol = matrix.create_vector_r();
     VectorType vec_rhs = matrix.create_vector_l();
 
-    // Create a cubature factory
-    Cubature::DynamicFactory cubature_factory("auto-degree:3");
+    // Create a domain assembler on all mesh elements
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:3";
 
     // First of all, format the matrix entries to zero.
     matrix.format();
@@ -498,12 +502,13 @@ namespace Tutorial08
 
     // Assemble the Laplace operator:
     Assembly::Common::LaplaceOperator laplace_operator;
-    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_operator, space, cubature_factory);
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix, laplace_operator, space, cubature_name);
 
     // Assemble the right-hand-side function:
     Analytic::Common::ConstantFunction<ShapeType::dimension> one_func(1.0);
-    Assembly::Common::ForceFunctional<decltype(one_func)> functional(one_func);
-    Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, functional, space, cubature_factory);
+    Assembly::assemble_force_function_vector(
+      domain_assembler, vec_rhs, one_func, space, cubature_name);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly

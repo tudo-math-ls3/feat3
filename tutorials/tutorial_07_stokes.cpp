@@ -71,8 +71,8 @@
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/mean_filter_assembler.hpp>       // for MeanFilterAssembler
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/gpdv_assembler.hpp>              // for GradPresDivVeloAssembler
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
@@ -281,8 +281,12 @@ namespace Tutorial07
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
-    // First of all, let's create a cubature factory:
-    Cubature::DynamicFactory cubature_factory("auto-degree:5");
+    // Create a domain assembler on all mesh elements
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:5";
 
     // Now we need to assemble the three sub-matrices individually.
 
@@ -293,11 +297,9 @@ namespace Tutorial07
     Assembly::Common::LaplaceOperatorBlocked<dim> operator_a; // gradient tensor
     //Assembly::Common::DuDvOperatorBlocked<dim>  operator_a; // deformation tensor
 
-    // In analogy to all previous (scalar) tutorials, we now use the BilinearOperatorAssembler
-    // to do the dirty work for us. The only notable difference is that we have to call the
-    // "assemble_block_matrix1" function instead of its scalar counterpart "assemble_matrix1":
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-      matrix.block_a(), operator_a, space_velo, cubature_factory);
+    // As usual, use the assembly helper function to do the dirty work here:
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix.block_a(), operator_a, space_velo, cubature_name);
 
     // Next, we need to assemble the sub-matrices B and D for the pressure gradient and
     // velocity divergence. The good news is that this operator pair is required so often
@@ -309,7 +311,7 @@ namespace Tutorial07
       matrix.block_d(),  // velocity divergence sub-matrix D
       space_velo,        // velocity space
       space_pres,        // pressure space
-      cubature_factory   // cubature factory
+      cubature_name      // cubature rule name
     );
 
     // Note that the right-rand-side of our Stokes equations is zero, so we don't have to assemble
@@ -360,7 +362,7 @@ namespace Tutorial07
     Assembly::MeanFilterAssembler::assemble(
       filter.at<1>(),   // pressure mean-filter component of system filter
       space_pres,       // pressure space
-      cubature_factory  // cubature factory
+      cubature_name     // cubature rule name
     );
 
     // Okay, now we have a mean-filter for the pressure and therefore the assembly of the
@@ -467,11 +469,11 @@ namespace Tutorial07
     solver->done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Post-Processing: Analyse velocity field
+    // Post-Processing: Analyze velocity field
 
     // At this point, we may compute the L2/H1-errors of the velocity and pressure against
     // reference solutions as in the previous tutorials. However, we want to do something else
-    // for a change here, so let us analyse the velocity field, i.e. compute various quantities
+    // for a change here, so let us analyze the velocity field, i.e. compute various quantities
     // from our field: divergence, vorticity and its H0/H1-norms.
 
     std::cout << std::endl << "Performing velocity field analysis..." << std::endl;
@@ -479,9 +481,9 @@ namespace Tutorial07
     // The class that performs this analysis is the "VelocityAnalyser" and it returns a
     // "VelicityInfo" object of the appropriate datatype and dimension:
     Assembly::VelocityInfo<DataType, dim> velo_info = Assembly::VelocityAnalyser::compute(
-      vec_sol.at<0>(), // the velocity field
-      space_velo,               // the velocity space
-      cubature_factory          // a cubature factory
+      vec_sol.at<0>(),      // the velocity field
+      space_velo,           // the velocity space
+      cubature_name         // cubature rule name
     );
 
     // Just as the "ScalarErrorInfo", that is returned by the "ScalarErrorComputer", we can now
@@ -512,9 +514,9 @@ namespace Tutorial07
     VectorPresType cell_pres;
     Assembly::DiscreteCellProjector::project(
       cell_pres,                // the vector that receives the cell-projection of the pressure
-      vec_sol.at<1>(), // the pressure-vector to be projection
+      vec_sol.at<1>(),          // the pressure-vector to be projection
       space_pres,               // the pressure space
-      cubature_factory          // a cubature factory for the projection.
+      cubature_name             // the cubature rule for the projection.
     );
 
     // Now we can add the cell-projected pressure to our VTK exporter:

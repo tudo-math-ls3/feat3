@@ -42,9 +42,6 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the weight vector for the prolongation matrix.
        *
-       * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
-       *
        * \param[in] fine_space
        * A reference to the fine-mesh test-space to be used.
        *
@@ -55,14 +52,52 @@ namespace FEAT
         typename Matrix_,
         typename Vector_,
         typename FineSpace_,
-        typename CoarseSpace_,
-        typename CubatureFactory_>
+        typename CoarseSpace_>
       static void assemble_prolongation(
         Matrix_& matrix,
         Vector_& vector,
         const FineSpace_& fine_space,
         const CoarseSpace_& coarse_space,
-        const CubatureFactory_& cubature_factory)
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_prolongation(matrix, vector, fine_space, coarse_space, cubature_factory);
+      }
+
+      /**
+       * \brief Assembles a prolongation matrix and its corresponding weight vector.
+       *
+       * To obtain the final prolongation matrix, one needs to invert the weight vector
+       * component-wise and scale the matrix rows by the inverted weights afterwards.
+       * This can be accomplished by the \c component_invert and \c scale_rows operations
+       * of the vector and matrix containers, resp.
+       *
+       * \param[in,out] matrix
+       * A reference to the prolongation matrix that is to be assembled.
+       *
+       * \param[in,out] vector
+       * A reference to the weight vector for the prolongation matrix.
+       *
+       * \param[in] fine_space
+       * A reference to the fine-mesh test-space to be used.
+       *
+       * \param[in] coarse_space
+       * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
+       */
+      template<
+        typename Matrix_,
+        typename Vector_,
+        typename FineSpace_,
+        typename CoarseSpace_>
+      static void assemble_prolongation(
+        Matrix_& matrix,
+        Vector_& vector,
+        const FineSpace_& fine_space,
+        const CoarseSpace_& coarse_space,
+        const Cubature::DynamicFactory& cubature_factory)
       {
         // validate matrix and vector dimensions
         XASSERTM(matrix.rows() == fine_space.get_num_dofs(), "invalid matrix dimensions");
@@ -302,25 +337,59 @@ namespace FEAT
        * \param[in,out] matrix
        * A reference to the prolongation matrix that is to be assembled.
        *
-       * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
+       * \param[in] fine_space
+       * A reference to the fine-mesh test-space to be used.
+       *
+       * \param[in] coarse_space
+       * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       */
+      template<
+        typename Matrix_,
+        typename FineSpace_,
+        typename CoarseSpace_>
+        static void assemble_prolongation_direct(
+          Matrix_& matrix,
+          const FineSpace_& fine_space,
+          const CoarseSpace_& coarse_space,
+          const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_prolongation_direct(matrix, fine_space, coarse_space, cubature_factory);
+      }
+
+      /**
+       * \brief Assembles a prolongation matrix.
+       *
+       * \attention
+       * This function <b>must not</b> be used to assemble prolongation matrices for
+       * parallel (i.e. global) simulations, as it will be scaled incorrectly due to
+       * missing weight synchronization!\n
+       * Use this function only in serial simulations!
+       *
+       * \param[in,out] matrix
+       * A reference to the prolongation matrix that is to be assembled.
        *
        * \param[in] fine_space
        * A reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
        * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
        */
       template<
         typename Matrix_,
         typename FineSpace_,
-        typename CoarseSpace_,
-        typename CubatureFactory_>
+        typename CoarseSpace_>
       static void assemble_prolongation_direct(
         Matrix_& matrix,
         const FineSpace_& fine_space,
         const CoarseSpace_& coarse_space,
-        const CubatureFactory_& cubature_factory)
+        const Cubature::DynamicFactory& cubature_factory)
       {
         // create a weight vector
         auto weight = matrix.create_vector_l();
@@ -349,27 +418,65 @@ namespace FEAT
        * \param[in,out] vector
        * A reference to the weight vector for the reduction matrix.
        *
-       * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
+       * \param[in] fine_space
+       * A reference to the fine-mesh test-space to be used.
+       *
+       * \param[in] coarse_space
+       * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       */
+      template<
+        typename Matrix_,
+        typename Vector_,
+        typename FineSpace_,
+        typename CoarseSpace_>
+      static void assemble_truncation(
+        Matrix_& matrix,
+        Vector_& vector,
+        const FineSpace_& fine_space,
+        const CoarseSpace_& coarse_space,
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_truncation(matrix, vector, fine_space, coarse_space, cubature_factory);
+      }
+
+      /**
+       * \brief Assembles a truncation matrix and its corresponding weight vector.
+       *
+       * To obtain the final truncation matrix, one needs to invert the weight vector
+       * component-wise and scale the matrix rows by the inverted weights afterwards.
+       * This can be accomplished by the \c component_invert and \c scale_rows operations
+       * of the vector and matrix containers, resp.
+       *
+       * \param[in,out] matrix
+       * A reference to the truncation matrix that is to be assembled.
+       *
+       * \param[in,out] vector
+       * A reference to the weight vector for the reduction matrix.
        *
        * \param[in] fine_space
        * A reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
        * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
        */
       template<
         typename Matrix_,
         typename Vector_,
         typename FineSpace_,
-        typename CoarseSpace_,
-        typename CubatureFactory_>
+        typename CoarseSpace_>
       static void assemble_truncation(
         Matrix_& matrix,
         Vector_& vector,
         const FineSpace_& fine_space,
         const CoarseSpace_& coarse_space,
-        const CubatureFactory_& cubature_factory)
+        const Cubature::DynamicFactory& cubature_factory)
       {
         // validate matrix and vector dimensions
         XASSERTM(matrix.rows() == coarse_space.get_num_dofs(), "invalid matrix dimensions");
@@ -609,25 +716,59 @@ namespace FEAT
        * \param[in,out] matrix
        * A reference to the truncation matrix that is to be assembled.
        *
-       * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
+       * \param[in] fine_space
+       * A reference to the fine-mesh test-space to be used.
+       *
+       * \param[in] coarse_space
+       * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       */
+      template<
+        typename Matrix_,
+        typename FineSpace_,
+        typename CoarseSpace_>
+      static void assemble_truncation_direct(
+        Matrix_& matrix,
+        const FineSpace_& fine_space,
+        const CoarseSpace_& coarse_space,
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_truncation_direct(matrix, fine_space, coarse_space, cubature_factory);
+      }
+
+      /**
+       * \brief Assembles a truncation matrix.
+       *
+       * \attention
+       * This function <b>must not</b> be used to assemble truncation matrices for
+       * parallel (i.e. global) simulations, as it will be scaled incorrectly due to
+       * missing weight synchronization!\n
+       * Use this function only in serial simulations!
+       *
+       * \param[in,out] matrix
+       * A reference to the truncation matrix that is to be assembled.
        *
        * \param[in] fine_space
        * A reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
        * A reference to the coarse-mesh trial-space to be used.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
        */
       template<
         typename Matrix_,
         typename FineSpace_,
-        typename CoarseSpace_,
-        typename CubatureFactory_>
+        typename CoarseSpace_>
       static void assemble_truncation_direct(
         Matrix_& matrix,
         const FineSpace_& fine_space,
         const CoarseSpace_& coarse_space,
-        const CubatureFactory_& cubature_factory)
+        const Cubature::DynamicFactory& cubature_factory)
       {
         // create a weight vector
         auto weight = matrix.create_vector_l();

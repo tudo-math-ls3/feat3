@@ -173,6 +173,13 @@ namespace FEAT
     Graph::~Graph()
     {}
 
+    void Graph::clear()
+    {
+      _image_idx.clear();
+      _domain_ptr.clear();
+      _num_nodes_image = Index(0);
+    }
+
     Index Graph::degree() const
     {
       Index deg = 0;

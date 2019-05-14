@@ -67,9 +67,8 @@
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
 #include <kernel/assembly/grid_transfer.hpp>               // NEW: for GridTransfer
@@ -132,8 +131,9 @@ namespace Tutorial05
   // following data for each level in our multigrid mesh hierarchy:
   //
   // 1) the mesh, trafo and FE space objects
-  // 2) the system matrix and the system filter
-  // 3) grid transfer matrices (except for the coarsest level)
+  // 2) the domain assembler object
+  // 3) the system matrix and the system filter
+  // 4) grid transfer matrices (except for the coarsest level)
   //
   // This simple Level class will act as a "container" that encapsulates these required objects
   // for each level. We declare all members as "public" and do not implement any member functions
@@ -147,6 +147,9 @@ namespace Tutorial05
     TrafoType trafo;
     // The space for this level
     SpaceType space;
+
+    // The domain assembler for this level
+    Assembly::DomainAssembler<TrafoType> domain_assembler;
 
     // The system matrix for this level
     MatrixType matrix;
@@ -162,7 +165,8 @@ namespace Tutorial05
     explicit Level(Geometry::Factory<MeshType>& mesh_factory) :
       mesh(mesh_factory),
       trafo(mesh),
-      space(trafo)
+      space(trafo),
+      domain_assembler(trafo)
     {
     }
   }; // class Level
@@ -223,8 +227,8 @@ namespace Tutorial05
 
     // In the next step, we will assemble the system matrices and filters for each level.
 
-    // Create a cubature factory; this one can be used for all assembly steps on all levels.
-    Cubature::DynamicFactory cubature_factory("auto-degree:5");
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:5";
 
     // Now loop over all levels:
     for(Index ilevel(level_min); ilevel <= level_max; ++ilevel)
@@ -234,11 +238,18 @@ namespace Tutorial05
       // Get a reference to the corresponding level for easier member access
       Level& lvl = *levels.at(std::size_t(level_max - ilevel));
 
+      // In all previous tutorials, we only had a single mesh and therefore a single domain assembler,
+      // but now we have a whole mesh hierarchy and therefore we also need a domain assembler for
+      // each level individually. The domain assembler is stored in the level structure, but we
+      // still need to 'compile' it, which we do here:
+      lvl.domain_assembler.compile_all_elements();
+
       // Assemble the Laplace matrix:
       Assembly::SymbolicAssembler::assemble_matrix_std1(lvl.matrix, lvl.space);
       Assembly::Common::LaplaceOperator laplace_operator;
       lvl.matrix.format();
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(lvl.matrix, laplace_operator, lvl.space, cubature_factory);
+      Assembly::assemble_bilinear_operator_matrix_1(
+        lvl.domain_assembler, lvl.matrix, laplace_operator, lvl.space, cubature_name);
 
       // Create the boundary object for the boundary condition assembly
       Geometry::BoundaryFactory<MeshType> boundary_factory(lvl.mesh);
@@ -290,7 +301,7 @@ namespace Tutorial05
         mat_prol,           // the prolongation matrix that is to be assembled
         lvl_fine.space,     // the fine-mesh space
         lvl_coarse.space,   // the coarse-mesh space
-        cubature_factory    // the cubature factory to be used for integration
+        cubature_name       // the cubature rule name to be used for integration
       );
 
       // That's it for our prolongation matrix.
@@ -332,7 +343,8 @@ namespace Tutorial05
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
 
     // And assemble the rhs vector:
-    Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, force_functional, lvl_fine.space, cubature_factory);
+    Assembly::assemble_linear_functional_vector(
+      lvl_fine.domain_assembler, vec_rhs, force_functional, lvl_fine.space, cubature_name);
 
     // As always, we have to apply the boundary condition filter onto our vectors:
     lvl_fine.filter.filter_sol(vec_sol);
@@ -357,7 +369,7 @@ namespace Tutorial05
     // for managing the level hierarchy used by a multigrid solver. Note that this hierarchy
     // object is not a solver/preconditioner -- we will create that one later on.
 
-    // The MultiGridHierarchy class templates has three template parameters and its only
+    // The MultiGridHierarchy class template has three template parameters and its only
     // constructor parameter is the size of the level hierarchy, i.e. the total number of
     // levels that we want to create:
     auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
@@ -462,7 +474,7 @@ namespace Tutorial05
     // Finally, there is one important point to keep in mind when using a multigrid solver:
     // The "multigrid" object, which we have created above, does not initialize its smoothers
     // and coarse grid solver. We have to initialize the multigrid hierarchy by hand *before*
-    // initialising the remaining solver tree by calling its init() function.
+    // initializing the remaining solver tree by calling its init() function.
     // This may seem inconvenient, but this is the only way to go when building more complex
     // multigrid solver configurations like e.g. the ScaRC solver, so we have to live with that.
 
@@ -492,11 +504,13 @@ namespace Tutorial05
 
     std::cout << std::endl << "Computing errors against reference solution..." << std::endl;
 
-    // Compute and print errors
-    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-      vec_sol, sol_function, lvl_fine.space, cubature_factory);
+    // Compute the error norms:
+    auto error_info = Assembly::integrate_error_function<1>(
+      lvl_fine.domain_assembler, sol_function, vec_sol, lvl_fine.space, cubature_name);
 
-    std::cout << errors << std::endl;
+    // Print the error norms to the console
+    std::cout << "Error Analysis:" << std::endl;
+    std::cout << error_info.print_norms() << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file

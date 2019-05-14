@@ -55,10 +55,9 @@
 
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 
@@ -81,7 +80,7 @@ namespace Tutorial02
 {
   // Note:
   // This tutorial works only for 2D shapes, i.e. quadrilaterals or triangles.
-  // The reason for this is that the implementation of the 'PringlesFunction' class below
+  // The reason for this is that the implementation of the 'SaddleFunction' class below
   // is restricted to 2D for the sake of keeping the code simple. However, the remainder of this
   // tutorial code works for any shape type.
 
@@ -116,7 +115,7 @@ namespace Tutorial02
   // analytical solution 'u' (for post-processing) as well as the boundary condition function 'g'.
   // For this, we derive our own solution function by defining a class that derives from the
   // 'Analytic::Function' base-class:
-  class PringlesFunction :
+  class SaddleFunction :
     public Analytic::Function
   {
   public:
@@ -179,11 +178,11 @@ namespace Tutorial02
 
       // Now we require a *mandatory* constructor that takes a const reference to our
       // analytic function object as its one and only parameter:
-      explicit Evaluator(const PringlesFunction&)
+      explicit Evaluator(const SaddleFunction&)
       {
       }
 
-      // At the beginning of our PringlesFunction class definition, we told the assembler that we
+      // At the beginning of our SaddleFunction class definition, we told the assembler that we
       // are capable of computing function values, so we have to provide a function for this job.
       // This function is called 'value', its one and only parameter is the point in which we want
       // to evaluate and it returns the function value of type 'ValueType', which we have declared
@@ -224,8 +223,8 @@ namespace Tutorial02
         hess[1][1] = -DataType(2);
         return hess;
       }
-    }; // class PringlesFunction::Evaluator<...>
-  }; // class PringlesFunction
+    }; // class SaddleFunction::Evaluator<...>
+  }; // class SaddleFunction
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -270,8 +269,12 @@ namespace Tutorial02
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Perform numerical matrix assembly
 
-    // Create a cubature factory
-    Cubature::DynamicFactory cubature_factory("auto-degree:5");
+    // Create a domain assembler on all mesh elements
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:5";
 
     std::cout << "Assembling system matrix..." << std::endl;
 
@@ -284,7 +287,8 @@ namespace Tutorial02
     Assembly::Common::LaplaceOperator laplace_operator;
 
     // And assemble that operator
-    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_operator, space, cubature_factory);
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix, laplace_operator, space, cubature_name);
 
     // Note that the force functional is zero for the Laplace equation, therefore we do not
     // have to assemble the right-hand-side vector.
@@ -305,7 +309,7 @@ namespace Tutorial02
     // function 'g' that defines the boundary values. In this tutorial, we simply pass an object
     // that represents our analytical solution 'u' for this task, as it will give the correct
     // boundary values, of course. So create an instance of our analytical function now:
-    PringlesFunction sol_function;
+    SaddleFunction sol_function;
 
     // And assemble a unit-filter representing inhomogeneous Dirichlet BCs; This is done by calling
     // the 'assemble' function, to which we pass our boundary value function object as the third
@@ -353,11 +357,14 @@ namespace Tutorial02
 
     std::cout << "Computing errors against reference solution..." << std::endl;
 
-    // Compute and print the H0-/H1-errors
-    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-      vec_sol, sol_function, space, cubature_factory);
+    // Compute the error norms:
+    auto error_info = Assembly::integrate_error_function<1>(
+      domain_assembler, sol_function, vec_sol, space, cubature_name);
 
-    std::cout << errors << std::endl;
+    // Print the error norms to the console
+    std::cout << "Error Analysis:" << std::endl;
+    std::cout << error_info.print_norms() << std::endl;
+
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file

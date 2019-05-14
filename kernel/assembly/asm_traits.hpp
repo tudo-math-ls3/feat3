@@ -165,18 +165,33 @@ namespace FEAT
       static constexpr int image_dim = TrafoEvaluator::image_dim;
 
       /// maximum local dofs
+      static constexpr int max_local_dofs       = SpaceEvaluator::max_local_dofs;
       static constexpr int max_local_test_dofs  = TestEvaluator::max_local_dofs;
       static constexpr int max_local_trial_dofs = TrialEvaluator::max_local_dofs;
       static constexpr int max_local_mult_dofs  = MultEvaluator::max_local_dofs;
 
       /// local vector type
-      typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
+      typedef Tiny::Vector<DataType, max_local_dofs> LocalVectorType;
       typedef LocalVectorType LocalTestVectorType;
       typedef LocalVectorType LocalTrialVectorType;
       typedef LocalVectorType LocalMultVectorType;
 
       /// local matrix type
-      typedef Tiny::Matrix<DataType, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs> LocalMatrixType;
+      typedef Tiny::Matrix<DataType, max_local_dofs, max_local_dofs> LocalMatrixType;
+
+      /// local vector template
+      template<typename Value_>
+      using TLocalVector      = Tiny::Vector<Value_, max_local_dofs>;
+      template<typename Value_>
+      using TLocalTestVector  = Tiny::Vector<Value_, max_local_test_dofs>;
+      template<typename Value_>
+      using TLocalTrialVector = Tiny::Vector<Value_, max_local_trial_dofs>;
+      template<typename Value_>
+      using TLocalMultVector  = Tiny::Vector<Value_, max_local_mult_dofs>;
+
+      /// local matrix template
+      template<typename Value_>
+      using TLocalMatrix = Tiny::Matrix<Value_, max_local_test_dofs, max_local_trial_dofs>;
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
@@ -305,6 +320,18 @@ namespace FEAT
 
       /// local matrix type
       typedef Tiny::Matrix<DataType, TestEvaluator::max_local_dofs, TrialEvaluator::max_local_dofs> LocalMatrixType;
+
+      /// local vector template
+      template<typename Value_>
+      using TLocalTestVector  = Tiny::Vector<Value_, max_local_test_dofs>;
+      template<typename Value_>
+      using TLocalTrialVector = Tiny::Vector<Value_, max_local_trial_dofs>;
+      template<typename Value_>
+      using TLocalMultVector  = Tiny::Vector<Value_, max_local_mult_dofs>;
+
+      /// local matrix template
+      template<typename Value_>
+      using TLocalMatrix = Tiny::Matrix<Value_, max_local_test_dofs, max_local_trial_dofs>;
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
@@ -439,6 +466,18 @@ namespace FEAT
 
       /// local matrix type
       typedef Tiny::Matrix<DataType, TestEvaluator::max_local_dofs, TrialEvaluator::max_local_dofs> LocalMatrixType;
+
+      /// local vector template
+      template<typename Value_>
+      using TLocalTestVector  = Tiny::Vector<Value_, max_local_test_dofs>;
+      template<typename Value_>
+      using TLocalTrialVector = Tiny::Vector<Value_, max_local_trial_dofs>;
+      template<typename Value_>
+      using TLocalMultVector  = Tiny::Vector<Value_, max_local_mult_dofs>;
+
+      /// local matrix template
+      template<typename Value_>
+      using TLocalMatrix = Tiny::Matrix<Value_, max_local_test_dofs, max_local_trial_dofs>;
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;

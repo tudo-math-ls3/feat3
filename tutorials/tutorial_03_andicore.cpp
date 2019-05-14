@@ -70,9 +70,8 @@
 #include <kernel/assembly/bilinear_operator.hpp>           // NEW: for BilinearOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 
 // FEAT-LAFEM includes
@@ -126,7 +125,7 @@ namespace Tutorial03
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   // This tutorial covers an "anisotropic diffusion-convection-reaction" PDE, which is slightly more
-  // complex than the poisson example, so we'll need to define a few custom classes for the assembly
+  // complex than the Poisson example, so we'll need to define a few custom classes for the assembly
   // before we can start with our actual main function.
 
   // The first thing we require is a class that will contain the data for our PDE, namely the
@@ -332,7 +331,7 @@ namespace Tutorial03
       // Now comes the interesting part:
       // We want to evaluate the analytical solution, and for this, we need to get its corresponding
       // evaluator, which is again a class template similar to the one that you are currently reading,
-      // see the 'PringlesFunction' from the 'tutorial_02_laplace' example.
+      // see the 'SaddleFunction' from the 'tutorial_02_laplace' example.
       // However, its template parameter is *not* our assembly traits type 'AsmTraits_', but another
       // type called 'analytic evaluation traits', which we need to provide here.
       // Luckily, there is another template class in the 'Analytic' namespace which takes care
@@ -385,7 +384,7 @@ namespace Tutorial03
         // 3. the reaction   :      c *    u   * psi
 
         // For this task, we need to call the 'value', 'gradient' and 'hessian' functions of the
-        // solution function evaluator (see the PringlesFunction in Tutorial 02), so we need to
+        // solution function evaluator (see the SaddleFunction in Tutorial 02), so we need to
         // obtain the corresponding types of the return values from the AnalyticEvalTraits class,
         // which we have defined above. All we have to do now is to call the corresponding functions
         // of the function's evaluator class and supply the image point of our trafo data as the
@@ -481,8 +480,12 @@ namespace Tutorial03
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Perform numerical matrix assembly
 
-    // Create a cubature factory
-    Cubature::DynamicFactory cubature_factory("auto-degree:5");
+    // Create a domain assembler on all mesh elements
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:5";
 
     std::cout << "Assembling system matrix..." << std::endl;
 
@@ -492,8 +495,9 @@ namespace Tutorial03
     // At this point, we need to create an object representing our custom bilinear operator:
     AndicoreOperator andicore_operator(andicore_data);
 
-    // Next, we call the bilinear operator assembler to assemble the operator into a matrix.
-    Assembly::BilinearOperatorAssembler::assemble_matrix1( matrix, andicore_operator, space, cubature_factory);
+    // And assemble that operator
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix, andicore_operator, space, cubature_name);
 
     std::cout << "Assembling right-hand-side vector..." << std::endl;
 
@@ -509,9 +513,9 @@ namespace Tutorial03
     // the desired analytical solution with our andicore PDE operator:
     AndicoreFunctional<decltype(sol_function)> force_functional(andicore_data, sol_function);
 
-    // Now we can call the LinearFunctionalAssembler class to assemble our linear
-    // functional into a vector.
-    Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, force_functional, space, cubature_factory);
+    // And assemble our linear functional:
+    Assembly::assemble_linear_functional_vector(
+      domain_assembler, vec_rhs, force_functional, space, cubature_name);
 
     // Finally, clear the initial solution vector.
     vec_sol.format();
@@ -573,11 +577,13 @@ namespace Tutorial03
 
     std::cout << "Computing errors against reference solution..." << std::endl;
 
-    // Compute and print the H0-/H1-errors
-    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-      vec_sol, sol_function, space, cubature_factory);
+    // Compute the error norms:
+    auto error_info = Assembly::integrate_error_function<1>(
+      domain_assembler, sol_function, vec_sol, space, cubature_name);
 
-    std::cout << errors << std::endl;
+    // Print the error norms to the console
+    std::cout << "Error Analysis:" << std::endl;
+    std::cout << error_info.print_norms() << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file

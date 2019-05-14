@@ -569,7 +569,7 @@ namespace FEAT
        * \returns
        * The squared euclid norm of the vector.
        */
-      ValueType norm_euclid_sqr() const
+      DataType norm_euclid_sqr() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
@@ -578,14 +578,42 @@ namespace FEAT
       }
 
       /**
-      * \brief Computes the euclid norm of the vector.
-      *
-      * \returns
-      * The euclid norm of the vector.
-      */
-      ValueType norm_euclid() const
+       * \brief Computes the euclid norm of the vector.
+       *
+       * \returns
+       * The euclid norm of the vector.
+       */
+      DataType norm_euclid() const
       {
         return Math::sqrt(norm_euclid_sqr());
+      }
+
+      /**
+       * \brief Computes the l1-norm of the vector.
+       *
+       * \returns
+       * The l1-norm of the vector.
+       */
+      DataType norm_l1() const
+      {
+        DataType r(DataType(0));
+        for(int i(0); i < n_; ++i)
+          r += Math::abs(v[i]);
+        return r;
+      }
+
+      /**
+       * \brief Computes the max-norm of the vector.
+       *
+       * \returns
+       * The max-norm of the vector.
+       */
+      DataType norm_max() const
+      {
+        DataType r(DataType(0));
+        for(int i(0); i < n_; ++i)
+          r = Math::max(r, Math::abs(v[i]));
+        return r;
       }
 
       /**

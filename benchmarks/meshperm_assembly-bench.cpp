@@ -16,7 +16,10 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/burgers_assembler.hpp>
+#include <kernel/assembly/burgers_assembly_job.hpp>
 #include <kernel/assembly/interpolator.hpp>
+#include <kernel/assembly/domain_assembler.hpp>
+#include <kernel/assembly/basic_assembly_jobs.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -47,6 +50,7 @@ namespace MeshPermAssemblyBench
 
   struct BenchResults
   {
+    int num_worker_threads;
     /// permutation time
     double permute_time;
     /// total symbolic assembly time in seconds
@@ -60,16 +64,25 @@ namespace MeshPermAssemblyBench
     /// number of matrix-vector products performed
     int mat_vec_count;
 
+    /// threaded total time
+    double thread_time_total;
+    double thread_time_assemble;
+    double thread_time_wait;
+
     BenchResults() :
+      num_worker_threads(1),
       permute_time(0.0),
       sym_asm_time(0.0), num_asm_time(0.0), mat_vec_time(0.0),
-      num_asm_count(0), mat_vec_count(0)
+      num_asm_count(0), mat_vec_count(0),
+      thread_time_total(0.0),
+      thread_time_assemble(0.0),
+      thread_time_wait(0.0)
     {
     }
   }; // struct BenchResults
 
   template<typename Shape_, int nc_, typename CT_>
-  void bench_simple(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres)
+  void bench_poisson(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres)
   {
     typedef Geometry::ConformalMesh<Shape_, nc_, CT_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
@@ -99,6 +112,60 @@ namespace MeshPermAssemblyBench
       bres.num_asm_time = stamp_2.elapsed(stamp_1);
       bres.num_asm_count += 1;
     } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
+  }
+
+  template<typename Shape_, int nc_, typename CT_>
+  void bench_poisson_new(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, std::size_t nthreads)
+  {
+    typedef Geometry::ConformalMesh<Shape_, nc_, CT_> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+    TrafoType trafo(mesh);
+    SpaceType space(trafo);
+
+    ScalarMatrixType matrix;
+
+    Assembly::ThreadingStrategy strategy = Assembly::ThreadingStrategy::layered;
+    if(mesh.get_mesh_permutation().get_strategy() == Geometry::PermutationStrategy::colored)
+      strategy = Assembly::ThreadingStrategy::colored;
+    if(nthreads == std::size_t(0))
+      strategy = Assembly::ThreadingStrategy::single;
+
+    Assembly::DomainAssembler<TrafoType> dom_asm(trafo);
+    dom_asm.set_threading_strategy(strategy);
+    dom_asm.set_max_worker_threads(nthreads);
+    dom_asm.compile_all_elements();
+    bres.num_worker_threads = int(dom_asm.get_num_worker_threads());
+
+    // assemble matrix structure
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+    Assembly::Common::LaplaceOperator laplace_op;
+    Assembly::BilinearOperatorMatrixAssemblyJob1<Assembly::Common::LaplaceOperator, ScalarMatrixType, SpaceType>
+      asm_job(laplace_op, matrix, space, "gauss-legendre:2");
+
+    bres.num_asm_count = 0;
+    bres.num_asm_time = 0.0;
+    TimeStamp stamp_1, stamp_2;
+
+    // numeric assembly loop
+    do
+    {
+      matrix.format();
+      //dom_asm.assemble_bilinear_operator_matrix_1(matrix, laplace_op, space, "gauss-legendre:2");
+      dom_asm.assemble(asm_job);
+      stamp_2.stamp();
+      bres.num_asm_time = stamp_2.elapsed(stamp_1);
+      bres.num_asm_count += 1;
+    } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
+
+    const double sc = 1e-6 / double(bres.num_asm_count);
+
+    // compute assembly timings
+    auto ts = dom_asm.reduce_thread_stats();
+    bres.thread_time_total    = sc * double(ts.micros_total);
+    bres.thread_time_assemble = sc * double(ts.micros_assemble);
+    bres.thread_time_wait     = sc * double(ts.micros_wait);
   }
 
   template<typename Shape_, int nc_, typename CT_>
@@ -144,6 +211,68 @@ namespace MeshPermAssemblyBench
     } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
   }
 
+  template<typename Shape_, int nc_, typename CT_>
+  void bench_burgers_new(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, std::size_t nthreads)
+  {
+    typedef Geometry::ConformalMesh<Shape_, nc_, CT_> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceType;
+
+    TrafoType trafo(mesh);
+    SpaceType space(trafo);
+
+    static constexpr int dim = Shape_::dimension;
+
+    Assembly::ThreadingStrategy strategy = Assembly::ThreadingStrategy::layered;
+    if(mesh.get_mesh_permutation().get_strategy() == Geometry::PermutationStrategy::colored)
+      strategy = Assembly::ThreadingStrategy::colored;
+    if(nthreads == std::size_t(0))
+      strategy = Assembly::ThreadingStrategy::single;
+
+    Assembly::DomainAssembler<TrafoType> dom_asm(trafo);
+    dom_asm.set_threading_strategy(strategy);
+    dom_asm.set_max_worker_threads(nthreads);
+    dom_asm.compile_all_elements();
+    bres.num_worker_threads = int(dom_asm.get_num_worker_threads());
+
+    // assemble matrix structure
+    LAFEM::SparseMatrixBCSR<MemType, DataType, IndexType, dim, dim> matrix;
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+
+    // interpolate convection vector
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> vector;
+    Analytic::Common::CosineWaveFunction<dim> cosine_wave;
+    Analytic::Gradient<decltype(cosine_wave)> conv_func(cosine_wave);
+    Assembly::Interpolator::project(vector, conv_func, space);
+
+    // setup burgers
+    Assembly::BurgersBlockedMatrixAssemblyJob<decltype(matrix), SpaceType>
+      burgers(matrix, vector, space, "gauss-legendre:3");
+    burgers.nu = burgers.beta = burgers.frechet_beta = burgers.theta = 1.0;
+
+    bres.num_asm_count = 0;
+    bres.num_asm_time = 0.0;
+    TimeStamp stamp_1, stamp_2;
+
+    // numeric assembly loop
+    do
+    {
+      matrix.format();
+      dom_asm.assemble(burgers);
+      stamp_2.stamp();
+      bres.num_asm_time = stamp_2.elapsed(stamp_1);
+      bres.num_asm_count += 1;
+    } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
+
+    const double sc = 1e-6 / double(bres.num_asm_count);
+
+    // compute assembly timings
+    auto ts = dom_asm.reduce_thread_stats();
+    bres.thread_time_total    = sc * double(ts.micros_total);
+    bres.thread_time_assemble = sc * double(ts.micros_assemble);
+    bres.thread_time_wait     = sc * double(ts.micros_wait);
+  }
+
   template<typename Mesh_>
   void run(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader)
   {
@@ -151,6 +280,26 @@ namespace MeshPermAssemblyBench
     Index lvl_min(0);
     Index lvl_max(1);
     args.parse("level", lvl_max, lvl_min);
+
+    // parse threads
+    std::vector<std::size_t> num_threads;
+    num_threads.push_back(0u);
+    {
+      auto* p = args.query("threads");
+      if(p != nullptr)
+      {
+        for(std::size_t i(0); i < p->second.size(); ++i)
+        {
+          std::size_t t(0u);
+          if(!p->second.at(i).parse(t))
+          {
+            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << std::endl;
+            return;
+          }
+          num_threads.push_back(t);
+        }
+      }
+    }
 
     Random rng;
 
@@ -188,19 +337,30 @@ namespace MeshPermAssemblyBench
       nodes.push_back(nodes.back()->refine_shared());
     }
 
-    static constexpr std::size_t nperms(8u);
+    static constexpr std::size_t nperms(5u);
 
-    std::deque<std::array<BenchResults, nperms>> res_simple(nodes.size());
+    std::deque<std::array<BenchResults, nperms>> res_poisson(nodes.size());
     std::deque<std::array<BenchResults, nperms>> res_burgers(nodes.size());
 
-    std::cout << std::endl << "Performing simple benchmark..." << std::endl;
+    std::deque<std::deque<std::array<BenchResults, nperms>>> res_poisson_smp(nodes.size());
+    std::deque<std::deque<std::array<BenchResults, nperms>>> res_burgers_smp(nodes.size());
+
+    const bool b_poisson = (args.check("no-poisson") < 0);
+    const bool b_burgers = (args.check("no-burgers") < 0);
+
+    std::cout << std::endl << "Performing benchmark..." << std::endl;
     for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Level " << stringify(lvl).pad_front(2) << ": ";
 
+      // allocate smp deques
+      res_poisson_smp.at(lvl).resize(num_threads.size());
+      res_burgers_smp.at(lvl).resize(num_threads.size());
+
       for(std::size_t perm(0); perm < nperms; ++perm)
       {
         std::cout << '.';
+        std::cout.flush();
 
         // clone node
         auto node = nodes.at(lvl)->clone_shared();
@@ -225,109 +385,277 @@ namespace MeshPermAssemblyBench
           break;
 
         case 4:
+          /*continue; // skip this one
           node->create_permutation(Geometry::PermutationStrategy::cuthill_mckee);
           break;
 
         case 5:
+          continue; // skip this one
           node->create_permutation(Geometry::PermutationStrategy::cuthill_mckee_reversed);
           break;
 
-        case 6:
+        case 6:*/
           node->create_permutation(Geometry::PermutationStrategy::geometric_cuthill_mckee);
           break;
 
-        case 7:
+        /*case 7:
+          continue; // skip this one
           node->create_permutation(Geometry::PermutationStrategy::geometric_cuthill_mckee_reversed);
-          break;
+          break;*/
         }
         TimeStamp stamp_2;
-        res_simple.at(lvl).at(perm).permute_time = stamp_2.elapsed(stamp_1);
+        res_poisson.at(lvl).at(perm).permute_time =
         res_burgers.at(lvl).at(perm).permute_time = stamp_2.elapsed(stamp_1);
 
-        bench_simple(*node->get_mesh(), res_simple.at(lvl).at(perm));
-        bench_burgers(*node->get_mesh(), res_burgers.at(lvl).at(perm));
+        if(b_poisson)
+        {
+          bench_poisson(*node->get_mesh(), res_poisson.at(lvl).at(perm));
+          for(std::size_t i(0); i < num_threads.size(); ++i)
+            bench_poisson_new(*node->get_mesh(), res_poisson_smp.at(lvl).at(i).at(perm), num_threads.at(i));
+        }
+        if(b_burgers)
+        {
+          bench_burgers(*node->get_mesh(), res_burgers.at(lvl).at(perm));
+          for(std::size_t i(0); i < num_threads.size(); ++i)
+            bench_burgers_new(*node->get_mesh(), res_burgers_smp.at(lvl).at(i).at(perm), num_threads.at(i));
+        }
       }
       std::cout << " done!"<< std::endl;
     }
 
+    for(std::size_t i(0); i < num_threads.size(); ++i)
+    {
+      std::cout << std::endl << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << std::endl;
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          std::cout << stringify(res_poisson_smp.at(lvl).at(i).at(perm).num_worker_threads).pad_front(12);
+        }
+        std::cout << std::endl;
+      }
+    }
+
     std::cout << std::endl << "Permutation Timings:" << std::endl;
-    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+    //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
 
     for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ": ";
       for(std::size_t perm(0); perm < nperms; ++perm)
       {
-        std::cout << stringify_fp_fix(res_simple.at(lvl).at(perm).permute_time, 6, 12);
+        std::cout << stringify_fp_fix(res_poisson.at(lvl).at(perm).permute_time, 6, 12);
       }
       std::cout << std::endl;
     }
 
-    std::cout << std::endl << "Simple Assembly Timings:" << std::endl;
-    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-
-    for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+    if(b_poisson)
     {
-      std::cout << stringify(lvl).pad_front(2) << ": ";
+      std::cout << std::endl << "Poisson Assembly Timings:" << std::endl;
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
 
-      for(std::size_t perm(0); perm < nperms; ++perm)
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
-        const auto& b = res_simple.at(lvl).at(perm);
-        double t = b.num_asm_time / double(b.num_asm_count);
-        std::cout << stringify_fp_fix(t, 6, 12);
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          const auto& b = res_poisson.at(lvl).at(perm);
+          double t = b.num_asm_time / double(b.num_asm_count);
+          std::cout << stringify_fp_fix(t, 6, 12);
+        }
+        std::cout << std::endl;
       }
-      std::cout << std::endl;
+
+      /*std::cout << std::endl << "Poisson Assembly Timing Relative to 2-Level:" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        const double t2 = res_poisson.at(lvl).front().num_asm_time / double(res_poisson.at(lvl).front().num_asm_count);
+
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          const auto& b = res_poisson.at(lvl).at(perm);
+          double t = b.num_asm_time / double(b.num_asm_count);
+          std::cout << stringify_fp_fix(t/t2, 6, 12);
+        }
+        std::cout << std::endl;
+      }*/
+
+
+      for(std::size_t i(0); i < num_threads.size(); ++i)
+      {
+        std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_poisson_smp.at(lvl).at(i).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t, 6, 12);
+          }
+          std::cout << std::endl;
+        }
+      }
+
+      for(std::size_t i(0); i < num_threads.size(); ++i)
+      {
+        std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          for(std::size_t perm(0); perm < nperms; ++perm)
+            std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
+          std::cout << std::endl;
+        }
+      }
+      for(std::size_t i(0); i < num_threads.size(); ++i)
+      {
+        std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          for(std::size_t perm(0); perm < nperms; ++perm)
+            std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
+          std::cout << std::endl;
+        }
+      }
+
+      /*std::cout << std::endl << "New Poisson Assembly Timing Relative to 2-Level:" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        const double t2 = res_poisson2.at(lvl).front().num_asm_time / double(res_poisson2.at(lvl).front().num_asm_count);
+
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          const auto& b = res_poisson2.at(lvl).at(perm);
+          double t = b.num_asm_time / double(b.num_asm_count);
+          std::cout << stringify_fp_fix(t/t2, 6, 12);
+        }
+        std::cout << std::endl;
+      }*/
     }
 
-    std::cout << std::endl << "Simple Assembly Timing Relative to 2-Level:" << std::endl;
-    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-
-    for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+    if(b_burgers)
     {
-      std::cout << stringify(lvl).pad_front(2) << ": ";
-      const double t2 = res_simple.at(lvl).front().num_asm_time / double(res_simple.at(lvl).front().num_asm_count);
+      std::cout << std::endl << "Burgers Assembly Timings:" << std::endl;
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
 
-      for(std::size_t perm(0); perm < nperms; ++perm)
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
-        const auto& b = res_simple.at(lvl).at(perm);
-        double t = b.num_asm_time / double(b.num_asm_count);
-        std::cout << stringify_fp_fix(t/t2, 6, 12);
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          const auto& b = res_burgers.at(lvl).at(perm);
+          double t = b.num_asm_time / double(b.num_asm_count);
+          std::cout << stringify_fp_fix(t, 6, 12);
+        }
+        std::cout << std::endl;
       }
-      std::cout << std::endl;
-    }
 
+      /*std::cout << std::endl << "Burgers Assembly Timing Relative to 2-Level:" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
 
-    std::cout << std::endl << "Burgers Assembly Timings:" << std::endl;
-    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-
-    for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
-    {
-      std::cout << stringify(lvl).pad_front(2) << ": ";
-
-      for(std::size_t perm(0); perm < nperms; ++perm)
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
-        const auto& b = res_burgers.at(lvl).at(perm);
-        double t = b.num_asm_time / double(b.num_asm_count);
-        std::cout << stringify_fp_fix(t, 6, 12);
-      }
-      std::cout << std::endl;
-    }
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        const double t2 = res_burgers.at(lvl).front().num_asm_time / double(res_burgers.at(lvl).front().num_asm_count);
 
-    std::cout << std::endl << "Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          const auto& b = res_burgers.at(lvl).at(perm);
+          double t = b.num_asm_time / double(b.num_asm_count);
+          std::cout << stringify_fp_fix(t/t2, 6, 12);
+        }
+        std::cout << std::endl;
+      }*/
 
-    for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
-    {
-      std::cout << stringify(lvl).pad_front(2) << ": ";
-      const double t2 = res_burgers.at(lvl).front().num_asm_time / double(res_burgers.at(lvl).front().num_asm_count);
-
-      for(std::size_t perm(0); perm < nperms; ++perm)
+      for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        const auto& b = res_burgers.at(lvl).at(perm);
-        double t = b.num_asm_time / double(b.num_asm_count);
-        std::cout << stringify_fp_fix(t/t2, 6, 12);
+        std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_burgers_smp.at(lvl).at(i).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t, 6, 12);
+          }
+          std::cout << std::endl;
+        }
       }
-      std::cout << std::endl;
+
+      for(std::size_t i(0); i < num_threads.size(); ++i)
+      {
+        std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          for(std::size_t perm(0); perm < nperms; ++perm)
+            std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
+          std::cout << std::endl;
+        }
+      }
+      for(std::size_t i(0); i < num_threads.size(); ++i)
+      {
+        std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          for(std::size_t perm(0); perm < nperms; ++perm)
+            std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
+          std::cout << std::endl;
+        }
+      }
+
+      /*std::cout << std::endl << "New Burgers Assembly Timing Relative to 2-Level:" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        const double t2 = res_burgers2.at(lvl).front().num_asm_time / double(res_burgers2.at(lvl).front().num_asm_count);
+
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          const auto& b = res_burgers2.at(lvl).at(perm);
+          double t = b.num_asm_time / double(b.num_asm_count);
+          std::cout << stringify_fp_fix(t/t2, 6, 12);
+        }
+        std::cout << std::endl;
+      }*/
     }
   }
 
@@ -343,6 +671,9 @@ namespace MeshPermAssemblyBench
 
     args.support("mesh");
     args.support("level");
+    args.support("threads");
+    args.support("no-poisson");
+    args.support("no-burgers");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();

@@ -137,7 +137,7 @@ namespace FEAT
           /// the data type to be used
           typedef typename AsmTraits_::DataType DataType;
           /// the data type for the block system
-          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
           /// the assembler's trafo data type
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// the assembler's test-function data type
@@ -171,14 +171,10 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            const DataType scalar = dot(phi.grad, psi.grad);
-            OperatorValueType r(DataType(0));
-            for(int i(0); i < OperatorValueType::m; ++i)
-            {
-              r(i,i) = scalar;
-            }
+            ValueType r(DataType(0));
+            r.add_scalar_main_diag(Tiny::dot(phi.grad, psi.grad));
             return r;
           }
         }; // class LaplaceOperatorBlocked::Evaluator<...>
@@ -398,7 +394,7 @@ namespace FEAT
           /// the data type to be used
           typedef typename AsmTraits_::DataType DataType;
           /// the data type for the block system
-          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
           /// the assembler's trafo data type
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// the assembler's test-function data type
@@ -432,13 +428,10 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            OperatorValueType r(DataType(0));
-            for(int i(0); i < OperatorValueType::m; ++i)
-            {
-              r(i,i) = phi.value * psi.value;
-            }
+            ValueType r(DataType(0));
+            r.add_scalar_main_diag(phi.value * psi.value);
             return r;
           }
         }; // class IdentityOperatorBlocked::Evaluator<...>
@@ -894,7 +887,7 @@ namespace FEAT
           /// the data type to be used
           typedef typename AsmTraits_::DataType DataType;
           /// the data type for the block system
-          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
           /// the assembler's trafo data type
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// the assembler's test-function data type
@@ -928,7 +921,15 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            ValueType r(DataType(0));
+            r.set_outer_product(phi.grad, psi.grad);
+            r.add_scalar_main_diag(Tiny::dot(phi.grad, psi.grad));
+            return r;
+          }
+
+          /*OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             OperatorValueType r(DataType(0));
             for(int i(0); i < OperatorValueType::m; ++i)
@@ -941,7 +942,7 @@ namespace FEAT
               }
             }
             return r;
-          }
+          }*/
         }; // class DuDvOperatorBlocked::Evaluator<...>
       }; // class DuDVOperatorBlocked
 
@@ -983,7 +984,7 @@ namespace FEAT
           public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
-          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef Tiny::Matrix<typename AsmTraits_::DataType, dim_, nsc_> ValueType;
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
@@ -1102,9 +1103,9 @@ namespace FEAT
             R(2,5) = u * der(0);
           }
 
-          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            OperatorValueType R;
+            ValueType R;
             eval(R, phi.grad, psi.value);
             return R;
           }
@@ -1149,7 +1150,7 @@ namespace FEAT
           public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
-          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+          typedef Tiny::Matrix<typename AsmTraits_::DataType, nsc_, dim_> ValueType;
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
@@ -1288,9 +1289,9 @@ namespace FEAT
             K(5,2) = s * der(0) / T_(2);
           }
 
-          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            OperatorValueType K;
+            ValueType K;
             eval(K, phi.grad, psi.value);
             return K;
           }

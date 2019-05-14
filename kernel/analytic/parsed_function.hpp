@@ -400,6 +400,27 @@ namespace FEAT
       }
 
       /**
+       * \brief Constructor
+       *
+       * This constructor creates a parsed function from a String.
+       *
+       * \param[in] function
+       * The expression that defines the function in the variables \c x, \c y, and \c z.
+       * The individual parts of the vector function components are separated by a single quotation mark <c>'</c>.
+       *
+       * \throws ParsedFunctionParseError
+       * An instance of the ParsedFunctionParseError exception is thrown if the
+       * fparser library fails to parse the formula. The message of the exception
+       * contains more information on the cause of the error and should be presented
+       * the user in an appropriate way.
+       */
+      explicit ParsedVectorFunction(const String& function) :
+        ParsedVectorFunction()
+      {
+        parse(function);
+      }
+
+      /**
        * \brief Adds a constant to the parser.
        *
        * \param[in] name
@@ -455,7 +476,7 @@ namespace FEAT
        *
        * \param[in] function
        * The expression that defines the function in the variables \c x, \c y, and \c z.
-       * The individual parts of the vector function components are separated by a single quoation mark <c>'</c>.
+       * The individual parts of the vector function components are separated by a single quotation mark <c>'</c>.
        *
        * \throws ParsedFunctionParseError
        * An instance of the ParsedFunctionParseError exception is thrown if the

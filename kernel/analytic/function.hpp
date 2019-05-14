@@ -71,6 +71,7 @@ namespace FEAT
     {
       typedef DataType_ DataType;
       static constexpr int domain_dim = domain_dim_;
+      static constexpr int image_dim = 1;
 
       typedef Tiny::Vector<DataType_, domain_dim_> PointType;
 
@@ -134,11 +135,11 @@ namespace FEAT
       typedef ... ImageType;
 
       /// Specifies whether the function's evaluator can compute function values.
-      static constexpr bool can_value = true | false;
+      static constexpr bool can_value = true or false;
       /// Specifies whether the function's evaluator can compute function gradients.
-      static constexpr bool can_grad = true | false;
+      static constexpr bool can_grad = true or false;
       /// Specifies whether the function's evaluator can compute function hessians.
-      static constexpr bool can_hess = true | false;
+      static constexpr bool can_hess = true or false;
 #else
       static constexpr bool can_value = false;
       static constexpr bool can_grad = false;

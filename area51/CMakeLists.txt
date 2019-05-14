@@ -38,6 +38,9 @@ TARGET_LINK_LIBRARIES(dbg-isoparam-2 feat)
 ADD_EXECUTABLE(dbg-isoparam-3 dbg_isoparam3.cpp)
 TARGET_LINK_LIBRARIES(dbg-isoparam-3 feat)
 
+ADD_EXECUTABLE(dbg-integrator dbg_integrator.cpp)
+TARGET_LINK_LIBRARIES(dbg-integrator feat)
+
 ADD_EXECUTABLE(dbg-mesh-width dbg_mesh_width.cpp)
 TARGET_LINK_LIBRARIES(dbg-mesh-width feat)
 

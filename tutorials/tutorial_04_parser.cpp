@@ -134,9 +134,8 @@
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
+#include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
+#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional / ForceFunctional
@@ -190,7 +189,7 @@ namespace Tutorial04
   // Here's our main function
   void main(int argc, char* argv[])
   {
-    // As a very first step, we create our argument parser that we will use to analyse
+    // As a very first step, we create our argument parser that we will use to analyze
     // the command line arguments. All we need to do is to create an instance of the
     // SimpleArgParser class and pass the 'argc' and 'argv' parameters to its constructor.
     // Note that the SimpleArgParser does not modify 'argc' and 'argv' in any way.
@@ -442,7 +441,7 @@ namespace Tutorial04
     Analytic::ParsedScalarFunction<ShapeType::dimension> dbc_function; // boundary conditions
 
     // In the case of the reference solution function, we also require the computation of
-    // derivates for the assembly of the right-hand-side (if 'f' is not given explicitly)
+    // derivatives for the assembly of the right-hand-side (if 'f' is not given explicitly)
     // and for the computation of errors in the post-processing step.
     // Unfortunately, the ParsedScalarFunction cannot compute the derivatives by itself, so
     // we need to put it into an 'AutoDerive' function wrapper - this one will add
@@ -576,8 +575,12 @@ namespace Tutorial04
     VectorType vec_sol = matrix.create_vector_r();
     VectorType vec_rhs = matrix.create_vector_l();
 
-    // Create a cubature factory
-    Cubature::DynamicFactory cubature_factory("auto-degree:5");
+    // Create a domain assembler on all mesh elements
+    Assembly::DomainAssembler<TrafoType> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    // Choose a cubature rule
+    String cubature_name = "auto-degree:5";
 
     // First of all, format the matrix entries to zero.
     matrix.format();
@@ -588,21 +591,23 @@ namespace Tutorial04
     Assembly::Common::LaplaceOperator laplace_operator;
 
     // And assemble that operator
-    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_operator, space, cubature_factory);
+    Assembly::assemble_bilinear_operator_matrix_1(
+      domain_assembler, matrix, laplace_operator, space, cubature_name);
 
     // Now, let us assemble the right-hand-side function.
     if(have_f)
     {
       // We have an rhs function given explicitly, so we use this one.
-      Assembly::Common::ForceFunctional<decltype(rhs_function)> functional(rhs_function);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, functional, space, cubature_factory);
+      // We use the 'assemble_force_function_vector', which will wrap the given analytical function
+      // into an Assembly::Common::ForceFunctional for us automatically.
+      Assembly::assemble_force_function_vector(domain_assembler, vec_rhs, rhs_function, space, cubature_name);
     }
     else if(have_u)
     {
       // We do not have an explicit rhs function, but we have a solution function,
       // so let's compute the RHS functional from the solution.
       Assembly::Common::LaplaceFunctional<decltype(sol_function)> functional(sol_function);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, functional, space, cubature_factory);
+      Assembly::assemble_linear_functional_vector(domain_assembler, vec_rhs, functional, space, cubature_name);
     }
     // else: We have neither u nor f given, so we leave the RHS vector zero.
 
@@ -682,11 +687,13 @@ namespace Tutorial04
       std::cout << std::endl;
       std::cout << "Computing errors against reference solution..." << std::endl;
 
-      // Compute and print the H0-/H1-errors
-      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
-        vec_sol, sol_function, space, cubature_factory);
+      // Compute the error norms:
+      auto error_info = Assembly::integrate_error_function<1>(
+        domain_assembler, sol_function, vec_sol, space, cubature_name);
 
-      std::cout << errors << std::endl;
+      // Print the error norms to the console
+      std::cout << "Error Analysis:" << std::endl;
+      std::cout << error_info.print_norms() << std::endl;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
