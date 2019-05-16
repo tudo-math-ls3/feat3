@@ -441,7 +441,7 @@ namespace FEAT
           watch_init_sym_matrix_loc.start();
 
           // compose structures of D and B
-          Adjacency::Graph graph_s(Adjacency::RenderType::injectify, _matrix_d.local(), _matrix_b.local());
+          Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, _matrix_d.local(), _matrix_b.local());
           // create the matrix layout of S
           _matrix_s = LocalMatrixTypeS(graph_s);
 
@@ -582,7 +582,7 @@ namespace FEAT
           Adjacency::Graph graph_dm(Adjacency::RenderType::injectify_transpose, gate_v->_mirrors.at(i), this->_matrix_b.local());
 
           // S = (D*M^T) * B'
-          Adjacency::Graph graph_s(Adjacency::RenderType::injectify, graph_dm, this->_neighbour_graphs.at(i));
+          Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, graph_dm, this->_neighbour_graphs.at(i));
 
           // allocate Schur-matrix
           this->_neighbour_matrices.at(i).convert(NeighMatrixTypeS(graph_s));

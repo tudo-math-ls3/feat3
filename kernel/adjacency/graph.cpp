@@ -6,7 +6,7 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/permutation.hpp>
 
-#include <algorithm> // for std::max/min
+#include <algorithm> // for std::max/min/sort
 
 namespace FEAT
 {
@@ -197,17 +197,8 @@ namespace FEAT
       // loop over all domain nodes
       for(Index i(0); i < _num_nodes_domain; ++i)
       {
-        // apply linear insertion sort onto the adjacency indices
-        for(Index j(_domain_ptr[i] + 1); j < _domain_ptr[i+1]; ++j)
-        {
-          Index x = _image_idx[j];
-          Index k(j);
-          for(; (k > _domain_ptr[i]) && (x < _image_idx[k-1]); --k)
-          {
-            _image_idx[k] = _image_idx[k-1];
-          }
-          _image_idx[k] = x;
-        }
+        // let the STL do the sorting work
+        std::sort(&_image_idx[_domain_ptr[i]], &_image_idx[_domain_ptr[i+1]]);
       }
     }
   } // namespace Adjacency

@@ -14,7 +14,7 @@
 #include <kernel/util/exception.hpp>
 
 // includes, system
-#include <set>
+#include <vector>
 
 namespace FEAT
 {
@@ -186,19 +186,29 @@ namespace FEAT
         switch(render_type)
         {
         case RenderType::as_is:
+        case RenderType::as_is_sorted:
           _render_as_is(adjactor);
+          if(render_type == RenderType::as_is_sorted)
+            this->sort_indices();
           break;
 
         case RenderType::injectify:
+        case RenderType::injectify_sorted:
           _render_injectify(adjactor);
+          if(render_type == RenderType::injectify_sorted)
+            this->sort_indices();
           break;
 
         case RenderType::transpose:
+        case RenderType::transpose_sorted:
           _render_transpose(adjactor);
+          // transpose is automatically sorted
           break;
 
         case RenderType::injectify_transpose:
+        case RenderType::injectify_transpose_sorted:
           _render_injectify_transpose(adjactor);
+          // transpose is automatically sorted
           break;
 
         default:
@@ -232,19 +242,29 @@ namespace FEAT
         switch(render_type)
         {
         case RenderType::as_is:
+        case RenderType::as_is_sorted:
           _render_as_is(adjactor1, adjactor2);
+          if(render_type == RenderType::as_is_sorted)
+            this->sort_indices();
           break;
 
         case RenderType::injectify:
+        case RenderType::injectify_sorted:
           _render_injectify(adjactor1, adjactor2);
+          if(render_type == RenderType::injectify_sorted)
+            this->sort_indices();
           break;
 
         case RenderType::transpose:
+        case RenderType::transpose_sorted:
           _render_transpose(adjactor1, adjactor2);
+          // transpose is automatically sorted
           break;
 
         case RenderType::injectify_transpose:
+        case RenderType::injectify_transpose_sorted:
           _render_injectify_transpose(adjactor1, adjactor2);
+          // transpose is automatically sorted
           break;
 
         default:
@@ -387,32 +407,6 @@ namespace FEAT
       /* *************************************************** */
     private:
       /// \cond internal
-      /*template<typename Adjactor_>
-      static Index _aux_inj(const Adjactor_& adj, Index i, Index idx[])
-      {
-        Index num_idx = 0;
-        typename Adjactor_::ImageIterator cur(adj.image_begin(i));
-        typename Adjactor_::ImageIterator end(adj.image_end(i));
-        for(; cur != end; ++cur)
-        {
-          Index jdx = *cur;
-          bool found = false;
-          for(Index k(0); k < num_idx; ++k)
-          {
-            if(idx[k] == jdx)
-            {
-              found = true;
-              break;
-            }
-          }
-          if(!found)
-          {
-            idx[num_idx] = jdx;
-            ++num_idx;
-          }
-        }
-        return num_idx;
-      }*/
 
       /// renders adjactor
       template<typename Adjactor_>
@@ -467,16 +461,24 @@ namespace FEAT
         // allocate pointer array
         _domain_ptr = new Index[_num_nodes_domain + 1];
 
-        // allocate auxiliary index array
-        std::set<Index> idx_set;
+        // allocate auxiliary mask vector
+        std::vector<char> vidx_mask(_num_nodes_image, 0);
+        char* idx_mask = vidx_mask.data();
 
         // count number of adjacencies and build pointer array
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           _domain_ptr[i] = _num_indices_image;
-          idx_set.clear();
-          idx_set.insert(adj.image_begin(i), adj.image_end(i));
-          _num_indices_image += Index(idx_set.size());
+          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+          {
+            if(idx_mask[*it] == 0)
+            {
+              ++_num_indices_image;
+              idx_mask[*it] = 1;
+            }
+          }
+          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+            idx_mask[*it] = 0;
         }
         _domain_ptr[_num_nodes_domain] = _num_indices_image;
 
@@ -484,11 +486,18 @@ namespace FEAT
         _image_idx = new Index[_num_indices_image];
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
-          idx_set.clear();
-          idx_set.insert(adj.image_begin(i), adj.image_end(i));
           Index k = _domain_ptr[i];
-          for(auto it = idx_set.begin(); it != idx_set.end(); ++it, ++k)
-            _image_idx[k] = *it;
+          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+          {
+            if(idx_mask[*it] == 0)
+            {
+              _image_idx[k] = *it;
+              ++k;
+              idx_mask[*it] = 1;
+            }
+          }
+          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+            idx_mask[*it] = 0;
         }
       }
 
@@ -530,7 +539,8 @@ namespace FEAT
 
         // allocate and build index array
         _image_idx = new Index[_num_indices_image];
-        Index** image_ptr = new Index*[_num_nodes_domain];
+        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        Index** image_ptr = vimg_ptr.data();
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           image_ptr[i] = &_image_idx[_domain_ptr[i]];
@@ -547,8 +557,6 @@ namespace FEAT
             ++idx;
           }
         }
-
-        delete [] image_ptr;
       }
 
       /// renders transposed injectified adjactor
@@ -566,21 +574,30 @@ namespace FEAT
         {
           _domain_ptr[i] = 0;
         }
-        // allocate auxiliary index array
-        std::set<Index> idx_set;
+
+        // allocate auxiliary mask vector
+        std::vector<char> vidx_mask(_num_nodes_domain, 0);
+        char* idx_mask = vidx_mask.data();
 
         // loop over all image nodes
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          idx_set.clear();
-          idx_set.insert(adj.image_begin(j), adj.image_end(j));
-          for(auto i : idx_set)
-            ++_domain_ptr[i+1];
-          _num_indices_image += Index(idx_set.size());
+          for(auto it = adj.image_begin(j); it != adj.image_end(j); ++it)
+          {
+            if(idx_mask[*it] == 0)
+            {
+              ++_num_indices_image;
+              ++_domain_ptr[(*it)+1];
+              idx_mask[*it] = 1;
+            }
+          }
+          for(auto it = adj.image_begin(j); it != adj.image_end(j); ++it)
+            idx_mask[*it] = 0;
         }
 
         _image_idx = new Index[_num_indices_image];
-        Index** image_ptr = new Index*[_num_nodes_domain];
+        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        Index** image_ptr = vimg_ptr.data();
 
         // build pointer arrays
         for(Index i(0); i < _num_nodes_domain; ++i)
@@ -592,58 +609,20 @@ namespace FEAT
         // build image index array
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          idx_set.clear();
-          idx_set.insert(adj.image_begin(j), adj.image_end(j));
-          for(auto i : idx_set)
+          for(auto it = adj.image_begin(j); it != adj.image_end(j); ++it)
           {
-            Index*& idx = image_ptr[i];
-            *idx = j;
-            ++idx;
+            if(idx_mask[*it] == 0)
+            {
+              Index*& idx = image_ptr[*it];
+              *idx = j;
+              ++idx;
+              idx_mask[*it] = 1;
+            }
           }
+          for(auto it = adj.image_begin(j); it != adj.image_end(j); ++it)
+            idx_mask[*it] = 0;
         }
-
-        // delete auxiliary arrays
-        delete [] image_ptr;
       }
-
-      /*template<
-        typename Adjactor1_,
-        typename Adjactor2_>
-      static Index _aux_inj(const Adjactor1_& adj1, const Adjactor2_& adj2, Index i, Index idx[])
-      {
-        Index num_idx = 0;
-        typename Adjactor1_::ImageIterator cur1(adj1.image_begin(i));
-        typename Adjactor1_::ImageIterator end1(adj1.image_end(i));
-        for(; cur1 != end1; ++cur1)
-        {
-          typename Adjactor2_::ImageIterator cur2(adj2.image_begin(*cur1));
-          typename Adjactor2_::ImageIterator end2(adj2.image_end(*cur1));
-
-          // loop over all image node indices
-          for(; cur2 != end2; ++cur2)
-          {
-            Index jdx = *cur2;
-
-            // check if we already have that image node index
-            bool found = false;
-            for(Index k(0); k < num_idx; ++k)
-            {
-              if(idx[k] == jdx)
-              {
-                found = true;
-                break;
-              }
-            }
-            // add the index if we don't have it already
-            if(!found)
-            {
-              idx[num_idx] = jdx;
-              ++num_idx;
-            }
-          }
-        }
-        return num_idx;
-      }*/
 
       /// renders adjactor composition
       template<
@@ -723,17 +702,29 @@ namespace FEAT
         // allocate pointer array
         _domain_ptr = new Index[_num_nodes_domain + 1];
 
-        // allocate auxiliary index set
-        std::set<Index> idx_set;
+        // allocate auxiliary mask vector
+        std::vector<char> vidx_mask(_num_nodes_image, 0);
+        char* idx_mask = vidx_mask.data();
 
         // count number of adjacencies and build pointer array
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           _domain_ptr[i] = _num_indices_image;
-          idx_set.clear();
           for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
-            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
-          _num_indices_image += Index(idx_set.size());
+          {
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+            {
+              if(idx_mask[*jt] == 0)
+              {
+                ++_num_indices_image;
+                idx_mask[*jt] = 1;
+              }
+            }
+          }
+          // reset mask
+          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+              idx_mask[*jt] = 0;
         }
         _domain_ptr[_num_nodes_domain] = _num_indices_image;
 
@@ -741,12 +732,23 @@ namespace FEAT
         _image_idx = new Index[_num_indices_image];
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
-          idx_set.clear();
-          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
-            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
           Index k = _domain_ptr[i];
-          for(auto it = idx_set.begin(); it != idx_set.end(); ++it, ++k)
-            _image_idx[k] = *it;
+          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+          {
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+            {
+              if(idx_mask[*jt] == 0)
+              {
+                _image_idx[k] = *jt;
+                ++k;
+                idx_mask[*jt] = 1;
+              }
+            }
+          }
+          // reset mask
+          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+              idx_mask[*jt] = 0;
         }
       }
 
@@ -801,7 +803,9 @@ namespace FEAT
 
         // allocate and build index array
         _image_idx = new Index[_num_indices_image];
-        Index** image_ptr = new Index*[_num_nodes_domain];
+        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        Index** image_ptr = vimg_ptr.data();
+
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           image_ptr[i] = &_image_idx[_domain_ptr[i]];
@@ -823,8 +827,6 @@ namespace FEAT
             }
           }
         }
-
-        delete [] image_ptr;
       }
 
       /// renders transposed injectified adjactor composition
@@ -850,22 +852,34 @@ namespace FEAT
           _domain_ptr[i] = 0;
         }
 
-        // allocate auxiliary index set
-        std::set<Index> idx_set;
+        // allocate auxiliary mask vector
+        std::vector<char> vidx_mask(_num_nodes_domain, 0);
+        char* idx_mask = vidx_mask.data();
 
         // loop over all image nodes
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          idx_set.clear();
           for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
-            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
-          for(auto i : idx_set)
-            ++_domain_ptr[i+1];
-          _num_indices_image += Index(idx_set.size());
+          {
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+            {
+              if(idx_mask[*jt] == 0)
+              {
+                ++_num_indices_image;
+                ++_domain_ptr[(*jt)+1];
+                idx_mask[*jt] = 1;
+              }
+            }
+          }
+          // reset mask
+          for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+              idx_mask[*jt] = 0;
         }
 
         _image_idx = new Index[_num_indices_image];
-        Index** image_ptr = new Index*[_num_nodes_domain];
+        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        Index** image_ptr = vimg_ptr.data();
 
         // build pointer arrays
         for(Index i(0); i < _num_nodes_domain; ++i)
@@ -877,20 +891,26 @@ namespace FEAT
         // build image index array
         for(Index j(0); j < _num_nodes_image; ++j)
         {
-          idx_set.clear();
           for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
-            idx_set.insert(adj2.image_begin(*it), adj2.image_end(*it));
-          for(auto i : idx_set)
           {
-            Index*& idx = image_ptr[i];
-            *idx = j;
-            ++idx;
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+            {
+              if(idx_mask[*jt] == 0)
+              {
+                Index*& idx = image_ptr[*jt];
+                *idx = j;
+                ++idx;
+                idx_mask[*jt] = 1;
+              }
+            }
           }
+          // reset mask
+          for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
+            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+              idx_mask[*jt] = 0;
         }
-
-        // delete auxiliary arrays
-        delete [] image_ptr;
       }
+
       /// \endcond
       /* ******************************************************************* */
       /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */

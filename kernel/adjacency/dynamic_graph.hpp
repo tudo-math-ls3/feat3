@@ -99,12 +99,16 @@ namespace FEAT
         switch(render_type)
         {
         case RenderType::as_is:
+        case RenderType::as_is_sorted:
         case RenderType::injectify:
+        case RenderType::injectify_sorted:
           _render_as_is(adjactor);
           break;
 
         case RenderType::transpose:
+        case RenderType::transpose_sorted:
         case RenderType::injectify_transpose:
+        case RenderType::injectify_transpose_sorted:
           _render_transpose(adjactor);
           break;
         }
@@ -139,12 +143,16 @@ namespace FEAT
         switch(render_type)
         {
         case RenderType::as_is:
+        case RenderType::as_is_sorted:
         case RenderType::injectify:
+        case RenderType::injectify_sorted:
           _render_as_is(adjactor1, adjactor2);
           break;
 
         case RenderType::transpose:
+        case RenderType::transpose_sorted:
         case RenderType::injectify_transpose:
+        case RenderType::injectify_transpose_sorted:
           _render_transpose(adjactor1, adjactor2);
           break;
         }

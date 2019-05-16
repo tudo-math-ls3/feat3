@@ -190,8 +190,8 @@ namespace MultiPrecHierarchBench
     // (R*A*P) * (P^-1x) = R*b
 
     // compute matrix structure
-    Adjacency::Graph gap(Adjacency::RenderType::injectify, matrix, mprol);
-    Adjacency::Graph grap(Adjacency::RenderType::injectify, mrest, gap);
+    Adjacency::Graph gap(Adjacency::RenderType::injectify_sorted, matrix, mprol);
+    Adjacency::Graph grap(Adjacency::RenderType::injectify_sorted, mrest, gap);
 
     // compute matrix
     LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> matrix_r(grap);

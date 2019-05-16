@@ -36,14 +36,27 @@ namespace FEAT
       as_is = 0,
 
       /**
+       * \brief Render-As-Is mode, sort image indices
+       *
+       * Same as RenderType::as_is, but in addition to that the image indices are sorted.
+       */
+      as_is_sorted = 1,
+
+      /**
        * \brief Render-Injectified mode
        *
        * In this mode, the adjactor passed to the constructor will be rendered "injective", i.e.
        * each domain node will contain at most one adjacency to a specific image node - in other
        * words: the graph will not contain adjacency duplicates.
-       * As a side effect, all image indices adjacent to a domain node are stored in ascending order.
        */
-      injectify = 1,
+      injectify = 2,
+
+      /**
+       * \brief Render-Injectified mode, sort image indices
+       *
+       * Same as RenderType::injectify, but in addition to that the image indices are sorted.
+       */
+      injectify_sorted = 3,
 
       /**
        * \brief Render-Transpose mode
@@ -53,18 +66,31 @@ namespace FEAT
        * node \e D has \e k adjacencies with an image node \e I, then the graph's domain node \e I
        * will have \e k adjacencies with the image node \e D.
        */
-      transpose = 2,
+      transpose = 4,
+
+      /**
+       * \brief Render-Transpose mode, sort image indices
+       *
+       * Same as RenderType::transpose, but in addition to that the image indices are sorted.
+       */
+      transpose_sorted = 5,
 
       /**
        * \brief Render-Injectified-Transpose mode
        *
        * In this mode, the transpose of the adjactor passed to the constructor will be rendered
        * "injective".
-       * As a side effect, all image indices adjacent to a domain node are stored in ascending order.
        *
        * \see RenderType::transpose, RenderType::injectify
        */
-      injectify_transpose = 3
+      injectify_transpose = 6,
+
+      /**
+       * \brief Render-Injectified-Transpose mode, sort image indices
+       *
+       * Same as RenderType::injectify_transpose, but in addition to that the image indices are sorted.
+       */
+      injectify_transpose_sorted = 7
     }; // enum class RenderType
   } // namespace Adjacency
 } // namespace FEAT

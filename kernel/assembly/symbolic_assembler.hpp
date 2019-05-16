@@ -110,7 +110,7 @@ namespace FEAT
         Adjacency::Graph test_dof_support(Adjacency::RenderType::transpose, test_dof_graph);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_support, trial_dof_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_graph);
 
         // return the graph
         return dof_adjactor;
@@ -135,7 +135,7 @@ namespace FEAT
         Adjacency::Graph dof_support(Adjacency::RenderType::transpose, dof_graph);
 
         // render composite dof-mapping/dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_support, dof_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, dof_support, dof_graph);
 
         // return the graph
         return dof_adjactor;
@@ -181,7 +181,7 @@ namespace FEAT
         Adjacency::Graph trial_dof_ext_graph(Adjacency::RenderType::injectify, shape_at_facet, trial_dof_graph);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_ext_sup, trial_dof_ext_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_ext_sup, trial_dof_ext_graph);
 
         // return the graph
         return dof_adjactor;
@@ -219,7 +219,7 @@ namespace FEAT
         Adjacency::Graph dof_ext_sup(Adjacency::RenderType::transpose, dof_ext_graph);
 
         // render composite dof-mapping/dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, dof_ext_sup, dof_ext_graph);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, dof_ext_sup, dof_ext_graph);
 
         // return the graph
         return dof_adjactor;
@@ -299,7 +299,7 @@ namespace FEAT
         Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, refine_adjactor, test_dof_mapping);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify, test_dof_support, trial_dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
 
         // return the graph
         return dof_adjactor;
