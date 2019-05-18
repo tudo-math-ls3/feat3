@@ -4,6 +4,14 @@
 #
 # Copy or link this file as ".git/hooks/pre-commit".
 
+# Set GIT_DIR either from the working directory, or from the environment
+# variable.
+GIT_DIR=$(git rev-parse --git-dir 2>/dev/null)
+if [ -z "$GIT_DIR" ]; then
+        echo >&2 "fatal: commit-msg: GIT_DIR not set"
+        exit 1
+fi
+
 # Prepare a copy of the message:
 #  - strip comment lines
 #  - stop at "diff --git" (git commit -v)
