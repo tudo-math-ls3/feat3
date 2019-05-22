@@ -34,6 +34,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if major >= 6:
     cxxflags += " -Wtautological-compare"
 
+  if major >= 7:
+    cxxflags += " -Woverloaded-virtual -Wnon-virtual-dtor"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 
