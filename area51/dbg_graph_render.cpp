@@ -79,7 +79,16 @@ Adjacency::Graph render_injectify_old(
   delete [] aux;
 
   // allocate and build index array
+  XASSERT(_num_indices_image > Index(0));
+  /// \compilerhack gcc (up to version 9 at least) thinks, that _num_indices_image will be zero for sure at runtime.
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 100000)
+  Index* _image_idx(nullptr);
+  if (_num_indices_image > 0)
+    _image_idx = new Index[_num_indices_image];
+#else
   Index* _image_idx = new Index[_num_indices_image];
+#endif
+
   for(Index i(0); i < _num_nodes_domain; ++i)
   {
     _aux_inj(adj1, adj2, i, &_image_idx[_domain_ptr[i]]);
