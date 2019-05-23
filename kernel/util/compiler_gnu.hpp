@@ -51,6 +51,7 @@
 #if(_GCC_VER >= 50000)
 #define FEAT_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
+  _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"") \
   _Pragma("GCC diagnostic ignored \"-Wundef\"") \
   _Pragma("GCC diagnostic ignored \"-Wparentheses\"") \
   _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") \
@@ -62,6 +63,7 @@
 #else
 #define FEAT_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
+  _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"") \
   _Pragma("GCC diagnostic ignored \"-Wundef\"") \
   _Pragma("GCC diagnostic ignored \"-Wparentheses\"") \
   _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") \
