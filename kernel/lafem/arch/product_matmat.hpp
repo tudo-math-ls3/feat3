@@ -27,12 +27,20 @@ namespace FEAT
         template <typename DT_>
         static void dense(DT_ * r, const DT_ * const x, const DT_ * const y, const Index rows, const Index columns, const Index inner)
         {
-#ifdef FEAT_HAVE_MKL
-          dense_mkl(r, x, y, rows, columns, inner);
-#else
           dense_generic(r, x, y, rows, columns, inner);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static void dense(float * r, const float * const x, const float * const y, const Index rows, const Index columns, const Index inner)
+        {
+          dense_mkl(r, x, y, rows, columns, inner);
+        }
+
+        static void dense(double * r, const double * const x, const double * const y, const Index rows, const Index columns, const Index inner)
+        {
+          dense_mkl(r, x, y, rows, columns, inner);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void dense(__float128 * r, const __float128 * const x, const __float128 * const y, const Index rows, const Index columns, const Index inner)

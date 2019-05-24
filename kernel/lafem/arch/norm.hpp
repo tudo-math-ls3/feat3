@@ -26,12 +26,20 @@ namespace FEAT
         template <typename DT_>
         static DT_ value(const DT_ * const x, const Index size)
         {
-#ifdef FEAT_HAVE_MKL
-          return value_mkl(x, size);
-#else
           return value_generic(x, size);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static float value(const float * const x, const Index size)
+        {
+          return value_mkl(x, size);
+        }
+
+        static double value(const double * const x, const Index size)
+        {
+          return value_mkl(x, size);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static __float128 value(const __float128 * const x, const Index size)

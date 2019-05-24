@@ -28,12 +28,20 @@ namespace FEAT
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const Index size)
         {
-#ifdef FEAT_HAVE_MKL
-          return value_mkl(x, y, size);
-#else
           return value_generic(x, y, size);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static float value(const float * const x, const float * const y, const Index size)
+        {
+          return value_mkl(x, y, size);
+        }
+
+        static double value(const double * const x, const double * const y, const Index size)
+        {
+          return value_mkl(x, y, size);
+        }
+#endif // FEAT_HAVE_MKL
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static __float128 value(const __float128 * const x, const __float128 * const y, const Index size)
@@ -70,12 +78,20 @@ namespace FEAT
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
         {
-#ifdef FEAT_HAVE_MKL
-          return value_mkl(x, y, z, size);
-#else
           return value_generic(x, y, z, size);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static float value(const float * const x, const float * const y, const float * const z, const Index size)
+        {
+          return value_mkl(x, y, z, size);
+        }
+
+        static double value(const double * const x, const double * const y, const double * const z, const Index size)
+        {
+          return value_mkl(x, y, z, size);
+        }
+#endif // FEAT_HAVE_MKL
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static __float128 value(const __float128 * const x, const __float128 * const y, const __float128 * const z, const Index size)

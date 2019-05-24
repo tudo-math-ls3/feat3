@@ -27,12 +27,20 @@ namespace FEAT
         template <typename DT_>
         static void value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
         {
-#ifdef FEAT_HAVE_MKL
-          value_mkl(r, x, s, size);
-#else
           value_generic(r, x, s, size);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static void value(float * r, const float * const x, const float s, const Index size)
+        {
+          value_mkl(r, x, s, size);
+        }
+
+        static void value(double * r, const double * const x, const double s, const Index size)
+        {
+          value_mkl(r, x, s, size);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void value(__float128 * r, const __float128 * const x, const __float128 s, const Index size)

@@ -35,17 +35,21 @@ namespace FEAT
           csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
         }
 
-        template <typename DT_>
-        static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
-                        const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
+#ifdef FEAT_HAVE_MKL
+        static void csr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
+                        const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
-#ifdef FEAT_HAVE_MKL
           csr_mkl(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
-#else
-          csr_generic(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
-#endif
         }
+
+        static void csr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+                        const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                        const Index used_elements, const bool transposed)
+        {
+          csr_mkl(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void csr(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
@@ -69,15 +73,32 @@ namespace FEAT
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
+          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+
 #ifdef FEAT_HAVE_MKL
-          if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
+        template <int BlockHeight_, int BlockWidth_>
+        static void csrb(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
+                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                         const Index used_elements)
+        {
+          if (BlockHeight_ == BlockWidth_)
             csrb_mkl(r, a, x, b, y, val, (const unsigned long*)col_ind, (const unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
           else
-            csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
-#else
-          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
-#endif
+            csrb_generic<float, unsigned long, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
+
+        template <int BlockHeight_, int BlockWidth_>
+        static void csrb(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                         const Index used_elements)
+        {
+          if (BlockHeight_ == BlockWidth_)
+            csrb_mkl(r, a, x, b, y, val, (const unsigned long*)col_ind, (const unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
+          else
+            csrb_generic<double, unsigned long, BlockHeight_, BlockWidth_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
@@ -112,12 +133,22 @@ namespace FEAT
         static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                         const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-#ifdef FEAT_HAVE_MKL
-          coo_mkl(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-#else
           coo_generic(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static void coo(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
+                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          coo_mkl(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
+        }
+
+        static void coo(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
+                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          coo_mkl(r, a, x, b, y, val, row_ptr, col_ptr, rows, columns, used_elements);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void coo(__float128 * r, const __float128 a, const __float128 * const x, const __float128 b, const __float128 * const y, const __float128 * const val,
@@ -136,12 +167,20 @@ namespace FEAT
         template <typename DT_>
         static void dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
         {
-#ifdef FEAT_HAVE_MKL
-          dense_mkl(r, alpha, beta, y, val, x, rows, columns);
-#else
           dense_generic(r, alpha, beta, y, val, x, rows, columns);
-#endif
         }
+
+#ifdef FEAT_HAVE_MKL
+        static void dense(float * r, const float alpha, const float beta, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns)
+        {
+          dense_mkl(r, alpha, beta, y, val, x, rows, columns);
+        }
+
+        static void dense(double * r, const double alpha, const double beta, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns)
+        {
+          dense_mkl(r, alpha, beta, y, val, x, rows, columns);
+        }
+#endif
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void dense(__float128 * r, const __float128 alpha, const __float128 beta, const __float128 * const y, const __float128 * const val, const __float128 * const x, const Index rows, const Index columns)
