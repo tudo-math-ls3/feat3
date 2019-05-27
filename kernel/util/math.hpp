@@ -234,7 +234,7 @@ namespace FEAT
     template<typename T_>
     inline T_ abs(T_ x)
     {
-      return (x < T_(0) ? T_(-x) : x);
+      return (x < T_(0.) ? -x : x);
     }
 
     // wrap std::abs

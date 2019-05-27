@@ -29,6 +29,14 @@
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 
+/// \compilerhack ICC insists on warning #2259, even when enclosed in push/pop statements
+/// The compiler does not actually issue the warning until the end of the file.
+/// At that point the warning stack has been popped by the #pragma warning (pop).
+/// So unfortunately this specific warning cannot be disabled by putting push/pop around the declaration.
+#if defined(FEAT_COMPILER_INTEL) && defined(FEAT_HAVE_FLOATX)
+_Pragma("warning(disable:2259)")
+#endif
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 // We are using FEAT
@@ -90,7 +98,7 @@ namespace MultiPrecHierarchBench
   }
   flx_bf16 choose_tol(flx_bf16)
   {
-    return flx_f16(5E-2);
+    return flx_bf16(5E-2);
   }
 #endif
 

@@ -250,11 +250,6 @@ SparseMatrixCSRTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_test_
 SparseMatrixCSRTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_csr_test_float128_ulong;
 SparseMatrixCSRTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_csr_test_float128_uint;
 #endif
-#ifdef FEAT_HAVE_FLOATX
-typedef flx::floatx<5, 10, double> flx_f16;  // half-prec
-SparseMatrixCSRTest<Mem::Main, flx_f16, unsigned long> cpu_sparse_matrix_csr_test_flx16_ulong;
-SparseMatrixCSRTest<Mem::Main, flx_f16, unsigned int> cpu_sparse_matrix_csr_test_flx16_uint;
-#endif
 #ifdef FEAT_HAVE_CUDA
 SparseMatrixCSRTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_csr_test_float_ulong;
 SparseMatrixCSRTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_csr_test_double_ulong;

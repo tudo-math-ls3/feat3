@@ -53,6 +53,7 @@
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"") \
   _Pragma("GCC diagnostic ignored \"-Wundef\"") \
+  _Pragma("GCC diagnostic ignored \"-Wstrict-aliasing\"") \
   _Pragma("GCC diagnostic ignored \"-Wparentheses\"") \
   _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") \
   _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
@@ -65,6 +66,7 @@
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"") \
   _Pragma("GCC diagnostic ignored \"-Wundef\"") \
+  _Pragma("GCC diagnostic ignored \"-Wstrict-aliasing\"") \
   _Pragma("GCC diagnostic ignored \"-Wparentheses\"") \
   _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") \
   _Pragma("GCC diagnostic ignored \"-Wshadow\"") \

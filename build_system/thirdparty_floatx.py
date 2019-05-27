@@ -12,8 +12,8 @@ class FParser(ThirdpartyPackage):
   def __init__(self,trunk_dirname):
     self.names = ["floatx"]
     self.dirname = "floatx"
-    self.filename = "FloatX-master.zip"
-    self.url = "https://codeload.github.com/oprecomp/FloatX/zip/master"
+    self.filename = "FloatX-develop.zip"
+    self.url = "https://codeload.github.com/oprecomp/FloatX/zip/develop"
     self.cmake_flags = " -DFEAT_HAVE_FLOATX:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname

@@ -117,7 +117,7 @@ if (FEAT_HAVE_FPARSER)
 endif(FEAT_HAVE_FPARSER)
 
 if (FEAT_HAVE_FLOATX)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/floatx/FloatX-master/src")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/floatx/FloatX-develop/src")
 endif(FEAT_HAVE_FLOATX)
 
 if (FEAT_HAVE_HALFMATH)

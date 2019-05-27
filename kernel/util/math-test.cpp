@@ -261,10 +261,6 @@ MathTest<double> math_test_double(8.1620E-15, 5.4774E-07);
 #ifdef FEAT_HAVE_QUADMATH
 MathTest<__float128> math_test_float128(4.5308E-31Q, 3.2648E-14Q);
 #endif // FEAT_HAVE_QUADMATH
-#ifdef FEAT_HAVE_FLOATX
-// test emulated single precision
-MathTest<flx::floatx<8, 23, double>> math_test_floatx_f32(5.8706E-07, 1.7003E-03);
-#endif // FEAT_HAVE_FLOATX
 
 
 /**

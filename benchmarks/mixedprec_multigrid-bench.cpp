@@ -44,6 +44,14 @@
 #include <omp.h>
 #endif
 
+/// \compilerhack ICC insists on warning #2259, even when enclosed in push/pop statements
+/// The compiler does not actually issue the warning until the end of the file.
+/// At that point the warning stack has been popped by the #pragma warning (pop).
+/// So unfortunately this specific warning cannot be disabled by putting push/pop around the declaration.
+#if defined(FEAT_COMPILER_INTEL) && defined(FEAT_HAVE_FLOATX)
+_Pragma("warning(disable:2259)")
+#endif
+
 using namespace FEAT;
 
 namespace MixedPrecMultiGridBench
@@ -209,6 +217,21 @@ namespace MixedPrecMultiGridBench
 
     return Math::sqrt(r);
   }
+
+     /// \compilerhack GCC/ICC fails on omp reduction with floatx
+#if defined(FEAT_COMPILER_GNU) || defined(FEAT_COMPILER_INTEL)
+  f_hp norm2(const std::vector<f_hp>& v)
+  {
+    const llint n = llint(v.size());
+    const f_hp* x = v.data();
+    f_hp r = f_hp(0);
+
+    for(llint i = 0; i < n; ++i)
+      r += x[i]*x[i];
+
+    return Math::sqrt(r);
+  }
+#endif
 
   // perform axpy
   template<typename F_>
