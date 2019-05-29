@@ -288,7 +288,7 @@ public:
       DenseVector<Mem::Main, DT_, IT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        x_local(i, DT_(i % 100 * DT_(1.234)));
+        x_local(i, DT_(i % 100) * DT_(1.234));
         y_local(i, DT_(2 - DT_(i % 42)));
       }
       DenseVector<Mem_, DT_, IT_> x(size);
@@ -375,7 +375,7 @@ public:
         ref.axpy(ref, y);
         ref_local.copy(ref);
         for (Index i(0) ; i < size ; ++i)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(7e-2));
       }
     }
   }
@@ -423,7 +423,7 @@ public:
       DenseVector<Mem::Main, DT_, IT_> ref_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        ref_x_local(i, DT_(i % 100 * DT_(1.234)));
+        ref_x_local(i, DT_(i % 100) * DT_(1.234));
       }
 
       for (Index row(0) ; row < a_local.rows() ; ++row)
@@ -788,7 +788,7 @@ public:
       DenseVector<Mem::Main, DT_, IT_> x_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        x_local(i, DT_(i % 100 * DT_(1.234)));
+        x_local(i, DT_(i % 100) * DT_(1.234));
       }
       DenseVector<Mem_, DT_, IT_> x(size);
       x.copy(x_local);
