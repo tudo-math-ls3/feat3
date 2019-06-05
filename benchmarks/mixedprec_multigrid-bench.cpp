@@ -220,6 +220,7 @@ namespace MixedPrecMultiGridBench
 
      /// \compilerhack GCC/ICC fails on omp reduction with floatx
 #if defined(FEAT_COMPILER_GNU) || defined(FEAT_COMPILER_INTEL)
+#ifdef FEAT_HAVE_FLOATX
   f_hp norm2(const std::vector<f_hp>& v)
   {
     const llint n = llint(v.size());
@@ -231,6 +232,7 @@ namespace MixedPrecMultiGridBench
 
     return Math::sqrt(r);
   }
+#endif
 #endif
 
   // perform axpy
