@@ -142,7 +142,7 @@ if (FEAT_HAVE_CGAL)
   find_package(Boost REQUIRED COMPONENTS thread)
   INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/cgal/CGAL-4.13/include")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/cgal/CGAL-4.14/include")
 endif(FEAT_HAVE_CGAL)
 
 # our custom target to build (but not execute) all tests in all directories
