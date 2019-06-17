@@ -110,7 +110,7 @@ namespace FEAT
         }
 
         // return vector
-        return std::move(vector);
+        return vector;
       }
 
       /**
@@ -147,7 +147,7 @@ namespace FEAT
         }
 
         // return vector
-        return std::move(vector);
+        return vector;
       }
     }; // PointstarFactoryBase
 
@@ -1143,7 +1143,7 @@ namespace FEAT
         }
 
         // return vector
-        return std::move(vector);
+        return vector;
       }
 
       /**
@@ -1187,7 +1187,7 @@ namespace FEAT
         }
 
         // return vector
-        return std::move(vector);
+        return vector;
       }
     }; // class PointstarFactoryFD2
 

@@ -103,7 +103,7 @@ namespace FEAT
         x.template at<0>().template at<0>().convert(r00);
         x.template at<0>().template at<1>().convert(r01);
         x.template at<1>().convert(r1);
-        return std::move(x);
+        return x;
       }
 
       // generate test-vector y
@@ -125,7 +125,7 @@ namespace FEAT
         y.template at<0>().template at<0>().convert(r00);
         y.template at<0>().template at<1>().convert(r01);
         y.template at<1>().convert(r1);
-        return std::move(y);
+        return y;
       }
 
       // Generate test-vector z. It is crucial that z_i != 0
@@ -147,7 +147,7 @@ namespace FEAT
         z.template at<0>().template at<0>().convert(r00);
         z.template at<0>().template at<1>().convert(r01);
         z.template at<1>().convert(r1);
-        return std::move(z);
+        return z;
       }
 
       // generate null vector
@@ -157,7 +157,7 @@ namespace FEAT
         x.template at<0>().template at<0>() = ScalarVector(n00, DataType(0));
         x.template at<0>().template at<1>() = ScalarVector(n01, DataType(0));
         x.template at<1>() = ScalarVector(n1, DataType(0));
-        return std::move(x);
+        return x;
       }
     }; // MetaVectorTestBase
   } // namespace LAFEM

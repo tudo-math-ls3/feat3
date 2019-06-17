@@ -11,9 +11,6 @@
 #include <kernel/shape.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-// includes, system
-#include <utility> // for std::move
-
 namespace FEAT
 {
   /**
@@ -142,7 +139,7 @@ namespace FEAT
           for(int j(0); j < dimension; ++j)
             rule._points[i][j] = _points[i][j];
         }
-        return std::move(rule);
+        return rule;
       }
 
       const String& get_name() const

@@ -114,7 +114,7 @@ namespace FEAT
       {
         UnitFilter other;
         other.clone(*this, clone_mode);
-        return std::move(other);
+        return other;
       }
 
       /// \brief Clones data from another UnitFilter

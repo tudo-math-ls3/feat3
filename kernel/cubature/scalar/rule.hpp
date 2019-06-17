@@ -11,9 +11,6 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/string.hpp>
 
-// includes, system
-#include <utility> // for std::move
-
 namespace FEAT
 {
   namespace Cubature
@@ -148,7 +145,7 @@ namespace FEAT
             rule._weights[i] = _weights[i];
             rule._coords[i] = _coords[i];
           }
-          return std::move(rule);
+          return rule;
         }
 
         const String& get_name() const
