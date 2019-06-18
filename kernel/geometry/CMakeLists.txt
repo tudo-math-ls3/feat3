@@ -69,6 +69,14 @@ ENDFOREACH(test)
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   SET_SOURCE_FILES_PROPERTIES(cgal.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
   SET_SOURCE_FILES_PROPERTIES(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
+
+  #silence weird glibcxx warning
+  #cgal/CGAL-4.14/include/CGAL/AABB_tree.h:1138:20:
+  #warning: argument 1 value ‘18446744073709551615’ exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    SET_SOURCE_FILES_PROPERTIES(cgal.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-alloc-size-larger-than -Wno-undef")
+    SET_SOURCE_FILES_PROPERTIES(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-alloc-size-larger-than -Wno-undef")
+  endif (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
 endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 # add all tests to geometry_tests
