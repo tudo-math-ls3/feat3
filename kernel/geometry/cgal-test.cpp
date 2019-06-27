@@ -26,6 +26,9 @@ public:
   {
   }
 
+#if defined(__clang__)
+  __attribute__((no_sanitize("undefined")))
+#endif
   virtual void run() const override
   {
     std::stringstream mts;
