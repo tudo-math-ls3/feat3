@@ -14,7 +14,7 @@
 #include <kernel/lafem/base.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/random.hpp>
-#include <kernel/util/checkpointable.hpp>
+
 
 #include <vector>
 #include <limits>
@@ -84,7 +84,7 @@ namespace FEAT
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class Container : public Checkpointable
+    class Container
     {
       template <typename Mem2_, typename DT2_, typename IT2_>
       friend class Container;
@@ -790,20 +790,20 @@ namespace FEAT
         this->_foreign_memory = other._foreign_memory;
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return this->template _serialised_size<>();
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         this->template _deserialise<>(FileMode::fm_binary, data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         auto buffer = this->template _serialise<>(FileMode::fm_binary);
         data.insert(std::end(data), std::begin(buffer), std::end(buffer));

@@ -11,7 +11,6 @@
 #include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/synch_mat.hpp>
-#include <kernel/util/checkpointable.hpp>
 
 namespace FEAT
 {
@@ -23,7 +22,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename LocalMatrix_, typename RowMirror_, typename ColMirror_>
-    class Matrix : public Checkpointable
+    class Matrix
     {
     public:
       typedef LocalMatrix_ LocalMatrixType;
@@ -288,20 +287,20 @@ namespace FEAT
         return locmat;
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return _matrix.get_checkpoint_size();
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char>& data)
       {
         _matrix.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         _matrix.set_checkpoint_data(data);
       }

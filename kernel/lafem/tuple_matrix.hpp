@@ -8,7 +8,7 @@
 #define KERNEL_LAFEM_TUPLE_MATRIX_HPP 1
 
 #include <kernel/lafem/tuple_vector.hpp>
-#include <kernel/util/checkpointable.hpp>
+
 
 namespace FEAT
 {
@@ -30,7 +30,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename First_, typename... Rest_>
-    class TupleMatrixRow : public Checkpointable
+    class TupleMatrixRow
     {
     private:
       template<typename,typename...>
@@ -339,14 +339,14 @@ namespace FEAT
         rest().set_line_reverse(row, pval_set + stride * first_length, stride);
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return sizeof(uint64_t) + _first.get_checkpoint_size() + _rest.get_checkpoint_size(); //sizeof(uint64_t) bits needed to store lenght of checkpointed _first
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed _first
         std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t);
@@ -358,8 +358,8 @@ namespace FEAT
         _rest.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         uint64_t isize = _first.get_checkpoint_size();
         char* csize = reinterpret_cast<char*>(&isize);
@@ -387,7 +387,7 @@ namespace FEAT
     /// \cond internal
     // specialisation for a single sub-matrix
     template<typename First_>
-    class TupleMatrixRow<First_> : public Checkpointable
+    class TupleMatrixRow<First_>
     {
     private:
       template<typename,typename...>
@@ -579,20 +579,20 @@ namespace FEAT
         first().set_line_reverse(row, pval_set, stride);
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return _first.get_checkpoint_size();
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         _first.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         _first.set_checkpoint_data(data);
       }
@@ -698,7 +698,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename FirstRow_, typename... RestRows_>
-    class TupleMatrix : public Checkpointable
+    class TupleMatrix
     {
     private:
       template<typename,typename...>
@@ -1042,14 +1042,14 @@ namespace FEAT
           rest().set_line_reverse(row - first_rows, pval_set, stride);
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return sizeof(uint64_t) + _first.get_checkpoint_size() + _rest.get_checkpoint_size(); //sizeof(uint64_t) bits needed to store lenght of checkpointed _first
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed _first
         std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t);
@@ -1061,8 +1061,8 @@ namespace FEAT
         _rest.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         uint64_t isize = _first.get_checkpoint_size();
         char* csize = reinterpret_cast<char*>(&isize);
@@ -1090,7 +1090,7 @@ namespace FEAT
     /// \cond internal
     // specialisation for 1 row
     template<typename FirstRow_>
-    class TupleMatrix<FirstRow_>  : public Checkpointable
+    class TupleMatrix<FirstRow_>
     {
     private:
       template<typename,typename...>
@@ -1292,20 +1292,20 @@ namespace FEAT
         first().set_line_reverse(row, pval_set, stride);
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return _first.get_checkpoint_size();
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         _first.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         _first.set_checkpoint_data(data);
       }

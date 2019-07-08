@@ -10,7 +10,7 @@
 #include <kernel/lafem/base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
-#include <kernel/util/checkpointable.hpp>
+
 
 namespace FEAT
 {
@@ -54,7 +54,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<typename Mem_, typename DT_, typename IT_, int BlockHeight_ = 1, int BlockWidth_ = 1>
-    class NullMatrix : public Checkpointable
+    class NullMatrix
     {
       static_assert(BlockHeight_ > 0, "invalid block size");
       static_assert(BlockWidth_ > 0, "invalid block size");
@@ -663,20 +663,20 @@ namespace FEAT
       }
       /// \endcond
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return size_t(0);
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & /*data*/) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & /*data*/)
       {
         // nothing to do here
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& /*data*/) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& /*data*/)
       {
         // nothing to do here
       }

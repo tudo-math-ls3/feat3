@@ -12,7 +12,7 @@
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/meta_element.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/util/checkpointable.hpp>
+
 
 namespace FEAT
 {
@@ -35,7 +35,7 @@ namespace FEAT
     template<
       typename SubType_,
       int blocks_>
-    class PowerDiagMatrix : public Checkpointable
+    class PowerDiagMatrix
     {
       // Note: the case = 1 is specialised below
       static_assert(blocks_ > 1, "invalid block size");
@@ -338,14 +338,14 @@ namespace FEAT
         return (i == 0) ? _first : _rest.get(i-1, j-1);
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return sizeof(uint64_t) + _first.get_checkpoint_size() + _rest.get_checkpoint_size(); //sizeof(uint64_t) bits needed to store lenght of checkpointed _first
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed _first
         std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t);
@@ -357,8 +357,8 @@ namespace FEAT
         _rest.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         uint64_t isize = _first.get_checkpoint_size();
         char* csize = reinterpret_cast<char*>(&isize);
@@ -659,7 +659,7 @@ namespace FEAT
 
     /// \cond internal
     template<typename SubType_>
-    class PowerDiagMatrix<SubType_, 1> : public Checkpointable
+    class PowerDiagMatrix<SubType_, 1>
     {
       template<typename, int>
       friend class PowerDiagMatrix;
@@ -856,20 +856,20 @@ namespace FEAT
         return _first;
       }
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return _first.get_checkpoint_size();
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         _first.restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         _first.set_checkpoint_data(data);
       }

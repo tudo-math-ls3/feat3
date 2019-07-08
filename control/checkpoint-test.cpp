@@ -47,7 +47,7 @@ public:
       auto comm = Dist::Comm::world();
       Control::CheckpointControl cp(comm);
       BinaryStream bs;
-      cp.add_object(String("dv1"), &dv1);
+      cp.add_object(String("dv1"), dv1);
       cp.save(bs);
       comm.barrier();
       bs.seekg(0);

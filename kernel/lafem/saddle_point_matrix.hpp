@@ -11,7 +11,7 @@
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/util/checkpointable.hpp>
+
 
 // includes, system
 #include <type_traits>
@@ -64,7 +64,7 @@ namespace FEAT
       typename MatrixA_,
       typename MatrixB_ = MatrixA_,
       typename MatrixD_ = MatrixB_>
-    class SaddlePointMatrix : public Checkpointable
+    class SaddlePointMatrix
     {
     public:
       /// type of sub-matrix A
@@ -576,14 +576,14 @@ namespace FEAT
       }
       /// \endcond
 
-      /// \copydoc Checkpointable::get_checkpoint_size()
-      virtual uint64_t get_checkpoint_size() override
+      /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
+      uint64_t get_checkpoint_size()
       {
         return (3 * sizeof(uint64_t)) + this->block_a().get_checkpoint_size() + this->block_b().get_checkpoint_size() + this->block_d().get_checkpoint_size();
       }
 
-      /// \copydoc Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
-      virtual void restore_from_checkpoint_data(std::vector<char> & data) override
+      /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
+      void restore_from_checkpoint_data(std::vector<char> & data)
       {
         uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed block a
         std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t); //get iterator at the beginning of block a
@@ -602,8 +602,8 @@ namespace FEAT
         this->block_d().restore_from_checkpoint_data(data);
       }
 
-      /// \copydoc Checkpointable::set_checkpoint_data(std::vector<char>&)
-      virtual void set_checkpoint_data(std::vector<char>& data) override
+      /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
+      void set_checkpoint_data(std::vector<char>& data)
       {
         uint64_t isize = this->block_a().get_checkpoint_size();
         char* csize = reinterpret_cast<char*>(&isize);
