@@ -1046,7 +1046,8 @@ namespace FEAT
       template<int sma_, int sna_>
       Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
       {
-        XASSERTM(this != &a, "Matrices must not be the same");
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "self-transpose is not allowed");
 
         for(int i(0); i < m_; ++i)
         {
