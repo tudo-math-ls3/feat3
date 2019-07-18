@@ -38,6 +38,9 @@ TARGET_LINK_LIBRARIES(dbg-pmdcdsc feat)
 ADD_EXECUTABLE(dbg-recursive-parti dbg_recursive_parti.cpp)
 TARGET_LINK_LIBRARIES(dbg-recursive-parti feat)
 
+ADD_EXECUTABLE(dbg-sphere-fem dbg_sphere_fem.cpp)
+TARGET_LINK_LIBRARIES(dbg-sphere-fem feat)
+
 ADD_EXECUTABLE(dbg-stokes-3field dbg_stokes_3field.cpp)
 TARGET_LINK_LIBRARIES(dbg-stokes-3field feat)
 

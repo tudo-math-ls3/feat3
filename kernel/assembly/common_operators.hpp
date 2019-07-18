@@ -185,6 +185,107 @@ namespace FEAT
       }; // class LaplaceOperatorBlocked
 
       /**
+       * \brief Laplace-Beltrami operator implementation
+       *
+       * This class implements the Laplace-Beltrami operator, which represents a generalisation
+       * the standard Laplace operator that can also be defined on manifolds.
+       *
+       * The discrete Laplace-Beltrami operator is defines as follows:
+       *
+       * \f[a(\phi,\psi) := \sum_{T\in T_h} \int_{\widehat{T}}
+         \sqrt{\textnormal{det}\big(\mathcal{G}_T\big)}
+         \cdot\big(\widehat{\nabla}\widehat{\varphi}\big)^\top\cdot
+         \mathcal{G}_T^{-1}
+         \cdot\widehat{\nabla}\widehat{\psi},\f]
+       * where
+       * - \f$\tau:\widehat{T}\rightarrow T\f$ is the transformation from the reference element
+       *   onto the real element
+       * - \f$\mathcal{G}_T := (\widehat{\nabla} \tau)^\top\cdot (\widehat{\nabla} \tau)\f$ is
+       *   the Gram matrix of the transformation's Jacobian matrix
+       * - \f$\widehat{\nabla}\widehat{\varphi}\f$ and \f$\widehat{\nabla}\widehat{\psi}\f$ are
+       *   the reference basis function gradients on the reference element
+       *
+       * \attention
+       * This operator can only be used in conjunction with parametric finite element spaces,
+       * because it explicitly requires reference basis gradients.
+       *
+       * \author Peter Zajac
+       */
+      class LaplaceBeltramiOperator :
+        public Assembly::BilinearOperator
+      {
+      public:
+        static constexpr TrafoTags trafo_config = TrafoTags::jac_det;
+        /// we need reference gradients from the test space
+        static constexpr SpaceTags test_config = SpaceTags::ref_grad;
+        /// we need reference gradients from the trial space
+        static constexpr SpaceTags trial_config = SpaceTags::ref_grad;
+
+        /**
+         * \brief Laplace-Beltrami evaluator class template
+         *
+         * \tparam AsmTraits_
+         * The assembly traits class.
+         *
+         * \author Peter Zajac
+         */
+        template<typename AsmTraits_>
+        class Evaluator :
+          public Assembly::BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// trafo evaluator type
+          typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        private:
+          /// the transformation Gram matrix and its inverse
+          Tiny::Matrix<DataType, TrafoEvaluator::domain_dim, TrafoEvaluator::domain_dim> gram_mat, gram_inv;
+
+        public:
+          explicit Evaluator(const LaplaceBeltramiOperator& DOXY(operat))
+          {
+          }
+
+          void set_point(const TrafoData& tau)
+          {
+            // compute the Jacobi-Gram matrix
+            gram_mat.set_gram(tau.jac_mat);
+            // and invert it
+            gram_inv.set_inverse(gram_mat);
+          }
+
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear operator.
+           **/
+          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            return gram_inv.scalar_product(phi.ref_grad, psi.ref_grad);
+          }
+        }; // class LaplaceBeltramiOperator::Evaluator<...>
+      }; // class LaplaceBeltramiOperator
+
+
+      /**
        * \brief Identity operator implementation
        *
        * This functor implements the weak formulation of the bilinear scalar Identity operator, i.e.

@@ -35,6 +35,8 @@ namespace FEAT
 
       /// shape dimension
       static constexpr int shape_dim = ShapeType::dimension;
+      /// our image/world dimension
+      static constexpr int world_dim = MeshType::world_dim;
 
       /*
        * \brief Specifies whether the element has node functionals

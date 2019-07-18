@@ -3044,6 +3044,226 @@ namespace FEAT
         }
       };
 
+
+      /**
+       * \brief Sphere-Normalised Sine-Bubble Function
+       *
+       * This function represents the 3D sine-bubble function, whose input
+       * point has been normalised, i.e.:
+       *
+       * \[fu(x,y,z) = \sin\bigg(\frac{\pi x}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
+          \sin\bigg(\frac{\pi y}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
+          \sin\bigg(\frac{\pi z}{\sqrt{x^2+y^2+z^2}}\bigg)\f]
+       *
+       * \tparam DT_
+       * The floating point type
+       *
+       * \author Peter Zajac
+       */
+      class SphereSinBubbleFunction : public Analytic::Function
+      {
+      public:
+        /// What type this mapping maps to
+        typedef Analytic::Image::Scalar ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 3;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = true;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const DataType pi;
+
+        public:
+          explicit Evaluator(const SphereSinBubbleFunction&) :
+            pi(Math::pi<DataType>())
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            const DataType re = pi / point.norm_euclid();
+            return Math::sin(re*point[0]) * Math::sin(re*point[1]) * Math::sin(re*point[2]);
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            const DataType x = point[0];
+            const DataType y = point[1];
+            const DataType z = point[2];
+            const DataType re = DataType(1) / point.norm_euclid();
+            const DataType cx = Math::cos(pi * re * x);
+            const DataType cy = Math::cos(pi * re * y);
+            const DataType cz = Math::cos(pi * re * z);
+            const DataType sx = Math::sin(pi * re * x);
+            const DataType sy = Math::sin(pi * re * y);
+            const DataType sz = Math::sin(pi * re * z);
+            GradientType grad;
+            grad[0] = +pi * Math::cub(re) * (cx*sz*sy*y*y + cx*sz*sy*z*z - sx*x*y*cy*sz - sx*sy*x*z*cz);
+            grad[1] = -pi * Math::cub(re) * (x*y*cx*sy*sz - sz*sx*cy*x*x - sz*sx*cy*z*z + sx*sy*z*y*cz);
+            grad[2] = -pi * Math::cub(re) * (x*z*cx*sy*sz + sx*z*y*cy*sz - sx*cz*sy*x*x - sx*cz*sy*y*y);
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            const DataType x = point[0];
+            const DataType y = point[1];
+            const DataType z = point[2];
+            const DataType di = Math::sqrt(x*x + y*y + z*z);
+            const DataType re = DataType(1) / di;
+            const DataType qo = DataType(1) / Math::cub(x*x + y*y + z*z);
+            const DataType cx = Math::cos(pi * re * x);
+            const DataType cy = Math::cos(pi * re * y);
+            const DataType cz = Math::cos(pi * re * z);
+            const DataType sx = Math::sin(pi * re * x);
+            const DataType sy = Math::sin(pi * re * y);
+            const DataType sz = Math::sin(pi * re * z);
+            HessianType hess;
+            hess[0][0] = -pi*qo*(
+              DataType(2)*cx*sy*cz*pi*x*y*y*z +
+              DataType(2)*cx*sy*cz*pi*x*z*z*z +
+              DataType(2)*cx*sz*cy*pi*x*y*y*y +
+              DataType(2)*cx*sz*cy*pi*x*y*z*z +
+              DataType(2)*sy*sz*sx*pi*y*y*z*z +
+              -DataType(2)*sx*y*x*x*cy*sz*di +
+              -DataType(2)*sx*y*pi*x*x*cy*z*cz +
+              -DataType(2)*sx*sy*z*x*x*cz*di +
+              DataType(3)*cx*sy*sz*x*di*y*y +
+              DataType(3)*cx*sy*sz*x*di*z*z +
+              sx*y*y*pi*x*x*sy*sz +
+              sx*sy*z*z*pi*x*x*sz +
+              sy*sz*sx*pi*y*y*y*y +
+              sy*sz*sx*pi*z*z*z*z +
+              sy*cz*sx*di*y*y*z +
+              sy*cz*sx*di*z*z*z +
+              sz*cy*sx*di*y*y*y +
+              sz*cy*sx*di*y*z*z);
+            hess[1][1] = -pi*qo*(
+              DataType(2)*cx*sz*cy*pi*x*x*x*y +
+              DataType(2)*cx*sz*cy*pi*x*y*z*z +
+              DataType(2)*sx*sy*z*z*pi*x*x*sz +
+              DataType(2)*sx*y*pi*x*x*cy*z*cz +
+              DataType(2)*sx*cy*cz*pi*y*z*z*z +
+              -DataType(2)*cx*sy*cz*pi*x*y*y*z +
+              -DataType(2)*cx*sy*sz*x*di*y*y +
+              -DataType(2)*sy*cz*sx*di*y*y*z +
+              DataType(3)*sx*y*x*x*cy*sz*di +
+              DataType(3)*sz*cy*sx*di*y*z*z +
+              sy*sz*sx*pi*x*x*x*x +
+              sx*y*y*pi*x*x*sy*sz +
+              sy*sz*sx*pi*y*y*z*z +
+              sy*sz*sx*pi*z*z*z*z +
+              di*cx*sy*sz*x*x*x +
+              cx*sy*sz*x*di*z*z +
+              sx*sy*z*x*x*cz*di +
+              sy*cz*sx*di*z*z*z);
+            hess[2][2] = -pi*qo*(
+              DataType(2)*cx*sy*cz*pi*x*x*x*z +
+              DataType(2)*cx*sy*cz*pi*x*y*y*z +
+              DataType(2)*sx*y*y*pi*x*x*sy*sz +
+              DataType(2)*sx*y*pi*x*x*cy*z*cz +
+              DataType(2)*sx*cy*cz*pi*y*y*y*z +
+              -DataType(2)*cx*sy*sz*x*di*z*z +
+              -DataType(2)*cx*sz*cy*pi*x*y*z*z +
+              -DataType(2)*sz*cy*sx*di*y*z*z +
+              DataType(3)*sx*sy*z*x*x*cz*di +
+              DataType(3)*sy*cz*sx*di*y*y*z +
+              sy*sz*sx*pi*x*x*x*x +
+              sx*sy*z*z*pi*x*x*sz +
+              sy*sz*sx*pi*y*y*y*y +
+              sy*sz*sx*pi*y*y*z*z +
+              di*cx*sy*sz*x*x*x +
+              cx*sy*sz*x*di*y*y +
+              sx*y*x*x*cy*sz*di +
+              sz*cy*sx*di*y*y*y);
+            hess[0][1] = hess[1][0] = pi*qo*(
+              DataType(2)*y*y*pi*x*x*cx*cy*sz +
+              DataType(2)*di*cx*sy*sz*x*x*y +
+              DataType(2)*sx*y*y*x*cy*sz*di +
+              DataType(3)*sx*sy*z*x*cz*y*di +
+              y*pi*x*x*cx*sy*z*cz +
+              -cx*sy*cz*pi*y*y*y*z +
+              -cx*sy*cz*pi*y*z*z*z +
+              cx*sz*cy*pi*x*x*z*z +
+              cx*sz*cy*pi*y*y*z*z +
+              cx*sz*cy*pi*z*z*z*z +
+              sy*sz*sx*pi*x*x*x*y +
+              sy*sz*sx*pi*x*y*y*y +
+              sx*sy*z*z*pi*x*y*sz +
+              -sx*cy*cz*pi*x*x*x*z +
+              sx*y*y*pi*x*cy*z*cz +
+              -sx*cy*cz*pi*x*z*z*z +
+              -cx*sy*sz*di*y*y*y +
+              -cx*sy*sz*di*y*z*z +
+              -cy*sz*sx*x*x*x*di +
+              -cy*sz*sx*x*di*z*z);
+            hess[0][1] = hess[0][2] = pi*qo*(
+              DataType(2)*z*z*pi*x*x*cx*sy*cz +
+              DataType(2)*sx*sy*z*z*x*cz*di +
+              DataType(2)*di*cx*sy*sz*x*x*z +
+              DataType(3)*sx*y*x*cy*sz*z*di +
+              cx*sy*cz*pi*x*x*y*y +
+              cx*sy*cz*pi*y*y*y*y +
+              cx*sy*cz*pi*y*y*z*z +
+              sy*sz*sx*pi*x*x*x*z +
+              sx*y*y*pi*x*z*sy*sz +
+              sy*sz*sx*pi*x*z*z*z +
+              -sx*cy*cz*pi*x*x*x*y +
+              -sx*cy*cz*pi*x*y*y*y +
+              sx*y*pi*z*z*cy*x*cz +
+              z*pi*x*x*cx*y*cy*sz +
+              -cx*sz*cy*pi*y*y*y*z +
+              -cx*sz*cy*pi*y*z*z*z +
+              -sy*cz*sx*x*x*x*di +
+              -sy*cz*sx*x*di*y*y +
+              -sy*sz*cx*di*y*y*z +
+              -sy*sz*cx*di*z*z*z);
+            hess[1][2] = hess[2][1] = pi*qo*(
+              DataType(2)*sx*y*y*pi*z*z*cy*cz +
+              DataType(2)*sx*sy*z*z*y*cz*di +
+              DataType(2)*di*sz*sx*cy*y*y*z +
+              DataType(3)*y*x*cx*sy*sz*z*di +
+              -cx*sy*cz*pi*x*x*x*y +
+              -cx*sy*cz*pi*x*y*y*y +
+              z*z*pi*x*cx*sy*y*cz +
+              -cx*sz*cy*pi*x*x*x*z +
+              y*y*pi*x*cx*z*cy*sz +
+              -cx*sz*cy*pi*x*z*z*z +
+              y*pi*x*x*z*sx*sy*sz +
+              sy*sz*sx*pi*y*y*y*z +
+              sy*sz*sx*pi*y*z*z*z +
+              sx*cy*cz*pi*x*x*x*x +
+              sx*cy*cz*pi*x*x*y*y +
+              sx*cy*cz*pi*x*x*z*z +
+              -sy*cz*sx*x*x*di*y +
+              -sy*cz*sx*di*y*y*y +
+              -sz*cy*sx*x*x*di*z +
+              -sz*cy*sx*di*z*z*z);
+            return hess;
+          }
+        }; // class SphereSinBubbleFunction::Evaluator<...>
+      }; // class SphereSinBubbleFunction
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

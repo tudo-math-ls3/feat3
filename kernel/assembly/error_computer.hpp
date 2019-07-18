@@ -63,7 +63,7 @@ namespace FEAT
         }
       };
 
-      template<bool h1_, typename AsmTraits_, typename AnaTraits_>
+      template<bool h1_, typename AsmTraits_, typename AnaTraits_, bool sub_dim_>
       struct SecHelperH1
       {
         typedef typename AsmTraits_::DataType DataType;
@@ -81,8 +81,9 @@ namespace FEAT
         }
       };
 
+      // full-dimension variant for H1
       template<typename AsmTraits_, typename AnaTraits_>
-      struct SecHelperH1<true, AsmTraits_, AnaTraits_>
+      struct SecHelperH1<true, AsmTraits_, AnaTraits_, false>
       {
         typedef typename AsmTraits_::DataType DataType;
 
@@ -104,6 +105,45 @@ namespace FEAT
 
           // return result
           return grad.norm_euclid_sqr();
+        }
+      };
+
+      // sub-dimensional variant for H1
+      template<typename AsmTraits_, typename AnaTraits_>
+      struct SecHelperH1<true, AsmTraits_, AnaTraits_, true>
+      {
+        typedef typename AsmTraits_::DataType DataType;
+
+        template<typename FuncEval_, typename LocalVec_>
+        static DataType eval(
+          FuncEval_& func_eval,
+          const typename AsmTraits_::TrafoEvalData& trafo_data,
+          const typename AsmTraits_::SpaceEvalData& space_data,
+          const LocalVec_& lvad,
+          const int num_loc_dofs
+          )
+        {
+          // get the dimensions
+          static constexpr int dom_dim = AsmTraits_::domain_dim;
+
+          // evaluate function gradient
+          typename AnaTraits_::GradientType grad = func_eval.gradient(trafo_data.img_point);
+
+          // transform back onto reference element by applying chain rule
+          Tiny::Vector<DataType, dom_dim> ref_grad;
+          ref_grad.set_vec_mat_mult(grad, trafo_data.jac_mat);
+
+          // subtract FE function reference gradient
+          for(int i(0); i < num_loc_dofs; ++i)
+            ref_grad.axpy(-lvad[i], space_data.phi[i].ref_grad);
+
+          // compute gram matrix of transformation
+          Tiny::Matrix<DataType, dom_dim, dom_dim> gram_mat, gram_inv;
+          gram_mat.set_gram(trafo_data.jac_mat);
+          gram_inv.set_inverse(gram_mat);
+
+          // return result
+          return gram_inv.scalar_product(ref_grad, ref_grad);
         }
       };
 
@@ -290,14 +330,21 @@ namespace FEAT
      * - max_norm_ = 1: compute H0-norm and H1-semi-norm of error
      * - max_norm_ = 2: compute H0-norm, H1- and H2-semi-norms of error
      *
+     * \tparam sub_dimensional_
+     * Specifies whether the errors are to be computed on a sub-dimensional mesh,
+     * i.e. on a surface mesh representing a manifold. It is recommended to set this
+     * to \c false if working on a fully-dimensional mesh.
+     *
      * \attention
      * To compute the H1- and H2-semi-norms of the error, both the analytic reference function
      * as well as the finite element space need to be able to compute gradients and hessians,
      * respectively.
      *
+     * \todo implement H2-error on sub-dimensional surface computation
+     *
      * \author Peter Zajac
      */
-    template<int max_norm_ = 0>
+    template<int max_norm_ = 0, bool sub_dimensional_ = false>
     class ScalarErrorComputer
     {
       static_assert(max_norm_ >= 0, "invalid max_norm_ parameter");
@@ -307,14 +354,14 @@ namespace FEAT
       /**
        * \brief Trafo configuration tag class
        */
-      static constexpr TrafoTags trafo_config = TrafoTags::img_point | TrafoTags::jac_det;
+      static constexpr TrafoTags trafo_config = TrafoTags::img_point | TrafoTags::jac_mat | TrafoTags::jac_det;
 
       /**
        * \brief Space configuration tag class
        */
       static constexpr SpaceTags space_config =
         ((max_norm_ >= 0) ? SpaceTags::value : SpaceTags::none) |
-        ((max_norm_ >= 1) ? SpaceTags::grad : SpaceTags::none) |
+        ((max_norm_ >= 1) ? (sub_dimensional_ ? SpaceTags::ref_grad : SpaceTags::grad) : SpaceTags::none) |
         ((max_norm_ >= 2) ? SpaceTags::hess : SpaceTags::none);
       /// \endcond
 
@@ -413,7 +460,7 @@ namespace FEAT
 
         // H0/H1/H2 helpers
         typedef Intern::SecHelperH0<(max_norm_ >= 0), AsmTraits, AnalyticEvalTraits> SecH0;
-        typedef Intern::SecHelperH1<(max_norm_ >= 1), AsmTraits, AnalyticEvalTraits> SecH1;
+        typedef Intern::SecHelperH1<(max_norm_ >= 1), AsmTraits, AnalyticEvalTraits, sub_dimensional_> SecH1;
         typedef Intern::SecHelperH2<(max_norm_ >= 2), AsmTraits, AnalyticEvalTraits> SecH2;
 
         // loop over all cells of the mesh

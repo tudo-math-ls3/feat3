@@ -851,9 +851,292 @@ namespace FEAT
             v_e[i][1] = i + Index(1);
           }
         }
-
     };
 
+    template<typename Mesh_>
+    class UnitSphereFactory DOXY({});
+
+    /// \cond internal
+
+    template<typename Coord_>
+    class UnitSphereFactory< ConformalMesh<Shape::Simplex<2>, 3, Coord_> > :
+      public Factory< ConformalMesh<Shape::Simplex<2>, 3, Coord_> >
+    {
+    public:
+      /// shape type
+      typedef Shape::Simplex<2> ShapeType;
+      /// mesh type
+      typedef ConformalMesh<Shape::Simplex<2>, 3, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+    public:
+      UnitSphereFactory()
+      {
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        switch(dim)
+        {
+          case 0:
+            return 12u;
+          case 1:
+            return 30u;
+          case 2:
+            return 20u;
+          default:
+            return 0u;
+        }
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        const Coord_ s5 = Math::sqrt(Coord_(5));
+        const Coord_ va = Coord_(0);
+        const Coord_ vb = Math::sqrt(Coord_(2) / (Coord_(5) + s5));
+        const Coord_ vc = (s5 + Coord_(1)) / Math::sqrt(Coord_(10) + Coord_(2)*s5);
+        vertex_set[ 0][0] =  va;
+        vertex_set[ 0][1] = -vb;
+        vertex_set[ 0][2] =  vc;
+        vertex_set[ 1][0] =  vc;
+        vertex_set[ 1][1] =  va;
+        vertex_set[ 1][2] =  vb;
+        vertex_set[ 2][0] =  vc;
+        vertex_set[ 2][1] =  va;
+        vertex_set[ 2][2] = -vb;
+        vertex_set[ 3][0] = -vc;
+        vertex_set[ 3][1] =  va;
+        vertex_set[ 3][2] = -vb;
+        vertex_set[ 4][0] = -vc;
+        vertex_set[ 4][1] =  va;
+        vertex_set[ 4][2] =  vb;
+        vertex_set[ 5][0] = -vb;
+        vertex_set[ 5][1] =  vc;
+        vertex_set[ 5][2] =  va;
+        vertex_set[ 6][0] =  vb;
+        vertex_set[ 6][1] =  vc;
+        vertex_set[ 6][2] =  va;
+        vertex_set[ 7][0] =  vb;
+        vertex_set[ 7][1] = -vc;
+        vertex_set[ 7][2] =  va;
+        vertex_set[ 8][0] = -vb;
+        vertex_set[ 8][1] = -vc;
+        vertex_set[ 8][2] =  va;
+        vertex_set[ 9][0] =  va;
+        vertex_set[ 9][1] = -vb;
+        vertex_set[ 9][2] = -vc;
+        vertex_set[10][0] =  va;
+        vertex_set[10][1] =  vb;
+        vertex_set[10][2] = -vc;
+        vertex_set[11][0] =  va;
+        vertex_set[11][1] =  vb;
+        vertex_set[11][2] =  vc;
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        // vertices-at-edge
+        auto& ve = index_set_holder.template get_index_set<1,0>();
+        ve[ 0][0] =  1;
+        ve[ 0][1] =  2;
+        ve[ 1][0] =  2;
+        ve[ 1][1] =  6;
+        ve[ 2][0] =  1;
+        ve[ 2][1] =  6;
+        ve[ 3][0] =  1;
+        ve[ 3][1] =  7;
+        ve[ 4][0] =  2;
+        ve[ 4][1] =  7;
+        ve[ 5][0] =  3;
+        ve[ 5][1] =  4;
+        ve[ 6][0] =  4;
+        ve[ 6][1] =  5;
+        ve[ 7][0] =  3;
+        ve[ 7][1] =  5;
+        ve[ 8][0] =  3;
+        ve[ 8][1] =  8;
+        ve[ 9][0] =  4;
+        ve[ 9][1] =  8;
+        ve[10][0] =  5;
+        ve[10][1] =  6;
+        ve[11][0] =  5;
+        ve[11][1] = 11;
+        ve[12][0] =  6;
+        ve[12][1] = 11;
+        ve[13][0] =  6;
+        ve[13][1] = 10;
+        ve[14][0] =  5;
+        ve[14][1] = 10;
+        ve[15][0] =  9;
+        ve[15][1] = 10;
+        ve[16][0] =  2;
+        ve[16][1] = 10;
+        ve[17][0] =  2;
+        ve[17][1] =  9;
+        ve[18][0] =  3;
+        ve[18][1] =  9;
+        ve[19][0] =  3;
+        ve[19][1] = 10;
+        ve[20][0] =  7;
+        ve[20][1] =  8;
+        ve[21][0] =  8;
+        ve[21][1] =  9;
+        ve[22][0] =  7;
+        ve[22][1] =  9;
+        ve[23][0] =  0;
+        ve[23][1] =  7;
+        ve[24][0] =  0;
+        ve[24][1] =  8;
+        ve[25][0] =  0;
+        ve[25][1] = 11;
+        ve[26][0] =  0;
+        ve[26][1] =  1;
+        ve[27][0] =  1;
+        ve[27][1] = 11;
+        ve[28][0] =  4;
+        ve[28][1] = 11;
+        ve[29][0] =  0;
+        ve[29][1] =  4;
+
+        // vertices-at-face
+        auto& vf = index_set_holder.template get_index_set<2,0>();
+        vf[ 0][0] =  1;
+        vf[ 0][1] =  2;
+        vf[ 0][2] =  6;
+        vf[ 1][0] =  1;
+        vf[ 1][1] =  7;
+        vf[ 1][2] =  2;
+        vf[ 2][0] =  3;
+        vf[ 2][1] =  4;
+        vf[ 2][2] =  5;
+        vf[ 3][0] =  4;
+        vf[ 3][1] =  3;
+        vf[ 3][2] =  8;
+        vf[ 4][0] =  6;
+        vf[ 4][1] =  5;
+        vf[ 4][2] = 11;
+        vf[ 5][0] =  5;
+        vf[ 5][1] =  6;
+        vf[ 5][2] = 10;
+        vf[ 6][0] =  9;
+        vf[ 6][1] = 10;
+        vf[ 6][2] =  2;
+        vf[ 7][0] = 10;
+        vf[ 7][1] =  9;
+        vf[ 7][2] =  3;
+        vf[ 8][0] =  7;
+        vf[ 8][1] =  8;
+        vf[ 8][2] =  9;
+        vf[ 9][0] =  8;
+        vf[ 9][1] =  7;
+        vf[ 9][2] =  0;
+        vf[10][0] = 11;
+        vf[10][1] =  0;
+        vf[10][2] =  1;
+        vf[11][0] =  0;
+        vf[11][1] = 11;
+        vf[11][2] =  4;
+        vf[12][0] =  6;
+        vf[12][1] =  2;
+        vf[12][2] = 10;
+        vf[13][0] =  1;
+        vf[13][1] =  6;
+        vf[13][2] = 11;
+        vf[14][0] =  3;
+        vf[14][1] =  5;
+        vf[14][2] = 10;
+        vf[15][0] =  5;
+        vf[15][1] =  4;
+        vf[15][2] = 11;
+        vf[16][0] =  2;
+        vf[16][1] =  7;
+        vf[16][2] =  9;
+        vf[17][0] =  7;
+        vf[17][1] =  1;
+        vf[17][2] =  0;
+        vf[18][0] =  3;
+        vf[18][1] =  9;
+        vf[18][2] =  8;
+        vf[19][0] =  4;
+        vf[19][1] =  8;
+        vf[19][2] =  0;
+
+        Geometry::RedundantIndexSetBuilder<Shape::Triangle>::compute(index_set_holder);
+      }
+    }; // class UnitSphereFactory<ConformalMesh<Shape::Simplex<2>, ...>>
+
+    template<typename Coord_>
+    class UnitSphereFactory< ConformalMesh<Shape::Hypercube<2>, 3, Coord_> > :
+      public Factory< ConformalMesh<Shape::Hypercube<2>, 3, Coord_> >
+    {
+    public:
+      /// shape type
+      typedef Shape::Hypercube<2> ShapeType;
+      /// mesh type
+      typedef ConformalMesh<Shape::Hypercube<2>, 3, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+    public:
+      UnitSphereFactory()
+      {
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        switch(dim)
+        {
+          case 0:
+            return 8u;
+          case 1:
+            return 12u;
+          case 2:
+            return 6u;
+          default:
+            return 0u;
+        }
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        const Coord_ scale = Coord_(2) / Math::sqrt(Coord_(3));
+        for(Index i(0); i < 8u; ++i)
+        {
+          for(int j(0); j < 3; ++j)
+          {
+            vertex_set[i][j] = scale * (Coord_((i >> j) & 0x1) - Coord_(0.5));
+          }
+        }
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        _fill_index_set<1,0>(index_set_holder);
+        _fill_index_set<2,0>(index_set_holder);
+        _fill_index_set<2,1>(index_set_holder);
+      }
+
+    private:
+      template<int cell_dim_, int face_dim_>
+      static void _fill_index_set(IndexSetHolderType& index_set_holder)
+      {
+        typedef typename Intern::FaceIndexMapping<Shape::Hypercube<3>, cell_dim_, face_dim_> FimType;
+        auto& idx = index_set_holder.template get_index_set<cell_dim_, face_dim_>();
+
+        for(int i(0); i < Shape::FaceTraits<Shape::Hypercube<3>, cell_dim_>::count; ++i)
+        {
+          for(int j(0); j < idx.num_indices; ++j)
+          {
+            idx[Index(i)][j] = Index(FimType::map(i, j));
+          }
+        }
+      }
+    }; // class UnitSphereFactory<ConformalMesh<Shape::Hypercube<2>, ...>>
   } // namespace Geometry
 } // namespace FEAT
 

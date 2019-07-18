@@ -51,7 +51,7 @@ namespace FEAT
         LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> vec_w(space.get_num_dofs(), DataType_(0));
 
         // create a constant 1-function and its corresponding force functional
-        Analytic::Common::ConstantFunction<Space_::shape_dim> one_func(Real(1));
+        Analytic::Common::ConstantFunction<Space_::world_dim> one_func(Real(1));
         Assembly::Common::ForceFunctional<decltype(one_func)> one_force(one_func);
 
         // interpolate 1-function into vector v

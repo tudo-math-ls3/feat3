@@ -1060,6 +1060,39 @@ namespace FEAT
       }
 
       /**
+       * \brief Sets this matrix to the Gram matrix of another matrix.
+       *
+       * Let \e C denote \c this n-by-n matrix, and let \e A denote the l-by-n input matrix,
+       * then this function computes:
+       * \f[ C\leftarrow A^\top\cdot A \f]
+       *
+       * \param[in] a
+       * The matrix whose Gram matrix is to be stored in this matrix.
+       *
+       * \returns \p *this
+       */
+      template<int l_, int sla_, int sna_>
+      Matrix& set_gram(const Matrix<T_, l_, n_, sla_, sna_>& a)
+      {
+        static_assert(m_ == n_, "Gram matrices must be square");
+
+        format();
+
+        for(int k(0); k < l_; ++k)
+        {
+          for(int i(0); i < n_; ++i)
+          {
+            for(int j(0); j < n_; ++j)
+            {
+              v[i][j] += a.v[k][i] * a.v[k][j];
+            }
+          }
+        }
+
+        return *this;
+      }
+
+      /**
        * \brief Computes the scalar product of two vectors with this matrix.
        *
        * This function returns
