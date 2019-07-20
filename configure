@@ -91,8 +91,10 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Let CMake export the used compile commands to compile_commands.json.")
   print ("--cpu=cputype")
   print ("  Override cpu auto detection with provided string (see build_system/detect_cpu.py for a list).")
-  print ("--compiler=path/to/binary")
+  print ("--cxx=path/to/binary")
   print ("  Override default c++ compiler binary by absolute path to binary. This does not replace the proper compiler statement in the build id.")
+  print ("--cc=path/to/binary")
+  print ("  Override default c compiler binary by absolute path to binary. This muss 'match' the c++ compiler and the compiler statement in the build id.")
   print ("--cuda_verbose")
   print ("  Be way more verbosive on cuda compilation steps")
   print ("--unroll_banded")
@@ -225,7 +227,8 @@ if "mpi" in buildid:
 cputype = ""
 system_host_compiler = ""
 cuda_host_compiler = ""
-compiler = ""
+compiler_cxx = ""
+compiler_cc = ""
 cuda_arch = ""
 cuda_verbose = False
 restrict_errors = False
@@ -258,14 +261,23 @@ for option in extra_options:
     if not os.path.exists(cuda_host_compiler):
       print ("Error: cuda_host_compiler " + cuda_host_compiler + " does not exist!")
 
-  if option.startswith("--compiler="):
+  if option.startswith("--cxx="):
     unused_extra_options.remove(option)
-    if compiler:
-      print ("Error: multiple compiler parameters in\n" + "\n".join(extra_options))
+    if compiler_cxx:
+      print ("Error: multiple cxx parameters in\n" + "\n".join(extra_options))
       exit(1)
-    compiler = option.replace("--compiler=", "", 1)
-    if not os.path.exists(compiler):
-      print ("Error: compiler " + compiler + " does not exist!")
+    compiler_cxx = option.replace("--cxx=", "", 1)
+    if not os.path.exists(compiler_cxx):
+      print ("Error: compiler " + compiler_cxx + " does not exist!")
+
+  if option.startswith("--cc="):
+    unused_extra_options.remove(option)
+    if compiler_cc:
+      print ("Error: multiple cc parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    compiler_cc = option.replace("--cc=", "", 1)
+    if not os.path.exists(compiler_cc):
+      print ("Error: compiler " + compiler_cc + " does not exist!")
 
   if option.startswith("--cuda_arch="):
     unused_extra_options.remove(option)
@@ -347,17 +359,22 @@ cmake_flags += " -DFEAT_CPU_TYPE:STRING=" + cputype
 
 #compiler selection
 if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
-  if not compiler:
-    compiler="g++"
-  if not is_found(compiler):
-    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
+  if not compiler_cxx:
+    compiler_cxx="g++"
+  if not is_found(compiler_cxx):
+    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
+    sys.exit(1)
+  if not compiler_cc:
+    compiler_cc="gcc"
+  if not is_found(compiler_cc):
+    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "gcc")
   remove_string(unused_tokens, "gnu")
-  os.environ["CC"] = "gcc"
-  os.environ["CXX"] = compiler
-  os.environ["LD"] = compiler
-  cxxflags_temp, cmake_temp = configure_gcc (cputype, buildid, compiler, restrict_errors)
+  os.environ["CC"] = compiler_cc
+  os.environ["CXX"] = compiler_cxx
+  os.environ["LD"] = compiler_cxx
+  cxxflags_temp, cmake_temp = configure_gcc (cputype, buildid, compiler_cxx, restrict_errors)
   cxxflags += cxxflags_temp
   cmake_flags += cmake_temp
   if "coverage" in buildid:
@@ -365,43 +382,58 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
     ldflags += " -fprofile-arcs -ftest-coverage"
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=gcc"
 elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
-  if not compiler:
-    compiler = "icpc"
-  if not is_found(compiler):
-    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
+  if not compiler_cxx:
+    compiler_cxx = "icpc"
+  if not is_found(compiler_cxx):
+    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
+    sys.exit(1)
+  if not compiler_cc:
+    compiler_cc = "icc"
+  if not is_found(compiler_cc):
+    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "icc")
   remove_string(unused_tokens, "icpc")
   remove_string(unused_tokens, "intel")
-  os.environ["CC"] = "icc"
-  os.environ["CXX"] = compiler
-  os.environ["LD"] = compiler
-  cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler, restrict_errors)
+  os.environ["CC"] = compiler_cc
+  os.environ["CXX"] = compiler_cxx
+  os.environ["LD"] = compiler_cxx
+  cxxflags += " " + configure_icc (cputype, buildid, compiler_cxx, system_host_compiler, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=icc"
 elif "clang" in buildid or "llvm" in buildid:
-  if not compiler:
-    compiler = "clang++"
-  if not is_found(compiler):
-    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
+  if not compiler_cxx:
+    compiler_cxx = "clang++"
+  if not is_found(compiler_cxx):
+    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
+    sys.exit(1)
+  if not compiler_cc:
+    compiler_cc = "clang"
+  if not is_found(compiler_cc):
+    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "clang")
   remove_string(unused_tokens, "llvm")
-  os.environ["CC"] = "clang"
-  os.environ["CXX"] = compiler
-  os.environ["LD"] = compiler
-  cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler, restrict_errors)
+  os.environ["CC"] = compiler_cc
+  os.environ["CXX"] = compiler_cxx
+  os.environ["LD"] = compiler_cxx
+  cxxflags += " " + configure_clang (cputype, buildid, compiler_cxx, system_host_compiler, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
 elif "pgi" in buildid:
-  if not compiler:
-    compiler = "pgc++"
-  if not is_found(compiler):
-    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
+  if not compiler_cxx:
+    compiler_cxx = "pgc++"
+  if not is_found(compiler_cxx):
+    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
+    sys.exit(1)
+  if not compiler_cc:
+    compiler_cxx = "pgcc"
+  if not is_found(compiler_cc):
+    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "pgi")
-  os.environ["CC"] = "pgcc"
-  os.environ["CXX"] = compiler
-  os.environ["LD"] = compiler
-  cxxflags += " " + configure_pgi (cputype, buildid, compiler, restrict_errors)
+  os.environ["CC"] = compiler_cc
+  os.environ["CXX"] = compiler_cxx
+  os.environ["LD"] = compiler_cxx
+  cxxflags += " " + configure_pgi (cputype, buildid, compiler_cxx, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=pgi"
 else:
   print ("Error: No supported compiler found in build id:")
