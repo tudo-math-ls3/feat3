@@ -435,6 +435,23 @@ elif "pgi" in buildid:
   os.environ["LD"] = compiler_cxx
   cxxflags += " " + configure_pgi (cputype, buildid, compiler_cxx, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=pgi"
+elif "cray" in buildid:
+  if not compiler_cxx:
+    compiler_cxx = "CC"
+  if not is_found(compiler_cxx):
+    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
+    sys.exit(1)
+  if not compiler_cc:
+    compiler_cxx = "cc"
+  if not is_found(compiler_cc):
+    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "cray")
+  os.environ["CC"] = compiler_cc
+  os.environ["CXX"] = compiler_cxx
+  os.environ["LD"] = compiler_cxx
+  cxxflags += " " + configure_cray (cputype, buildid, compiler_cxx, restrict_errors)
+  cmake_flags += " -DFEAT_COMPILER_ID:STRING=cray"
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)
