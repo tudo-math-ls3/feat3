@@ -71,6 +71,8 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       /**
@@ -98,6 +100,8 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // set communicator by system matrix
+        this->_set_comm_by_matrix(matrix);
       }
 
       virtual String name() const override
@@ -206,6 +210,12 @@ namespace FEAT
 
           // compute defect norm
           status = this->_set_new_defect(vec_r, vec_sol);
+          if(status != Status::progress)
+          {
+            stat.destroy();
+            Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
+            return status;
+          }
         }
 
         // we should never reach this point...
