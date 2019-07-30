@@ -24,7 +24,8 @@ namespace FEAT
        */
       static constexpr SpaceTags ref_caps = SpaceTags::ref_value | SpaceTags::ref_grad | SpaceTags::ref_hess;
 
-      static constexpr SpaceTags ref_caps_hexa = SpaceTags::ref_value | SpaceTags::ref_grad;
+      // no hessians in 3D
+      static constexpr SpaceTags ref_caps_3d = SpaceTags::ref_value | SpaceTags::ref_grad;
 
       /// \cond internal
       namespace Intern
@@ -127,123 +128,7 @@ namespace FEAT
       class Evaluator DOXY({});
 
       /**
-       * \brief Lagrange-3 Element evaluator implementation for 1D Hypercube shape
-       *
-       * \author Peter Zajac
-       */
-      template<
-        typename Space_,
-        typename TrafoEvaluator_,
-        typename SpaceEvalTraits_>
-      class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube<1> > :
-        public ParametricEvaluator<
-          Evaluator<
-            Space_,
-            TrafoEvaluator_,
-            SpaceEvalTraits_,
-            Shape::Hypercube<1> >,
-          TrafoEvaluator_,
-          SpaceEvalTraits_,
-          ref_caps>
-      {
-      public:
-        /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
-
-        /// space type
-        typedef Space_ SpaceType;
-
-        /// space evaluation traits
-        typedef SpaceEvalTraits_ SpaceEvalTraits;
-
-        /// evaluation policy
-        typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
-
-        /// domain point type
-        typedef typename EvalPolicy::DomainPointType DomainPointType;
-
-        /// data type
-        typedef typename SpaceEvalTraits::DataType DataType;
-
-      public:
-        /**
-         * \brief Constructor.
-         *
-         * \param[in] space
-         * A reference to the Element using this evaluator.
-         */
-        explicit Evaluator(const SpaceType& DOXY(space))
-        {
-        }
-
-        /**
-         * \brief Returns the number of local DOFs.
-         *
-         * \returns
-         * The number of local dofs.
-         */
-        int get_num_local_dofs() const
-        {
-          return 4;
-        }
-
-        /**
-         * \brief Evaluates the basis function values on the reference cell.
-         *
-         * \param[out] data
-         * A reference to a basis value vector receiving the result.
-         *
-         * \param[in] point
-         * A reference to the point on the reference cell where to evaluate.
-         */
-        template<typename EvalData_>
-        void eval_ref_values(EvalData_& data, const DomainPointType& point) const
-        {
-          data.phi[0].ref_value = Intern::p0(point[0]);
-          data.phi[1].ref_value = Intern::p1(point[0]);
-          data.phi[2].ref_value = Intern::p2(point[0]);
-          data.phi[3].ref_value = Intern::p3(point[0]);
-        }
-
-        /**
-         * \brief Evaluates the basis function gradients on the reference cell.
-         *
-         * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
-         *
-         * \param[in] point
-         * A reference to the point on the reference cell where to evaluate.
-         */
-        template<typename EvalData_>
-        void eval_ref_gradients(EvalData_& data, const DomainPointType& point) const
-        {
-          data.phi[0].ref_grad[0] = Intern::d1p0(point[0]);
-          data.phi[1].ref_grad[0] = Intern::d1p1(point[0]);
-          data.phi[2].ref_grad[0] = Intern::d1p2(point[0]);
-          data.phi[3].ref_grad[0] = Intern::d1p3(point[0]);
-        }
-
-        /**
-         * \brief Evaluates the basis function hessians on the reference cell.
-         *
-         * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
-         *
-         * \param[in] point
-         * A reference to the point on the reference cell where to evaluate.
-         */
-        template<typename EvalData_>
-        void eval_ref_hessians(EvalData_& data, const DomainPointType& point) const
-        {
-          data.phi[0].ref_hess[0][0] = Intern::d2p0(point[0]);
-          data.phi[1].ref_hess[0][0] = Intern::d2p1(point[0]);
-          data.phi[2].ref_hess[0][0] = Intern::d2p2(point[0]);
-          data.phi[3].ref_hess[0][0] = Intern::d2p3(point[0]);
-        }
-      }; // class Evaluator<...,Hypercube<1>>
-
-      /**
-       * \brief Lagrange-3 Element evaluator implementation for Quadrilateral shape
+       * \brief Lagrange-3 Element evaluator implementation for Triangle shape
        *
        * \author Peter Zajac
        */
@@ -356,7 +241,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -393,7 +278,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -446,6 +331,355 @@ namespace FEAT
           data.phi[9].ref_hess[1][0] = DataType(27) * (DataType(1) - DataType(2)*(point[0] + point[1]));
         }
       }; // class Evaluator<...,Simplex<2>>
+
+
+      /**
+       * \brief Lagrange-3 Element evaluator implementation for Tetrahedron shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Space_,
+        typename TrafoEvaluator_,
+        typename SpaceEvalTraits_>
+      class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Simplex<3> > :
+        public ParametricEvaluator<
+          Evaluator<
+            Space_,
+            TrafoEvaluator_,
+            SpaceEvalTraits_,
+            Shape::Simplex<3> >,
+          TrafoEvaluator_,
+          SpaceEvalTraits_,
+          ref_caps_3d>
+      {
+      public:
+        /// base-class typedef
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_3d> BaseClass;
+
+        /// space type
+        typedef Space_ SpaceType;
+
+        /// space evaluation traits
+        typedef SpaceEvalTraits_ SpaceEvalTraits;
+
+        /// evaluation policy
+        typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
+
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+
+        /// data type
+        typedef typename SpaceEvalTraits::DataType DataType;
+
+      protected:
+        /// edge dof indices
+        int ek[6][2];
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] space
+         * A reference to the Element using this evaluator.
+         */
+        explicit Evaluator(const SpaceType& DOXY(space))
+        {
+        }
+
+        /**
+         * \brief Returns the number of local DOFs.
+         *
+         * \returns
+         * The number of local dofs.
+         */
+        int get_num_local_dofs() const
+        {
+          return 20;
+        }
+
+        void NOINLINE prepare(const TrafoEvaluator_& trafo_eval)
+        {
+          // compute edge orientations
+          Geometry::Intern::SubIndexMapping<Shape::Simplex<3>, 1, 0> sim(
+            trafo_eval.get_trafo().get_mesh().template get_index_set<3,0>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<3,1>()[trafo_eval.get_cell_index()],
+            trafo_eval.get_trafo().get_mesh().template get_index_set<1,0>());
+
+          // fetch edge dof indices
+          for(int i(0); i < 6; ++i)
+          {
+            for(int j(0); j < 2; ++j)
+            {
+              ek[i][j] = 4 + 2*i + int(sim.map(i, j));
+            }
+          }
+        }
+
+        /**
+         * \brief Evaluates the basis function values on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis value vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_values(EvalData_& data, const DomainPointType& point) const
+        {
+          static constexpr DataType D1    = DataType(1);
+          static constexpr DataType D4_5  = DataType(4.5);
+          static constexpr DataType D5_5  = DataType(5.5);
+          static constexpr DataType D9    = DataType(9);
+          static constexpr DataType D13_5 = DataType(13.5);
+          static constexpr DataType D18   = DataType(18);
+          static constexpr DataType D22_5 = DataType(22.5);
+          static constexpr DataType D27   = DataType(27);
+
+          // get point coordinates
+          const DataType x = point[0];
+          const DataType y = point[1];
+          const DataType z = point[2];
+
+          // vertex dofs
+          data.phi[ 0].ref_value = D1 + (-D5_5 + (D9 - D4_5 * z) * z) * z + (-D5_5 + (D18 - D13_5 * z) * z + (D9 - D13_5 * z - D4_5 * y) * y) * y + (-D5_5 + (D18 - D13_5 * z) * z + (D18 - D27 * z - D13_5 * y) * y + (D9 - D13_5 * y - D13_5 * z - D4_5 * x) * x) * x;
+          data.phi[ 1].ref_value = (D1 + (-D4_5 + D4_5 * x) * x) * x;
+          data.phi[ 2].ref_value = (D1 + (-D4_5 + D4_5 * y) * y) * y;
+          data.phi[ 3].ref_value = (D1 + (-D4_5 + D4_5 * z) * z) * z;
+          // egde dofs
+          data.phi[ek[0][0]].ref_value = (D9 + (-D22_5 + D13_5 * z) * z + (-D22_5 + D27 * z + D13_5 * y) * y + (-D22_5 + D27 * y + D27 * z + D13_5 * x) * x) * x;
+          data.phi[ek[0][1]].ref_value = (-D4_5 + D4_5 * y + D4_5 * z + (D18 - D13_5 * y - D13_5 * z - D13_5 * x) * x) * x;
+          data.phi[ek[1][0]].ref_value = (D9 + (-D22_5 + D13_5 * z) * z + (-D22_5 + D27 * z + D13_5 * y) * y) * y + ((-D22_5 + D27 * y + D27 * z) * y + D13_5 * x * y) * x;
+          data.phi[ek[1][1]].ref_value = (-D4_5 + D4_5 * z + (D18 - D13_5 * y - D13_5 * z) * y) * y + (D4_5 - D13_5 * y) * y * x;
+          data.phi[ek[2][0]].ref_value = (D9 + (-D22_5 + D13_5 * z) * z) * z + ((-D22_5 + D27 * z) * z + D13_5 * y * z) * y + ((-D22_5 + D27 * z) * z + D27 * y * z + D13_5 * z * x) * x;
+          data.phi[ek[2][1]].ref_value = (-D4_5 + (D18 - D13_5 * z) * z) * z + (D4_5 - D13_5 * z) * z * y + (D4_5 - D13_5 * z) * z * x;
+          data.phi[ek[3][0]].ref_value = (-D4_5 * y + D13_5 * x * y) * x;
+          data.phi[ek[3][1]].ref_value = (-D4_5 + D13_5 * y) * y * x;
+          data.phi[ek[4][0]].ref_value = (-D4_5 * z + D13_5 * z * x) * x;
+          data.phi[ek[4][1]].ref_value = (-D4_5 + D13_5 * z) * z * x;
+          data.phi[ek[5][0]].ref_value = (-D4_5 * z + D13_5 * y * z) * y;
+          data.phi[ek[5][1]].ref_value = (-D4_5 + D13_5 * z) * z * y;
+          // face dofs
+          data.phi[16].ref_value = D27 * x * y * z;
+          data.phi[17].ref_value = ((D27 - D27 * z) * z - D27 * y * z) * y - D27 * x * y * z;
+          data.phi[18].ref_value = ((D27 - D27 * z) * z - D27 * y * z - D27 * z * x) * x;
+          data.phi[19].ref_value = ((D27 - D27 * z - D27 * y) * y - D27 * x * y) * x;
+        }
+
+        /**
+         * \brief Evaluates the basis function gradients on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis gradient vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void NOINLINE eval_ref_gradients(EvalData_& data, const DomainPointType& point) const
+        {
+          static constexpr DataType D0    = DataType(0);
+          static constexpr DataType D1    = DataType(1);
+          static constexpr DataType D4_5  = DataType(4.5);
+          static constexpr DataType D5_5  = DataType(5.5);
+          static constexpr DataType D9    = DataType(9);
+          static constexpr DataType D13_5 = DataType(13.5);
+          static constexpr DataType D18   = DataType(18);
+          static constexpr DataType D22_5 = DataType(22.5);
+          static constexpr DataType D27   = DataType(27);
+          static constexpr DataType D36   = DataType(36);
+          static constexpr DataType D40_5 = DataType(40.5);
+          static constexpr DataType D45   = DataType(45);
+          static constexpr DataType D54   = DataType(54);
+
+          // get point coordinates
+          const DataType x = point[0];
+          const DataType y = point[1];
+          const DataType z = point[2];
+
+          // vertex dofs
+          data.phi[ 0].ref_grad[0] = -D5_5 + (D18 - D13_5 * z) * z + (D18 - D27 * z - D13_5 * y) * y + (D18 - D27 * y - D27 * z - D13_5 * x) * x;
+          data.phi[ 0].ref_grad[1] = -D5_5 + (D18 - D13_5 * z) * z + (D18 - D27 * z - D13_5 * y) * y + (D18 - D27 * y - D27 * z - D13_5 * x) * x;
+          data.phi[ 0].ref_grad[2] = -D5_5 + (D18 - D13_5 * z) * z + (D18 - D27 * z - D13_5 * y) * y + (D18 - D27 * y - D27 * z - D13_5 * x) * x;
+          data.phi[ 1].ref_grad[0] = D1 + (-D9 + D13_5 * x) * x;
+          data.phi[ 1].ref_grad[1] = D0;
+          data.phi[ 1].ref_grad[2] = D0;
+          data.phi[ 2].ref_grad[0] = D0;
+          data.phi[ 2].ref_grad[1] = D1 + (-D9 + D13_5 * y) * y;
+          data.phi[ 2].ref_grad[2] = D0;
+          data.phi[ 3].ref_grad[0] = D0;
+          data.phi[ 3].ref_grad[1] = D0;
+          data.phi[ 3].ref_grad[2] = D1 + (-D9 + D13_5 * z) * z;
+          // edge dofs
+          data.phi[ek[0][0]].ref_grad[0] = D9 + (-D22_5 + D13_5 * z) * z + (-D22_5 + D27 * z + D13_5 * y) * y + (-D45 + D54 * y + D54 * z + D40_5 * x) * x;
+          data.phi[ek[0][0]].ref_grad[1] = (-D22_5 + D27 * y + D27 * z + D27 * x) * x;
+          data.phi[ek[0][0]].ref_grad[2] = (-D22_5 + D27 * y + D27 * z + D27 * x) * x;
+          data.phi[ek[0][1]].ref_grad[0] = -D4_5 + D4_5 * y + D4_5 * z + (D36 - D27 * y - D27 * z - D40_5 * x) * x;
+          data.phi[ek[0][1]].ref_grad[1] = (D4_5 - D13_5 * x) * x;
+          data.phi[ek[0][1]].ref_grad[2] = (D4_5 - D13_5 * x) * x;
+          data.phi[ek[1][0]].ref_grad[0] = (-D22_5 + D27 * y + D27 * z) * y + D27 * x * y;
+          data.phi[ek[1][0]].ref_grad[1] = D9 + (-D22_5 + D13_5 * z) * z + (-D45 + D54 * z + D40_5 * y) * y + (-D22_5 + D54 * y + D27 * z + D13_5 * x) * x;
+          data.phi[ek[1][0]].ref_grad[2] = (-D22_5 + D27 * y + D27 * z) * y + D27 * x * y;
+          data.phi[ek[1][1]].ref_grad[0] = (D4_5 - D13_5 * y) * y;
+          data.phi[ek[1][1]].ref_grad[1] = -D4_5 + D4_5 * z + (D36 - D27 * z - D40_5 * y) * y + (D4_5 - D27 * y) * x;
+          data.phi[ek[1][1]].ref_grad[2] = (D4_5 - D13_5 * y) * y;
+          data.phi[ek[2][0]].ref_grad[0] = (-D22_5 + D27 * z) * z + D27 * y * z + D27 * z * x;
+          data.phi[ek[2][0]].ref_grad[1] = (-D22_5 + D27 * z) * z + D27 * y * z + D27 * z * x;
+          data.phi[ek[2][0]].ref_grad[2] = D9 + (-D45 + D40_5 * z) * z + (-D22_5 + D54 * z + D13_5 * y) * y + (-D22_5 + D54 * z + D27 * y + D13_5 * x) * x;
+          data.phi[ek[2][1]].ref_grad[0] = (D4_5 - D13_5 * z) * z;
+          data.phi[ek[2][1]].ref_grad[1] = (D4_5 - D13_5 * z) * z;
+          data.phi[ek[2][1]].ref_grad[2] = -D4_5 + (D36 - D40_5 * z) * z + (D4_5 - D27 * z) * y + (D4_5 - D27 * z) * x;
+          data.phi[ek[3][0]].ref_grad[0] = -D4_5 * y + D27 * x * y;
+          data.phi[ek[3][0]].ref_grad[1] = (-D4_5 + D13_5 * x) * x;
+          data.phi[ek[3][0]].ref_grad[2] = D0;
+          data.phi[ek[3][1]].ref_grad[0] = (-D4_5 + D13_5 * y) * y;
+          data.phi[ek[3][1]].ref_grad[1] = (-D4_5 + D27 * y) * x;
+          data.phi[ek[3][1]].ref_grad[2] = D0;
+          data.phi[ek[4][0]].ref_grad[0] = -D4_5 * z + D27 * z * x;
+          data.phi[ek[4][0]].ref_grad[1] = D0;
+          data.phi[ek[4][0]].ref_grad[2] = (-D4_5 + D13_5 * x) * x;
+          data.phi[ek[4][1]].ref_grad[0] = (-D4_5 + D13_5 * z) * z;
+          data.phi[ek[4][1]].ref_grad[1] = D0;
+          data.phi[ek[4][1]].ref_grad[2] = (-D4_5 + D27 * z) * x;
+          data.phi[ek[5][0]].ref_grad[0] = D0;
+          data.phi[ek[5][0]].ref_grad[1] = -D4_5 * z + D27 * y * z;
+          data.phi[ek[5][0]].ref_grad[2] = (-D4_5 + D13_5 * y) * y;
+          data.phi[ek[5][1]].ref_grad[0] = D0;
+          data.phi[ek[5][1]].ref_grad[1] = (-D4_5 + D13_5 * z) * z;
+          data.phi[ek[5][1]].ref_grad[2] = (-D4_5 + D27 * z) * y;
+          // face dofs
+          data.phi[16].ref_grad[0] = D27 * y * z;
+          data.phi[16].ref_grad[1] = D27 * z * x;
+          data.phi[16].ref_grad[2] = D27 * x * y;
+          data.phi[17].ref_grad[0] = -D27 * y * z;
+          data.phi[17].ref_grad[1] = (D27 - D27 * z) * z - D54 * y * z - D27 * z * x;
+          data.phi[17].ref_grad[2] = (-D54 * z + D27 - D27 * y) * y - D27 * x * y;
+          data.phi[18].ref_grad[0] = (D27 - D27 * z) * z - D27 * y * z - D54 * z * x;
+          data.phi[18].ref_grad[1] = -D27 * z * x;
+          data.phi[18].ref_grad[2] = (-D54 * z + D27 - D27 * y - D27 * x) * x;
+          data.phi[19].ref_grad[0] = (D27 - D27 * z - D27 * y) * y - D54 * x * y;
+          data.phi[19].ref_grad[1] = (-D54 * y - D27 * z + D27 - D27 * x) * x;
+          data.phi[19].ref_grad[2] = -D27 * x * y;
+        }
+      }; // class Evaluator<...,Simplex<3>>
+
+
+      /**
+       * \brief Lagrange-3 Element evaluator implementation for 1D Hypercube shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Space_,
+        typename TrafoEvaluator_,
+        typename SpaceEvalTraits_>
+      class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube<1> > :
+        public ParametricEvaluator<
+          Evaluator<
+            Space_,
+            TrafoEvaluator_,
+            SpaceEvalTraits_,
+            Shape::Hypercube<1> >,
+          TrafoEvaluator_,
+          SpaceEvalTraits_,
+          ref_caps>
+      {
+      public:
+        /// base-class typedef
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
+
+        /// space type
+        typedef Space_ SpaceType;
+
+        /// space evaluation traits
+        typedef SpaceEvalTraits_ SpaceEvalTraits;
+
+        /// evaluation policy
+        typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
+
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+
+        /// data type
+        typedef typename SpaceEvalTraits::DataType DataType;
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] space
+         * A reference to the Element using this evaluator.
+         */
+        explicit Evaluator(const SpaceType& DOXY(space))
+        {
+        }
+
+        /**
+         * \brief Returns the number of local DOFs.
+         *
+         * \returns
+         * The number of local dofs.
+         */
+        int get_num_local_dofs() const
+        {
+          return 4;
+        }
+
+        /**
+         * \brief Evaluates the basis function values on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis value vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void eval_ref_values(EvalData_& data, const DomainPointType& point) const
+        {
+          data.phi[0].ref_value = Intern::p0(point[0]);
+          data.phi[1].ref_value = Intern::p1(point[0]);
+          data.phi[2].ref_value = Intern::p2(point[0]);
+          data.phi[3].ref_value = Intern::p3(point[0]);
+        }
+
+        /**
+         * \brief Evaluates the basis function gradients on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis gradient vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void eval_ref_gradients(EvalData_& data, const DomainPointType& point) const
+        {
+          data.phi[0].ref_grad[0] = Intern::d1p0(point[0]);
+          data.phi[1].ref_grad[0] = Intern::d1p1(point[0]);
+          data.phi[2].ref_grad[0] = Intern::d1p2(point[0]);
+          data.phi[3].ref_grad[0] = Intern::d1p3(point[0]);
+        }
+
+        /**
+         * \brief Evaluates the basis function hessians on the reference cell.
+         *
+         * \param[out] data
+         * A reference to a basis hessian vector receiving the result.
+         *
+         * \param[in] point
+         * A reference to the point on the reference cell where to evaluate.
+         */
+        template<typename EvalData_>
+        void eval_ref_hessians(EvalData_& data, const DomainPointType& point) const
+        {
+          data.phi[0].ref_hess[0][0] = Intern::d2p0(point[0]);
+          data.phi[1].ref_hess[0][0] = Intern::d2p1(point[0]);
+          data.phi[2].ref_hess[0][0] = Intern::d2p2(point[0]);
+          data.phi[3].ref_hess[0][0] = Intern::d2p3(point[0]);
+        }
+      }; // class Evaluator<...,Hypercube<1>>
 
       /**
        * \brief Lagrange-3 Element evaluator implementation for Quadrilateral shape
@@ -569,7 +803,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -620,7 +854,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -718,11 +952,11 @@ namespace FEAT
             Shape::Hypercube<3> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ref_caps_hexa>
+          ref_caps_3d>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_hexa> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_3d> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -888,7 +1122,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.

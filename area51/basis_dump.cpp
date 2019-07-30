@@ -79,6 +79,8 @@ int main(int, char**)
     dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_tetra_lagrange-1.vtk", 2);
     // Lagrange-2
     dump_basis< Space::Lagrange2::Element<TrafoType> >("3d_tetra_lagrange-2.vtk", 2);
+    // Lagrange-3
+    dump_basis< Space::Lagrange3::Element<TrafoType> >("3d_tetra_lagrange-3.vtk", 3);
   }
 
   // 2D Quad Elements

@@ -628,9 +628,13 @@ namespace ElementRegression
   ElementRegressionInterpol<Shape::Hypercube<3>, Space::Lagrange3::Element, true, true, false>
     int_hy3_lagrange3_lvl1(1, 1.386373490584e-03, 2.465473197324e-02);
 
-  // Interpolation Hypercube<2>
+  // Interpolation Simplex<2>
   ElementRegressionInterpol<Shape::Simplex<2>, Space::Lagrange3::Element, true, true, true>
     int_sx2_lagrange3_lvl2(2, 6.380539842624e-05, 3.528251713395e-03, 2.230598114107e-01);
+
+  // Interpolation Simplex<3>
+  //ElementRegressionInterpol<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
+    //int_sx3_lagrange3_lvl1(1);
 
   // **********************************************************************************************
   // **********************************************************************************************
@@ -805,6 +809,10 @@ namespace ElementRegression
   ElementRegressionL2<Shape::Simplex<2>, Space::Lagrange3::Element, true, true, true>
     l2_sx2_lagrange3_lvl2(2, 3.585700211175e-05, 3.395273574955e-03, 2.037773958573e-01);
 
+  // L2-Projection Simplex<3>
+  //ElementRegressionL2<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
+    //l2_sx3_lagrange3_lvl1(1);
+
   // **********************************************************************************************
   // **********************************************************************************************
   // **********************************************************************************************
@@ -933,6 +941,10 @@ namespace ElementRegression
   // H1-Projection Simplex<2>
   ElementRegressionH1<Shape::Simplex<2>, Space::Lagrange3::Element, true, true, true>
     h1_sx2_lagrange3_lvl2(2, 5.454735873714e-05, 2.968662957508e-03, 1.849310523020e-01);
+
+  // H1-Projection Simplex<3>
+  //ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
+    //h1_sx3_lagrange3_lvl1(1);
 
   // **********************************************************************************************
   // **********************************************************************************************

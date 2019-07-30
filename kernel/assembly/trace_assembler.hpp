@@ -1091,6 +1091,234 @@ namespace FEAT
         // okay, that's it
       }
 
+      /**
+       * \brief Assembles the jump operator onto a matrix.
+       *
+       * This function assembles the jump operator:
+       *   \f[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\f]
+       *
+       * \attention
+       * The matrix must have an extended stencil, which must have been assembled by calling
+       * Assembly::SymbolicAssembler::assemble_matrix_ext1() !
+       *
+       * \param[inout] matrix
+       * The matrix that is to be assembled.
+       *
+       * \param[in] space
+       * The finite element space to be used.
+       *
+       * \param[in] cubature_factory
+       * The cubature for integration. Note that this is a cubature rule on the facets.
+       *
+       * \param[in] alpha
+       * The scaling factor alpha for the jump operator.
+       */
+      template<
+        typename Matrix_,
+        typename Space_,
+        typename CubatureFactory_>
+      void assemble_jump_operator_matrix(
+        Matrix_& matrix,
+        const Space_& space,
+        const CubatureFactory_& cubature_factory,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
+      {
+        // validate matrix dimensions
+        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+
+        // matrix type
+        typedef Matrix_ MatrixType;
+        // test-space type
+        typedef Space_ SpaceType;
+
+        // assembly traits
+        typedef AsmTraits1<
+          typename MatrixType::DataType,
+          SpaceType,
+          TrafoTags::none,
+          SpaceTags::value> AsmTraits;
+
+        typedef typename AsmTraits::DataType DataType;
+
+        // shape types
+        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
+
+        // fetch the trafo
+        const TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval_1(trafo), trafo_eval_2(trafo);
+
+        // create a trafo facet evaluator
+        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
+        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
+        TrafoFacetEvaluator trafo_facet_eval(trafo);
+
+        // create space evaluators
+        typename AsmTraits::SpaceEvaluator space_eval_1(space), space_eval_2(space);
+
+        // create dof-mappings
+        typename AsmTraits::DofMapping dof_mapping_1(space), dof_mapping_2(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data_1, trafo_data_2;
+        TrafoFacetEvalData trafo_facet_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data_1, space_data_2;
+
+        // create cubature rule
+        typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create matrix scatter-axpy
+        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
+
+        // common DOF mapping
+        static constexpr int max_common_dofs = 2 * AsmTraits::max_local_test_dofs;
+        Intern::CommonDofMap<max_common_dofs> common_map;
+
+        // jump gradients
+        typename AsmTraits::SpaceEvalTraits::BasisValueType jump_value[max_common_dofs];
+
+        // local matrix data
+        Tiny::Matrix<DataType, max_common_dofs, max_common_dofs> loc_mat;
+
+        // trafo matrices and vectors
+        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat_1, face_mat_2;
+        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat_1, ori_mat_2;
+        Tiny::Vector<DataType, shape_dim> face_vec_1, face_vec_2;
+        Tiny::Vector<DataType, facet_dim> ori_vec_1, ori_vec_2;
+
+        face_mat_1.format();
+        face_mat_2.format();
+        ori_mat_1.format();
+        ori_mat_2.format();
+        face_vec_1.format();
+        face_vec_2.format();
+        ori_vec_1.format();
+        ori_vec_2.format();
+
+        // loop over all cells of the mesh
+        for(std::size_t f(0); f < _facets.size(); /*++f*/)
+        {
+          // get facet index
+          const Index face = _facets[f];
+          const Index cell_1 = _cells[f];
+          const int cell_facet_1 = _cell_facet[f];
+          const int facet_ori_1 = _facet_ori[f];
+          ++f;
+
+          // check for next cell
+          const bool inner = ((f < _facets.size()) && (face == _facets[f]));
+          const Index cell_2 = (inner ? _cells[f] : cell_1);
+          const int cell_facet_2 = (inner ? _cell_facet[f] : cell_facet_1);
+          const int facet_ori_2 = (inner ? _facet_ori[f] : facet_ori_1);
+          if(inner)
+            ++f;
+
+          // prepare dof mappings
+          dof_mapping_1.prepare(cell_1);
+          dof_mapping_2.prepare(cell_2);
+
+          // build local dof map
+          common_map.clear();
+          for(int i(0); i < dof_mapping_1.get_num_local_dofs(); ++i)
+            common_map.push_1(dof_mapping_1.get_index(i), i);
+          if(inner)
+          {
+            for(int i(0); i < dof_mapping_2.get_num_local_dofs(); ++i)
+              common_map.push_2(dof_mapping_2.get_index(i), i);
+          }
+
+          // finish dof mapping
+          dof_mapping_2.finish();
+          dof_mapping_1.finish();
+
+          // get number of common local dofs
+          const int num_local_dofs = common_map.get_num_local_dofs();
+
+          // compute facet trafos
+          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_1, face_vec_1, cell_facet_1);
+          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_2, face_vec_2, cell_facet_2);
+
+          // compute orientation trafos
+          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat_1, ori_vec_1, facet_ori_1);
+          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat_2, ori_vec_2, facet_ori_2);
+
+          // prepare trafo evaluators
+          trafo_facet_eval.prepare(face);
+          trafo_eval_1.prepare(cell_1);
+          trafo_eval_2.prepare(cell_2);
+
+          // prepare space evaluators
+          space_eval_1.prepare(trafo_eval_1);
+          space_eval_2.prepare(trafo_eval_2);
+
+          // format local matrix
+          loc_mat.format();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // get cubature point
+            auto cub_pt = cubature_rule.get_point(k);
+
+            // transform to local facets
+            auto cub_cf_1 = (face_mat_1 * ((ori_mat_1 * cub_pt) + ori_vec_1)) + face_vec_1;
+            auto cub_cf_2 = (face_mat_2 * ((ori_mat_2 * cub_pt) + ori_vec_2)) + face_vec_2;
+
+            // compute trafo data
+            trafo_facet_eval(trafo_facet_data, cub_pt);
+            trafo_eval_1(trafo_data_1, cub_cf_1);
+            trafo_eval_2(trafo_data_2, cub_cf_2);
+
+            // compute basis function data
+            space_eval_1(space_data_1, trafo_data_1);
+            space_eval_2(space_data_2, trafo_data_2);
+
+            // compute weight factor
+            const DataType weight = trafo_facet_data.jac_det * cubature_rule.get_weight(k);
+
+            // compute jump gradients
+            for(int i(0); i < num_local_dofs; ++i)
+            {
+              jump_value[i] = DataType(0);
+              const int i_1 = common_map.loc_1(i);
+              const int i_2 = common_map.loc_2(i);
+              // note the different signs to compute the jump
+              if(i_1 > -1) jump_value[i] += space_data_1.phi[i_1].value;
+              if(i_2 > -1) jump_value[i] -= space_data_2.phi[i_2].value;
+            }
+
+            // assemble jump stabilisation operator
+            for(int i(0); i < num_local_dofs; ++i)
+            {
+              for(int j(0); j < num_local_dofs; ++j)
+              {
+                loc_mat(i,j) += weight * jump_value[i] * jump_value[j];
+              }
+            }
+
+            // continue with next cubature point
+          }
+
+          // finish evaluators
+          space_eval_2.finish();
+          space_eval_1.finish();
+          trafo_eval_2.finish();
+          trafo_eval_1.finish();
+          trafo_facet_eval.finish();
+
+          // incorporate local matrix
+          scatter_axpy(loc_mat, common_map, common_map, alpha);
+
+          // continue with next cell
+        }
+
+        // okay, that's it
+      }
+
     protected:
       bool find_local_facet(Index face, Index cell, int& facet, int& ori)
       {
