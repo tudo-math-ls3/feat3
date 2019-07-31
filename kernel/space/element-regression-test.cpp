@@ -609,7 +609,7 @@ namespace ElementRegression
 
   // Interpolation Simplex<3>
   ElementRegressionInterpol<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
-    int_sx3_lagrange2_lvl2(2, 1.090590184712e-003, 5.661280319448e-002, 2.129317058613e+000);
+    int_sx3_lagrange2_lvl2(2, 1.170882366851e-03, 5.658866731711e-02, 2.129319714991e+00);
 
   // **********************************************************************************************
   // **********************************************************************************************
@@ -633,8 +633,8 @@ namespace ElementRegression
     int_sx2_lagrange3_lvl2(2, 6.380539842624e-05, 3.528251713395e-03, 2.230598114107e-01);
 
   // Interpolation Simplex<3>
-  //ElementRegressionInterpol<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
-    //int_sx3_lagrange3_lvl1(1);
+  ElementRegressionInterpol<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
+    int_sx3_lagrange3_lvl1(1, 1.025181526442e-03, 3.473705588728e-02);
 
   // **********************************************************************************************
   // **********************************************************************************************
@@ -786,7 +786,7 @@ namespace ElementRegression
 
   // L2-Projection Simplex<3>
   ElementRegressionL2<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
-    l2_sx3_lagrange2_lvl2(2, 6.920385959247e-004, 5.149687612368e-002, 2.013985124586e+000);
+    l2_sx3_lagrange2_lvl2(2, 8.109206079466e-04, 5.148261721436e-02, 2.013358827350e+00);
 
   // **********************************************************************************************
   // **********************************************************************************************
@@ -810,8 +810,8 @@ namespace ElementRegression
     l2_sx2_lagrange3_lvl2(2, 3.585700211175e-05, 3.395273574955e-03, 2.037773958573e-01);
 
   // L2-Projection Simplex<3>
-  //ElementRegressionL2<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
-    //l2_sx3_lagrange3_lvl1(1);
+  ElementRegressionL2<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
+    l2_sx3_lagrange3_lvl1(1, 4.963971351343e-04, 2.801273229544e-02);
 
   // **********************************************************************************************
   // **********************************************************************************************
@@ -919,7 +919,7 @@ namespace ElementRegression
 
   // H1-Projection Simplex<3>
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
-    h1_sx3_lagrange2_lvl1(2, 1.008388594508e-003, 5.001897374726e-002, 1.934606569160e+000);
+    h1_sx3_lagrange2_lvl1(2, 1.093475352792e-03, 4.999186038443e-02, 1.934606143689e+00);
 
   // **********************************************************************************************
   // **********************************************************************************************
@@ -942,9 +942,8 @@ namespace ElementRegression
   ElementRegressionH1<Shape::Simplex<2>, Space::Lagrange3::Element, true, true, true>
     h1_sx2_lagrange3_lvl2(2, 5.454735873714e-05, 2.968662957508e-03, 1.849310523020e-01);
 
-  // H1-Projection Simplex<3>
-  //ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
-    //h1_sx3_lagrange3_lvl1(1);
+  ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
+    h1_sx3_lagrange3_lvl1(1, 8.477232986348e-04, 2.701830481642e-02);
 
   // **********************************************************************************************
   // **********************************************************************************************

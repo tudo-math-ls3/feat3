@@ -16,6 +16,7 @@
 #include <kernel/cubature/lauffer_driver.hpp>
 #include <kernel/cubature/silvester_driver.hpp>
 #include <kernel/cubature/dunavant_driver.hpp>
+#include <kernel/cubature/shunn_ham_driver.hpp>
 #include <kernel/cubature/simplex_scalar_factory.hpp>
 #include <kernel/cubature/tensor_product_factory.hpp>
 #include <kernel/cubature/scalar/factory_wrapper.hpp>
@@ -224,6 +225,7 @@ namespace FEAT
         functor.template driver<HammerStroudD5Driver>();
         functor.template driver<LaufferD2Driver>();
         functor.template driver<LaufferD4Driver>();
+        functor.template driver<ShunnHamDriver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }

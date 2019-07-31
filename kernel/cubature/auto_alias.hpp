@@ -13,6 +13,7 @@
 #include <kernel/cubature/lauffer_driver.hpp>
 #include <kernel/cubature/hammer_stroud_driver.hpp>
 #include <kernel/cubature/dunavant_driver.hpp>
+#include <kernel/cubature/shunn_ham_driver.hpp>
 
 // includes, STL
 #include <deque>
@@ -168,25 +169,17 @@ namespace FEAT
         static String choose(Index degree)
         {
           if(degree <= 1) // barycentre
-          {
             return BarycentreDriver<Shape::Simplex<3> >::name();
-          }
-          else if(degree == 2) // Hammer-Stroud of degree 2
-          {
-            return HammerStroudD2Driver<Shape::Simplex<3> >::name();
-          }
-          else if(degree == 3) // Hammer-Stroud of degree 3
-          {
-            return HammerStroudD3Driver<Shape::Simplex<3> >::name();
-          }
-          else if(degree == 4) // Lauffer formula of degree 4 only for tetrahedron
-          {
-            return LaufferD4Driver<Shape::Simplex<3> >::name();
-          }
-          else // Hammer-Stroud of degree 5 only for tetrahedra
-          {
-            return HammerStroudD5Driver<Shape::Simplex<3> >::name();
-          }
+          else if(degree <= 2)
+            return ShunnHamDriver<Shape::Simplex<3>>::name() + ":2";
+          else if(degree <= 3)
+            return ShunnHamDriver<Shape::Simplex<3>>::name() + ":3";
+          else if(degree <= 5)
+            return ShunnHamDriver<Shape::Simplex<3>>::name() + ":4";
+          else if(degree <= 7)
+            return ShunnHamDriver<Shape::Simplex<3>>::name() + ":5";
+          else //if(degree <= 9)
+            return ShunnHamDriver<Shape::Simplex<3>>::name() + ":6";
         }
       };
 
