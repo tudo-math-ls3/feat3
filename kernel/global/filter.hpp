@@ -24,7 +24,7 @@ namespace FEAT
     public:
       typedef Global::Vector<typename LocalFilter_::VectorType, Mirror_> VectorType;
       typedef Mirror_ MirrorType;
-      typedef LocalFilter_ LocalFilter;
+      typedef LocalFilter_ LocalFilterType;
 
       /// Our 'base' class type
       template <typename LocalFilter2_, typename Mirror2_ = Mirror_>

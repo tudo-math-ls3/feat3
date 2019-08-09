@@ -175,39 +175,39 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_ulong, FT_cuda_double_ulong, TT_cuda_double_ulong> > > hierarchy_map_cuda_double_ulong;
 #endif
 
-        std::deque<typename MT_main_float_ulong::LocalMatrix> local_systems_main_float_ulong;
-        std::deque<typename MT_main_double_ulong::LocalMatrix> local_systems_main_double_ulong;
+        std::deque<typename MT_main_float_ulong::LocalMatrixType> local_systems_main_float_ulong;
+        std::deque<typename MT_main_double_ulong::LocalMatrixType> local_systems_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename MT_cuda_float_ulong::LocalMatrix> local_systems_cuda_float_ulong;
-        std::deque<typename MT_cuda_double_ulong::LocalMatrix> local_systems_cuda_double_ulong;
+        std::deque<typename MT_cuda_float_ulong::LocalMatrixType> local_systems_cuda_float_ulong;
+        std::deque<typename MT_cuda_double_ulong::LocalMatrixType> local_systems_cuda_double_ulong;
 #endif
 
-        std::deque<typename FT_main_float_ulong::LocalFilter> local_filters_main_float_ulong;
-        std::deque<typename FT_main_double_ulong::LocalFilter> local_filters_main_double_ulong;
+        std::deque<typename FT_main_float_ulong::LocalFilterType> local_filters_main_float_ulong;
+        std::deque<typename FT_main_double_ulong::LocalFilterType> local_filters_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename FT_cuda_float_ulong::LocalFilter> local_filters_cuda_float_ulong;
-        std::deque<typename FT_cuda_double_ulong::LocalFilter> local_filters_cuda_double_ulong;
+        std::deque<typename FT_cuda_float_ulong::LocalFilterType> local_filters_cuda_float_ulong;
+        std::deque<typename FT_cuda_double_ulong::LocalFilterType> local_filters_cuda_double_ulong;
 #endif
 
-        std::deque<typename TT_main_float_ulong::LocalTransfer> local_transfers_main_float_ulong;
-        std::deque<typename TT_main_double_ulong::LocalTransfer> local_transfers_main_double_ulong;
+        std::deque<typename TT_main_float_ulong::LocalTransferType> local_transfers_main_float_ulong;
+        std::deque<typename TT_main_double_ulong::LocalTransferType> local_transfers_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename TT_cuda_float_ulong::LocalTransfer> local_transfers_cuda_float_ulong;
-        std::deque<typename TT_cuda_double_ulong::LocalTransfer> local_transfers_cuda_double_ulong;
+        std::deque<typename TT_cuda_float_ulong::LocalTransferType> local_transfers_cuda_float_ulong;
+        std::deque<typename TT_cuda_double_ulong::LocalTransferType> local_transfers_cuda_double_ulong;
 #endif
 
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_float_ulong::LocalMatrix, typename FT_main_float_ulong::LocalFilter, typename TT_main_float_ulong::LocalTransfer>
+          typename MT_main_float_ulong::LocalMatrixType, typename FT_main_float_ulong::LocalFilterType, typename TT_main_float_ulong::LocalTransferType>
           > > local_hierarchy_map_main_float_ulong;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_double_ulong::LocalMatrix, typename FT_main_double_ulong::LocalFilter, typename TT_main_double_ulong::LocalTransfer>
+          typename MT_main_double_ulong::LocalMatrixType, typename FT_main_double_ulong::LocalFilterType, typename TT_main_double_ulong::LocalTransferType>
           > > local_hierarchy_map_main_double_ulong;
 #ifdef FEAT_HAVE_CUDA
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_float_ulong::LocalMatrix, typename FT_cuda_float_ulong::LocalFilter, typename TT_cuda_float_ulong::LocalTransfer>
+          typename MT_cuda_float_ulong::LocalMatrixType, typename FT_cuda_float_ulong::LocalFilterType, typename TT_cuda_float_ulong::LocalTransferType>
           > > local_hierarchy_map_cuda_float_ulong;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_double_ulong::LocalMatrix, typename FT_cuda_double_ulong::LocalFilter, typename TT_cuda_double_ulong::LocalTransfer>
+          typename MT_cuda_double_ulong::LocalMatrixType, typename FT_cuda_double_ulong::LocalFilterType, typename TT_cuda_double_ulong::LocalTransferType>
           > > local_hierarchy_map_cuda_double_ulong;
 #endif
 
@@ -257,39 +257,39 @@ namespace FEAT
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<MT_cuda_double_uint, FT_cuda_double_uint, TT_cuda_double_uint> > > hierarchy_map_cuda_double_uint;
 #endif
 
-        std::deque<typename MT_main_float_uint::LocalMatrix> local_systems_main_float_uint;
-        std::deque<typename MT_main_double_uint::LocalMatrix> local_systems_main_double_uint;
+        std::deque<typename MT_main_float_uint::LocalMatrixType> local_systems_main_float_uint;
+        std::deque<typename MT_main_double_uint::LocalMatrixType> local_systems_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename MT_cuda_float_uint::LocalMatrix> local_systems_cuda_float_uint;
-        std::deque<typename MT_cuda_double_uint::LocalMatrix> local_systems_cuda_double_uint;
+        std::deque<typename MT_cuda_float_uint::LocalMatrixType> local_systems_cuda_float_uint;
+        std::deque<typename MT_cuda_double_uint::LocalMatrixType> local_systems_cuda_double_uint;
 #endif
 
-        std::deque<typename FT_main_float_uint::LocalFilter> local_filters_main_float_uint;
-        std::deque<typename FT_main_double_uint::LocalFilter> local_filters_main_double_uint;
+        std::deque<typename FT_main_float_uint::LocalFilterType> local_filters_main_float_uint;
+        std::deque<typename FT_main_double_uint::LocalFilterType> local_filters_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename FT_cuda_float_uint::LocalFilter> local_filters_cuda_float_uint;
-        std::deque<typename FT_cuda_double_uint::LocalFilter> local_filters_cuda_double_uint;
+        std::deque<typename FT_cuda_float_uint::LocalFilterType> local_filters_cuda_float_uint;
+        std::deque<typename FT_cuda_double_uint::LocalFilterType> local_filters_cuda_double_uint;
 #endif
 
-        std::deque<typename TT_main_float_uint::LocalTransfer> local_transfers_main_float_uint;
-        std::deque<typename TT_main_double_uint::LocalTransfer> local_transfers_main_double_uint;
+        std::deque<typename TT_main_float_uint::LocalTransferType> local_transfers_main_float_uint;
+        std::deque<typename TT_main_double_uint::LocalTransferType> local_transfers_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
-        std::deque<typename TT_cuda_float_uint::LocalTransfer> local_transfers_cuda_float_uint;
-        std::deque<typename TT_cuda_double_uint::LocalTransfer> local_transfers_cuda_double_uint;
+        std::deque<typename TT_cuda_float_uint::LocalTransferType> local_transfers_cuda_float_uint;
+        std::deque<typename TT_cuda_double_uint::LocalTransferType> local_transfers_cuda_double_uint;
 #endif
 
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_float_uint::LocalMatrix, typename FT_main_float_uint::LocalFilter, typename TT_main_float_uint::LocalTransfer>
+          typename MT_main_float_uint::LocalMatrixType, typename FT_main_float_uint::LocalFilterType, typename TT_main_float_uint::LocalTransferType>
           > > local_hierarchy_map_main_float_uint;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_double_uint::LocalMatrix, typename FT_main_double_uint::LocalFilter, typename TT_main_double_uint::LocalTransfer>
+          typename MT_main_double_uint::LocalMatrixType, typename FT_main_double_uint::LocalFilterType, typename TT_main_double_uint::LocalTransferType>
           > > local_hierarchy_map_main_double_uint;
 #ifdef FEAT_HAVE_CUDA
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_float_uint::LocalMatrix, typename FT_cuda_float_uint::LocalFilter, typename TT_cuda_float_uint::LocalTransfer>
+          typename MT_cuda_float_uint::LocalMatrixType, typename FT_cuda_float_uint::LocalFilterType, typename TT_cuda_float_uint::LocalTransferType>
           > > local_hierarchy_map_cuda_float_uint;
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_double_uint::LocalMatrix, typename FT_cuda_double_uint::LocalFilter, typename TT_cuda_double_uint::LocalTransfer>
+          typename MT_cuda_double_uint::LocalMatrixType, typename FT_cuda_double_uint::LocalFilterType, typename TT_cuda_double_uint::LocalTransferType>
           > > local_hierarchy_map_cuda_double_uint;
 #endif
 
@@ -1542,7 +1542,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1568,7 +1568,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1595,7 +1595,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1621,7 +1621,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1658,7 +1658,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1684,7 +1684,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1711,7 +1711,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1737,7 +1737,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename MatrixType::LocalMatrix::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename MatrixType::LocalMatrixType::template ContainerTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_systems(
@@ -1764,7 +1764,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1790,7 +1790,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1817,7 +1817,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1843,7 +1843,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1870,7 +1870,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1896,7 +1896,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1923,7 +1923,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1949,7 +1949,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename FilterType::LocalFilter::template FilterTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename FilterType::LocalFilterType::template FilterTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_filters(
@@ -1976,7 +1976,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2002,7 +2002,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2029,7 +2029,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2055,7 +2055,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2082,7 +2082,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2108,7 +2108,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2135,7 +2135,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2161,7 +2161,7 @@ namespace FEAT
           }
 
         template <typename SolverVectorType_>
-        std::deque<typename TransferType::LocalTransfer::template TransferTypeByMDI<typename SolverVectorType_::MemType,
+        std::deque<typename TransferType::LocalTransferType::template TransferTypeByMDI<typename SolverVectorType_::MemType,
                                                                     typename SolverVectorType_::DataType,
                                                                     typename SolverVectorType_::IndexType> > &
           get_transfers(
@@ -2187,9 +2187,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_float_ulong::LocalMatrix,
-          typename FT_main_float_ulong::LocalFilter,
-          typename TT_main_float_ulong::LocalTransfer
+          typename MT_main_float_ulong::LocalMatrixType,
+          typename FT_main_float_ulong::LocalFilterType,
+          typename TT_main_float_ulong::LocalTransferType
           > > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
@@ -2213,9 +2213,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_double_ulong::LocalMatrix,
-          typename FT_main_double_ulong::LocalFilter,
-          typename TT_main_double_ulong::LocalTransfer> > > &
+          typename MT_main_double_ulong::LocalMatrixType,
+          typename FT_main_double_ulong::LocalFilterType,
+          typename TT_main_double_ulong::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2239,9 +2239,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_float_ulong::LocalMatrix,
-          typename FT_cuda_float_ulong::LocalFilter,
-          typename TT_cuda_float_ulong::LocalTransfer> > > &
+          typename MT_cuda_float_ulong::LocalMatrixType,
+          typename FT_cuda_float_ulong::LocalFilterType,
+          typename TT_cuda_float_ulong::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2264,9 +2264,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_double_ulong::LocalMatrix,
-          typename FT_cuda_double_ulong::LocalFilter,
-          typename TT_cuda_double_ulong::LocalTransfer> > > &
+          typename MT_cuda_double_ulong::LocalMatrixType,
+          typename FT_cuda_double_ulong::LocalFilterType,
+          typename TT_cuda_double_ulong::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2290,9 +2290,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_float_uint::LocalMatrix,
-          typename FT_main_float_uint::LocalFilter,
-          typename TT_main_float_uint::LocalTransfer> > > &
+          typename MT_main_float_uint::LocalMatrixType,
+          typename FT_main_float_uint::LocalFilterType,
+          typename TT_main_float_uint::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2315,9 +2315,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_main_double_uint::LocalMatrix,
-          typename FT_main_double_uint::LocalFilter,
-          typename TT_main_double_uint::LocalTransfer> > > &
+          typename MT_main_double_uint::LocalMatrixType,
+          typename FT_main_double_uint::LocalFilterType,
+          typename TT_main_double_uint::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::Main>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,
@@ -2341,9 +2341,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_float_uint::LocalMatrix,
-          typename FT_cuda_float_uint::LocalFilter,
-          typename TT_cuda_float_uint::LocalTransfer> > > &
+          typename MT_cuda_float_uint::LocalMatrixType,
+          typename FT_cuda_float_uint::LocalFilterType,
+          typename TT_cuda_float_uint::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, float>::value>::type *,
@@ -2366,9 +2366,9 @@ namespace FEAT
 
         template <typename SolverVectorType_>
         std::map<String, std::shared_ptr<Solver::MultiGridHierarchy<
-          typename MT_cuda_double_uint::LocalMatrix,
-          typename FT_cuda_double_uint::LocalFilter,
-          typename TT_cuda_double_uint::LocalTransfer> > > &
+          typename MT_cuda_double_uint::LocalMatrixType,
+          typename FT_cuda_double_uint::LocalFilterType,
+          typename TT_cuda_double_uint::LocalTransferType> > > &
         get_hierarchy_map(
               typename std::enable_if<std::is_same<typename SolverVectorType_::MemType, Mem::CUDA>::value>::type *,
               typename std::enable_if<std::is_same<typename SolverVectorType_::DataType, double>::value>::type *,

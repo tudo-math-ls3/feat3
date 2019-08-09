@@ -53,42 +53,42 @@ namespace FEAT
   {
     public:
       /// The type of A = diag(a)
-      typedef LumpedMatrixA_ LumpedMatrixA;
+      typedef LumpedMatrixA_ LumpedMatrixTypeA;
       /// The type of B
-      typedef MatrixB_ MatrixB;
+      typedef MatrixB_ MatrixTypeB;
       /// The type of D = B^T
-      typedef MatrixD_ MatrixD;
+      typedef MatrixD_ MatrixTypeD;
       /// The filter for A
-      typedef FilterA_ FilterA;
+      typedef FilterA_ FilterTypeA;
 
       /// The floating point precision
       typedef typename LumpedMatrixA_::DataType DataType;
       /// The vector for left-multiplication with S
-      typedef typename MatrixD::VectorTypeL VectorTypeL;
+      typedef typename MatrixD_::VectorTypeL VectorTypeL;
       /// The vector for right-multiplication with S
-      typedef typename MatrixB::VectorTypeR VectorTypeR;
+      typedef typename MatrixB_::VectorTypeR VectorTypeR;
 
       /// The left-vector type for A
-      typedef LumpedMatrixA VectorTypeML;
+      typedef LumpedMatrixA_ VectorTypeML;
       /// The right-vector type for A
-      typedef LumpedMatrixA VectorTypeMR;
+      typedef LumpedMatrixA_ VectorTypeMR;
 
       /// The row-gate type (used by SFINAE)
-      typedef typename MatrixD::GateRowType GateRowType;
+      typedef typename MatrixD_::GateRowType GateRowType;
       /// The column-gate type (used by SFINAE)
-      typedef typename MatrixB::GateColType GateColType;
+      typedef typename MatrixB_::GateColType GateColType;
 
       static constexpr bool is_global = true;
       static constexpr bool is_local = false;
 
       /// A = diag(a)
-      LumpedMatrixA inv_lumped_matrix_a;
+      LumpedMatrixA_ inv_lumped_matrix_a;
       /// B
-      const MatrixB& matrix_b;
+      const MatrixB_& matrix_b;
       /// D = B^T
-      const MatrixD& matrix_d;
+      const MatrixD_& matrix_d;
       /// The filter for a
-      const FilterA& filter_a;
+      const FilterA_& filter_a;
 
     private:
       // These two need to be modified even when apply() (which is const) is called
@@ -113,10 +113,10 @@ namespace FEAT
        * \param[in] filter_a_
        * Filter for A
        */
-      SymmetricLumpedSchurMatrix(const LumpedMatrixA& lumped_matrix_a_,
-      const MatrixB& matrix_b_,
-      const MatrixD& matrix_d_,
-      const FilterA& filter_a_) :
+      SymmetricLumpedSchurMatrix(const LumpedMatrixA_& lumped_matrix_a_,
+      const MatrixB_& matrix_b_,
+      const MatrixD_& matrix_d_,
+      const FilterA_& filter_a_) :
         inv_lumped_matrix_a(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
         matrix_b(matrix_b_),
         matrix_d(matrix_d_),
@@ -142,7 +142,7 @@ namespace FEAT
         return inv_lumped_matrix_a.get_comm();
       }
 
-      void update_lumped_a(const LumpedMatrixA& lumped_matrix_a_)
+      void update_lumped_a(const LumpedMatrixA_& lumped_matrix_a_)
       {
         // If these were initialised empty (as it frequently happens with Global containers), adjust the sizes
         if(_vec_ml.local().size() == Index(0))
@@ -261,7 +261,7 @@ namespace FEAT
         {
           diag.format();
 
-          typename MatrixB::LocalMatrix matrix_b1(matrix_b.convert_to_1());
+          typename MatrixB_::LocalMatrixType matrix_b1(matrix_b.convert_to_1());
 
           matrix_b1.add_trace_double_mat_mult(diag.local(), matrix_d.local(), inv_lumped_matrix_a.local(), DataType(1));
         }

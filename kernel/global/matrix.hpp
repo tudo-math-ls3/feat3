@@ -26,9 +26,9 @@ namespace FEAT
     class Matrix : public Checkpointable
     {
     public:
-      typedef LocalMatrix_ LocalMatrix;
-      typedef RowMirror_ RowMirror;
-      typedef ColMirror_ ColMirror;
+      typedef LocalMatrix_ LocalMatrixType;
+      typedef RowMirror_ RowMirrorType;
+      typedef ColMirror_ ColMirrorType;
 
       typedef typename LocalMatrix_::MemType MemType;
       typedef typename LocalMatrix_::DataType DataType;
@@ -280,9 +280,9 @@ namespace FEAT
         return lump;
       }
 
-      LocalMatrix convert_to_1() const
+      LocalMatrix_ convert_to_1() const
       {
-        LocalMatrix locmat = _matrix.clone(LAFEM::CloneMode::Weak);
+        LocalMatrix_ locmat = _matrix.clone(LAFEM::CloneMode::Weak);
         if((_row_gate != nullptr) && (_col_gate != nullptr))
           synch_matrix(locmat, *_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
         return locmat;

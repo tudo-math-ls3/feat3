@@ -25,7 +25,7 @@ namespace FEAT
     {
     public:
       /// our local transfer
-      typedef LocalTransfer_ LocalTransfer;
+      typedef LocalTransfer_ LocalTransferType;
       /// our internal local matrix type
       typedef typename LocalTransfer_::MatrixType LocalMatrixType;
       /// our internal local vector type
