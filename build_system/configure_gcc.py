@@ -74,7 +74,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
     if major >= 6:
       cxxflags += " -fsanitize=bounds-strict"
-    if major >= 6 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
+    if major >= 6 and major != 9 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
       cxxflags += " -fsanitize=address"
     if major >= 9:
       cxxflags += " -lrt"
