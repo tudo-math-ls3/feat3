@@ -49,7 +49,6 @@ namespace FEAT
      * Data survey: \n
      * _elements[0]: raw number values \n
      * _scalar_index[0]: container size
-     * _scalar_index[1]: boolean flag, signaling DenseVectorRange usage
      *
      * Refer to \ref lafem_design for general usage informations.
      *
