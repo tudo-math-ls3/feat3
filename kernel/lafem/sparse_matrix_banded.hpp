@@ -816,7 +816,7 @@ namespace FEAT
        * \returns Matrix row count.
        */
       template <Perspective = Perspective::native>
-      const Index & rows() const
+      Index rows() const
       {
         return this->_scalar_index.at(1);
       }
@@ -827,7 +827,7 @@ namespace FEAT
        * \returns Matrix column count.
        */
       template <Perspective = Perspective::native>
-      const Index & columns() const
+      Index columns() const
       {
         return this->_scalar_index.at(2);
       }
@@ -1194,13 +1194,13 @@ namespace FEAT
       /* ******************************************************************* */
     public:
       /** \copydoc Adjactor::get_num_nodes_domain() */
-      const inline Index & get_num_nodes_domain() const
+      inline Index get_num_nodes_domain() const
       {
         return rows();
       }
 
       /** \copydoc Adjactor::get_num_nodes_image() */
-      const inline Index & get_num_nodes_image() const
+      inline Index get_num_nodes_image() const
       {
         return columns();
       }

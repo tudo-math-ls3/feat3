@@ -1624,7 +1624,7 @@ namespace FEAT
        * \returns Matrix row count.
        */
       template <Perspective = Perspective::native>
-      const Index & rows() const
+      Index rows() const
       {
         return this->_scalar_index.at(1);
       }
@@ -1635,7 +1635,7 @@ namespace FEAT
        * \returns Matrix column count.
        */
       template <Perspective = Perspective::native>
-      const Index & columns() const
+      Index columns() const
       {
         return this->_scalar_index.at(2);
       }
@@ -1645,7 +1645,7 @@ namespace FEAT
        *
        * \returns Chunk size.
        */
-      const Index & C() const
+      Index C() const
       {
         return this->_scalar_index.at(3);
       }
@@ -1655,7 +1655,7 @@ namespace FEAT
        *
        * \returns number of chunks.
        */
-      const Index & num_of_chunks() const
+      Index num_of_chunks() const
       {
         return this->_scalar_index.at(4);
       }
@@ -1665,7 +1665,7 @@ namespace FEAT
        *
        * \returns Size of val- and col-arrays
        */
-      const Index & val_size() const
+      Index val_size() const
       {
         return this->_scalar_index.at(5);
       }
@@ -2256,13 +2256,13 @@ namespace FEAT
       /* ******************************************************************* */
     public:
       /** \copydoc Adjactor::get_num_nodes_domain() */
-      const inline Index & get_num_nodes_domain() const
+      inline Index get_num_nodes_domain() const
       {
         return rows();
       }
 
       /** \copydoc Adjactor::get_num_nodes_image() */
-      const inline Index & get_num_nodes_image() const
+      inline Index get_num_nodes_image() const
       {
         return columns();
       }
