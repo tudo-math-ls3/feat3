@@ -425,7 +425,7 @@ elif "pgi" in buildid:
     print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
     sys.exit(1)
   if not compiler_cc:
-    compiler_cxx = "pgcc"
+    compiler_cc = "pgcc"
   if not is_found(compiler_cc):
     print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
     sys.exit(1)
