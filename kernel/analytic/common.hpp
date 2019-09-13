@@ -3051,7 +3051,7 @@ namespace FEAT
        * This function represents the 3D sine-bubble function, whose input
        * point has been normalised, i.e.:
        *
-       * \[fu(x,y,z) = \sin\bigg(\frac{\pi x}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
+       * \f[u(x,y,z) = \sin\bigg(\frac{\pi x}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
           \sin\bigg(\frac{\pi y}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
           \sin\bigg(\frac{\pi z}{\sqrt{x^2+y^2+z^2}}\bigg)\f]
        *
@@ -3218,7 +3218,7 @@ namespace FEAT
               -cx*sy*sz*di*y*z*z +
               -cy*sz*sx*x*x*x*di +
               -cy*sz*sx*x*di*z*z);
-            hess[0][1] = hess[0][2] = pi*qo*(
+            hess[0][2] = hess[2][0] = pi*qo*(
               DataType(2)*z*z*pi*x*x*cx*sy*cz +
               DataType(2)*sx*sy*z*z*x*cz*di +
               DataType(2)*di*cx*sy*sz*x*x*z +
