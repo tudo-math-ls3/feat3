@@ -365,7 +365,13 @@ namespace FEAT
         XASSERTM(x.columns() == this->columns(), "Column count does not match!");
         XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size());
         Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -375,7 +381,15 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_>::value(this->elements(), this->used_elements());
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
+        DT_ result = Arch::Norm2<Mem_>::value(this->elements(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
@@ -391,8 +405,14 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
         Arch::Apply<Mem_>::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
-            x.elements(), this->rows(), this->columns());
+                                 x.elements(), this->rows(), this->columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -415,14 +435,20 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
+        TimeStamp ts_start;
+
         if(Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
           return;
         }
 
+        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
         Arch::Apply<Mem_>::dense(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
-            x.elements(), this->rows(), this->columns());
+                                 x.elements(), this->rows(), this->columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -434,8 +460,14 @@ namespace FEAT
         XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
         XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
 
+        TimeStamp ts_start;
+        Statistics::add_flops(x.used_elements() * y.columns()*2);
+
         Arch::ProductMatMat<Mem_>::dense(this->elements(), x.elements(),
                                          y.elements(), this->rows(), this->columns(), x.columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
 
       }
 
@@ -443,12 +475,19 @@ namespace FEAT
       void invert()
       {
         XASSERTM(this->rows() == this->columns(), "matrix must be square!");
+
+        TimeStamp ts_start;
+        Statistics::add_flops(this->used_elements() * this->columns()*2);
+
         DenseMatrix<Mem::Main, DT_, IT_> m_main;
         m_main.convert(*this);
         IT_ * temp = new IT_[this->rows()];
         Math::invert_matrix((IT_)this->rows(), (IT_)this->rows(), m_main.elements(), temp);
         delete[] temp;
         this->convert(m_main);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
       }
 
       /// Create an inverse of the current matrix

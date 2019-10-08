@@ -1752,7 +1752,13 @@ namespace FEAT
           return;
         }
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
         Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1767,7 +1773,13 @@ namespace FEAT
         XASSERTM(x.columns() == this->columns(), "Column count does not match!");
         XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1777,7 +1789,15 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
+        DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
@@ -1863,8 +1883,14 @@ namespace FEAT
         XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
         XASSERTM(s.size() == this->rows(), "Vector size does not match!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements());
         Arch::ScaleRows<Mem_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
-                                          s.elements(), this->rows(), this->columns(), this->used_elements());
+                                   s.elements(), this->rows(), this->columns(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1880,8 +1906,14 @@ namespace FEAT
         XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
         XASSERTM(s.size() == this->columns(), "Vector size does not match!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements());
         Arch::ScaleCols<Mem_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
-                                          s.elements(), this->rows(), this->columns(), this->used_elements());
+                                   s.elements(), this->rows(), this->columns(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1897,8 +1929,14 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
         Arch::Apply<Mem_>::coo(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
             this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1921,14 +1959,20 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
+        TimeStamp ts_start;
+
         if(used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
           return;
         }
 
+        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
         Arch::Apply<Mem_>::coo(r.elements(), alpha, x.elements(), DT_(1), y.elements(),
-            this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
+                               this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
       ///@}
 

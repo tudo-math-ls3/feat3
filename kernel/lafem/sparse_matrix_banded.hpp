@@ -956,7 +956,13 @@ namespace FEAT
           return;
         }
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
         Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -972,7 +978,14 @@ namespace FEAT
         XASSERTM(x.num_of_offsets() == this->num_of_offsets(), "Matrix num_of_offsets do not match!");
         XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
 
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->rows() * this->num_of_offsets());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+
       }
 
       /**
@@ -982,7 +995,16 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_>::value(this->val(), this->rows() * this->num_of_offsets());
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
+        DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->rows() * this->num_of_offsets());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
@@ -998,6 +1020,9 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
+        TimeStamp ts_start;
+        Statistics::add_flops( 2 * this->used_elements() );
+
         Arch::Apply<Mem_>::banded(r.elements(),
             DT_(1),
             x.elements(),
@@ -1008,6 +1033,9 @@ namespace FEAT
             this->num_of_offsets(),
             this->rows(),
             this->columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1036,6 +1064,9 @@ namespace FEAT
           return;
         }
 
+        TimeStamp ts_start;
+        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
+
         Arch::Apply<Mem_>::banded(r.elements(),
             alpha,
             x.elements(),
@@ -1046,6 +1077,9 @@ namespace FEAT
             this->num_of_offsets(),
             this->rows(),
             this->columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
       ///@}
 

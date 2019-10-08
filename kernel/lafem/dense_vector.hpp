@@ -1173,6 +1173,7 @@ namespace FEAT
       DT_ norm2() const
       {
         TimeStamp ts_start;
+        Statistics::add_flops(this->size() * 2);
 
         DT_ result = Arch::Norm2<Mem_>::value(this->elements(), this->size());
 

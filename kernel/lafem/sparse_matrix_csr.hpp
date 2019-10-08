@@ -2094,7 +2094,7 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops(this->used_elements() * 3);
+        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
         Arch::Apply<Mem_>::csr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
 
@@ -2134,7 +2134,7 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
+        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 * BlockSize_);
         Arch::Apply<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());

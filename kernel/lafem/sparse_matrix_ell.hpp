@@ -1829,7 +1829,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements());
+        Statistics::add_flops(this->used_elements() * 2);
         Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->val_size());
 
         TimeStamp ts_stop;
@@ -2152,7 +2152,7 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops(this->used_elements() * 3);
+        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
         Arch::Apply<Mem_>::ell(r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->val(),
             this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
 

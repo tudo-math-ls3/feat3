@@ -1147,7 +1147,7 @@ namespace FEAT
 
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops(this->used_elements() * 3);
+        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
         Arch::Apply<Mem_>::cscr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
             this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), transposed);
 
