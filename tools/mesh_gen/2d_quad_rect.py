@@ -4,8 +4,8 @@
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 ################################################################################
-# This tool generates a 2D rectangular mesh representing the domain
-# [x0,x1]x[y0,y1] consisting of m-by-n congruent rectangles.
+# This script generates a 2D rectangular mesh representing the domain
+# [x0,x1]x[y0,y1] consisting of m-by-n congruent or anisotropic rectangles.
 # The generated meshfile also contains four meshparts representing the
 # four outer edges of the domain named:
 # bnd:l     The left boundary edge meshpart   (x=x0)
@@ -13,14 +13,28 @@
 # bnd:b     The bottom boundary edge meshpart (y=y0)
 # bnd:t     The top boundary edge meshpart    (y=y1)
 #
-# USAGE: 2d_rect_quad.py x0 x1 y0 y1 m n filename
+# USAGE: 2d_rect_quad.py x0 x1 y0 y1 (m-list) (n-list) filename
 #
 # Options:
 # x0 x1     The X-range of the rectangular domain
 # y0 y1     The Y-range of the rectangular domain
-# m         The number of rectangles in X-direction
-# n         The number of rectangles in Y-direction
+# (m-list)  The rectangle list in X-direction, see below
+# (n-list)  The rectangle list in Y-direction, see below
 # filename  The name of the meshfile to be created
+#
+# Rectangle Lists:
+# For both the X- and the Y-dimension, one may either specify the number of
+# elements in that dimension, which will yield an equidistant discretisation,
+# or alternatively a list of relative element sizes, which will yield an
+# anisotropic discretisation.
+#
+# Mixed Equidistant/Anisotropic Example:
+# The call
+#      2d_rect_quad.py 0 4 0 1 4 (1 4 1) mesh.xml
+# will create a mesh discretising the domain [0,4]x[0,1] with 4x3 elements,
+# where each element has the same X-dimension and where the vertically inner
+# elements are 4 times as big in Y-dimension as the vertically outer elements.
+#
 #
 # Note: This script is compatible with both Python 2.x and Python 3.x
 #
@@ -55,6 +69,49 @@ def mp_vert(f, name, j, m, n):
   f.write("    </Mapping>\n")
   f.write("  </MeshPart>\n")
 
+def pop_front(args):
+  return (args[0], args[1:])
+
+# parse anisotropic parameter list
+def parse_aniso_list(args, mn):
+  # empty list?
+  if len(args) == 0:
+    print("ERROR: " + mn + "-list is empty")
+    sys.exit(1)
+
+  # isotropic case ?
+  a, args = (args[0], args[1:])
+  if not a.startswith('('):
+    return ([], int(a), args)
+
+  # it's an anisotropy list
+  lst = a
+  while len(args) > 0:
+    a, args = (args[0], args[1:])
+    lst = lst + " " + a
+    if a.endswith(')'):
+      break
+  if not lst.endswith(')'):
+    print("ERROR: " + mn + "-list is incomplete")
+    sys.exit(1)
+
+  # remove braces and split by whitespaces
+  lst = lst[1:-1].strip().split()
+
+  # convert from string to float list
+  l = []
+  for t in lst:
+    l = l + [float(t)]
+
+  return (l, len(l), args)
+
+# print aniso list
+def print_aniso_list(il, lst, sum):
+  s = ""
+  for i in lst:
+    s = s + " %f " % (il * i / sum)
+  return "[" + s + "]"
+
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################
@@ -65,18 +122,18 @@ myself = os.path.basename(sys.argv[0])
 # do we have enough arguments?
 if len(sys.argv) < 8:
   print("")
-  print("USAGE: " + myself + " x0 x1 y0 y1 m n filename")
+  print("USAGE: " + myself + " x0 x1 y0 y1 (m-list) (n-list) filename")
   print("")
   print("Options:")
   print("x0 x1     The X-range of the rectangular domain")
   print("y0 y1     The Y-range of the rectangular domain")
-  print("m         The number of rectangles in X-direction")
-  print("n         The number of rectangles in Y-direction")
+  print("(m-list)  The rectangle list in X-direction")
+  print("(n-list)  The rectangle list in Y-direction")
   print("filename  The name of the meshfile to be created")
   print("")
   print("Information:")
   print("This tool generates a 2D rectangular mesh representing the domain")
-  print("[x0,x1]x[y0,y1] consisting of m-by-n congruent rectangles.")
+  print("[x0,x1]x[y0,y1] consisting of m-by-n congruent or anisotropic rectangles.")
   print("The generated meshfile also contains four meshparts representing the")
   print("four outer edges of the domain named:")
   print("bnd:l     The left boundary edge meshpart   (x=x0)")
@@ -90,9 +147,24 @@ x0 = float(sys.argv[1])
 x1 = float(sys.argv[2])
 y0 = float(sys.argv[3])
 y1 = float(sys.argv[4])
-m  = int(sys.argv[5])
-n  = int(sys.argv[6])
-filename = sys.argv[7]
+filename = sys.argv[-1]
+
+# parse anisotropy lists
+mn_args = sys.argv[5:-1]
+m_list, m, mn_args = parse_aniso_list(mn_args, 'm')
+n_list, n, mn_args = parse_aniso_list(mn_args, 'n')
+
+# compute list offsets (anisotropic case only)
+m_sum = 0.0
+m_off = [0]
+for i in m_list:
+  m_sum = m_sum + i
+  m_off = m_off + [m_sum]
+n_sum = 0.0
+n_off = [0]
+for j in n_list:
+  n_sum = n_sum + j
+  n_off = n_off + [n_sum]
 
 # some basic sanity checks
 if(x0 >= x1):
@@ -116,7 +188,14 @@ nq = m*n
 # print some basic information
 print("Domain: [%g , %g] x [%g , %g]" % (x0, x1, y0, y1))
 print("Slices: %i x %i" % (m, n))
-print("Rects.: %g x %g" % ((x1-x0)/float(m), (y1-y0)/float(n)))
+if len(m_list) == 0:
+  print("X-Size: isotropic: %g" % ((x1-x0)/float(m)))
+else:
+  print("X-Size: anisotropic: " + print_aniso_list(x1-x0, m_list, m_sum))
+if len(n_list) == 0:
+  print("Y-Size: isotropic: %g" % ((y1-y0)/float(m)))
+else:
+  print("Y-Size: anisotropic: " + print_aniso_list(y1-y0, n_list, n_sum))
 print("Verts.: %i" % nv)
 print("Edges.: %i" % ne)
 print("Quads.: %i" % nq)
@@ -138,9 +217,17 @@ f.write("  <Mesh type=\"conformal:hypercube:2:2\" size=\"%i %i %i\">\n" % (nv, n
 f.write("    <Vertices>\n")
 # write vertices in line-wise order
 for i in range(0,n+1):
-  y = y0 + (y1-y0)*(float(i)/float(n))
+  # anisotropic in Y?
+  if len(n_off) > 1:
+    y = y0 + (y1-y0)*(n_off[i]/n_sum)
+  else:
+    y = y0 + (y1-y0)*(float(i)/float(n))
   for j in range(0,m+1):
-    x = x0 + (x1-x0)*(float(j)/float(m))
+    # anisotropic in X?
+    if len(m_off) > 1:
+      x = x0 + (x1-x0)*(m_off[j]/m_sum)
+    else:
+      x = x0 + (x1-x0)*(float(j)/float(m))
     f.write("      %g %g\n" % (x, y))
 f.write("    </Vertices>\n")
 f.write("    <Topology dim=\"1\">\n")
