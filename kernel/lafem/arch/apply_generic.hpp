@@ -36,16 +36,21 @@ namespace FEAT
 
         if (transposed)
         {
+          DT_ ba = b/a;
           for (Index col(0) ; col < columns ; ++col)
           {
-            r[col] = b * r[col];
+            r[col] = ba * r[col];
           }
           for (Index row(0) ; row < rows ; ++row)
           {
             for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
             {
-              r[col_ind[i]] += val[i] * x[row] * a;
+              r[col_ind[i]] += val[i] * x[row];
             }
+          }
+          for (Index col(0) ; col < columns ; ++col)
+          {
+            r[col] = a * r[col];
           }
         }
         else
@@ -79,17 +84,22 @@ namespace FEAT
 
         if (transposed)
         {
+          DT_ ba = b/a;
           for (Index col(0) ; col < columns ; ++col)
           {
-            r[col] = b * r[col];
+            r[col] = ba * r[col];
           }
           for (Index nzrow(0) ; nzrow < used_rows ; ++nzrow)
           {
             const Index row(row_numbers[nzrow]);
             for (Index i(row_ptr[nzrow]) ; i < row_ptr[nzrow+1] ; ++i)
             {
-              r[col_ind[i]] += val[i] * x[row] * a;
+              r[col_ind[i]] += val[i] * x[row];
             }
+          }
+          for (Index col(0) ; col < columns ; ++col)
+          {
+            r[col] = a * r[col];
           }
         }
         else
