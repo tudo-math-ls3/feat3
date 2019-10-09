@@ -39,7 +39,10 @@ namespace FEAT
       static KahanAccumulation _time_reduction;
 
       /// global time of execution for blas-2 type operations
-      static KahanAccumulation _time_spmv;
+      static KahanAccumulation _time_blas2;
+
+      /// global time of execution for blas-3 type operations
+      static KahanAccumulation _time_blas3;
 
       /// global time of execution for blas-1 type operations
       static KahanAccumulation _time_axpy;
@@ -50,8 +53,11 @@ namespace FEAT
       /// global time of execution for mpi related idle/wait tasks of (scalar) reduction operations
       static KahanAccumulation _time_mpi_execute_reduction;
 
-      /// global time of execution for mpi related idle/wait tasks of spmv operations
-      static KahanAccumulation _time_mpi_execute_spmv;
+      /// global time of execution for mpi related idle/wait tasks of blas-2 operations
+      static KahanAccumulation _time_mpi_execute_blas2;
+
+      /// global time of execution for mpi related idle/wait tasks of blas-3 operations
+      static KahanAccumulation _time_mpi_execute_blas3;
 
       /// global time of execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
       static KahanAccumulation _time_mpi_execute_collective;
@@ -59,8 +65,11 @@ namespace FEAT
       /// global time of wait execution for mpi related idle/wait tasks of (scalar) reduction operations
       static KahanAccumulation _time_mpi_wait_reduction;
 
-      /// global time of wait execution for mpi related idle/wait tasks of spmv operations
-      static KahanAccumulation _time_mpi_wait_spmv;
+      /// global time of wait execution for mpi related idle/wait tasks of blas2 operations
+      static KahanAccumulation _time_mpi_wait_blas2;
+
+      /// global time of wait execution for mpi related idle/wait tasks of blas3 operations
+      static KahanAccumulation _time_mpi_wait_blas3;
 
       /// global time of wait execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
       static KahanAccumulation _time_mpi_wait_collective;
@@ -75,18 +84,22 @@ namespace FEAT
       static std::map<String, std::list<double>> _overall_toe;
       static std::map<String, std::list<Index>> _overall_iters;
       static std::map<String, std::list<double>> _overall_mpi_execute_reduction;
-      static std::map<String, std::list<double>> _overall_mpi_execute_spmv;
+      static std::map<String, std::list<double>> _overall_mpi_execute_blas2;
+      static std::map<String, std::list<double>> _overall_mpi_execute_blas3;
       static std::map<String, std::list<double>> _overall_mpi_execute_collective;
       static std::map<String, std::list<double>> _overall_mpi_wait_reduction;
-      static std::map<String, std::list<double>> _overall_mpi_wait_spmv;
+      static std::map<String, std::list<double>> _overall_mpi_wait_blas2;
+      static std::map<String, std::list<double>> _overall_mpi_wait_blas3;
       static std::map<String, std::list<double>> _overall_mpi_wait_collective;
       /// mapping of solver name to list of outer multigrid level timings. each std::vector holds a complete level hierarchy of timings.
       static std::map<String, std::list<std::vector<double>>> _outer_mg_toe;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_reduction;
-      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_spmv;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_blas2;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_blas3;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_execute_collective;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_reduction;
-      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_spmv;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_blas2;
+      static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_blas3;
       static std::map<String, std::list<std::vector<double>>> _outer_mg_mpi_wait_collective;
       /// overall time of outer schwarz preconditioners internal solver
       static std::map<String, std::list<double>> _outer_schwarz_toe;
@@ -169,17 +182,21 @@ namespace FEAT
         _overall_toe.clear();
         _overall_iters.clear();
         _overall_mpi_execute_reduction.clear();
-        _overall_mpi_execute_spmv.clear();
+        _overall_mpi_execute_blas2.clear();
+        _overall_mpi_execute_blas3.clear();
         _overall_mpi_execute_collective.clear();
         _overall_mpi_wait_reduction.clear();
-        _overall_mpi_wait_spmv.clear();
+        _overall_mpi_wait_blas2.clear();
+        _overall_mpi_wait_blas3.clear();
         _overall_mpi_wait_collective.clear();
         _outer_mg_toe.clear();
         _outer_mg_mpi_execute_reduction.clear();
-        _outer_mg_mpi_execute_spmv.clear();
+        _outer_mg_mpi_execute_blas2.clear();
+        _outer_mg_mpi_execute_blas3.clear();
         _outer_mg_mpi_execute_collective.clear();
         _outer_mg_mpi_wait_reduction.clear();
-        _outer_mg_mpi_wait_spmv.clear();
+        _outer_mg_mpi_wait_blas2.clear();
+        _outer_mg_mpi_wait_blas3.clear();
         _outer_mg_mpi_wait_collective.clear();
         _outer_schwarz_toe.clear();
         _outer_schwarz_iters.clear();
@@ -218,9 +235,13 @@ namespace FEAT
       {
         _time_reduction = KahanSum(_time_reduction, seconds);
       }
-      inline static void add_time_spmv(double seconds)
+      inline static void add_time_blas2(double seconds)
       {
-        _time_spmv = KahanSum(_time_spmv, seconds);
+        _time_blas2 = KahanSum(_time_blas2, seconds);
+      }
+      inline static void add_time_blas3(double seconds)
+      {
+        _time_blas3 = KahanSum(_time_blas3, seconds);
       }
       inline static void add_time_axpy(double seconds)
       {
@@ -234,9 +255,13 @@ namespace FEAT
       {
         _time_mpi_execute_reduction = KahanSum(_time_mpi_execute_reduction, seconds);
       }
-      inline static void add_time_mpi_execute_spmv(double seconds)
+      inline static void add_time_mpi_execute_blas2(double seconds)
       {
-        _time_mpi_execute_spmv = KahanSum(_time_mpi_execute_spmv, seconds);
+        _time_mpi_execute_blas2 = KahanSum(_time_mpi_execute_blas2, seconds);
+      }
+      inline static void add_time_mpi_execute_blas3(double seconds)
+      {
+        _time_mpi_execute_blas3 = KahanSum(_time_mpi_execute_blas3, seconds);
       }
       inline static void add_time_mpi_execute_collective(double seconds)
       {
@@ -246,9 +271,13 @@ namespace FEAT
       {
         _time_mpi_wait_reduction = KahanSum(_time_mpi_wait_reduction, seconds);
       }
-      inline static void add_time_mpi_wait_spmv(double seconds)
+      inline static void add_time_mpi_wait_blas2(double seconds)
       {
-        _time_mpi_wait_spmv = KahanSum(_time_mpi_wait_spmv, seconds);
+        _time_mpi_wait_blas2 = KahanSum(_time_mpi_wait_blas2, seconds);
+      }
+      inline static void add_time_mpi_wait_blas3(double seconds)
+      {
+        _time_mpi_wait_blas3 = KahanSum(_time_mpi_wait_blas3, seconds);
       }
       inline static void add_time_mpi_wait_collective(double seconds)
       {
@@ -259,9 +288,13 @@ namespace FEAT
       {
         return _time_reduction.sum;
       }
-      inline static double get_time_spmv()
+      inline static double get_time_blas2()
       {
-        return _time_spmv.sum;
+        return _time_blas2.sum;
+      }
+      inline static double get_time_blas3()
+      {
+        return _time_blas3.sum;
       }
       inline static double get_time_axpy()
       {
@@ -275,9 +308,13 @@ namespace FEAT
       {
         return _time_mpi_execute_reduction.sum;
       }
-      inline static double get_time_mpi_execute_spmv()
+      inline static double get_time_mpi_execute_blas2()
       {
-        return _time_mpi_execute_spmv.sum;
+        return _time_mpi_execute_blas2.sum;
+      }
+      inline static double get_time_mpi_execute_blas3()
+      {
+        return _time_mpi_execute_blas3.sum;
       }
       inline static double get_time_mpi_execute_collective()
       {
@@ -287,9 +324,13 @@ namespace FEAT
       {
         return _time_mpi_wait_reduction.sum;
       }
-      inline static double get_time_mpi_wait_spmv()
+      inline static double get_time_mpi_wait_blas2()
       {
-        return _time_mpi_wait_spmv.sum;
+        return _time_mpi_wait_blas2.sum;
+      }
+      inline static double get_time_mpi_wait_blas3()
+      {
+        return _time_mpi_wait_blas3.sum;
       }
       inline static double get_time_mpi_wait_collective()
       {
@@ -347,10 +388,16 @@ namespace FEAT
         return _overall_mpi_execute_reduction.at(target);
       }
 
-      /// retrieve list of all overall solver mpi execute spmv toe entries
-      static inline std::list<double> & get_time_mpi_execute_spmv(String target)
+      /// retrieve list of all overall solver mpi execute blas2 toe entries
+      static inline std::list<double> & get_time_mpi_execute_blas2(String target)
       {
-        return _overall_mpi_execute_spmv.at(target);
+        return _overall_mpi_execute_blas2.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute blas3 toe entries
+      static inline std::list<double> & get_time_mpi_execute_blas3(String target)
+      {
+        return _overall_mpi_execute_blas3.at(target);
       }
 
       /// retrieve list of all overall solver mpi execute collective toe entries
@@ -365,10 +412,16 @@ namespace FEAT
         return _overall_mpi_wait_reduction.at(target);
       }
 
-      /// retrieve list of all overall solver mpi spmv wait toe entries
-      static inline std::list<double> & get_time_mpi_wait_spmv(String target)
+      /// retrieve list of all overall solver mpi blas2 wait toe entries
+      static inline std::list<double> & get_time_mpi_wait_blas2(String target)
       {
-        return _overall_mpi_wait_spmv.at(target);
+        return _overall_mpi_wait_blas2.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi blas3 wait toe entries
+      static inline std::list<double> & get_time_mpi_wait_blas3(String target)
+      {
+        return _overall_mpi_wait_blas3.at(target);
       }
 
       /// retrieve list of all overall solver mpi collective wait toe entries
@@ -389,10 +442,16 @@ namespace FEAT
         return _outer_mg_mpi_execute_reduction.at(target);
       }
 
-      /// retrieve list of all overall solver mpi execute spmv toe entries per level
-      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute_spmv(String target)
+      /// retrieve list of all overall solver mpi execute blas2 toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute_blas2(String target)
       {
-        return _outer_mg_mpi_execute_spmv.at(target);
+        return _outer_mg_mpi_execute_blas2.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi execute blas3 toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_execute_blas3(String target)
+      {
+        return _outer_mg_mpi_execute_blas3.at(target);
       }
 
       /// retrieve list of all overall solver mpi execute collective toe entries per level
@@ -407,10 +466,16 @@ namespace FEAT
         return _outer_mg_mpi_wait_reduction.at(target);
       }
 
-      /// retrieve list of all overall solver mpi spmv wait toe entries per level
-      static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_spmv(String target)
+      /// retrieve list of all overall solver mpi blas2 wait toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_blas2(String target)
       {
-        return _outer_mg_mpi_wait_spmv.at(target);
+        return _outer_mg_mpi_wait_blas2.at(target);
+      }
+
+      /// retrieve list of all overall solver mpi blas3 wait toe entries per level
+      static inline std::list<std::vector<double>> & get_time_mg_mpi_wait_blas3(String target)
+      {
+        return _outer_mg_mpi_wait_blas3.at(target);
       }
 
       /// retrieve list of all overall solver mpi collective wait toe entries per level
@@ -446,22 +511,28 @@ namespace FEAT
       {
         _time_reduction.sum = 0.;
         _time_reduction.correction = 0.;
-        _time_spmv.sum = 0.;
-        _time_spmv.correction = 0.;
+        _time_blas2.sum = 0.;
+        _time_blas2.correction = 0.;
+        _time_blas3.sum = 0.;
+        _time_blas3.correction = 0.;
         _time_axpy.sum = 0.;
         _time_axpy.correction = 0.;
         _time_precon.sum = 0.;
         _time_precon.correction = 0.;
         _time_mpi_execute_reduction.sum = 0.;
         _time_mpi_execute_reduction.correction = 0.;
-        _time_mpi_execute_spmv.sum = 0.;
-        _time_mpi_execute_spmv.correction = 0.;
+        _time_mpi_execute_blas2.sum = 0.;
+        _time_mpi_execute_blas2.correction = 0.;
+        _time_mpi_execute_blas3.sum = 0.;
+        _time_mpi_execute_blas3.correction = 0.;
         _time_mpi_execute_collective.sum = 0.;
         _time_mpi_execute_collective.correction = 0.;
         _time_mpi_wait_reduction.sum = 0.;
         _time_mpi_wait_reduction.correction = 0.;
-        _time_mpi_wait_spmv.sum = 0.;
-        _time_mpi_wait_spmv.correction = 0.;
+        _time_mpi_wait_blas2.sum = 0.;
+        _time_mpi_wait_blas2.correction = 0.;
+        _time_mpi_wait_blas3.sum = 0.;
+        _time_mpi_wait_blas3.correction = 0.;
         _time_mpi_wait_collective.sum = 0.;
         _time_mpi_wait_collective.correction = 0.;
       }
@@ -498,11 +569,11 @@ namespace FEAT
         file << "#solver time" << std::endl;
         file << "reduction " << stringify(get_time_reduction()) << std::endl;
         file << "axpy " << stringify(get_time_axpy()) << std::endl;
-        file << "spmv " << stringify(get_time_spmv()) << std::endl;
+        file << "blas2 " << stringify(get_time_blas2()) << std::endl;
         file << "precon " << stringify(get_time_precon()) << std::endl;
         file << "mpi " << stringify(get_time_mpi_execute()) << std::endl;
         file << "wait reduction" << stringify(get_time_mpi_wait_reduction()) << std::endl;
-        file << "wait spmv" << stringify(get_time_mpi_wait_spmv()) << std::endl;
+        file << "wait blas2" << stringify(get_time_mpi_wait_blas2()) << std::endl;
 
         file << std::endl;
 

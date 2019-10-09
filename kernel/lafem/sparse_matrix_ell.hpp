@@ -2121,7 +2121,7 @@ namespace FEAT
             this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
 
         TimeStamp ts_stop;
-        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -2157,7 +2157,7 @@ namespace FEAT
             this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
 
         TimeStamp ts_stop;
-        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
       ///@}
 

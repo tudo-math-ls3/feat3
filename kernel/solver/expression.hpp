@@ -323,17 +323,19 @@ namespace FEAT
     class ExpressionTimings : public ExpressionBase
     {
       public:
-        double solver_toe, mpi_execute_reduction, mpi_execute_spmv, mpi_execute_collective, mpi_wait_reduction, mpi_wait_spmv, mpi_wait_collective;
+        double solver_toe, mpi_execute_reduction, mpi_execute_blas2, mpi_execute_blas3, mpi_execute_collective, mpi_wait_reduction, mpi_wait_blas2, mpi_wait_blas3, mpi_wait_collective;
 
-        explicit ExpressionTimings(String name, double solver_toe_in, double mpi_execute_reduction_in, double mpi_execute_spmv_in, double mpi_execute_collective_in,
-            double mpi_wait_reduction_in, double mpi_wait_spmv_in, double mpi_wait_collective_in) :
+        explicit ExpressionTimings(String name, double solver_toe_in, double mpi_execute_reduction_in, double mpi_execute_blas2_in, double mpi_execute_blas3_in,
+            double mpi_execute_collective_in, double mpi_wait_reduction_in, double mpi_wait_blas2_in, double mpi_wait_blas3_in, double mpi_wait_collective_in) :
           ExpressionBase(name),
           solver_toe(solver_toe_in),
           mpi_execute_reduction(mpi_execute_reduction_in),
-          mpi_execute_spmv(mpi_execute_spmv_in),
+          mpi_execute_blas2(mpi_execute_blas2_in),
+          mpi_execute_blas3(mpi_execute_blas3_in),
           mpi_execute_collective(mpi_execute_collective_in),
           mpi_wait_reduction(mpi_wait_reduction_in),
-          mpi_wait_spmv(mpi_wait_spmv_in),
+          mpi_wait_blas2(mpi_wait_blas2_in),
+          mpi_wait_blas3(mpi_wait_blas3_in),
           mpi_wait_collective(mpi_wait_collective_in)
         {
         }
@@ -352,18 +354,20 @@ namespace FEAT
     {
       public:
         Index level;
-        double level_toe, mpi_execute_reduction, mpi_execute_spmv, mpi_execute_collective, mpi_wait_reduction, mpi_wait_spmv, mpi_wait_collective;
+        double level_toe, mpi_execute_reduction, mpi_execute_blas2, mpi_execute_blas3, mpi_execute_collective, mpi_wait_reduction, mpi_wait_blas2, mpi_wait_blas3, mpi_wait_collective;
 
-        explicit ExpressionLevelTimings(String name, Index level_in, double level_toe_in, double mpi_execute_reduction_in, double mpi_execute_spmv_in, double mpi_execute_collective_in,
-            double mpi_wait_reduction_in, double mpi_wait_spmv_in, double mpi_wait_collective_in) :
+        explicit ExpressionLevelTimings(String name, Index level_in, double level_toe_in, double mpi_execute_reduction_in, double mpi_execute_blas2_in, double mpi_execute_blas3_in,
+            double mpi_execute_collective_in, double mpi_wait_reduction_in, double mpi_wait_blas2_in, double mpi_wait_blas3_in, double mpi_wait_collective_in) :
           ExpressionBase(name),
           level(level_in),
           level_toe(level_toe_in),
           mpi_execute_reduction(mpi_execute_reduction_in),
-          mpi_execute_spmv(mpi_execute_spmv_in),
+          mpi_execute_blas2(mpi_execute_blas2_in),
+          mpi_execute_blas3(mpi_execute_blas3_in),
           mpi_execute_collective(mpi_execute_collective_in),
           mpi_wait_reduction(mpi_wait_reduction_in),
-          mpi_wait_spmv(mpi_wait_spmv_in),
+          mpi_wait_blas2(mpi_wait_blas2_in),
+          mpi_wait_blas3(mpi_wait_blas3_in),
           mpi_wait_collective(mpi_wait_collective_in)
         {
         }

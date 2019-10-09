@@ -391,15 +391,19 @@ namespace FEAT
       TimeStamp _at;
       double _mpi_execute_reduction_start;
       double _mpi_execute_reduction_stop;
-      double _mpi_execute_spmv_start;
-      double _mpi_execute_spmv_stop;
+      double _mpi_execute_blas2_start;
+      double _mpi_execute_blas2_stop;
+      double _mpi_execute_blas3_start;
+      double _mpi_execute_blas3_stop;
       double _mpi_execute_collective_start;
       double _mpi_execute_collective_stop;
       double _mpi_wait_start_reduction;
-      double _mpi_wait_start_spmv;
+      double _mpi_wait_start_blas2;
+      double _mpi_wait_start_blas3;
       double _mpi_wait_start_collective;
       double _mpi_wait_stop_reduction;
-      double _mpi_wait_stop_spmv;
+      double _mpi_wait_stop_blas2;
+      double _mpi_wait_stop_blas3;
       double _mpi_wait_stop_collective;
       bool _destroyed;
 
@@ -419,16 +423,20 @@ namespace FEAT
         _destroyed(false)
       {
         _mpi_execute_reduction_start = Statistics::get_time_mpi_execute_reduction();
-        _mpi_execute_spmv_start = Statistics::get_time_mpi_execute_spmv();
+        _mpi_execute_blas2_start = Statistics::get_time_mpi_execute_blas2();
+        _mpi_execute_blas3_start = Statistics::get_time_mpi_execute_blas3();
         _mpi_execute_collective_start = Statistics::get_time_mpi_execute_collective();
         _mpi_wait_start_reduction    = Statistics::get_time_mpi_wait_reduction();
-        _mpi_wait_start_spmv    = Statistics::get_time_mpi_wait_spmv();
+        _mpi_wait_start_blas2    = Statistics::get_time_mpi_wait_blas2();
+        _mpi_wait_start_blas3    = Statistics::get_time_mpi_wait_blas3();
         _mpi_wait_start_collective    = Statistics::get_time_mpi_wait_collective();
         _mpi_execute_reduction_stop = _mpi_execute_reduction_start;
-        _mpi_execute_spmv_stop = _mpi_execute_spmv_start;
+        _mpi_execute_blas2_stop = _mpi_execute_blas2_start;
+        _mpi_execute_blas3_stop = _mpi_execute_blas3_start;
         _mpi_execute_collective_stop = _mpi_execute_collective_start;
         _mpi_wait_stop_reduction    = _mpi_wait_start_reduction;
-        _mpi_wait_stop_spmv    = _mpi_wait_start_spmv;
+        _mpi_wait_stop_blas2    = _mpi_wait_start_blas2;
+        _mpi_wait_stop_blas3    = _mpi_wait_start_blas3;
         _mpi_wait_stop_collective    = _mpi_wait_start_collective;
       }
 
@@ -454,17 +462,21 @@ namespace FEAT
         XASSERTM(!_destroyed, "IterationStats::destroy() was already called before!");
 
         _mpi_execute_reduction_stop = Statistics::get_time_mpi_execute_reduction();
-        _mpi_execute_spmv_stop = Statistics::get_time_mpi_execute_spmv();
+        _mpi_execute_blas2_stop = Statistics::get_time_mpi_execute_blas2();
+        _mpi_execute_blas3_stop = Statistics::get_time_mpi_execute_blas3();
         _mpi_execute_collective_stop = Statistics::get_time_mpi_execute_collective();
         _mpi_wait_stop_reduction    = Statistics::get_time_mpi_wait_reduction();
-        _mpi_wait_stop_spmv    = Statistics::get_time_mpi_wait_spmv();
+        _mpi_wait_stop_blas2    = Statistics::get_time_mpi_wait_blas2();
+        _mpi_wait_stop_blas3    = Statistics::get_time_mpi_wait_blas3();
         _mpi_wait_stop_collective    = Statistics::get_time_mpi_wait_collective();
         Statistics::add_solver_expression(std::make_shared<ExpressionTimings>(_solver_name, _at.elapsed_now(),
           _mpi_execute_reduction_stop - _mpi_execute_reduction_start,
-          _mpi_execute_spmv_stop - _mpi_execute_spmv_start,
+          _mpi_execute_blas2_stop - _mpi_execute_blas2_start,
+          _mpi_execute_blas3_stop - _mpi_execute_blas3_start,
           _mpi_execute_collective_stop - _mpi_execute_collective_start,
           _mpi_wait_stop_reduction - _mpi_wait_start_reduction,
-          _mpi_wait_stop_spmv - _mpi_wait_start_spmv,
+          _mpi_wait_stop_blas2 - _mpi_wait_start_blas2,
+          _mpi_wait_stop_blas3 - _mpi_wait_start_blas3,
           _mpi_wait_stop_collective - _mpi_wait_start_collective));
 
         _destroyed = true;

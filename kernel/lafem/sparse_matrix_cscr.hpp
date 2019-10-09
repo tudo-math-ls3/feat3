@@ -1104,7 +1104,7 @@ namespace FEAT
             this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), transposed);
 
         TimeStamp ts_stop;
-        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1152,7 +1152,7 @@ namespace FEAT
             this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), transposed);
 
         TimeStamp ts_stop;
-        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
       ///@}
 
