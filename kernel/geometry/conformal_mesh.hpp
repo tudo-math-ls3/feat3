@@ -58,6 +58,9 @@ namespace FEAT
       /// world dimension
       static constexpr int world_dim = VertexSetType::num_coords;
 
+      /// the mesh is structured
+      static constexpr bool is_structured = false;
+
       /**
        * \brief Index set type class template
        *

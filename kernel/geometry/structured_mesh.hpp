@@ -41,6 +41,9 @@ namespace FEAT
       /// Shape type
       typedef Shape::Hypercube<shape_dim_> ShapeType;
 
+      /// Coordinate type
+      typedef Coord_ CoordType;
+
       /// vertex set type
       typedef VertexSet<num_coords_, Coord_> VertexSetType;
 
@@ -51,6 +54,9 @@ namespace FEAT
       static constexpr int shape_dim = shape_dim_;
       /// world dimension
       static constexpr int world_dim = num_coords_;
+
+      /// the mesh is structured
+      static constexpr bool is_structured = true;
 
       /**
        * \brief Index set type class template

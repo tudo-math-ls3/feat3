@@ -11,6 +11,7 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/space/dof_mapping_renderer.hpp>
 #include <kernel/lafem/null_matrix.hpp>
+#include <kernel/geometry/intern/coarse_fine_cell_mapping.hpp>
 
 namespace FEAT
 {
@@ -41,50 +42,6 @@ namespace FEAT
      */
     class SymbolicAssembler
     {
-    private:
-      /// \cond internal
-      // This helper class is required for the assembly of the 2-level matrix structure.
-      // This class implements the adjacency relation between coarse mesh and fine mesh cells:
-      // For each coarse mesh cell this adjactor maps to the set of all fine mesh cells, which
-      // spawned from the corresponding coarse mesh cell.
-      class RefinementAdjactor
-      {
-      public:
-        typedef Adjacency::Adjactor::IndexImageIterator ImageIterator;
-
-      private:
-        Index _num_elements;
-        Index _num_children;
-
-      public:
-        explicit RefinementAdjactor(Index num_elements, Index num_children) :
-          _num_elements(num_elements),
-          _num_children(num_children)
-        {
-        }
-
-        Index get_num_nodes_domain() const
-        {
-          return _num_elements;
-        }
-
-        Index get_num_nodes_image() const
-        {
-          return _num_elements * _num_children;
-        }
-
-        ImageIterator image_begin(Index domain_node) const
-        {
-          return ImageIterator(_num_children * domain_node);
-        }
-
-        ImageIterator image_end(Index domain_node) const
-        {
-          return ImageIterator(_num_children * (domain_node + 1));
-        }
-      };
-      /// \endcond
-
     public:
       /**
        * \brief Assembles the standard Dof-Adjacency graph for different test- and trial-spaces.
@@ -276,20 +233,9 @@ namespace FEAT
         const FineTestSpace_& fine_space,
         const CoarseTrialSpace_& coarse_space)
       {
-        // fetch the shape of the space
-        typedef typename CoarseTrialSpace_::ShapeType ShapeType;
-
-        // fetch number of coarse mesh elements
-        Index num_elements_coarse = coarse_space.get_trafo().get_mesh().get_num_entities(ShapeType::dimension);
-
-        // fetch number of fine mesh elements
-        Index num_elements_fine = fine_space.get_trafo().get_mesh().get_num_entities(ShapeType::dimension);
-
-        // calculate child count
-        Index num_children = num_elements_fine / num_elements_coarse;
-
         // create an refinement adjactor
-        RefinementAdjactor refine_adjactor(num_elements_coarse, num_children);
+        Geometry::Intern::CoarseFineCellMapping<typename FineTestSpace_::MeshType, typename CoarseTrialSpace_::MeshType>
+            refine_adjactor(fine_space.get_trafo().get_mesh(), coarse_space.get_trafo().get_mesh());
 
         // create test- and trial-dof-mappers
         Adjacency::Graph test_dof_mapping(Space::DofMappingRenderer::render(fine_space));

@@ -415,7 +415,7 @@ namespace FEAT
     /// \cond internal
     template<typename Shape_, int num_coords_, typename Coord_, template<typename> class Factory_>
     class RefineFactory< ConformalMesh<Shape_, num_coords_, Coord_>, Factory_ > :
-    public Factory< ConformalMesh<Shape_, num_coords_, Coord_> >
+      public Factory< ConformalMesh<Shape_, num_coords_, Coord_> >
     {
       public:
         typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
@@ -435,35 +435,35 @@ namespace FEAT
         explicit RefineFactory(Index num_refines, Arguments&&... args) :
           _coarse_mesh(nullptr),
           _factory(nullptr)
-      {
-        if(num_refines <= 0)
         {
-          _factory = new MyFactoryType(std::forward<Arguments>(args)...);
-          return;
-        }
+          if(num_refines <= 0)
+          {
+            _factory = new MyFactoryType(std::forward<Arguments>(args)...);
+            return;
+          }
 
-        // create coarse mesh
-        MyFactoryType my_factory(std::forward<Arguments>(args)...);
-        _coarse_mesh = new MeshType(my_factory);
+          // create coarse mesh
+          MyFactoryType my_factory(std::forward<Arguments>(args)...);
+          _coarse_mesh = new MeshType(my_factory);
 
-        // create refinery
-        _factory = new Refinery(*_coarse_mesh);
-
-        // refine n-1 times;
-        for(Index i(1); i < num_refines; ++i)
-        {
-          // backup old mesh
-          MeshType* mesh_old = _coarse_mesh;
-          // refine mesh
-          _coarse_mesh = new MeshType(*_factory);
-          // delete old factory
-          delete _factory;
-          // delete old coarse mesh
-          delete mesh_old;
-          // create new factory
+          // create refinery
           _factory = new Refinery(*_coarse_mesh);
+
+          // refine n-1 times;
+          for(Index i(1); i < num_refines; ++i)
+          {
+            // backup old mesh
+            MeshType* mesh_old = _coarse_mesh;
+            // refine mesh
+            _coarse_mesh = new MeshType(*_factory);
+            // delete old factory
+            delete _factory;
+            // delete old coarse mesh
+            delete mesh_old;
+            // create new factory
+            _factory = new Refinery(*_coarse_mesh);
+          }
         }
-      }
 
         virtual ~RefineFactory()
         {
@@ -490,6 +490,80 @@ namespace FEAT
         virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           _factory->fill_index_sets(index_set_holder);
+        }
+    };
+
+    template<int shape_dim_, int num_coords_, typename Coord_, template<typename> class Factory_>
+    class RefineFactory< StructuredMesh<shape_dim_, num_coords_, Coord_>, Factory_ > :
+      public Factory< StructuredMesh<shape_dim_, num_coords_, Coord_> >
+    {
+      public:
+        typedef StructuredMesh<shape_dim_, num_coords_, Coord_> MeshType;
+        typedef typename MeshType::VertexSetType VertexSetType;
+
+      private:
+        typedef Factory<MeshType> MeshFactory;
+        typedef Factory_<MeshType> MyFactoryType;
+        typedef StandardRefinery<MeshType> Refinery;
+
+        MeshType* _coarse_mesh;
+        MeshFactory* _factory;
+
+      public:
+        template<typename... Arguments>
+        explicit RefineFactory(Index num_refines, Arguments&&... args) :
+          _coarse_mesh(nullptr),
+          _factory(nullptr)
+        {
+          if(num_refines <= 0)
+          {
+            _factory = new MyFactoryType(std::forward<Arguments>(args)...);
+            return;
+          }
+
+          // create coarse mesh
+          MyFactoryType my_factory(std::forward<Arguments>(args)...);
+          _coarse_mesh = new MeshType(my_factory);
+
+          // create refinery
+          _factory = new Refinery(*_coarse_mesh);
+
+          // refine n-1 times;
+          for(Index i(1); i < num_refines; ++i)
+          {
+            // backup old mesh
+            MeshType* mesh_old = _coarse_mesh;
+            // refine mesh
+            _coarse_mesh = new MeshType(*_factory);
+            // delete old factory
+            delete _factory;
+            // delete old coarse mesh
+            delete mesh_old;
+            // create new factory
+            _factory = new Refinery(*_coarse_mesh);
+          }
+        }
+
+        virtual ~RefineFactory()
+        {
+          if(_factory != nullptr)
+          {
+            delete _factory;
+          }
+          if(_coarse_mesh != nullptr)
+          {
+            delete _coarse_mesh;
+          }
+        }
+
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
+        {
+          _factory->fill_vertex_set(vertex_set);
+        }
+
+        virtual Index get_num_slices(int dir) override
+        {
+          return _factory->get_num_slices(dir);
         }
     };
     /// \endcond

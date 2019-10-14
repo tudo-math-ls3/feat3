@@ -10,6 +10,7 @@
 // includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/geometry/intern/coarse_fine_cell_mapping.hpp>
 
 namespace FEAT
 {
@@ -143,8 +144,9 @@ namespace FEAT
         // pivot array for factorisation
         int pivot[FineSpaceEvaluator::max_local_dofs];
 
-        // calculate child count
-        const Index num_children = fine_trafo_eval.get_num_cells() / coarse_trafo_eval.get_num_cells();
+        // helper struct to calculate fine mesh cell index
+        const Geometry::Intern::CoarseFineCellMapping<typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
+            cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
 
         // loop over all coarse mesh cells
         for(Index ccell(0); ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
@@ -162,10 +164,10 @@ namespace FEAT
           coarse_dof_mapping.prepare(ccell);
 
           // loop over all child cells
-          for(Index child(0); child < num_children; ++child)
+          for(Index child(0); child < cfmapping.get_num_children(); ++child)
           {
             // calculate fine mesh cell index
-            const Index fcell = ccell*num_children + child;
+            const Index fcell = cfmapping.calc_fcell(ccell, child);
 
             // prepare fine trafo evaluator
             fine_trafo_eval.prepare(fcell);
@@ -437,8 +439,9 @@ namespace FEAT
         // pivot array for factorisation
         int pivot[CoarseSpaceEvaluator::max_local_dofs];
 
-        // calculate child count
-        const Index num_children = fine_trafo_eval.get_num_cells() / coarse_trafo_eval.get_num_cells();
+        // helper struct to calculate fine mesh cell index
+        const Geometry::Intern::CoarseFineCellMapping<typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
+            cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
 
         // loop over all coarse mesh cells
         for(Index ccell(0); ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
@@ -479,10 +482,10 @@ namespace FEAT
           Math::invert_matrix(coarse_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
 
           // loop over all child cells
-          for(Index child(0); child < num_children; ++child)
+          for(Index child(0); child < cfmapping.get_num_children(); ++child)
           {
             // calculate fine mesh cell index
-            const Index fcell = ccell*num_children + child;
+            const Index fcell = cfmapping.calc_fcell(ccell, child);
 
             // prepare fine trafo evaluator
             fine_trafo_eval.prepare(fcell);
