@@ -14,7 +14,7 @@ if (FEAT_HAVE_MPI)
   ADD_TEST(sleep1 sleep 2)
   SET_PROPERTY(TEST sleep1 PROPERTY LABELS "mpi,sleep")
 
-  ADD_TEST(meshopt_r_adapt_app_mpi_4 ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(meshopt_r_adapt_app_mpi_3 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -22,13 +22,13 @@ if (FEAT_HAVE_MPI)
     --build-nocmake
     --build-noclean
     --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app" ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST meshopt_r_adapt_app_mpi_4 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST meshopt_r_adapt_app_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  SET_PROPERTY(TEST meshopt_r_adapt_app_mpi_3 PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST meshopt_r_adapt_app_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   ADD_TEST(sleep2 sleep 2)
   SET_PROPERTY(TEST sleep2 PROPERTY LABELS "mpi,sleep")
 
-  ADD_TEST(meshopt_r_adapt_app_alignment_mpi_4 ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(meshopt_r_adapt_app_alignment_mpi_5 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -36,8 +36,8 @@ if (FEAT_HAVE_MPI)
     --build-nocmake
     --build-noclean
     --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 5 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app" ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST meshopt_r_adapt_app_alignment_mpi_4 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST meshopt_r_adapt_app_alignment_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  SET_PROPERTY(TEST meshopt_r_adapt_app_alignment_mpi_5 PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST meshopt_r_adapt_app_alignment_mpi_5 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAT_HAVE_MPI)
 ADD_TEST(meshopt_r_adapt_app_serial ${CMAKE_CTEST_COMMAND}
   --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
