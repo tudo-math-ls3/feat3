@@ -110,7 +110,7 @@ namespace FEAT
           // First of all, let's guess the number of non-zeros for L and U:
           // In most of our cases, the sparsity pattern of A is symmetric,
           // so we have a guess of (nz(A)-n)/2 for both L and U:
-          const IT_ nzul = (row_ptr_a[n] - n) / IT_(2);
+          const IT_ nzul = (Math::max(row_ptr_a[n], n) - n) / IT_(2);
 
           // store size and clear containers
           _n = n;
@@ -638,7 +638,7 @@ namespace FEAT
               }
 
               // process main diagonal entry
-              if( cidx_u != nullptr && cidx_u[k] == i)
+              if((k < rptr_u[cj+1]) && (cidx_u[k] == i))
               {
                 data_d[i] -= data_l[j] * data_u[k];
                 ++k;
