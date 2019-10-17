@@ -596,11 +596,11 @@ namespace FEAT
         {
           // get data arrays
           const IT_* rptr_l = this->_row_ptr_l.data();
-          const IT_* cidx_l = this->_col_idx_l.data();
           const IT_* rptr_u = this->_row_ptr_u.data();
-          const IT_* cidx_u = this->_col_idx_u.data();
-          DT_* data_l = this->_data_l.data();
-          DT_* data_u = this->_data_u.data();
+          const IT_* cidx_l = (this->_col_idx_l.empty() ? nullptr : this->_col_idx_l.data());
+          const IT_* cidx_u = (this->_col_idx_u.empty() ? nullptr : this->_col_idx_u.data());
+          DT_* data_l = (this->_data_l.empty() ? nullptr : this->_data_l.data());
+          DT_* data_u = (this->_data_u.empty() ? nullptr : this->_data_u.data());
           DT_* data_d = this->_data_d.data();
 
           // loop over all rows
@@ -638,12 +638,11 @@ namespace FEAT
               }
 
               // process main diagonal entry
-              if(cidx_u[k] == i)
+              if( cidx_u != nullptr && cidx_u[k] == i)
               {
                 data_d[i] -= data_l[j] * data_u[k];
                 ++k;
               }
-
               // loop over row j of U and process row i of U
               for(; k < rptr_u[cj+1]; ++k)
               {
@@ -675,9 +674,10 @@ namespace FEAT
          */
         void solve_il(DT_* x, const DT_* b) const
         {
+
           const IT_* rptr = this->_row_ptr_l.data();
-          const IT_* cidx = this->_col_idx_l.data();
-          const DT_* data_l = this->_data_l.data();
+          const IT_* cidx = (this->_col_idx_l.empty() ? nullptr : this->_col_idx_l.data());
+          const DT_* data_l = (this->_data_l.empty() ? nullptr : this->_data_l.data());
 
           for(IT_ i(0); i < this->_n; ++i)
           {
@@ -705,8 +705,8 @@ namespace FEAT
         void solve_du(DT_* x, const DT_* b) const
         {
           const IT_* rptr = this->_row_ptr_u.data();
-          const IT_* cidx = this->_col_idx_u.data();
-          const DT_* data_u = this->_data_u.data();
+          const IT_* cidx = (this->_col_idx_u.empty() ? nullptr : this->_col_idx_u.data());
+          const DT_* data_u = (this->_data_u.empty() ? nullptr : this->_data_u.data());
           const DT_* data_d = this->_data_d.data();
 
           for(IT_ i(this->_n); i > IT_(0); )
