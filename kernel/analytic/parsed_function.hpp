@@ -8,6 +8,7 @@
 #define KERNEL_ANALYTIC_PARSED_FUNCTION_HPP 1
 
 #include <kernel/analytic/function.hpp>
+#include <kernel/util/exception.hpp>
 
 // The contents of this file require the 'fparser' third-party library.
 #if defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)
@@ -19,6 +20,12 @@ namespace FEAT
 {
   namespace Analytic
   {
+    class ParsedFunctionEvalError : public Exception
+    {
+    public:
+      explicit ParsedFunctionEvalError(const String& msg) : Exception(msg) {}
+    };
+
     /**
      * \brief Parsed function implementation
      *
@@ -32,7 +39,7 @@ namespace FEAT
      * parsing and evaluation.
      *
      * For a full documentation and a list of supported expressions, see the documentation
-     * of the undrlying parser at http://warp.povusers.org/FunctionParser/fparser.html
+     * of the underlying parser at http://warp.povusers.org/FunctionParser/fparser.html
      *
      * There are two possibilities how to create an instance of this class:
      * If you have a 'simple' function without any symbolic constants, you can use the
@@ -137,8 +144,23 @@ namespace FEAT
         if(dim_ > 2) vars += ",z";
 
         // try to parse the function
-        if(_parser.Parse(function.c_str(), vars.c_str()) >= 0)
-          throw InternalError("Failed to parse function");
+        const int ret = _parser.Parse(function.c_str(), vars.c_str());
+        if(ret >= 0)
+        {
+          String msg(_parser.ErrorMsg());
+          msg.append("\n>>> '");
+          msg.append(function);
+          msg.append("'");
+          if(ret < int(function.size()))
+          {
+            // ret contains the index of the first invalid character in the input string
+            // append an additional line to mark the faulty character
+            msg.append("\n>>>");
+            msg.append(String(std::size_t(ret+2), '-'));
+            msg.append("^");
+          }
+          throw ParseError(msg);
+        }
 
         // optimise the parsed function
         _parser.Optimize();
@@ -167,6 +189,8 @@ namespace FEAT
         explicit Evaluator(const ParsedFunction& function) :
           _parser(function._parser)
         {
+          // force deep copy to avoid race conditions in case of multi-threading
+          _parser.ForceDeepCopy();
         }
 
         ValueType value(const PointType& point)
@@ -175,7 +199,31 @@ namespace FEAT
           Tiny::Vector<double, dim_> v(point);
 
           // evaluate the parser
-          return ValueType(_parser.Eval(v.v));
+          const double val = _parser.Eval(v.v);
+
+          // check for errors
+          switch(_parser.EvalError())
+          {
+          case 0: // no error
+            break;
+
+          case 1: // division by zero
+            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: division by zero");
+
+          case 2: // sqrt error
+          case 3: // log error
+          case 4: // trigonometric error
+            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: illegal input value");
+
+          case 5:
+            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: maximum recursion depth reached");
+
+          default:
+            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: unknown error");
+          }
+
+          // return value
+          return ValueType(val);
         }
       }; // class ParsedFunction::Evaluator<...>
     }; // class ParsedFunction
