@@ -254,6 +254,187 @@ namespace FEAT
 #endif // DOXYGEN
       }; // class Function::Evaluator<...>
     }; // class Function
+
+    /**
+     * \brief Helper function to quickly evaluate a function value in a given point
+     *
+     * \attention
+     * This function is intended only for quick testing and debugging, because it recreates
+     * the function evaluator in each function call, which is an absolute performance killer.\n
+     * You have been warned.
+     *
+     * \param[in] function
+     * The function whose value is to be evaluated.
+     *
+     * \param[in] point
+     * The point in which the function is to be evaluated.
+     *
+     * \returns The function value of the given function in the given point.
+     */
+    template<typename Function_, typename DT_, int dim_, int s_>
+    typename Analytic::EvalTraits<DT_, Function_>::ValueType
+    eval_value(const Function_& function, const Tiny::Vector<DT_, dim_, s_>& point)
+    {
+      typedef Analytic::EvalTraits<DT_, Function_> Traits;
+      static_assert(Function_::can_value, "function does not support evaluation of values");
+      static_assert(dim_ == Traits::domain_dim, "invalid point dimension");
+      typename Function_::template Evaluator<Traits> evaluator(function);
+      return evaluator.value(point);
+    }
+
+    // \see eval_value()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::ValueType
+    eval_value_x(const Function_& function, const DT_ x)
+    {
+      Tiny::Vector<DT_, 1> p;
+      p.v[0] = x;
+      return eval_value(function, p);
+    }
+
+    // \see eval_value()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::ValueType
+    eval_value_x(const Function_& function, const DT_ x, const DT_ y)
+    {
+      Tiny::Vector<DT_, 2> p;
+      p.v[0] = x;
+      p.v[1] = y;
+      return eval_value(function, p);
+    }
+
+    // \see eval_value()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::ValueType
+    eval_value_x(const Function_& function, const DT_ x, const DT_ y, const DT_ z)
+    {
+      Tiny::Vector<DT_, 3> p;
+      p.v[0] = x;
+      p.v[1] = y;
+      p.v[2] = z;
+      return eval_value(function, p);
+    }
+
+    /**
+     * \brief Helper function to quickly evaluate a function gradient in a given point
+     *
+     * \attention
+     * This function is intended only for quick testing and debugging, because it recreates
+     * the function evaluator in each function call, which is an absolute performance killer.\n
+     * You have been warned.
+     *
+     * \param[in] function
+     * The function whose gradient is to be evaluated.
+     *
+     * \param[in] point
+     * The point in which the function is to be evaluated.
+     *
+     * \returns The function gradient of the given function in the given point.
+     */
+    template<typename Function_, typename DT_, int dim_, int s_>
+    typename Analytic::EvalTraits<DT_, Function_>::GradientType
+    eval_gradient(const Function_& function, const Tiny::Vector<DT_, dim_, s_>& point)
+    {
+      typedef Analytic::EvalTraits<DT_, Function_> Traits;
+      static_assert(Function_::can_grad, "function does not support evaluation of gradients");
+      static_assert(dim_ == Traits::domain_dim, "invalid point dimension");
+      typename Function_::template Evaluator<Traits> evaluator(function);
+      return evaluator.gradient(point);
+    }
+
+    // \see eval_gradient()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::GradientType
+    eval_gradient_x(const Function_& function, const DT_ x)
+    {
+      Tiny::Vector<DT_, 1> p;
+      p.v[0] = x;
+      return eval_gradient(function, p);
+    }
+
+    // \see eval_gradient()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::GradientType
+    eval_gradient_x(const Function_& function, const DT_ x, const DT_ y)
+    {
+      Tiny::Vector<DT_, 2> p;
+      p.v[0] = x;
+      p.v[1] = y;
+      return eval_gradient(function, p);
+    }
+
+    // \see eval_gradient()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::GradientType
+    eval_gradient_x(const Function_& function, const DT_ x, const DT_ y, const DT_ z)
+    {
+      Tiny::Vector<DT_, 3> p;
+      p.v[0] = x;
+      p.v[1] = y;
+      p.v[2] = z;
+      return eval_gradient(function, p);
+    }
+
+    /**
+     * \brief Helper function to quickly evaluate a function hessian in a given point
+     *
+     * \attention
+     * This function is intended only for quick testing and debugging, because it recreates
+     * the function evaluator in each function call, which is an absolute performance killer.\n
+     * You have been warned.
+     *
+     * \param[in] function
+     * The function whose hessian is to be evaluated.
+     *
+     * \param[in] point
+     * The point in which the function is to be evaluated.
+     *
+     * \returns The function hessian of the given function in the given point.
+     */
+    template<typename Function_, typename DT_, int dim_, int s_>
+    typename Analytic::EvalTraits<DT_, Function_>::HessianType
+    eval_hessian(const Function_& function, const Tiny::Vector<DT_, dim_, s_>& point)
+    {
+      typedef Analytic::EvalTraits<DT_, Function_> Traits;
+      static_assert(Function_::can_hess, "function does not support evaluation of hessians");
+      static_assert(dim_ == Traits::domain_dim, "invalid point dimension");
+      typename Function_::template Evaluator<Traits> evaluator(function);
+      return evaluator.hessian(point);
+    }
+
+    // \see eval_hessian()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::HessianType
+    eval_hessian_x(const Function_& function, const DT_ x)
+    {
+      Tiny::Vector<DT_, 1> p;
+      p.v[0] = x;
+      return eval_hessian(function, p);
+    }
+
+    // \see eval_hessian()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::HessianType
+    eval_hessian_x(const Function_& function, const DT_ x, const DT_ y)
+    {
+      Tiny::Vector<DT_, 2> p;
+      p.v[0] = x;
+      p.v[1] = y;
+      return eval_hessian(function, p);
+    }
+
+    // \see eval_hessian()
+    template<typename Function_, typename DT_>
+    typename Analytic::EvalTraits<DT_, Function_>::HessianType
+    eval_hessian_x(const Function_& function, const DT_ x, const DT_ y, const DT_ z)
+    {
+      Tiny::Vector<DT_, 3> p;
+      p.v[0] = x;
+      p.v[1] = y;
+      p.v[2] = z;
+      return eval_hessian(function, p);
+    }
+
   } // namespace Analytic
 } // namespace FEAT
 
