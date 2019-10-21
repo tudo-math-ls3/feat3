@@ -20,16 +20,43 @@ namespace FEAT
 {
   namespace Analytic
   {
+    /**
+     * \brief Parsed Function parse error
+     *
+     * An instance of this exception may is thrown if the parsing process
+     * of a ParsedFunction formula fails for some reason.
+     *
+     * The error message contains a description of the error cause and
+     * can be queried by calling the inherited what() method.
+     *
+     * \author Peter Zajac
+     */
+    class ParsedFunctionParseError : public ParseError
+    {
+    public:
+      /// constructor
+      explicit ParsedFunctionParseError(const String& msg) : ParseError(msg) {}
+    };
+
+    /**
+     * \brief Parsed Function evaluation error
+     *
+     * An instance of this exception may is thrown if the evaluation of
+     * a ParsedFunction evaluator fails for some reason, e.g. division by zero.
+     *
+     * \author Peter Zajac
+     */
     class ParsedFunctionEvalError : public Exception
     {
     public:
+      /// constructor
       explicit ParsedFunctionEvalError(const String& msg) : Exception(msg) {}
     };
 
     /**
      * \brief Parsed function implementation
      *
-     * This class provides an implementatuon of the Analytic::Function interface which
+     * This class provides an implementation of the Analytic::Function interface which
      * can parse and evaluate a formula in the up to three variables 'x', 'y' and 'z'
      * given as a string at runtime.
      *
@@ -56,6 +83,17 @@ namespace FEAT
      *
      * \tparam dim_
      * The dimension of the function, i.e. the number of variables. Must be 1 <= dim_ <= 3.
+     *
+     * <b>Note to Implementers:</b>\n
+     * The <c>FunctionParser</c> class, which is defined by the 'fparser' library, is actually
+     * just a typedef for the template class instance <c>FunctionParserBase<double></c>. This
+     * may lead the reader to the (erroneous) conclusion, that one might easily templatise this
+     * ParsedFunction class in the datatype, thus adding support for other interesting floating
+     * point types like the <c>__float128</c> type of GCC's libquadmath. Unfortunately, most of
+     * the auxiliary function templates implemented in the depths of the 'fparser' library are
+     * only specialised for the common build-in types without offering any generic implementation.
+     * Therefore, trying to use the <c>FunctionParserBase</c> class template with a somewhat
+     * interesting type like <c>__float128</c> is unfortunately doomed to end in linker errors :(
      *
      * \author Peter Zajac
      */
@@ -108,7 +146,13 @@ namespace FEAT
        * This constructor creates a parsed function from a String.
        *
        * \param[in] function
-       * The expession that defines the function in the variables \c x, \c y, and \c z.
+       * The expression that defines the function in the variables \c x, \c y, and \c z.
+       *
+       * \throws ParsedFunctionParseError
+       * An instance of the ParsedFunctionParseError exception is thrown if the
+       * fparser library fails to parse the formula. The message of the exception
+       * contains more information on the cause of the error and should be presented
+       * the user in an appropriate way.
        */
       explicit ParsedFunction(const String& function) :
         ParsedFunction()
@@ -134,7 +178,13 @@ namespace FEAT
        * \brief Parses a function.
        *
        * \param[in] function
-       * The expession that defines the function in the variables \c x, \c y, and \c z.
+       * The expression that defines the function in the variables \c x, \c y, and \c z.
+       *
+       * \throws ParsedFunctionParseError
+       * An instance of the ParsedFunctionParseError exception is thrown if the
+       * fparser library fails to parse the formula. The message of the exception
+       * contains more information on the cause of the error and should be presented
+       * the user in an appropriate way.
        */
       void parse(const String& function)
       {
@@ -159,7 +209,7 @@ namespace FEAT
             msg.append(String(std::size_t(ret+2), '-'));
             msg.append("^");
           }
-          throw ParseError(msg);
+          throw ParsedFunctionParseError(msg);
         }
 
         // optimise the parsed function
@@ -215,10 +265,10 @@ namespace FEAT
           case 4: // trigonometric error
             throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: illegal input value");
 
-          case 5:
+          case 5: // recursion error
             throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: maximum recursion depth reached");
 
-          default:
+          default: // ???
             throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: unknown error");
           }
 

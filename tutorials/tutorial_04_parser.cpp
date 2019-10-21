@@ -40,7 +40,8 @@
 // and/or boundary condition functions for our Poisson equation from the command line at
 // runtime! Yay!
 //
-// Important Note:
+// Important Note #1:
+// ==================
 // The ParsedFunction class is only defined if FEAT was configured with the 'fparser'
 // build-id tag, which enables the use of the corresponding third-party library.
 // If you configure without the corresponding token, then this application will compile
@@ -49,6 +50,17 @@
 // right-hand-side and boundary condition functions are those coinciding to the
 // sine-bubble solution used in Tutorial 01.
 //
+// Important Note #2:
+// ==================
+// It is highly recommended to specify function formulae in double-quotation marks
+// when passing them as arguments to the program call from the command line, because
+// the command line interpreter (bash, csh, cmd) may 'swallow' some characters (e.g.
+// the circumflex ^ which acts as the power operator) or may misinterpret them as
+// internal operators otherwise, thus resulting in potentially erroneous behaviour.
+// In short: Type
+//                    ./tutorial-04-parser --u "2*x+y*2^3" --g "4-x"
+// instead of
+//                    ./tutorial-04-parser --u  2*x+y*2^3  --g  4-x
 //
 // The Problem Definition
 // ======================
@@ -276,7 +288,7 @@ namespace Tutorial04
         std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
       }
 
-      // We may abort program execution here, but instead we remember that we have to print
+      // We could abort program execution here, but instead we remember that we have to print
       // the help information containing all supported options later:
       need_help = true;
     }
@@ -451,10 +463,13 @@ namespace Tutorial04
         // Let's give it a try
         sol_function.parse(formula_u);
       }
-      catch(...)
+      catch(const std::exception& exc)
       {
         // Oops...
         std::cerr << "ERROR: Cannot parse expression '" << formula_u << "' as function 'u(x,y)'" << std::endl;
+        // Let's also print the exception's message, which might contain useful information
+        // regarding the cause of the error
+        std::cerr << exc.what() << std::endl;
         Runtime::abort();
       }
     }
@@ -465,9 +480,10 @@ namespace Tutorial04
       {
         rhs_function.parse(formula_f);
       }
-      catch(...)
+      catch(const std::exception& exc)
       {
         std::cerr << "ERROR: Cannot parse expression '" << formula_f << "' as function 'f(x,y)'" << std::endl;
+        std::cerr << exc.what() << std::endl;
         Runtime::abort();
       }
     }
@@ -477,9 +493,10 @@ namespace Tutorial04
       {
         dbc_function.parse(formula_g);
       }
-      catch(...)
+      catch(const std::exception& exc)
       {
         std::cerr << "ERROR: Cannot parse expression '" << formula_g << "' as function 'g(x,y)'" << std::endl;
+        std::cerr << exc.what() << std::endl;
         Runtime::abort();
       }
     }
