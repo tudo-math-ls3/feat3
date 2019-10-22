@@ -13,13 +13,13 @@
 # bnd:b     The bottom boundary edge meshpart (y=y0)
 # bnd:t     The top boundary edge meshpart    (y=y1)
 #
-# USAGE: 2d_rect_quad.py x0 x1 y0 y1 (m-list) (n-list) filename
+# USAGE: 2d_rect_quad.py x0 x1 y0 y1 [m-list] [n-list] filename
 #
 # Options:
 # x0 x1     The X-range of the rectangular domain
 # y0 y1     The Y-range of the rectangular domain
-# (m-list)  The rectangle list in X-direction, see below
-# (n-list)  The rectangle list in Y-direction, see below
+# [m-list]  The rectangle list in X-direction, see below
+# [n-list]  The rectangle list in Y-direction, see below
 # filename  The name of the meshfile to be created
 #
 # Rectangle Lists:
@@ -30,7 +30,7 @@
 #
 # Mixed Equidistant/Anisotropic Example:
 # The call
-#      2d_rect_quad.py 0 4 0 1 4 (1 4 1) mesh.xml
+#      2d_rect_quad.py 0 4 0 1 4 [1 4 1] mesh.xml
 # will create a mesh discretising the domain [0,4]x[0,1] with 4x3 elements,
 # where each element has the same X-dimension and where the vertically inner
 # elements are 4 times as big in Y-dimension as the vertically outer elements.
@@ -81,7 +81,7 @@ def parse_aniso_list(args, mn):
 
   # isotropic case ?
   a, args = (args[0], args[1:])
-  if not a.startswith('('):
+  if not a.startswith('['):
     return ([], int(a), args)
 
   # it's an anisotropy list
@@ -89,9 +89,9 @@ def parse_aniso_list(args, mn):
   while len(args) > 0:
     a, args = (args[0], args[1:])
     lst = lst + " " + a
-    if a.endswith(')'):
+    if a.endswith(']'):
       break
-  if not lst.endswith(')'):
+  if not lst.endswith(']'):
     print("ERROR: " + mn + "-list is incomplete")
     sys.exit(1)
 
@@ -122,13 +122,13 @@ myself = os.path.basename(sys.argv[0])
 # do we have enough arguments?
 if len(sys.argv) < 8:
   print("")
-  print("USAGE: " + myself + " x0 x1 y0 y1 (m-list) (n-list) filename")
+  print("USAGE: " + myself + " x0 x1 y0 y1 [m-list] [n-list] filename")
   print("")
   print("Options:")
   print("x0 x1     The X-range of the rectangular domain")
   print("y0 y1     The Y-range of the rectangular domain")
-  print("(m-list)  The rectangle list in X-direction")
-  print("(n-list)  The rectangle list in Y-direction")
+  print("[m-list]  The rectangle list in X-direction")
+  print("[n-list]  The rectangle list in Y-direction")
   print("filename  The name of the meshfile to be created")
   print("")
   print("Information:")
@@ -193,7 +193,7 @@ if len(m_list) == 0:
 else:
   print("X-Size: anisotropic: " + print_aniso_list(x1-x0, m_list, m_sum))
 if len(n_list) == 0:
-  print("Y-Size: isotropic: %g" % ((y1-y0)/float(m)))
+  print("Y-Size: isotropic: %g" % ((y1-y0)/float(n)))
 else:
   print("Y-Size: anisotropic: " + print_aniso_list(y1-y0, n_list, n_sum))
 print("Verts.: %i" % nv)
