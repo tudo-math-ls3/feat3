@@ -72,7 +72,7 @@ namespace FEAT
       {
         XASSERTM(&(other.local()) != &(this->local()), "Trying to self-clone a Global::Filter!");
 
-        this->local() = other->local().clone(mode);
+        this->local() = other.local().clone(mode);
       }
 
       /// \brief Returns the total amount of bytes allocated.
