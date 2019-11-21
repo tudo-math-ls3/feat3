@@ -145,6 +145,10 @@ if (FEAT_HAVE_CGAL)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/cgal/CGAL-4.14/include")
 endif(FEAT_HAVE_CGAL)
 
+if (FEAT_HAVE_DEATH_HANDLER)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/deathhandler/DeathHandler-master/")
+endif(FEAT_HAVE_DEATH_HANDLER)
+
 # our custom target to build (but not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 

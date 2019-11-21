@@ -66,7 +66,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Backends: cuda, mkl")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scorep")
-  print ("  Debugging: valgrind, cudamemcheck")
+  print ("  Debugging: valgrind, cudamemcheck, deathhandler")
   print ("  Precision extensions: quadmath, half, floatx")
   print ("  Compilation process optimisations: cotire")
   print ("  Compiler optimisation steps: lto")

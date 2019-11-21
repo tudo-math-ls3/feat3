@@ -65,6 +65,10 @@ if (FEAT_HAVE_CGAL)
   target_link_libraries(feat ${Boost_LIBRARIES})
 endif(FEAT_HAVE_CGAL)
 
+if (FEAT_HAVE_DEATH_HANDLER)
+  TARGET_LINK_LIBRARIES(feat thirdparty-deathhandler)
+endif (FEAT_HAVE_DEATH_HANDLER)
+
 
 #libquadmath needs to be the last library linked against
 if (FEAT_HAVE_QUADMATH)

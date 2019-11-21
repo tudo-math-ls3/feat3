@@ -3,11 +3,15 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+#include <kernel/base_header.hpp>
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/os_windows.hpp>
+#ifdef FEAT_HAVE_DEATH_HANDLER
+#include <death_handler.h>
+#endif
 
 #include <cstdlib>
 #include <fstream>
@@ -76,6 +80,9 @@ void Runtime::abort(bool dump_call_stack)
   if(dump_call_stack)
   {
 #if defined(__linux) || defined(__unix__)
+#if defined(FEAT_HAVE_DEATH_HANDLER) and not defined(FEAT_HAVE_MPI)
+    Debug::DeathHandler death_handler;
+#else
     // https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
     void* buffer[1024];
     auto bt_size = backtrace(buffer, 1024);
@@ -88,16 +95,23 @@ void Runtime::abort(bool dump_call_stack)
         fprintf(stderr, "%s\n", bt_symb[i]);
       fflush(stderr);
     }
+#endif
 #elif defined(_WIN32)
     Windows::dump_call_stack_to_stderr();
 #endif
-  }
-
 #ifdef FEAT_HAVE_MPI
   ::MPI_Abort(MPI_COMM_WORLD, 1);
 #endif
 
   std::abort();
+  }
+  else
+  {
+#ifdef FEAT_HAVE_MPI
+    ::MPI_Abort(MPI_COMM_WORLD, 1);
+#endif
+    std::abort();
+  }
 }
 
 int Runtime::finalise()
