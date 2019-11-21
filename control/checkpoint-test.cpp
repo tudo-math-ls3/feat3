@@ -55,6 +55,7 @@ public:
       LAFEM::DenseVector<Mem_, DT_, IT_> dv2;
       cp.restore_object(String("dv1"), dv2, false);
       TEST_CHECK_EQUAL(dv1, dv2);
+      TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("dv1"), std::string::npos);
     }
   }
 };

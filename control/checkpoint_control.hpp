@@ -378,6 +378,21 @@ namespace FEAT
         _input_array = nullptr;
       }
 
+      /// Retrieve a list of all items stored in the checkpoint
+      String get_identifier_list()
+      {
+        String identifiers;
+        for (auto item : _checkpointable_by_identifier)
+        {
+          if (identifiers.length() > 0)
+          {
+            identifiers += "\n";
+          }
+          identifiers += item.first;
+        }
+        return identifiers;
+      }
+
       /**
          * \brief Register checkpointable object
          *
