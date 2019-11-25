@@ -372,15 +372,15 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if(edge_angle < DT_(50))
+      if(edge_angle < DT_(49))
       {
-        comm.print("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(50)+
+        comm.print("FAILED: Post Initial worst angle should be >= "+stringify_fp_fix(49)+
             " but is "+stringify_fp_fix(edge_angle));
         ++ret;
       }
-      if(qi_min < DT_(3.4e-1))
+      if(qi_min < DT_(3.3e-1))
       {
-        comm.print("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(3.4e-1)+
+        comm.print("FAILED: Post Initial worst shape quality should be >= "+stringify_fp_fix(3.3e-1)+
             " but is "+stringify_fp_fix(qi_min));
         ++ret;
       }
@@ -614,15 +614,15 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_number == 1)
     {
-      if(edge_angle < DT_(50))
+      if(edge_angle < DT_(49))
       {
-        comm.print("FAILED: Final worst angle should be >= "+stringify_fp_fix(50)+
+        comm.print("FAILED: Final worst angle should be >= "+stringify_fp_fix(49)+
             " but is "+stringify_fp_fix(edge_angle));
         ++ret;
       }
-      if(qi_min < DT_(3.45e-1))
+      if(qi_min < DT_(3.3e-1))
       {
-        comm.print("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(3.45e-1)+
+        comm.print("FAILED: Final worst shape quality should be >= "+stringify_fp_fix(3.3e-1)+
             " but is "+stringify_fp_fix(qi_min));
         ++ret;
       }
