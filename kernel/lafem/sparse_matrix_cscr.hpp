@@ -652,17 +652,14 @@ namespace FEAT
        */
       void read_from(FileMode mode, String filename)
       {
-        switch(mode)
-        {
-        case FileMode::fm_cscr:
-          read_from_cscr(filename);
-          break;
-        case FileMode::fm_binary:
-          read_from_cscr(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ifstream::in;
+        std::ifstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        read_from(mode, file);
+        file.close();
       }
 
       /**
@@ -676,40 +673,13 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_cscr:
-          read_from_cscr(file);
-          break;
         case FileMode::fm_binary:
-          read_from_cscr(file);
+          this->template _deserialise<double, uint64_t>(FileMode::fm_cscr, file);
           break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
-
-      /**
-       * \brief Read in matrix from binary file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_cscr(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        read_from_cscr(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in matrix from binary stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_cscr(std::istream& file)
-      {
-        this->template _deserialise<double, uint64_t>(FileMode::fm_cscr, file);
-      }
-
 
       /**
        * \brief Write out matrix to file.
@@ -719,17 +689,14 @@ namespace FEAT
        */
       void write_out(FileMode mode, String filename) const
       {
-        switch(mode)
-        {
-        case FileMode::fm_cscr:
-          write_out_cscr(filename);
-          break;
-        case FileMode::fm_binary:
-          write_out_cscr(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ofstream::out;
+        std::ofstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        write_out(mode, file);
+        file.close();
       }
 
       /**
@@ -743,38 +710,12 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_cscr:
-          write_out_cscr(file);
-          break;
         case FileMode::fm_binary:
-          write_out_cscr(file);
+          this->template _serialise<double, uint64_t>(FileMode::fm_cscr, file);
           break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Write out matrix to csr binary file.
-       *
-       * \param[in] filename The file where the matrix shall be stored.
-       */
-      void write_out_cscr(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        write_out_cscr(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out matrix to csr binary file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_cscr(std::ostream& file) const
-      {
-        this->template _serialise<double, uint64_t>(FileMode::fm_cscr, file);
       }
 
       /**

@@ -31,17 +31,17 @@ namespace FEAT
     enum class FileMode
     {
       fm_exp = 0, /**< Exponential ascii */
-      fm_dv, /**< Binary vector data */
+      fm_dv, /**< Internal: Binary vector data */
       fm_mtx, /**< Matrix market ascii */
-      fm_ell, /**< Binary ell data */
-      fm_csr, /**< Binary csr data */
-      fm_coo, /**< Binary coo data */
-      fm_bm, /**< Binary banded data */
-      fm_dm,  /**< Binary dense matrix data */
-      fm_sv,  /**< Binary sparse vector data */
-      fm_dvb, /**< Binary block vector data */
-      fm_bcsr, /**< Binary block csr data */
-      fm_cscr, /**< Binary cscr data */
+      fm_ell, /**< Internal: Binary ell data */
+      fm_csr, /**< Internal: Binary csr data */
+      fm_coo, /**< Internal: Binary coo data */
+      fm_bm, /**< Internal: Binary banded data */
+      fm_dm,  /**< Internal: Binary dense matrix data */
+      fm_sv,  /**< Internal: Binary sparse vector data */
+      fm_dvb, /**< Internal: Binary block vector data */
+      fm_bcsr, /**< Internal: Binary block csr data */
+      fm_cscr, /**< Internal: Binary cscr data */
       fm_binary /**< Binary format of corresponding container type */
     };
 

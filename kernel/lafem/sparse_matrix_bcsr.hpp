@@ -608,23 +608,15 @@ namespace FEAT
        */
       void read_from(FileMode mode, String filename)
       {
-        switch(mode)
-        {
-        /// \todo read_from_mtx
-        /*case FileMode::fm_mtx:
-          read_from_mtx(filename);
-          break;*/
-        case FileMode::fm_bcsr:
-          read_from_bcsr(filename);
-          break;
-        case FileMode::fm_binary:
-          read_from_bcsr(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ifstream::in;
+        std::ifstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        read_from(mode, file);
+        file.close();
       }
-
       /**
        * \brief Read in matrix from stream.
        *
@@ -635,17 +627,16 @@ namespace FEAT
       {
         switch(mode)
         {
-        /*case FileMode::fm_mtx:
-          read_from_mtx(file);
-          break;*/
-        case FileMode::fm_bcsr:
-          read_from_bcsr(file);
-          break;
-        case FileMode::fm_binary:
-          read_from_bcsr(file);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          /// \todo read_from_mtx
+          /*case FileMode::fm_mtx:
+           *   read_from_mtx(filename);
+           *   break;*/
+          case FileMode::fm_bcsr:
+          case FileMode::fm_binary:
+            this->template _deserialise<double, uint64_t>(FileMode::fm_bcsr, file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 
@@ -794,32 +785,6 @@ namespace FEAT
         delete[] tcol_ind;
         delete[] trow_ptr;
       }*/
-
-      /**
-       * \brief Read in matrix from binary file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_bcsr(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        read_from_bcsr(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in matrix from binary stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_bcsr(std::istream& file)
-      {
-        this->template _deserialise<double, uint64_t>(FileMode::fm_bcsr, file);
-      }
-
-
       /**
        * \brief Write out matrix to file.
        *
@@ -828,20 +793,14 @@ namespace FEAT
        */
       void write_out(FileMode mode, String filename) const
       {
-        switch(mode)
-        {
-        case FileMode::fm_bcsr:
-          write_out_bcsr(filename);
-          break;
-        case FileMode::fm_binary:
-          write_out_bcsr(filename);
-          break;
-        case FileMode::fm_mtx:
-          write_out_mtx(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ofstream::out;
+        std::ofstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        write_out(mode, file);
+        file.close();
       }
 
       /**
@@ -854,85 +813,37 @@ namespace FEAT
       {
         switch(mode)
         {
-        case FileMode::fm_bcsr:
-          write_out_bcsr(file);
-          break;
-        case FileMode::fm_binary:
-          write_out_bcsr(file);
-          break;
-        case FileMode::fm_mtx:
-          write_out_mtx(file);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
-      }
-
-      /**
-       * \brief Write out matrix to bcsr binary file.
-       *
-       * \param[in] filename The file where the matrix shall be stored.
-       */
-      void write_out_bcsr(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        write_out_bcsr(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out matrix to bcsr binary file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_bcsr(std::ostream& file) const
-      {
-        this->template _serialise<double, uint64_t>(FileMode::fm_bcsr, file);
-      }
-
-      /**
-       * \brief Write out matrix to MatrixMarktet mtx file.
-       *
-       * \param[in] filename The file where the matrix shall be stored.
-       */
-      void write_out_mtx(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        write_out_mtx(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out matrix to MatrixMarktet mtx file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_mtx(std::ostream& file) const
-      {
-        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> temp;
-        temp.convert(*this);
-
-        file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-        file << temp.template rows<Perspective::pod>() << " " << temp.template columns<Perspective::pod>() << " " << temp.template used_elements<Perspective::pod>() << std::endl;
-
-        for (Index row(0) ; row < rows() ; ++row)
-        {
-          const IT_ end(temp.row_ptr()[row + 1]);
-          for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
+          case FileMode::fm_bcsr:
+          case FileMode::fm_binary:
+            this->template _serialise<double, uint64_t>(FileMode::fm_bcsr, file);
+            break;
+          case FileMode::fm_mtx:
           {
-            auto block = temp.val()[i];
-            for (int y(0) ; y < BlockHeight_ ; ++y)
+            SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> temp;
+            temp.convert(*this);
+
+            file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+            file << temp.template rows<Perspective::pod>() << " " << temp.template columns<Perspective::pod>() << " " << temp.template used_elements<Perspective::pod>() << std::endl;
+
+            for (Index row(0) ; row < rows() ; ++row)
             {
-              for (int x(0) ; x < BlockWidth_ ; ++x)
+              const IT_ end(temp.row_ptr()[row + 1]);
+              for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
               {
-                file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)temp.col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
+                auto block = temp.val()[i];
+                for (int y(0) ; y < BlockHeight_ ; ++y)
+                {
+                  for (int x(0) ; x < BlockWidth_ ; ++x)
+                  {
+                    file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)temp.col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
+                  }
+                }
               }
             }
+            break;
           }
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 

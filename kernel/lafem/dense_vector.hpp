@@ -5,34 +5,33 @@
 
 #pragma once
 #ifndef KERNEL_LAFEM_DENSE_VECTOR_HPP
-#define KERNEL_LAFEM_DENSE_VECTOR_HPP 1
+  #define KERNEL_LAFEM_DENSE_VECTOR_HPP 1
 
-// includes, FEAT
-#include <kernel/base_header.hpp>
-#include <kernel/lafem/forward.hpp>
-#include <kernel/util/assertion.hpp>
-#include <kernel/util/type_traits.hpp>
-#include <kernel/util/math.hpp>
-#include <kernel/util/random.hpp>
-#include <kernel/lafem/container.hpp>
-#include <kernel/lafem/dense_vector_blocked.hpp>
-#include <kernel/lafem/edi.hpp>
-#include <kernel/lafem/arch/component_invert.hpp>
-#include <kernel/lafem/arch/dot_product.hpp>
-#include <kernel/lafem/arch/norm.hpp>
-#include <kernel/lafem/arch/max_element.hpp>
-#include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/component_product.hpp>
-#include <kernel/adjacency/permutation.hpp>
-#include <kernel/util/statistics.hpp>
-#include <kernel/util/time_stamp.hpp>
+  // includes, FEAT
+  #include <kernel/base_header.hpp>
+  #include <kernel/lafem/forward.hpp>
+  #include <kernel/util/assertion.hpp>
+  #include <kernel/util/type_traits.hpp>
+  #include <kernel/util/math.hpp>
+  #include <kernel/util/random.hpp>
+  #include <kernel/lafem/container.hpp>
+  #include <kernel/lafem/dense_vector_blocked.hpp>
+  #include <kernel/lafem/edi.hpp>
+  #include <kernel/lafem/arch/component_invert.hpp>
+  #include <kernel/lafem/arch/dot_product.hpp>
+  #include <kernel/lafem/arch/norm.hpp>
+  #include <kernel/lafem/arch/max_element.hpp>
+  #include <kernel/lafem/arch/scale.hpp>
+  #include <kernel/lafem/arch/axpy.hpp>
+  #include <kernel/lafem/arch/component_product.hpp>
+  #include <kernel/adjacency/permutation.hpp>
+  #include <kernel/util/statistics.hpp>
+  #include <kernel/util/time_stamp.hpp>
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <stdint.h>
-
+  #include <iostream>
+  #include <fstream>
+  #include <string>
+  #include <stdint.h>
 
 namespace FEAT
 {
@@ -73,27 +72,27 @@ namespace FEAT
 
       private:
         Index _num_entries;
-        DT_* _data;
+        DT_ * _data;
 
       public:
-        explicit ScatterAxpy(VectorType& vector) :
+        explicit ScatterAxpy(VectorType & vector) :
           _num_entries(vector.size()),
           _data(vector.elements())
         {
         }
 
-        template<typename LocalVector_, typename Mapping_>
-        void operator()(const LocalVector_& loc_vec, const Mapping_& mapping, DT_ alpha = DT_(1))
+        template <typename LocalVector_, typename Mapping_>
+        void operator()(const LocalVector_ & loc_vec, const Mapping_ & mapping, DT_ alpha = DT_(1))
         {
           // loop over all local entries
-          for(int i(0); i < mapping.get_num_local_dofs(); ++i)
+          for (int i(0); i < mapping.get_num_local_dofs(); ++i)
           {
             // get dof index
             Index dof_idx = mapping.get_index(i);
             ASSERT(dof_idx < _num_entries);
 
             // update vector entry
-             _data[dof_idx] += alpha * loc_vec[i];
+            _data[dof_idx] += alpha * loc_vec[i];
           }
         }
       }; // class ScatterAxpy
@@ -113,20 +112,20 @@ namespace FEAT
 
       private:
         Index _num_entries;
-        const DT_* _data;
+        const DT_ * _data;
 
       public:
-        explicit GatherAxpy(const VectorType& vector) :
+        explicit GatherAxpy(const VectorType & vector) :
           _num_entries(vector.size()),
           _data(vector.elements())
         {
         }
 
-        template<typename LocalVector_, typename Mapping_>
-        void operator()(LocalVector_& loc_vec, const Mapping_& mapping, DT_ alpha = DT_(1))
+        template <typename LocalVector_, typename Mapping_>
+        void operator()(LocalVector_ & loc_vec, const Mapping_ & mapping, DT_ alpha = DT_(1))
         {
           // loop over all local entries
-          for(int i(0); i < mapping.get_num_local_dofs(); ++i)
+          for (int i(0); i < mapping.get_num_local_dofs(); ++i)
           {
             // get dof index
             Index dof_idx = mapping.get_index(i);
@@ -161,7 +160,7 @@ namespace FEAT
        * Creates an empty non dimensional vector.
        */
       explicit DenseVector() :
-        Container<Mem_, DT_, IT_> (0)
+        Container<Mem_, DT_, IT_>(0)
       {
       }
 
@@ -179,18 +178,18 @@ namespace FEAT
         Container<Mem_, DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
-            return;
+          return;
 
         XASSERTM(! (pinning == Pinning::enabled && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
         if (pinning == Pinning::enabled)
         {
-#ifdef FEAT_HAVE_CUDA
+  #ifdef FEAT_HAVE_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size_in));
-#else
+  #else
           // no cuda support enabled - we cannot serve and do not need pinned memory support
           this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
-#endif
+  #endif
         }
         else
         {
@@ -212,7 +211,7 @@ namespace FEAT
         Container<Mem_, DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
-            return;
+          return;
 
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
         this->_elements_size.push_back(size_in);
@@ -239,14 +238,14 @@ namespace FEAT
         Container<Mem_, DT_, IT_>(size_in)
       {
         if (size_in == Index(0))
-            return;
+          return;
 
         this->_elements.push_back(data);
         this->_elements_size.push_back(size_in);
 
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
+        for (Index i(0); i < this->_elements.size(); ++i)
           MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
+        for (Index i(0); i < this->_indices.size(); ++i)
           MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
       }
 
@@ -269,7 +268,7 @@ namespace FEAT
 
         this->_foreign_memory = true;
 
-        DT_ * te(const_cast<DT_*>(dv_in.elements()));
+        DT_ * te(const_cast<DT_ *>(dv_in.elements()));
         this->_elements.push_back(te + offset_in);
         this->_elements_size.push_back(size_in);
       }
@@ -310,7 +309,7 @@ namespace FEAT
        *
        * Creates a vector from the given source file.
        */
-      explicit DenseVector(FileMode mode, std::istream& file) :
+      explicit DenseVector(FileMode mode, std::istream & file) :
         Container<Mem_, DT_, IT_>(0)
       {
         read_from(mode, file);
@@ -346,7 +345,6 @@ namespace FEAT
         this->format(rng, min, max);
       }
 
-
       /**
        * \brief Move Constructor
        *
@@ -373,7 +371,7 @@ namespace FEAT
        *
        * Moves another vector to the target vector.
        */
-      DenseVector & operator= (DenseVector && other)
+      DenseVector & operator=(DenseVector && other)
       {
         this->move(std::forward<DenseVector>(other));
 
@@ -403,7 +401,7 @@ namespace FEAT
        * \param[in] clone_mode The actual cloning procedure.
        *
        */
-      template<typename Mem2_, typename DT2_, typename IT2_>
+      template <typename Mem2_, typename DT2_, typename IT2_>
       void clone(const DenseVector<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep)
       {
         Container<Mem_, DT_, IT_>::clone(other, clone_mode);
@@ -438,9 +436,9 @@ namespace FEAT
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(this->size());
 
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
+        for (Index i(0); i < this->_elements.size(); ++i)
           MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
+        for (Index i(0); i < this->_indices.size(); ++i)
           MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
       }
 
@@ -514,9 +512,9 @@ namespace FEAT
         main.convert(*this);
         DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> result_main(main.size());
 
-        const auto* mp = main.elements();
-        auto* rmp = result_main.template elements<Perspective::native>();
-        for (Index i(0) ; i < main.size() ; ++i)
+        const auto * mp = main.elements();
+        auto * rmp = result_main.template elements<Perspective::native>();
+        for (Index i(0); i < main.size(); ++i)
         {
           rmp[i] = typename decltype(result_main)::ValueType(mp[i]);
         }
@@ -530,7 +528,7 @@ namespace FEAT
        *
        * \param[in] a The vector to be copied (could be of any format; must have same size).
        */
-      template<typename VT_>
+      template <typename VT_>
       void copy(const VT_ & a)
       {
         XASSERTM(this->template size<Perspective::pod>() == a.template size<Perspective::pod>(), "Vectors have not the same size!");
@@ -555,7 +553,7 @@ namespace FEAT
        *
        * \param[in] a The target-vector to be copied to (could be of any format; must have same size).
        */
-      template<typename VT_>
+      template <typename VT_>
       void copy_inv(VT_ & a) const
       {
         XASSERTM(this->template size<Perspective::pod>() == a.template size<Perspective::pod>(), "Vectors have not the same size!");
@@ -579,25 +577,17 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
+
       void read_from(FileMode mode, String filename)
       {
-        switch(mode)
-        {
-        case FileMode::fm_mtx:
-          read_from_mtx(filename);
-          break;
-        case FileMode::fm_exp:
-          read_from_exp(filename);
-          break;
-        case FileMode::fm_dv:
-          read_from_dv(filename);
-          break;
-        case FileMode::fm_binary:
-          read_from_dv(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
+        if (mode == FileMode::fm_mtx)
+          bin = std::ifstream::in;
+        std::ifstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from(mode, file);
+        file.close();
       }
 
       /**
@@ -606,187 +596,115 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] file The stream that shall be read in.
        */
-      void read_from(FileMode mode, std::istream& file)
+      void read_from(FileMode mode, std::istream & file)
       {
-        switch(mode)
+        switch (mode)
         {
         case FileMode::fm_mtx:
-          read_from_mtx(file);
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+
+          Index rows;
+          String line;
+          std::getline(file, line);
+          if (line.find("%%MatrixMarket matrix array real general") == String::npos)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-vector-file");
+          }
+          while (! file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+            String::size_type begin(line.find_first_not_of(" "));
+            if (line.at(begin) != '%')
+              break;
+          }
+          {
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srows(line, 0, end);
+            rows = (Index)atol(srows.c_str());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scols(line, 0, end);
+            Index cols((Index)atol(scols.c_str()));
+            line.erase(0, end);
+            XASSERTM(cols == 1, "Input-file is no dense-vector-file");
+          }
+
+          DenseVector<Mem::Main, DT_, IT_> tmp(rows);
+          DT_ * pval(tmp.elements());
+
+          while (! file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String sval(line, 0, end);
+            DT_ tval((DT_)atof(sval.c_str()));
+
+            *pval = tval;
+            ++pval;
+          }
+          this->assign(tmp);
           break;
+        }
         case FileMode::fm_exp:
-          read_from_exp(file);
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+
+          std::vector<DT_> data;
+
+          while (! file.eof())
+          {
+            std::string line;
+            std::getline(file, line);
+            if (line.find("#", 0) < line.npos)
+              continue;
+            if (file.eof())
+              break;
+
+            std::string n_z_s;
+
+            std::string::size_type first_digit(line.find_first_not_of(" "));
+            line.erase(0, first_digit);
+            std::string::size_type eol(line.length());
+            for (unsigned long i(0); i < eol; ++i)
+            {
+              n_z_s.append(1, line[i]);
+            }
+
+            DT_ n_z((DT_)atof(n_z_s.c_str()));
+
+            data.push_back(n_z);
+          }
+
+          this->_scalar_index.at(0) = Index(data.size());
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(Index(data.size())));
+          this->_elements_size.push_back(Index(data.size()));
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
           break;
+        }
         case FileMode::fm_dv:
-          read_from_dv(file);
-          break;
         case FileMode::fm_binary:
-          read_from_dv(file);
+          this->template _deserialise<double, uint64_t>(FileMode::fm_dv, file);
           break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
-
-      /**
-       * \brief Read in vector from MatrixMarket mtx file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_mtx(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        read_from_mtx(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in vector from MatrixMarket mtx stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_mtx(std::istream& file)
-      {
-        this->clear();
-        this->_scalar_index.push_back(0);
-
-        Index rows;
-        String line;
-        std::getline(file, line);
-        if (line.find("%%MatrixMarket matrix array real general") == String::npos)
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-vector-file");
-        }
-        while(!file.eof())
-        {
-          std::getline(file,line);
-          if (file.eof())
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
-
-          String::size_type begin(line.find_first_not_of(" "));
-          if (line.at(begin) != '%')
-            break;
-        }
-        {
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srows(line, 0, end);
-          rows = (Index)atol(srows.c_str());
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String scols(line, 0, end);
-          Index cols((Index)atol(scols.c_str()));
-          line.erase(0, end);
-          XASSERTM(cols == 1, "Input-file is no dense-vector-file");
-        }
-
-        DenseVector<Mem::Main, DT_, IT_> tmp(rows);
-        DT_ * pval(tmp.elements());
-
-        while(!file.eof())
-        {
-          std::getline(file, line);
-          if (file.eof())
-            break;
-
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String sval(line, 0, end);
-          DT_ tval((DT_)atof(sval.c_str()));
-
-          *pval = tval;
-          ++pval;
-        }
-        this->assign(tmp);
-      }
-
-      /**
-       * \brief Read in vector from ASCII file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_exp(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        read_from_exp(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in vector from ASCII stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_exp(std::istream& file)
-      {
-        this->clear();
-        this->_scalar_index.push_back(0);
-
-        std::vector<DT_> data;
-
-        while(!file.eof())
-        {
-          std::string line;
-          std::getline(file, line);
-          if(line.find("#", 0) < line.npos)
-            continue;
-          if(file.eof())
-            break;
-
-          std::string n_z_s;
-
-          std::string::size_type first_digit(line.find_first_not_of(" "));
-          line.erase(0, first_digit);
-          std::string::size_type eol(line.length());
-          for(unsigned long i(0) ; i < eol ; ++i)
-          {
-            n_z_s.append(1, line[i]);
-          }
-
-          DT_ n_z((DT_)atof(n_z_s.c_str()));
-
-          data.push_back(n_z);
-
-        }
-
-        this->_scalar_index.at(0) = Index(data.size());
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(Index(data.size())));
-        this->_elements_size.push_back(Index(data.size()));
-        MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
-      }
-
-      /**
-       * \brief Read in vector from binary file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_dv(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        read_from_dv(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in vector from binary stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_dv(std::istream& file)
-      {
-        this->template _deserialise<double, uint64_t>(FileMode::fm_dv, file);
-      }
-
 
       /**
        * \brief Write out vector to file.
@@ -796,23 +714,15 @@ namespace FEAT
        */
       void write_out(FileMode mode, String filename) const
       {
-        switch(mode)
-        {
-        case FileMode::fm_mtx:
-          write_out_mtx(filename);
-          break;
-        case FileMode::fm_exp:
-          write_out_exp(filename);
-          break;
-        case FileMode::fm_dv:
-          write_out_dv(filename);
-          break;
-        case FileMode::fm_binary:
-          write_out_dv(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if (mode == FileMode::fm_mtx || mode == FileMode::fm_exp)
+          bin = std::ofstream::out;
+        std::ofstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+
+        write_out(mode, file);
+        file.close();
       }
 
       /**
@@ -821,116 +731,45 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] file The stream that shall be written to.
        */
-      void write_out(FileMode mode, std::ostream& file) const
+      void write_out(FileMode mode, std::ostream & file) const
       {
-        switch(mode)
+        switch (mode)
         {
         case FileMode::fm_mtx:
-          write_out_mtx(file);
+        {
+          DenseVector<Mem::Main, DT_, IT_> temp;
+          temp.convert(*this);
+
+          const Index tsize(temp.size());
+          file << "%%MatrixMarket matrix array real general" << std::endl;
+          file << tsize << " " << 1 << std::endl;
+
+          const DT_ * pval(temp.elements());
+          for (Index i(0); i < tsize; ++i, ++pval)
+          {
+            file << std::scientific << *pval << std::endl;
+          }
           break;
+        }
         case FileMode::fm_exp:
-          write_out_exp(file);
+        {
+          DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->size()));
+          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->size());
+
+          for (Index i(0); i < this->size(); ++i)
+          {
+            file << std::scientific << temp[i] << std::endl;
+          }
+          MemoryPool<Mem::Main>::release_memory(temp);
           break;
+        }
         case FileMode::fm_dv:
-          write_out_dv(file);
-          break;
         case FileMode::fm_binary:
-          write_out_dv(file);
+          this->template _serialise<double, uint64_t>(FileMode::fm_dv, file);
           break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Write out vector to MatrixMarket mtx file.
-       *
-       * \param[in] filename The file where the vector shall be stored.
-       */
-      void write_out_mtx(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        write_out_mtx(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out vector to MatrixMarket mtx file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_mtx(std::ostream& file) const
-      {
-        DenseVector<Mem::Main, DT_, IT_> temp;
-        temp.convert(*this);
-
-        const Index tsize(temp.size());
-        file << "%%MatrixMarket matrix array real general" << std::endl;
-        file << tsize << " " << 1 << std::endl;
-
-        const DT_ * pval(temp.elements());
-        for (Index i(0) ; i < tsize ; ++i, ++pval)
-        {
-          file << std::scientific << *pval << std::endl;
-        }
-      }
-
-      /**
-       * \brief Write out vector to file.
-       *
-       * \param[in] filename The file where the vector shall be stored.
-       */
-      void write_out_exp(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        write_out_exp(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out vector to file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_exp(std::ostream& file) const
-      {
-        DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->size()));
-        MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->size());
-
-        for (Index i(0) ; i < this->size() ; ++i)
-        {
-          file << std::scientific << temp[i] << std::endl;
-        }
-
-        MemoryPool<Mem::Main>::release_memory(temp);
-      }
-
-      /**
-       * \brief Write out vector to file.
-       *
-       * \param[in] filename The file where the vector shall be stored.
-       */
-      void write_out_dv(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        write_out_dv(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out vector to file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_dv(std::ostream& file) const
-      {
-        this->template _serialise<double, uint64_t>(FileMode::fm_dv, file);
       }
 
       /**
@@ -1036,14 +875,14 @@ namespace FEAT
        * \param[in] alpha A scalar to multiply x with.
        */
       void axpy(
-                const DenseVector & x,
-                const DenseVector & y,
-                const DT_ alpha = DT_(1))
+        const DenseVector & x,
+        const DenseVector & y,
+        const DT_ alpha = DT_(1))
       {
         XASSERTM(x.size() == y.size(), "Vector size does not match!");
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
-        if(Math::abs(alpha) < Math::eps<DT_>())
+        if (Math::abs(alpha) < Math::eps<DT_>())
         {
           this->copy(y);
           //y.scale(beta);
@@ -1249,7 +1088,8 @@ namespace FEAT
        * \param[in] a A vector to compare with.
        * \param[in] b A vector to compare with.
        */
-      template <typename Mem2_> friend bool operator== (const DenseVector & a, const DenseVector<Mem2_, DT_, IT_> & b)
+      template <typename Mem2_>
+      friend bool operator==(const DenseVector & a, const DenseVector<Mem2_, DT_, IT_> & b)
       {
         if (a.size() != b.size())
           return false;
@@ -1258,7 +1098,7 @@ namespace FEAT
         if (a.get_indices().size() != b.get_indices().size())
           return false;
 
-        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
+        if (a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
           return true;
 
         bool ret(true);
@@ -1266,9 +1106,9 @@ namespace FEAT
         DT_ * ta;
         DT_ * tb;
 
-        if(std::is_same<Mem::Main, Mem_>::value)
+        if (std::is_same<Mem::Main, Mem_>::value)
         {
-          ta = const_cast<DT_*>(a.elements());
+          ta = const_cast<DT_ *>(a.elements());
         }
         else
         {
@@ -1276,9 +1116,9 @@ namespace FEAT
           MemoryPool<Mem_>::template download<DT_>(ta, a.elements(), a.size());
         }
 
-        if(std::is_same<Mem::Main, Mem2_>::value)
+        if (std::is_same<Mem::Main, Mem2_>::value)
         {
-          tb = const_cast<DT_*>(b.elements());
+          tb = const_cast<DT_ *>(b.elements());
         }
         else
         {
@@ -1286,7 +1126,7 @@ namespace FEAT
           MemoryPool<Mem2_>::template download<DT_>(tb, b.elements(), b.size());
         }
 
-        for (Index i(0) ; i < a.size() ; ++i)
+        for (Index i(0); i < a.size(); ++i)
         {
           if (ta[i] != tb[i])
           {
@@ -1295,9 +1135,9 @@ namespace FEAT
           }
         }
 
-        if(! std::is_same<Mem::Main, Mem_>::value)
+        if (! std::is_same<Mem::Main, Mem_>::value)
           delete[] ta;
-        if(! std::is_same<Mem::Main, Mem2_>::value)
+        if (! std::is_same<Mem::Main, Mem2_>::value)
           delete[] tb;
 
         return ret;
@@ -1309,10 +1149,10 @@ namespace FEAT
        * \param[in] lhs The target stream.
        * \param[in] b The vector to be streamed.
        */
-      friend std::ostream & operator<< (std::ostream & lhs, const DenseVector & b)
+      friend std::ostream & operator<<(std::ostream & lhs, const DenseVector & b)
       {
         lhs << "[";
-        for (Index i(0) ; i < b.size() ; ++i)
+        for (Index i(0); i < b.size(); ++i)
         {
           lhs << "  " << b(i);
         }
@@ -1322,18 +1162,18 @@ namespace FEAT
       }
     }; // class DenseVector<...>
 
-#ifdef FEAT_EICKT
+  #ifdef FEAT_EICKT
     extern template class DenseVector<Mem::Main, float, unsigned int>;
     extern template class DenseVector<Mem::Main, double, unsigned int>;
     extern template class DenseVector<Mem::Main, float, unsigned long>;
     extern template class DenseVector<Mem::Main, double, unsigned long>;
-#ifdef FEAT_HAVE_CUDA
+    #ifdef FEAT_HAVE_CUDA
     extern template class DenseVector<Mem::CUDA, float, unsigned int>;
     extern template class DenseVector<Mem::CUDA, double, unsigned int>;
     extern template class DenseVector<Mem::CUDA, float, unsigned long>;
     extern template class DenseVector<Mem::CUDA, double, unsigned long>;
-#endif
-#endif
+    #endif
+  #endif
 
   } // namespace LAFEM
 } // namespace FEAT

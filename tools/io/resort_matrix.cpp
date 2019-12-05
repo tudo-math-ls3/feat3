@@ -30,9 +30,9 @@ int main(int argc, char ** argv)
     String input_extension(input.substr(input.size() - 4, 4));
     SparseMatrixCSR<Mem::Main, double, Index> orig;
     if (input_extension == ".mtx")
-      orig.read_from_mtx(input);
+      orig.read_from(FileMode::fm_mtx, input);
     else if (input_extension == ".csr")
-      orig.read_from_csr(input);
+      orig.read_from(FileMode::fm_csr, input);
     else if (input_extension == ".ell")
     {
       SparseMatrixELL<Mem::Main, double, Index> temp(FileMode::fm_ell, input);
@@ -256,14 +256,14 @@ int main(int argc, char ** argv)
       }
       String output_extension(output.substr(output.size() - 4, 4));
       if (output_extension == ".mtx")
-        best.write_out_mtx(output);
+        best.write_out(FileMode::fm_mtx, output);
       else if (output_extension == ".csr")
-        best.write_out_csr(output);
+        best.write_out(FileMode::fm_csr, output);
       else if (output_extension == ".ell")
       {
         SparseMatrixELL<Mem::Main, double, Index> temp;
         temp.convert(best);
-        temp.write_out_ell(output);
+        temp.write_out(FileMode::fm_ell, output);
       }
       else
       {

@@ -201,7 +201,7 @@ public:
     TEST_CHECK_EQUAL(j, f);
 
     std::stringstream ts2;
-    f.write_out_mtx(ts2, true);
+    f.write_out(FileMode::fm_mtx, ts2, true);
     SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
     TEST_CHECK_EQUAL(j2, f);
 

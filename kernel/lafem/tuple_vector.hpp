@@ -423,14 +423,11 @@ namespace FEAT
        */
       void read_from(FileMode mode, String filename)
       {
-        switch(mode)
-        {
-        case FileMode::fm_binary:
-          read_from_binary(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from(mode, file);
+        file.close();
       }
 
       /**
@@ -443,45 +440,23 @@ namespace FEAT
       {
         switch(mode)
         {
-        case FileMode::fm_binary:
-          read_from_binary(file);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          case FileMode::fm_binary:
+          {
+            uint64_t magic; // magic_number
+            file.read((char *)&magic, (long)(sizeof(uint64_t)));
+            if (magic != 101)
+              throw InternalError(__func__, __FILE__, __LINE__, "Given file or file component is no TupleVector!");
+            uint64_t count; // subvector count
+            file.read((char *)&count, (long)(sizeof(uint64_t)));
+            //if (count != num_blocks)
+            //  throw InternalError(__func__, __FILE__, __LINE__, "TupleVector file read in component count mismatch: class has " + stringify(num_blocks) + "- " + stringify(count) + " read in!");
+
+            _read_from_binary(file);
+            break;
+          }
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Read in vector from binary file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_binary(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        read_from_binary(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in vector from binary stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_binary(std::istream& file)
-      {
-        uint64_t magic; // magic_number
-        file.read((char *)&magic, (long)(sizeof(uint64_t)));
-        if (magic != 101)
-          throw InternalError(__func__, __FILE__, __LINE__, "Given file or file component is no TupleVector!");
-        uint64_t count; // subvector count
-        file.read((char *)&count, (long)(sizeof(uint64_t)));
-        //if (count != num_blocks)
-        //  throw InternalError(__func__, __FILE__, __LINE__, "TupleVector file read in component count mismatch: class has " + stringify(num_blocks) + "- " + stringify(count) + " read in!");
-
-        _read_from_binary(file);
       }
 
       /**
@@ -492,14 +467,11 @@ namespace FEAT
        */
       void write_out(FileMode mode, String filename) const
       {
-        switch(mode)
-        {
-        case FileMode::fm_binary:
-          write_out_binary(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        write_out(mode, file);
+        file.close();
       }
 
       /**
@@ -512,47 +484,23 @@ namespace FEAT
       {
         switch(mode)
         {
-        case FileMode::fm_binary:
-          write_out_binary(file);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          case FileMode::fm_binary:
+          {
+            size_t gsize(2 * sizeof(uint64_t)); // magic_number and subvector count
+            std::vector<char> result(gsize);
+            char * array(result.data());
+            uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
+            uiarray[0] = 101; /// \todo globale liste anlegen
+            uiarray[1] = num_blocks;
+
+            file.write(result.data(), long(result.size()));
+
+            _write_out_binary(file);
+            break;
+          }
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Write out vector to file.
-       *
-       * \param[in] filename The file where the vector shall be stored.
-       */
-      void write_out_binary(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        write_out_binary(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out vector to file.
-       *
-       * \param[in] file The stream that shall be written to.
-       *
-       * Creates a binary file, that consists of a small header describing the type and all subvector's binary dumps.
-       */
-      void write_out_binary(std::ostream& file) const
-      {
-        size_t gsize(2 * sizeof(uint64_t)); // magic_number and subvector count
-        std::vector<char> result(gsize);
-        char * array(result.data());
-        uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
-        uiarray[0] = 101; /// \todo globale liste anlegen
-        uiarray[1] = num_blocks;
-
-        file.write(result.data(), long(result.size()));
-
-        _write_out_binary(file);
       }
     }; // class TupleVector<...>
 

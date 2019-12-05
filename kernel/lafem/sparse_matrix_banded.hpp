@@ -713,19 +713,15 @@ namespace FEAT
        */
       void write_out(FileMode mode, String filename) const
       {
-        switch(mode)
-        {
-        case FileMode::fm_bm:
-          write_out_bm(filename);
-          break;
-        case FileMode::fm_binary:
-          write_out_bm(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ofstream::out;
+        std::ofstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        write_out(mode, file);
+        file.close();
       }
-
       /**
        * \brief Write out matrix to file.
        *
@@ -737,41 +733,15 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_bm:
-          write_out_bm(file);
-          break;
         case FileMode::fm_binary:
-          write_out_bm(file);
+          if (! std::is_same<DT_, double>::value)
+            std::cout<<"Warning: You are writing out a banded matrix that is not double precision!"<<std::endl;
+
+        this->template _serialise<double, uint64_t>(FileMode::fm_bm, file);
           break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Write out matrix to banded binary file.
-       *
-       * \param[in] filename The file where the matrix shall be stored.
-       */
-      void write_out_bm(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        write_out_bm(file);
-        file.close();
-      }
-
-      /**
-       * \brief Write out matrix to banded binary file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_bm(std::ostream& file) const
-      {
-        if (! std::is_same<DT_, double>::value)
-          std::cout<<"Warning: You are writing out a banded matrix that is not double precision!"<<std::endl;
-
-        this->template _serialise<double, uint64_t>(FileMode::fm_bm, file);
       }
 
       /**
@@ -1141,19 +1111,15 @@ namespace FEAT
        */
       void read_from(FileMode mode, String filename)
       {
-        switch(mode)
-        {
-        case FileMode::fm_bm:
-          read_from_bm(filename);
-          break;
-        case FileMode::fm_binary:
-          read_from_bm(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ifstream::in;
+        std::ifstream file(filename.c_str(), bin);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        read_from(mode, file);
+        file.close();
       }
-
       /**
        * \brief Read in matrix from stream.
        *
@@ -1165,38 +1131,12 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_bm:
-          read_from_bm(file);
-          break;
         case FileMode::fm_binary:
-          read_from_bm(file);
+          this->template _deserialise<double, uint64_t>(FileMode::fm_bm, file);
           break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Read in matrix from binary file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      void read_from_bm(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        read_from_bm(file);
-        file.close();
-      }
-
-      /**
-       * \brief Read in matrix from binary stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      void read_from_bm(std::istream& file)
-      {
-        this->template _deserialise<double, uint64_t>(FileMode::fm_bm, file);
       }
 
       /// Returns a new compatible L-Vector.

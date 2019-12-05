@@ -93,10 +93,77 @@ public:
     {
       for(Index j(0) ; j < l.rows() ; ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(m(i, j), l(i, j), Math::template eps<DT_>()*DT_(100));
+        TEST_CHECK_EQUAL_WITHIN_EPS(m(i, j), l(i, j), Math::template eps<DT_>() * DT_(100));
       }
     }
 
+   // DenseMatrix write_out test
+    DenseMatrix<Mem_, DT_, IT_> u(11, 11);
+    for(Index i(0) ; i < u.rows() ; ++i)
+    {
+      for(Index j(0) ; j < u.columns() ; ++j)
+      {
+        u(i, j, DT_(i + j + 1));
+      }
+    }
+    //Binary Test
+    {
+      BinaryStream bs;
+      u.write_out(FileMode::fm_dm, bs);
+      bs.seekg(0);
+      DenseMatrix<Mem_, DT_, IT_> test(FileMode::fm_dm, bs);
+      for(Index i(0) ; i < u.rows() ; ++i)
+      {
+        for(Index j(0) ; j < u.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test(i, j), Math::template eps<DT_>() * DT_(100));
+        }
+      }
+    }
+    //Mtx Test
+    {
+      std::stringstream ts;
+      u.write_out(FileMode::fm_mtx, ts);
+      DenseMatrix<Mem_, DT_, IT_> test2(FileMode::fm_mtx, ts);
+      for(Index i(0) ; i < u.rows() ; ++i)
+      {
+        for(Index j(0) ; j < u.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test2(i, j), Math::template eps<DT_>() * DT_(100));
+        }
+      }
+    }
+    /*
+    //FileTest-> for now... problem if write rights arent given...
+    {
+      String filename = "test_dense_matrix_file_bin.txt";
+      std::ofstream (filename.c_str());
+      u.write_out(FileMode::fm_dm, filename);
+      DenseMatrix<Mem_, DT_, IT_> test3(FileMode::fm_dm, filename);
+      for(Index i(0) ; i < u.rows() ; ++i)
+      {
+        for(Index j(0) ; j < u.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test3(i, j), Math::template eps<DT_>() * DT_(100));
+        }
+      }
+      std::remove(filename.c_str());
+    }
+    {
+      String filename = "test_dense_matrix_file_mtx.txt";
+      std::ofstream (filename.c_str());
+      u.write_out(FileMode::fm_mtx, filename);
+      DenseMatrix<Mem_, DT_, IT_> test4(FileMode::fm_mtx, filename);
+      for(Index i(0) ; i < u.rows() ; ++i)
+      {
+        for(Index j(0) ; j < u.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test4(i, j), Math::template eps<DT_>() * DT_(100));
+        }
+      }
+      std::remove(filename.c_str());
+    }
+    */
   }
 };
 DenseMatrixTest<Mem::Main, float, unsigned int> cpu_dense_matrix_test_float_uint;

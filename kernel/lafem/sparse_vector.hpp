@@ -516,14 +516,11 @@ namespace FEAT
        */
       void read_from(FileMode mode, String filename)
       {
-        switch(mode)
-        {
-        case FileMode::fm_mtx:
-          read_from_mtx(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from(mode, file);
+        file.close();
       }
 
       /**
@@ -536,113 +533,101 @@ namespace FEAT
       {
         switch(mode)
         {
-        case FileMode::fm_mtx:
-          read_from_mtx(file);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
-      }
+          case FileMode::fm_mtx:
+          {
+            this->clear();
+            this->_scalar_index.push_back(0);
+            this->_scalar_index.push_back(0);
+            this->_scalar_index.push_back(Math::min<Index>(0, 1000));
+            this->_scalar_index.push_back(1);
+            this->_scalar_dt.push_back(DT_(0));
 
-      void read_from_mtx(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        read_from_mtx(file);
-        file.close();
-      }
+            Index rows;
+            Index nnz;
+            String line;
+            std::getline(file, line);
+            if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
+            {
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+            }
+            while(!file.eof())
+            {
+              std::getline(file,line);
+              if (file.eof())
+                throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
 
-      void read_from_mtx(std::istream& file)
-      {
-        this->clear();
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(Math::min<Index>(0, 1000));
-        this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
+              String::size_type begin(line.find_first_not_of(" "));
+              if (line.at(begin) != '%')
+                break;
+            }
+            {
+              String::size_type begin(line.find_first_not_of(" "));
+              line.erase(0, begin);
+              String::size_type end(line.find_first_of(" "));
+              String srows(line, 0, end);
+              rows = (Index)atol(srows.c_str());
+              line.erase(0, end);
 
-        Index rows;
-        Index nnz;
-        String line;
-        std::getline(file, line);
-        if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
-        }
-        while(!file.eof())
-        {
-          std::getline(file,line);
-          if (file.eof())
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              String scols(line, 0, end);
+              Index cols((Index)atol(scols.c_str()));
+              line.erase(0, end);
+              if (cols != 1)
+                throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no sparse-vector-file");
 
-          String::size_type begin(line.find_first_not_of(" "));
-          if (line.at(begin) != '%')
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              String snnz(line, 0, end);
+              nnz = (Index)atol(snnz.c_str());
+              line.erase(0, end);
+            }
+
+            DenseVector<Mem::Main, IT_, IT_> ind(nnz);
+            DenseVector<Mem::Main, DT_, IT_> val(nnz);
+
+            IT_ * pind(ind.elements());
+            DT_ * pval(val.elements());
+
+            while(!file.eof())
+            {
+              std::getline(file, line);
+              if (file.eof())
+                break;
+
+              String::size_type begin(line.find_first_not_of(" "));
+              line.erase(0, begin);
+              String::size_type end(line.find_first_of(" "));
+              String srow(line, 0, end);
+              IT_ row((IT_)atol(srow.c_str()));
+              --row;
+              line.erase(0, end);
+
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              line.erase(0, end);
+
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              String sval(line, 0, end);
+              DT_ tval((DT_)atof(sval.c_str()));
+
+              *pval = tval;
+              *pind = row;
+              ++pval;
+              ++pind;
+            }
+            SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind, false);
+            this->assign(tmp);
             break;
+          }
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
-        {
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srows(line, 0, end);
-          rows = (Index)atol(srows.c_str());
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String scols(line, 0, end);
-          Index cols((Index)atol(scols.c_str()));
-          line.erase(0, end);
-          if (cols != 1)
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no sparse-vector-file");
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String snnz(line, 0, end);
-          nnz = (Index)atol(snnz.c_str());
-          line.erase(0, end);
-        }
-
-        DenseVector<Mem::Main, IT_, IT_> ind(nnz);
-        DenseVector<Mem::Main, DT_, IT_> val(nnz);
-
-        IT_ * pind(ind.elements());
-        DT_ * pval(val.elements());
-
-        while(!file.eof())
-        {
-          std::getline(file, line);
-          if (file.eof())
-            break;
-
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srow(line, 0, end);
-          IT_ row((IT_)atol(srow.c_str()));
-          --row;
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String sval(line, 0, end);
-          DT_ tval((DT_)atof(sval.c_str()));
-
-          *pval = tval;
-          *pind = row;
-          ++pval;
-          ++pind;
-        }
-        SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind, false);
-        this->assign(tmp);
       }
 
       /**
@@ -653,14 +638,11 @@ namespace FEAT
        */
       void write_out(FileMode mode, String filename) const
       {
-        switch(mode)
-        {
-        case FileMode::fm_mtx:
-          write_out_mtx(filename);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        write_out(mode, file);
+        file.close();
       }
 
       /**
@@ -673,47 +655,25 @@ namespace FEAT
       {
         switch(mode)
         {
-        case FileMode::fm_mtx:
-          write_out_mtx(file);
-          break;
-        default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
-      }
+          case FileMode::fm_mtx:
+          {
+            SparseVector<Mem::Main, DT_, IT_> temp;
+            temp.convert(*this);
 
-      /**
-       * \brief Write out matrix to MatrixMarktet mtx file.
-       *
-       * \param[in] filename The file where the vector shall be stored.
-       */
-      void write_out_mtx(String filename) const
-      {
-        std::ofstream file(filename.c_str(), std::ofstream::out);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-        write_out_mtx(file);
-        file.close();
-      }
+            file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+            file << temp.size() << " " << 1 << " " << temp.used_elements() << std::endl;
 
-      /**
-       * \brief Write out matrix to MatrixMarktet mtx file.
-       *
-       * \param[in] file The stream that shall be written to.
-       */
-      void write_out_mtx(std::ostream& file) const
-      {
-        SparseVector<Mem::Main, DT_, IT_> temp;
-        temp.convert(*this);
-
-        file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-        file << temp.size() << " " << 1 << " " << temp.used_elements() << std::endl;
-
-        const Index u_elem(temp.used_elements());
-        const IT_ * pind(temp.indices());
-        const DT_ * pval(temp.elements());
-        for (Index i(0) ; i < u_elem ; ++i, ++pind, ++pval)
-        {
-          file << *pind+1 << " " << 1 << " " << std::scientific << *pval << std::endl;
+            const Index u_elem(temp.used_elements());
+            const IT_ * pind(temp.indices());
+            const DT_ * pval(temp.elements());
+            for (Index i(0) ; i < u_elem ; ++i, ++pind, ++pval)
+            {
+              file << *pind+1 << " " << 1 << " " << std::scientific << *pval << std::endl;
+            }
+            break;
+          }
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 

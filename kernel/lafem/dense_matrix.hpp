@@ -140,6 +140,31 @@ namespace FEAT
         deserialise<DT2_, IT2_>(input);
       }
 
+      //Just a test:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       */
+      explicit DenseMatrix(FileMode mode, String filename) :
+      Container<Mem_, DT_, IT_>(0)
+      {
+        read_from(mode, filename);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source filestream.
+       */
+      explicit DenseMatrix(FileMode mode, std::istream& file) :
+      Container<Mem_, DT_, IT_>(0)
+      {
+        read_from(mode, file);
+      }
+      //end of test
       /**
        * \brief Move Constructor
        *
@@ -279,6 +304,193 @@ namespace FEAT
       {
         return this->template _serialise<DT2_, IT2_>(FileMode::fm_dm);
       }
+
+      /**
+       * \brief Read in matrix from file
+       *
+       * \param[in] mode The used file format
+       * \param[in] filename The file that shall be read in
+       */
+      //begin of test
+      void read_from(FileMode mode, String filename)
+      {
+        std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ifstream::in;
+        std::ifstream file(filename.c_str(), bin);
+        if(! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from(mode, file);
+        file.close();
+      }
+
+      /**
+      *\brief Read in matrix from file
+      *
+      * \param[in] mode The used file format
+      * \param[in] file The stream that shall be writen to.
+      */
+      void read_from(FileMode mode, std::istream& file)
+      {
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+          {
+            std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
+
+            IT_ trows;
+            Index tcols, ue(0); //ue is not needed...
+            String line;
+            std::getline(file, line); // !!? Test on overflow error... could be an enormous matrix... !??
+            //for now, just symmetric and general matrices...
+            const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
+            const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
+            if (symmetric == false && general == false)
+            {
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+            }
+
+            while(!file.eof())
+            {
+              std::getline(file,line);
+              if (file.eof())
+                throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+              String::size_type begin(line.find_first_not_of(" "));
+              if (line.at(begin) != '%')
+                break;
+            }
+            //Read in number of rows and columns
+            {
+              String::size_type begin(line.find_first_not_of(" "));
+              line.erase(0, begin);
+              String::size_type end(line.find_first_of(" "));
+              String srow(line, 0, end);
+              trows = IT_(atol(srow.c_str()));
+              line.erase(0, end);
+
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              String scol(line, 0, end);
+              tcols = Index(atol(scol.c_str()));
+              line.erase(0, end);
+            }
+            //Read in row, column and value of lines:
+            while(!file.eof())
+            {
+              std::getline(file, line);
+              if(file.eof())
+                break;
+
+              String::size_type begin(line.find_first_not_of(" "));
+              line.erase(0, begin);
+              String::size_type end(line.find_first_of(" "));
+              String srow(line, 0, end);
+              IT_ row((IT_)atol(srow.c_str()));
+              --row;
+              line.erase(0, end);
+
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              String scol(line, 0, end);
+              IT_ col((IT_)atol(scol.c_str()));
+              --col;
+              line.erase(0, end);
+
+              begin = line.find_first_not_of(" ");
+              line.erase(0, begin);
+              end = line.find_first_of(" ");
+              String sval(line, 0, end);
+              DT_ tval((DT_)atof(sval.c_str()));
+
+              entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
+              ++ue;
+              if (symmetric == true && row != col)
+              {
+                entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
+                ++ue;
+              }
+            }
+            //create temp Matrix, write in values, assign temp to this
+            {
+              DenseMatrix<Mem::Main, DT_, IT_> swapMat(Index(trows), tcols);
+              for(auto row : entries)
+              {
+                for(auto col : row.second)
+                {
+                  swapMat(Index(row.first),Index(col.first), col.second);
+                }
+              }
+              this->assign(swapMat);
+            }
+            break;
+
+          }
+          case FileMode::fm_dm:
+          case FileMode::fm_binary:
+            this->template _deserialise<double, uint64_t>(FileMode::fm_dm, file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Write out matrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ofstream::out;
+        std::ofstream file(filename.c_str(), bin);
+        if(! file.is_open())
+          throw InternalError(__func__,__FILE__,__LINE__, "Unable to open Matrix file " + filename);
+        write_out(mode, file);
+        file.close();
+      }
+
+      /**
+       * \brief Write outmatrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out(FileMode mode, std::ostream& file) const
+      {
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+          {
+            DenseMatrix<Mem::Main, DT_, IT_> temp;
+            temp.convert(*this);
+            file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+            file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
+
+            for(IT_ row(0) ; row < rows(); ++row)
+            {
+              for(IT_ col(0) ; col < columns() ; ++col)
+              {
+                if(temp(row, col) != DT_(0))
+                  file << row + 1 << " " << col + 1 << " " << std::scientific << temp(row, col) << std::endl;
+              }
+            }
+            break;
+          }
+          case FileMode::fm_dm:
+          case FileMode::fm_binary:
+            this->template _serialise<double, uint64_t>(FileMode::fm_dm, file);
+            break;
+          default:
+            InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+      //end of test
 
       /**
        * \brief Retrieve matrix row count.

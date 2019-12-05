@@ -1790,14 +1790,14 @@ namespace NavierStokesPP
     if (!cfg.load.empty())
     {
       load_data(cfg, comm, t_step, c_drag_old, c_lift_old);
-      vec_sol_v_2.local().read_from_dvb(cfg.load.substr(0, cfg.load.length() - 4) + "_v2_" + stringify(rank));
-      vec_sol_v_1.local().read_from_dvb(cfg.load.substr(0, cfg.load.length() - 4) + "_v1_" + stringify(rank));
+      vec_sol_v_2.local().read_from(LAFEM::FileMode::fm_dvb, cfg.load.substr(0, cfg.load.length() - 4) + "_v2_" + stringify(rank));
+      vec_sol_v_1.local().read_from(LAFEM::FileMode::fm_dvb, cfg.load.substr(0, cfg.load.length() - 4) + "_v1_" + stringify(rank));
       vec_sol_v.copy(vec_sol_v_1);
-      vec_sol_p_1.local().read_from_dv(cfg.load.substr(0, cfg.load.length() - 4) + "_p1_" + stringify(rank));
+      vec_sol_p_1.local().read_from(LAFEM::FileMode::fm_dv, cfg.load.substr(0, cfg.load.length() - 4) + "_p1_" + stringify(rank));
       vec_sol_p.copy(vec_sol_p_1);
       // save given rhs vector (if time dependent)
-      vec_f.local().read_from_dvb(cfg.load.substr(0, cfg.load.length() - 4) + "_f_" + stringify(rank));
-      vec_f_old.local().read_from_dvb(cfg.load.substr(0, cfg.load.length() - 4) + "_f_old_" + stringify(rank));
+      vec_f.local().read_from(LAFEM::FileMode::fm_dvb, cfg.load.substr(0, cfg.load.length() - 4) + "_f_" + stringify(rank));
+      vec_f_old.local().read_from(LAFEM::FileMode::fm_dvb, cfg.load.substr(0, cfg.load.length() - 4) + "_f_old_" + stringify(rank));
     }
 
     // fractional_step = 1 means use theta sheme
@@ -2406,11 +2406,11 @@ namespace NavierStokesPP
         watch_save.start();
 
         // get vector data
-        vec_sol_v_1.local().write_out_dvb(cfg.save_file + "_v1_" + stringify(rank));
-        vec_sol_v_2.local().write_out_dvb(cfg.save_file + "_v2_" + stringify(rank));
-        vec_sol_p_1.local().write_out_dv(cfg.save_file + "_p1_" + stringify(rank));
-        vec_f.local().write_out_dvb(cfg.save_file + "_f_" + stringify(rank));
-        vec_f_old.local().write_out_dvb(cfg.save_file + "_f_old_" + stringify(rank));
+        vec_sol_v_1.local().write_out(LAFEM::FileMode::fm_dvb, cfg.save_file + "_v1_" + stringify(rank));
+        vec_sol_v_2.local().write_out(LAFEM::FileMode::fm_dvb, cfg.save_file + "_v2_" + stringify(rank));
+        vec_sol_p_1.local().write_out(LAFEM::FileMode::fm_dv, cfg.save_file + "_p1_" + stringify(rank));
+        vec_f.local().write_out(LAFEM::FileMode::fm_dvb, cfg.save_file + "_f_" + stringify(rank));
+        vec_f_old.local().write_out(LAFEM::FileMode::fm_dvb, cfg.save_file + "_f_old_" + stringify(rank));
         save(cfg, comm, time_step, c_drag_old, c_lift_old);
         comm.print("Save State: " + cfg.save_file + ".ini");
         watch_save.stop();
