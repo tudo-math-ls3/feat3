@@ -390,7 +390,7 @@ namespace FEAT
       /**
        * \brief Adds another scaled vector onto this vector.
        *
-       * \param[in] a
+       * \param[in] x
        * The vector to be added onto this vector.
        *
        * \param[in] alpha
@@ -399,10 +399,35 @@ namespace FEAT
        * \returns \c *this
        */
       template<int snx_>
-      Vector& axpy(DataType alpha,const Vector<T_, n_, snx_>& a)
+      Vector& axpy(DataType alpha, const Vector<T_, n_, snx_>& x)
       {
         for(int i(0); i < n_; ++i)
-          v[i] += alpha * a.v[i];
+          v[i] += alpha * x.v[i];
+        return *this;
+      }
+
+      /**
+       * \brief Sets this vector to the convex combination of two other vectors.
+       *
+       * Let \e y denote \c this vector, then this function computes:
+       * \f[ y \leftarrow (1-\alpha)\cdot a + \alpha\cdot b \f]
+       *
+       * \param[in] alpha
+       * The interpolation parameter for the convex combination. Should be 0 <= alpha <= 1
+       *
+       * \param[in] a
+       * The first vector for the convex combination.
+       *
+       * \param[in] b
+       * The second vector for the convex combination.
+       *
+       * \returns \c *this
+       */
+      template<int sna_, int snb_>
+      Vector& set_convex(DataType alpha, const Vector<T_, n_, sna_>& a, const Vector<T_, n_, snb_>& b)
+      {
+        for(int i(0); i < n_; ++i)
+          v[i] = (T_(1) - alpha) * a.v[i] + alpha * b.v[i];
         return *this;
       }
 

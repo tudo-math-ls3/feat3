@@ -122,12 +122,12 @@ namespace FEAT
        * \param[in] scale
        * A scaling factor for the matrix to be assembled.
        */
-      template<typename Space_>
+      template<typename Space_, typename CubatureFactory_>
       void assemble_matrix(
         LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, dim_>& matrix,
         const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
         const Space_& space,
-        const Cubature::DynamicFactory& cubature_factory,
+        const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
         ) const
       {
@@ -457,12 +457,12 @@ namespace FEAT
        * \param[in] scale
        * A scaling factor for the matrix to be assembled.
        */
-      template<typename Matrix_, typename Space_>
+      template<typename Matrix_, typename Space_, typename CubatureFactory_>
       void assemble_scalar_matrix(
         Matrix_& matrix,
         const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
         const Space_& space,
-        const Cubature::DynamicFactory& cubature_factory,
+        const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
         ) const
       {
@@ -726,13 +726,13 @@ namespace FEAT
        * \param[in] scale
        * A scaling factor the the vector to be assembled.
        */
-      template<typename Space_>
+      template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
         LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& vector,
         const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect,
         const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& primal,
         const Space_& space,
-        const Cubature::DynamicFactory& cubature_factory,
+        const CubatureFactory_& cubature_factory,
         const DataType_ scale = DataType_(1)
         ) const
       {

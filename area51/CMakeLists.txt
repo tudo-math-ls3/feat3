@@ -32,6 +32,15 @@ TARGET_LINK_LIBRARIES(dbg-dist-file-io feat)
 ADD_EXECUTABLE(dbg-graph-render dbg_graph_render.cpp)
 TARGET_LINK_LIBRARIES(dbg-graph-render feat)
 
+ADD_EXECUTABLE(dbg-isoparam-1 dbg_isoparam1.cpp)
+TARGET_LINK_LIBRARIES(dbg-isoparam-1 feat)
+
+ADD_EXECUTABLE(dbg-isoparam-2 dbg_isoparam2.cpp)
+TARGET_LINK_LIBRARIES(dbg-isoparam-2 feat)
+
+ADD_EXECUTABLE(dbg-isoparam-3 dbg_isoparam3.cpp)
+TARGET_LINK_LIBRARIES(dbg-isoparam-3 feat)
+
 ADD_EXECUTABLE(dbg-mesh-width dbg_mesh_width.cpp)
 TARGET_LINK_LIBRARIES(dbg-mesh-width feat)
 
