@@ -366,6 +366,12 @@ namespace FEAT
       explicit DenseVectorBlocked(Random & rng, Index size_in, DataType min, DataType max) :
         Container<Mem_, DT_, IT_>(size_in)
       {
+        if (size_in == Index(0))
+          return;
+
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+        this->_elements_size.push_back(size<Perspective::pod>());
+
         this->format(rng, min, max);
       }
 
