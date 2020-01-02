@@ -135,6 +135,19 @@ public:
     auto kp = f.serialise();
     SparseMatrixCOO<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, f);
+
+    SparseMatrixCSR<Mem_, DT_, IT_> csr00;
+    SparseMatrixCOO<Mem_, DT_, IT_> l00(csr00);
+    TEST_CHECK_EQUAL(l00.size(), 0ul);
+    TEST_CHECK_EQUAL(l00.rows(), 0ul);
+    TEST_CHECK_EQUAL(l00.columns(), 0ul);
+    TEST_CHECK_EQUAL(l00.used_elements(), 0ul);
+    SparseMatrixCSR<Mem_, DT_, IT_> csr01(10, 10);
+    SparseMatrixCOO<Mem_, DT_, IT_> l01(csr01);
+    TEST_CHECK_EQUAL(l01.size(), 100ul);
+    TEST_CHECK_EQUAL(l01.rows(), 10ul);
+    TEST_CHECK_EQUAL(l01.columns(), 10ul);
+    TEST_CHECK_EQUAL(l01.used_elements(), 0ul);
   }
 };
 

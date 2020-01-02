@@ -83,6 +83,19 @@ public:
     TEST_CHECK_EQUAL(empty5.columns(), 0);
     TEST_CHECK_EQUAL(empty5.used_elements(), 0);
 
+    SparseMatrixCOO<Mem::Main, DT_, IT_> a00;
+    SparseMatrixCSR<Mem_, DT_, IT_> b00(a00);
+    TEST_CHECK_EQUAL(b00.size(), 0ul);
+    TEST_CHECK_EQUAL(b00.rows(), 0ul);
+    TEST_CHECK_EQUAL(b00.columns(), 0ul);
+    TEST_CHECK_EQUAL(b00.used_elements(), 0ul);
+    SparseMatrixCOO<Mem::Main, DT_, IT_> a01(10, 10);
+    SparseMatrixCSR<Mem_, DT_, IT_> b01(a01);
+    TEST_CHECK_EQUAL(b01.size(), 100ul);
+    TEST_CHECK_EQUAL(b01.rows(), 10ul);
+    TEST_CHECK_EQUAL(b01.columns(), 10ul);
+    TEST_CHECK_EQUAL(b01.used_elements(), 0ul);
+
     SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 10);
     a(1,2,7);
     a.format();

@@ -618,10 +618,13 @@ namespace FEAT
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(other.used_elements());
+        this->_scalar_dt.push_back(other.zero_element());
+
+        if (other.used_elements() == 0)
+          return;
 
         SparseMatrixCOO<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -700,10 +703,13 @@ namespace FEAT
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(other.used_elements());
+        this->_scalar_dt.push_back(other.zero_element());
+
+        if (other.used_elements() == 0)
+          return;
 
         SparseMatrixELL<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -775,10 +781,13 @@ namespace FEAT
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(other.used_elements());
+        this->_scalar_dt.push_back(other.zero_element());
+
+        if (other.used_elements() == 0)
+          return;
 
         SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -873,10 +882,13 @@ namespace FEAT
         this->_scalar_index.push_back(other.template rows<Perspective::pod>());
         this->_scalar_index.push_back(other.template columns<Perspective::pod>());
         this->_scalar_index.push_back(other.template used_elements<Perspective::pod>());
+        this->_scalar_dt.push_back(other.zero_element());
+
+        if (other.template used_elements<Perspective::pod>() == 0)
+          return;
 
         SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -943,6 +955,8 @@ namespace FEAT
       template <typename MT_>
       void convert(const MT_ & a)
       {
+        XASSERT(a.template used_elements<Perspective::pod>() > 0);
+
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);
 

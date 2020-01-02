@@ -664,6 +664,8 @@ namespace FEAT
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & csr_in)
       {
+        XASSERT(csr_in.template used_elements<Perspective::pod>() > 0);
+
         SparseMatrixCSR<Mem::Main, DT_, IT_> csr;
         csr.convert(csr_in);
 

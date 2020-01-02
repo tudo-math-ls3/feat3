@@ -706,6 +706,9 @@ namespace FEAT
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
 
+        if (other.used_elements() == 0)
+          return;
+
         SparseMatrixCSR<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
 
@@ -775,6 +778,9 @@ namespace FEAT
         this->_scalar_index.push_back(1000);
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
+
+        if (other.used_elements() == 0)
+          return;
 
         SparseMatrixELL<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
@@ -850,6 +856,9 @@ namespace FEAT
         this->_scalar_index.push_back(1000);
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
+
+        if (other.used_elements() == 0)
+          return;
 
         SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
@@ -939,6 +948,8 @@ namespace FEAT
       template <typename MT_>
       void convert(const MT_ & a)
       {
+        XASSERT(a.template used_elements<Perspective::pod>() > 0);
+
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);
 
