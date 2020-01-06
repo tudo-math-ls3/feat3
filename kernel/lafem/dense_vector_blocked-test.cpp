@@ -125,6 +125,22 @@ public:
     TEST_CHECK_EQUAL(g, f);
     TEST_CHECK_EQUAL((void*)g.template elements<Perspective::pod>(), (void*)f.template elements<Perspective::pod>());
 
+    // random constructor check
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rng(seed);
+    DT_ rnd_range[2];
+    IT_ rnd_size = 3*1234;
+    rnd_range[0] = DT_(-10);
+    rnd_range[1] = DT_(+10);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> rnd_vec(rng, rnd_size, rnd_range[0], rnd_range[1]);
+    TEST_CHECK_EQUAL(rnd_vec.size(), rnd_size);
+    DT_ rnd_max = rnd_vec.max_element();
+    TEST_CHECK_IN_RANGE(rnd_max, rnd_range[0], rnd_range[1]);
+    rnd_vec.scale(rnd_vec, DT_(-1));
+    DT_ rnd_min = -rnd_vec.max_element();
+    TEST_CHECK_IN_RANGE(rnd_min, rnd_range[0], rnd_range[1]);
+
     std::stringstream mts;
     g.write_out(FileMode::fm_mtx, mts);
     DenseVectorBlocked<Mem_, DT_, IT_, 3> l(FileMode::fm_mtx, mts);

@@ -337,7 +337,7 @@ namespace FEAT
        * \param[in] min Lower rng bound.
        * \param[in] max Upper rng bound.
        *
-       * Creates a vector from the given source file.
+       * Creates a vector from the given random number generator.
        */
       explicit DenseVector(Random & rng, Index size_in, DataType min, DataType max) :
         Container<Mem_, DT_, IT_>(size_in)
