@@ -459,7 +459,7 @@ namespace FEAT
         virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String& name) override
         {
           typedef typename Mesh_::ShapeType ShapeType;
-          typedef typename Shape::FaceTraits<ShapeType, 1>::ShapeType SubShapeType;
+          typedef typename Shape::FaceTraits<ShapeType, 2>::ShapeType SubShapeType;
           typedef ConformalMesh<SubShapeType, 2, CoordType> SubMeshType;
 
           // What have we here?
