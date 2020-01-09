@@ -88,7 +88,7 @@ namespace FEAT
         IT_* _row_idx;
         IT_* _col_idx;
         IT_* _col_ptr;
-        DT_ *_data;
+        DT_* _data;
 
       public:
         explicit ScatterAxpy(MatrixType& matrix) :
@@ -199,7 +199,7 @@ namespace FEAT
         const IT_* _row_idx;
         const IT_* _col_idx;
         IT_* _col_ptr;
-        const DT_ *_data;
+        const DT_* _data;
 
       public:
         explicit GatherAxpy(const MatrixType& matrix) :
@@ -1568,7 +1568,7 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
       DT_ zero_element() const
       {
@@ -1580,7 +1580,7 @@ namespace FEAT
        *
        * \return Allocated element count.
        */
-      const Index & allocated_elements() const
+      Index allocated_elements() const
       {
         return this->_scalar_index.at(4);
       }
@@ -1590,7 +1590,7 @@ namespace FEAT
        *
        * \return Allocation increment.
        */
-      const Index & alloc_increment() const
+      Index alloc_increment() const
       {
         return this->_scalar_index.at(5);
       }
@@ -1600,7 +1600,7 @@ namespace FEAT
        *
        * \return Sorting status.
        */
-      const Index & sorted() const
+      Index sorted() const
       {
         return this->_scalar_index.at(6);
       }

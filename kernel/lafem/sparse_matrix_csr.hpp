@@ -87,7 +87,7 @@ namespace FEAT
         IT_* _row_ptr;
         IT_* _col_idx;
         IT_* _col_ptr;
-        DT_ *_data;
+        DT_* _data;
 
       public:
         explicit ScatterAxpy(MatrixType& matrix) :
@@ -184,7 +184,7 @@ namespace FEAT
         const IT_* _row_ptr;
         const IT_* _col_idx;
         IT_* _col_ptr;
-        const DT_ *_data;
+        const DT_* _data;
 
       public:
         explicit GatherAxpy(const MatrixType& matrix) :
@@ -1477,9 +1477,9 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
-      const DT_ zero_element() const
+      DT_ zero_element() const
       {
         return this->_scalar_dt.at(0);
       }

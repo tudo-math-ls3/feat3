@@ -287,7 +287,7 @@ namespace FEAT
        * \returns Matrix row count.
        */
       template <Perspective = Perspective::native>
-      const Index & rows() const
+      Index rows() const
       {
         return this->_scalar_index.at(1);
       }
@@ -298,7 +298,7 @@ namespace FEAT
        * \returns Matrix column count.
        */
       template <Perspective = Perspective::native>
-      const Index & columns() const
+      Index columns() const
       {
         return this->_scalar_index.at(2);
       }

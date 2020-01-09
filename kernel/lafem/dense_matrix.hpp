@@ -497,7 +497,7 @@ namespace FEAT
        *
        * \returns Matrix row count.
        */
-      const Index & rows() const
+      Index rows() const
       {
         return this->_scalar_index.at(1);
       }
@@ -507,7 +507,7 @@ namespace FEAT
        *
        * \returns Matrix column count.
        */
-      const Index & columns() const
+      Index columns() const
       {
         return this->_scalar_index.at(2);
       }

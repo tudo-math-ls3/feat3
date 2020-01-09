@@ -327,8 +327,6 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indexype
       typedef IT_ IndexType;
-      /// Value type, meaning the type of each 'block'
-      typedef DT_ ValueType;
       /// Compatible L-vector type
       typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
       /// Compatible R-vector type
@@ -1638,7 +1636,7 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
       DT_ zero_element() const
       {

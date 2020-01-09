@@ -592,7 +592,7 @@ namespace FEAT
          *
          * \returns The number of columns.
          */
-        const Index& columns() const
+        Index columns() const
         {
           return _columns;
         }
@@ -602,7 +602,7 @@ namespace FEAT
          *
          * \returns The number of rows.
          */
-        const Index& rows() const
+        Index rows() const
         {
           return _rows;
         }

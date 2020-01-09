@@ -102,7 +102,7 @@ namespace FEAT
         Index _num_of_offsets;
         IT_* _offsets;
         IT_* _col_ptr;
-        DT_ *_data;
+        DT_* _data;
 
       public:
         explicit ScatterAxpy(MatrixType& matrix) :
@@ -205,7 +205,7 @@ namespace FEAT
         Index _num_of_offsets;
         const IT_* _offsets;
         IT_* _col_ptr;
-        const DT_ *_data;
+        const DT_* _data;
 
       public:
         explicit GatherAxpy(const MatrixType& matrix) :
@@ -820,7 +820,7 @@ namespace FEAT
        *
        * \returns Number of offsets.
        */
-      const Index & num_of_offsets() const
+      Index num_of_offsets() const
       {
         return this->_scalar_index.at(4);
       }
@@ -858,9 +858,9 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
-      const DT_ zero_element() const
+      DT_ zero_element() const
       {
         return this->_scalar_dt.at(0);
       }

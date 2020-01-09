@@ -101,8 +101,6 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
-      /// Value type, meaning the type of each 'block'
-      typedef DT_ ValueType;
       /// Compatible L-vector type
       typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
       /// Compatible R-vector type
@@ -767,7 +765,7 @@ namespace FEAT
        * \returns Matrix row count.
        */
       template <Perspective = Perspective::native>
-      const Index & rows() const
+      Index rows() const
       {
         return this->_scalar_index.at(1);
       }
@@ -778,7 +776,7 @@ namespace FEAT
        * \returns Matrix column count.
        */
       template <Perspective = Perspective::native>
-      const Index & columns() const
+      Index columns() const
       {
         return this->_scalar_index.at(2);
       }
@@ -789,7 +787,7 @@ namespace FEAT
        * \returns Used matrix non zero row count.
        */
       template <Perspective = Perspective::native>
-      const Index & used_rows() const
+      Index used_rows() const
       {
         return this->_scalar_index.at(4);
       }
@@ -892,9 +890,9 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
-      const DT_ zero_element() const
+      DT_ zero_element() const
       {
         return this->_scalar_dt.at(0);
       }

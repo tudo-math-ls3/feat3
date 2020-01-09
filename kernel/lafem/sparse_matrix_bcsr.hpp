@@ -82,7 +82,7 @@ namespace FEAT
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: row count \n
      * _scalar_index[2]: column count \n
-     * _scalar_index[3]: non zero element count (used VT_ elements)\n
+     * _scalar_index[3]: non zero element count (used ValueType elements)\n
      * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
@@ -108,7 +108,6 @@ namespace FEAT
       static constexpr int BlockWidth = BlockWidth_;
       /// Value type, meaning the type of each block
       typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
-      using VT_ = ValueType;
 
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
@@ -157,7 +156,7 @@ namespace FEAT
         IT_* _row_ptr;
         IT_* _col_idx;
         IT_* _col_ptr;
-        ValueType *_data;
+        ValueType* _data;
 
       public:
         explicit ScatterAxpy(MatrixType& matrix) :
@@ -855,7 +854,7 @@ namespace FEAT
        *
        * \returns Specific matrix element.
        */
-      Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> operator()(Index row, Index col) const
+      ValueType operator()(Index row, Index col) const
       {
         ASSERT(row < rows());
         ASSERT(col < columns());
@@ -864,7 +863,7 @@ namespace FEAT
         {
           if (MemoryPool<Mem_>::get_element(this->col_ind(), i) == col)
           {
-            Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> t;
+            ValueType t;
             MemoryPool<Mem_>::download((DT_*)t.v, this->val<Perspective::pod>() + i * Index(BlockHeight_*BlockWidth_), Index(BlockHeight_*BlockWidth_));
             return t;
           }
@@ -872,8 +871,7 @@ namespace FEAT
             break; //return zero element
         }
 
-        Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> ze((DT_(zero_element())));
-        return ze;
+        return ValueType(zero_element());
       }
 
       /**
@@ -1008,9 +1006,9 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
-      const DT_ zero_element() const
+      DataType zero_element() const
       {
         return this->_scalar_dt.at(0);
       }
@@ -1248,7 +1246,7 @@ namespace FEAT
         DenseVector<Mem::Main, IT_, IT_> trow_ptr(txcolumns + 1, IT_(0));
 
         IT_ * ptcol_ind(tcol_ind.elements());
-        VT_ * ptval((VT_*)tval.elements());
+        ValueType * ptval((ValueType*)tval.elements());
         IT_ * ptrow_ptr(trow_ptr.elements());
 
         ptrow_ptr[0] = 0;
@@ -1649,10 +1647,10 @@ namespace FEAT
         XASSERT(b.columns() == this->columns());
 
         // fetch matrix arrays:
-        VT_* data_x = this->val();
-        const VT_* data_d = d.val();
-        const VT_* data_a = a.val();
-        const VT_* data_b = b.val();
+        ValueType* data_x = this->val();
+        const ValueType* data_d = d.val();
+        const ValueType* data_a = a.val();
+        const ValueType* data_b = b.val();
         const IT_* row_ptr_x = this->row_ptr();
         const IT_* col_idx_x = this->col_ind();
         const IT_* row_ptr_d = d.row_ptr();
@@ -1678,7 +1676,7 @@ namespace FEAT
               const IT_ l = col_idx_a[kl];
 
               // pre-compute factor (alpha * D_ik * A_kl)
-              VT_ omega;
+              ValueType omega;
               omega.set_mat_mat_mult(data_d[ik], data_a[kl]);
               omega *= alpha;
 
@@ -1703,7 +1701,7 @@ namespace FEAT
                 else if(col_idx_x[ij] == col_idx_b[lj])
                 {
                   // okay: B_lj contributes to X_ij
-                  VT_ temp;
+                  ValueType temp;
                   temp.set_mat_mat_mult(omega, data_b[lj]);
                   data_x[ij] += temp;
                   ++ij;
@@ -1782,9 +1780,9 @@ namespace FEAT
         XASSERT(b.columns() == this->columns());
 
         // fetch matrix arrays:
-        VT_* data_x = this->val();
+        ValueType* data_x = this->val();
         const DT_* data_d = d.val();
-        const VT_* data_a = a.val();
+        const ValueType* data_a = a.val();
         const DT_* data_b = b.val();
         const IT_* row_ptr_x = this->row_ptr();
         const IT_* col_idx_x = this->col_ind();
@@ -1811,8 +1809,8 @@ namespace FEAT
               const IT_ l = col_idx_a[kl];
 
               // pre-compute factor (alpha * D_ik * A_kl)
-              VT_ omega;
-              omega.set_mat_mat_mult(VT_(data_d[ik]), data_a[kl]);
+              ValueType omega;
+              omega.set_mat_mat_mult(ValueType(data_d[ik]), data_a[kl]);
               omega *= alpha;
 
               // loop over all non-zeros B_lj in row j of B and
@@ -1836,8 +1834,8 @@ namespace FEAT
                 else if(col_idx_x[ij] == col_idx_b[lj])
                 {
                   // okay: B_lj contributes to X_ij
-                  VT_ temp;
-                  temp.set_mat_mat_mult(omega, VT_(data_b[lj]));
+                  ValueType temp;
+                  temp.set_mat_mat_mult(omega, ValueType(data_b[lj]));
                   data_x[ij] += temp;
                   ++ij;
                   ++lj;
@@ -1924,7 +1922,7 @@ namespace FEAT
         local.convert(*this);
         IT_ * temp_row_ptr = new IT_[rows() + 1];
         IT_ * temp_col_ind = new IT_[used_elements()];
-        VT_ * temp_val = new VT_[used_elements()];
+        ValueType * temp_val = new ValueType[used_elements()];
 
         Index * perm_pos;
         perm_pos = perm_row.get_perm_pos();
@@ -1953,7 +1951,7 @@ namespace FEAT
 
         //permute columns from temp_* to local
         ::memcpy(local.row_ptr(), temp_row_ptr, (rows() + 1) * sizeof(IT_));
-        ::memcpy(local.val(), temp_val, used_elements() * sizeof(VT_));
+        ::memcpy(local.val(), temp_val, used_elements() * sizeof(ValueType));
         for (Index i(0) ; i < used_elements() ; ++i)
         {
           local.col_ind()[i] = (IT_)perm_pos[temp_col_ind[i]];
@@ -1965,7 +1963,7 @@ namespace FEAT
 
         //sort columns in every row by column index
         IT_ swap_key;
-        VT_ swap_val;
+        ValueType swap_val;
         for (Index row(0) ; row < rows() ; ++row)
         {
           Index offset(local.row_ptr()[row]);

@@ -693,7 +693,7 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
       DT_ zero_element() const
       {
@@ -705,7 +705,7 @@ namespace FEAT
        *
        * \return Allocated element count.
        */
-      const Index & allocated_elements() const
+      Index allocated_elements() const
       {
         return this->_scalar_index.at(2);
       }
@@ -715,7 +715,7 @@ namespace FEAT
        *
        * \return Allocation increment.
        */
-      const Index & alloc_increment() const
+      Index alloc_increment() const
       {
         return this->_scalar_index.at(3);
       }
@@ -725,7 +725,7 @@ namespace FEAT
        *
        * \return Sorting status.
        */
-      const Index & sorted() const
+      Index sorted() const
       {
         return this->_scalar_index.at(4);
       }

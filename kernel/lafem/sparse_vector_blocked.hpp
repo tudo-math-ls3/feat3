@@ -114,7 +114,6 @@ namespace FEAT
       static constexpr int BlockSize = BlockSize_;
       /// Our value type
       typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-      typedef ValueType VT_;
 
       /**
        * \brief Constructor
@@ -312,8 +311,8 @@ namespace FEAT
       /**
        * \brief The number of elements
        *
-       * \returns number of elements of type Tiny::Vector<DT_, Blocksize_> if perspective_ = false.
-       * \returns Raw number of elements of type DT_ if perspective_ = true.
+       * \returns number of elements of type ValueType if perspective_ = false.
+       * \returns Raw number of elements of type DataType if perspective_ = true.
        */
     template <Perspective perspective_ = Perspective::native>
       Index size() const
@@ -331,12 +330,12 @@ namespace FEAT
        *
        * \returns Specific vector element.
        */
-      const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
+      const ValueType operator()(Index index) const
       {
         ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
         if (this->_elements.size() == 0)
-          return zero_element();
+          return ValueType(zero_element());
 
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();
@@ -351,12 +350,12 @@ namespace FEAT
 
         if (i < used_elements() && MemoryPool<Mem_>::get_element(indices(), i) == index)
         {
-          Tiny::Vector<DT_, BlockSize_> t;
+          ValueType t;
           MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + i * Index(BlockSize_), Index(BlockSize_));
           return t;
         }
         else
-          return zero_element();
+          return ValueType(zero_element());
       }
 
 
@@ -366,7 +365,7 @@ namespace FEAT
        * \param[in] index The index of the vector element.
        * \param[in] val The val to be set.
        */
-      void operator()(Index index, const Tiny::Vector<DT_, BlockSize_>& val)
+      void operator()(Index index, const ValueType& val)
       {
         ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
@@ -443,7 +442,7 @@ namespace FEAT
             return;
 
           IT_ * pindices;
-          VT_ * pelements;
+          ValueType * pelements;
           if (typeid(Mem_) == typeid(Mem::Main))
           {
             pindices = this->_indices.at(0);
@@ -452,7 +451,7 @@ namespace FEAT
           else
           {
             pindices = new IT_[_allocated_elements()];
-            pelements = new VT_[_allocated_elements()];
+            pelements = new ValueType[_allocated_elements()];
             MemoryPool<Mem_>::download(pindices, this->_indices.at(0), _allocated_elements());
             MemoryPool<Mem_>::download((DT_*)pelements, this->_elements.at(0), _allocated_elements() * BlockSize_);
           }
@@ -550,12 +549,11 @@ namespace FEAT
       /**
        * \brief Retrieve non zero element.
        *
-       * \returns Non zero element.
+       * \returns Zero element.
        */
-      const Tiny::Vector<DT_, BlockSize_> zero_element() const
+      DataType zero_element() const
       {
-        Tiny::Vector<DT_, BlockSize_> t(this->_scalar_dt.at(0));
-        return t;
+        return this->_scalar_dt.at(0);
       }
 
       /**
@@ -563,7 +561,7 @@ namespace FEAT
        *
        * \return Allocated element count.
        */
-      const Index & allocated_elements() const
+      Index allocated_elements() const
       {
         return this->_scalar_index.at(2);
       }
@@ -573,7 +571,7 @@ namespace FEAT
        *
        * \return Allocation increment.
        */
-      const Index & alloc_increment() const
+      Index alloc_increment() const
       {
         return this->_scalar_index.at(3);
       }
@@ -583,7 +581,7 @@ namespace FEAT
        *
        * \return Sorting status.
        */
-      const Index & sorted() const
+      Index sorted() const
       {
         return this->_scalar_index.at(4);
       }
@@ -640,7 +638,7 @@ namespace FEAT
         lhs << "[";
         for (Index i(0) ; i < b.size() ; ++i)
         {
-          Tiny::Vector<DT_, BlockSize_> t = b(i);
+          ValueType t = b(i);
           for (int j(0) ; j < BlockSize_ ; ++j)
             lhs << "  " << t[j];
         }

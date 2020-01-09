@@ -27,7 +27,7 @@ With little exceptions, the object which hosts the function call will contain th
 A typical call may look like these:
 \code{.cpp}
 // compute component product
-vector1.componen_product(vector1, vector2)
+vector1.component_product(vector1, vector2);
 // compute dot product
 double d = vector1.dot(vector2);
 // compute matrix vector product
@@ -61,8 +61,10 @@ Thus empty matrices with identical layout can be created easily and memory consu
 \section lafem_sec_typedefs Common container typedefs
 - DataType
 - IndexType
-- MemoryType
+- MemType
 - ContainerType, the base container type
+- ValueType (mainly for blocked containers)
+<--! maybe add ValueType for all containers (set to DataType) -->
 
 Usage:
 \code{.cpp}
@@ -74,7 +76,7 @@ typedef typename VT_::template ContainerType<Mem::CUDA, typename VT_main::DataTy
 - DT_ - Datatype (float, double)
 - IT_ - Indextype (Index, unsigned long)
 - Mem_ - Memorytype (Mem::Main, Mem::CUDA)
-- VT_ - Vectortype (DenseVector<...>)
+- VT_ - Vectortype (DenseVector<...>), not to be confused with ValueType typedefs
 - MT_ - Matrixtype, not to be confused with Mem_
 - FT_ - Filtertype (UnitFilter, NoneFilter)
 
