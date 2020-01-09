@@ -125,6 +125,9 @@ namespace FEAT
 
         /// return the overall amount of memory allocated in bytes
         static Index allocated_memory();
+
+        /// return allocated size in bytes of a given array by memory address
+        static Index allocated_size(void * address);
     };
 
     /**
@@ -359,6 +362,17 @@ namespace FEAT
             bytes += i.second.size;
           }
           return bytes;
+        }
+
+        static Index allocated_size(void * address)
+        {
+          std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
+          if (it != _pool.end())
+          {
+            return it->second.size;
+          }
+          else
+            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::allocated_size: Memory address not found!");
         }
     };
 

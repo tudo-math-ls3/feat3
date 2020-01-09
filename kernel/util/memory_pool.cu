@@ -257,6 +257,17 @@ Index MemoryPool<Mem::CUDA>::allocated_memory()
   return bytes;
 }
 
+Index MemoryPool<Mem::CUDA>::allocated_size(void * address)
+{
+  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
+  if (it != _pool.end())
+  {
+    return it->second.size;
+  }
+  else
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::allocated_size: Memory address not found!");
+}
+
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::CUDA>::allocate_memory<unsigned int>(const Index);
