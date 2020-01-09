@@ -149,6 +149,10 @@ if (FEAT_HAVE_DEATH_HANDLER)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/deathhandler/DeathHandler-master/")
 endif(FEAT_HAVE_DEATH_HANDLER)
 
+if (FEAT_HAVE_ZFP)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-0.5.5/include/")
+endif(FEAT_HAVE_ZFP)
+
 # our custom target to build (but not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 

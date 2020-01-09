@@ -163,6 +163,10 @@ the SuiteSparse library package.
 \subsection ppm_feat_have_zlib FEAT_HAVE_ZLIB
 This macro is defined by the build system if the FEAT kernel is linked against the zlib library.
 
+<hr>
+\subsection ppm_feat_have_zlib FEAT_HAVE_ZFP
+This macro is defined by the build system if the FEAT kernel is linked against the zfp library.
+
 <hr><hr>
 \section preproc_sec_user_def User-Defineable Macros
 This section enlists miscellaneous macros that can be defined by the user via the build-system to affect various parts

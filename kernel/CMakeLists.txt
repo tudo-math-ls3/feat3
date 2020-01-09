@@ -69,6 +69,10 @@ if (FEAT_HAVE_DEATH_HANDLER)
   TARGET_LINK_LIBRARIES(feat thirdparty-deathhandler)
 endif (FEAT_HAVE_DEATH_HANDLER)
 
+if (FEAT_HAVE_ZFP)
+  TARGET_LINK_LIBRARIES(feat thirdparty-zfp)
+endif (FEAT_HAVE_ZFP)
+
 
 #libquadmath needs to be the last library linked against
 if (FEAT_HAVE_QUADMATH)

@@ -63,6 +63,9 @@
 /// Do we have ZLIB support enabled?
 #cmakedefine FEAT_HAVE_ZLIB
 
+/// Do we have ZFP support enabled?
+#cmakedefine FEAT_HAVE_ZFP
+
 /// Do we have HYPRE support enabled?
 #cmakedefine FEAT_HAVE_HYPRE
 
