@@ -167,11 +167,15 @@ namespace FEAT
 
         /// allocate new memory
         template <typename DT_>
-        static DT_ * allocate_memory(const Index count)
+        static DT_ * allocate_memory(Index count)
         {
-          XASSERT(count != 0);
-
           DT_ * memory(nullptr);
+          if (count == 0)
+            return memory;
+
+          if (count%4 != 0)
+            count = count + (4ul - count%4);
+
           memory = (DT_*)::malloc(count * sizeof(DT_));
           if (memory == nullptr)
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
@@ -187,11 +191,14 @@ namespace FEAT
 #ifdef FEAT_HAVE_CUDA
         /// allocate new pinned memory
         template <typename DT_>
-        static DT_ * allocate_pinned_memory(const Index count)
+        static DT_ * allocate_pinned_memory(Index count)
         {
           DT_ * memory(nullptr);
           if (count == 0)
             return memory;
+
+          if (count%4 != 0)
+            count = count + (4ul - count%4);
 
           memory = (DT_*)Util::cuda_malloc_host(count * sizeof(DT_));
 
