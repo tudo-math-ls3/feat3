@@ -976,7 +976,8 @@ namespace FEAT
        */
       DataType triple_dot(const DenseVector & x, const DenseVector & y) const
       {
-        XASSERTM(x.size() != this->size() || y.size() == this->size(), "Vector sizes does not match!");
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+        XASSERTM(y.size() == this->size(), "Vector size does not match!");
 
         TimeStamp ts_start;
 

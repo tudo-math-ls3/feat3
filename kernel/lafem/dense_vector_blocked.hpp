@@ -917,7 +917,8 @@ namespace FEAT
        */
       DataType triple_dot(const DenseVectorBlocked & x, const DenseVectorBlocked & y) const
       {
-        XASSERTM(x.template size<Perspective::pod>() != this->template size<Perspective::pod>() || y.template size<Perspective::pod>() == this->template size<Perspective::pod>(), "Vector sizes does not match!");
+        XASSERTM(x.template size<Perspective::pod>() == this->template size<Perspective::pod>(), "Vector size does not match!");
+        XASSERTM(y.template size<Perspective::pod>() == this->template size<Perspective::pod>(), "Vector size does not match!");
 
         TimeStamp ts_start;
 
