@@ -20,7 +20,33 @@ public:
     TaggedTest<Archs::None, Archs::None>("PackTest")
   {
   }
+  template<typename DT_>
+  void test_lossy_float(const Pack::Type pack_type, const double precision, bool swap_bytes = false) const
+  {
+    static constexpr std::size_t n = 43;
+    const DT_ scal = Math::pi<DT_>() / DT_(2*n);
+    DT_ idata[n], odata[n];
 
+    // fill array with sine values
+    for(std::size_t i(0); i < n; ++i)
+      idata[i] = Math::sin(DT_(i+1) * scal);
+    // estimate buffer size and create buffer vector
+    const std::size_t est_size = Pack::estimate_size(n, pack_type, precision);
+    std::vector<char> pbuf(est_size + std::size_t(64u));
+
+    const std::size_t dst_size = Pack::encode(pbuf.data(), idata, pbuf.size(), n, pack_type, swap_bytes, precision);
+    TEST_CHECK(dst_size <= est_size);
+
+    const std::size_t src_size = Pack::decode(odata, pbuf.data(), n, pbuf.size(), pack_type, swap_bytes);
+    TEST_CHECK_EQUAL(src_size, dst_size);
+
+    // compare with input array, testing absolut error...
+    for(std::size_t i(0); i < n; ++i)
+    {
+      DT_ abs_err = Math::abs(odata[i] - idata[i]);
+      TEST_CHECK_IN_RANGE(abs_err, DT_(0), (DT_)precision);
+    }
+  }
   template<typename DT_>
   void test_pack_float(const Pack::Type pack_type, const DT_ tol, bool swap_bytes = false) const
   {
@@ -160,5 +186,18 @@ public:
     test_pack_int<int>(Pack::Type::ZI32, true ); // int -> int32 (swap)
     test_pack_int<int>(Pack::Type::ZI64, false); // int -> int64 (expand)
 #endif // FEAT_HAVE_ZLIB
+
+#ifdef FEAT_HAVE_ZFP
+    test_lossy_float<float>(Pack::Type::PF32, 1E-4);
+    test_lossy_float<float>(Pack::Type::PF64, 1E-4);
+    test_lossy_float<float>(Pack::Type::PF32, 1E-7);
+    test_lossy_float<float>(Pack::Type::PF64, 1E-7);
+    test_lossy_float<double>(Pack::Type::PF32, 1E-4);
+    test_lossy_float<double>(Pack::Type::PF64, 1E-4);
+    test_lossy_float<double>(Pack::Type::PF32, 1E-7);
+    test_lossy_float<double>(Pack::Type::PF64, 1E-7);
+    test_lossy_float<double>(Pack::Type::PF64, 1E-12);
+    test_lossy_float<double>(Pack::Type::PF64, 1E-14);
+#endif //FEAT_HAVE_ZFP
   }
 } pack_test;

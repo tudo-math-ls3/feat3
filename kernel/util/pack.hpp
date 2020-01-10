@@ -17,6 +17,8 @@
 // includes, system
 #include <cstdint>
 #include <vector>
+#include <cstring>
+#include <limits>
 
 // includes, thirdparty
 #ifdef FEAT_HAVE_HALFMATH
@@ -25,6 +27,11 @@
 #ifdef FEAT_HAVE_ZLIB
 #include <zlib.h>
 #endif // FEAT_HAVE_ZLIB
+#ifdef FEAT_HAVE_ZFP
+FEAT_DISABLE_WARNINGS
+#include "zfp.h"
+FEAT_RESTORE_WARNINGS
+#endif //FEAT_HAVE_ZFP
 
 namespace FEAT
 {
@@ -33,7 +40,7 @@ namespace FEAT
    *
    * This namespace encapsulates various functions than provide means of packing and unpacking
    * data arrays as well as compression and decompression of buffers using the third-party
-   * library zlib.
+   * library zlib or lossy compression and decompression of buffers using the third-party library zfp.
    */
   namespace Pack
   {
@@ -84,6 +91,16 @@ namespace FEAT
 #endif
 
     /**
+     * \brief bitmask for zfp header
+     *
+     * //0x1u HEADER_MAGIC -> for version control--> only checks codec... in last 8 bits of first 32 bits...
+     * //0x2u HEADER_META
+     * //0x4u HEADER_MODE
+     */
+#ifdef FEAT_HAVE_ZFP
+    const uint zfp_header_mask = 7u;
+#endif //FEAT_HAVE_ZFP
+    /**
      * \brief Type enumeration
      */
     enum class Type : u16
@@ -91,6 +108,7 @@ namespace FEAT
       None    = 0x0000, //< none (for comparison)
       Mask_T  = 0x0FFF, //< raw type mask
       Mask_Z  = 0x8000, //< zlib compression mask
+      Mask_P  = 0x2000, //< zfp compression mask
     //Mask_E  = 0x4000, //< swap endianness mask
 
       // raw signed integer types
@@ -129,7 +147,15 @@ namespace FEAT
       ZF16    = 0x8032, //<  16-bit floating point (half precision)
       ZF32    = 0x8033, //<  32-bit floating point (single precision)
       ZF64    = 0x8034, //<  64-bit floating point (double precision)
-      ZF128   = 0x8035  //< 128-bit floating point (quadruple precision)
+      ZF128   = 0x8035,  //< 128-bit floating point (quadruple precision)
+
+      //zfp compressed floating point types
+    //PF8     = 0x2031, //<   8-bit floating point (quarter precision)
+    //PF16    = 0x2032, //<  16-bit floating point (half precision)
+      PF32    = 0x2033, //<  32-bit floating point (single precision)
+      PF64    = 0x2034 //<  64-bit floating point (double precision)
+    //PF128   = 0x2035  //< 128-bit floating point (quadruple precision)
+
     }; // enum class Type
 
     /// bit-wise AND operator for Pack::Type
@@ -175,6 +201,8 @@ namespace FEAT
       case Pack::Type::ZU16:  return os << "ZU16";
       case Pack::Type::ZU32:  return os << "ZU32";
       case Pack::Type::ZU64:  return os << "ZU64";
+      case Pack::Type::PF32:  return os << "PF32";
+      case Pack::Type::PF64:  return os << "PF64";
       default:
         return os << "???";
       }
@@ -213,6 +241,8 @@ namespace FEAT
       if(s.compare_no_case("ZU16") == 0)   t = Pack::Type::ZU16; else
       if(s.compare_no_case("ZU32") == 0)   t = Pack::Type::ZU32; else
       if(s.compare_no_case("ZU64") == 0)   t = Pack::Type::ZU64; else
+      if(s.compare_no_case("PF32") == 0)   t = Pack::Type::PF32; else
+      if(s.compare_no_case("PF64") == 0)   t = Pack::Type::PF64; else
         is.setstate(std::ios_base::failbit);
 
       return is;
@@ -553,6 +583,91 @@ namespace FEAT
         decode(dst, buf, count, pack_type, swap_bytes);
     }
 
+        /**
+     * \brief Computes the estimated (upper bound) pack buffer size for an array for lossy compression
+     *
+     * \note
+     * This function exists primarily for code outsourcing; it is recommended
+     * that you use the estimate_size() function instead.
+     *
+     * \warning
+     * Lossless estimation and lossy estimation of buffer size are different!
+     *
+     * \param[in] src
+     * A pointer to the input array that is to be packed. Must not be \c nullptr.
+     *
+     * \param[in] count
+     * The number of input array elements.
+     *
+     * \param[in] tolerance
+     * The desired maximum error of compressed data.
+     *
+     * \returns
+     * An estimated (upper bound) array buffer size.
+     *
+     */
+
+    std::size_t lossy_estimate_size(const std::size_t count, const Pack::Type type, const double tolerance)
+    {
+      if(count <= std::size_t(0))
+        return std::size_t(0);
+#ifdef FEAT_HAVE_ZFP
+      //get type T_, int would be handleable... but why lossy save an int array?:
+      zfp_type t = zfp_type::zfp_type_none;
+      switch(type)
+      {
+        case Pack::Type::PF32:
+          t = zfp_type::zfp_type_float;
+          break;
+        case Pack::Type::PF64:
+          t = zfp_type::zfp_type_double;
+          break;
+        default:
+          throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; data typ not available");
+      }
+      XASSERT(t != zfp_type::zfp_type_none);
+
+      //declare needed zfp internal variables:
+      zfp_field* field;
+      zfp_stream* zfp;
+      std::size_t bytes;
+      std::size_t x_size, y_size;
+      void* temp_arr = nullptr;
+
+      //calculate needed representation size, e.g. 4 times (size/4 +1):
+      x_size = 4u;
+      y_size = count/x_size + 1;
+
+      //check if we lose significant bits through type conversion...
+      if((sizeof(std::size_t) > sizeof(uint)) && (count > std::numeric_limits<uint>::max()))
+        throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; array size to big for internal data");
+
+      //initialize zfp field as 2D variant, that src is not right type does not matter at this point...( memory has to be freed in the end):
+      field = zfp_field_2d(temp_arr, t, (uint)x_size, (uint)y_size);
+      //open stream(has to be freed)
+      zfp = zfp_stream_open(NULL);
+      //set error tolerance of stream:
+      zfp_stream_set_accuracy(zfp, tolerance);
+      //get a conservativ estimate for the buffer size(header size included)
+      bytes = zfp_stream_maximum_size(zfp, field);
+
+      //free allocated data:
+      zfp_field_free(field);
+      zfp_stream_close(zfp);
+
+      //return compression size
+      return bytes;
+
+#else // no FEAT_HAVE_ZFP
+      (void) type;
+      (void) tolerance;
+      throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zfp not available");
+#endif // FEAT_HAVE_ZFP*/
+
+      // return 0
+      return std::size_t(0);
+    }
+
     /**
      * \brief Computes the estimated (upper bound) pack buffer size for an array
      *
@@ -565,8 +680,10 @@ namespace FEAT
      * \returns
      * An estimated (upper bound) array buffer size.
      */
-    inline std::size_t estimate_size(const std::size_t count, const Pack::Type type)
+    inline std::size_t estimate_size(const std::size_t count, const Pack::Type type, const double tolerance = 1e-16)
     {
+      if((type & Pack::Type::Mask_P) != Pack::Type::None)
+        return lossy_estimate_size(count, type, tolerance);
       // compute raw element size
       std::size_t raw_size = count * Pack::element_size(type & Pack::Type::Mask_T);
 
@@ -604,12 +721,15 @@ namespace FEAT
      * \param[in] swap_bytes
      * Specifies whether to swap the pack type bytes.
      *
+     * \param[in] tolerance
+     * Optional paramter: The desired maximum error for lossy compression.
+     *
      * \returns
      * The total number of bytes written into the output buffer.
      */
     template<typename T_>
     static std::size_t encode(void* buf, const T_* src, const std::size_t buf_size, const std::size_t count,
-      const Pack::Type pack_type, bool swap_bytes)
+      const Pack::Type pack_type, bool swap_bytes, double tolerance = 1e-16)
     {
       if(count <= std::size_t(0))
         return std::size_t(0);
@@ -621,8 +741,53 @@ namespace FEAT
       const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
 
       // no compression required?
-      if((pack_type & Pack::Type::Mask_Z) == Pack::Type::None)
+      if((pack_type & (Pack::Type::Mask_Z | Pack::Type::Mask_P) ) == Pack::Type::None)
         return encode_raw(buf, src, count, raw_type, swap_bytes);
+
+      // zlib compression?
+      if((pack_type & Pack::Type::Mask_Z) == Pack::Type::Mask_Z)
+        return lossless_encode(buf, src, buf_size, count, pack_type, swap_bytes);
+
+      //zfp compression?
+      if((pack_type & Pack::Type::Mask_P) == Pack::Type::Mask_P)
+        return lossy_encode(buf, src, buf_size, count, pack_type, swap_bytes, tolerance);
+
+      return std::size_t(0);
+    }
+    /**
+     * \brief Encodes an array into a packed buffer
+     *
+     * \note
+     * This function exists primarily for code outsourcing; it is recommended
+     * that you use the encode() function instead.
+     *
+     * \param[out] buf
+     * A pointer to the output buffer. Must not be \c nullptr.
+     *
+     * \param[in] src
+     * A pointer to the input array that is to be packed. Must not be \c nullptr.
+     *
+     * \param[in] buf_size
+     * The size of the output buffer \p buf in bytes. Must be at least as big as the estimated buffer size.
+     *
+     * \param[in] count
+     * The number of input array elements.
+     *
+     * \param[in] pack_type
+     * The desired output buffer pack type.
+     *
+     * \param[in] swap_bytes
+     * Specifies whether to swap the pack type bytes.
+     *
+     * \returns
+     * The total number of bytes written into the output buffer.
+     */
+    template<typename T_>
+    static std::size_t lossless_encode(void* buf, const T_* src, const std::size_t buf_size, const std::size_t count,
+      const Pack::Type pack_type, bool swap_bytes)
+    {
+      // get raw type
+      const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
 
 #ifdef FEAT_HAVE_ZLIB
       // ensure that the temporary buffer is large enough
@@ -648,11 +813,17 @@ namespace FEAT
       return static_cast<std::size_t>(dl);
 #else // no FEAT_HAVE_ZLIB
       (void)buf_size;
+      (void) buf;
+      (void) src;
+      (void) raw_type;
+      (void) swap_bytes;
+      (void) pack_type;
+      (void) count;
       throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zlib not available");
 #endif // FEAT_HAVE_ZLIB
     }
 
-    /**
+     /**
      * \brief Decodes an array from a packed buffer
      *
      * \param[out] dst
@@ -677,7 +848,7 @@ namespace FEAT
      * The total number of bytes consumed from the input buffer.
      */
     template<typename T_>
-    static std::size_t decode(T_* dst, const void* buf, const std::size_t count, const std::size_t buf_size,
+    static std::size_t decode(T_* dst, void* buf, const std::size_t count, const std::size_t buf_size,
       const Pack::Type pack_type, bool swap_bytes)
     {
       if(count <= std::size_t(0))
@@ -689,9 +860,57 @@ namespace FEAT
       // get raw type
       const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
 
-      // no decompression required?
-      if((pack_type & Pack::Type::Mask_Z) == Pack::Type::None)
+      // no compression required?
+      if((pack_type & (Pack::Type::Mask_Z | Pack::Type::Mask_P) ) == Pack::Type::None)
         return decode_raw(dst, buf, count, raw_type, swap_bytes);
+
+      // zlib compression?
+      if((pack_type & Pack::Type::Mask_Z) == Pack::Type::Mask_Z)
+        return lossless_decode(dst, buf, count, buf_size, pack_type, swap_bytes);
+
+      //zfp compression?
+      if((pack_type & Pack::Type::Mask_P) == Pack::Type::Mask_P)
+        return lossy_decode(dst, buf, count, buf_size, pack_type, swap_bytes);
+
+      return std::size_t(0);
+    }
+
+
+    /**
+     * \brief Decodes an array from a packed buffer
+     *
+     * \note
+     * This function exists primarily for code outsourcing; it is recommended
+     * that you use the decode() function instead.
+     *
+     * \param[out] dst
+     * A pointer to the output array that is to be unpacked. Must not be \c nullptr.
+     *
+     * \param[in] buf
+     * A pointer to the input buffer. Must not be \c nullptr.
+     *
+     * \param[in] count
+     * The number of output array elements.
+     *
+     * \param[in] buf_size
+     * The size of the input buffer \p buf in bytes.
+     *
+     * \param[in] pack_type
+     * The input buffer pack type.
+     *
+     * \param[in] swap_bytes
+     * Specifies whether to swap the pack type bytes.
+     *
+     * \returns
+     * The total number of bytes consumed from the input buffer.
+     */
+    template<typename T_>
+    static std::size_t lossless_decode(T_* dst, const void* buf, const std::size_t count, const std::size_t buf_size,
+      const Pack::Type pack_type, bool swap_bytes)
+    {
+
+      // get raw type
+      const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
 
 #ifdef FEAT_HAVE_ZLIB
       // ensure that the temporary buffer is large enough
@@ -717,9 +936,242 @@ namespace FEAT
       return static_cast<std::size_t>(sl);
 #else // no FEAT_HAVE_ZLIB
       (void)buf_size;
+      (void) buf;
+      (void) dst;
+      (void) raw_type;
+      (void) swap_bytes;
+      (void) pack_type;
+      (void) count;
       throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zlib not available");
 #endif // FEAT_HAVE_ZLIB
     }
+
+    /**
+     * \brief Encodes an array into a packed buffer
+     *
+     * \note
+     * This function exists primarily for code outsourcing; it is recommended
+     * that you use the encode() function instead.
+     *
+     * \param[out] buf
+     * A pointer to the output buffer. Must not be \c nullptr.
+     *
+     * \param[in] src
+     * A pointer to the input array that is to be packed. Must not be \c nullptr.
+     *
+     * \param[in] buf_size
+     * The size of the output buffer \p buf in bytes. Must be at least as big as the estimated buffer size.
+     *
+     * \param[in] count
+     * The number of input array elements.
+     *
+     * \param[in] pack_type
+     * The desired output buffer pack type.
+     *
+     * \param[in] swap_bytes
+     * Specifies whether to swap the pack type bytes.
+     *
+     * \param[in] tolerance
+     * The desired maximum error of compressed data.
+     *
+     * \warning
+     * Tolerance can be exceeded in fringe cases. If data set is highly uncontinuous, error testing is
+     * recommended.
+     *
+     * \returns
+     * The total number of bytes written into the output buffer.
+     *
+     */
+    template<typename T_>
+    static std::size_t lossy_encode(void* buf, T_* src, const std::size_t buf_size,  const std::size_t count,
+       const Pack::Type pack_type, bool swap_bytes, const double tolerance)
+    {
+      // get raw type
+      const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
+      //Test if zfp is loaded:
+#ifdef FEAT_HAVE_ZFP
+      //get type T_ :
+      zfp_type t = zfp_type::zfp_type_none;
+      switch(pack_type)
+      {
+        case Pack::Type::PF32:
+          t = zfp_type::zfp_type_float;
+          break;
+        case Pack::Type::PF64:
+          t = zfp_type::zfp_type_double;
+          break;
+        default:
+          throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; data typ not available");
+      }
+      XASSERT(t != zfp_type::zfp_type_none);
+      //check if header can hold size of the array, in case it cant (more than 1 petabyte of double data) give out error for now
+      //limitation is only for the header, not for the underlying zfp_array, so there could be a workaround if needed...
+      XASSERT(count <= u64(2e14));
+
+      //cast src to the needed type:
+      // ensure that the temporary buffer is large enough
+      std::size_t raw_size = element_size(raw_type) * count + 3 * element_size(raw_type);
+      std::vector<char> tmp(raw_size);
+
+      // encode into temporary buffer
+      encode_raw(tmp.data(), src, count, raw_type, swap_bytes);
+
+      //declare needed zfp internal variables:
+      zfp_field* field;
+      zfp_stream* zfp;
+      std::size_t real_bytes;
+      bitstream* stream;
+      std::size_t x_size, y_size;
+
+      //check if we lose significant bits through type conversion...
+      if((sizeof(std::size_t) > sizeof(uint)) && (count > std::numeric_limits<uint>::max()))
+        throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; array size to big for internal data structure");
+      //calculate needed representation size and rest:
+      x_size = 4u;
+      if(count%4u == 0)
+        y_size = count/x_size;
+      else
+        y_size = count/x_size + 1;
+
+      //initialize zfp structures:
+      field = zfp_field_2d(tmp.data(), t, (uint)x_size, (uint)y_size);
+      zfp = zfp_stream_open(NULL);
+      zfp_stream_set_accuracy(zfp, tolerance);
+      stream = stream_open(buf, buf_size);
+      zfp_stream_set_bit_stream(zfp, stream);
+      stream_rewind(stream);
+      //write header to stream
+      zfp_write_header(zfp, field, zfp_header_mask);
+      //compress
+      real_bytes = zfp_compress(zfp, field);
+
+      //free allocated data:
+      zfp_field_free(field);
+      zfp_stream_close(zfp);
+      stream_close(stream);
+
+      return real_bytes;
+#else
+      (void)buf_size;
+      (void) buf;
+      (void) src;
+      (void) raw_type;
+      (void) swap_bytes;
+      (void) pack_type;
+      (void) count;
+      (void) tolerance;
+      throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zfp not available");
+#endif //FEAT_HAVE_ZFP
+    }
+    /**
+     * \brief Decodes an array from a packed buffer with lossy saved compression data.
+     *
+     * \note
+     * This function exists primarily for code outsourcing; it is recommended
+     * that you use the decode() function instead.
+     *
+     * \param[out] dst
+     * A pointer to the output array that is to be unpacked. Must not be \c nullptr.
+     *
+     * \param[in] buf
+     * A pointer to the input buffer. Must not be \c nullptr.
+     *
+     * \param[in] count
+     * The number of output array elements.
+     *
+     * \param[in] buf_size
+     * The size of the input buffer \p buf in bytes.
+     *
+     * \param[in] pack_type
+     * The input buffer pack type.
+     *
+     * \param[in] swap_bytes
+     * Specifies whether to swap the pack type bytes.
+     *
+     * \returns
+     * The total number of bytes consumed from the input buffer.
+     */
+    template<typename T_>
+    static std::size_t lossy_decode(T_* dst, void* buf, const std::size_t count, const std::size_t buf_size,
+      const Pack::Type pack_type, bool swap_bytes)
+    {
+      // get raw type
+      const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
+#ifdef FEAT_HAVE_ZFP
+      //get type T_ :
+      zfp_type t = zfp_type::zfp_type_none;
+      switch(pack_type)
+      {
+        case Pack::Type::PF32:
+          t = zfp_type::zfp_type_float;
+          break;
+        case Pack::Type::PF64:
+          t = zfp_type::zfp_type_double;
+          break;
+        default:
+          throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; data typ not available");
+      }
+      XASSERT(t != zfp_type::zfp_type_none);
+
+      // ensure that the temporary buffer is large enough
+      std::size_t raw_size = element_size(raw_type) * count + 1024u; // + 1KB
+      std::vector<char> tmp(raw_size);
+
+      //declare intern zfp variables
+      zfp_field* field;
+      zfp_stream* zfp;
+      bitstream* stream;
+      std::size_t array_size;
+      std::size_t real_bytes;
+      //allocating memory
+      field = zfp_field_alloc();
+      zfp = zfp_stream_open(NULL);
+      //aligning stream with buf:
+      stream = stream_open(buf, buf_size);
+      //read in Codec:
+      stream_rseek(stream, 24u);
+      uint codec = (uint)stream_read_bits(stream, 8u);
+      if(codec != zfp_codec_version)
+        throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zfp version not compatible \n zfp_Systemcodec: " + std::to_string(zfp_codec_version) +
+          "\n zfp_Compressed codec: " + std::to_string(codec));
+      stream_rewind(stream);
+      //aligning zfp_stream with bitsream
+      zfp_stream_set_bit_stream(zfp, stream);
+      //read header
+      zfp_read_header(zfp, field, zfp_header_mask);
+      array_size = zfp_field_size(field, NULL);
+      //check if T_ and type to be decompressed is same:
+      if(t != field->type)
+        throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; given array and saved data do not have the same type");
+      //checking if buffersize of given array is enough to take up saved array....
+      if(array_size - 3 > count)
+        throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed data; given count is too small for decompressed data!");
+      //alligning field and tmp
+      field->data = tmp.data();
+      //decompress data
+      real_bytes = zfp_decompress(zfp, field);
+
+      // decode from temporary buffer
+      decode_raw(dst, tmp.data(), count, raw_type, swap_bytes);
+
+      //free memory
+      zfp_field_free(field);
+      zfp_stream_close(zfp);
+      stream_close(stream);
+
+      return real_bytes;
+#else
+      (void)buf_size;
+      (void) buf;
+      (void) dst;
+      (void) count;
+      (void) raw_type;
+      (void) swap_bytes;
+      (void) pack_type;
+      throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zfp not available");
+#endif //FEAT_HAVE_ZFP
+    }
+
   } // namespace Pack
 } // namespace FEAT
 
