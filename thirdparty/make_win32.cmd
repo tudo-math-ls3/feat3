@@ -70,6 +70,15 @@ if exist "./fparser" (
 
 rem ===========================================================================
 echo **************************************************************************
+if exist "./zfp" (
+  call ./vc_internal/make_zfp.cmd vc%VSVER% dbg x86
+  call ./vc_internal/make_zfp.cmd vc%VSVER% opt x86
+) else (
+  echo zfp not found; skipping...
+  echo.
+)
+rem ===========================================================================
+echo **************************************************************************
 if exist "./zlib" (
   call ./vc_internal/make_zlib.cmd vc%VSVER% dbg x86
   call ./vc_internal/make_zlib.cmd vc%VSVER% opt x86

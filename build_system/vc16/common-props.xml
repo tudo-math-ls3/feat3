@@ -108,6 +108,9 @@
   <PropertyGroup Condition="Exists('..\..\lib\umfpack.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveUmfpack>true</FeatHaveUmfpack>
   </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\..\lib\zfp.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveZfp>true</FeatHaveZfp>
+  </PropertyGroup>
   <PropertyGroup Condition="Exists('..\..\lib\zlib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveZlib>true</FeatHaveZlib>
   </PropertyGroup>
@@ -146,6 +149,8 @@
       Include="FEAT_HAVE_TRIANGLE" />
     <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="FEAT_HAVE_UMFPACK" />
+    <FeatDef Condition="'$(FeatHaveZfp)'=='true'"
+      Include="FEAT_HAVE_ZFP" />
     <FeatDef Condition="'$(FeatHaveZlib)'=='true'"
       Include="FEAT_HAVE_ZLIB" />
   </ItemGroup>
@@ -176,6 +181,8 @@
       Include="$(FeatRootPath)\thirdparty\triangle;" />
     <FeatIncDir Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="$(FeatRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeatRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeatRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
+    <FeatIncDir Condition="'$(FeatHaveZfp)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\zfp\include;" />
     <FeatIncDir Condition="'$(FeatHaveZlib)'=='true'"
       Include="$(FeatRootPath)\thirdparty\zlib;" />
   </ItemGroup>
@@ -225,6 +232,8 @@
       Include="triangle.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="umfpack.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveZfp)'=='true'"
+      Include="zfp.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveZlib)'=='true'"
       Include="zlib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>

@@ -61,6 +61,7 @@ thirdparty/hypre
 thirdparty/parmetis
 thirdparty/SuiteSparse
 thirdparty/triangle
+thirdparty/zfp
 thirdparty/zlib
 
 # Ignore Visual Studio symlinks

@@ -80,6 +80,16 @@ if exist "./zlib" (
 
 rem ===========================================================================
 echo **************************************************************************
+if exist "./zfp" (
+  call ./vc_internal/make_zfp.cmd vc%VSVER% dbg x64
+  call ./vc_internal/make_zfp.cmd vc%VSVER% opt x64
+) else (
+  echo zfp not found; skipping...
+  echo.
+)
+
+rem ===========================================================================
+echo **************************************************************************
 if exist "./triangle" (
   call ./vc_internal/make_triangle.cmd vc%VSVER% dbg x64
   call ./vc_internal/make_triangle.cmd vc%VSVER% opt x64
