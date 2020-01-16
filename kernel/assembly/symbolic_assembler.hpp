@@ -32,7 +32,11 @@ namespace FEAT
      * - Extended-facet pattern for identical or different test-/trial-spaces on the same mesh.
      *   This pattern is used for matrices which include operator coupling over neighbour elements,
      *   e.g. for jump-stabilisiation or discontinuous Galerkin methods. The corresponding functions
-     *   are assemble_matrix_ext1 and assemble_matrix_ext2.
+     *   are assemble_matrix_ext_facet1 and assemble_matrix_ext_facet2.
+     *
+     * - Extended-node pattern for identical or different test-/trial-spaces on the same mesh.
+     *   This pattern is used for matrices which include operator coupling over neighbour nodes.
+     *   The corresponding functions are assemble_matrix_ext_node1 and assemble_matrix_ext-node2.
      *
      * - Standard pattern for test-/trial-spaces defined on a 2-level-refined mesh pair.
      *   This pattern is used for prolongation and restriction matrices in multigrid methods.
@@ -108,7 +112,7 @@ namespace FEAT
        * The extended-facet Dof-Adjacency graph of the test- and trial-space combination.
        */
       template<typename TestSpace_, typename TrialSpace_>
-      static Adjacency::Graph assemble_graph_ext2(const TestSpace_& test_space, const TrialSpace_& trial_space)
+      static Adjacency::Graph assemble_graph_ext_facet2(const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         // render dof-graphs
         Adjacency::Graph test_dof_graph(Space::DofMappingRenderer::render(test_space));
@@ -145,16 +149,16 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles the standard Dof-Adjacency graph for identical test- and trial-spaces.
+       * \brief Assembles the extented-facet Dof-Adjacency graph for identical test- and trial-spaces.
        *
        * \param[in] space
        * The space representing the test- and trial spaces to be used for the assembly.
        *
        * \returns
-       * The standard Dof-Adjacency graph of the space.
+       * The extended-facet Dof-Adjacency graph of the space.
        */
       template<typename Space_>
-      static Adjacency::Graph assemble_graph_ext1(const Space_& space)
+      static Adjacency::Graph assemble_graph_ext_facet1(const Space_& space)
       {
         // create dof-mapping
         Adjacency::Graph dof_graph(Space::DofMappingRenderer::render(space));
@@ -165,6 +169,90 @@ namespace FEAT
 
         // get the facet index set
         const auto& facet_at_shape = space.get_trafo().get_mesh().template get_index_set<shape_dim, shape_dim-1>();
+
+        // transpose to get the facet support
+        Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
+
+        // render extended dof-mapping
+        Adjacency::Graph dof_ext_graph(Adjacency::RenderType::injectify, shape_at_facet, dof_graph);
+
+        // render transposed extended dof-mapping
+        Adjacency::Graph dof_ext_sup(Adjacency::RenderType::transpose, dof_ext_graph);
+
+        // render composite dof-mapping/dof-support graph
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, dof_ext_sup, dof_ext_graph);
+
+        // return the graph
+        return dof_adjactor;
+      }
+
+      /**
+       * \brief Assembles the extended-node Dof-Adjacency graph for different test- and trial-spaces.
+       *
+       * \param[in] test_space, trial_space
+       * The test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
+       *
+       * \returns
+       * The extended-node Dof-Adjacency graph of the test- and trial-space combination.
+       */
+      template<typename TestSpace_, typename TrialSpace_>
+      static Adjacency::Graph assemble_graph_ext_node2(const TestSpace_& test_space, const TrialSpace_& trial_space)
+      {
+        // render dof-graphs
+        Adjacency::Graph test_dof_graph(Space::DofMappingRenderer::render(test_space));
+        Adjacency::Graph trial_dof_graph(Space::DofMappingRenderer::render(trial_space));
+
+        // check dimensions
+        if(test_dof_graph.get_num_nodes_domain() != trial_dof_graph.get_num_nodes_domain())
+          throw InternalError(__func__, __FILE__, __LINE__, "invalid test-/trial-space pair");
+
+        // get the shape dimension
+        typedef typename TestSpace_::ShapeType ShapeType;
+        static constexpr Index shape_dim = Index(ShapeType::dimension);
+
+        // get the facet index set
+        const auto& facet_at_shape = test_space.get_trafo().get_mesh().template get_index_set<shape_dim, 1>();
+
+        // transpose to get the facet support
+        Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
+
+        // render transposed test-dof-mapping
+        Adjacency::Graph test_dof_support(Adjacency::RenderType::transpose, test_dof_graph);
+
+        // render extended test-dof-support
+        Adjacency::Graph test_dof_ext_sup(Adjacency::RenderType::injectify, test_dof_support, facet_at_shape);
+
+        // render extended trial-dof-mapping
+        Adjacency::Graph trial_dof_ext_graph(Adjacency::RenderType::injectify, shape_at_facet, trial_dof_graph);
+
+        // render composite test-dof-mapping/trial-dof-support graph
+        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_ext_sup, trial_dof_ext_graph);
+
+        // return the graph
+        return dof_adjactor;
+      }
+
+      /**
+       * \brief Assembles the extended-node Dof-Adjacency graph for identical test- and trial-spaces.
+       *
+       * \param[in] space
+       * The space representing the test- and trial spaces to be used for the assembly.
+       *
+       * \returns
+       * The extended-node Dof-Adjacency graph of the space.
+       */
+      template<typename Space_>
+      static Adjacency::Graph assemble_graph_ext_node1(const Space_& space)
+      {
+        // create dof-mapping
+        Adjacency::Graph dof_graph(Space::DofMappingRenderer::render(space));
+
+        // get the shape dimension
+        typedef typename Space_::ShapeType ShapeType;
+        static constexpr Index shape_dim = Index(ShapeType::dimension);
+
+        // get the facet index set
+        const auto& facet_at_shape = space.get_trafo().get_mesh().template get_index_set<shape_dim, 1>();
 
         // transpose to get the facet support
         Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
@@ -302,7 +390,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles an extended matrix structure from a test-trial-space pair.
+       * \brief Assembles an extended-facet matrix structure from a test-trial-space pair.
        *
        * \param[out] matrix
        * A reference to the matrix to be assembled.
@@ -311,14 +399,14 @@ namespace FEAT
        * The test- and trial-spaces to be used for the assembly.
        */
       template<typename MatrixType_, typename TestSpace_, typename TrialSpace_>
-      static void assemble_matrix_ext2(MatrixType_ & matrix,
-        const TestSpace_& test_space, const TrialSpace_& trial_space)
+      static void assemble_matrix_ext_facet2(MatrixType_ & matrix,
+                                             const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
-        matrix = MatrixType_(assemble_graph_ext2(test_space, trial_space));
+        matrix = MatrixType_(assemble_graph_ext_facet2(test_space, trial_space));
       }
 
       /**
-       * \brief Assembles an extended matrix structure from a single space.
+       * \brief Assembles an extended-facet matrix structure from a single space.
        *
        * \param[out] matrix
        * A reference to the matrix to be assembled.
@@ -327,9 +415,40 @@ namespace FEAT
        * The space to be used for the assembly.
        */
       template<typename MatrixType_, typename Space_>
-      static void assemble_matrix_ext1(MatrixType_ & matrix, const Space_& space)
+      static void assemble_matrix_ext_facet1(MatrixType_ & matrix, const Space_& space)
       {
-        matrix = MatrixType_(assemble_graph_ext1(space));
+        matrix = MatrixType_(assemble_graph_ext_facet1(space));
+      }
+
+      /**
+       * \brief Assembles an extended-node matrix structure from a test-trial-space pair.
+       *
+       * \param[out] matrix
+       * A reference to the matrix to be assembled.
+       *
+       * \param[in] test_space, trial_space
+       * The test- and trial-spaces to be used for the assembly.
+       */
+      template<typename MatrixType_, typename TestSpace_, typename TrialSpace_>
+      static void assemble_matrix_ext_node2(MatrixType_ & matrix,
+        const TestSpace_& test_space, const TrialSpace_& trial_space)
+      {
+        matrix = MatrixType_(assemble_graph_ext_node2(test_space, trial_space));
+      }
+
+      /**
+       * \brief Assembles an extended-node matrix structure from a single space.
+       *
+       * \param[out] matrix
+       * A reference to the matrix to be assembled.
+       *
+       * \param[in] space
+       * The space to be used for the assembly.
+       */
+      template<typename MatrixType_, typename Space_>
+      static void assemble_matrix_ext_node1(MatrixType_ & matrix, const Space_& space)
+      {
+        matrix = MatrixType_(assemble_graph_ext_node1(space));
       }
 
       /**

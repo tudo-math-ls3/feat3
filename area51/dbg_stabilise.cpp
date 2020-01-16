@@ -256,7 +256,7 @@ namespace Andicore
     MatrixType matrix;
 
     //Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
-    Assembly::SymbolicAssembler::assemble_matrix_ext1(matrix, space);
+    Assembly::SymbolicAssembler::assemble_matrix_ext_facet1(matrix, space);
 
     VectorType vec_sol_1 = matrix.create_vector_r();
     VectorType vec_sol_2 = matrix.create_vector_r();

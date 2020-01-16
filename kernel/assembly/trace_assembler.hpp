@@ -862,7 +862,7 @@ namespace FEAT
        *
        * \attention
        * The matrix must have an extended stencil, which must have been assembled by calling
-       * Assembly::SymbolicAssembler::assemble_matrix_ext1() !
+       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
        *
        * \param[inout] matrix
        * The matrix that is to be assembled.
@@ -1099,7 +1099,7 @@ namespace FEAT
        *
        * \attention
        * The matrix must have an extended stencil, which must have been assembled by calling
-       * Assembly::SymbolicAssembler::assemble_matrix_ext1() !
+       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
        *
        * \param[inout] matrix
        * The matrix that is to be assembled.

@@ -167,7 +167,7 @@ public:
   {
     // assemble extended matrix structure
     MatrixType matrix;
-    Assembly::SymbolicAssembler::assemble_matrix_ext1(matrix, space);
+    Assembly::SymbolicAssembler::assemble_matrix_ext_facet1(matrix, space);
 
     // allocate vectors
     VectorType vec_x(matrix.create_vector_l());

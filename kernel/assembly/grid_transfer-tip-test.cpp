@@ -94,7 +94,7 @@ public:
 
     // assemble extended matrix structure on coarse mesh
     MatrixType rip_matrix;
-    Assembly::SymbolicAssembler::assemble_matrix_ext1(rip_matrix, space_c);
+    Assembly::SymbolicAssembler::assemble_matrix_ext_facet1(rip_matrix, space_c);
 
     // initialise to coarse-mesh identity matrix "I_c"
     {
