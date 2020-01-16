@@ -211,7 +211,7 @@ namespace FEAT
         static constexpr Index shape_dim = Index(ShapeType::dimension);
 
         // get the facet index set
-        const auto& facet_at_shape = test_space.get_trafo().get_mesh().template get_index_set<shape_dim, 1>();
+        const auto& facet_at_shape = test_space.get_trafo().get_mesh().template get_index_set<shape_dim, 0>();
 
         // transpose to get the facet support
         Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
@@ -252,7 +252,7 @@ namespace FEAT
         static constexpr Index shape_dim = Index(ShapeType::dimension);
 
         // get the facet index set
-        const auto& facet_at_shape = space.get_trafo().get_mesh().template get_index_set<shape_dim, 1>();
+        const auto& facet_at_shape = space.get_trafo().get_mesh().template get_index_set<shape_dim, 0>();
 
         // transpose to get the facet support
         Adjacency::Graph shape_at_facet(Adjacency::RenderType::transpose, facet_at_shape);
