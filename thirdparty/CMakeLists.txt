@@ -137,6 +137,9 @@ if (FEAT_HAVE_DEATH_HANDLER)
 endif (FEAT_HAVE_DEATH_HANDLER)
 
 if (FEAT_HAVE_ZFP)
+  if(NOT EXISTS  ${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-0.5.5)
+    file(RENAME ${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-08adb27dbc7ed91373ba76312aa7e48504a02190 ${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-0.5.5)
+  endif(NOT EXISTS  ${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-0.5.5)
   file(GLOB zfp-list "${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-0.5.5/src/*.c")
 
   ADD_LIBRARY(thirdparty-zfp STATIC ${zfp-list})

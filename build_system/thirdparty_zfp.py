@@ -12,8 +12,10 @@ class ZFP(ThirdpartyPackage):
   def __init__(self,trunk_dirname):
     self.names = ["zfp"]
     self.dirname = "zfp"
-    self.filename = "zfp-0.5.5.tar.gz"
-    self.url = "https://computing.llnl.gov/projects/floating-point-compression/download/" + self.filename
+    #self.filename = "zfp-0.5.5.tar.gz"
+    #self.url = "https://computing.llnl.gov/projects/floating-point-compression/download/" + self.filename
+    self.filename ="08adb27dbc7ed91373ba76312aa7e48504a02190.zip"
+    self.url ="https://github.com/LLNL/zfp/archive/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_ZFP:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname
