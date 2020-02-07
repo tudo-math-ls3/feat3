@@ -38,7 +38,8 @@ def detect_cpu():
           cputype = "cortexa15"
         elif cpu_part == "0xd03":
           cputype = "cortexa53"
-        elif cpu_part == "0x004":
+      if cpu_implementer == "0x4e":
+        if cpu_part == "0x004":
           cputype = "armv8"
 
     else:

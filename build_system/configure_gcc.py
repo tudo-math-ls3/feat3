@@ -218,7 +218,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     elif cpu == "cortexa53":
       cxxflags += " -ffast-math -funsafe-math-optimizations -mcpu=cortex-a53 -mfpu=neon-vfpv4  -mfloat-abi=hard -mthumb"
     elif cpu == "armv8":
-      cxxflags += " -ffast-math -funsafe-math-optimizations -march=armv8-a -mcpu=cortex-a57 -mfpu=neon-vfpv4  -mfloat-abi=hard -mthumb"
+      cxxflags += " -ffast-math -funsafe-math-optimizations -march=armv8-a -mcpu=cortex-a57"
 
     #POWER
     elif cpu == "power7":
