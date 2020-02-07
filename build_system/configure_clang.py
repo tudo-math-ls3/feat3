@@ -42,6 +42,7 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
 
   if "ccache" in buildid:
     cxxflags += " -Qunused-arguments"
+
   if "debug" in buildid or "noop" in buildid:
     if major < 4:
       cxxflags += " -O0"
@@ -61,6 +62,11 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
       cxxflags += " -fsanitize=address" #" -fsanitize=memory" #-fsanitize=address-full
 
   elif "opt" in buildid or "fast" in buildid:
+    if major >= 7:
+      cxxflags += " -funroll-loops"
+      if "lto" in buildid:
+        cxxflags += " -flto"
+
     if "opt" in buildid:
       cxxflags += " -O3"
     elif "fast" in buildid:
@@ -111,6 +117,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
       cxxflags += " -march=core-avx2"
     elif cpu == "skylake-sp":
       cxxflags += " -march=core-avx2"
+    elif cpu == "cascadelake":
+      cxxflags += " -march=core-avx2"
     elif cpu == "coffee-lake":
       cxxflags += " -march=core-avx2"
     elif cpu == "kaby-lake":
@@ -155,6 +163,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
       cxxflags += " -m64 -march=barcelona"
     elif cpu == "zen":
       cxxflags += " -m64 -march=znver1"
+    elif cpu == "zen2":
+      cxxflags += " -m64 -march=znver2"
 
     else:
       cxxflags += " -march=native"

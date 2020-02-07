@@ -91,8 +91,10 @@ def detect_cpu():
         vendor_id = items[2]
       if items[0] == "cpu" and items[1] == "family":
         cpu_family = int(items[3])
-      if items[0] == "model":
+      if items[0] == "model" and items[1] != "name":
         model = int(items[2])
+      if items[0] == "stepping":
+        stepping = int(items[2])
         #assume that all three fields have been found in this order and abort, cause we now all we need
         break
 
@@ -192,8 +194,10 @@ def detect_cpu():
         cputype = "haswell"
       elif model == 79:
         cputype = "broadwell"
-      elif model == 85:
+      elif model == 85 and stepping < 5:
         cputype = "skylake-sp"
+      elif model == 85 and stepping >= 5:
+        cputype = "cascadelake"
       elif model == 87:
         cputype = "knightslanding"
       elif model == 94:
@@ -258,6 +262,8 @@ def detect_cpu():
     elif cpu_family == 23:
       if model == 1:
         cputype = "zen"
+      elif model == 49:
+        cputype = "zen2"
 
   # TODO insert sparc support here once it has been implemented properly
 

@@ -162,6 +162,11 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
         cxxflags += " -march=skylake -m64"
+    elif cpu == "cascadelake":
+      if platform.system() == "Darwin":
+        cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+      else:
+        cxxflags += " -march=cascadelake -m64"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
@@ -210,6 +215,8 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags = cxxflags.replace("O3", "O2")
     elif cpu == "zen":
       cxxflags += " -m64 -march=znver1"
+    elif cpu == "zen2":
+      cxxflags += " -m64 -march=znver2"
 
     #ARM
     elif cpu == "cortexa15":

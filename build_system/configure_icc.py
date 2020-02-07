@@ -88,6 +88,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -xCORE-AVX2"
     elif cpu == "skylake-sp":
       cxxflags += " -xCORE-AVX512"
+    elif cpu == "cascadelake":
+      cxxflags += " -xCORE-AVX512"
     elif cpu == "coffee-lake":
       cxxflags += " -xCORE-AVX2"
     elif cpu == "kaby-lake":
@@ -133,7 +135,9 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     elif cpu == "magnycours":
       cxxflags += " -msse3"
     elif cpu == "zen":
-      cxxflags += " " # not really supported by intel
+      cxxflags += " -march=core-avx2" # not really supported by intel
+    elif cpu == "zen":
+      cxxflags += " -march=core-avx2" # not really supported by intel
     else:
       print ("Warning: Detected cpu type not supported by configure_icc.py, using generic vectorisation support instead")
       # generate code for every simd unit, existing so far
