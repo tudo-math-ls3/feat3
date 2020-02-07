@@ -10,7 +10,7 @@ def detect_cpu():
   cputype = "unknown"
 
 # detect arm architecture
-  if "arm" in platform.machine():
+  if "arm" in platform.machine() or "aarch64" in platform.machine():
     if platform.system() == "Linux":
       d = {}
       f = open("/proc/cpuinfo")
@@ -38,6 +38,8 @@ def detect_cpu():
           cputype = "cortexa15"
         elif cpu_part == "0xd03":
           cputype = "cortexa53"
+        elif cpu_part == "0x004":
+          cputype = "armv8"
 
     else:
       print ("detect_cpu: operating system not supported")
