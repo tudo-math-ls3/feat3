@@ -754,6 +754,67 @@ namespace FEAT
     /// \endcond
 
     /**
+     * \brief Returns a quiet Not-A-Number (NaN)
+     *
+     * \note The generic implementation simply returns 0/0, which should
+     * result in a NaN for any IEEE-754 conforming implementation.
+     *
+     * \returns NaN
+     */
+    template<typename T_>
+    inline T_ nan()
+    {
+      // divide 0 by 0, which hopefully yields NaN
+      return T_(0) / T_(0);
+    }
+
+    /// \cond internal
+    template<>
+    inline float nan<float>()
+    {
+      return std::nanf("");
+    }
+
+    template<>
+    inline double nan<double>()
+    {
+      return std::nan("");
+    }
+
+    template<>
+    inline long double nan<long double>()
+    {
+      return std::nanl("");
+    }
+
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
+    template<>
+    inline __float128 nan<__float128>()
+    {
+      return ::nanq("");
+    }
+#endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
+
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
+    template<>
+    inline half_float::half nan<half_float::half>()
+    {
+      return half_float::nanh("");
+    }
+#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+
+#if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
+    /*template<int exp_bits_, int sig_bits_, typename Backend_>
+    inline flx::floatx<exp_bits_, sig_bits_, Backend_> nan<flx::floatx<exp_bits_, sig_bits_, Backend_>>()
+    {
+      // FloatX doesn't offer its own nan implementation,
+      // so create a backend type NaN and convert it to FloatX
+      return flx::floatx<exp_bits_, sig_bits_, Backend_>(Math::nan<Backend_>());
+    }*/
+#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+    /// \endcond
+
+    /**
      * \brief Returns the arcsine of a value.
      *
      * \param[in] x The value to calculate the arcsine from.

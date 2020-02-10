@@ -115,6 +115,7 @@ public:
     test_pi();
     test_asin();
     test_acos();
+    test_nan();
   }
 
   void test_sqrt() const
@@ -253,6 +254,21 @@ public:
 
     // test against std
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::acos<DT_>(DT_(0.7)), Math::acos(DT_(0.7)), tol);
+  }
+
+  void test_nan() const
+  {
+    // generate NaN
+    const DT_ q = Math::nan<DT_>();
+
+    // should be NaN
+    TEST_CHECK(Math::isnan(q));
+
+    // should not be finite
+    TEST_CHECK(!Math::isfinite(q));
+
+    // should not be normal
+    TEST_CHECK(!Math::isnormal(q));
   }
 };
 
