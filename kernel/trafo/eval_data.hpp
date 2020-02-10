@@ -23,6 +23,9 @@ namespace FEAT
      * \tparam cfg_tags_
      * A trafo data config class that specifies what data shall be supplied.
      *
+     * \note
+     * When compiling in debug mode, all values are initialised to NaN.
+     *
      * \author Peter Zajac
      */
     template<
@@ -55,6 +58,21 @@ namespace FEAT
 
       /// our trafo configuration
       static constexpr TrafoTags config = cfg_tags_;
+
+#ifdef DEBUG
+      EvalData()
+      {
+        // format all values to NaN
+        const auto qnan = Math::nan<typename EvalTraits_::DataType>();
+        hess_inv = qnan;
+        hess_ten = qnan;
+        jac_inv = qnan;
+        jac_mat = qnan;
+        img_point = qnan;
+        dom_point = qnan;
+        jac_det = qnan;
+      }
+#endif // DEBUG
     }; // class EvalData<...>
   } // namespace Trafo
 } // namespace FEAT

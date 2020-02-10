@@ -23,6 +23,9 @@ namespace FEAT
      * \tparam Cfg_
      * A space config class that specifies what data shall be supplied. See Space::ConfigBase for details.
      *
+     * \note
+     * When compiling in debug mode, all values are initialised to NaN.
+     *
      * \author Peter Zajac
      */
     template<
@@ -47,6 +50,20 @@ namespace FEAT
 
       // our space config
       static constexpr SpaceTags config = cfg_tags_;
+
+#ifdef DEBUG
+      BasisData()
+      {
+        // format all values to NaN
+        const auto qnan = Math::nan<typename EvalTraits_::DataType>();
+        hess = qnan;
+        grad = qnan;
+        value = qnan;
+        ref_hess = qnan;
+        ref_grad = qnan;
+        ref_value = qnan;
+      }
+#endif // DEBUG
     }; // class BasisData<...>
 
     /**
@@ -57,6 +74,9 @@ namespace FEAT
      *
      * \tparam Cfg_
      * A space config class that specifies what data shall be supplied. See Space::ConfigBase for details.
+     *
+     * \note
+     * When compiling in debug mode, all values are initialised to NaN.
      *
      * \author Peter Zajac
      */
