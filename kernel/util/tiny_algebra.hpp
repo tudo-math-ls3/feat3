@@ -424,6 +424,9 @@ namespace FEAT
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x)
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
         for(int i(0); i < n_; ++i)
         {
           v[i] = T_(0);
@@ -453,6 +456,9 @@ namespace FEAT
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
         for(int j(0); j < n_; ++j)
         {
           v[j] = T_(0);
@@ -485,6 +491,9 @@ namespace FEAT
       template<int m_, int sma_, int sna_, int sx_>
       Vector& add_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x, DataType alpha = DataType(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
         for(int i(0); i < n_; ++i)
         {
           for(int j(0); j < m_; ++j)
@@ -516,6 +525,9 @@ namespace FEAT
       template<int m_, int sma_, int sna_, int sx_>
       Vector& add_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a, DataType alpha = DataType(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
         for(int j(0); j < n_; ++j)
         {
           for(int i(0); i < m_; ++i)
@@ -997,6 +1009,9 @@ namespace FEAT
       template<int sma_, int sna_>
       Matrix& set_inverse(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
+
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
         typedef DataType Tv[sm_][sn_];
@@ -1026,6 +1041,9 @@ namespace FEAT
       template<int sma_, int sna_>
       Matrix& set_cofactor(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
+
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
         typedef DataType Tv[sm_][sn_];
@@ -1047,7 +1065,7 @@ namespace FEAT
       Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
-        ASSERTM((const void*)this != (const void*)&a, "self-transpose is not allowed");
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
 
         for(int i(0); i < m_; ++i)
         {
@@ -1241,6 +1259,10 @@ namespace FEAT
         const Matrix<T_, l_, n_, smb_, snb_>& b,
         DataType alpha = DataType(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
+        ASSERTM((const void*)this != (const void*)&b, "result matrix and multiplicand matrix 'b' must be different objects");
+
         for(int i(0); i < m_; ++i)
         {
           for(int j(0); j < n_; ++j)
@@ -1274,6 +1296,10 @@ namespace FEAT
       template<int l_, int sma_, int sna_, int smb_, int snb_>
       Matrix& set_mat_mat_mult(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
+        ASSERTM((const void*)this != (const void*)&b, "result matrix and multiplicand matrix 'b' must be different objects");
+
         format();
         return add_mat_mat_mult(a, b);
       }
@@ -1306,6 +1332,11 @@ namespace FEAT
         const Matrix<T_, l_, n_, smd_, snd_>& d,
         DataType alpha = DataType(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
+        ASSERTM((const void*)this != (const void*)&b, "result matrix and multiplicand matrix 'b' must be different objects");
+        ASSERTM((const void*)this != (const void*)&d, "result matrix and multiplicand matrix 'd' must be different objects");
+
         for(int i(0); i < m_; ++i)
         {
           for(int j(0); j < n_; ++j)
@@ -1354,6 +1385,11 @@ namespace FEAT
         const Matrix<T_, l_, n_, smd_, snd_>& d,
         T_ alpha = T_(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
+        ASSERTM((const void*)this != (const void*)&b, "result matrix and multiplicand matrix 'b' must be different objects");
+        ASSERTM((const void*)this != (const void*)&d, "result matrix and multiplicand matrix 'd' must be different objects");
+
         format();
         return add_double_mat_mult(a, b, d, alpha);
       }
@@ -1860,6 +1896,9 @@ namespace FEAT
         const Tensor3<T_, k_, m_, n_, slt_, smt_, snt_>& t,
         DataType alpha = DataType(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&t, "result tensor and multiplicand tensor 't' must be different objects");
+
         for(int h(0); h < l_; ++h)
         {
           for(int i(0); i < m_; ++i)
@@ -1912,6 +1951,9 @@ namespace FEAT
         const Matrix<T_, mt_, m_, smd_, snd_>& d,
         DataType alpha = DataType(1))
       {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&t, "result tensor and multiplicand tensor 't' must be different objects");
+
         for(int h(0); h < l_; ++h)
         {
           for(int i(0); i < m_; ++i)
