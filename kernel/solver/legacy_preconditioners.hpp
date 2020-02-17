@@ -965,7 +965,7 @@ namespace FEAT
        *
        * \param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
        *
-       * \param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       * \param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1.0)
        *
        * \param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
        *
@@ -980,7 +980,7 @@ namespace FEAT
       SPAIPreconditioner(const MT_ & A,
                          //LAFEM::SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> && layout,
                          const Index max_iter = 10,
-                         const DT_ eps_res = DT_(1e-2),
+                         const DT_ eps_res = DT_(1.0),
                          const Index fill_in = 10,
                          const DT_ eps_res_comp = DT_(1e-3),
                          const DT_ max_rho = DT_(1e-3),
