@@ -182,7 +182,7 @@ public:
     {
       auto precon = Solver::new_spai_precond(matrix, filter);
       auto solver = Solver::new_fgmres(matrix, filter, 16, 0.0, precon);
-      test_solver("FGMRES(16)-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 32);
+      test_solver("FGMRES(16)-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 16);
     }
 
     // test Richardson-SOR
