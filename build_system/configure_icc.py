@@ -136,7 +136,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -msse3"
     elif cpu == "zen":
       cxxflags += " -march=core-avx2" # not really supported by intel
-    elif cpu == "zen":
+    elif cpu == "zen2":
       cxxflags += " -march=core-avx2" # not really supported by intel
     else:
       print ("Warning: Detected cpu type not supported by configure_icc.py, using generic vectorisation support instead")
