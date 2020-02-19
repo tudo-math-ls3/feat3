@@ -178,11 +178,11 @@ public:
       test_solver("PCR-SSOR", *solver, vec_sol, vec_ref, vec_rhs, 19);
     }
 
-    // test FGMRES-SPAI
+    // test BICGStab-left-SPAI
     {
       auto precon = Solver::new_spai_precond(matrix, filter);
-      auto solver = Solver::new_fgmres(matrix, filter, 16, 0.0, precon);
-      test_solver("FGMRES(16)-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 16);
+      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::left);
+      test_solver("BiCGStab-left-SPAI", *solver, vec_sol, vec_ref, vec_rhs, 12);
     }
 
     // test Richardson-SOR
@@ -421,7 +421,7 @@ public:
     {
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_fgmres(matrix, filter, 16, DataType(0), precon);
-      test_solver("FGMRES-JAC", *solver, vec_sol, vec_ref, vec_rhs, 48);
+      test_solver("FGMRES(16)-JAC", *solver, vec_sol, vec_ref, vec_rhs, 48);
     }
 
     // test PCG-Matrix(jac)
