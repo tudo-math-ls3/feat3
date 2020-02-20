@@ -62,6 +62,8 @@ namespace FEAT
        *
        * \todo document this
        *
+       * For more details on meshes, see the related doxygen page \ref mesh_file_format.
+       *
        * \author Peter Zajac
        */
       template<typename DomainLevel_>
@@ -178,8 +180,6 @@ namespace FEAT
          *
          * \param[in] support_multi_layered
          * Specifies whether the controller is allowed to create multi-layered hierarchies.
-         *
-         * For more details on meshes, see the related doxygen page \ref mesh_file_format.
          */
         explicit PartiDomainControl(const Dist::Comm& comm_, bool support_multi_layered) :
           BaseClass(comm_),
