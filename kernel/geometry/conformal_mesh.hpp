@@ -27,6 +27,8 @@ namespace FEAT
      * The shape that is to be used for the mesh. Must be either Shape::Simplex<n> or Shape::Hypercube<n>
      * for some \c n > 0.
      *
+     * For more details on meshes, see the related doxygen page \ref mesh_file_format.
+     *
      * \author Peter Zajac
      */
     template<

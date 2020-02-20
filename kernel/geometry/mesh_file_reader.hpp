@@ -1338,6 +1338,8 @@ namespace FEAT
      * -# Parse the file contents into the corresponding MeshAtlas, RootMeshNode and PartitionSet objects
      *    by calling the parse() function.
      *
+     * For more details on meshes, see the related doxygen page \ref mesh_file_format.
+     *
      * \author Peter Zajac
      */
     class MeshFileReader
