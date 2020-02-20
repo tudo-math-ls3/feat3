@@ -3,7 +3,6 @@
 
 \section main_sec_buildsys Build-System
 - \ref feat_for_win_vs16
-- \ref feat_for_win_vs14
 
 \section main_sec_subsystems Kernel Subsystems
 The subsystems are in detail:
@@ -11,6 +10,6 @@ The subsystems are in detail:
 - \ref meshopt_design
 
 \section main_sec_details Details about specific topics:
-- \ref multigrid_design
+- [Related Pages](pages.html)
 
 **/
