@@ -239,6 +239,8 @@ namespace FEAT
       /**
        * \brief Constructor using a PropertyMap
        *
+       * \sa \ref solver_configuration
+       *
        * \param[in] section_name
        * The name of the config section, which it does not know by itself
        *

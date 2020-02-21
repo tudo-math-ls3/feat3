@@ -201,6 +201,8 @@ namespace FEAT
        * This configures the solver using the key/value pairs in the PropertyMap. This base class has nothing to
        * configure, but this constructor is called from the derived classes as well.
        *
+       * \sa \ref solver_configuration
+       *
        * \param[in] section_name
        * The name of the config section, which it does not know by itself
        *

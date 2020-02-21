@@ -377,13 +377,20 @@ namespace FEAT
         /**
          * \brief Create solver tree based on PropertyMap
          *
-         * \param[in] matrix_stock A MatrixStock object, initialised with Systemlevels etc
-         * \param[in] base A pointer to the PropertyMap that contains all solver related informations
-         * \param[in] section_name The name of the solver tree's root section
+         * \param[in] matrix_stock
+         *      A MatrixStock object, initialised with Systemlevels etc
+         *
+         * \param[in] base
+         *      A pointer to the PropertyMap that contains all solver related informations
+         *
+         * \param[in] section_name
+         *     The name of the solver tree's root section
+         *
+         * \sa \ref solver_configuration
          */
         template <typename MST_, typename SolverVectorType_ = typename MST_::VectorType>
-        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
-        create_scalar_solver(MST_ & matrix_stock, PropertyMap* base, const String& section_name, std::size_t solver_level = std::size_t(0))
+        static std::shared_ptr<Solver::SolverBase<SolverVectorType_> > create_scalar_solver(MST_ & matrix_stock,
+               PropertyMap* base, const String& section_name, std::size_t solver_level = std::size_t(0))
         {
           using MemType = typename SolverVectorType_::MemType;
           using DataType = typename SolverVectorType_::DataType;

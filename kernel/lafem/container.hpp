@@ -73,6 +73,8 @@ namespace FEAT
     /**
      * \brief Container base class.
      *
+     * All LAFEM-Container are derived from this base class. \sa \ref lafem_design
+     *
      * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.

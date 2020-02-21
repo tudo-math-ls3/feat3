@@ -959,6 +959,8 @@ namespace FEAT
     /**
      * \brief Multigrid preconditioner implementation
      *
+     * \sa For details in the design see \ref multigrid_design
+     *
      * \todo document this
      *
      * \tparam SystemMatrix_
