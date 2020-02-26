@@ -216,7 +216,10 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     elif cpu == "zen":
       cxxflags += " -m64 -march=znver1"
     elif cpu == "zen2":
-      cxxflags += " -m64 -march=znver2"
+      if major >= 9:
+        cxxflags += " -m64 -march=znver2"
+      else:
+        cxxflags += " -m64 -march=znver1"
 
     #ARM
     elif cpu == "cortexa15":
