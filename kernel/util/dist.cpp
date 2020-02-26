@@ -1141,7 +1141,7 @@ namespace FEAT
     {
       XASSERT(sendcount == recvcount);
       XASSERT(sendtype == recvtype);
-      if(recvbuf != sendbuf)
+      if((recvbuf != sendbuf) && (sendcount > std::size_t(0)))
         memcpy(recvbuf, sendbuf, sendcount * sendtype.size());
     }
 
@@ -1173,7 +1173,7 @@ namespace FEAT
 
     void Comm::allreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation&) const
     {
-      if(sendbuf != recvbuf)
+      if((recvbuf != sendbuf) && (count > std::size_t(0)))
         memcpy(recvbuf, sendbuf, count * datatype.size());
     }
 
