@@ -1141,7 +1141,9 @@ namespace FEAT
     {
       XASSERT(sendcount == recvcount);
       XASSERT(sendtype == recvtype);
-      if((recvbuf != sendbuf) && (sendcount > std::size_t(0)))
+      // gcc 9.2.0 checks for non-nullptr receive buffer at compile-time,
+      // which may issue false-positive warnings for code that is never executed at run-time
+      if((recvbuf != sendbuf) && (recvbuf != nullptr))
         memcpy(recvbuf, sendbuf, sendcount * sendtype.size());
     }
 
@@ -1173,7 +1175,9 @@ namespace FEAT
 
     void Comm::allreduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation&) const
     {
-      if((recvbuf != sendbuf) && (count > std::size_t(0)))
+      // gcc 9.2.0 checks for non-nullptr receive buffer at compile-time,
+      // which may issue false-positive warnings for code that is never executed at run-time
+      if((recvbuf != sendbuf) && (recvbuf != nullptr))
         memcpy(recvbuf, sendbuf, count * datatype.size());
     }
 
