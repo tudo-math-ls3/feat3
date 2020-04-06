@@ -911,6 +911,7 @@ namespace FEAT
           SpaceTags::grad> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
+        typedef typename Matrix_::ValueType ValueType;
 
         // shape types
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
@@ -953,7 +954,7 @@ namespace FEAT
         typename AsmTraits::SpaceEvalTraits::BasisGradientType jump_grad[max_common_dofs];
 
         // local matrix data
-        Tiny::Matrix<DataType, max_common_dofs, max_common_dofs> loc_mat;
+        Tiny::Matrix<ValueType, max_common_dofs, max_common_dofs> loc_mat;
 
         // trafo matrices and vectors
         Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat_1, face_mat_2;
@@ -1068,7 +1069,7 @@ namespace FEAT
             {
               for(int j(0); j < num_local_dofs; ++j)
               {
-                loc_mat(i,j) += weight * Tiny::dot(jump_grad[i], jump_grad[j]);
+                Tiny::add_id(loc_mat(i,j), weight * Tiny::dot(jump_grad[i], jump_grad[j]));
               }
             }
 
@@ -1140,6 +1141,7 @@ namespace FEAT
           SpaceTags::value> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
+        typedef typename Matrix_::ValueType ValueType;
 
         // shape types
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
@@ -1182,7 +1184,7 @@ namespace FEAT
         typename AsmTraits::SpaceEvalTraits::BasisValueType jump_value[max_common_dofs];
 
         // local matrix data
-        Tiny::Matrix<DataType, max_common_dofs, max_common_dofs> loc_mat;
+        Tiny::Matrix<ValueType, max_common_dofs, max_common_dofs> loc_mat;
 
         // trafo matrices and vectors
         Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat_1, face_mat_2;
@@ -1296,7 +1298,7 @@ namespace FEAT
             {
               for(int j(0); j < num_local_dofs; ++j)
               {
-                loc_mat(i,j) += weight * jump_value[i] * jump_value[j];
+                Tiny::add_id(loc_mat(i,j), weight * jump_value[i] * jump_value[j]);
               }
             }
 
