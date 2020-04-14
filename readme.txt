@@ -9,7 +9,7 @@ see the file 'copyright.txt' in the top level directory for details.
 FEAT depends on:
 cmake 3.9 or greater
 python 2.6 or greater
-gcc 4.8+ or icc 15+ or clang 3.6+ or MSVC++ 2015+ or AOCC 1.3+
+gcc 4.8+ or icc 16+ or clang 3.6+ or MSVC++ 2015+ or AOCC 1.3+
 
 Additionally you will need a proper buildsystem, e.g. gnumake.
 
