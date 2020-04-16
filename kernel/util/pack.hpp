@@ -98,7 +98,7 @@ namespace FEAT
      * //0x4u HEADER_MODE
      */
 #ifdef FEAT_HAVE_ZFP
-    const uint zfp_header_mask = 7u;
+    static constexpr uint zfp_header_mask = 7u;
 #endif //FEAT_HAVE_ZFP
     /**
      * \brief Type enumeration
@@ -110,6 +110,10 @@ namespace FEAT
       Mask_Z  = 0x8000, //< zlib compression mask
       Mask_P  = 0x2000, //< zfp compression mask
     //Mask_E  = 0x4000, //< swap endianness mask
+
+      Type_I  = 0x0010, //< signed integer type
+      Type_U  = 0x0020, //< unsigend integer type
+      Type_F  = 0x0030, //< floating point type
 
       // raw signed integer types
       I8      = 0x0011, //<  8-bit unsigned integer
@@ -248,6 +252,15 @@ namespace FEAT
       return is;
     }
 
+    /**
+     * \brief Returns the size of a Pack::Type element in bytes
+     *
+     * \param[in] type
+     * The type whose element size is to be determined
+     *
+     * \returns
+     * The size of the type in bytes or 0, if \p type is not a valid data type
+     */
     inline std::size_t element_size(const Pack::Type type)
     {
       return std::size_t(1) << (((int)type & 0xF) - 1);
@@ -335,55 +348,130 @@ namespace FEAT
         return x;
       }
 
+      /**
+       * \brief Encodes an array by converting each of its elements to a desired type
+       *
+       * Effectively, this function performs <c>((X_*)buf)[i] = X_(src[i])</c> for all i < count.
+       *
+       * \tparam X_
+       * The desired type of the encoded destination array buffer \p buf
+       *
+       * \tparam T_
+       * The type of the source array \p src whose elements are to be converted.
+       *
+       * \param[out] buf
+       * The destination buffer that receives the array elements of type \p X_.
+       * This buffer is assumed to be at least <c>sizeof(X_)*count</c> bytes in size.
+       *
+       * \param[in] src
+       * The source array whose elements of type \p T_ are to be converted
+       *
+       * \param[in] count
+       * The number of elements in the source array \p src.
+       *
+       * \param[in] swap_bytes
+       * Specifies whether the bytes in the destination buffer \p buf are to be swapped after conversion.
+       *
+       * \returns
+       * The number bytes written to the destination buffer, i.e. <c>sizeof(X_)*count</c>.
+       */
       template<typename X_, typename T_>
-      static std::size_t xencode(void* buf, const T_* t, const std::size_t count, bool swap_bytes)
+      static std::size_t xencode(void* buf, const T_* src, const std::size_t count, bool swap_bytes)
       {
         X_* x = reinterpret_cast<X_*>(buf);
         if(swap_bytes)
         {
           for(std::size_t i(0); i < count; ++i)
           {
-            x[i] = xswap(static_cast<X_>(t[i]));
+            x[i] = xswap(static_cast<X_>(src[i]));
           }
         }
         else
         {
           for(std::size_t i(0); i < count; ++i)
           {
-            x[i] = static_cast<X_>(t[i]);
+            x[i] = static_cast<X_>(src[i]);
           }
         }
         return count * sizeof(X_);
       }
 
+      /**
+       * \brief Encodes an array by converting each of its elements to a desired type
+       *
+       * Effectively, this function performs <c>dest[i] = T_(((X_*)buf)[i])</c> for all i < count.
+       *
+       * \tparam X_
+       * The type of the encoded source array buffer \p buf whose elements are to be converted
+       *
+       * \tparam T_
+       * The type of the destination array \p dest
+       *
+       * \param[out] dest
+       * The destination array that receives the converted array elements
+       *
+       * \param[in] buf
+       * The source buffer whose elements of type \p X_ are to be converted.
+       * This buffer is assumed to be at least <c>sizeof(X_)*count</c> bytes in size.
+       *
+       * \param[in] count
+       * The number of elements in the destination array \p dest.
+       *
+       * \param[in] swap_bytes
+       * Specifies whether the bytes in the source buffer \p buf are to be swapped before conversion.
+       *
+       * \returns
+       * The number bytes read from the source buffer, i.e. <c>sizeof(X_)*count</c>.
+       */
       template<typename X_, typename T_>
-      static std::size_t xdecode(T_* t, const void* buf, const std::size_t count, bool swap_bytes)
+      static std::size_t xdecode(T_* dest, const void* buf, const std::size_t count, bool swap_bytes)
       {
         const X_* x = reinterpret_cast<const X_*>(buf);
         if(swap_bytes)
         {
           for(std::size_t i(0); i < count; ++i)
           {
-            t[i] = static_cast<T_>(xswap(x[i]));
+            dest[i] = static_cast<T_>(xswap(x[i]));
           }
         }
         else
         {
           for(std::size_t i(0); i < count; ++i)
           {
-            t[i] = static_cast<T_>(x[i]);
+            dest[i] = static_cast<T_>(x[i]);
           }
         }
         return count * sizeof(X_);
       }
 
       template<typename Tclass_, bool signed_>
-      struct TypeHelper;
+      struct TypeHelper
+      {
+        template<typename T_>
+        static Pack::Type deduct()
+        {
+          return Pack::Type::None;
+        }
+      };
 
       // specialisation for floating point types
       template<>
       struct TypeHelper<FEAT::Type::FloatingClass, true>
       {
+        template<typename T_>
+        static Pack::Type deduct()
+        {
+          switch(sizeof(T_))
+          {
+          //case 1: return Pack::Type::F8;
+          case 2: return Pack::Type::F16;
+          case 4: return Pack::Type::F32;
+          case 8: return Pack::Type::F64;
+          case 16: return Pack::Type::F128;
+          default: return Pack::Type::None;
+          }
+        }
+
         template<typename T_>
         static std::size_t encode(void* buf, const T_* t, const std::size_t count, const Pack::Type pack_type, bool swap_bytes)
         {
@@ -426,6 +514,19 @@ namespace FEAT
       struct TypeHelper<FEAT::Type::IntegralClass, true>
       {
         template<typename T_>
+        static Pack::Type deduct()
+        {
+          switch(sizeof(T_))
+          {
+          case 1: return Pack::Type::I8;
+          case 2: return Pack::Type::I16;
+          case 4: return Pack::Type::I32;
+          case 8: return Pack::Type::I64;
+          default: return Pack::Type::None;
+          }
+        }
+
+        template<typename T_>
         static std::size_t encode(void* buf, const T_* t, const std::size_t count, const Pack::Type pack_type, bool swap_bytes)
         {
           switch(pack_type)
@@ -459,6 +560,19 @@ namespace FEAT
       struct TypeHelper<FEAT::Type::IntegralClass, false>
       {
         template<typename T_>
+        static Pack::Type deduct()
+        {
+          switch(sizeof(T_))
+          {
+          case 1: return Pack::Type::U8;
+          case 2: return Pack::Type::U16;
+          case 4: return Pack::Type::U32;
+          case 8: return Pack::Type::U64;
+          default: return Pack::Type::None;
+          }
+        }
+
+        template<typename T_>
         static std::size_t encode(void* buf, const T_* t, const std::size_t count, const Pack::Type pack_type, bool swap_bytes)
         {
           switch(pack_type)
@@ -488,6 +602,23 @@ namespace FEAT
       };
     } // namespace Intern
     /// \endcond
+
+    /**
+     * \brief Deduct the (raw) Pack::Type from a given data type \p T_
+     *
+     * \tparam T_
+     * The type whose Pack::Type value is to be determined.
+     *
+     * \returns
+     * The (raw) Pack::Type value for the given type \p T_ or Pack::Type::None,
+     * if \p T_ does not represent a type from the Pack::Type enum.
+     */
+    template<typename T_>
+    Pack::Type deduct_type()
+    {
+      typedef typename FEAT::Type::Traits<T_> TypeTraits;
+      return Intern::TypeHelper<typename TypeTraits::TypeClass, TypeTraits::is_signed>::template deduct<T_>();
+    }
 
     /**
      * \brief Encodes an array into a packed buffer without compression support.
@@ -606,7 +737,6 @@ namespace FEAT
      * An estimated (upper bound) array buffer size.
      *
      */
-
     std::size_t lossy_estimate_size(const std::size_t count, const Pack::Type type, const double tolerance)
     {
       if(count <= std::size_t(0))
@@ -754,6 +884,7 @@ namespace FEAT
 
       return std::size_t(0);
     }
+
     /**
      * \brief Encodes an array into a packed buffer
      *
@@ -823,7 +954,7 @@ namespace FEAT
 #endif // FEAT_HAVE_ZLIB
     }
 
-     /**
+    /**
      * \brief Decodes an array from a packed buffer
      *
      * \param[out] dst
@@ -875,7 +1006,6 @@ namespace FEAT
       return std::size_t(0);
     }
 
-
     /**
      * \brief Decodes an array from a packed buffer
      *
@@ -908,7 +1038,6 @@ namespace FEAT
     static std::size_t lossless_decode(T_* dst, const void* buf, const std::size_t count, const std::size_t buf_size,
       const Pack::Type pack_type, bool swap_bytes)
     {
-
       // get raw type
       const Pack::Type raw_type = pack_type & Pack::Type::Mask_T;
 
@@ -1063,6 +1192,7 @@ namespace FEAT
       throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zfp not available");
 #endif //FEAT_HAVE_ZFP
     }
+
     /**
      * \brief Decodes an array from a packed buffer with lossy saved compression data.
      *
@@ -1171,7 +1301,6 @@ namespace FEAT
       throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zfp not available");
 #endif //FEAT_HAVE_ZFP
     }
-
   } // namespace Pack
 } // namespace FEAT
 

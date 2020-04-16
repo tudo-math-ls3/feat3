@@ -20,6 +20,7 @@ public:
     TaggedTest<Archs::None, Archs::None>("PackTest")
   {
   }
+
   template<typename DT_>
   void test_lossy_float(const Pack::Type pack_type, const double precision, bool swap_bytes = false) const
   {
@@ -47,6 +48,7 @@ public:
       TEST_CHECK_IN_RANGE(abs_err, DT_(0), (DT_)precision);
     }
   }
+
   template<typename DT_>
   void test_pack_float(const Pack::Type pack_type, const DT_ tol, bool swap_bytes = false) const
   {
@@ -113,6 +115,7 @@ public:
     }
   }
 
+
   virtual void run() const override
   {
     // test element sizes
@@ -145,6 +148,24 @@ public:
     TEST_CHECK_EQUAL(Pack::element_size(Pack::Type::ZU16), 2);
     TEST_CHECK_EQUAL(Pack::element_size(Pack::Type::ZU32), 4);
     TEST_CHECK_EQUAL(Pack::element_size(Pack::Type::ZU64), 8);
+
+    // test type deduction
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::i8>(), Pack::Type::I8);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::i16>(), Pack::Type::I16);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::i32>(), Pack::Type::I32);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::i64>(), Pack::Type::I64);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::u8>(), Pack::Type::U8);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::u16>(), Pack::Type::U16);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::u32>(), Pack::Type::U32);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::u64>(), Pack::Type::U64);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::f32>(), Pack::Type::F32);
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::f64>(), Pack::Type::F64);
+#ifdef FEAT_HAVE_PACK_TYPE_F16
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::f16>(), Pack::Type::F16);
+#endif // FEAT_HAVE_PACK_TYPE_F16
+#ifdef FEAT_HAVE_PACK_TYPE_F128
+    TEST_CHECK_EQUAL(Pack::deduct_type<Pack::f128>(), Pack::Type::F128);
+#endif // FEAT_HAVE_PACK_TYPE_F128
 
     // test array packing
     test_pack_float<float> (Pack::Type::F64, 1E-7F); // float -> double
