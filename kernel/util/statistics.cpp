@@ -62,13 +62,12 @@ String Statistics::_generate_formatted_solver_tree(String target)
 
   if(_solver_expressions.count(target) == 0)
   {
-    throw InternalError(__func__, __FILE__, __LINE__,
-    "target "+target+" not present in _solver_expressions");
+    XABORTM("target "+target+" not present in _solver_expressions");
   }
 
   if (_solver_expressions[target].front()->get_type() != Solver::ExpressionType::start_solve)
   {
-    throw InternalError(__func__, __FILE__, __LINE__, "Should never happen - _solver_expressions list did not start with start solve expression!");
+    XABORTM("Should never happen - _solver_expressions list did not start with start solve expression!");
   }
 
   // process the very first entry, e.g. the outer most solver
@@ -340,7 +339,7 @@ String Statistics::_generate_formatted_solver_tree(String target)
 
   if (names.size() > 0)
   {
-    throw InternalError(__func__, __FILE__, __LINE__, "Should never happen - not all solver calls were parsed to the end!");
+    XABORTM("Should never happen - not all solver calls were parsed to the end!");
   }
 
   return tree;
@@ -870,13 +869,12 @@ void Statistics::compress_solver_expressions()
 
     if(_solver_expressions.count(target) == 0)
     {
-      throw InternalError(__func__, __FILE__, __LINE__,
-          "target "+target+" not present in _solver_expressions");
+      XABORTM("target "+target+" not present in _solver_expressions");
     }
 
     if (_solver_expressions[target].front()->get_type() != Solver::ExpressionType::start_solve)
     {
-      throw InternalError(__func__, __FILE__, __LINE__, "Should never happen - _solver_expressions list did not start with start solve expression!");
+      XABORTM("Should never happen - _solver_expressions list did not start with start solve expression!");
     }
 
     _overall_toe[target].push_back(0.);

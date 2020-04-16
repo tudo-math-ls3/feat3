@@ -484,8 +484,7 @@ namespace FEAT
 
           if(this->_delta_0 > DataType(0))
           {
-            throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
-                +stringify_fp_sci(this->_delta_0));
+            XABORTM("Search direction is not a descent direction: " +stringify_fp_sci(this->_delta_0));
           }
 
           // Compute initial defect. We want to minimise d^T * grad(_functional)

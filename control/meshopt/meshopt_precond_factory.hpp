@@ -73,19 +73,17 @@ namespace FEAT
           {
             auto precon_section = solver_config.query_section(precon_p.first);
             if(precon_section == nullptr)
-              throw InternalError(__func__,__FILE__,__LINE__,"precon_section "+precon_p.first+" not found!");
+              XABORTM("precon_section "+precon_p.first+" not found!");
 
             auto precon_type_p = precon_section->query("type");
             if(!precon_type_p.second)
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Section "+precon_p.first+" does not have a type key!");
+              XABORTM("Section "+precon_p.first+" does not have a type key!");
 
             if(precon_type_p.first == "DuDvPrecon")
             {
               auto precon_solver_p = precon_section->query("linear_solver");
               if(!precon_solver_p.second)
-                throw InternalError(__func__,__FILE__,__LINE__,
-                "precon_section "+precon_type_p.first+" has no linear_solver key!");
+                XABORTM("precon_section "+precon_type_p.first+" has no linear_solver key!");
 
               auto dirichlet_list_p = precon_section->query("dirichlet_boundaries");
               std::deque<String> precon_dirichlet_list = dirichlet_list_p.first.split_by_whitespaces();
@@ -116,8 +114,7 @@ namespace FEAT
             }
             else if(precon_p.first != "none")
             {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Unsupport nonlinear optimiser precon: "+precon_p.first);
+              XABORTM("Unsupport nonlinear optimiser precon: "+precon_p.first);
             }
           }
           else

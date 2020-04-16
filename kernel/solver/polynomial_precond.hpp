@@ -110,8 +110,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            name()+" config section is missing the mandatory omega key!");
+            XABORTM(name()+" config section is missing the mandatory omega key!");
           }
 
           auto m_p = section->query("m");
@@ -121,8 +120,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            name()+" config section is missing the mandatory m key!");
+            XABORTM(name()+" config section is missing the mandatory m key!");
           }
         }
 

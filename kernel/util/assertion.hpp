@@ -13,8 +13,36 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 
+// includes, system
+#include <string>
+
 namespace FEAT
 {
+  /**
+   * \brief Abortion function
+   *
+   * This function implements the actual abortion that is called by the XABORTM macro, which prints
+   * an informative error message to stderr and calls Runtime::abort to terminate the process.
+   *
+   * \param[in] func
+   * The name of the function that contains the abortion, usually <c>__func__</c>.
+   *
+   * \param[in] file
+   * The name of the source/header file that contains the abortion, usually <c>__FILE__</c>.
+   *
+   * \param[in] line
+   * The line number of the abortion in the source/header file, usually <c>__LINE__</c>.
+   *
+   * \param[in] msg
+   * A custom error message to be displayed in addition to the standard information.
+   */
+  [[noreturn]] void abortion(const char* const func, const char* const file, const int line, const char* const msg);
+
+  [[noreturn]] inline void abortion(const char* const func, const char* const file, const int line, const std::string& msg)
+  {
+    abortion(func, file, line, msg.c_str());
+  }
+
   /**
    * \brief Assertion function
    *
@@ -52,6 +80,39 @@ namespace FEAT
     const char * const file,
     const int line,
     const char * const msg = nullptr);
+
+  inline void assertion(
+    bool expr,
+    const char* const expr_str,
+    const char* const func,
+    const char* const file,
+    const int line,
+    const std::string& msg)
+  {
+    assertion(expr, expr_str, func, file, line, msg.c_str());
+  }
+
+  /**
+   * \def XABORTM
+   * \brief Abortion macro definition with custom message
+   *
+   * This macro prints an errors message and aborts program execution.
+   *
+   * \param msg
+   * An error message that is to be displayed.
+   *
+   * This macro will be compiled in both debug and non-debug mode builds.
+   *
+   * \compilerhack Intel C++ compiler is too dumb for [[noreturn]] attribute,
+   * so attach an additional call to std::abort() to silence warning 1011
+   * that complains about missing return statements in non-void functions.
+    */
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 2000)
+#  define XABORTM(msg) do {FEAT::abortion(__func__, __FILE__, __LINE__, msg); std::abort();} while(false)
+#else // any smart C++ compiler
+#  define XABORTM(msg) FEAT::abortion(__func__, __FILE__, __LINE__, msg)
+#endif
+
 
   /**
    * \def ASSERT

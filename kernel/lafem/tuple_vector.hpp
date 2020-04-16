@@ -425,7 +425,7 @@ namespace FEAT
       {
         std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          XABORTM("Unable to open Vector file " + filename);
         read_from(mode, file);
         file.close();
       }
@@ -445,17 +445,17 @@ namespace FEAT
             uint64_t magic; // magic_number
             file.read((char *)&magic, (long)(sizeof(uint64_t)));
             if (magic != 101)
-              throw InternalError(__func__, __FILE__, __LINE__, "Given file or file component is no TupleVector!");
+              XABORTM("Given file or file component is no TupleVector!");
             uint64_t count; // subvector count
             file.read((char *)&count, (long)(sizeof(uint64_t)));
             //if (count != num_blocks)
-            //  throw InternalError(__func__, __FILE__, __LINE__, "TupleVector file read in component count mismatch: class has " + stringify(num_blocks) + "- " + stringify(count) + " read in!");
+            //  XABORTM("TupleVector file read in component count mismatch: class has " + stringify(num_blocks) + "- " + stringify(count) + " read in!");
 
             _read_from_binary(file);
             break;
           }
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+            XABORTM("Filemode not supported!");
         }
       }
 
@@ -469,7 +469,7 @@ namespace FEAT
       {
         std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          XABORTM("Unable to open Vector file " + filename);
         write_out(mode, file);
         file.close();
       }
@@ -499,7 +499,7 @@ namespace FEAT
             break;
           }
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+            XABORTM("Filemode not supported!");
         }
       }
     }; // class TupleVector<...>
@@ -800,7 +800,7 @@ namespace FEAT
           read_from_binary(filename);
           break;
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -818,7 +818,7 @@ namespace FEAT
           read_from_binary(file);
           break;
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -831,7 +831,7 @@ namespace FEAT
       {
         std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          XABORTM("Unable to open Vector file " + filename);
         read_from_binary(file);
         file.close();
       }
@@ -846,11 +846,11 @@ namespace FEAT
         uint64_t magic; // magic_number
         file.read((char *)&magic, (long)(sizeof(uint64_t)));
         if (magic != 101)
-          throw InternalError(__func__, __FILE__, __LINE__, "Given file or file component is no TupleVector!");
+          XABORTM("Given file or file component is no TupleVector!");
         uint64_t count; // subvector count
         file.read((char *)&count, (long)(sizeof(uint64_t)));
         if (count != 1)
-          throw InternalError(__func__, __FILE__, __LINE__, "PowerVector file read in component count mismatch: class has 1 - " + stringify(count) + " read in!");
+          XABORTM("PowerVector file read in component count mismatch: class has 1 - " + stringify(count) + " read in!");
 
         _read_from_binary(file);
       }
@@ -869,7 +869,7 @@ namespace FEAT
           write_out_binary(filename);
           break;
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -887,7 +887,7 @@ namespace FEAT
           write_out_binary(file);
           break;
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -900,7 +900,7 @@ namespace FEAT
       {
         std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          XABORTM("Unable to open Vector file " + filename);
         write_out_binary(file);
         file.close();
       }

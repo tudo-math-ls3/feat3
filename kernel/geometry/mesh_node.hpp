@@ -87,15 +87,14 @@ namespace FEAT
 
     inline void operator<<(AdaptMode& mode, const String& mode_name)
     {
-        if(mode_name == "none")
-          mode = AdaptMode::none;
-        else if(mode_name == "chart")
-          mode = AdaptMode::chart;
-        else if(mode_name == "dual")
-          mode = AdaptMode::dual;
-        else
-          throw InternalError(__func__, __FILE__, __LINE__, "Unknown AdaptMode identifier string "
-              +mode_name);
+      if(mode_name == "none")
+        mode = AdaptMode::none;
+      else if(mode_name == "chart")
+        mode = AdaptMode::chart;
+      else if(mode_name == "dual")
+        mode = AdaptMode::dual;
+      else
+        XABORTM("Unknown AdaptMode identifier string " + mode_name);
     }
     /// \endcond
 
@@ -854,8 +853,7 @@ namespace FEAT
       void create_base_splitting()
       {
         // make sure we have a mesh
-        if(this->_mesh == nullptr)
-          throw InternalError("No mesh assigned");
+        XASSERT(this->_mesh != nullptr);
 
         // get number of cells
         Index num_cells = this->_mesh->get_num_entities(MeshType::shape_dim);
@@ -1021,7 +1019,7 @@ namespace FEAT
             String msg("Rank ");
             msg += stringify(rank);
             msg += " received empty patch from partitioner!";
-            throw InternalError(__func__, __FILE__, __LINE__, msg);
+            XABORTM(msg);
           }
 
           // create patch mesh part
@@ -1057,8 +1055,7 @@ namespace FEAT
           {
             // get base mesh part node
             auto* base_part_node = this->find_mesh_part_node(*it);
-            if(base_part_node == nullptr)
-              throw InternalError(String("base-mesh part '") + (*it) + "' not found!");
+            XASSERTM(base_part_node != nullptr, String("base-mesh part '") + (*it) + "' not found!");
 
             // our split mesh part
             MeshPartType* split_part = nullptr;

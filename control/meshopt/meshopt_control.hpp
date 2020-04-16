@@ -317,8 +317,7 @@ namespace FEAT
           }
 
           // We should never get to this point
-          throw InternalError(__func__,__FILE__,__LINE__,
-          "Could not find level with index "+stringify(lvl_index)+"!\n");
+          XABORTM("Could not find level with index "+stringify(lvl_index)+"!\n");
 
         }
       }; // class MeshoptControlBase

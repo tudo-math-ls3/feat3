@@ -352,7 +352,7 @@ namespace FEAT
       public:
         explicit ExtrudeChartParser(ChartBase<Mesh_>*&)
         {
-          throw InternalError(__func__,__FILE__,__LINE__,"Thou shall not arrive here");
+          XABORTM("Thou shall not arrive here");
         }
       };
 

@@ -374,7 +374,7 @@ nextj:
             // check if construction of SPAI is possible
             if (_matrix.columns() != _matrix.rows())
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square.");
+              XABORTM("Matrix is not square.");
             }
           }
 
@@ -460,7 +460,7 @@ nextj:
             // check if construction of SPAI is possible
             if (_matrix.columns() != _matrix.rows())
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square.");
+              XABORTM("Matrix is not square.");
             }
           }
 
@@ -580,12 +580,12 @@ nextj:
 
       Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
 
       String name() const override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
     };
 

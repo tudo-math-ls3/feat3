@@ -72,8 +72,8 @@ namespace FEAT
         static_assert(SpaceVelo_::shape_dim == dim_, "invalid matrix block sizes");
 
         // make sure that velocity and pressure have the same trafo
-        if((&space_velo.get_trafo()) != (&space_pres.get_trafo()))
-          throw InternalError("Velocity and Pressure spaces must be defined on the same trafo!");
+        XASSERTM((&space_velo.get_trafo()) == (&space_pres.get_trafo()),
+          "Velocity and Pressure spaces must be defined on the same trafo!");
 
         typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, dim_, 1> MatrixB;
         typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType_, IndexType_, 1, dim_> MatrixD;

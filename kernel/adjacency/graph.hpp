@@ -212,7 +212,7 @@ namespace FEAT
           break;
 
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Invalid render_type parameter!");
+          XABORTM("Invalid render_type parameter!");
         }
       }
 
@@ -268,7 +268,7 @@ namespace FEAT
           break;
 
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Invalid render_type parameter!");
+          XABORTM("Invalid render_type parameter!");
         }
       }
 

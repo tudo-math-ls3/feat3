@@ -61,7 +61,7 @@ namespace FEAT
       /** \copydoc DofAssignmentBase::get_index() */
       Index get_index(int /*assign_idx*/) const
       {
-        throw InternalError("invalid call of DofAssignmentNull::get_index()");
+        XABORTM("invalid call of DofAssignmentNull::get_index()");
       }
     }; // class DofAssignmentNull<...>
 

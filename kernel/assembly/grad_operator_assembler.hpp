@@ -84,8 +84,8 @@ namespace FEAT
         static_assert(SpaceTest_::shape_dim == dim_, "invalid matrix block sizes");
 
         // make sure that trial and test spaces have the same trafo
-        if((&test_space.get_trafo()) != (&trial_space.get_trafo()))
-          throw InternalError("Trial and test spaces must be defined on the same trafo!");
+        XASSERTM((&test_space.get_trafo()) == (&trial_space.get_trafo()),
+          "Trial and test spaces must be defined on the same trafo!");
 
         typedef LAFEM::SparseMatrixBCSR<Mem::Main, DataType, IndexType, dim, 1> MatrixG;
 
@@ -269,8 +269,8 @@ namespace FEAT
         static_assert(SpaceTest_::shape_dim == dim, "invalid matrix block sizes");
 
         // make sure that trial and test spaces have the same trafo
-        if((&test_space.get_trafo()) != (&trial_space.get_trafo()))
-          throw InternalError("Trial and test spaces must be defined on the same trafo!");
+        XASSERTM((&test_space.get_trafo()) == (&trial_space.get_trafo()),
+          "Trial and test spaces must be defined on the same trafo!");
 
         typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, IndexType, dim> VectorAsm;
         typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> VectorIn;

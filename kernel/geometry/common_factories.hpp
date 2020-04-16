@@ -878,8 +878,7 @@ namespace FEAT
         explicit PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
           _points(points_)
         {
-          if(points_.empty())
-            throw InternalError("PolylineFactory constructor called on empty point set!");
+          XASSERTM(!points_.empty(), "PolylineFactory constructor called on empty point set!");
 
         }
 

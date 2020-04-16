@@ -8,6 +8,7 @@
 #define KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP 1
 
 // includes, FEAT
+#include <kernel/util/assertion.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/space/dof_mapping_renderer.hpp>
 #include <kernel/lafem/null_matrix.hpp>
@@ -64,8 +65,7 @@ namespace FEAT
         Adjacency::Graph trial_dof_graph(Space::DofMappingRenderer::render(trial_space));
 
         // check dimensions
-        if(test_dof_graph.get_num_nodes_domain() != trial_dof_graph.get_num_nodes_domain())
-          throw InternalError(__func__, __FILE__, __LINE__, "invalid test-/trial-space pair");
+        XASSERTM(test_dof_graph.get_num_nodes_domain() == trial_dof_graph.get_num_nodes_domain(), "invalid test-/trial-space pair");
 
         // render transposed test-dof-mapping
         Adjacency::Graph test_dof_support(Adjacency::RenderType::transpose, test_dof_graph);
@@ -119,8 +119,7 @@ namespace FEAT
         Adjacency::Graph trial_dof_graph(Space::DofMappingRenderer::render(trial_space));
 
         // check dimensions
-        if(test_dof_graph.get_num_nodes_domain() != trial_dof_graph.get_num_nodes_domain())
-          throw InternalError(__func__, __FILE__, __LINE__, "invalid test-/trial-space pair");
+        XASSERTM(test_dof_graph.get_num_nodes_domain() == trial_dof_graph.get_num_nodes_domain(), "invalid test-/trial-space pair");
 
         // get the shape dimension
         typedef typename TestSpace_::ShapeType ShapeType;
@@ -203,8 +202,7 @@ namespace FEAT
         Adjacency::Graph trial_dof_graph(Space::DofMappingRenderer::render(trial_space));
 
         // check dimensions
-        if(test_dof_graph.get_num_nodes_domain() != trial_dof_graph.get_num_nodes_domain())
-          throw InternalError(__func__, __FILE__, __LINE__, "invalid test-/trial-space pair");
+        XASSERTM(test_dof_graph.get_num_nodes_domain() == trial_dof_graph.get_num_nodes_domain(), "invalid test-/trial-space pair");
 
         // get the shape dimension
         typedef typename TestSpace_::ShapeType ShapeType;

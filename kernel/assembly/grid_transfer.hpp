@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/intern/coarse_fine_cell_mapping.hpp>
 
@@ -245,7 +246,7 @@ namespace FEAT
             // sanity check for matrix inversion
             if(!Math::isnormal(lid.norm_frobenius()))
             {
-              throw InternalError(__func__,__FILE__,__LINE__,"Local Mass Matrix inversion failed!");
+              XABORTM("Local Mass Matrix inversion failed!");
             }
 
             // prepare fine mesh dof-mapping
@@ -539,7 +540,7 @@ namespace FEAT
             // sanity check for matrix inversion
             if(!Math::isnormal(lid.norm_frobenius()))
             {
-              throw InternalError(__func__,__FILE__,__LINE__,"Local Mass Matrix inversion failed!");
+              XABORTM("Local Mass Matrix inversion failed!");
             }
 
             // prepare fine mesh dof-mapping

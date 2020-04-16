@@ -6,7 +6,7 @@
 // includes, FEAT
 #include <kernel/adjacency/cuthill_mckee.hpp>
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 
 // includes, system
 #include <vector>
@@ -101,14 +101,11 @@ namespace FEAT
 
         // else: error
         default:
-          throw InternalError("Invalid root_type parameter!");
+          XABORTM("Invalid root_type parameter!");
         }
 
         // if something very odd has happened
-        if(!(root < num_nodes))
-        {
-          throw InternalError("No root found!");
-        }
+        XASSERTM(root < num_nodes, "No root node found!");
 
         // initialise the first level of the root node
         ++lvl1;
@@ -206,7 +203,7 @@ namespace FEAT
 
           // else: error
           default:
-            throw InternalError("Invalid run_type parameter!");
+            XABORTM("Invalid run_type parameter!");
           }
 
           // get to the next adjacency level

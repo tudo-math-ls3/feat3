@@ -115,17 +115,14 @@ namespace FEAT
 
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
-        if(nprocs < 1)
-          throw InternalError("Invalid number of processes!");
-        if((rank < 0) || (rank >= nprocs))
-          throw InternalError("Invalid rank!");
+        XASSERT(nprocs > 0);
+        XASSERT((rank >= 0) && (rank < nprocs));
 
         // determine slice count and refinement level
         int level(0);
         int n(1);
         for(; n < nprocs; n *= 2, ++level) {}
-        if(n != nprocs)
-          throw InternalError("number of processes must be a power of 2");
+        XASSERTM(n == nprocs, "number of processes must be a power of 2");
 
         // decompose rank to (i)
         const int ii(rank);
@@ -308,17 +305,14 @@ namespace FEAT
 
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
-        if(nprocs < 1)
-          throw InternalError("Invalid number of processes!");
-        if((rank < 0) || (rank >= nprocs))
-          throw InternalError("Invalid rank!");
+        XASSERT(nprocs > 0);
+        XASSERT((rank >= 0) && (rank < nprocs));
 
         // determine slice count and refinement level
         int level(0);
         int n(1);
         for(; n*n < nprocs; n *= 2, ++level) {}
-        if(n*n != nprocs)
-          throw InternalError("number of processes must be a power of 4");
+        XASSERTM(n*n == nprocs, "number of processes must be a power of 4");
 
         // decompose rank to (i,j)
         const int ii(rank % n);
@@ -638,20 +632,14 @@ namespace FEAT
 
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
-        if(nprocs < 1)
-          throw InternalError("Invalid number of processes!");
-        if((rank < 0) || (rank >= nprocs))
-          throw InternalError("Invalid rank!");
+        XASSERT(nprocs > 0);
+        XASSERT((rank >= 0) && (rank < nprocs));
 
         // determine slice count and refinement level
         int level(0);
         int n(1);
-        if(nprocs > 1)
-        {
-          for(; n*n*n < nprocs; n *= 2, ++level) {}
-          if(n*n*n != nprocs)
-            throw std::runtime_error("number of processes must be a power of 8");
-        }
+        for(; n*n*n < nprocs; n *= 2, ++level) {}
+        XASSERTM(n*n*n == nprocs, "number of processes must be a power of 8");
 
         // decompose rank to (i,j,k)
         const int ii(rank % n);

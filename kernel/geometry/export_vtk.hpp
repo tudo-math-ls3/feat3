@@ -450,8 +450,7 @@ namespace FEAT
         }
 
         // verify rank
-        if((rank < 0) || (rank >= nparts))
-          throw InternalError("Invalid rank '" + stringify(rank) + "'");
+        XASSERTM((rank >= 0) && (rank < nparts), "Invalid rank");
 
         // Add rank cell array since we're parallel if we come to here
         std::vector<double> rank_array((std::size_t(_num_cells)), double(rank));

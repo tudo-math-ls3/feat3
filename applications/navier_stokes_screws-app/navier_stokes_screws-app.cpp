@@ -240,8 +240,7 @@ class ExtrudedPartiDomainControl :
           }
           if(!found)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Could not find 2d point for "+stringify(extruded_vtx[i_extruded]));
+            XABORTM("Could not find 2d point for "+stringify(extruded_vtx[i_extruded]));
           }
         }
 
@@ -428,7 +427,7 @@ struct NavierStokesScrewsApp
 
       if(args.check("vtk") > 1)
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --vtk");
+        XABORTM("Too many options for --vtk");
       }
 
       args.parse("vtk",vtk_freq);
@@ -442,7 +441,7 @@ struct NavierStokesScrewsApp
 
       if(args.check("xml") > 1)
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --xml");
+        XABORTM("Too many options for --xml");
       }
 
       args.parse("xml",xml_freq);
@@ -1343,7 +1342,7 @@ struct NavierStokesScrewsApp
 
       if(comm.size() != 1)
       {
-        throw InternalError(__func__,__FILE__,__LINE__,"Writing the mesh to xml is only possible with 1 process!");
+        XABORTM("Writing the mesh to xml is only possible with 1 process!");
       }
 
 
@@ -2011,7 +2010,7 @@ struct NavierStokesScrewsApp
 
         if(comm.size() != 1)
         {
-          throw InternalError(__func__,__FILE__,__LINE__,"Writing the mesh to xml is only possible with 1 process!");
+          XABORTM("Writing the mesh to xml is only possible with 1 process!");
         }
 
         for(size_t l(0); l < dom_ctrl.size_physical(); ++l)
@@ -2367,7 +2366,7 @@ int run_app(int argc, char* argv[])
     if(args.check("application_config") != 1 )
     {
       comm.print("You need to specify a application configuration file with --application_config.");
-      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --application_config");
+      XABORTM("Invalid option for --application_config");
     }
     else
     {
@@ -2447,7 +2446,7 @@ int run_app(int argc, char* argv[])
   //}
   else
   {
-    throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
+    XABORTM("Unhandled mesh type "+mesh_type);
   }
 
   return ret;

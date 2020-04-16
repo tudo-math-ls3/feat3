@@ -438,8 +438,7 @@ namespace FEAT
              }
              else
              {
-               throw InternalError(__func__,__FILE__,__LINE__,
-               "Invalid number of BDF steps: "+stringify(num_steps));
+               XABORTM("Invalid number of BDF steps: "+stringify(num_steps));
              }
 
              // Coefficient for the div v term for the projection step
@@ -462,8 +461,7 @@ namespace FEAT
              }
              else
              {
-               throw InternalError(__func__,__FILE__,__LINE__,
-               "Invalid number of pressure extrapolation steps: "+stringify(p_extrapolation_steps));
+               XABORTM("Invalid number of pressure extrapolation steps: "+stringify(p_extrapolation_steps));
              }
 
            }

@@ -148,7 +148,7 @@ namespace FEAT
         typename Function_>
       void operator()(NodeData_& DOXY(node_data), const Function_& DOXY(function)) const
       {
-        throw InternalError("invalid call of NodeFunctionalNull::operator()()");
+        XABORTM("invalid call of NodeFunctionalNull::operator()()");
       }
     }; // class NodeFunctionalNull<...>
   } // namespace Space

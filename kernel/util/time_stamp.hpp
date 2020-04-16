@@ -10,7 +10,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/os_windows.hpp>
 
 // includes, system
@@ -230,7 +230,7 @@ namespace FEAT
           break;
 
         default:
-          throw InternalError("TimeFormat not supported!");
+          XABORTM("TimeFormat not supported!");
       }
 
       // return formatted string

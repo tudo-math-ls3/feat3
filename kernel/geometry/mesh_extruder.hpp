@@ -244,7 +244,7 @@ namespace FEAT
           return hexa_chart;
 
         // If we come out here then we failed to extrude the 2D chart for some reason...
-        throw InternalError(__func__, __FILE__, __LINE__, "Could not extrude 2D chart to 3D");
+        XABORTM("Could not extrude 2D chart to 3D");
       }
 
       /**

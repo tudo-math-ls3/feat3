@@ -246,10 +246,8 @@ namespace FEAT
             for(Index i(0); i < target_set.get_num_entities(); ++i)
             {
               // This maps the BaseMesh entity j = target_set[i] to the patch MeshPart entity i
-              if(!_idx_map.emplace(target_set[i], i).second)
-              {
-                throw InternalError("PatchMeshPartSplitter: internal error");
-              }
+              XASSERTM(_idx_map.emplace(target_set[i], i).second, "internal error");
+
             }
           }
 
@@ -329,8 +327,7 @@ namespace FEAT
             }
 
             // Push the new attribute to set_out
-            if(!(attribute_container_out.insert(std::make_pair(it->first, new_attribute)).second))
-                throw InternalError(__func__,__FILE__,__LINE__, "Error inserting new AttributeSet");
+            XASSERTM(attribute_container_out.insert(std::make_pair(it->first, new_attribute)).second, "Error inserting new AttributeSet");
           }
 
         }
@@ -400,7 +397,7 @@ namespace FEAT
                   // This is the correct number
                   index_set_out(kt->second, j) = jt->second;
                 else
-                  throw InternalError("Vertex "+stringify(i_in)+" missing in MeshPart topology!");
+                  XABORTM("Vertex "+stringify(i_in)+" missing in MeshPart topology!");
               }
             }
           }

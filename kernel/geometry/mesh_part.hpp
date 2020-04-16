@@ -737,8 +737,7 @@ namespace FEAT
               ::refine(*refined_attribute, *(it->second), *_coarse_meshpart.get_topology());
 
             // Add the attribute to the corresponding set
-            if(!(attribute_container.insert(std::make_pair(it->first, refined_attribute))).second)
-              throw InternalError(__func__,__FILE__,__LINE__,"Error refining attribute "+it->first);
+            XASSERTM(attribute_container.insert(std::make_pair(it->first, refined_attribute)).second, "Error refining attribute " + it->first);
           }
         }
 
@@ -787,7 +786,7 @@ namespace FEAT
               _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_meshpart);
           }
           else
-            throw INTERNAL_ERROR("no parent present");
+            XABORTM("no parent present");
         }
 
     }; // class StandardRefinery<MeshPart<...>,...>
@@ -860,7 +859,7 @@ namespace FEAT
 
           if(coarse_ish != nullptr)
           {
-            throw INTERNAL_ERROR("TargetSetRefineParentWrapper not implemented");
+            XABORTM("TargetSetRefineParentWrapper not implemented");
             //Intern::TargetRefineWrapper<ShapeType>::refine(
               //target_set_holder, num_entities_parent, coarse_target_set_holder, *coarse_ish, parent_ish);
           }

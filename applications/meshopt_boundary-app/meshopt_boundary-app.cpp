@@ -98,7 +98,7 @@ struct MeshoptBoundaryApp
 
       if(args.check("vtk") > 1)
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --vtk");
+        XABORTM("Too many options for --vtk");
       }
 
       args.parse("vtk",vtk_freq);
@@ -109,14 +109,13 @@ struct MeshoptBoundaryApp
     {
       if(args.check("test") > 1)
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
+        XABORTM("Too many options for --test");
       }
 
       args.parse("test",test_number);
       if(test_number != 1 && test_number != 2)
       {
-        throw InternalError(__func__, __FILE__, __LINE__,
-        "Encountered unhandled test number "+stringify(test_number));
+        XABORTM("Encountered unhandled test number "+stringify(test_number));
       }
     }
 
@@ -757,13 +756,13 @@ int run_app(int argc, char* argv[])
   {
     if(args.check("test") > 1)
     {
-      throw InternalError(__func__, __FILE__, __LINE__, "Too many options for --test");
+      XABORTM("Too many options for --test");
     }
 
     args.parse("test",test_number);
     if(test_number != 1 && test_number != 2)
     {
-      throw InternalError(__func__, __FILE__, __LINE__, "Encountered unhandled test number "+stringify(test_number));
+      XABORTM("Encountered unhandled test number "+stringify(test_number));
     }
   }
 
@@ -772,7 +771,7 @@ int run_app(int argc, char* argv[])
   {
     if(args.parse("mesh-path", mesh_path) != 1)
     {
-      throw InternalError(__func__, __FILE__ , __LINE__, "Failed to parse mesh directory");
+      XABORTM("Failed to parse mesh directory");
     }
   }
 
@@ -793,7 +792,7 @@ int run_app(int argc, char* argv[])
     if(args.check("application_config") != 1 )
     {
       comm.print("You need to specify a application configuration file with --application_config.");
-      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --application_config");
+      XABORTM("Invalid option for --application_config");
     }
     else
     {
@@ -883,7 +882,7 @@ int run_app(int argc, char* argv[])
   //}
   else
   {
-    throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type "+mesh_type);
+    XABORTM("Unhandled mesh type "+mesh_type);
   }
 
   return ret;
@@ -927,7 +926,7 @@ static void read_test_application_config(std::stringstream& iss, const int test_
   }
   else
   {
-    throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number: "+stringify(test_number));
+    XABORTM("Unknown test number: "+stringify(test_number));
   }
 }
 
@@ -964,7 +963,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
   }
   else
   {
-    throw InternalError(__func__,__FILE__,__LINE__,"Unknown test number "+stringify(test_number));
+    XABORTM("Unknown test number "+stringify(test_number));
   }
 }
 
@@ -1043,7 +1042,7 @@ static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int 
   }
   else
   {
-    throw InternalError(__func__,__FILE__,__LINE__,"Encountered unhandled test "+stringify(test_number));
+    XABORTM("Encountered unhandled test "+stringify(test_number));
   }
 }
 

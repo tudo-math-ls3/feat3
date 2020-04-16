@@ -10,6 +10,31 @@
 
 namespace FEAT
 {
+  void abortion(
+    const char * const func,
+    const char * const file,
+    const int line,
+    const char * const msg)
+  {
+    // write error message if available
+    if(msg != nullptr)
+      fprintf(stderr, "\n>>> FATAL ERROR: %s\n\n", msg);
+    else
+      fprintf(stderr, "\n>>> FATAL ERROR: UNSPECIFIED ABORTION\n\n");
+
+    // write basic information
+    fprintf(stderr, "Function: %s\n", func);
+    fprintf(stderr, "File....: %s\n", file);
+    fprintf(stderr, "Line....: %i\n", line);
+
+    // flush stderr
+    fflush(stderr);
+
+    // abort execution;
+    // this may also write a call-stack dump if possible
+    Runtime::abort();
+  }
+
   void assertion(
     bool expr,
     const char * const expr_str,
@@ -24,9 +49,9 @@ namespace FEAT
 
     // write error message if available
     if(msg != nullptr)
-      fprintf(stderr, "\nERROR: ASSERTION FAILED: %s\n", msg);
+      fprintf(stderr, "\n>>> FATAL ERROR: ASSERTION FAILED: %s\n", msg);
     else
-      fprintf(stderr, "\nERROR: ASSERTION FAILED\n");
+      fprintf(stderr, "\n>>> FATAL ERROR: ASSERTION FAILED\n");
 
     // write basic information
     fprintf(stderr, "Expression: %s\n", expr_str);

@@ -486,7 +486,7 @@ namespace FEAT
           case Pack::Type::F128: return xencode<Pack::f128>(buf, t, count, swap_bytes);
 #endif
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "invalid data type conversion");
+            XABORTM("invalid data type conversion");
           }
         }
 
@@ -504,7 +504,7 @@ namespace FEAT
           case Pack::Type::F128: return xdecode<Pack::f128>(t, buf, count, swap_bytes);
 #endif
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "invalid data type conversion");
+            XABORTM("invalid data type conversion");
           }
         }
       };
@@ -536,7 +536,7 @@ namespace FEAT
           case Pack::Type::I32:  return xencode<Pack::i32>(buf, t, count, swap_bytes);
           case Pack::Type::I64:  return xencode<Pack::i64>(buf, t, count, swap_bytes);
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "invalid data type conversion");
+            XABORTM("invalid data type conversion");
           }
         }
 
@@ -550,7 +550,7 @@ namespace FEAT
           case Pack::Type::I32:  return xdecode<Pack::i32>(t, buf, count, swap_bytes);
           case Pack::Type::I64:  return xdecode<Pack::i64>(t, buf, count, swap_bytes);
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "invalid data type conversion");
+            XABORTM("invalid data type conversion");
           }
         }
       };
@@ -582,7 +582,7 @@ namespace FEAT
           case Pack::Type::U32:  return xencode<Pack::u32>(buf, t, count, swap_bytes);
           case Pack::Type::U64:  return xencode<Pack::u64>(buf, t, count, swap_bytes);
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "invalid data type conversion");
+            XABORTM("invalid data type conversion");
           }
         }
 
@@ -596,7 +596,7 @@ namespace FEAT
           case Pack::Type::U32:  return xdecode<Pack::u32>(t, buf, count, swap_bytes);
           case Pack::Type::U64:  return xdecode<Pack::u64>(t, buf, count, swap_bytes);
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "invalid data type conversion");
+            XABORTM("invalid data type conversion");
           }
         }
       };
@@ -753,7 +753,7 @@ namespace FEAT
           t = zfp_type::zfp_type_double;
           break;
         default:
-          throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; data typ not available");
+          XABORTM("cannot encode compressed type; data typ not available");
       }
       XASSERT(t != zfp_type::zfp_type_none);
 
@@ -770,7 +770,7 @@ namespace FEAT
 
       //check if we lose significant bits through type conversion...
       if((sizeof(std::size_t) > sizeof(uint)) && (count > std::numeric_limits<uint>::max()))
-        throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; array size to big for internal data");
+        XABORTM("cannot encode compressed type; array size to big for internal data");
 
       //initialize zfp field as 2D variant, that src is not right type does not matter at this point...( memory has to be freed in the end):
       field = zfp_field_2d(temp_arr, t, (uint)x_size, (uint)y_size);
@@ -791,7 +791,7 @@ namespace FEAT
 #else // no FEAT_HAVE_ZFP
       (void) type;
       (void) tolerance;
-      throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zfp not available");
+      XABORTM("cannot encode compressed type; zfp not available");
 #endif // FEAT_HAVE_ZFP*/
 
       // return 0
@@ -938,7 +938,7 @@ namespace FEAT
 
       // compress via zlib
       if(::compress(dbuf, &dl, sbuf, sl) != Z_OK)
-        throw INTERNAL_ERROR("zlib compression error");
+        XABORTM("zlib compression error");
 
       // return final destination buffer usage as reported by zlib
       return static_cast<std::size_t>(dl);
@@ -950,7 +950,7 @@ namespace FEAT
       (void) swap_bytes;
       (void) pack_type;
       (void) count;
-      throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zlib not available");
+      XABORTM("cannot encode compressed type; zlib not available");
 #endif // FEAT_HAVE_ZLIB
     }
 
@@ -1056,7 +1056,7 @@ namespace FEAT
 
       // decompress via zlib
       if(::uncompress2(dbuf, &dl, sbuf, &sl) != Z_OK)
-        throw INTERNAL_ERROR("zlib decompression error");
+        XABORTM("zlib decompression error");
 
       // decode from temporary buffer
       decode_raw(dst, tmp.data(), count, raw_type, swap_bytes);
@@ -1071,7 +1071,7 @@ namespace FEAT
       (void) swap_bytes;
       (void) pack_type;
       (void) count;
-      throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zlib not available");
+      XABORTM("cannot decode compressed type; zlib not available");
 #endif // FEAT_HAVE_ZLIB
     }
 
@@ -1130,7 +1130,7 @@ namespace FEAT
           t = zfp_type::zfp_type_double;
           break;
         default:
-          throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; data typ not available");
+          XABORTM("cannot encode compressed type; data typ not available");
       }
       XASSERT(t != zfp_type::zfp_type_none);
       //check if header can hold size of the array, in case it cant (more than 1 petabyte of double data) give out error for now
@@ -1154,7 +1154,7 @@ namespace FEAT
 
       //check if we lose significant bits through type conversion...
       if((sizeof(std::size_t) > sizeof(uint)) && (count > std::numeric_limits<uint>::max()))
-        throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; array size to big for internal data structure");
+        XABORTM("cannot encode compressed type; array size to big for internal data structure");
       //calculate needed representation size and rest:
       x_size = 4u;
       if(count%4u == 0)
@@ -1189,7 +1189,7 @@ namespace FEAT
       (void) pack_type;
       (void) count;
       (void) tolerance;
-      throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; zfp not available");
+      XABORTM("cannot encode compressed type; zfp not available");
 #endif //FEAT_HAVE_ZFP
     }
 
@@ -1239,7 +1239,7 @@ namespace FEAT
           t = zfp_type::zfp_type_double;
           break;
         default:
-          throw InternalError(__func__, __FILE__ , __LINE__, "cannot encode compressed type; data typ not available");
+          XABORTM("cannot encode compressed type; data typ not available");
       }
       XASSERT(t != zfp_type::zfp_type_none);
 
@@ -1261,9 +1261,8 @@ namespace FEAT
       //read in Codec:
       stream_rseek(stream, 24u);
       uint codec = (uint)stream_read_bits(stream, 8u);
-      if(codec != zfp_codec_version)
-        throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zfp version not compatible \n zfp_Systemcodec: " + std::to_string(zfp_codec_version) +
-          "\n zfp_Compressed codec: " + std::to_string(codec));
+      XASSERTM(codec == zfp_codec_version, "cannot decode compressed type; zfp version not compatible \n zfp_Systemcodec: "
+        + stringify(zfp_codec_version) + "\n zfp_Compressed codec: " + stringify(codec));
       stream_rewind(stream);
       //aligning zfp_stream with bitsream
       zfp_stream_set_bit_stream(zfp, stream);
@@ -1272,10 +1271,10 @@ namespace FEAT
       array_size = zfp_field_size(field, NULL);
       //check if T_ and type to be decompressed is same:
       if(t != field->type)
-        throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; given array and saved data do not have the same type");
+        XABORTM("cannot decode compressed type; given array and saved data do not have the same type");
       //checking if buffersize of given array is enough to take up saved array....
       if(array_size - 3 > count)
-        throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed data; given count is too small for decompressed data!");
+        XABORTM("cannot decode compressed data; given count is too small for decompressed data!");
       //alligning field and tmp
       field->data = tmp.data();
       //decompress data
@@ -1298,7 +1297,7 @@ namespace FEAT
       (void) raw_type;
       (void) swap_bytes;
       (void) pack_type;
-      throw InternalError(__func__, __FILE__ , __LINE__, "cannot decode compressed type; zfp not available");
+      XABORTM("cannot decode compressed type; zfp not available");
 #endif //FEAT_HAVE_ZFP
     }
   } // namespace Pack

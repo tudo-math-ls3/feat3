@@ -30,12 +30,12 @@ namespace FEAT
         // QR decomposition
         MKL_INT ret_error = LAPACKE_sgeqrf(LAPACK_COL_MAJOR, lenJk, rowlen, Ahat, lda, tau.elements());
         if(ret_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "SPAI: sgeqrf: Invalid argument no. " + stringify(-ret_error));
+          XABORTM("SPAI: sgeqrf: Invalid argument no. " + stringify(-ret_error));
 
         // rhs <- Qt * rhs
         ret_error = LAPACKE_sormqr (LAPACK_COL_MAJOR, 'L', 'T', lenJk, 1, rowlen, Ahat, lda, tau.elements(), rhs, lenJk);
         if(ret_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "SPAI: sormqr: Invalid argument no. " + stringify(-ret_error));
+          XABORTM("SPAI: sormqr: Invalid argument no. " + stringify(-ret_error));
 
         // rhs <- solution of R*x = rhs
         cblas_strsm(CblasColMajor, CblasLeft, CblasUpper, CblasNoTrans, CblasNonUnit, rowlen, 1, 1.0f, Ahat, lda, rhs, rowlen);
@@ -59,12 +59,12 @@ namespace FEAT
         // QR decomposition
         MKL_INT ret_error = LAPACKE_dgeqrf(LAPACK_COL_MAJOR, lenJk, rowlen, Ahat, lda, tau.elements());
         if(ret_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "SPAI: dgeqrf: Invalid argument no. " + stringify(-ret_error));
+          XABORTM("SPAI: dgeqrf: Invalid argument no. " + stringify(-ret_error));
 
         // rhs <- Qt * rhs
         ret_error = LAPACKE_dormqr (LAPACK_COL_MAJOR, 'L', 'T', lenJk, 1, rowlen, Ahat, lda, tau.elements(), rhs, lenJk);
         if(ret_error)
-          throw InternalError(__func__, __FILE__, __LINE__, "SPAI: dormqr: Invalid argument no. " + stringify(-ret_error));
+          XABORTM("SPAI: dormqr: Invalid argument no. " + stringify(-ret_error));
 
         // rhs <- solution of R*x = rhs
         cblas_dtrsm(CblasColMajor, CblasLeft, CblasUpper, CblasNoTrans, CblasNonUnit, rowlen, 1, 1.0f, Ahat, lda, rhs, rowlen);

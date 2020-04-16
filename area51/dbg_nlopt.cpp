@@ -375,7 +375,7 @@ int main(int argc, char* argv[])
     else if(precon_name == "ApproximateHessian")
       my_precond = new_approximate_hessian_precond(my_op, my_filter);
     else if(precon_name != "none")
-      throw InternalError("Got invalid precon_name: "+precon_name);
+      XABORTM("Got invalid precon_name: "+precon_name);
 
     NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::DYHSHybrid);
     auto update_pair(args.query("direction_update"));
@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
     else if(precon_name == "ApproximateHessian")
       my_precond = new_approximate_hessian_precond(my_op, my_filter);
     else if(precon_name != "none")
-      throw InternalError("Got invalid precon_name: "+precon_name);
+      XABORTM("Got invalid precon_name: "+precon_name);
 
     auto* update_pair(args.query("direction_update"));
     if(update_pair != nullptr)
@@ -466,7 +466,7 @@ int main(int argc, char* argv[])
       else if(update_name == "DYHSHybrid")
         my_direction_update = NLCGDirectionUpdate::DYHSHybrid;
       else
-        throw InternalError("Got invalid ALGLIBMinCG direction update: "+update_name);
+        XABORTM("Got invalid ALGLIBMinCG direction update: "+update_name);
     }
 
     auto my_solver = new_alglib_mincg(my_op, my_filter, my_direction_update, true);
@@ -480,6 +480,6 @@ int main(int argc, char* argv[])
 #endif // FEAT_HAVE_ALGLIB
   else
   {
-    throw InternalError("dbg-nlopt got invalid solver name: "+solver_name);
+    XABORTM("dbg-nlopt got invalid solver name: "+solver_name);
   }
 }

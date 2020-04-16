@@ -347,10 +347,7 @@ namespace FEAT
           // 2D submesh of a 3D tetrahedral mesh -- in this case the number of tetrahedra is zero,
           // so we'll check for that to ensure that we don't prohibit this valid scenario.
           Index num_cells = target_set_holder_in.get_target_set<3>().get_num_entities();
-          if(num_cells != 0)
-          {
-            throw InternalError("TargetSet refinement not implemented for Tetrahedra");
-          }
+          XASSERTM(num_cells == 0, "TargetSet refinement not implemented for Tetrahedra");
 
           // okay, no tetrahedron to be refined...
           return 0;
@@ -661,10 +658,7 @@ namespace FEAT
           // 2D submesh of a 3D hexahedral mesh -- in this case the number of hexahedra is zero,
           // so we'll check for that to ensure that we don't prohibit this valid scenario.
           Index num_cells = target_set_holder_in.get_target_set<3>().get_num_entities();
-          if(num_cells != 0)
-          {
-            throw InternalError("TargetSet refinement not implemented for Hexahedra");
-          }
+          XASSERTM(num_cells == 0, "TargetSet refinement not implemented for Hexahedra");
 
           // okay, no hexahedra to be refined...
           return 0;

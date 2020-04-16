@@ -364,7 +364,7 @@ namespace FEAT
         static void map_img_point(TrafoData_& trafo_data, const Evaluator_& evaluator)
         {
           if(!*(Evaluator_::eval_caps & TrafoTags::img_point))
-            throw InternalError(__func__, __FILE__, __LINE__, "trafo evaluator can't compute image point coordinates");
+            XABORTM("trafo evaluator can't compute image point coordinates");
           evaluator.map_point(trafo_data.img_point, trafo_data.dom_point);
         }
 
@@ -372,7 +372,7 @@ namespace FEAT
         static void calc_jac_mat(TrafoData_& trafo_data, const Evaluator_& evaluator)
         {
           if(!*(Evaluator_::eval_caps & TrafoTags::jac_mat))
-            throw InternalError(__func__, __FILE__, __LINE__, "trafo evaluator can't compute jacobian matrices");
+            XABORTM("trafo evaluator can't compute jacobian matrices");
           // let the evaluator compute the jacobian matrix
           evaluator.calc_jac_mat(trafo_data.jac_mat, trafo_data.dom_point);
         }
@@ -381,7 +381,7 @@ namespace FEAT
         static void calc_jac_inv(TrafoData_& trafo_data, const Evaluator_&)
         {
           if(!*(Evaluator_::eval_caps & TrafoTags::jac_inv))
-            throw InternalError(__func__, __FILE__, __LINE__, "trafo evaluator can't compute jacobian inverse matrices");
+            XABORTM("trafo evaluator can't compute jacobian inverse matrices");
           // invert the jacobian matrix
           trafo_data.jac_inv.set_inverse(trafo_data.jac_mat);
         }
@@ -390,7 +390,7 @@ namespace FEAT
         static void calc_jac_det(TrafoData_& trafo_data, const Evaluator_&)
         {
           if(!*(Evaluator_::eval_caps & TrafoTags::jac_det))
-            throw InternalError(__func__, __FILE__, __LINE__, "trafo evaluator can't compute jacobian determinants");
+            XABORTM("trafo evaluator can't compute jacobian determinants");
           // compute the volume of the jacobian matrix
           trafo_data.jac_det = trafo_data.jac_mat.vol();
         }
@@ -399,7 +399,7 @@ namespace FEAT
         static void calc_hess_ten(TrafoData_& trafo_data, const Evaluator_& evaluator)
         {
           if(!*(Evaluator_::eval_caps & TrafoTags::hess_ten))
-            throw InternalError(__func__, __FILE__, __LINE__, "trafo evaluator can't compute hessian tensors");
+            XABORTM("trafo evaluator can't compute hessian tensors");
           // let the evaluator compute the hessian tensor
           evaluator.calc_hess_ten(trafo_data.hess_ten, trafo_data.dom_point);
         }
@@ -408,7 +408,7 @@ namespace FEAT
         static void calc_hess_inv(TrafoData_& trafo_data, const Evaluator_&)
         {
           if(!*(Evaluator_::eval_caps & TrafoTags::hess_inv))
-            throw InternalError(__func__, __FILE__, __LINE__, "trafo evaluator can't compute inverse hessian tensors");
+            XABORTM("trafo evaluator can't compute inverse hessian tensors");
 
           typedef typename TrafoData_::EvalTraits EvalTraits;
           typedef typename EvalTraits::DataType DataType;

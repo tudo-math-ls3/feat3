@@ -49,7 +49,7 @@ namespace FEAT
         template <typename MT_, typename T1_, typename T2_>
         static void assign(std::vector<T1_ *> &, const std::vector<T2_ *> &)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Should never be reached!");
+          XABORTM("Should never be reached!");
         }
 
         template <typename T_>
@@ -159,7 +159,7 @@ namespace FEAT
             else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
               MemoryPool<Mem_>::template upload<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
             else
-              throw InternalError(__func__, __FILE__, __LINE__, "Memory Backend not known!");
+              XABORTM("Memory Backend not known!");
           }
         }
 
@@ -171,7 +171,7 @@ namespace FEAT
           else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
             MemoryPool<Mem_>::template upload<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
           else
-            throw InternalError(__func__, __FILE__, __LINE__, "Memory Backend not known!");
+            XABORTM("Memory Backend not known!");
         }
       }
 
@@ -462,7 +462,7 @@ namespace FEAT
         auto temp(this->template _serialise<DT2_, IT2_>(mode));
         file.write(temp.data(), long(temp.size()));
         if (!file.good())
-          throw InternalError(__func__, __FILE__, __LINE__, "Error in _serialise - file ostream is not good anymore!");
+          XABORTM("Error in _serialise - file ostream is not good anymore!");
       }
 
       /**
@@ -568,7 +568,7 @@ namespace FEAT
         file.seekg(-(long)sizeof(uint64_t), file.cur);
         file.read(temp.data(), (long)(tsize));
         if (!file.good())
-          throw InternalError(__func__, __FILE__, __LINE__, "Error in _deserialise - file istream is not good anymore!");
+          XABORTM("Error in _deserialise - file istream is not good anymore!");
         this->template _deserialise<DT2_, IT2_>(mode, temp);
       }
 
@@ -689,7 +689,7 @@ namespace FEAT
       {
         if (this == &other)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a lafem container!");
+          XABORTM("Trying to self-clone a lafem container!");
         }
 
         XASSERTM(other._foreign_memory == false || clone_mode == CloneMode::Deep, "Must use deep cloning with ranged based source containers");

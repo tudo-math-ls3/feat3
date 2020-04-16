@@ -518,7 +518,7 @@ namespace FEAT
       {
         std::ifstream file(filename.c_str(), std::ifstream::in);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          XABORTM("Unable to open Vector file " + filename);
         read_from(mode, file);
         file.close();
       }
@@ -548,13 +548,13 @@ namespace FEAT
             std::getline(file, line);
             if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+              XABORTM("Input-file is not a compatible mtx-file");
             }
             while(!file.eof())
             {
               std::getline(file,line);
               if (file.eof())
-                throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+                XABORTM("Input-file is empty");
 
               String::size_type begin(line.find_first_not_of(" "));
               if (line.at(begin) != '%')
@@ -575,7 +575,7 @@ namespace FEAT
               Index cols((Index)atol(scols.c_str()));
               line.erase(0, end);
               if (cols != 1)
-                throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no sparse-vector-file");
+                XABORTM("Input-file is no sparse-vector-file");
 
               begin = line.find_first_not_of(" ");
               line.erase(0, begin);
@@ -626,7 +626,7 @@ namespace FEAT
             break;
           }
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+            XABORTM("Filemode not supported!");
         }
       }
 
@@ -640,7 +640,7 @@ namespace FEAT
       {
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          XABORTM("Unable to open Vector file " + filename);
         write_out(mode, file);
         file.close();
       }
@@ -673,7 +673,7 @@ namespace FEAT
             break;
           }
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+            XABORTM("Filemode not supported!");
         }
       }
 

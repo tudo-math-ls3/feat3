@@ -96,8 +96,7 @@ namespace FEAT
             }
             else
             {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              name()+" config section is missing the mandatory step_length key!");
+              XABORTM(name()+" config section is missing the mandatory step_length key!");
             }
 
           }

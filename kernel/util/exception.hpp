@@ -127,18 +127,6 @@ namespace FEAT
   }; // class InternalError
 
   /**
-   * \def INTERNAL_ERROR
-   * \brief InteralError constructor macro definition
-   *
-   * This macro creates an InternalError exception and automatically supplies
-   * the function name, file name and line number to the constructor.
-   *
-   * \param msg
-   * The message to be passed to the constructor.
-   */
-#define INTERNAL_ERROR(msg) FEAT::InternalError(__func__, __FILE__, __LINE__, msg)
-
-  /**
    * \brief Class for parser related errors
    */
   class ParseError :
@@ -169,7 +157,7 @@ namespace FEAT
      * What was expected instead, e.g. "a non-negative integer"
      */
     explicit ParseError(const String& name, const String& got, const String& expect) :
-      Exception("ParseError: " + name + ", got " + got + ", expected " + expect)
+      Exception("ParseError: " + name + ": expected " + expect + " but got '" + got + "'")
     {
     }
 

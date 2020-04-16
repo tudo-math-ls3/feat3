@@ -271,7 +271,7 @@ namespace PoissonDirichlet
       if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
       {
         comm.print("FAILED");
-        throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
+        XABORTM("iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
       }
     }
   }

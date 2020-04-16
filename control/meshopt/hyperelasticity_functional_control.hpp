@@ -228,7 +228,7 @@ namespace FEAT
               auto* solver_section = solver_config.query_section(solver_name);
               if(solver_section == nullptr)
               {
-                throw InternalError(__func__,__FILE__,__LINE__,"Could not find section for solver "+solver_name);
+                XABORTM("Could not find section for solver "+solver_name);
               }
 
               precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);

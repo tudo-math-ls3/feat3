@@ -9,6 +9,8 @@
 
 // includes, FEAT
 #include <kernel/adjacency/adjactor.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/util/string.hpp>
 
 // includes, system
 #include <vector>
@@ -56,7 +58,7 @@ namespace FEAT
         // try to open output file
         std::ofstream ofs(filename, std::ios_base::binary|std::ios_base::out);
         if(!(ofs.is_open() && ofs.good()))
-          throw InternalError(String("Failed to open '") + filename + "'");
+          throw FileError(String("Failed to open '") + filename + "'");
 
         // write
         write(ofs, adj);
@@ -89,8 +91,7 @@ namespace FEAT
         const Index h = adj.get_num_nodes_domain();
 
         // make sure we do not exceed the 16-bit range
-        if((w > Index(32767)) || (h > Index(32767)))
-          throw InternalError("TGA dimensions are limited to 32767");
+        XASSERTM((w <= Index(32767)) && (h <= Index(32767)), "TGA dimensions are limited to 32767");
 
         // set dimensions
         header[12] = u8( w       & 0xFF);

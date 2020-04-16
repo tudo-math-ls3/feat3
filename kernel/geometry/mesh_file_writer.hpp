@@ -229,8 +229,7 @@ namespace FEAT
         for(auto it = names.begin(); it != names.end(); ++it)
         {
           const Atlas::ChartBase<RootMesh_>* chart = mesh_atlas.find_mesh_chart(*it);
-          if(chart == nullptr)
-            throw InternalError(String("Chart '") + (*it) + "' not found in atlas");
+          XASSERTM(chart != nullptr, String("Chart '") + (*it) + "' not found in atlas");
 
           write_chart(*chart, *it);
         }

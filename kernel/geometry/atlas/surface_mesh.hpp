@@ -334,9 +334,7 @@ namespace FEAT
         {
           // We need the topology of the meshpart because searching for points is cell-wise and we need to know
           // about the vertices in each cell
-          if(meshpart.get_topology() == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "The meshpart needs a topology for SurfaceMesh::project()!");
+          XASSERTM(meshpart.get_topology() != nullptr, "The meshpart needs a topology for SurfaceMesh::project()!");
 
           Index num_facets(meshpart.get_num_entities(SurfaceMeshType::shape_dim));
 
@@ -677,8 +675,7 @@ namespace FEAT
           } // search loop
 
           // If we get here without success being true, the point could not be found
-          if(best_approx_cell == ~Index(0))
-            throw InternalError(__func__,__FILE__,__LINE__,"Could not find point "+stringify(x)+" in SurfaceMesh");
+          XASSERTM(best_approx_cell == ~Index(0), "Could not find point "+stringify(x)+" in SurfaceMesh");
 
           // Otherwise, it was found in current and coeffs is still set from that evaluation
           return best_approx_cell;
@@ -1065,7 +1062,7 @@ namespace FEAT
       public:
         explicit SurfaceMeshChartParser(ChartBase<Mesh_>*&)
         {
-          throw InternalError(__func__,__FILE__,__LINE__,"Thou shall not arrive here");
+          XABORTM("Thou shall not arrive here");
         }
       };
 

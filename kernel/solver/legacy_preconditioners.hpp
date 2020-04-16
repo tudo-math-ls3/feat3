@@ -937,7 +937,7 @@ namespace FEAT
       {
         if (_A.columns() != _A.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         const Index n(_A.columns());
@@ -995,15 +995,15 @@ namespace FEAT
       {
         if (_A.columns() != _A.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
         if (_layout.get_scalar_index().at(1) != _layout.get_scalar_index().at(2))
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Precon-layout is not square!");
+          XABORTM("Precon-layout is not square!");
         }
         if (_A.columns() != _layout.get_scalar_index().at(1))
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Precon-layout and matrix do not match!");
+          XABORTM("Precon-layout and matrix do not match!");
         }
 
         _m_columns = new std::list<PAIR_>[_A.rows()];
@@ -1037,7 +1037,7 @@ namespace FEAT
         {
           if (in.elements() == out.elements())
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "Input- and output-vectors must be different!");
+            XABORTM("Input- and output-vectors must be different!");
           }
 
           this->apply_m_transpose(out, in);
@@ -1547,7 +1547,7 @@ namespace FEAT
       {
         if (_A.columns() != _A.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
       }
 

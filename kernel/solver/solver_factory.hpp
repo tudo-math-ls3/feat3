@@ -68,7 +68,7 @@ namespace FEAT
             return name;
           }
           else
-            throw InternalError(__func__, __FILE__, __LINE__, "section " + name + " not found!");
+            XABORTM("section " + name + " not found!");
         }
 
         template <typename SolverVectorType_, typename MST_>
@@ -86,8 +86,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__,
-            "Schwarz precon section without solver key is not allowed!");
+            XABORTM("Schwarz precon section without solver key is not allowed!");
           }
 
           auto& filters = matrix_stock.template get_filters<SolverVectorType_>(nullptr, nullptr, nullptr, nullptr);
@@ -98,8 +97,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_schwarz_precon(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
         {
-          throw InternalError(__func__, __FILE__, __LINE__,
-          "Schwarz precon section is only allowed in global context! Maybe you have two in one solver branch?");
+          XABORTM("Schwarz precon section is only allowed in global context! Maybe you have two in one solver branch?");
           return nullptr;
         }
 
@@ -133,7 +131,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_pipepcg(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "pipepcg solver section is only allowed in global context!");
+          XABORTM("pipepcg solver section is only allowed in global context!");
           return nullptr;
         }
 
@@ -167,7 +165,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_gropppcg(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "gropppcg solver section is only allowed in global context!");
+          XABORTM("gropppcg solver section is only allowed in global context!");
           return nullptr;
         }
 
@@ -201,7 +199,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_rbicgstab(MST_ &, PropertyMap *, String, PropertyMap *, size_t, ...)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "rbicgstab solver section is only allowed in global context!");
+          XABORTM("rbicgstab solver section is only allowed in global context!");
           return nullptr;
         }
 
@@ -209,7 +207,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_ilu_precon(MST_&, const String&, PropertyMap*, size_t, typename SolverVectorType_::GateType *)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "ilu precon section is only allowed in local context!");
+          XABORTM("ilu precon section is only allowed in local context!");
           return nullptr;
         }
 
@@ -227,7 +225,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_spai_precon(MST_ & , size_t, typename SolverVectorType_::GateType *)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "spai precon section is only allowed in local context!");
+          XABORTM("spai precon section is only allowed in local context!");
           return nullptr;
         }
 
@@ -245,7 +243,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_sor_precon(MST_ & , PropertyMap * /*section*/, size_t, typename SolverVectorType_::GateType *)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "sor precon section is only allowed in local context!");
+          XABORTM("sor precon section is only allowed in local context!");
           return nullptr;
         }
 
@@ -266,7 +264,7 @@ namespace FEAT
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_ssor_precon(MST_ & , PropertyMap * /*section*/, size_t, typename SolverVectorType_::GateType *)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "ssor precon section is only allowed in local context!");
+          XABORTM("ssor precon section is only allowed in local context!");
           return nullptr;
         }
 
@@ -366,7 +364,7 @@ namespace FEAT
 #endif
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "memorytype/datatype/indextype combination unknown!\n Did you try configure with the --sf_esoteric flag?");
+            XABORTM("memorytype/datatype/indextype combination unknown!\n Did you try configure with the --sf_esoteric flag?");
           }
 
           return precon;
@@ -401,13 +399,12 @@ namespace FEAT
           auto section = base->query_section(section_name);
           if (section == nullptr)
           {
-            throw InternalError(__func__, __FILE__, __LINE__,
-            "section not found in property map: " + section_name + "!");
+            XABORTM("section not found in property map: " + section_name + "!");
           }
 
           auto solver_p = section->query("type");
           if (!solver_p.second)
-            throw InternalError(__func__, __FILE__, __LINE__, "no type key found in property map section: " + section_name + "!");
+            XABORTM("no type key found in property map section: " + section_name + "!");
           String solver_type = solver_p.first;
 
           auto section_memorytype = section->query("memorytype", "main");
@@ -567,7 +564,7 @@ namespace FEAT
 
             auto hierarchy_p = section->get_entry("hierarchy");
             if (!hierarchy_p.second)
-              throw InternalError(__func__, __FILE__, __LINE__, "no hierarchy key found in mg section!");
+              XABORTM("no hierarchy key found in mg section!");
 
             if (hmap.count(hierarchy_p.first) > 0)
             {
@@ -583,17 +580,17 @@ namespace FEAT
 
               auto hierarchy_type_p = hierarchy_section->query("type");
               if (!hierarchy_type_p.second)
-                throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without type key is not allowed!");
+                XABORTM("hierarchy section without type key is not allowed!");
               XASSERTM(hierarchy_type_p.first == "hierarchy", "hierarchy key type must match string 'hierarchy'!");
 
               auto coarse_solver_p = hierarchy_section->query("coarse");
               if (!coarse_solver_p.second)
-                throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without coarse key is not allowed!");
+                XABORTM("hierarchy section without coarse key is not allowed!");
               auto coarse_solver_section_path = get_section_path(base, section, section_name, coarse_solver_p.first);
 
               auto smoother_p = hierarchy_section->query("smoother");
               if (!smoother_p.second)
-                throw InternalError(__func__, __FILE__, __LINE__, "hierarchy section without smoother key is not allowed!");
+                XABORTM("hierarchy section without smoother key is not allowed!");
               auto smoother_section_path = get_section_path(base, section, section_name, smoother_p.first);
 
               XASSERT(matrix_stock.systems.size() <= matrix_stock.size_virtual);
@@ -615,7 +612,7 @@ namespace FEAT
             // These parameters have to be known before calling the constructor, so we have to parse them here
             auto cycle_p = section->query("cycle");
             if (!cycle_p.second)
-              throw InternalError(__func__, __FILE__, __LINE__, "mg section without cycle key is not allowed!");
+              XABORTM("mg section without cycle key is not allowed!");
             auto lvl_min_s = section->query("lvl_min", "-1");
             auto lvl_min = std::stoi(lvl_min_s);
             auto lvl_max_s = section->query("lvl_max", "0");
@@ -627,7 +624,7 @@ namespace FEAT
 
             if(!cycle_p.first.parse(cycle))
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "mg cycle " + cycle_p.first + " unknown!");
+              XABORTM("mg cycle " + cycle_p.first + " unknown!");
             }
 
             auto mgv = Solver::new_multigrid(hierarchy, cycle, lvl_max, lvl_min);
@@ -642,7 +639,7 @@ namespace FEAT
               else if(adapt_cgc_p.first == "min_defect")
                 mgv->set_adapt_cgc(Solver::MultiGridAdaptCGC::MinDefect);
               else
-                throw InternalError(__func__, __FILE__, __LINE__, "unknown coarse grid correction adaptivity mode: " + adapt_cgc_p.first);
+                XABORTM("unknown coarse grid correction adaptivity mode: " + adapt_cgc_p.first);
             }
             result = mgv;
           }
@@ -652,7 +649,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "solver with type " + solver_type + " unkown!");
+            XABORTM("solver with type " + solver_type + " unkown!");
           }
 
           return result;
@@ -690,16 +687,14 @@ namespace FEAT
           auto section = base->query_section(section_name);
           if(section == nullptr)
           {
-            throw InternalError(__func__, __FILE__, __LINE__,
-            "could not find section "+section_name+" in PropertyMap!");
+            XABORTM("could not find section "+section_name+" in PropertyMap!");
           }
 
           // Get the required type String
           auto solver_p = section->query("type");
           if (!solver_p.second)
           {
-            throw InternalError(__func__, __FILE__, __LINE__,
-            "No type key found in PropertyMap section with name " + section_name + "!");
+            XABORTM("No type key found in PropertyMap section with name " + section_name + "!");
           }
           String solver_type(solver_p.first);
 
@@ -724,7 +719,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "Unknown linesearch type " + section_name + "!");
+            XABORTM("Unknown linesearch type " + section_name + "!");
           }
 
           return result;
@@ -766,8 +761,7 @@ namespace FEAT
           auto solver_p = section->query("type");
           if (!solver_p.second)
           {
-            throw InternalError(__func__, __FILE__, __LINE__,
-            "no type key found in property map: " + section_name + "!");
+            XABORTM("no type key found in property map: " + section_name + "!");
           }
           String solver_type(solver_p.first);
 
@@ -789,14 +783,13 @@ namespace FEAT
           else if(solver_type == "ALGLIBMinLBFGS")
           {
 #ifndef FEAT_HAVE_ALGLIB
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "ALGLIBMinLBFGS is only available if FEAT was built with the alglib token in the buildid.");
+            XABORTM("ALGLIBMinLBFGS is only available if FEAT was built with the alglib token in the buildid.");
 #else
 
             Dist::Comm comm_world(Dist::Comm::world());
             if(comm_world.size() != 1)
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
+              XABORTM("ALGLIBMinLBFGS is only available with 1 process!");
             }
 
             result = Solver::new_alglib_minlbfgs<Functional_, Filter_>(
@@ -808,13 +801,12 @@ namespace FEAT
           else if (solver_type == "ALGLIBMinCG")
           {
 #ifndef FEAT_HAVE_ALGLIB
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "ALGLIBMinCG is only available if FEAT was built with the alglib token in the buildid.");
+            XABORTM("ALGLIBMinCG is only available if FEAT was built with the alglib token in the buildid.");
 #else
             Dist::Comm comm_world(Dist::Comm::world());
             if(comm_world.size() != 1)
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
+              XABORTM("ALGLIBMinLBFGS is only available with 1 process!");
             }
 
             result = Solver::new_alglib_mincg<Functional_, Filter_>(
@@ -834,8 +826,7 @@ namespace FEAT
             }
             else
             {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "NLCG config section "+section_name+" is missing the mandatory linesearch key!");
+              XABORTM("NLCG config section "+section_name+" is missing the mandatory linesearch key!");
             }
 
             my_linesearch = create_linesearch(functional, filter, base, linesearch_name);
@@ -847,7 +838,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__,__FILE__,__LINE__,"Solver type key "+stringify(solver_type)+" unknown.");
+            XABORTM("Solver type key "+stringify(solver_type)+" unknown.");
           }
 
           return result;

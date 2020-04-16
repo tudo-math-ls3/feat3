@@ -125,7 +125,7 @@ namespace FEAT
         if (best_toe < std::numeric_limits<double>::max())
           MemoryPool<Mem::CUDA>::blocksize_spmv = best_blocksize;
         else
-          throw InternalError(__func__, __FILE__, __LINE__, "no valid spmv configuration found!");
+          XABORTM("no valid spmv configuration found!");
 
         ///// AXPY
         best_toe = std::numeric_limits<double>::max();
@@ -161,7 +161,7 @@ namespace FEAT
         if (best_toe < std::numeric_limits<double>::max())
           MemoryPool<Mem::CUDA>::blocksize_axpy = best_blocksize;
         else
-          throw InternalError(__func__, __FILE__, __LINE__, "no valid axpy configuration found!");
+          XABORTM("no valid axpy configuration found!");
       }
     };
   } // namespace LAFEM

@@ -1297,11 +1297,11 @@ namespace FEAT
 
         // make sure that we do not push more graphs than we have blocks
         if(int(_macro_dofs.size()) >= Intern::AmaVankaMatrixHelper<Matrix_>::num_blocks)
-          throw INTERNAL_ERROR("all macro-dofs graphs have already been added");
+          XABORTM("all macro-dofs graphs have already been added");
 
         // make sure that the number of macros matches our previous graph
         if(!_macro_dofs.empty() && (_macro_dofs.back().get_num_nodes_domain() != dofs.get_num_nodes_domain()))
-          throw INTERNAL_ERROR("macro count mismatch");
+          XABORTM("macro count mismatch");
 
         // push graph into the list
         _macro_dofs.emplace_back(std::forward<Adjacency::Graph>(dofs));
@@ -1430,7 +1430,7 @@ namespace FEAT
         {
           // try to deduct macros by pressure matrices in SaddlePointMatrix
           if(!Intern::AmaVankaCore::deduct_macro_dofs(this->_matrix, this->_macro_dofs))
-            throw INTERNAL_ERROR("Cannot auto-deduct macros for this matrix type");
+            XABORTM("Cannot auto-deduct macros for this matrix type");
         }
 
         // make sure we have one macro-dof graph for each matrix block

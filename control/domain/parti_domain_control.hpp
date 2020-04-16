@@ -402,22 +402,22 @@ namespace FEAT
             sv = slvls.at(i).split_by_string(":");
 
             if((sv.size() < std::size_t(1)) || (sv.size() > std::size_t(2)))
-              throw INTERNAL_ERROR("Invalid input format: '" + slvls.at(i) + "', expected 'level:patches'");
+              throw ParseError("Invalid input format", slvls.at(i), "an int-pair 'level:patches'");
 
             if(!sv.front().parse(ilvl))
-              throw INTERNAL_ERROR("Failed to parse level index: '" + slvls.at(i) + "'");
+              throw ParseError("Failed to parse level index", slvls.at(i), "an integer");
             if((sv.size() > std::size_t(1)) && !sv.back().parse(nprocs))
-              throw INTERNAL_ERROR("Failed to parse process count: '" + slvls.at(i) + "'");
+              throw ParseError("Failed to parse process count" , slvls.at(i), "an integer");
 
             // level must be non-negative
             if(ilvl < 0)
-              throw INTERNAL_ERROR("Invalid negative level index: '" + slvls.at(i) + "'");
+              throw ParseError("Invalid negative level index", slvls.at(i), "a non-negative level index");
 
             // first level index?
             if(i == std::size_t(0))
             {
               if((nprocs >= 0) && (nprocs != this->_comm.size()))
-                throw INTERNAL_ERROR("Invalid number of processes for global level: '" + slvls.at(i) +
+                throw ParseError("Invalid number of processes for global level: '" + slvls.at(i) +
                   "', expected " + stringify(this->_comm.size()) + " but got " + stringify(nprocs));
               _desired_levels.push_back(std::make_pair(ilvl, nranks));
               continue;
@@ -425,7 +425,7 @@ namespace FEAT
 
             // make sure the level is non-ascending
             if(_desired_levels.back().first < ilvl)
-              throw INTERNAL_ERROR("Invalid non-descending level index: '" + slvls.at(i) +
+              throw ParseError("Invalid non-descending level index: '" + slvls.at(i) +
                 "', expected <= " + stringify(_desired_levels.back().first) + " but got " + stringify(ilvl));
 
             // make sure process count is valid
@@ -435,12 +435,12 @@ namespace FEAT
             {
               // the process count must be descending
               if(_desired_levels.back().second <= nprocs)
-                throw INTERNAL_ERROR("Invalid non-descending process count: '" + slvls.at(i) +
+                throw ParseError("Invalid non-descending process count: '" + slvls.at(i) +
                   "', expected < " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
 
               // the previous process count must be a multiple
               if(_desired_levels.back().second % nprocs != 0)
-                throw INTERNAL_ERROR("Invalid indivisible process count: '" + slvls.at(i) +
+                throw ParseError("Invalid indivisible process count: '" + slvls.at(i) +
                   "', expected a divisor of " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
             }
 
@@ -465,12 +465,9 @@ namespace FEAT
           int _desired_level_max = lvl_max;
           int _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_max + lvl_min + 1);
 
-          if(_desired_level_max < 0)
-            throw INTERNAL_ERROR("Invalid level-max");
-          if(_desired_level_min < 0)
-            throw INTERNAL_ERROR("Invalid level-min");
-          if(_desired_level_max < _desired_level_min)
-            throw INTERNAL_ERROR("Invalid level-min/max combination");
+          XASSERTM(_desired_level_max >= 0, "Invalid level-max");
+          XASSERTM(_desired_level_min >= 0, "Invalid level-min");
+          XASSERTM(_desired_level_max >= _desired_level_min, "Invalid level-min/max combination");
 
           _desired_levels.emplace_back(std::make_pair(_desired_level_max, this->_comm.size()));
           _desired_levels.emplace_back(std::make_pair(_desired_level_min, 0));
@@ -497,20 +494,15 @@ namespace FEAT
           int _desired_level_med = (lvl_med >= 0 ? lvl_med : lvl_max + lvl_med + 1);
           int _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_med + lvl_min + 1);
 
-          if(_desired_level_max < 0)
-            throw INTERNAL_ERROR("Invalid level-max");
-          if(_desired_level_med < 0)
-            throw INTERNAL_ERROR("Invalid level-med");
-          if(_desired_level_min < 0)
-            throw INTERNAL_ERROR("Invalid level-min");
+          XASSERTM(_desired_level_max >= 0, "Invalid level-max");
+          XASSERTM(_desired_level_med >= 0, "Invalid level-med");
+          XASSERTM(_desired_level_min >= 0, "Invalid level-min");
 
           // level_max must be strictly greater than level_med
-          if(_desired_level_max <= _desired_level_med)
-            throw INTERNAL_ERROR("Invalid level-max/med combination");
+          XASSERTM(_desired_level_max > _desired_level_med, "Invalid level-max/med combination");
 
           // level_med must be greater or equal level_min
-          if(_desired_level_med < _desired_level_min)
-            throw INTERNAL_ERROR("Invalid level-med/min combination");
+          XASSERTM(_desired_level_med >= _desired_level_min, "Invalid level-med/min combination");
 
           _desired_levels.emplace_back(std::make_pair(_desired_level_max, this->_comm.size()));
           _desired_levels.emplace_back(std::make_pair(_desired_level_med, 1));
@@ -869,7 +861,7 @@ namespace FEAT
           // apply partitioner
           if(!this->_apply_parti(ancestor, *base_mesh_node))
           {
-            throw INTERNAL_ERROR("Failed to find a suitable partitioning");
+            XABORTM("Failed to find a suitable partitioning");
           }
 
           // extract our patch
@@ -1093,7 +1085,7 @@ namespace FEAT
             // we're now at the partitioning level, so apply the partitioner
             if(!this->_apply_parti(ancestor, *base_mesh_node))
             {
-              throw INTERNAL_ERROR("Failed to find a suitable partitioning");
+              XABORTM("Failed to find a suitable partitioning");
             }
 
             // extract our patch

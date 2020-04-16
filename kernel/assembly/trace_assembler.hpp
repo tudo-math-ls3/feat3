@@ -194,7 +194,7 @@ namespace FEAT
 
           // ensure that this is a boundary facet if required
           if(only_boundary && (elem_at_facet.degree(iface) != Index(1)))
-            throw InternalError(__func__, __FILE__, __LINE__, "facet is adjacent to more than 1 element");
+            XABORTM("facet is adjacent to more than 1 element");
 
           // add all elements
           for(auto it = elem_at_facet.image_begin(iface); it != elem_at_facet.image_end(iface); ++it)
@@ -204,7 +204,7 @@ namespace FEAT
             // try to compute local facet index and orientation
             int loc_face(0), face_ori(0);
             if(!find_local_facet(iface, icell, loc_face, face_ori))
-              throw InternalError(__func__, __FILE__, __LINE__, "failed to find local facet");
+              XABORTM("failed to find local facet");
 
             // alright, add this facet to our list
             _facets.push_back(iface);
@@ -246,7 +246,7 @@ namespace FEAT
             // try to compute local facet index and orientation
             int loc_face(0), face_ori(0);
             if(!find_local_facet(iface, icell, loc_face, face_ori))
-              throw InternalError(__func__, __FILE__, __LINE__, "failed to find local facet");
+              XABORTM("failed to find local facet");
 
             // alright, add this facet to our list
             _facets.push_back(iface);

@@ -3,6 +3,7 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/xml_scanner.hpp>
 #include <cctype>
 
@@ -91,12 +92,10 @@ namespace FEAT
     void Scanner::read_root()
     {
       // ensure that the markup stack is empty
-      if(!_markups.empty())
-        throw InternalError(__func__, __FILE__, __LINE__, "markup stack is not empty");
+      XASSERTM(_markups.empty(), "markup stack is not empty");
 
       // make sure that we did not yet read a line
-      if(_have_read_root)
-        throw InternalError(__func__, __FILE__, __LINE__, "root markup already read");
+      XASSERTM(!_have_read_root, "root markup already read");
 
       // try to read first line
       if(!read_next_line())
@@ -119,16 +118,13 @@ namespace FEAT
     void Scanner::set_root_parser(std::shared_ptr<MarkupParser> parser)
     {
       // avoid bogus
-      if(parser == nullptr)
-        throw InternalError(__func__, __FILE__, __LINE__, "root parser must not be nullptr");
+      XASSERTM(parser != nullptr, "root parser must not be nullptr");
 
       // make sure that we do not have any markups yet
-      if(!_markups.empty())
-        throw InternalError(__func__, __FILE__, __LINE__, "root parser already exists");
+      XASSERTM(_markups.empty(), "root parser already exists");
 
       // make sure that we did read a root parser
-      if(!_have_read_root)
-        throw InternalError(__func__, __FILE__, __LINE__, "root markup not read yet");
+      XASSERTM(_have_read_root, "root markup not read yet");
 
       // push our parser to the markup stack
       _markups.push_back(MarkupInfo(_cur_iline, _cur_name, parser));
@@ -141,8 +137,7 @@ namespace FEAT
     void Scanner::scan()
     {
       // ensure that we have a root parser
-      if(_markups.empty())
-        throw InternalError(__func__, __FILE__, __LINE__, "root parser does not yet exist");
+      XASSERTM(!_markups.empty(), "root parser does not yet exist");
 
       // scan through all lines
       while(read_next_line())
@@ -346,8 +341,7 @@ namespace FEAT
     void Scanner::process_markup()
     {
       // not a markup?
-      if(!_cur_is_markup)
-        throw InternalError(__func__, __FILE__, __LINE__, "invalid markup process call");
+      XASSERTM(_cur_is_markup, "invalid markup process call");
 
       // is it a terminator?
       if(_cur_is_termin)
@@ -393,10 +387,8 @@ namespace FEAT
 
     void Scanner::create_top_parser()
     {
-      if(_markups.empty())
-        throw InternalError(__func__, __FILE__, __LINE__, "Empty markup stack");
-      if(!_cur_is_markup)
-        throw InternalError(__func__, __FILE__, __LINE__, "no markup to create");
+      XASSERTM(!_markups.empty(), "Empty markup stack");
+      XASSERTM(_cur_is_markup, "no markup to create");
 
       // get the parser attributes
       std::map<String, bool> parser_attribs;

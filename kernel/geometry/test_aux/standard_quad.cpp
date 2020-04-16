@@ -231,7 +231,7 @@ namespace FEAT
             copy_idx(mesh->get_index_set<2,1>(), e_q3);
             break;
           default:
-            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
+            XABORTM("Unhandled orientation "+stringify(orientation));
         }
         // okay
         return mesh;
@@ -527,7 +527,7 @@ namespace FEAT
             break;
 
           default:
-            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
+            XABORTM("Unhandled orientation "+stringify(orientation));
         } //switch
       } // validate_refined_quad_mesh_2d
 

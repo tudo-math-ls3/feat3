@@ -1162,7 +1162,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         // set matrix structure
@@ -1299,7 +1299,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         // set matrix structure
@@ -1445,7 +1445,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         _lu_matrix.clone(_matrix, LAFEM::CloneMode::Layout);
@@ -1515,12 +1515,12 @@ namespace FEAT
 
       Status apply(VectorType &, const VectorType &) override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
 
       String name() const override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
     };
 
@@ -1539,12 +1539,12 @@ namespace FEAT
 
       Status apply(VectorType &, const VectorType &) override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
 
       String name() const override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
     };
 
@@ -1563,12 +1563,12 @@ namespace FEAT
 
       Status apply(VectorType &, const VectorType &) override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
 
       String name() const override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
     };*/
 
@@ -1679,7 +1679,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         _lu_matrix.clone(_matrix, LAFEM::CloneMode::Layout);
@@ -1747,12 +1747,12 @@ namespace FEAT
 
       Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
 
       String name() const override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
     };
 

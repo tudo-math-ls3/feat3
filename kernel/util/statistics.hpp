@@ -547,7 +547,7 @@ namespace FEAT
 
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open statistics file " + filename);
+          XABORTM("Unable to open statistics file " + filename);
 
         {
           time_t t = time(nullptr);

@@ -364,9 +364,7 @@ namespace FEAT
           const IT_ mo = IT_(0), const IT_ no = IT_(0)) const
         {
           // empty matrix?
-          if(_mat_val == nullptr)
-            //return std::make_pair(mo+m, no+n);
-            throw InternalError("Vanka: invalid empty BCSR matrix");
+          XASSERTM(_mat_val != nullptr, "Vanka: invalid empty BCSR matrix");
 
           // loop over all local rows
           for(IT_ i(0); i < m; ++i)

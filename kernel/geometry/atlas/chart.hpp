@@ -431,7 +431,7 @@ namespace FEAT
             return;
 
           // If we come out here, we have no way of adaption...
-          throw InternalError(__func__,__FILE__,__LINE__,"No adaption possible!");
+          XABORTM("No mesh adaption possible!");
         }
 
         /**
@@ -449,7 +449,7 @@ namespace FEAT
          */
         virtual void adapt(PartType& DOXY(parent_meshpart), const PartType& DOXY(meshpart)) const override
         {
-          throw InternalError(__func__,__FILE__,__LINE__,"Adaption of MeshPart not possible yet");
+          XABORTM("Adaption of MeshPart not possible yet");
         }
 
         /// \copydoc BaseClass::map()

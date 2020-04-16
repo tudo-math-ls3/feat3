@@ -127,8 +127,7 @@ namespace FEAT
         template<int sn_>
         static void get_domain_bounds(Tiny::Vector<DT_, 2, sn_>& domain, int dim)
         {
-          if( dim < 0 || dim > 2)
-            throw InternalError("get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
+          XASSERTM((dim >= 0) && (dim <= 2), "get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
 
           domain(0) = -DT_(0.5);
           domain(1) = DT_(4.5);
@@ -186,8 +185,7 @@ namespace FEAT
         template<int sn_>
         static void get_domain_bounds(Tiny::Vector<DT_, 2, sn_>& domain, int dim)
         {
-          if( dim < 0 || dim > 2)
-            throw InternalError("get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
+          XASSERTM((dim >= 0) && (dim <= 2), "get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
 
           domain(0) = -DT_(0.2);
           domain(1) = DT_(0.2);
@@ -241,8 +239,7 @@ namespace FEAT
         template<int sn_>
         static void get_domain_bounds(Tiny::Vector<DT_, 2, sn_>& domain, int dim)
         {
-          if( dim < 0 || dim > 2)
-            throw InternalError("get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
+          XASSERTM((dim >= 0) && (dim <= 2), "get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
 
           domain(0) = DT_(1);
           domain(1) = DT_(4.5);
@@ -290,7 +287,7 @@ namespace FEAT
             domain(1) = DT_(3.5);
           }
           else
-            throw InternalError("get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
+            XABORTM("get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
         }
 
         static String name()

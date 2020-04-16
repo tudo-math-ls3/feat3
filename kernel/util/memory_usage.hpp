@@ -11,7 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/memory_usage.hpp>
-#include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/os_windows.hpp>
 
 #ifdef __unix__
@@ -68,7 +68,7 @@ namespace FEAT
       String line;
       std::ifstream status_file("/proc/self/status");
       if (!status_file.is_open())
-        throw InternalError(__func__, __FILE__, __LINE__, "could not open /proc/self/status!");
+        XABORTM("could not open /proc/self/status!");
 
       /* man 5 proc:
        *   /proc/[pid]/status
@@ -101,8 +101,7 @@ namespace FEAT
         if (line.starts_with("VmRSS"))
         {
           std::deque<String> v = line.split_by_whitespaces();
-          if (v.at(v.size() - 1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
+          XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_current_physical);
           _current_physical *= 1024;
           continue;
@@ -111,8 +110,7 @@ namespace FEAT
         if (line.starts_with("VmHWM"))
         {
           std::deque<String> v = line.split_by_whitespaces();
-          if (v.at(v.size() - 1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
+          XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_peak_physical);
           _peak_physical *= 1024;
           continue;
@@ -121,8 +119,7 @@ namespace FEAT
         if (line.starts_with("VmSize"))
         {
           std::deque<String> v = line.split_by_whitespaces();
-          if (v.at(v.size() - 1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
+          XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_current_virtual);
           _current_virtual *= 1024;
           continue;
@@ -131,8 +128,7 @@ namespace FEAT
         if (line.starts_with("VmPeak"))
         {
           std::deque<String> v = line.split_by_whitespaces();
-          if (v.at(v.size() - 1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
+          XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_peak_virtual);
           _peak_virtual *= 1024;
           continue;
@@ -141,8 +137,7 @@ namespace FEAT
         if (line.starts_with("VmSwap"))
         {
           std::deque<String> v = line.split_by_whitespaces();
-          if (v.at(v.size() - 1) != "kB")
-            throw InternalError(__func__, __FILE__, __LINE__, "get_memory_usage: unit mismatch!");
+          XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_current_swap);
           _current_swap *= 1024;
           continue;
@@ -168,7 +163,7 @@ namespace FEAT
       // https://www.freebsd.org/cgi/man.cgi?query=getrusage
       struct rusage r_usage;
       if (0 != getrusage(RUSAGE_SELF, &r_usage))
-        throw InternalError(__func__, __FILE__, __LINE__, "Error in getrusage call!");
+        XABORTM("Error in getrusage call!");
       _peak_physical = (std::size_t)r_usage.ru_maxrss;
       _peak_virtual = (std::size_t)r_usage.ru_maxrss;
       _current_physical = (std::size_t)r_usage.ru_maxrss;

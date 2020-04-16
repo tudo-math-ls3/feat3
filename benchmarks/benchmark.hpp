@@ -30,7 +30,7 @@ namespace FEAT
     void run_bench(std::function<void (void)> func, double flops, double bytes)
     {
 #ifdef FEAT_DEBUG_MODE
-      throw InternalError("You are running a benchmark in DEBUG mode!");
+      XABORTM("You are running a benchmark in DEBUG mode!");
 #endif
 
       Index iters(1);

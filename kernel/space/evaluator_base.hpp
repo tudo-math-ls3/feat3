@@ -176,7 +176,7 @@ namespace FEAT
         EvalData<SpaceEvalTraits, space_cfg_>& DOXY(space_data),
         const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& DOXY(trafo_data)) const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function values");
+        XABORTM("space evaluator does not support basis function values");
       }
 
       /**
@@ -196,7 +196,7 @@ namespace FEAT
         EvalData<SpaceEvalTraits, space_cfg_>& DOXY(space_data),
         const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& DOXY(trafo_data)) const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function gradients");
+        XABORTM("space evaluator does not support basis function gradients");
       }
 
       /**
@@ -216,7 +216,7 @@ namespace FEAT
         EvalData<SpaceEvalTraits, space_cfg_>& DOXY(space_data),
         const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& DOXY(trafo_data)) const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function hessians");
+        XABORTM("space evaluator does not support basis function hessians");
       }
     }; // class EvaluatorBase<...>
 
@@ -243,7 +243,7 @@ namespace FEAT
         static void eval_values(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
           if(!*(Evaluator_::eval_caps & SpaceTags::value))
-            throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function values");
+            XABORTM("space evaluator does not support basis function values");
           evaluator.eval_values(space_data, trafo_data);
         }
 
@@ -251,7 +251,7 @@ namespace FEAT
         static void eval_gradients(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
           if(!*(Evaluator_::eval_caps & SpaceTags::grad))
-            throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function gradients");
+            XABORTM("space evaluator does not support basis function gradients");
           evaluator.eval_gradients(space_data, trafo_data);
         }
 
@@ -259,7 +259,7 @@ namespace FEAT
         static void eval_hessians(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
           if(!*(Evaluator_::eval_caps & SpaceTags::hess))
-            throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function hessians");
+            XABORTM("space evaluator does not support basis function hessians");
           evaluator.eval_hessians(space_data, trafo_data);
         }
       };

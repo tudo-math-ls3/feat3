@@ -133,8 +133,7 @@ namespace FEAT
           auto dudv_config_section = meshopt_config->query_section(config_section_p.first);
           if(dudv_config_section == nullptr)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" not found!");
+            XABORTM("config_section "+config_section_p.first+" not found!");
           }
 
           auto solver_p = dudv_config_section->query("solver_config");
@@ -226,7 +225,7 @@ namespace FEAT
           auto config_section_p = meshopt_section->query("config_section");
           if(!config_section_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__, "config_section "+config_section_p.first+" not found");
+            XABORTM("config_section "+config_section_p.first+" not found");
           }
 
           // Get the MeshOptimiser configuration section
@@ -236,8 +235,7 @@ namespace FEAT
           auto fac_norm_p = hyperelasticity_config_section->query("fac_norm");
           if(!fac_norm_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing fac_norm entry!");
+            XABORTM("config_section "+config_section_p.first+" is missing fac_norm entry!");
           }
           fac_norm = DT_(std::stod(fac_norm_p.first));
 
@@ -245,8 +243,7 @@ namespace FEAT
           auto fac_det_p = hyperelasticity_config_section->query("fac_det");
           if(!fac_det_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing fac_det entry!");
+            XABORTM("config_section "+config_section_p.first+" is missing fac_det entry!");
           }
           fac_det = DT_(std::stod(fac_det_p.first));
 
@@ -254,8 +251,7 @@ namespace FEAT
           auto fac_cof_p = hyperelasticity_config_section->query("fac_cof");
           if(!fac_cof_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing fac_cof entry!");
+            XABORTM("config_section "+config_section_p.first+" is missing fac_cof entry!");
           }
           fac_cof = DT_(std::stod(fac_cof_p.first));
 
@@ -263,8 +259,7 @@ namespace FEAT
           auto fac_reg_p = hyperelasticity_config_section->query("fac_reg");
           if(!fac_reg_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing fac_reg entry!");
+            XABORTM("config_section "+config_section_p.first+" is missing fac_reg entry!");
           }
           fac_reg = DT_(std::stod(fac_reg_p.first));
 
@@ -272,8 +267,7 @@ namespace FEAT
           auto cell_functional_p = hyperelasticity_config_section->query("cell_functional");
           if(!cell_functional_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing cell_functional entry!");
+            XABORTM("config_section "+config_section_p.first+" is missing cell_functional entry!");
           }
 
           // Get the handling of the 1/det term
@@ -281,8 +275,7 @@ namespace FEAT
           auto exponent_det_p = hyperelasticity_config_section->query("exponent_det");
           if(!exponent_det_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "config_section "+config_section_p.first+" is missing exponent_det entry!");
+            XABORTM("config_section "+config_section_p.first+" is missing exponent_det entry!");
           }
           exponent_det = std::stoi(exponent_det_p.first);
 
@@ -309,7 +302,7 @@ namespace FEAT
           //}
           else
           {
-            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled cell_functional "+cell_functional_p.first);
+            XABORTM("Unhandled cell_functional "+cell_functional_p.first);
           }
 
           return result;
@@ -373,8 +366,7 @@ namespace FEAT
           auto global_functional_p = hyperelasticity_config_section->query("global_functional");
           if(!global_functional_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Hyperelasticity config section is missing global_functional entry!");
+            XABORTM("Hyperelasticity config section is missing global_functional entry!");
           }
 
           // Get scale computation type, default is once_uniform
@@ -397,8 +389,7 @@ namespace FEAT
           auto solver_p = hyperelasticity_config_section->query("solver_config");
           if(!solver_p.second)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Hyperelasticity config section is missing solver entry!");
+            XABORTM("Hyperelasticity config section is missing solver entry!");
           }
 
           if(global_functional_p.first == "HyperelasticityFunctional")
@@ -427,7 +418,7 @@ namespace FEAT
           }
           else
           {
-            throw InternalError(__func__,__FILE__,__LINE__, "Unknown global_functional "+global_functional_p.first);
+            XABORTM("Unknown global_functional "+global_functional_p.first);
           }
 
           return result;
@@ -465,8 +456,7 @@ namespace FEAT
           auto meshopt_section = meshopt_config->query_section(section_key);
           if(meshopt_section == nullptr)
           {
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Meshopt config is missing the ["+section_key+"] section!");
+            XABORTM("Meshopt config is missing the ["+section_key+"] section!");
           }
           else
           {
@@ -474,7 +464,7 @@ namespace FEAT
             auto type_p = meshopt_section->query("type");
             if(!type_p.second)
             {
-              throw InternalError(__func__,__FILE__,__LINE__, "MeshOptimiser section is missing the mandatory type!");
+              XABORTM("MeshOptimiser section is missing the mandatory type!");
             }
             else
             {
@@ -493,7 +483,7 @@ namespace FEAT
 
           if(result == nullptr)
           {
-            throw InternalError(__func__,__FILE__,__LINE__, "MeshOptimiser section has unhandled type "+type);
+            XABORTM("MeshOptimiser section has unhandled type "+type);
           }
 
           return result;

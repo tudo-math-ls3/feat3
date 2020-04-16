@@ -106,8 +106,7 @@ namespace FEAT
       else if(sc_name == "iter_concentration")
         scale_computation = ScaleComputation::iter_concentration;
       else
-        throw InternalError(__func__, __FILE__, __LINE__, "Unknown ScaleComputation identifier string "
-            +sc_name);
+        XABORTM("Unknown ScaleComputation identifier string " +sc_name);
     }
     /// \endcond
 
@@ -763,9 +762,8 @@ namespace FEAT
               (_penalty_param > DataType(0)) )
               {
                 if(_mesh_conc == nullptr)
-                  throw InternalError(__func__,__FILE__,__LINE__,
-                  "Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
-                  stringify_fp_sci(_penalty_param)+", but no concentration function was given");
+                  XABORTM("Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
+                    stringify_fp_sci(_penalty_param)+", but no concentration function was given");
 
                 _mesh_conc->compute_dist();
               }
@@ -849,8 +847,7 @@ namespace FEAT
             const auto& assembler = _dirichlet_asm.find(it.first);
 
             if(assembler == _dirichlet_asm.end())
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find unit filter assembler for filter with key "+it.first);
+              XABORTM("Could not find unit filter assembler for filter with key "+it.first);
 
             assembler->second->assemble(it.second, trafo_space, vec_state);
           }
@@ -869,8 +866,7 @@ namespace FEAT
 
             if(assembler == _slip_asm.end())
             {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find slip filter assembler for filter with key "+it.first);
+              XABORTM("Could not find slip filter assembler for filter with key "+it.first);
             }
 
             assembler->second->assemble(it.second, trafo_space);
@@ -881,9 +877,8 @@ namespace FEAT
               {
                 if(_mesh_conc == nullptr)
                 {
-                  throw InternalError(__func__,__FILE__,__LINE__,
-                  "Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
-                  stringify_fp_sci(_penalty_param)+", but no concentration function was given");
+                  XABORTM("Scale computation set to "+stringify(_scale_computation)+"and alignment penalty factor to "+
+                    stringify_fp_sci(_penalty_param)+", but no concentration function was given");
                 }
 
                 _mesh_conc->compute_dist();

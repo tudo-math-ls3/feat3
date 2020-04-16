@@ -54,8 +54,7 @@ namespace FEAT
       explicit BaseSplitter(const SpaceType& space, const RootMeshNodeType& mesh_node)
       {
         // ensure that the mesh is valid
-        if(mesh_node.get_mesh() != &space.get_mesh())
-          throw InternalError("Space mesh and root mesh different");
+        XASSERTM(mesh_node.get_mesh() == &space.get_mesh(), "Space mesh and root mesh different");
 
         // loop over all base cell mesh-parts
         for(Index cell(0); ; ++cell)
@@ -71,8 +70,7 @@ namespace FEAT
           _mirrors.push_back(std::move(mir));
         }
 
-        if(_mirrors.empty())
-          throw InternalError("No base cell splitting available in mesh node");
+        XASSERTM(!_mirrors.empty(), "No base cell splitting available in mesh node");
       }
 
       virtual ~BaseSplitter()
@@ -119,8 +117,7 @@ namespace FEAT
         const std::vector<LAFEM::DenseVector<Mem::Main, DT_, IT_>>& splits) const
       {
         // check size
-        if(_mirrors.size() != splits.size())
-          throw InternalError("Invalid number of split vectors");
+        XASSERTM(_mirrors.size() == splits.size(), "Invalid number of split vectors");
 
         // format output
         vector.format();

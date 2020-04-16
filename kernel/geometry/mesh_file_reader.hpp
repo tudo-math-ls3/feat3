@@ -219,8 +219,8 @@ namespace FEAT
           throw Xml::GrammarError(iline, sline, "Empty chart name");
 
         // make sure that we don't have that chart yet
-        if(_atlas.find_mesh_chart(_chart_name) != nullptr)
-          throw InternalError(String("Chart '") + _chart_name + "' already exists in atlas");
+        XASSERTM(_atlas.find_mesh_chart(_chart_name) == nullptr,
+          String("Chart '") + _chart_name + "' already exists in atlas");
 
         // okay, that's all there is to check
       }
@@ -341,7 +341,7 @@ namespace FEAT
         template<typename TopoParser_>
         static void init_topo(TopoParser_&, IndexSetHolder<Shape_>&, int)
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Thou shall not arrive here");
+          XABORTM("Thou shall not arrive here");
         }
       };
 
@@ -1621,8 +1621,7 @@ namespace FEAT
             if(!_mesh_type_string.empty())
             {
               // make sure that the mesh types are identical
-              if(it_m->second != _mesh_type_string)
-                throw InternalError(__func__, __FILE__, __LINE__, "conflicting mesh types");
+              XASSERTM(it_m->second == _mesh_type_string, "conflicting mesh types");
             }
             else
             {

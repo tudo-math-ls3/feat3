@@ -136,7 +136,7 @@ namespace FEAT
         String line;
         do {
           if (file.eof())
-            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
+            XABORTM("Wrong Input-file");
           std::getline(file, line);
           line.trim_me();
         } while (line.find("%%") == 0 || line == "");
@@ -165,12 +165,12 @@ namespace FEAT
 
         std::ifstream file(filename.c_str(), std::ifstream::in);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
 
         String line;
         std::getline(file, line);
         if (line.find("%%MatrixMarket powerdiagmatrix coordinate real general") == String::npos)
-          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a complatible file");
+          XABORTM("Input-file is not a complatible file");
 
         PowerDiagMatrix other(mode, file, directory);
 
@@ -211,7 +211,7 @@ namespace FEAT
       {
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
 
         String suffix, directory;
         auto found = filename.rfind(".");
@@ -735,7 +735,7 @@ namespace FEAT
         String line;
         do {
           if (file.eof())
-            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
+            XABORTM("Wrong Input-file");
           std::getline(file, line);
           line.trim_me();
         } while (line.find("%%") == 0 || line == "");
@@ -755,7 +755,7 @@ namespace FEAT
 
         std::ifstream file(filename.c_str(), std::ifstream::in);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
 
         PowerDiagMatrix other(mode, file, directory);
 
@@ -778,7 +778,7 @@ namespace FEAT
       {
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
 
         String suffix, directory;
         auto found = filename.rfind(".");

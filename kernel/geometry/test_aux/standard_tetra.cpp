@@ -306,7 +306,7 @@ namespace FEAT
             break;
 
           default:
-            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
+            XABORTM("Unhandled orientation "+stringify(orientation));
         }
         // okay
         return mesh;
@@ -1067,7 +1067,7 @@ namespace FEAT
             break;
 
           default:
-            throw InternalError(__func__,__FILE__,__LINE__,"Unhandled orientation "+stringify(orientation));
+            XABORTM("Unhandled orientation "+stringify(orientation));
         } //switch
       } // validate_refined_tetra_mesh_3d
 

@@ -297,8 +297,7 @@ namespace FEAT
             const auto& assembler = _dirichlet_asm.find(it.first);
             if(assembler == _dirichlet_asm.end())
             {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find dirichlet assembler for filter with key "+it.first);
+              XABORTM("Could not find dirichlet assembler for filter with key "+it.first);
             }
 
             assembler->second->assemble(it.second, trafo_space, vec_state);
@@ -312,8 +311,7 @@ namespace FEAT
             const auto& assembler = _slip_asm.find(it.first);
             if(assembler == _slip_asm.end())
             {
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find slip filter assembler for filter with key "+it.first);
+              XABORTM("Could not find slip filter assembler for filter with key "+it.first);
             }
 
             assembler->second->assemble(it.second, trafo_space);

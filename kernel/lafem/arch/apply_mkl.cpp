@@ -42,12 +42,12 @@ void Apply<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, 
   sparse_status_t status = mkl_sparse_s_create_csr(&A, SPARSE_INDEX_BASE_ZERO, mrows, mcolumns, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr + 1), (MKL_INT*)col_ind, (float*) val);
   FEAT_RESTORE_WARNINGS
   if (status != SPARSE_STATUS_SUCCESS)
-    throw InternalError(__func__, __FILE__, __LINE__, "MKL Sparse Error occurred in execution!\n");
+    XABORTM("MKL Sparse Error occurred in execution!\n");
   matrix_descr md;
   md.type = SPARSE_MATRIX_TYPE_GENERAL;
   status = mkl_sparse_s_mv(opt, a, A, md, x, b, r);
   if (status != SPARSE_STATUS_SUCCESS)
-    throw InternalError(__func__, __FILE__, __LINE__, "MKL Sparse Error occurred in execution!\n");
+    XABORTM("MKL Sparse Error occurred in execution!\n");
   mkl_sparse_destroy(A);
 
 #else
@@ -95,12 +95,12 @@ void Apply<Mem::Main>::csr_mkl(double * r, const double a, const double * const 
   sparse_status_t status = mkl_sparse_d_create_csr(&A, SPARSE_INDEX_BASE_ZERO, mrows, mcolumns, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr + 1), (MKL_INT*)col_ind, (double*) val);
   FEAT_RESTORE_WARNINGS
   if (status != SPARSE_STATUS_SUCCESS)
-    throw InternalError(__func__, __FILE__, __LINE__, "MKL Sparse Error occurred in execution!\n");
+    XABORTM("MKL Sparse Error occurred in execution!\n");
   matrix_descr md;
   md.type = SPARSE_MATRIX_TYPE_GENERAL;
   status = mkl_sparse_d_mv(opt, a, A, md, x, b, r);
   if (status != SPARSE_STATUS_SUCCESS)
-    throw InternalError(__func__, __FILE__, __LINE__, "MKL Sparse Error occurred in execution!\n");
+    XABORTM("MKL Sparse Error occurred in execution!\n");
   mkl_sparse_destroy(A);
 
 #else

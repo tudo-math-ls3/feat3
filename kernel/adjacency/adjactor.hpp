@@ -145,22 +145,22 @@ namespace FEAT
         /**
          * \copydoc ImageIterator::operator++()
          *
-         * \attention Calling this operator will throw an InternalError exception!
+         * \attention Calling this operator will abort program execution!
          */
         NullImageIterator& operator++()
         {
-          XASSERTM(false, "cannot increment NullImageIterator");
+          XABORTM("cannot increment NullImageIterator");
           return *this;
         }
 
         /**
          * \copydoc ImageIterator::operator*()
          *
-         * \attention Calling this operator will throw an InternalError exception!
+         * \attention Calling this operator will abort program execution!
          */
         Index operator*() const
         {
-          XASSERTM(false, "cannot dereference NullImageIterator");
+          XABORTM("cannot dereference NullImageIterator");
           return Index(0);
         }
 

@@ -734,8 +734,7 @@ namespace FEAT
                   my_sign = Math::signum(Tiny::dot(difference, other_nu));
                 }
                 //else
-                //  throw InternalError(__func__,__FILE__,__LINE__,
-                //  "signum == "+stringify_fp_sci(my_sign)+" but t = "+stringify_fp_sci(t));
+                //  XABORTM("signum == "+stringify_fp_sci(my_sign)+" but t = "+stringify_fp_sci(t));
               }
             }
 

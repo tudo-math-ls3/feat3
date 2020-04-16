@@ -1378,7 +1378,7 @@ namespace FEAT
           else if(_operation == "min")
             compute_dist_min();
           else
-            throw InternalError(__func__,__FILE__,__LINE__,"Unknown operation "+_operation);
+            XABORTM("Unknown operation "+_operation);
         }
 
         /// \copydoc BaseClass::compute_dist()
@@ -1400,7 +1400,7 @@ namespace FEAT
             {
               auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
               if(chart == nullptr)
-                throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
+                XABORTM("Could not find chart "+it);
 
               my_dist += Math::abs(chart->signed_dist(vtx[i], tmp));
               my_dist_vec += tmp;
@@ -1436,7 +1436,7 @@ namespace FEAT
             {
               auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
               if(chart == nullptr)
-                throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
+                XABORTM("Could not find chart "+it);
 
               CoordType this_dist = chart->signed_dist(vtx[i], tmp);
               if(this_dist > my_dist)
@@ -1470,7 +1470,7 @@ namespace FEAT
             {
               auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
               if(chart == nullptr)
-                throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
+                XABORTM("Could not find chart "+it);
 
               CoordType this_dist = chart->signed_dist(vtx[i], tmp);
               if(Math::abs(this_dist) < Math::abs(my_dist))
@@ -1554,21 +1554,15 @@ namespace FEAT
 
           // Get the configuration section
           auto my_section = config->query_section(section_key);
-          if(my_section == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Config is missing the referenced "+section_key+" section.");
+          XASSERTM(my_section != nullptr, "Config is missing the referenced "+section_key+" section.");
 
           auto type_p = my_section->query("type");
-          if(!type_p.second)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Section "+section_key+" is missing the mandatory type key.");
+          XASSERTM(type_p.second, "Section "+section_key+" is missing the mandatory type key.");
 
           if(type_p.first== "ChartDistance")
           {
             auto chart_list_p = my_section->query("chart_list");
-            if(!chart_list_p.second)
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Section "+section_key+" is missing the mandatory chart_list key.");
+            XASSERTM(chart_list_p.second, "Section "+section_key+" is missing the mandatory chart_list key.");
 
             String operation("min");
             auto operation_p = my_section->query("operation");

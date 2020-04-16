@@ -756,9 +756,7 @@ namespace FEAT
               alglib::mincgsetcgtype(_state, 1);
               break;
             default:
-              throw InternalError(__func__,__FILE__, __LINE__, name()+" got invalid direction update: "
-                  +stringify(update_));
-
+              XABORTM("got invalid direction update: " +stringify(update_));
           }
         }
 

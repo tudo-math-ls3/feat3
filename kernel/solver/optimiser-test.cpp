@@ -94,7 +94,7 @@ class NLCGTest:
       }
       else
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
+        XABORTM("Got invalid linesearch_type: "+_linesearch_type);
       }
 
       my_linesearch->set_max_iter(20);
@@ -113,7 +113,7 @@ class NLCGTest:
       }
       else if(_precon_type != "none")
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid precon_type: "+_precon_type);
+        XABORTM("Got invalid precon_type: "+_precon_type);
       }
 
       auto solver = new_nlcg(my_functional, my_filter, my_linesearch, _update, false, my_precond);
@@ -305,7 +305,7 @@ class NLSDTest:
       }
       else
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
+        XABORTM("Got invalid linesearch_type: "+_linesearch_type);
       }
 
       my_linesearch->set_max_iter(20);
@@ -324,7 +324,7 @@ class NLSDTest:
       }
       else if(_precon_type != "none")
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid precon_type: "+_precon_type);
+        XABORTM("Got invalid precon_type: "+_precon_type);
       }
 
       auto solver = new_nlsd(my_functional, my_filter, my_linesearch, false, my_precond);

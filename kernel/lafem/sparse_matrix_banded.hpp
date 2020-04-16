@@ -424,7 +424,7 @@ namespace FEAT
       {
         if (val_in.size() != rows_in * offsets_in.size())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Size of values does not match to number of offsets and row count!");
+          XABORTM("Size of values does not match to number of offsets and row count!");
         }
 
         this->_scalar_index.push_back(rows_in);
@@ -438,7 +438,7 @@ namespace FEAT
 
           if (toffset + Index(2) > rows_in + columns_in)
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "Offset out of matrix!");
+            XABORTM("Offset out of matrix!");
           }
 
           tused_elements += columns_in + Math::min(rows_in, columns_in + rows_in - toffset - 1) - Math::max(columns_in + rows_in - toffset - 1, columns_in);
@@ -720,7 +720,7 @@ namespace FEAT
           bin = std::ofstream::out;
         std::ofstream file(filename.c_str(), bin);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
         write_out(mode, file);
         file.close();
       }
@@ -742,7 +742,7 @@ namespace FEAT
         this->template _serialise<double, uint64_t>(FileMode::fm_bm, file);
           break;
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -1118,7 +1118,7 @@ namespace FEAT
           bin = std::ifstream::in;
         std::ifstream file(filename.c_str(), bin);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
         read_from(mode, file);
         file.close();
       }
@@ -1137,7 +1137,7 @@ namespace FEAT
           this->template _deserialise<double, uint64_t>(FileMode::fm_bm, file);
           break;
         default:
-          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          XABORTM("Filemode not supported!");
         }
       }
 

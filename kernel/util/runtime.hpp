@@ -46,7 +46,7 @@ namespace FEAT
      * Specifies whether to dump the call-stack to stderr prior to process termination.\n
      * Note that a call-stack dump may not be available on all platforms.
      */
-    static void abort(bool dump_call_stack = true);
+    [[noreturn]] static void abort(bool dump_call_stack = true);
 
     /**
      * \brief FEAT finalisation

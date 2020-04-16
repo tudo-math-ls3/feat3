@@ -76,8 +76,7 @@ namespace FEAT
         else if(update_name == "PolakRibiere")
           update = NLCGDirectionUpdate::PolakRibiere;
         else
-          throw InternalError(__func__, __FILE__, __LINE__, "Unknown NLCGDirectionUpdate identifier string "
-              +update_name);
+          XABORTM("Unknown NLCGDirectionUpdate identifier string " +update_name);
     }
 
     /// \endcond
@@ -652,8 +651,7 @@ namespace FEAT
             case NLCGDirectionUpdate::PolakRibiere:
               return polak_ribiere(gamma_prev);
             default:
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Unhandled direction update: "+stringify(_direction_update));
+              XABORTM("Unhandled direction update: "+stringify(_direction_update));
           }
         }
 

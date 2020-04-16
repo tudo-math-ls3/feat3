@@ -232,7 +232,7 @@ namespace FEAT
        */
       bool trunc_send(const VectorType& DOXY(vec_fine)) const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "This function must not be called");
+        XABORTM("This function must not be called");
       }
 
       /**
@@ -264,7 +264,7 @@ namespace FEAT
        */
       bool rest_send(const VectorType& DOXY(vec_fine)) const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "This function must not be called");
+        XABORTM("This function must not be called");
       }
 
       /**
@@ -296,7 +296,7 @@ namespace FEAT
        */
       bool prol_recv(VectorType& DOXY(vec_fine)) const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "This function must not be called");
+        XABORTM("This function must not be called");
       }
 
       /**
@@ -308,7 +308,7 @@ namespace FEAT
        */
       void prol_cancel() const
       {
-        throw InternalError(__func__, __FILE__, __LINE__, "This function must not be called");
+        XABORTM("This function must not be called");
       }
     }; // class Transfer<...>
   } // namespace LAFEM

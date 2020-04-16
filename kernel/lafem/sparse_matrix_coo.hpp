@@ -1084,7 +1084,7 @@ namespace FEAT
           bin = std::ifstream::in;
         std::ifstream file(filename.c_str(), bin);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
         read_from(mode, file);
         file.close();
       }
@@ -1120,14 +1120,14 @@ namespace FEAT
 
             if (symmetric == false && general == false)
             {
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+              XABORTM("Input-file is not a compatible mtx-file");
             }
 
             while(!file.eof())
             {
               std::getline(file,line);
               if (file.eof())
-                throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+                XABORTM("Input-file is empty");
 
               String::size_type begin(line.find_first_not_of(" "));
               if (line.at(begin) != '%')
@@ -1231,7 +1231,7 @@ namespace FEAT
             this->template _deserialise<double, uint64_t>(FileMode::fm_coo, file);
             break;
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+            XABORTM("Filemode not supported!");
         }
       }
 
@@ -1248,7 +1248,7 @@ namespace FEAT
           bin = std::ofstream::out;
         std::ofstream file(filename.c_str(), bin);
         if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          XABORTM("Unable to open Matrix file " + filename);
         write_out(mode, file);
         file.close();
       }
@@ -1288,7 +1288,7 @@ namespace FEAT
             this->template _serialise<double, uint64_t>(FileMode::fm_coo, file);
             break;
           default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+            XABORTM("Filemode not supported!");
         }
       }
 

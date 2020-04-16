@@ -303,7 +303,7 @@ namespace PoissonMixed
     }
     else
     {
-        throw InternalError(__func__, __FILE__, __LINE__, "--bc supports only 'dirichlet' or 'neumann', but got "+bc_name);
+        XABORTM("--bc supports only 'dirichlet' or 'neumann', but got "+bc_name);
     }
 
     Cubature::DynamicFactory cubature("auto-degree:7");
@@ -646,7 +646,7 @@ namespace PoissonMixed
       if (num_iter < iter_target - 2 || num_iter > iter_target + 2)
       {
         comm.print("FAILED");
-        throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
+        XABORTM("iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
       }
     }
   }

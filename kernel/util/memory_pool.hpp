@@ -181,7 +181,7 @@ namespace FEAT
 
           memory = (DT_*)::malloc(count * sizeof(DT_));
           if (memory == nullptr)
-            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
+            XABORTM("MemoryPool<CPU> allocation error!");
 
           Util::Intern::MemoryInfo mi;
           mi.counter = 1;
@@ -235,7 +235,7 @@ namespace FEAT
           }
 #endif
 
-          throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
+          XABORTM("MemoryPool<CPU>::increase_memory: Memory address not found!");
         }
 
         /// release memory or decrease reference counter
@@ -276,7 +276,7 @@ namespace FEAT
           }
 #endif
 
-          throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
+          XABORTM("MemoryPool<CPU>::release_memory: Memory address not found!");
         }
 
         /// download memory chunk to host memory
@@ -372,7 +372,7 @@ namespace FEAT
             return it->second.size;
           }
           else
-            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::allocated_size: Memory address not found!");
+            XABORTM("MemoryPool<CPU>::allocated_size: Memory address not found!");
         }
     };
 

@@ -75,7 +75,7 @@ namespace FEAT
               else if(shared_by[l][1] == ~Index(0))
                 shared_by[l][1] = k;
               else
-                throw InternalError("Facet "+stringify(l)+" is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1])+" and again by "+stringify(k));
+                XABORTM("Facet "+stringify(l)+" is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1])+" and again by "+stringify(k));
             }
           }
 
@@ -93,7 +93,7 @@ namespace FEAT
               else if(shared_by[l][1] == k)
                 neighbours[k][j] = shared_by[l][0];
               else
-                throw InternalError("Facet "+stringify(l)+" found at cell "+stringify(k)+" but is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1]));
+                XABORTM("Facet "+stringify(l)+" found at cell "+stringify(k)+" but is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1]));
             }
           }
 

@@ -85,7 +85,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
       }
 
@@ -114,7 +114,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         auto omega_p = section->query("omega");
@@ -284,7 +284,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
       }
 
@@ -313,7 +313,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         // Check if we have set _krylov_vim
@@ -431,7 +431,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
       }
 
@@ -464,7 +464,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         // Check if we have set _krylov_vim
@@ -577,7 +577,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
       }
 
@@ -610,7 +610,7 @@ namespace FEAT
       {
         if (_matrix.columns() != _matrix.rows())
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+          XABORTM("Matrix is not square!");
         }
 
         // Check if we have set _krylov_vim
@@ -692,12 +692,12 @@ namespace FEAT
 
       Status apply(typename Matrix_::VectorTypeL &, const typename Matrix_::VectorTypeL &) override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
 
       String name() const override
       {
-          throw InternalError(__func__, __FILE__, __LINE__, "not implemented yet!");
+          XABORTM("not implemented yet!");
       }
     };
 
