@@ -253,7 +253,7 @@ namespace FEAT
         }
 
         // process all pending receives
-        for(std::size_t idx; _recv_reqs.wait_any(idx); )
+        for(std::size_t idx(0u); _recv_reqs.wait_any(idx); )
         {
           // scatter the receive buffer
           _mirrors.at(idx).scatter_axpy(matrix, _recv_bufs.at(idx));

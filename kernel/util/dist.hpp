@@ -628,7 +628,7 @@ namespace FEAT
 
        ... // create some requests here
 
-       for(std::size_t idx; reqs.wait_any(idx); )
+       for(std::size_t idx(0u); reqs.wait_any(idx); )
        {
          ... // request 'idx' has been fulfilled
        }

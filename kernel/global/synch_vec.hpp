@@ -137,7 +137,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         // process all pending receives
-        for(std::size_t idx; _recv_reqs.wait_any(idx); )
+        for(std::size_t idx(0u); _recv_reqs.wait_any(idx); )
         {
           // convert buffer to device memory
           BufferType buffer;

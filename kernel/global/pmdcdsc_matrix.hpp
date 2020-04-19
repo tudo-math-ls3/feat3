@@ -519,7 +519,7 @@ namespace FEAT
         }
 
         // process all pending receives
-        for(std::size_t i; recv_reqs.wait_any(i); )
+        for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
           // get received dimension
           auto& rdim = recv_dims.at(i);
@@ -652,7 +652,7 @@ namespace FEAT
         watch_init_num_premult_da.stop();
 
         // process receives and compute neighbour schur matrices
-        for(std::size_t i; recv_reqs.wait_any(i); )
+        for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
           watch_init_num_neighbour_s.start();
           this->_neighbour_matrices.at(i).format();
@@ -1497,7 +1497,7 @@ namespace FEAT
         watch_apply_matrix_loc.stop();
 
         // process receives and multiply by neighbour schur matrices
-        for(std::size_t i; recv_reqs.wait_any(i); )
+        for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
           watch_apply_neighbour_s.start();
           this->_neighbour_matrices.at(i).apply(r, recv_bufs.at(i), r, (only_Ax ? DataType(1) : alpha));

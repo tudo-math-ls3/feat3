@@ -559,7 +559,7 @@ namespace FEAT
         }
 
         // Now process all receive requests from our owner-neighbours:
-        for(std::size_t i; recv_reqs.wait_any(i); )
+        for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
           const MirrorType& mirror = _neighbours_owner.at(i).second;
           const Index num_idx = mirror.num_indices();
@@ -875,7 +875,7 @@ namespace FEAT
         adp.get_owned_mirror().scatter_axpy(local_vector, this->_vector);
 
         // process receives from our owner-neighbours
-        for(std::size_t idx; recv_reqs.wait_any(idx); )
+        for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter received DOFs into our output vector
           adp.get_owner_mirror(Index(idx)).scatter_axpy(local_vector, recv_bufs.at(idx));
@@ -1195,7 +1195,7 @@ namespace FEAT
         this->_upload_own(mat_a);
 
         // process all pending receives
-        for(std::size_t idx; recv_reqs.wait_any(idx); )
+        for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter from buffer
           this->_scatter_data(this->_matrix, donee_vbufs.at(idx), this->_data_donee_mirs.at(idx));
