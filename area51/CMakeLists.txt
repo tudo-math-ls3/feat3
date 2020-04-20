@@ -26,6 +26,9 @@ TARGET_LINK_LIBRARIES(dbg-amavanka feat)
 ADD_EXECUTABLE(dbg-cubature dbg_cubature.cpp)
 TARGET_LINK_LIBRARIES(dbg-cubature feat)
 
+ADD_EXECUTABLE(dbg-dist-file-io dbg_dist_file_io.cpp)
+TARGET_LINK_LIBRARIES(dbg-dist-file-io feat)
+
 ADD_EXECUTABLE(dbg-graph-render dbg_graph_render.cpp)
 TARGET_LINK_LIBRARIES(dbg-graph-render feat)
 
