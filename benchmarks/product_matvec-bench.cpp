@@ -128,9 +128,9 @@ void run()
   flops *= 2;
 
   double bytes(double(sys.used_elements()));
-  bytes *= sizeof(DT_);
-  bytes += sys.used_elements() * sizeof(IT_);
-  bytes += size * sizeof(DT_);
+  bytes *= double(sizeof(DT_));
+  bytes += double(sys.used_elements() * sizeof(IT_));
+  bytes += double(size * sizeof(DT_));
 
   auto func = [&] () { ProductMatVecBench<Algo_, SM_::layout_id, DT_, IT_>::f(x, b, sys); };
   run_bench<Mem_>(func, flops, bytes);

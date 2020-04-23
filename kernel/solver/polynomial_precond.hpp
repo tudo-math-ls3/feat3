@@ -187,7 +187,7 @@ namespace FEAT
        */
       void set_m(Index m)
       {
-        XASSERT(m > DataType(0));
+        XASSERT(m > Index(0));
         _m = m;
       }
 

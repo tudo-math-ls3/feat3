@@ -24,7 +24,25 @@
 
 #define FEAT_COMPILER "Clang Compiler" // __clang_version__ contains details
 
-#if(__clang_major__ > 3) || (__clang_minor__ > 8)
+#if(__clang_major__ > 8)
+#define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+  _Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
+  _Pragma("clang diagnostic ignored \"-Wsign-compare\"") \
+  _Pragma("clang diagnostic ignored \"-Wconversion\"") \
+  _Pragma("clang diagnostic ignored \"-Wmismatched-tags\"") \
+  _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"") \
+  _Pragma("clang diagnostic ignored \"-Wcast-qual\"") \
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"") \
+  _Pragma("clang diagnostic ignored \"-Wshadow\"") \
+  _Pragma("clang diagnostic ignored \"-Wundef\"") \
+  _Pragma("clang diagnostic ignored \"-Wimplicit-fallthrough\"") \
+  _Pragma("clang diagnostic ignored \"-Wcomma\"") \
+  _Pragma("clang diagnostic ignored \"-Wextra-semi\"") \
+  _Pragma("clang diagnostic ignored \"-Wextra-semi-stmt\"") \
+  _Pragma("clang diagnostic ignored \"-Wc++98-compat-extra-semi\"")
+#endif
+#if(__clang_major__ >= 4) && (__clang_major__ < 8)
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
@@ -38,7 +56,8 @@
   _Pragma("clang diagnostic ignored \"-Wundef\"") \
   _Pragma("clang diagnostic ignored \"-Wimplicit-fallthrough\"") \
   _Pragma("clang diagnostic ignored \"-Wcomma\"")
-#else
+#endif
+#if(__clang_major__ < 4)
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \

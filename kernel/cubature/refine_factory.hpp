@@ -248,7 +248,7 @@ namespace FEAT
             rule.get_weight(  i) = Weight_(0.5) * rule_in.get_weight(i);
             rule.get_weight(n+i) = Weight_(0.5) * rule_in.get_weight(i);
           }
-        };
+        }
       }; //RuleRefinery<Rule_, Shape::Simplex<1> >
 
       template<typename Rule_>
@@ -656,7 +656,7 @@ namespace FEAT
             rule.get_weight(  i) = Weight_(0.5) * rule_in.get_weight(i);
             rule.get_weight(n+i) = Weight_(0.5) * rule_in.get_weight(i);
           }
-        };
+        }
 
       };//RuleRefinery<Rule_, Shape::Hypercube<1> >
 

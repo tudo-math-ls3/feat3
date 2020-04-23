@@ -99,7 +99,7 @@ namespace FEAT
           };
 
           return indices[orient][idx];
-        };
+        }
       };
 
       /**
@@ -125,7 +125,7 @@ namespace FEAT
           };
 
           return indices[orient][idx];
-        };
+        }
       };
 
       /**

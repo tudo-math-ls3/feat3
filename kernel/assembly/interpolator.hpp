@@ -82,7 +82,7 @@ namespace FEAT
         static void project(Vector_&, const Function_&, const Space_&)
         {
           // do nothing
-        };
+        }
       };
 
       template<typename Space_, int shape_dim_ = Space_::shape_dim>

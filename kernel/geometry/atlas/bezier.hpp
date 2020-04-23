@@ -805,7 +805,7 @@ namespace FEAT
           {
             os << sind << "<Params>" << std::endl;
             for(std::size_t i(0); i < _param.size(); ++i)
-              os << sind2 << _param[i][0] << std::endl;;
+              os << sind2 << _param[i][0] << std::endl;
             os << sind << "</Params>" << std::endl;
           }
 

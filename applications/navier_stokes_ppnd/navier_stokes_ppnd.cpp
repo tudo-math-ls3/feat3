@@ -518,7 +518,7 @@ namespace NavierStokesPP
       dump_line(comm, "Alpha_r", alpha_r);
       if (alpha_d==-1.0)
       {
-      dump_line(comm, "Alpha_d", nu*theta*time_max/time_steps);
+      dump_line(comm, "Alpha_d", nu*theta*time_max/Real(time_steps));
       }else{
       dump_line(comm, "Alpha_d", alpha_d);
       }
@@ -530,7 +530,7 @@ namespace NavierStokesPP
       dump_line(comm, "Time-Max", time_max);
       dump_line(comm, "Time-Steps", time_steps);
       dump_line(comm, "Max Time-Steps", max_time_steps);
-      dump_line(comm, "Delta-t", time_max / time_steps);
+      dump_line(comm, "Delta-t", time_max / Real(time_steps));
        // =======================================================================================
       comm.print("\nSolver Setting:");
       dump_line(comm, "Iteration", (no_nonlinear ? "Linear Extrapolation" : "Fixpoint"));

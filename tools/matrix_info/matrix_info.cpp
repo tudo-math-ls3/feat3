@@ -531,12 +531,12 @@ namespace MatrixInfo
     if(nrows != ncols)
       std::cout << "no (matrix is not square)" << std::endl;
     else
-      std::cout << (sym_symbolic ? "yes" : "no") << std::endl;;
+      std::cout << (sym_symbolic ? "yes" : "no") << std::endl;
     std::cout << String("Has Symmetric Data").pad_back(pad_len, '.') << ": ";
     if(nrows != ncols)
       std::cout << "no (matrix is not square)" << std::endl;
     else
-      std::cout << (sym_numeric ? "yes" : "no") << std::endl;;
+      std::cout << (sym_numeric ? "yes" : "no") << std::endl;
 
     // plot content information
     std::cout << String("Matrix Content").pad_back(pad_len, '.') << ": " << dec_content_code(mat_content) << std::endl;

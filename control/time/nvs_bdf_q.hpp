@@ -276,7 +276,7 @@ namespace FEAT
             */
            virtual ~NvsBdfQ()
            {
-           };
+           }
 
            /**
             * \brief Returns the time step size

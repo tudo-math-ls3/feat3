@@ -252,7 +252,7 @@ public:
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       DenseVector<Mem::Main, DT_, IT_> b_local(size);
@@ -324,7 +324,7 @@ public:
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       DenseVector<Mem::Main, DT_, IT_> b_local(size);
@@ -400,7 +400,7 @@ public:
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       DenseVector<Mem::Main, DT_, IT_> b_local(size);
@@ -480,7 +480,7 @@ public:
 
   void run1() const
   {
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       DenseVector<Mem::Main, DT_, IT_> b_local(size);
@@ -489,7 +489,7 @@ public:
       DenseVector<Mem::Main, DT_, IT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i * DT_(1.234)));
+        a_local(i, DT_(DT_(i) * DT_(1.234)));
         b_local(i, DT_(size*2 - i));
         ref(i, a_local(i) * b_local(i));
         ref2(i, a_local(i) * a_local(i));
@@ -561,7 +561,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
@@ -569,7 +569,7 @@ public:
       DenseVector<Mem::Main, DT_, IT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i * DT_(1.234)));
+        a_local(i, DT_(DT_(i) * DT_(1.234)));
         ref(i, a_local(i) * s);
       }
 
@@ -624,7 +624,7 @@ public:
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
@@ -685,7 +685,7 @@ public:
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     const DT_ alpha(Math::pi<DT_>());
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       // create a vector
       DenseVector<Mem::Main, DT_, IT_> tvec(size);
@@ -744,7 +744,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       for (Index i(0) ; i < size ; ++i)

@@ -98,7 +98,7 @@ public:
     // This factor is there so that the l2-norm of x does not get too big
     DataType_ fac(DataType_(1)/DataType_(my_space.get_num_dofs()));
     for(Index i(0); i < x.size(); ++i)
-      x(i, fac*(DataType_(2)*i - Math::sqrt(DataType_(i))));
+      x(i, fac*(DataType_(2)*DataType_(i) - Math::sqrt(DataType_(i))));
 
     // Compute reference solution by assembling the matrix and multiplying x to it
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, my_operator, my_space, cubature_factory);
@@ -150,7 +150,7 @@ public:
     // This factor is there so that the l2-norm of x does not get too big
     DataType_ fac(DataType_(1)/DataType_(my_trial_space.get_num_dofs()));
     for(Index i(0); i < x.size(); ++i)
-      x(i, fac*(DataType_(2)*i - Math::sqrt(DataType_(i))));
+      x(i, fac*(DataType_(2)*DataType_(i) - Math::sqrt(DataType_(i))));
 
     // Our bilinear operator
     OperatorType_ my_operator;

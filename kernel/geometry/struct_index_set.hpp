@@ -276,7 +276,7 @@ namespace FEAT
         BaseClass(num_slices),
         _index_set(num_slices)
       {
-      };
+      }
 
       template<int face_dim__>
       const StructIndexSet<shape_dim_, cell_dim_, face_dim__>& get_index_set() const
@@ -303,7 +303,7 @@ namespace FEAT
       explicit StructIndexSetWrapper(const Index num_slices[]) :
         _index_set(num_slices)
       {
-      };
+      }
 
       template<int face_dim__>
       const StructIndexSet<shape_dim_, cell_dim_, face_dim__>& get_index_set() const

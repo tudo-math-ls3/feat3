@@ -128,9 +128,9 @@ void run()
     flops *= 2;
 
     double bytes = double(used_elements);
-    bytes *= sizeof(DT_);
-    bytes += used_elements * sizeof(IT_);
-    bytes += size * Blocksize_ * sizeof(DT_);
+    bytes *= DT_(sizeof(DT_));
+    bytes += DT_(used_elements * sizeof(IT_));
+    bytes += DT_(size * Blocksize_ * sizeof(DT_));
 
     auto func = [&] () { BlockProductMatVecBench<Algo_, SM_::layout_id, DT_, IT_>::f(x, b, sys); };
     run_bench<Mem_>(func, flops, bytes);
@@ -160,9 +160,9 @@ void run()
     flops *= 2;
 
     double bytes = double(used_elements);
-    bytes *= sizeof(DT_);
-    bytes += used_elements * sizeof(IT_);
-    bytes += size * sizeof(DT_);
+    bytes *= DT_(sizeof(DT_));
+    bytes += DT_(used_elements * sizeof(IT_));
+    bytes += DT_(size * sizeof(DT_));
 
     auto func = [&] () { BlockProductMatVecBench<Algo_, SM_::layout_id, DT_, IT_>::f(x, b, sys); };
     run_bench<Mem_>(func, flops, bytes);

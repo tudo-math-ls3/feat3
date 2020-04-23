@@ -211,7 +211,7 @@ class ExtrudedPartiDomainControl :
         Index num_verts(finest_mesh_2d.get_num_entities(0));
         Index extruded_num_verts(finest_extruded_mesh.get_num_entities(0));
 
-        _vtx_map = std::move(std::vector<Index>(extruded_num_verts));
+        _vtx_map.resize(extruded_num_verts);
 
         const CoordType tol(Math::eps<CoordType>());
 

@@ -208,7 +208,7 @@ public:
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> x_local(size);

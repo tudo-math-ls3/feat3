@@ -291,7 +291,7 @@ public:
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> x_local(size);
@@ -429,7 +429,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> ref_x_local(size);
@@ -546,7 +546,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < 3e2 ; size*=2)
+    for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
       DT_ s(DT_(4.321));
 
@@ -617,7 +617,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < 3e2 ; size*=3)
+    for (Index size(2) ; size < Index(3e2) ; size*=3)
     {
       const DT_ pi(Math::pi<DT_>());
       const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
@@ -724,7 +724,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < 3e2 ; size*=4)
+    for (Index size(2) ; size < Index(3e2) ; size*=4)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
 
@@ -795,7 +795,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(25) ; size < 1e3 ; size*=2)
+    for (Index size(25) ; size < Index(1e3) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> x_local(size);
@@ -893,7 +893,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < 3e2 ; size*=2)
+    for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
       for (Index row(0) ; row < a_local.rows() ; ++row)
@@ -958,7 +958,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < 3e2 ; size*=2)
+    for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
       DT_ s(DT_(4.321));
 
@@ -1059,7 +1059,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < 3e2 ; size*=2)
+    for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
       for (Index row(0) ; row < a_local.rows() ; ++row)
@@ -1120,7 +1120,7 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    for (Index size(2) ; size < 3e2 ; size*=2)
+    for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
       SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
       for (Index row(0) ; row < a_local.rows() ; ++row)

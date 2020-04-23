@@ -37,6 +37,12 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if major >= 7:
     cxxflags += " -Woverloaded-virtual -Wnon-virtual-dtor"
 
+  if major >= 8:
+    cxxflags += " -Wextra-semi-stmt -Wextra-semi"
+
+  if major >= 10:
+    cxxflags += " -Wtautological-overlap-compare -Wtautological-bitwise-compare -Wmisleading-indentation -Wsizeof-array-div -Wsizeof-pointer-div -Wxor-used-as-pow -Wfinal-dtor-non-final-class"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 

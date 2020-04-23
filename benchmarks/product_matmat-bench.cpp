@@ -77,8 +77,8 @@ void run()
 
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << std::endl;
 
-  double flops = 2. * x.rows() * x.rows() * r.columns() + r.columns();
-  double bytes = 2. * x.rows() * x.columns() * y.columns() + r.columns() * r.rows();
+  double flops = 2. * double(x.rows() * x.rows() * r.columns() + r.columns());
+  double bytes = 2. * double(x.rows() * x.columns() * y.columns() + r.columns() * r.rows());
   bytes *= sizeof(DT_);
 
 

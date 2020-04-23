@@ -66,13 +66,13 @@ namespace FEAT
       mean /= double(times.size());
       std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs."<<std::endl;
       std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<std::endl;
-      flops *= iters;
+      flops *= double(iters);
       flops /= mean;
       flops /= 1000.; // kilo
       flops /= 1000.; // mega
       flops /= 1000.; // giga
       std::cout<<"GFlop/s: "<<flops<<std::endl;
-      bytes *= iters;
+      bytes *= double(iters);
       bytes /= mean;
       bytes /= 1024.; // kilo
       bytes /= 1024.; // mega

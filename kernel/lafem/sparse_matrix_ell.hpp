@@ -345,13 +345,6 @@ namespace FEAT
 
         ImageIterator(const IT_* ai, Index c) : _ai(ai), _c(c) {}
 
-        ImageIterator& operator=(const ImageIterator& other)
-        {
-          _ai = other._ai;
-          _c = other._c;
-          return *this;
-        }
-
         bool operator!=(const ImageIterator& other) const
         {
           return this->_ai != other._ai;
@@ -1476,7 +1469,7 @@ namespace FEAT
         ASSERT(row < rows());
         ASSERT(col < columns());
 
-        const Index nchunk(Index(Math::floor(row / float(C()))));
+        const Index nchunk(Index(Math::floor(float(row) / float(C()))));
         Index start(Index(MemoryPool<Mem_>::get_element(cs(), nchunk)));
         Index max(Index(MemoryPool<Mem_>::get_element(rl(), row)));
         for (Index i(start + row - nchunk * C()), j(0) ; j < max && Index(MemoryPool<Mem_>::get_element(col_ind(), i)) <= col ; i += C(), ++j)

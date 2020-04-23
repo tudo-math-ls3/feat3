@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
     std::cout << "If only the first argument is given, this tool will print a list of all" << std::endl;
     std::cout << "available cubature rule names for the specified shape, including its aliases." << std::endl;
     std::cout << "If <shape> is 'all', this tools prints out the cubature rules for all shapes." << std::endl;
-    std::cout << std::endl << std::endl;;
+    std::cout << std::endl << std::endl;
     std::cout << "Further information:" << std::endl;
     std::cout << "--------------------" << std::endl;
     std::cout << "There are two types of cubature rules: variadic and non-variadic ones." << std::endl;

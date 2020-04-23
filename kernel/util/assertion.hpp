@@ -147,8 +147,8 @@ namespace FEAT
 #  define ASSERT(expr) FEAT::assertion(expr, #expr, __func__, __FILE__, __LINE__)
 #  define ASSERTM(expr, msg) FEAT::assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
 #else
-#  define ASSERT(expr)
-#  define ASSERTM(expr, msg)
+#  define ASSERT(expr) void(0)
+#  define ASSERTM(expr, msg) void(0)
 #endif
 
   /**

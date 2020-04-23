@@ -616,7 +616,7 @@ namespace FEAT
           const IT_ C((IT_(_A.C())));
 
           // calculate cl-array and fill rl-array
-          Index num_of_chunks(Index(ceil(n / float(C))));
+          Index num_of_chunks(Index(ceil(float(n) / float(C))));
           LAFEM::DenseVector<Mem::Main, IT_, IT_> mcl(num_of_chunks, IT_(0));
           LAFEM::DenseVector<Mem::Main, IT_, IT_> mcs(num_of_chunks + 1);
           LAFEM::DenseVector<Mem::Main, IT_, IT_> mrl(_A.rows());
@@ -671,7 +671,7 @@ namespace FEAT
           const IT_ C((IT_(_A.C())));
 
           // calculate cl-array and fill rl-array
-          Index num_of_chunks(Index(ceil(n / float(C))));
+          Index num_of_chunks(Index(ceil(float(n) / float(C))));
           LAFEM::DenseVector<Mem::Main, IT_, IT_> mcl(num_of_chunks, IT_(0));
           LAFEM::DenseVector<Mem::Main, IT_, IT_> mcs(num_of_chunks + 1);
           LAFEM::DenseVector<Mem::Main, IT_, IT_> mrl(_A.rows(), IT_(0));
@@ -743,7 +743,7 @@ namespace FEAT
             const IT_ C((IT_(_A.C())));
 
             // calculate cl-array and fill rl-array
-            Index num_of_chunks(Index(ceil(n / float(C))));
+            Index num_of_chunks(Index(ceil(float(n) / float(C))));
             LAFEM::DenseVector<Mem::Main, IT_, IT_> mcl(num_of_chunks, IT_(0));
             LAFEM::DenseVector<Mem::Main, IT_, IT_> mcs(num_of_chunks + 1);
             LAFEM::DenseVector<Mem::Main, IT_, IT_> mrl(_A.rows());

@@ -206,7 +206,7 @@ public:
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> b_local(size);
@@ -216,7 +216,7 @@ public:
       {
         Tiny::Vector<DT_, BS_> tv1;
         for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(i % 100 * DT_(1.234 + j));
+          tv1.v[j] = DT_(i % 100) * DT_(1.234) + DT_(j);
         a_local(i, tv1);
         Tiny::Vector<DT_, BS_> tv2;
         for (Index j(0) ; j < BS_ ; ++j)
@@ -289,7 +289,7 @@ public:
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> b_local(size);
@@ -362,7 +362,7 @@ public:
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> b_local(size);
@@ -444,7 +444,7 @@ public:
 
   void run1() const
   {
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> b_local(size);
@@ -456,7 +456,7 @@ public:
       {
         Tiny::Vector<DT_, BS_> tv1;
         for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(j + i  *DT_(1.234));
+          tv1.v[j] = DT_(DT_(j) + DT_(i) * DT_(1.234));
         a_local(i, tv1);
         Tiny::Vector<DT_, BS_> tv2;
         for (Index j(0) ; j < BS_ ; ++j)
@@ -532,7 +532,7 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
@@ -542,7 +542,7 @@ public:
       {
         Tiny::Vector<DT_, BS_> tv1;
         for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(i * BS_ + j * DT_(1.234));
+          tv1.v[j] = DT_(DT_(i) * DT_(BS_) + DT_(j) * DT_(1.234));
         a_local(i, tv1);
         ref(i, a_local(i) * s);
       }
@@ -599,7 +599,7 @@ public:
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
@@ -660,14 +660,14 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < 1e4 ; size*=2)
+    for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         Tiny::Vector<DT_, BS_> tv1;
         for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j]  = DT_((i * BS_ + j) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+          tv1.v[j]  = DT_(DT_((i * BS_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
         a_local(i, tv1);
       }
 
@@ -722,14 +722,14 @@ public:
   {
     bool one_error(false);
 
-    for (Index size(10) ; size < 1e4 ; size*=2)
+    for (Index size(10) ; size < Index(1e4) ; size*=2)
     {
       DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         Tiny::Vector<DT_, BS_> tv1;
         for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j]  = DT_((i * BS_ + j) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+          tv1.v[j]  = DT_(DT_((i * BS_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
         a_local(i, tv1);
       }
 

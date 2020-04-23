@@ -861,7 +861,7 @@ namespace FEAT
         DataType_ y = DataType_(v);
         for(Index k(1); k < this->_d; ++k)
         {
-          (y *= c) += ((v *= this->_d - k + Index(1)) /= (Index(2) * k));
+          (y *= c) += DataType_((v *= this->_d - k + Index(1)) /= (Index(2) * k));
         }
 
         return DataType_(a - Index(1)) - c*y;
