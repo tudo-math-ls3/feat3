@@ -133,6 +133,48 @@ namespace FEAT
       /**
        * \brief Constructor
        *
+       * \param[in] input A std::vector, containing the byte array.
+       *
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      explicit SparseVectorBlocked(std::vector<char> input) :
+         Container<Mem_, DT_, IT_>(0)
+      {
+        deserialise<DT2_,IT2_>(input);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       *
+       * Creates a vector based on the source file.
+       */
+      explicit SparseVectorBlocked(FileMode mode, String filename) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        read_from(mode, filename);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The source filestream.
+       *
+       * Creates a vector based on the source filestream.
+       */
+      explicit SparseVectorBlocked(FileMode mode, std::istream& file) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        read_from(mode, file);
+      }
+
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] size_in The size of the created vector.
        *
        * Creates a vector with a given size.
@@ -481,6 +523,103 @@ namespace FEAT
             delete[] pindices;
             delete[] pelements;
           }
+        }
+      }
+
+      /**
+       * \brief Deserialisation of complete container entity.
+       *
+       * \param[in] input A std::vector, containing the byte array.
+       *
+       * Recreate a complete container entity by a single binary array.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      void deserialise(std::vector<char> input)
+      {
+        this->template _deserialise<DT2_, IT2_>(FileMode::fm_svb, input);
+      }
+
+      /**
+       * \brief Serialisation of complete container entity.
+       *
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
+       *
+       * Serialize a complete container entity into a single binary array.
+       *
+       * See \ref FEAT::LAFEM::Container::_serialise for details.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      std::vector<char> serialise(const LAFEM::SerialConfig& config = SerialConfig())
+      {
+        return this->template _serialise<DT2_, IT2_>(FileMode::fm_svb, config);
+      }
+
+      /**
+       * \brief Read in vector from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          XABORTM("Unable to open Vector file " + filename);
+        read_from(mode, file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in vector from stream.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from(FileMode mode, std::istream& file)
+      {
+        switch(mode)
+        {
+          case FileMode::fm_binary:
+          case FileMode::fm_svb:
+            this->template _deserialise<double, std::uint64_t>(FileMode::fm_svb, file);
+            break;
+          default:
+            XABORTM("Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          XABORTM("Unable to open Vector file " + filename);
+        write_out(mode, file);
+        file.close();
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out(FileMode mode, std::ostream& file) const
+      {
+        switch(mode)
+        {
+          case FileMode::fm_binary:
+          case FileMode::fm_svb:
+            this->template _serialise<double, std::uint64_t>(FileMode::fm_svb, file);
+            break;
+          default:
+            XABORTM("Filemode not supported!");
         }
       }
 

@@ -187,40 +187,6 @@ public:
     b.clone(e);
     TEST_CHECK_EQUAL(b, c);
 
-    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
-    for (Index row(0) ; row < fcoo.rows() ; ++row)
-    {
-      for (Index col(0) ; col < fcoo.columns() ; ++col)
-      {
-        if(row == col)
-          fcoo(row, col, DT_(2));
-        else if((row == col+1) || (row+1 == col))
-          fcoo(row, col, DT_(-1));
-      }
-    }
-    SparseMatrixCSR<Mem_, DT_, IT_> f(fcoo);
-
-    BinaryStream bs;
-    f.write_out(FileMode::fm_csr, bs);
-    TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
-    bs.seekg(0);
-    SparseMatrixCSR<Mem_, DT_, IT_> g(FileMode::fm_csr, bs);
-    TEST_CHECK_EQUAL(g, f);
-    TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
-
-    std::stringstream ts;
-    f.write_out(FileMode::fm_mtx, ts);
-    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, f);
-
-    std::stringstream ts2;
-    f.write_out(FileMode::fm_mtx, ts2, true);
-    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
-    TEST_CHECK_EQUAL(j2, f);
-
-    auto kp = f.serialise();
-    SparseMatrixCSR<Mem_, DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, f);
 
     // new clone testing
     auto clone1 = b.clone(CloneMode::Deep);
@@ -247,6 +213,19 @@ public:
     TEST_CHECK_EQUAL((void*)clone4.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone4.row_ptr(), (void*)clone1.row_ptr());
 
+    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
+    for (Index row(0) ; row < fcoo.rows() ; ++row)
+    {
+      for (Index col(0) ; col < fcoo.columns() ; ++col)
+      {
+        if(row == col)
+          fcoo(row, col, DT_(2));
+        else if((row == col+1) || (row+1 == col))
+          fcoo(row, col, DT_(-1));
+      }
+    }
+    SparseMatrixCSR<Mem_, DT_, IT_> f(fcoo);
+
     // shrink test
     SparseMatrixCSR<Mem_, DT_, IT_> l(f.clone());
     l.shrink(DT_(1.9));
@@ -270,6 +249,87 @@ SparseMatrixCSRTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_csr_test_
 SparseMatrixCSRTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_csr_test_double_uint;
 #endif
 
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixCSRSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRSerialiseTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
+    for (Index row(0) ; row < fcoo.rows() ; ++row)
+    {
+      for (Index col(0) ; col < fcoo.columns() ; ++col)
+      {
+        if(row == col)
+          fcoo(row, col, DT_(2));
+        else if((row == col+1) || (row+1 == col))
+          fcoo(row, col, DT_(-1));
+      }
+    }
+    SparseMatrixCSR<Mem_, DT_, IT_> f(fcoo);
+
+    BinaryStream bs;
+    f.write_out(FileMode::fm_csr, bs);
+    //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
+    bs.seekg(0);
+    SparseMatrixCSR<Mem_, DT_, IT_> g(FileMode::fm_csr, bs);
+    TEST_CHECK_EQUAL(g, f);
+    //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
+
+    std::stringstream ts;
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, f);
+
+    std::stringstream ts2;
+    f.write_out(FileMode::fm_mtx, ts2, true);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
+    TEST_CHECK_EQUAL(j2, f);
+
+    auto kp = f.serialise(LAFEM::SerialConfig(false, false));
+    SparseMatrixCSR<Mem_, DT_, IT_> k(kp);
+    TEST_CHECK_EQUAL(k, f);
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = f.serialise(LAFEM::SerialConfig(true, false));
+    SparseMatrixCSR<Mem_, DT_, IT_> zlib(zl);
+    TEST_CHECK_EQUAL(zlib, f);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = f.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseMatrixCSR<Mem_, DT_, IT_> zfp(zf);
+    for(Index row(0) ; row < f.rows() ; ++row)
+    {
+      for(Index col(0) ; col < f.columns() ; ++col)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), f(row, col), DT_(1e-4));
+      }
+    }
+#endif
+  }
+};
+SparseMatrixCSRSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_serialise_test_float_ulong;
+SparseMatrixCSRSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_serialise_test_double_ulong;
+SparseMatrixCSRSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_serialise_test_float_uint;
+SparseMatrixCSRSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_serialise_test_double_uint;
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSRSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_csr_serialise_test_float_ulong;
+SparseMatrixCSRSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_csr_serialise_test_double_ulong;
+SparseMatrixCSRSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_csr_serialise_test_float_uint;
+SparseMatrixCSRSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_csr_serialise_test_double_uint;
+#endif
 
 template<
   typename Mem_,
@@ -1160,3 +1220,78 @@ SparseMatrixCSRLumpTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_lump_test_d
 SparseMatrixCSRLumpTest<Mem::CUDA, float, unsigned long> cuda_sm_csr_lump_test_float_ulong;
 SparseMatrixCSRLumpTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_lump_test_double_ulong;
 #endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRCompressionTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixCSRCompressionTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRCompressionTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSRCompressionTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    Index mat_rows = 56;
+    Index mat_cols = 56;
+    DenseVector<Mem_, IT_, IT_> col_ind(400);
+    DenseVector<Mem_, DT_, IT_> val(400);
+    DenseVector<Mem_, IT_, IT_> row_ptr(mat_rows+1);
+    for(Index i(0) ; i < 400 ; ++i)
+    {
+      col_ind(i, IT_(i/40 + (3*i)%16));
+      val(i, DT_(7)/DT_(3*(i+1)) - DT_(13)/DT_((i+1)*(i+1)));
+    }
+    row_ptr(0, 0);
+    for(Index i(1) ; i < mat_rows ; ++i)
+    {
+      row_ptr(i, IT_(i * Index(400/mat_rows -1)));
+    }
+    row_ptr(mat_rows, 400);
+    SparseMatrixCSR<Mem_, DT_, IT_> a(mat_rows, mat_cols, col_ind, val, row_ptr);
+#ifdef FEAT_HAVE_ZLIB
+#ifdef FEAT_HAVE_ZFP
+    LAFEM::SerialConfig config(false, false);
+    config.set_tolerance(FEAT::Real(1e-2));
+    std::vector<char> uncompressed = a.serialise(config);
+    config.set_elements_compression(LAFEM::CompressionModes::elements_zlib);
+    std::vector<char> elements_compressed_zlib = a.serialise(config);
+    config.set_elements_compression(LAFEM::CompressionModes::elements_zfp);
+    std::vector<char> elements_compressed_zfp = a.serialise(config);
+    config.set_indices_compression(LAFEM::CompressionModes::indices_zlib);
+    std::vector<char> elements_indices_compressed_zfp = a.serialise(config);
+    config.set_elements_compression(LAFEM::CompressionModes::elements_zlib);
+    std::vector<char> elements_indices_compressed_zlib = a.serialise(config);
+    config.set_elements_compression(LAFEM::CompressionModes::elements_off);
+    std::vector<char> indices_compressed_zlib = a.serialise(config);
+    config.set_elements_compression(LAFEM::CompressionModes::elements_zfp);
+    config.set_indices_compression(LAFEM::CompressionModes::indices_off);
+    config.set_tolerance(FEAT::Real(1e-4));
+    std::vector<char> elements_compressed_zfp_e4 = a.serialise(config);
+    config.set_tolerance(FEAT::Real(1e-6));
+    std::vector<char> elements_compressed_zfp_e6 = a.serialise(config);
+
+    XASSERTM(uncompressed.size() > elements_compressed_zlib.size(), "ele zlib is not smaller than uncomp");
+    XASSERTM(elements_compressed_zlib.size() > elements_compressed_zfp.size(), "ele zfp is not smaleer than ele zlib");
+    XASSERTM(elements_compressed_zfp.size() > elements_indices_compressed_zfp.size(), "ele + ind zfp is not smaller than ele zfp");
+    XASSERTM(elements_compressed_zlib.size() > elements_indices_compressed_zlib.size(), "ele + ind zlib is not smaller than ele zlib");
+    XASSERTM(uncompressed.size() > indices_compressed_zlib.size(), "ind zlib is not smaller than uncomp");
+    XASSERTM(indices_compressed_zlib.size() > elements_indices_compressed_zlib.size(), "ele + ind zlib is not smaller than ind zlib");
+    XASSERTM(elements_compressed_zfp_e4.size() > elements_compressed_zfp.size(), "e4 smaller than e2");
+    XASSERTM(elements_compressed_zfp_e6.size() > elements_compressed_zfp_e4.size(), "e6 smaller than e4");
+#endif
+#endif
+  }
+};
+SparseMatrixCSRCompressionTest<Mem::Main, float, unsigned int> sm_csr_comp_test_float_uint;
+SparseMatrixCSRCompressionTest<Mem::Main, double, unsigned int> sm_csr_comp_test_double_uint;
+SparseMatrixCSRCompressionTest<Mem::Main, float, unsigned long> sm_csr_comp_test_float_ulong;
+SparseMatrixCSRCompressionTest<Mem::Main, double, unsigned long> sm_csr_comp_test_double_ulong;

@@ -1061,14 +1061,17 @@ namespace FEAT
       /**
        * \brief Serialisation of complete container entity.
        *
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
+       *
        * Serialize a complete container entity into a single binary array.
        *
        * See \ref FEAT::LAFEM::Container::_serialise for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialise()
+      std::vector<char> serialise(const LAFEM::SerialConfig& config = SerialConfig())
       {
-        return this->template _serialise<DT2_, IT2_>(FileMode::fm_coo);
+        return this->template _serialise<DT2_, IT2_>(FileMode::fm_coo, config);
       }
 
       /**
@@ -1228,7 +1231,7 @@ namespace FEAT
           }
           case FileMode::fm_coo:
           case FileMode::fm_binary:
-            this->template _deserialise<double, uint64_t>(FileMode::fm_coo, file);
+            this->template _deserialise<double, std::uint64_t>(FileMode::fm_coo, file);
             break;
           default:
             XABORTM("Filemode not supported!");
@@ -1285,7 +1288,7 @@ namespace FEAT
             if (! std::is_same<DT_, double>::value)
               std::cout<<"Warning: You are writing out a coo matrix that is not double precision!"<<std::endl;
 
-            this->template _serialise<double, uint64_t>(FileMode::fm_coo, file);
+            this->template _serialise<double, std::uint64_t>(FileMode::fm_coo, file);
             break;
           default:
             XABORTM("Filemode not supported!");

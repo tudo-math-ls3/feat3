@@ -13,6 +13,7 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/binary_stream.hpp>
 #include <kernel/util/pack.hpp>
+#include <kernel/lafem/container.hpp>
 
 #include <cstdio>
 #include <cstring>
@@ -41,7 +42,7 @@ namespace FEAT
          * \return size of object
          *
          */
-      virtual uint64_t get_checkpoint_size() = 0;
+      virtual std::uint64_t get_checkpoint_size(LAFEM::SerialConfig & config) = 0;
 
       /**
          * \brief Extract object from checkpoint
@@ -61,7 +62,7 @@ namespace FEAT
          * \param[out] data object as bytestream
          *
          */
-      virtual void set_checkpoint_data(std::vector<char> & data) = 0;
+      virtual std::uint64_t set_checkpoint_data(std::vector<char> & data, LAFEM::SerialConfig & config) = 0;
 
     protected:
       virtual ~Checkpointable() {}
@@ -92,9 +93,9 @@ namespace FEAT
          * \return size of object
          *
          */
-      virtual uint64_t get_checkpoint_size() override
+      virtual std::uint64_t get_checkpoint_size(LAFEM::SerialConfig & config) override
       {
-        return _object.get_checkpoint_size();
+        return _object.get_checkpoint_size(config);
       }
 
       /**
@@ -118,9 +119,9 @@ namespace FEAT
          * \param[out] data object as bytestream
          *
          */
-      virtual void set_checkpoint_data(std::vector<char> & data) override
+      virtual std::uint64_t set_checkpoint_data(std::vector<char> & data, LAFEM::SerialConfig & config) override
       {
-        _object.set_checkpoint_data(data);
+        return _object.set_checkpoint_data(data, config);
       }
     }; // class CheckpointableWrapper
 
@@ -143,12 +144,14 @@ namespace FEAT
     private:
       /// Mapping of identifier string to pointer to the checkpointable object
       std::map<String, std::shared_ptr<Checkpointable>> _checkpointable_by_identifier;
-      /// Pointer to the char array read from the input file during restore
-      char * _input_array;
+      /// Vector holding the array read from the input file during restore
+      std::vector<char> _input_array;
       /// Mapping of identifier string to the offset in the input file
-      std::map<String, uint64_t> _offset_by_identifier;
+      std::map<String, std::uint64_t> _offset_by_identifier;
       /// the mpi communicator identifying our mpi context
       const Dist::Comm & _comm;
+      /// The config class that controls the compression modes
+      FEAT::LAFEM::SerialConfig _config;
 
       /**
          * \brief Build checkpoint buffer
@@ -159,17 +162,19 @@ namespace FEAT
          * \returns the size of the buffer
          *
          */
-      uint64_t _collect_checkpoint_data(std::vector<char> & buffer)
+      std::uint64_t _collect_checkpoint_data(std::vector<char> & buffer)
       {
-        uint64_t checkpoint_size(0);
-        std::map<String, std::tuple<uint64_t, uint64_t>> sizes;
+        std::uint64_t checkpoint_size(0u);
+        std::uint64_t real_size(0u);
+        std::map<String, std::tuple<std::uint64_t, std::uint64_t>> sizes;
 
         for (auto const & it : _checkpointable_by_identifier)
         {
-          uint64_t identifierlength = (uint64_t)it.first.length();
-          uint64_t datalength = it.second->get_checkpoint_size();
+          std::uint64_t identifierlength = (std::uint64_t)it.first.length();
+          std::uint64_t datalength = it.second->get_checkpoint_size(_config);
 
-          checkpoint_size += identifierlength + datalength + sizeof(uint64_t) + sizeof(uint64_t);
+          checkpoint_size += identifierlength + datalength + sizeof(std::uint64_t) + sizeof(std::uint64_t);
+          real_size += identifierlength + sizeof(std::uint64_t) + sizeof(std::uint64_t);
           sizes[it.first] = std::make_tuple(identifierlength, datalength);
         }
 
@@ -178,14 +183,21 @@ namespace FEAT
         for (auto const & it : _checkpointable_by_identifier)
         {
           char * cidentifierlength = reinterpret_cast<char *>(&std::get<0>(sizes[it.first]));
-          buffer.insert(std::end(buffer), cidentifierlength, cidentifierlength + sizeof(uint64_t));
+          buffer.insert(std::end(buffer), cidentifierlength, cidentifierlength + sizeof(std::uint64_t));
           buffer.insert(std::end(buffer), it.first.begin(), it.first.end());
-          char * cdatalength = reinterpret_cast<char *>(&std::get<1>(sizes[it.first]));
-          buffer.insert(std::end(buffer), cdatalength, cdatalength + sizeof(uint64_t));
-          it.second->set_checkpoint_data(buffer);
+          std::uint64_t old_size = buffer.size();
+          buffer.insert(std::end(buffer), sizeof(std::uint64_t), 0); //set datalength to an arbitrary value
+          std::uint64_t ireal_size = it.second->set_checkpoint_data(buffer, _config);
+          char * csize = reinterpret_cast<char *>(&ireal_size);
+          for(uint i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the the datalength
+          {
+            buffer[old_size + i] = csize[i];
+          }
+          real_size += ireal_size;
         }
 
-        return checkpoint_size;
+        buffer.resize(real_size);
+        return real_size;
       }
 
       /**
@@ -194,125 +206,51 @@ namespace FEAT
          * Extract the identifier string and offset for its data in the input array for every object
          * in the read checkpoint, and store this information for restoration in this checkpoint control object.
          *
-         * \param[in] size current size of _input_array after reading the file / stream
-         *
          */
-      void _restore_checkpoint_data(const uint64_t size)
+      void _restore_checkpoint_data()
       {
-        uint64_t stringsize;
-        uint64_t datasize(0);
-        size_t i = 0;
+        std::uint64_t stringsize;
+        std::uint64_t datasize(0);
+        std::size_t i = 0;
+        std::size_t size = _input_array.size();
 
         // Loop over all objects stored in the checkpoint file
         while (i < size)
         {
           // Get size of identifier string
-          ::memcpy(&stringsize, _input_array + i, sizeof(uint64_t));
-          i += sizeof(uint64_t);
+          ::memcpy(&stringsize, _input_array.data() + i, sizeof(std::uint64_t));
+          i += sizeof(std::uint64_t);
 
           // Read the identifier string and put it as key for the calculated offset to the map
-          _offset_by_identifier[String(_input_array + i, stringsize)] = i + stringsize;
+          _offset_by_identifier[String(_input_array.data() + i, stringsize)] = i + stringsize;
           i += stringsize;
 
           // Get the size of the Data holding the array, to get the start point of the next checkpointable object in the array
-          ::memcpy(&datasize, _input_array + i, sizeof(uint64_t));
-          i += sizeof(uint64_t) + datasize;
+          ::memcpy(&datasize, _input_array.data() + i, sizeof(std::uint64_t));
+          i += sizeof(std::uint64_t) + datasize;
         }
       }
 
-#ifdef FEAT_HAVE_ZLIB
       /**
          * \brief Write checkpoint files to disk
          *
-         * Write two binary files:
-         * [name].zcp: a compressed file holding the current status of all checkpointable objects added to the checkpoint control
-         * [name].szcp: a file holding the size of the checkpoint data per rank, needed for loading the checkpoint
-         *
-         * \param[in] name String holding the name of the file (without the extension .zcp)
-         */
-      void _save_compressed(const String name)
-      {
-        std::vector<char> buffer;
-        uint64_t sizes[2];
-        sizes[0] = _collect_checkpoint_data(buffer);
-
-        uLongf compressedLen = compressBound(static_cast<uLong>(sizes[0]));
-        Bytef * compressed = new Bytef[compressedLen];
-        Bytef * buffer_data = (Bytef *)buffer.data();
-
-        int c_status = ::compress(compressed, &compressedLen, buffer_data, static_cast<uLongf>(sizes[0]));
-        XASSERTM(c_status == Z_OK, "compression of checkpoint data failed");
-
-        sizes[1] = static_cast<uint64_t>(compressedLen);
-
-        DistFileIO::write_ordered(compressed, sizes[1], name + ".zcp", _comm);
-        DistFileIO::write_ordered(sizes, 2 * sizeof(uint64_t), name + ".szcp", _comm);
-      }
-
-      /**
-         * \brief Load checkpoint from disk
-         *
-         * Read the [name].szcp file, to restore the size of the checkpoint data per rank.
-         * Read the compressed binary file [name].zcp holding a safed state of all checkpointable objects and store it to _input_array.
-         *
-         * Fill the _offset_by_identifier map with the data from the array.
-         *
-         * \param[in] name String holding the name of the file (without the extension .zcp)
-         *
-         * \warning Reading another input file / stream will overwrite values in _input_array and _offset_by_identifier
-         */
-      void _load_compressed(const String name)
-      {
-        struct stat stat_buf;
-        stat((name + ".szcp").c_str(), &stat_buf);
-        size_t filesize = (unsigned)stat_buf.st_size;
-        size_t original_rank_count = (filesize / (2 * sizeof(uint64_t)));
-        int world_size(_comm.size());
-        XASSERTM(original_rank_count == unsigned(world_size), "number of ranks of checkpoint file and running program does not match");
-
-        // read the file with the sizes first, so that every rank knows its checkpoint size (needed for read_ordered)
-        uint64_t size_buffer[2];
-        DistFileIO::read_ordered((char *)size_buffer, 2 * sizeof(uint64_t), name + ".szcp", _comm);
-        uLongf size = static_cast<uLongf>(size_buffer[0]);
-        uint64_t buffersize = size_buffer[1];
-
-        auto buffer = new char[buffersize];
-        DistFileIO::read_ordered(buffer, buffersize, name + ".zcp", _comm);
-
-        _input_array = new char[size];
-
-        Bytef * buffer_data = (Bytef *)buffer;
-        int d_status = ::uncompress((Bytef *)_input_array, &size, buffer_data, static_cast<uLongf>(buffersize));
-        XASSERTM(d_status == Z_OK, "decompression of checkpoint data failed");
-
-        delete[] buffer;
-
-        _restore_checkpoint_data(static_cast<uint64_t>(size));
-      }
-#endif //FEAT_HAVE_ZLIB
-
-      /**
-         * \brief Write checkpoint files to disk
-         *
-         * Write two binary files:
+         * Write one binary file:
          * [name].cp: a uncompressed binary file holding the current status of all checkpointable objects added to the checkpoint control
-         * [name].scp: a file holding the size of the checkpoint data per rank, needed for loading the checkpoint
          *
          * \param[in] name String holding the name of the file (without the extension .cp)
          */
       void _save(const String name)
       {
         std::vector<char> buffer;
-        auto checkpoint_size = _collect_checkpoint_data(buffer);
+        _collect_checkpoint_data(buffer);
+        std::vector<char> common(0);
 
-        DistFileIO::write_ordered(buffer.data(), checkpoint_size, name + ".cp", _comm);
-        DistFileIO::write_ordered(reinterpret_cast<char *>(&checkpoint_size), sizeof(uint64_t), name + ".scp", _comm);
+        DistFileIO::write_combined(common, buffer, name + ".cp", _comm);
       }
 
       /**
          * \brief Load checkpoint from disk
          *
-         * Read the [name].scp file, to restore the size of the checkpoint data per rank.
          * Read binary file [name].cp holding a safed state of all checkpointable objects and store it to _input_array.
          *
          * Fill the _offset_by_identifier map with the data from the array.
@@ -323,22 +261,13 @@ namespace FEAT
          */
       void _load(const String name)
       {
-        struct stat stat_buf;
-        stat((name + ".scp").c_str(), &stat_buf);
-        size_t filesize = (unsigned)stat_buf.st_size;
-        int world_size(_comm.size());
-        XASSERTM((filesize / sizeof(uint64_t)) == unsigned(world_size), "number of ranks of checkpoint file and running program does not match");
 
-        // read the file with the sizes first, so that every rank knows its checkpoint size (needed for read_ordered)
-        uint64_t size_buffer[1];
-        DistFileIO::read_ordered((char *)size_buffer, sizeof(uint64_t), name + ".scp", _comm);
-        const uint64_t size = *size_buffer;
-
+        //std::vector<char> temp(0);
+        std::vector<char> common(0);
         // read the checkpoint file
-        _input_array = new char[size];
-        DistFileIO::read_ordered(_input_array, size, name + ".cp", _comm);
+        DistFileIO::read_combined(common, _input_array, name + ".cp", _comm);
 
-        _restore_checkpoint_data(size);
+        _restore_checkpoint_data();
       }
 
     public:
@@ -348,11 +277,13 @@ namespace FEAT
          * Initalise the input array as NULL pointer.
          *
          * \param[in] comm The communicator common to all stored objects
+         * \param[in] config A config class, controlling the compression of the written out data
          */
-      CheckpointControl(const Dist::Comm & comm) :
-        _comm(comm)
+      CheckpointControl(const Dist::Comm & comm, const LAFEM::SerialConfig & config = LAFEM::SerialConfig()) :
+        _comm(comm),
+        _config(config)
       {
-        _input_array = nullptr;
+        _input_array = std::vector<char>(0);
       }
 
       /**
@@ -362,9 +293,19 @@ namespace FEAT
          */
       ~CheckpointControl()
       {
-        delete[] _input_array;
       }
 
+      /**
+       * \brief Set a new serialise configuration
+       *
+       * \param[in] conf LAFEM::SerialConfig, a config class holding information about the compression parameters.
+       *
+       * Set a new SerialConfig object.
+       */
+      void set_config(FEAT::LAFEM::SerialConfig& conf)
+      {
+        _config = conf;
+      }
       /**
          * \brief Delete all read input
          *
@@ -373,9 +314,8 @@ namespace FEAT
          */
       void clear_input()
       {
-        delete[] _input_array;
         _offset_by_identifier.clear();
-        _input_array = nullptr;
+        _input_array.resize(0);
       }
 
       /// Retrieve a list of all items stored in the checkpoint
@@ -441,14 +381,15 @@ namespace FEAT
       template <typename OT_>
       void restore_object(String identifier, OT_ & object, bool add_to_checkpoint_control = true)
       {
-        XASSERTM(_input_array != nullptr, "no input file has been loaded before");
+        XASSERTM(_input_array.size() > 0u, "no input file has been loaded before");
         XASSERTM(_offset_by_identifier.count(identifier) == 1, "input file doesn't contain data for the given identifier");
 
         auto checkpointable_object = std::make_shared<CheckpointableWrapper<OT_>>(object);
 
-        uint64_t size(0);
-        ::memcpy(&size, _input_array + _offset_by_identifier[identifier], sizeof(uint64_t));
-        std::vector<char> buffer(&_input_array[_offset_by_identifier[identifier] + sizeof(uint64_t)], &_input_array[_offset_by_identifier[identifier] + sizeof(uint64_t) + size]);
+        std::uint64_t size(0);
+        char * in_data = _input_array.data() + _offset_by_identifier[identifier];
+        ::memcpy(&size, in_data, sizeof(std::uint64_t));
+        std::vector<char> buffer(in_data + sizeof(std::uint64_t), in_data + sizeof(std::uint64_t) + size);
         checkpointable_object->restore_from_checkpoint_data(buffer);
 
         if (add_to_checkpoint_control)
@@ -458,16 +399,12 @@ namespace FEAT
       }
 
       /**
-         * \brief Write checkpoint files to disk
+         * \brief Write checkpoint file to disk
          *
-         * Write two uncompressed binary files:
+         * Write one uncompressed binary file:
          * filename: [name.cp]: holding the current status of all checkpointable objects added to the checkpoint control
-         *           [name.scp]: holding the size of the checkpoint data per rank, needed for loading the checkpoint
-         * or write two compressed binary files:
-         * filename: [name.zcp]: a compressed file holding the current status of all checkpointable objects added to the checkpoint control, needs zlib support
-         *           [name.szcp]: holding the size of the checkpoint data per rank, needed for loading the checkpoint
          *
-         * \param[in] filename String holding the complete name of the file with extension .cp, without compression, or .zcp, for compression
+         * \param[in] filename String holding the complete name of the file with extension .cp
          */
       void save(const String filename)
       {
@@ -481,12 +418,6 @@ namespace FEAT
         {
           _save(name);
         }
-#ifdef FEAT_HAVE_ZLIB
-        else if (extension == "zcp")
-        {
-          _save_compressed(name);
-        }
-#endif // FEAT_HAVE_ZLIB
         else
         {
           XASSERTM(extension != "zcp", "no zlib support, activate zlib or write uncompressed files with .cp extension instead");
@@ -494,10 +425,11 @@ namespace FEAT
         }
       }
 
+      //Should we ignore the extension and just give in filename without .cp?
       /**
          * \brief Load checkpoint from disk
          *
-         * Read the [filename.sz] file, to restore the size of the checkpoint data per rank.
+         * Read the [filename.cp] file, to restore the size of the checkpoint data per rank.
          *
          * Read binary file [filename] holding a safed state of all checkpointable objects and store it to _input_array.
          *
@@ -509,7 +441,7 @@ namespace FEAT
          */
       void load(const String filename)
       {
-        XASSERTM(_input_array == nullptr, "another input file was read before");
+        XASSERTM(_input_array.size() == 0u, "another input file was read before");
 
         size_t pos = filename.rfind('.');
         String extension = filename.substr(pos + 1);
@@ -521,78 +453,12 @@ namespace FEAT
         {
           _load(name);
         }
-#ifdef FEAT_HAVE_ZLIB
-        else if (extension == "zcp")
-        {
-          _load_compressed(name);
-        }
-#endif // FEAT_HAVE_ZLIB
         else
         {
-          XASSERTM(extension != "zcp", "no zlib support, activate zlip or read uncompressed files with .cp extension instead");
-          XASSERTM(extension == "zcp", "no valid checkpoint file choosen");
+          XABORTM("no valid checkpoint file choosen");
         }
       }
 
-#ifdef FEAT_HAVE_ZLIB
-      /**
-         * \brief Save checkpoint to a stream
-         *
-         * Save a checkpoint, holding the current status of all registered objects, in a BinaryStream
-         *
-         * \param[in] bs BinaryStream that shall be written to
-         */
-      void save(BinaryStream & bs)
-      {
-        std::vector<char> data;
-
-        uLongf checkpoint_size = static_cast<uLongf>(_collect_checkpoint_data(data));
-
-        uLongf compressedLen = static_cast<uLongf>(compressBound(checkpoint_size));
-
-        Bytef * compressed = new Bytef[compressedLen];
-        Bytef * uncompressed = (Bytef *)data.data();
-        int c_status = ::compress(compressed, &compressedLen, uncompressed, checkpoint_size);
-        XASSERTM(c_status == Z_OK, "compression of checkpoint data failed");
-
-        std::uint64_t clen = compressedLen;
-        std::uint64_t slen = checkpoint_size;
-
-        bs.write(reinterpret_cast<char *>(&clen), sizeof(clen));
-        bs.write(reinterpret_cast<char *>(&slen), sizeof(slen));
-        bs.write(reinterpret_cast<char *>(compressed), static_cast<std::streamsize>(clen));
-
-        delete[] compressed;
-      }
-
-      /**
-         * \brief Load checkpoint from stream
-         *
-         * Read the BinaryStream, to restore the safed state of all objects registered to the checkpoint control
-         * and store it to _input_array.
-         *
-         * Fill the _offset_by_identifier map with the data from the array.
-         *
-         * \param[in] bs BinaryStream that shall be read from
-         *
-         * \warning Reading another input file / stream will overwrite values in _input_array and _offset_by_identifier
-         */
-      void load(BinaryStream & bs)
-      {
-        XASSERTM(_input_array == nullptr, "another input file was read before");
-
-        char * data = bs.data();
-        uLongf compressed_size = static_cast<uLongf>(*(std::uint64_t *)(data));
-        uLongf checkpoint_size = static_cast<uLongf>(*(std::uint64_t *)(data + sizeof(uint64_t)));
-
-        Bytef * compressed = (Bytef *)(data + (2 * sizeof(uint64_t)));
-        _input_array = new char[checkpoint_size];
-        int d_status = ::uncompress((Bytef *)_input_array, &checkpoint_size, compressed, compressed_size);
-        XASSERTM(d_status == Z_OK, "decompression of checkpoint data failed");
-
-        _restore_checkpoint_data(static_cast<uint64_t>(checkpoint_size));
-      }
-#else //FEAT_HAVE_ZLIB
       /**
          * \brief Save checkpoint to a stream
          *
@@ -603,9 +469,8 @@ namespace FEAT
       void save(BinaryStream & bs)
       {
         std::vector<char> buffer;
-        auto checkpoint_size = _collect_checkpoint_data(buffer);
+        std::uint64_t slen = _collect_checkpoint_data(buffer);
 
-        std::uint64_t slen = checkpoint_size;
         bs.write(reinterpret_cast<char *>(&slen), sizeof(slen));
         bs.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
       }
@@ -624,17 +489,16 @@ namespace FEAT
          */
       void load(BinaryStream & bs)
       {
-        XASSERTM(_input_array == nullptr, "another input file was read before");
+        XASSERTM(_input_array.size() == 0, "another input file was read before");
 
         char * buffer = bs.data();
-        uint64_t size = *(std::uint64_t *)(buffer);
+        std::uint64_t size = *(std::uint64_t *)(buffer);
 
-        _input_array = new char[size];
-        std::copy(buffer + sizeof(uint64_t), buffer + sizeof(uint64_t) + size - 1, _input_array);
+        _input_array.resize(size);
+        std::copy(buffer + sizeof(std::uint64_t), buffer + sizeof(std::uint64_t) + size - 1, _input_array.data());
 
-        _restore_checkpoint_data(size);
+        _restore_checkpoint_data();
       }
-#endif //FEAT_HAVE_ZLIB
 
     }; // class Checkpoint
 

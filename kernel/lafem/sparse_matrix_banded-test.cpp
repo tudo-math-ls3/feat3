@@ -136,16 +136,6 @@ public:
     TEST_CHECK_EQUAL(e, c);
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);
-
-    BinaryStream bs;
-    c.write_out(FileMode::fm_bm, bs);
-    bs.seekg(0);
-    SparseMatrixBanded<Mem_, DT_, IT_> f(FileMode::fm_bm, bs);
-    TEST_CHECK_EQUAL(f, c);
-
-    auto kp = c.serialise();
-    SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, c);
   }
 };
 
@@ -160,6 +150,91 @@ SparseMatrixBandedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded
 SparseMatrixBandedTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_test_double_uint;
 #endif
 
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBandedSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixBandedSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedSerialiseTest")
+  {
+  }
+
+  virtual ~SparseMatrixBandedSerialiseTest()
+  {
+  }
+
+  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
+
+  virtual void run() const override
+  {
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
+
+    // create random matrix
+    const Index tsize(100);
+    const Index rows(tsize + random(Index(0), Index(20)));
+    const Index columns(tsize + random(Index(0), Index(20)));
+
+    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+
+    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
+
+    // create random vector of offsets
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    for (Index i(0); i < num_of_offsets; ++i)
+    {
+      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+    }
+    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
+    DenseVector<Mem_, IT_, IT_> vec_offsets;
+    vec_offsets.convert(tvec_offsets);
+
+    SparseMatrixBanded<Mem_, DT_, IT_> c(rows, columns, vec_val, vec_offsets);
+
+    BinaryStream bs;
+    c.write_out(FileMode::fm_bm, bs);
+    bs.seekg(0);
+    SparseMatrixBanded<Mem_, DT_, IT_> f(FileMode::fm_bm, bs);
+    TEST_CHECK_EQUAL(f, c);
+
+    auto kp = c.serialise(LAFEM::SerialConfig(false, false));
+    SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
+    TEST_CHECK_EQUAL(k, c);
+
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = c.serialise(LAFEM::SerialConfig(true, false));
+    SparseMatrixBanded<Mem_, DT_, IT_> zlib(zl);
+    TEST_CHECK_EQUAL(zlib, c);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = c.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseMatrixBanded<Mem_, DT_, IT_> zfp(zf);
+    for(Index i(0); i < c.rows() ; ++i)
+    {
+      for(Index j(0) ; j < c.columns() ; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(c(i,j), zfp(i,j), DT_(1e-5));
+      }
+    }
+#endif
+  }
+};
+SparseMatrixBandedSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_serialise_test_float_ulong;
+SparseMatrixBandedSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_serialise_test_double_ulong;
+SparseMatrixBandedSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_serialise_test_float_uint;
+SparseMatrixBandedSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_serialise_test_double_uint;
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBandedSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_serialise_test_float_ulong;
+SparseMatrixBandedSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_serialise_test_double_ulong;
+SparseMatrixBandedSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_serialise_test_float_uint;
+SparseMatrixBandedSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_serialise_test_double_uint;
+#endif
 
 template<
   typename Mem_,

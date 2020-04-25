@@ -71,11 +71,6 @@ public:
     TEST_CHECK_EQUAL(ap, a);
     TEST_CHECK_EQUAL(ap.used_elements(), Index(3));
 
-    std::stringstream ts;
-    a.write_out(FileMode::fm_mtx, ts);
-    SparseVector<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, a);
-
     SparseVector<Mem_, DT_, IT_> b;
     b.convert(a);
     TEST_CHECK_EQUAL(a, b);
@@ -105,10 +100,6 @@ public:
     TEST_CHECK_EQUAL(a(2), DT_(0));
     TEST_CHECK_EQUAL(a(3), DT_(0));
 
-    auto op = b.serialise();
-    SparseVector<Mem_, DT_, IT_> o(op);
-    for (Index i(0) ; i < b.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), b(i), DT_(1e-5));
 
     //increase vector size above alloc_increment
     SparseVector<Mem_, DT_, IT_> p(3001);
@@ -125,4 +116,68 @@ SparseVectorTest<Mem::Main, double, Index> cpu_sparse_vector_test_double;
 SparseVectorTest<Mem::CUDA, float, Index> cuda_sparse_vector_test_float;
 SparseVectorTest<Mem::CUDA, double, Index> cuda_sparse_vector_test_double;
 //SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseVectorSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseVectorSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorSerialiseTest")
+  {
+  }
+
+  virtual ~SparseVectorSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    SparseVector<Mem_, DT_, IT_> a(10);
+    a(3, DT_(7));
+    a(3, DT_(3));
+    a(6, DT_(1));
+    a(5, DT_(6));
+    a(6, DT_(8));
+
+    std::stringstream ts;
+    a.write_out(FileMode::fm_mtx, ts);
+    SparseVector<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, a);
+
+    BinaryStream bs;
+    a.write_out(FileMode::fm_sv, bs);
+    bs.seekg(0);
+    SparseVector<Mem::Main, DT_, IT_> bin(FileMode::fm_sv, bs);
+    TEST_CHECK_EQUAL(bin, a);
+
+    auto op = a.serialise(LAFEM::SerialConfig(false, false));
+    SparseVector<Mem_, DT_, IT_> o(op);
+    for (Index i(0) ; i < a.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), a(i), DT_(1e-5));
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = a.serialise(LAFEM::SerialConfig(true, false));
+    SparseVector<Mem_, DT_, IT_> zlib(zl);
+    for (Index i(0) ; i < a.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), a(i), DT_(1e-5));
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = a.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseVector<Mem_, DT_, IT_> zfp(zf);
+    for (Index i(0) ; i < a.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), a(i), DT_(1e-4));
+#endif
+  }
+};
+SparseVectorSerialiseTest<Mem::Main, float, Index> cpu_sparse_vector_serialise_test_float;
+SparseVectorSerialiseTest<Mem::Main, double, Index> cpu_sparse_vector_serialise_test_double;
+//SparseVectorSerialiseTest<Mem::Main, Index> cpu_sparse_vector_serialise_test_index;
+#ifdef FEAT_HAVE_CUDA
+SparseVectorSerialiseTest<Mem::CUDA, float, Index> cuda_sparse_vector_serialise_test_float;
+SparseVectorSerialiseTest<Mem::CUDA, double, Index> cuda_sparse_vector_serialise_test_double;
+//SparseVectorSerialiseTest<Mem::CUDA, Index> cuda_sparse_vector_serialise_test_index;
 #endif

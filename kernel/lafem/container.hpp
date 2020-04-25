@@ -14,6 +14,7 @@
 #include <kernel/lafem/base.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/random.hpp>
+#include <kernel/util/pack.hpp>
 
 
 #include <vector>
@@ -69,6 +70,177 @@ namespace FEAT
       };
     } //namespace Intern
     /// \endcond
+
+    /**
+     * \brief Config class for serialise parameter
+     *
+     * Data survey:
+     * elements_compression LAFEM::SerialiseMode, The compression mode for the elements array. Refer to CompressionModes for details.
+     * indices_compression LAFEM::SerialiseMode, The compression mode for the indices array
+     * tolerance FEAT::Real, The max error that should be occur while compressing with zfp.
+     * \note tolerance should be unset(meaning -1.) if elements_compression != CompressionModes::elements_zfp
+     *          and strictly greater 0 if elements_compression == CompressionModes::elements_zfp.
+     *
+     * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
+     *
+     */
+    class SerialConfig
+    {
+    private:
+      CompressionModes elements_compression, indices_compression;
+      FEAT::Real tolerance;
+    public:
+      /**
+       * \brief Default Constructor
+       *
+       * Sets default values for compression, depending whether zlib is loaded or not
+       */
+#ifdef FEAT_HAVE_ZLIB
+      explicit SerialConfig() :
+      elements_compression(CompressionModes::elements_zlib),
+      indices_compression(CompressionModes::indices_zlib),
+      tolerance(FEAT::Real(-1.))
+#else
+      explicit SerialConfig() :
+      elements_compression(CompressionModes::elements_off),
+      indices_compression(CompressionModes::indices_off),
+      tolerance(FEAT::Real(-1.))
+#endif
+      {
+      }
+      /**
+       * \brief Constructor
+       *
+       * \param[in] zlib_compression bool, if true zlib will be used to compress indice arrays and if zfp is not loaded,
+       *                                     will also be used to compress element arrays.
+       * \param[in] zfp_compression bool, if true zfp will be used to compress element arrays.
+       * \param[in] tolerance FEAT::Real, the maximum error done compressing with zfp. If zfp is enabled, has to be greater 0.
+       *
+       * \warning if zfp_compression is true and tolerance <= 0, an error will be raised.
+       *
+       * Set values depending on the configuration of the user
+       */
+      explicit SerialConfig(bool zlib_compression, bool zfp_compression, FEAT::Real tol = FEAT::Real(-1.))
+      {
+        set_elements_compression(CompressionModes::elements_off);
+        set_indices_compression(CompressionModes::indices_off);
+        if(zlib_compression)
+        {
+          set_elements_compression(CompressionModes::elements_zlib);
+          set_indices_compression(CompressionModes::indices_zlib);
+        }
+        if(zfp_compression)
+        {
+          set_tolerance(tol);
+          set_elements_compression(CompressionModes::elements_zfp);
+        }
+      }
+
+      /**
+       * \brief method for setting elements_compression
+       *
+       * \param[in] comp CompressionModes, describing the compression mode for _elements. See CompressionModes for details.
+       *
+       */
+      void set_elements_compression(CompressionModes comp)
+      {
+        CompressionModes temp = comp & CompressionModes::elements_mask;
+        switch(temp)
+        {
+          case CompressionModes::elements_off:
+            break;
+          case CompressionModes::elements_zlib:
+#ifdef FEAT_HAVE_ZLIB
+            break;
+#else
+            XABORTM("Zlib compression was enabled for elements, but zlib bibliography was not loaded. Please configure FEAT with -zlib flag!");
+#endif
+          case CompressionModes::elements_zfp:
+#ifdef FEAT_HAVE_ZFP
+            XASSERTM(tolerance > FEAT::Real(0.), "tolerance ist smaller or equall 0 while zfp is enabled!");
+            break;
+#else
+            XABORTM("Zfp compression was enabled for elements, but zfp bibliography was not loaded. Please configure FEAT with -zfp flag!");
+#endif
+          default:
+            XABORTM("No legal CompressionModes was given");
+        }
+        elements_compression = temp;
+      }
+      /**
+       * \brief method for setting indices_compression
+       *
+       * \param[in] comp CompressionModes, describing the compression mode for _indices. See CompressionModes for details.
+       *
+       */
+      void set_indices_compression(CompressionModes comp)
+      {
+        CompressionModes temp = comp & CompressionModes::indices_mask;
+        switch(temp)
+        {
+          case CompressionModes::indices_off:
+            break;
+          case CompressionModes::indices_zlib:
+#ifdef FEAT_HAVE_ZLIB
+            break;
+#else
+            XABORTM("Zlib compression was enabled for indices, but zlib bibliography was not loaded. Please configure FEAT with -zlib flag!");
+#endif
+          default:
+            XABORTM("No legal CompressionModes was given");
+        }
+        indices_compression = temp;
+      }
+
+      /**
+       * \brief method for setting tolerance
+       *
+       * \param[in] tol FEAT::Real, the maximum error to be made by zfp compression. If zfp is enabled this has to be greater 0.
+       *
+       */
+     void set_tolerance(FEAT::Real tol)
+     {
+       if(elements_compression == CompressionModes::elements_zfp)
+       {
+         XASSERTM(tol > FEAT::Real(0.), "Zfp enabled, but tolerance is smaller or equal to 0!");
+       }
+       tolerance = tol;
+     }
+     /**
+       * \brief method for getting elements_compression
+       *
+       * \return CompressionModes, The compression mode for elements.
+       *
+       */
+     CompressionModes get_elements_compression() const
+     {
+       return elements_compression;
+     }
+
+     /**
+       * \brief method for getting indices_compression
+       *
+       * \return CompressionModes, The compression mode for indices.
+       *
+       */
+     CompressionModes get_indices_compression() const
+     {
+       return indices_compression;
+     }
+
+     /**
+       * \brief method for getting tolerance
+       *
+       * \return FEAT::Real, the maximum error to be made by zfp compression. If zfp is enabled this has to be greater 0.
+       *
+       */
+     FEAT::Real get_tolerance() const
+     {
+       return tolerance;
+     }
+
+    }; //class SerialConfig
+
 
     /**
      * \brief Container base class.
@@ -311,89 +483,136 @@ namespace FEAT
         }
       }
 
-       /**
-       * \brief Calculation of the serialised size of complete container entity.
+      /**
+       * \brief Calculation of the serialised size with optional compression of complete container entity.
+       *
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
        *
        * \return An unsigned int containing the size of serialised container.
        *
        * Calculate the size of the serialised container entity.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      uint64_t _serialised_size() const
+      std::uint64_t _serialised_size(const LAFEM::SerialConfig& config = LAFEM::SerialConfig()) const
       {
         Container<Mem::Main, DT2_, IT2_> tc(0);
         tc.assign(*this);
 
-        uint64_t gsize(4 * sizeof(uint64_t)); //raw array size + magic number + type_index DT_ + type_index IT_
-        gsize += 6 * sizeof(uint64_t); // size of all six stl containers
-        gsize += tc._elements_size.size() * sizeof(uint64_t); // _elements_size contents
-        gsize += tc._indices_size.size() * sizeof(uint64_t); // _indices_size contents
-        gsize += tc._scalar_index.size() * sizeof(uint64_t); // _scalar_index contents
+        std::uint64_t gsize(4 * sizeof(std::uint64_t)); //raw array size + magic number + type_index DT_ + type_index IT_
+        gsize += 7 * sizeof(std::uint64_t); // size of all seven stl containers
+        gsize += 2 * tc._elements_size.size() * sizeof(std::uint64_t); // _elements_size contents + _elements_arrays bytesize
+        gsize += 2 * tc._indices_size.size() * sizeof(std::uint64_t); // _indices_size contents + _indizes_arrays bytesize
+        gsize += tc._scalar_index.size() * sizeof(std::uint64_t); // _scalar_index contents
         gsize += tc._scalar_dt.size() * sizeof(DT2_); // _scalar_dt contents
+
+        CompressionModes compress = config.get_elements_compression() | config.get_indices_compression();
+        Pack::Type compression_type_elements = Pack::deduct_type<DT2_>();
+        Pack::Type compression_type_index = Pack::deduct_type<IT2_>();
+        if((compress & CompressionModes::elements_mask) == CompressionModes::elements_zfp) // If zfp is used for elements
+        {
+          compression_type_elements = compression_type_elements | Pack::Type::Mask_P;
+        }
+        else if((compress & CompressionModes::elements_mask) == CompressionModes::elements_zlib) //If zlib is used and zfp is not used elements
+        {
+          compression_type_elements = compression_type_elements | Pack::Type::Mask_Z;
+        }
+        if((compress & CompressionModes::indices_mask) == CompressionModes::indices_zlib) // If zlib is used for indices
+            compression_type_index = compression_type_index | Pack::Type::Mask_Z;
+
+
+        FEAT::Real tolerance = config.get_tolerance();
 
         for (Index i(0) ; i < tc._elements_size.size() ; ++i)
         {
-          gsize += tc._elements_size.at(i) * sizeof(DT2_); // actual array sizes
+          gsize += Pack::estimate_size(tc._elements_size.at(i), compression_type_elements, (double)tolerance); // upper_bound for (compressed) elements
         }
+
         for (Index i(0) ; i < tc._indices_size.size() ; ++i)
         {
-          gsize += tc._indices_size.at(i) * sizeof(IT2_); // actual array sizes
+          gsize += Pack::estimate_size(tc._indices_size.at(i), compression_type_index); // upper_bound for (compressed) indizes
         }
-        gsize +=16; //padding for datatype alignment mismatch
+        gsize += 16; //padding for datatype alignment mismatch
 
         return gsize;
       }
 
       /**
-       * \brief Serialisation of complete container entity.
+       *
+       * \brief Serialisation of complete container entity(with options of lossless and lossy compression of data arrays).
        *
        * \param[in] mode FileMode enum, describing the actual container specialisation.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
+       *
        * \returns A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *
        * Array data layout:
        * \code
-       * raw array size in bytes (uint64_t)
-       * magic number (uint64_t)
-       * DT_ 'hash' value (sizeof(DT_) and floating/integral distinction (packed uint64_t)
-       * IT_ 'hash' value (sizeof(IT_) and floating/integral distinction (packed uint64_t)
-       * _elements.size() (uint64_t)
-       * _indices.size() (uint64_t)
-       * _elements_size.size() (uint64_t)
-       * _indices_size.size() (uint64_t)
-       * _scalar_index.size() (uint64_t)
-       * _scalar_dt.size() (uint64_t)
+       * raw array size in bytes (std::uint64_t)
+       * magic number (std::uint64_t)
+       * DT_ 'hash' value (sizeof(DT_) and floating/integral distinction (packed std::uint64_t)
+       * IT_ 'hash' value (sizeof(IT_) and floating/integral distinction (packed std::uint64_t)
+       * _elements.size() (std::uint64_t)
+       * _indices.size() (std::uint64_t)
+       * _elements_size.size() (std::uint64_t)
+       * _indices_size.size() (std::uint64_t)
+       * _scalar_index.size() (std::uint64_t)
+       * _scalar_dt.size() (std::uint64_t)
+       * _compressed (std::uint64_t)
        *
-       * _elements_size array (uint64_t)
-       * _indices_size array (uint64_t)
-       * _scalar_index array (uint64_t)
+       * _elements_size array (std::uint64_t)
+       * _elements arrays byte_size (std::uint64_t) just temporary to read in data
+       * _indices_size array (std::uint64_t)
+       * _indices arrays byte_size (std::uint64_t)
+       * _scalar_index array (std::uint64_t)
        * _scalar_dt array (DT2_)
        * _elements arrays (DT2_)
        * _indices arrays (IT2_)
        * \endcode
+       *
+       * See \ref FEAT::LAFEM::SerialConfig for details.
        */
+
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> _serialise(FileMode mode) const
+      std::vector<char> _serialise(FileMode mode, const SerialConfig& config = SerialConfig()) const
       {
+        std::uint64_t raw_size = 0u;
+        FEAT::Real tolerance = config.get_tolerance();
+
+        CompressionModes compress = config.get_elements_compression() | config.get_indices_compression();
+        Pack::Type compression_type_elements = Pack::deduct_type<DT2_>();
+        Pack::Type compression_type_index = Pack::deduct_type<IT2_>();
+        if((compress & CompressionModes::elements_mask) == CompressionModes::elements_zfp) // If zfp is used for elements
+        {
+          compression_type_elements = compression_type_elements | Pack::Type::Mask_P;
+        }
+        else if((compress & CompressionModes::elements_mask) == CompressionModes::elements_zlib) //If zlib is used and zfp is not used elements
+        {
+          compression_type_elements = compression_type_elements | Pack::Type::Mask_Z;
+        }
+        if((compress & CompressionModes::indices_mask) == CompressionModes::indices_zlib) // If zlib is used for indices
+            compression_type_index = compression_type_index | Pack::Type::Mask_Z;
+
         Container<Mem::Main, DT2_, IT2_> tc(0);
         tc.assign(*this);
 
-        uint64_t gsize = this->template _serialised_size<DT2_, IT2_>();
+        std::uint64_t gsize = this->template _serialised_size<DT2_, IT2_>(config);
 
         std::vector<char> result((size_t(gsize)));
         char * array(result.data());
-        uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
+        std::uint64_t * uiarray(reinterpret_cast<std::uint64_t *>(array));
         DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
         /// \compilerhack clang seems to use older libc++ without std::underlying_type
-#if defined(FEAT_COMPILER_CLANG)
-        uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
-#else
-        uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
-#endif
-        uiarray[0] = gsize;
+        #if defined(FEAT_COMPILER_CLANG)
+        std::uint64_t magic = (std::uint64_t)static_cast<__underlying_type(FileMode)>(mode);
+        #else
+        std::uint64_t magic = (std::uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
+        #endif
+        uiarray[0] = gsize; //we will overwrite this at the end with the finalized data...
         uiarray[1] = magic;
         uiarray[2] = Type::Traits<DT_>::feature_hash();
         uiarray[3] = Type::Traits<IT_>::feature_hash();
@@ -403,70 +622,135 @@ namespace FEAT
         uiarray[7] = tc._indices_size.size();
         uiarray[8] = tc._scalar_index.size();
         uiarray[9] = tc._scalar_dt.size();
+        uiarray[10] = (std::uint64_t)compress;
+        raw_size += 11 * (std::uint64_t)sizeof(std::uint64_t);
 
-        Index global_i(10); // count how many elements of uint64_t have been inserted so far
+        Index global_i(11); // count how many elements of std::uint64_t have been inserted so far
+        Index local_elements(0); // count where elements array bytesize starts
+        Index local_index(0); // same for index...
 
         for (Index i(0) ; i < tc._elements_size.size() ; ++i)
         {
           uiarray[i + global_i] = tc._elements_size.at(i);
         }
         global_i += Index(tc._elements_size.size());
+        local_elements = global_i;
+        for (Index i(0) ; i < tc._elements_size.size() ; ++i)
+        {
+          uiarray[i + global_i] = (std::uint64_t)0u; //placeholder, until we calculate the real data...
+        }
+        global_i += Index(tc._elements_size.size());
+        raw_size += 2 * std::uint64_t(tc._elements_size.size()) * std::uint64_t(sizeof(std::uint64_t));
 
         for (Index i(0) ; i < tc._indices_size.size() ; ++i)
         {
           uiarray[i + global_i] = tc._indices_size.at(i);
         }
-        global_i += Index(tc._indices.size());
+        global_i += Index(tc._indices_size.size());
+        local_index = global_i;
+        for (Index i(0) ; i < tc._indices_size.size() ; ++i)
+        {
+          uiarray[i + global_i] = 0;
+        }
+        global_i += Index(tc._indices_size.size());
+        raw_size += 2 * std::uint64_t(tc._indices_size.size()) * std::uint64_t(sizeof(std::uint64_t));
 
         for (Index i(0) ; i < tc._scalar_index.size() ; ++i)
         {
           uiarray[i + global_i] = tc._scalar_index.at(i);
         }
         global_i += Index(tc._scalar_index.size());
+        raw_size += std::uint64_t(tc._scalar_index.size()) * std::uint64_t(sizeof(std::uint64_t));
 
-        global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_)); // now counting how many DT2 have been inserted so far
+        global_i = Index((global_i * sizeof(std::uint64_t) + sizeof(DT2_) - 1u) / sizeof(DT2_)); // now counting how many DT2 have been inserted so far
 
         for (Index i(0) ; i < tc._scalar_dt.size() ; ++i)
         {
           dtarray[i + global_i] = tc._scalar_dt.at(i);
         }
         global_i += Index(tc._scalar_dt.size());
+        raw_size += std::uint64_t(tc._scalar_dt.size()) * std::uint64_t(sizeof(DT2_));
 
-        for (Index i(0) ; i < tc._elements.size() ; ++i)
+        if((compress & CompressionModes::elements_mask) != CompressionModes::elements_off)
         {
-          std::memcpy(&dtarray[global_i], tc._elements.at(i), tc._elements_size.at(i) * sizeof(DT2_));
-          global_i += tc._elements_size.at(i);
+          global_i = Index((global_i * sizeof(DT2_) + sizeof(char) - 1u) / sizeof(char)); // now counting how many bytes/chars have been inserted so far
+          for (Index i(0) ; i < tc._elements.size() ; ++i)
+          {
+            char* dest = &result[global_i];
+            std::size_t est_buff_size = Pack::estimate_size(tc._elements_size.at(i), compression_type_elements, (double)tolerance);
+            std::size_t real_size = Pack::encode<DT2_>(dest, tc._elements.at(i), est_buff_size, tc._elements_size.at(i), compression_type_elements, false, (double)tolerance);
+            XASSERTM(real_size != 0u, "could not encode elements");
+            uiarray[i + local_elements] = (std::uint64_t)real_size; //save used memory for compressed array
+            global_i += (Index)real_size; //go forward the number of bytes(chars)
+            raw_size += (std::uint64_t)real_size * (std::uint64_t)sizeof(char);
+          }
+          global_i = Index((global_i * sizeof(char) + sizeof(DT2_) - 1u) / sizeof(DT2_)); // go back to DT2_ indexing
         }
-
-        global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_)); // now counting IT2_ elements
-        for (Index i(0) ; i < tc._indices.size() ; ++i)
+        else
         {
-          std::memcpy(&itarray[global_i], tc._indices.at(i), tc._indices_size.at(i) * sizeof(IT2_));
-          global_i += tc._indices_size.at(i);
+          for (Index i(0) ; i < tc._elements.size() ; ++i)
+          {
+            std::memcpy(&dtarray[global_i], tc._elements.at(i), tc._elements_size.at(i) * sizeof(DT2_));
+            uiarray[i + local_elements] = (std::uint64_t) tc._elements_size.at(i) * sizeof(DT2_);
+            global_i += tc._elements_size.at(i);
+            raw_size += (std::uint64_t) tc._elements_size.at(i) * sizeof(DT2_);
+          }
         }
+        if((compress & CompressionModes::indices_mask) != CompressionModes::indices_off)
+        {
+          global_i = Index((global_i * sizeof(DT2_) + sizeof(char) - 1u) / sizeof(char)); // now counting how many bytes/chars have been inserted so far
+          for (Index i(0) ; i < tc._indices.size() ; ++i)
+          {
+            char* dest = &result[global_i];
+            std::size_t est_buff_size = Pack::estimate_size(tc._indices_size.at(i), compression_type_index);
+            std::size_t real_size = Pack::encode<IT2_>(dest, tc._indices.at(i), est_buff_size, tc._indices_size.at(i), compression_type_index, false);
+            XASSERTM(real_size != 0u, "could not encode indices");
+            uiarray[i + local_index] = (std::uint64_t) real_size;
+            global_i += Index(real_size);
+            raw_size += std::uint64_t(real_size) * std::uint64_t(sizeof(char));
+          }
+        }
+        else
+        {
+          global_i = Index((global_i * sizeof(DT2_) + sizeof(IT2_) - 1u) / sizeof(IT2_)); // now counting IT2_ elements
+          for (Index i(0) ; i < tc._indices.size() ; ++i)
+          {
+            std::memcpy(&itarray[global_i], tc._indices.at(i), tc._indices_size.at(i) * sizeof(IT2_));
+            uiarray[i + local_index] = (std::uint64_t) tc._indices_size.at(i) * sizeof(IT2_);
+            global_i += tc._indices_size.at(i);
+            raw_size += (std::uint64_t) tc._indices_size.at(i) * sizeof(IT2_);
+          }
+        }
+        uiarray[0] = raw_size + 16u; //padding
+        //std::cout << "Compressed size is: " << uiarray[0] << std::endl;
 
+        result.resize(std::size_t(uiarray[0]));
         return result;
       }
 
       /**
-       * \brief Serialisation of complete container entity.
+       *
+       * \brief Serialisation of complete container entity(with options of lossless and lossy compression of data arrays).
        *
        * \param[in] mode FileMode enum, describing the actual container specialisation.
        * \param[in] file The output stream to write data into.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
        *
-       * Serialize a complete container entity into a single binary file.
+       * Serialize a complete container entity into a single binary file with compression enabled.
+       * See \ref FEAT::LAFEM::SerialConfig for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void _serialise(FileMode mode, std::ostream & file) const
+      void _serialise(FileMode mode, std::ostream & file, const SerialConfig& config = SerialConfig()) const
       {
-        auto temp(this->template _serialise<DT2_, IT2_>(mode));
+        auto temp(this->template _serialise<DT2_, IT2_>(mode, config));
         file.write(temp.data(), long(temp.size()));
         if (!file.good())
           XABORTM("Error in _serialise - file ostream is not good anymore!");
       }
 
-      /**
-       * \brief Deserialisation of complete container entity.
+       /**
+       * \brief Deserialisation of complete container entity with possible decompression.
        *
        * \param[in] mode FileMode enum, describing the actual container specialisation.
        * \param[in] input A std::vector containing the byte array.
@@ -481,15 +765,15 @@ namespace FEAT
         tc.clear();
 
         char * array(input.data());
-        uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
+        std::uint64_t * uiarray(reinterpret_cast<std::uint64_t *>(array));
         DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
         /// \compilerhack clang seems to use older libc++ without std::underlying_type
 #if defined(FEAT_COMPILER_CLANG)
-        uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
+        std::uint64_t magic = (std::uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
-        uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
+        std::uint64_t magic = (std::uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
 #endif
         XASSERTM(magic == uiarray[1], "_deserialise: given FileMode incompatible with given array!");
 
@@ -507,52 +791,120 @@ namespace FEAT
         if (sizeof(IT_) > Type::Helper::extract_type_size(uiarray[3]))
           std::cerr<<"Warning: You are reading a container integral type in higher precision then it was saved before!"<<std::endl;
 
-        Index global_i(10);
-        for (uint64_t i(0) ; i < uiarray[6] ; ++i)
+        CompressionModes compress = (CompressionModes)uiarray[10];
+        //test whether system has right third_party software loaded:
+#ifndef FEAT_HAVE_ZLIB
+        XASSERTM((compress & CompressionModes::elements_mask) != CompressionModes::elements_zlib,
+                 "Data was compressed with ZLIB! To read in data, please configure FEAT with zlib enabled.\n For more information see FEAT documentation.");
+        XASSERTM((compress & CompressionModes::indices_mask) != CompressionModes::indices_zlib,
+                 "Data was compressed with ZLIB! To read in data, please configure FEAT with zlib enabled.\n For more information see FEAT documentation.");
+#endif
+#ifndef FEAT_HAVE_ZFP
+        XASSERTM((compress & CompressionModes::elements_mask) != CompressionModes::elements_zfp,
+                 "Data was compressed with zfp! To read in data, please configure FEAT with zfp enabled.\n For more information see FEAT documentation.");
+#endif
+        std::vector<std::uint64_t> elements_bytes(uiarray[6]); //temp arrays to keep track of bytessize of compressed arrays
+        std::vector<std::uint64_t> indices_bytes(uiarray[7]);
+        Index global_i(11);
+        for (std::uint64_t i(0) ; i < uiarray[6] ; ++i)
         {
           tc._elements_size.push_back(Index(uiarray[i + global_i]));
         }
         global_i += Index(uiarray[6]);
+        for (std::uint64_t i(0) ; i < uiarray[6] ; ++i)
+        {
+          elements_bytes[i] = uiarray[i + global_i];
+        }
+        global_i += Index(uiarray[6]);
 
-        for (uint64_t i(0) ; i < uiarray[7] ; ++i)
+        for (std::uint64_t i(0) ; i < uiarray[7] ; ++i)
         {
           tc._indices_size.push_back(Index(uiarray[i + global_i]));
         }
         global_i += Index(uiarray[7]);
+        for (std::uint64_t i(0) ; i < uiarray[7] ; ++i)
+        {
+          indices_bytes[i] = uiarray[i + global_i];
+        }
+        global_i += Index(uiarray[7]);
 
-        for (uint64_t i(0) ; i < uiarray[8] ; ++i)
+        for (std::uint64_t i(0) ; i < uiarray[8] ; ++i)
         {
           tc._scalar_index.push_back(Index(uiarray[i + global_i]));
         }
         global_i += Index(uiarray[8]);
 
-        global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_));
-        for (uint64_t i(0) ; i < uiarray[9] ; ++i)
+        global_i = Index((global_i * sizeof(std::uint64_t) + sizeof(DT2_) - 1u) / sizeof(DT2_));
+        for (std::uint64_t i(0) ; i < uiarray[9] ; ++i)
         {
           tc._scalar_dt.push_back(dtarray[i + global_i]);
         }
         global_i += Index(uiarray[9]);
 
-        for (Index i(0) ; i < Index(uiarray[4]) ; ++i)
+        Pack::Type compression_type_elements = Pack::deduct_type<DT2_>();
+        Pack::Type compression_type_index = Pack::deduct_type<IT2_>();
+        if((compress & CompressionModes::elements_mask) == CompressionModes::elements_zfp)// If zfp is used
         {
-          tc._elements.push_back(MemoryPool<Mem::Main>::template allocate_memory<DT2_>(tc._elements_size.at(i)));
-          MemoryPool<Mem::Main>::template upload<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
-          global_i += tc._elements_size.at(i);
+          compression_type_elements = compression_type_elements | Pack::Type::Mask_P;
+        }
+        else if((compress & CompressionModes::elements_mask) == CompressionModes::elements_zlib) //If zlib is loaded and zfp is not used
+        {
+          compression_type_elements = compression_type_elements | Pack::Type::Mask_Z;
+        }
+        if((compress & CompressionModes::indices_mask) == CompressionModes::indices_zlib)
+        {
+          compression_type_index = compression_type_index | Pack::Type::Mask_Z;
         }
 
-        global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_));
-        for (Index i(0) ; i < Index(uiarray[5]) ; ++i)
+        if((compress & CompressionModes::elements_mask) != CompressionModes::elements_off)
         {
-          tc._indices.push_back(MemoryPool<Mem::Main>::template allocate_memory<IT2_>(tc._indices_size.at(i)));
-          MemoryPool<Mem::Main>::template upload<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));
-          global_i += tc._indices_size.at(i);
+          global_i = Index((global_i * sizeof(DT2_) + sizeof(char) - 1u) / sizeof(char));
+          for(Index i(0); i < Index(uiarray[4]); ++i)
+          {
+            tc._elements.push_back(MemoryPool<Mem::Main>::template allocate_memory<DT2_>(tc._elements_size.at(i)));
+            if(0u == Pack::decode(tc._elements.at(i), &array[global_i], (std::size_t) tc._elements_size.at(i), (std::size_t) elements_bytes[i], compression_type_elements, false))
+              XABORTM("Cannot decode compressed elements array");
+            global_i += (Index)elements_bytes[i];
+          }
+          global_i = Index((global_i * sizeof(char) + sizeof(DT2_) - 1u) / sizeof(DT2_));
+        }
+        else
+        {
+          for (Index i(0) ; i < Index(uiarray[4]) ; ++i)
+          {
+            tc._elements.push_back(MemoryPool<Mem::Main>::template allocate_memory<DT2_>(tc._elements_size.at(i)));
+            MemoryPool<Mem::Main>::template upload<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
+            global_i += tc._elements_size.at(i);
+          }
+        }
+
+        if((compress & CompressionModes::indices_mask) != CompressionModes::indices_off)
+        {
+          global_i = Index((global_i * sizeof(DT2_) + sizeof(char) - 1u) / sizeof(char));
+          for (Index i(0) ; i < Index(uiarray[5]) ; ++i)
+          {
+            tc._indices.push_back(MemoryPool<Mem::Main>::template allocate_memory<IT2_>(tc._indices_size.at(i)));
+            if(0u == Pack::decode(tc._indices.at(i), &array[global_i], (std::size_t) tc._indices_size.at(i), (std::size_t) indices_bytes[i], compression_type_index, false))
+              XABORTM("Cannot decode compressed indice array");
+            global_i += (Index)indices_bytes[i];
+          }
+        }
+        else
+        {
+          global_i = Index((global_i * sizeof(DT2_) + sizeof(IT2_) - 1u) / sizeof(IT2_));
+          for (Index i(0) ; i < Index(uiarray[5]) ; ++i)
+          {
+            tc._indices.push_back(MemoryPool<Mem::Main>::template allocate_memory<IT2_>(tc._indices_size.at(i)));
+            MemoryPool<Mem::Main>::template upload<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));
+            global_i += tc._indices_size.at(i);
+          }
         }
 
         this->assign(tc);
       }
 
       /**
-       * \brief Deserialisation of complete container entity.
+       * \brief Deserialisation of complete container entity with possible decompression.
        *
        * \param[in] mode FileMode enum, describing the actual container specialisation.
        * \param[in] file std::istream, pointing to the input data.
@@ -562,10 +914,10 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       void _deserialise(FileMode mode, std::istream & file)
       {
-        uint64_t tsize;
-        file.read((char *)&tsize, (long)(sizeof(uint64_t)));
+        std::uint64_t tsize;
+        file.read((char *)&tsize, (long)(sizeof(std::uint64_t)));
         std::vector<char> temp((size_t(tsize)));
-        file.seekg(-(long)sizeof(uint64_t), file.cur);
+        file.seekg(-(long)sizeof(std::uint64_t), file.cur);
         file.read(temp.data(), (long)(tsize));
         if (!file.good())
           XABORTM("Error in _deserialise - file istream is not good anymore!");
@@ -793,9 +1145,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      uint64_t get_checkpoint_size()
+      std::uint64_t get_checkpoint_size(LAFEM::SerialConfig& config)
       {
-        return this->template _serialised_size<>();
+        return this->template _serialised_size<>(config);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
@@ -805,10 +1157,11 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      void set_checkpoint_data(std::vector<char>& data)
+      std::uint64_t set_checkpoint_data(std::vector<char>& data, LAFEM::SerialConfig& config)
       {
-        auto buffer = this->template _serialise<>(FileMode::fm_binary);
+        auto buffer = this->template _serialise<>(FileMode::fm_binary, config);
         data.insert(std::end(data), std::begin(buffer), std::end(buffer));
+        return std::uint64_t(buffer.size());
       }
 
       /**

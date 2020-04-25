@@ -498,14 +498,17 @@ namespace FEAT
       /**
        * \brief Serialisation of complete container entity.
        *
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
+       *
        * Serialize a complete container entity into a single binary array.
        *
        * See \ref FEAT::LAFEM::Container::_serialise for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialise()
+      std::vector<char> serialise(const LAFEM::SerialConfig& config = SerialConfig())
       {
-        return this->template _serialise<DT2_, IT2_>(FileMode::fm_sv);
+        return this->template _serialise<DT2_, IT2_>(FileMode::fm_sv, config);
       }
 
       /**
@@ -533,6 +536,10 @@ namespace FEAT
       {
         switch(mode)
         {
+          case FileMode::fm_binary:
+          case FileMode::fm_sv:
+            this->template _deserialise<double, std::uint64_t>(FileMode::fm_sv, file);
+            break;
           case FileMode::fm_mtx:
           {
             this->clear();
@@ -655,6 +662,10 @@ namespace FEAT
       {
         switch(mode)
         {
+          case FileMode::fm_binary:
+          case FileMode::fm_sv:
+            this->template _serialise<double, std::uint64_t>(FileMode::fm_sv, file);
+            break;
           case FileMode::fm_mtx:
           {
             SparseVector<Mem::Main, DT_, IT_> temp;

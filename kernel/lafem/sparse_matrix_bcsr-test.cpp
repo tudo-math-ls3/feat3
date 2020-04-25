@@ -68,7 +68,7 @@ public:
 
     DenseVector<Mem_, DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
-      dv1(i, DT_(i+1));
+      dv1(i, DT_(i+1)/DT_(7*i+1));
     DenseVector<Mem_, IT_, IT_> dv2(2);
     dv2(0, IT_(0));
     dv2(1, IT_(1));
@@ -79,7 +79,7 @@ public:
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
     TEST_CHECK_EQUAL(c(1,0)(0,0), DT_(0));
-    TEST_CHECK_EQUAL(c(1,1)(1,1), DT_(11));
+    TEST_CHECK_EQUAL(c(1,1)(1,1), DT_(10+1)/DT_(7*10+1));
 
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> d;
     d.convert(c);
@@ -106,25 +106,6 @@ public:
     TEST_CHECK_NOT_EQUAL((void*)f.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)f.row_ptr(), (void*)c.row_ptr());
 
-    BinaryStream bs;
-    c.write_out(FileMode::fm_bcsr, bs);
-    bs.seekg(0);
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> g(FileMode::fm_bcsr, bs);
-    TEST_CHECK_EQUAL(g, c);
-
-    /*std::stringstream ts;
-    f.write_out(FileMode::fm_mtx, ts);
-    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, f);
-
-    std::stringstream ts2;
-    f.write_out_mtx(ts2, true);
-    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
-    TEST_CHECK_EQUAL(j2, f);*/
-
-    auto kp = c.serialise();
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> k(kp);
-    TEST_CHECK_EQUAL(k, c);
   }
 };
 SparseMatrixBCSRTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_test_float_ulong;
@@ -142,6 +123,90 @@ SparseMatrixBCSRTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_tes
 SparseMatrixBCSRTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_test_double_uint;
 #endif
 
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixBCSRSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRSerialiseTest")
+  {
+  }
+
+  virtual ~SparseMatrixBCSRSerialiseTest()
+  {
+  }
+  virtual void run() const override
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(12);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+      dv1(i, DT_(i+1)/DT_(7*i+1));
+    DenseVector<Mem_, IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+
+    BinaryStream bs;
+    c.write_out(FileMode::fm_bcsr, bs);
+    bs.seekg(0);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> g(FileMode::fm_bcsr, bs);
+    TEST_CHECK_EQUAL(g, c);
+
+    /*std::stringstream ts;
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, f);
+
+    std::stringstream ts2;
+    f.write_out_mtx(ts2, true);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
+    TEST_CHECK_EQUAL(j2, f);*/
+
+    auto kp = c.serialise(LAFEM::SerialConfig(false, false));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> k(kp);
+    TEST_CHECK_EQUAL(k, c);
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = c.serialise(LAFEM::SerialConfig(true, false));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zlib(zl);
+    TEST_CHECK_EQUAL(k, c);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = c.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zfp(zf);
+    for(Index i(0) ; i < c.rows() ; ++i)
+    {
+      for(Index j(0) ; j < c.columns() ; ++j)
+      {
+        for(int q(0) ; q < c(i,j).m ; ++q)
+        {
+          for(int w(0) ; w < c(i,j).n ; ++w)
+          {
+            TEST_CHECK_EQUAL_WITHIN_EPS(c(i,j)(q,w), zfp(i,j)(q,w), DT_(1e-5));
+          }
+        }
+      }
+    }
+#endif
+  }
+};
+
+SparseMatrixBCSRSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_serialise_test_float_ulong;
+SparseMatrixBCSRSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_serialise_test_double_ulong;
+SparseMatrixBCSRSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_serialise_test_float_uint;
+SparseMatrixBCSRSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_serialise_test_double_uint;
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_serialise_test_float_ulong;
+SparseMatrixBCSRSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_serialise_test_double_ulong;
+SparseMatrixBCSRSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_serialise_test_float_uint;
+SparseMatrixBCSRSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_serialise_test_double_uint;
+#endif
 /**
  * \brief Test class for the sparse matrix csr blocked apply method.
  *

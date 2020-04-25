@@ -339,17 +339,17 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      uint64_t get_checkpoint_size()
+      std::uint64_t get_checkpoint_size(SerialConfig& config)
       {
-        return sizeof(uint64_t) + _first.get_checkpoint_size() + _rest.get_checkpoint_size(); //sizeof(uint64_t) bits needed to store lenght of checkpointed _first
+        return sizeof(std::uint64_t) + _first.get_checkpoint_size(config) + _rest.get_checkpoint_size(config); //sizeof(std::uint64_t) bits needed to store lenght of checkpointed _first
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
       void restore_from_checkpoint_data(std::vector<char> & data)
       {
-        uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed _first
-        std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t);
-        std::vector<char>::iterator last_of_first = std::begin(data) + sizeof(uint64_t) + (int) isize;
+        std::uint64_t isize = *(std::uint64_t*) data.data(); //get size of checkpointed _first
+        std::vector<char>::iterator start = std::begin(data) + sizeof(std::uint64_t);
+        std::vector<char>::iterator last_of_first = std::begin(data) + sizeof(std::uint64_t) + (int) isize;
         std::vector<char> buffer_first(start, last_of_first);
         _first.restore_from_checkpoint_data(buffer_first);
 
@@ -358,15 +358,18 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      void set_checkpoint_data(std::vector<char>& data)
+      std::uint64_t set_checkpoint_data(std::vector<char>& data, SerialConfig& config)
       {
-        uint64_t isize = _first.get_checkpoint_size();
-        char* csize = reinterpret_cast<char*>(&isize);
+        std::size_t old_size = data.size();
+        data.insert(std::end(data), sizeof(std::uint64_t), 0); //add placeholder
+        std::uint64_t ireal_size = _first.set_checkpoint_data(data, config); //add data of _first to the overall checkpoint and save its size
+        char* csize = reinterpret_cast<char*>(&ireal_size);
+        for(std::size_t i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the guessed datalength
+        {
+          data[old_size + i] = csize[i];
+        }
 
-        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed _first element to the overall checkpoint data
-        _first.set_checkpoint_data(data); //add data of _first to the overall checkpoint
-
-        _rest.set_checkpoint_data(data); //generate and add checkpoint data for the _rest
+        return sizeof(std::uint64_t) + ireal_size + _rest.set_checkpoint_data(data, config); //generate and add checkpoint data for the _rest
       }
 
       /// \cond internal
@@ -857,9 +860,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      uint64_t get_checkpoint_size()
+      std::uint64_t get_checkpoint_size(SerialConfig& config)
       {
-        return _first.get_checkpoint_size();
+        return _first.get_checkpoint_size(config);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
@@ -869,9 +872,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      void set_checkpoint_data(std::vector<char>& data)
+      std::uint64_t set_checkpoint_data(std::vector<char>& data, SerialConfig& config)
       {
-        _first.set_checkpoint_data(data);
+        return _first.set_checkpoint_data(data, config);
       }
 
       SubMatrixType& first()

@@ -109,32 +109,7 @@ public:
     decltype(c) d(c.layout());
     TEST_CHECK_NOT_EQUAL((void*)d.row_indices(), (void*)c.row_indices());
 
-    SparseMatrixCOO<Mem_, DT_, IT_> f(10, 10);
-    for (Index row(0) ; row < f.rows() ; ++row)
-    {
-      for (Index col(0) ; col < f.columns() ; ++col)
-      {
-        if(row == col)
-          f(row, col, DT_(2));
-        else if((row == col+1) || (row+1 == col))
-          f(row, col, DT_(-1));
-      }
-    }
 
-    BinaryStream bs;
-    f.write_out(FileMode::fm_coo, bs);
-    bs.seekg(0);
-    SparseMatrixCOO<Mem_, DT_, IT_> g(FileMode::fm_coo, bs);
-    TEST_CHECK_EQUAL(g, f);
-
-    std::stringstream ts;
-    f.write_out(FileMode::fm_mtx, ts);
-    SparseMatrixCOO<Mem_, DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, f);
-
-    auto kp = f.serialise();
-    SparseMatrixCOO<Mem_, DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, f);
 
     SparseMatrixCSR<Mem_, DT_, IT_> csr00;
     SparseMatrixCOO<Mem_, DT_, IT_> l00(csr00);
@@ -166,6 +141,86 @@ SparseMatrixCOOTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_coo_test
 SparseMatrixCOOTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_coo_test_double_ulong;
 #endif
 
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCOOSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixCOOSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOSerialiseTest")
+  {
+  }
+
+  virtual ~SparseMatrixCOOSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    SparseMatrixCOO<Mem_, DT_, IT_> f(10, 10);
+    SparseMatrixCOO<Mem_, DT_, IT_> zfp_tester(10, 10);
+    for (Index row(0) ; row < f.rows() ; ++row)
+    {
+      for (Index col(0) ; col < f.columns() ; ++col)
+      {
+        if(row == col)
+        {
+          f(row, col, DT_(2));
+          zfp_tester(row, col, DT_(1.)/DT_(row * col + 1));
+        }
+        else if((row == col+1) || (row+1 == col))
+        {
+          f(row, col, DT_(-1));
+          zfp_tester(row, col, DT_(1.)/DT_(row * col + 1));
+        }
+      }
+    }
+
+    BinaryStream bs;
+    f.write_out(FileMode::fm_coo, bs);
+    bs.seekg(0);
+    SparseMatrixCOO<Mem_, DT_, IT_> g(FileMode::fm_coo, bs);
+    TEST_CHECK_EQUAL(g, f);
+
+    std::stringstream ts;
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixCOO<Mem_, DT_, IT_> j(FileMode::fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, f);
+
+    auto kp = f.serialise(LAFEM::SerialConfig(false, false));
+    SparseMatrixCOO<Mem_, DT_, IT_> k(kp);
+    TEST_CHECK_EQUAL(k, f);
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = f.serialise(LAFEM::SerialConfig(true, false));
+    SparseMatrixCOO<Mem_, DT_, IT_> zlib(zl);
+    TEST_CHECK_EQUAL(zlib, f);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = zfp_tester.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseMatrixCOO<Mem_, DT_, IT_> zfp(zf);
+    for(Index i_ind(0) ; i_ind < zfp_tester.rows() ; ++i_ind)
+    {
+      for(Index j_ind(0) ; j_ind < zfp_tester.columns() ; ++j_ind)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp_tester(i_ind,j_ind), zfp(i_ind,j_ind), DT_(1e-4));
+      }
+    }
+#endif
+  }
+};
+SparseMatrixCOOSerialiseTest<Mem::Main, float, unsigned int> sparse_matrix_coo_serialise_test_float_uint;
+SparseMatrixCOOSerialiseTest<Mem::Main, double, unsigned int> sparse_matrix_coo_serialise_test_double_uint;
+SparseMatrixCOOSerialiseTest<Mem::Main, float, unsigned long> sparse_matrix_coo_serialise_test_float_ulong;
+SparseMatrixCOOSerialiseTest<Mem::Main, double, unsigned long> sparse_matrix_coo_serialise_test_double_ulong;
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCOOSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_coo_serialise_test_float_uint;
+SparseMatrixCOOSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_coo_serialise_test_double_uint;
+SparseMatrixCOOSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_coo_serialise_test_float_ulong;
+SparseMatrixCOOSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_coo_serialise_test_double_ulong;
+#endif
 
 template<
   typename Mem_,

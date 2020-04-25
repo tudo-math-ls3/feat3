@@ -141,6 +141,46 @@ public:
     DT_ rnd_min = -rnd_vec.max_element();
     TEST_CHECK_IN_RANGE(rnd_min, rnd_range[0], rnd_range[1]);
 
+  }
+};
+DenseVectorBlockedTest<Mem::Main, float, unsigned int> cpu_dense_vector_blocked_test_float_uint;
+DenseVectorBlockedTest<Mem::Main, double, unsigned int> cpu_dense_vector_blocked_test_double_uint;
+DenseVectorBlockedTest<Mem::Main, float, unsigned long> cpu_dense_vector_blocked_test_float_ulong;
+DenseVectorBlockedTest<Mem::Main, double, unsigned long> cpu_dense_vector_blocked_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_blocked_test_float128_uint;
+DenseVectorBlockedTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_blocked_test_float128_ulong;
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_blocked_test_float_uint;
+DenseVectorBlockedTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_blocked_test_double_uint;
+DenseVectorBlockedTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_blocked_test_float_ulong;
+DenseVectorBlockedTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_blocked_test_double_ulong;
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseVectorBlockedSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorBlockedSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedSerialiseTest")
+  {
+  }
+
+  virtual ~DenseVectorBlockedSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<Mem_, DT_, IT_> dv(12, DT_(2));
+    dv(7, DT_(3));
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> g(dv);
+
     std::stringstream mts;
     g.write_out(FileMode::fm_mtx, mts);
     DenseVectorBlocked<Mem_, DT_, IT_, 3> l(FileMode::fm_mtx, mts);
@@ -163,26 +203,43 @@ public:
     /*for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), DT_(1e-5));*/
 
-    auto op = g.serialise();
+    DenseVector<Mem_,DT_,IT_> zfp_tester(20);
+    for(Index i(0); i < zfp_tester.size() ; ++i)
+    {
+      zfp_tester(i, DT_(7)/(((DT_(i)+DT_(0.5))*DT_(i+1))));
+    }
+    DenseVectorBlocked<Mem_, DT_, IT_, 5> tester_blocked(zfp_tester);
+    auto op = g.serialise(LAFEM::SerialConfig(false, false));
     DenseVectorBlocked<Mem_, DT_, IT_, 3> o(op);
     TEST_CHECK_EQUAL(o, g);
-    /*for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), DT_(1e-5));*/
+#ifdef FEAT_HAVE_ZLIB
+    auto zb = tester_blocked.serialise(LAFEM::SerialConfig(true,false));
+    DenseVectorBlocked<Mem_, DT_, IT_, 5> zlib(zb);
+    TEST_CHECK_EQUAL(zlib, tester_blocked);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zp = tester_blocked.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    DenseVectorBlocked<Mem_, DT_, IT_, 5> zfp(zp);
+    for (Index i(0) ; i < tester_blocked.size() ; ++i)
+    {
+      auto tst = zfp(i);
+      for(int j(0) ; j < tst.n ; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(tst[j], tester_blocked(i)[j], DT_(1e-5));
+      }
+    }
+#endif
   }
 };
-DenseVectorBlockedTest<Mem::Main, float, unsigned int> cpu_dense_vector_blocked_test_float_uint;
-DenseVectorBlockedTest<Mem::Main, double, unsigned int> cpu_dense_vector_blocked_test_double_uint;
-DenseVectorBlockedTest<Mem::Main, float, unsigned long> cpu_dense_vector_blocked_test_float_ulong;
-DenseVectorBlockedTest<Mem::Main, double, unsigned long> cpu_dense_vector_blocked_test_double_ulong;
-#ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_blocked_test_float128_uint;
-DenseVectorBlockedTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_blocked_test_float128_ulong;
-#endif
+DenseVectorBlockedSerialiseTest<Mem::Main, float, unsigned int> cpu_dense_vector_blocked_serialise_test_float_uint;
+DenseVectorBlockedSerialiseTest<Mem::Main, double, unsigned int> cpu_dense_vector_blocked_serialise_test_double_uint;
+DenseVectorBlockedSerialiseTest<Mem::Main, float, unsigned long> cpu_dense_vector_blocked_serialise_test_float_ulong;
+DenseVectorBlockedSerialiseTest<Mem::Main, double, unsigned long> cpu_dense_vector_blocked_serialise_test_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_blocked_test_float_uint;
-DenseVectorBlockedTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_blocked_test_double_uint;
-DenseVectorBlockedTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_blocked_test_float_ulong;
-DenseVectorBlockedTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_blocked_test_double_ulong;
+DenseVectorBlockedSerialiseTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_blocked_serialise_test_float_uint;
+DenseVectorBlockedSerialiseTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_blocked_serialise_test_double_uint;
+DenseVectorBlockedSerialiseTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_blocked_serialise_test_float_ulong;
+DenseVectorBlockedSerialiseTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_blocked_serialise_test_double_ulong;
 #endif
 
 template<

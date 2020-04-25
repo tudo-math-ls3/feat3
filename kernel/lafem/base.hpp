@@ -39,6 +39,7 @@ namespace FEAT
       fm_bm, /**< Internal: Binary banded data */
       fm_dm,  /**< Internal: Binary dense matrix data */
       fm_sv,  /**< Internal: Binary sparse vector data */
+      fm_svb, /**< Internal: Binary block sparse vector data */
       fm_dvb, /**< Internal: Binary block vector data */
       fm_bcsr, /**< Internal: Binary block csr data */
       fm_cscr, /**< Internal: Binary cscr data */
@@ -98,6 +99,37 @@ namespace FEAT
       disabled = 0, /**< do not use memory pinning */
       enabled /** < enable memory pinning (for fast device <-> host transfers) */
     };
+        /**
+     * Supported Compression modes.
+     *
+     */
+    enum class CompressionModes : uint64_t
+    {
+      None = 0x0000000000000000, /**< None, for comparison */
+      elements_mask = 0x00000000000000F0, /**< element compression mask */
+      indices_mask = 0x000000000000000F, /** indice compression mask */
+
+      compression_off = 0x0000000000000011, /**< compression off */
+
+      elements_off = 0x0000000000000010, /**< _elements no compression */
+      elements_zlib = 0x0000000000000040,/**< _elements zlib compression */
+      elements_zfp = 0x0000000000000080,/**< _elements zfp compression */
+
+      indices_off = 0x0000000000000001, /**< _indices no_compression */
+      indices_zlib = 0x0000000000000004, /**< _indices zlib_compression */
+    }; //enum class type
+
+    /// bit-wise AND operator for CompressionModes
+    inline CompressionModes operator&(CompressionModes a, CompressionModes b)
+    {
+      return (CompressionModes)(((uint64_t)a) & ((uint64_t)b));
+    }
+
+    /// bit-wise OR operator for Pack::Type
+    inline CompressionModes operator|(CompressionModes a, CompressionModes b)
+    {
+      return (CompressionModes)(((uint64_t)a) | ((uint64_t)b));
+    }
   } // namespace LAFEM
 } // namespace FEAT
 

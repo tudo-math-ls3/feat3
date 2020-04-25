@@ -113,8 +113,43 @@ public:
     TEST_CHECK_EQUAL((void*)y.cs(), (void*)b.cs());
     TEST_CHECK_EQUAL((void*)y.cl(), (void*)b.cl());
     TEST_CHECK_EQUAL((void*)y.rl(), (void*)b.rl());
+  }
+};
 
+SparseMatrixELLTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_ell_test_float_ulong;
+SparseMatrixELLTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_ell_test_double_ulong;
+SparseMatrixELLTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_ell_test_float_uint;
+SparseMatrixELLTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_ell_test_double_uint;
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixELLTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_ell_test_float128_ulong;
+SparseMatrixELLTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_ell_test_float128_uint;
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixELLTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_ell_test_float_ulong;
+SparseMatrixELLTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_ell_test_double_ulong;
+SparseMatrixELLTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_ell_test_float_uint;
+SparseMatrixELLTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_ell_test_double_uint;
+#endif
 
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixELLSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixELLSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLSerialiseTest")
+  {
+  }
+
+  virtual ~SparseMatrixELLSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
     SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
     for (Index row(0) ; row < fcoo.rows() ; ++row)
     {
@@ -139,27 +174,37 @@ public:
     SparseMatrixELL<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
 
-    auto kp = f.serialise();
+    auto kp = f.serialise(LAFEM::SerialConfig(false, false));
     SparseMatrixELL<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, f);
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = f.serialise(LAFEM::SerialConfig(true, false));
+    SparseMatrixELL<Mem_, DT_, IT_> zlib(zl);
+    TEST_CHECK_EQUAL(zlib, f);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = f.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseMatrixELL<Mem_, DT_, IT_> zfp(zf);
+    for(Index row(0) ; row < f.rows() ; ++row)
+    {
+      for(Index col(0) ; col < f.columns() ; ++col)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), f(row, col), DT_(1e-4));
+      }
+    }
+#endif
   }
 };
-
-SparseMatrixELLTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_ell_test_float_ulong;
-SparseMatrixELLTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_ell_test_double_ulong;
-SparseMatrixELLTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_ell_test_float_uint;
-SparseMatrixELLTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_ell_test_double_uint;
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixELLTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_ell_test_float128_ulong;
-SparseMatrixELLTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_ell_test_float128_uint;
-#endif
+SparseMatrixELLSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_ell_serialise_test_float_ulong;
+SparseMatrixELLSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_ell_serialise_test_double_ulong;
+SparseMatrixELLSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_ell_serialise_test_float_uint;
+SparseMatrixELLSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_ell_serialise_test_double_uint;
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixELLTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_ell_test_float_ulong;
-SparseMatrixELLTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_ell_test_double_ulong;
-SparseMatrixELLTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_ell_test_float_uint;
-SparseMatrixELLTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_ell_test_double_uint;
+SparseMatrixELLSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_ell_serialise_test_float_ulong;
+SparseMatrixELLSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_ell_serialise_test_double_ulong;
+SparseMatrixELLSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_ell_serialise_test_float_uint;
+SparseMatrixELLSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_ell_serialise_test_double_uint;
 #endif
-
 
 template<
   typename Mem_,

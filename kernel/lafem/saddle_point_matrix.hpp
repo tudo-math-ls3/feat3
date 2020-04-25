@@ -583,24 +583,24 @@ namespace FEAT
       /// \endcond
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      uint64_t get_checkpoint_size()
+      std::uint64_t get_checkpoint_size(SerialConfig& config)
       {
-        return (3 * sizeof(uint64_t)) + this->block_a().get_checkpoint_size() + this->block_b().get_checkpoint_size() + this->block_d().get_checkpoint_size();
+        return (3 * sizeof(std::uint64_t)) + this->block_a().get_checkpoint_size(config) + this->block_b().get_checkpoint_size(config) + this->block_d().get_checkpoint_size(config);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
       void restore_from_checkpoint_data(std::vector<char> & data)
       {
-        uint64_t isize = *(uint64_t*) data.data(); //get size of checkpointed block a
-        std::vector<char>::iterator start = std::begin(data) + sizeof(uint64_t); //get iterator at the beginning of block a
-        std::vector<char>::iterator end = std::begin(data) + sizeof(uint64_t) + (int) isize; //get iterator at the beginning of block a
+        std::uint64_t isize = *(std::uint64_t*) data.data(); //get size of checkpointed block a
+        std::vector<char>::iterator start = std::begin(data) + sizeof(std::uint64_t); //get iterator at the beginning of block a
+        std::vector<char>::iterator end = std::begin(data) + sizeof(std::uint64_t) + (int) isize; //get iterator at the beginning of block a
         std::vector<char> buffer_a(start, end); //copy the data of block a to fresh vector
         this->block_a().restore_from_checkpoint_data(buffer_a);
 
         data.erase(std::begin(data), end);
-        isize = *(uint64_t*) data.data();
-        start = std::begin(data) + sizeof(uint64_t);
-        end = std::begin(data) + sizeof(uint64_t) + (int) isize;
+        isize = *(std::uint64_t*) data.data();
+        start = std::begin(data) + sizeof(std::uint64_t);
+        end = std::begin(data) + sizeof(std::uint64_t) + (int) isize;
         std::vector<char> buffer_b(start, end);
         this->block_b().restore_from_checkpoint_data(buffer_b);
 
@@ -609,19 +609,29 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      void set_checkpoint_data(std::vector<char>& data)
+      std::uint64_t set_checkpoint_data(std::vector<char>& data, SerialConfig& config)
       {
-        uint64_t isize = this->block_a().get_checkpoint_size();
-        char* csize = reinterpret_cast<char*>(&isize);
-        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed block a to the overall checkpoint data
-        this->block_a().set_checkpoint_data(data); //add data of block a to the overall checkpoint
+        std::size_t old_size = data.size();
+        data.insert(std::end(data), sizeof(std::uint64_t),0); //add placeholder
+        std::uint64_t ireal_size = this->block_a().set_checkpoint_data(data, config); //add data of block a to the overall checkpoint
+        std::uint64_t ret_size = ireal_size;
+        char* csize = reinterpret_cast<char*>(&ireal_size);
+        for(std::size_t i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the guessed datalength
+        {
+          data[old_size + i] = csize[i];
+        }
 
-        isize = this->block_b().get_checkpoint_size();
-        csize = reinterpret_cast<char*>(&isize);
-        data.insert(std::end(data), csize, csize + sizeof(uint64_t)); //add lenght of checkpointed block b to the overall checkpoint data
-        this->block_b().set_checkpoint_data(data); //add data of block b to the overall checkpoint
+        old_size = data.size();
+        data.insert(std::end(data), sizeof(std::uint64_t), 0); //add placeholder
+        ireal_size = this->block_b().set_checkpoint_data(data, config); //add data of block b to the overall checkpoint
+        ret_size += ireal_size;
+        csize = reinterpret_cast<char*>(&ireal_size);
+        for(uint i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the guessed datalength
+        {
+          data[old_size + i] = csize[i];
+        }
 
-        this->block_d().set_checkpoint_data(data); //add data of block d to the overall checkpoint
+        return 2*sizeof(std::uint64_t) + ret_size + this->block_d().set_checkpoint_data(data, config); //add data of block d to the overall checkpoint
       }
 
       /**

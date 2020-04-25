@@ -391,9 +391,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      uint64_t get_checkpoint_size()
+      std::uint64_t get_checkpoint_size(SerialConfig& config)
       {
-        return _container.get_checkpoint_size();
+        return _container.get_checkpoint_size(config);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
@@ -403,9 +403,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      void set_checkpoint_data(std::vector<char>& data)
+      std::uint64_t set_checkpoint_data(std::vector<char>& data, SerialConfig& config)
       {
-        _container.set_checkpoint_data(data);
+        return _container.set_checkpoint_data(data, config);
       }
 
       /**

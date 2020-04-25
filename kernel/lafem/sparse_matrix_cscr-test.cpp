@@ -125,23 +125,6 @@ public:
     SparseMatrixCSCR<Mem_, DT_, IT_> d(a.clone());
     TEST_CHECK_EQUAL(d, c);
 
-    BinaryStream bs;
-    a.write_out(FileMode::fm_cscr, bs);
-    //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
-    bs.seekg(0);
-    SparseMatrixCSCR<Mem_, DT_, IT_> e(FileMode::fm_cscr, bs);
-    TEST_CHECK_EQUAL(e.rows(), 10);
-    TEST_CHECK_EQUAL(e.columns(), 10);
-    TEST_CHECK_EQUAL(e.size(), 100);
-    TEST_CHECK_EQUAL(e.used_rows(), 3);
-    for (Index row(0) ; row < e.rows() ; ++row)
-    {
-      for (Index col(0) ; col < e.columns() ; ++col)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(e(row, col), a(row, col), Math::eps<DT_>());
-      }
-    }
-    //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
 
     SparseMatrixCOO<Mem_, DT_, IT_> coo(10, 10);
     coo(0, 3, DT_(1));
@@ -187,6 +170,120 @@ SparseMatrixCSCRTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_cscr_t
 SparseMatrixCSCRTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_cscr_test_float_uint;
 SparseMatrixCSCRTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_cscr_test_double_uint;
 #endif*/
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSCRSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   SparseMatrixCSCRSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSCRSerialiseTest")
+  {
+  }
+
+  virtual ~SparseMatrixCSCRSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<Mem_, DT_, IT_> val(7);
+    DenseVector<Mem_, IT_, IT_> col_ind(7);
+    for (Index i(0) ; i < val.size() ; ++i)
+    {
+      val(i, DT_(i+1));
+      col_ind(i, IT_(i + 3));
+    }
+    DenseVector<Mem_, IT_, IT_> row_ptr(4);
+    row_ptr(0, IT_(0));
+    row_ptr(1, IT_(2));
+    row_ptr(2, IT_(5));
+    row_ptr(3, IT_(6));
+    DenseVector<Mem_, IT_, IT_> row_numbers(3);
+    row_numbers(0, IT_(0));
+    row_numbers(1, IT_(4));
+    row_numbers(2, IT_(8));
+
+    SparseMatrixCSCR<Mem_, DT_, IT_> a(10, 10, col_ind, val, row_ptr, row_numbers);
+
+    BinaryStream bs;
+    a.write_out(FileMode::fm_cscr, bs);
+    //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
+    bs.seekg(0);
+    SparseMatrixCSCR<Mem_, DT_, IT_> e(FileMode::fm_cscr, bs);
+    TEST_CHECK_EQUAL(e.rows(), 10);
+    TEST_CHECK_EQUAL(e.columns(), 10);
+    TEST_CHECK_EQUAL(e.size(), 100);
+    TEST_CHECK_EQUAL(e.used_rows(), 3);
+    for (Index row(0) ; row < e.rows() ; ++row)
+    {
+      for (Index col(0) ; col < e.columns() ; ++col)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(e(row, col), a(row, col), Math::eps<DT_>());
+      }
+    }
+    auto l = a.serialise(LAFEM::SerialConfig(false, false));
+    SparseMatrixCSCR<Mem_, DT_, IT_> tst(l);
+    TEST_CHECK_EQUAL(tst.rows(), a.rows());
+    TEST_CHECK_EQUAL(tst.columns(), a.columns());
+    TEST_CHECK_EQUAL(tst.size(), a.size());
+    TEST_CHECK_EQUAL(tst.used_rows(), a.used_rows());
+    for (Index row(0) ; row < a.rows() ; ++row)
+    {
+      for (Index col(0) ; col < a.columns() ; ++col)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(tst(row, col), a(row, col), Math::eps<DT_>());
+      }
+    }
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = a.serialise(LAFEM::SerialConfig(true, false));
+    SparseMatrixCSCR<Mem_, DT_, IT_> zlib(zl);
+    TEST_CHECK_EQUAL(zlib.rows(), a.rows());
+    TEST_CHECK_EQUAL(zlib.columns(), a.columns());
+    TEST_CHECK_EQUAL(zlib.size(), a.size());
+    TEST_CHECK_EQUAL(zlib.used_rows(), a.used_rows());
+    for (Index row(0) ; row < a.rows() ; ++row)
+    {
+      for (Index col(0) ; col < a.columns() ; ++col)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(zlib(row, col), a(row, col), Math::eps<DT_>());
+      }
+    }
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zf = a.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    SparseMatrixCSCR<Mem_, DT_, IT_> zfp(zf);
+    TEST_CHECK_EQUAL(zfp.rows(), a.rows());
+    TEST_CHECK_EQUAL(zfp.columns(), a.columns());
+    TEST_CHECK_EQUAL(zfp.size(), a.size());
+    TEST_CHECK_EQUAL(zfp.used_rows(), a.used_rows());
+    for (Index row(0) ; row < a.rows() ; ++row)
+    {
+      for (Index col(0) ; col < a.columns() ; ++col)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), a(row, col), DT_(1e-4));
+      }
+    }
+#endif
+
+    //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
+
+  }
+};
+SparseMatrixCSCRSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_cscr_serialise_test_float_ulong;
+SparseMatrixCSCRSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_cscr_serialise_test_double_ulong;
+SparseMatrixCSCRSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_cscr_serialise_test_float_uint;
+SparseMatrixCSCRSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_cscr_serialise_test_double_uint;
+/*#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSCRSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_cscr_serialise_test_float_ulong;
+SparseMatrixCSCRSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_cscr_serialise_test_double_ulong;
+SparseMatrixCSCRSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_cscr_serialise_test_float_uint;
+SparseMatrixCSCRSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_cscr_serialise_test_double_uint;
+#endif*/
+
 
 template<
   typename Mem_,

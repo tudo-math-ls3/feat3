@@ -737,7 +737,7 @@ namespace FEAT
      * An estimated (upper bound) array buffer size.
      *
      */
-    std::size_t lossy_estimate_size(const std::size_t count, const Pack::Type type, const double tolerance)
+    static std::size_t lossy_estimate_size(const std::size_t count, const Pack::Type type, const double tolerance)
     {
       if(count <= std::size_t(0))
         return std::size_t(0);

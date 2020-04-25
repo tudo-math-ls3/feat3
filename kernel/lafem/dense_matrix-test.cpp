@@ -2,7 +2,6 @@
 // Copyright (C) 2010 - 2020 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
@@ -36,7 +35,7 @@ class DenseMatrixTest
 public:
 
   DenseMatrixTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("dense_matrix_test")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixTest")
   {
   }
 
@@ -74,9 +73,7 @@ public:
     TEST_CHECK_NOT_EQUAL(h, c);
     TEST_CHECK_NOT_EQUAL((void *)h.elements(), (void *)c.elements());
 
-    auto kp = b.serialise();
-    DenseMatrix<Mem_, DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, b);
+
 
     // Lehmer matrix inverse test
     DenseMatrix<Mem_, DT_, IT_> l(11, 11);
@@ -97,7 +94,73 @@ public:
       }
     }
 
-   // DenseMatrix write_out test
+  }
+};
+DenseMatrixTest<Mem::Main, float, unsigned int> cpu_dense_matrix_test_float_uint;
+DenseMatrixTest<Mem::Main, double, unsigned int> cpu_dense_matrix_test_double_uint;
+DenseMatrixTest<Mem::Main, float, unsigned long> cpu_dense_matrix_test_float_ulong;
+DenseMatrixTest<Mem::Main, double, unsigned long> cpu_dense_matrix_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixTest<Mem::Main, __float128, unsigned int> cpu_dense_matrix_test_float128_uint;
+DenseMatrixTest<Mem::Main, __float128, unsigned long> cpu_dense_matrix_test_float128_ulong;
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_test_float_uint;
+DenseMatrixTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_test_double_uint;
+DenseMatrixTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_test_float_ulong;
+DenseMatrixTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_test_double_ulong;
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseMatrixSerialiseTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+
+public:
+
+  DenseMatrixSerialiseTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixSerialiseTest")
+  {
+  }
+
+  virtual ~DenseMatrixSerialiseTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseMatrix<Mem_, DT_, IT_> test_mat(40, 40);
+    for(Index i(0) ; i < test_mat.rows() ; ++i)
+    {
+      for(Index j(0) ; j < test_mat.rows() ; ++j)
+      {
+        test_mat(i,j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
+      }
+    }
+    auto kp = test_mat.serialise(LAFEM::SerialConfig(false, false));
+    DenseMatrix<Mem_, DT_, IT_> k(kp);
+    TEST_CHECK_EQUAL(k, test_mat);
+#ifdef FEAT_HAVE_ZLIB
+    auto zl = test_mat.serialise(LAFEM::SerialConfig(true, false));
+    DenseMatrix<Mem_, DT_, IT_> k1(zl);
+    TEST_CHECK_EQUAL(k1, test_mat);
+#endif
+#ifdef FEAT_HAVE_ZFP
+    auto zfp = test_mat.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-6)));
+    DenseMatrix<Mem_, DT_, IT_> k2(zfp);
+    for(Index i(0) ; i < k2.rows() ; ++i)
+    {
+      for(Index j(0) ; j < k2.rows() ; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(k2(i, j), test_mat(i, j), (DT_)1e-6);
+      }
+    }
+#endif
+
+    // DenseMatrix write_out test
     DenseMatrix<Mem_, DT_, IT_> u(11, 11);
     for(Index i(0) ; i < u.rows() ; ++i)
     {
@@ -166,21 +229,16 @@ public:
     */
   }
 };
-DenseMatrixTest<Mem::Main, float, unsigned int> cpu_dense_matrix_test_float_uint;
-DenseMatrixTest<Mem::Main, double, unsigned int> cpu_dense_matrix_test_double_uint;
-DenseMatrixTest<Mem::Main, float, unsigned long> cpu_dense_matrix_test_float_ulong;
-DenseMatrixTest<Mem::Main, double, unsigned long> cpu_dense_matrix_test_double_ulong;
-#ifdef FEAT_HAVE_QUADMATH
-DenseMatrixTest<Mem::Main, __float128, unsigned int> cpu_dense_matrix_test_float128_uint;
-DenseMatrixTest<Mem::Main, __float128, unsigned long> cpu_dense_matrix_test_float128_ulong;
-#endif
+DenseMatrixSerialiseTest<Mem::Main, float, unsigned int> cpu_dense_matrix_serialise_test_float_uint;
+DenseMatrixSerialiseTest<Mem::Main, double, unsigned int> cpu_dense_matrix_serialise_test_double_uint;
+DenseMatrixSerialiseTest<Mem::Main, float, unsigned long> cpu_dense_matrix_serialise_test_float_ulong;
+DenseMatrixSerialiseTest<Mem::Main, double, unsigned long> cpu_dense_matrix_serialise_test_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_test_float_uint;
-DenseMatrixTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_test_double_uint;
-DenseMatrixTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_test_float_ulong;
-DenseMatrixTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_test_double_ulong;
+DenseMatrixSerialiseTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_serialise_test_float_uint;
+DenseMatrixSerialiseTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_serialise_test_double_uint;
+DenseMatrixSerialiseTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_serialise_test_float_ulong;
+DenseMatrixSerialiseTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_serialise_test_double_ulong;
 #endif
-
 
 template<
   typename Mem_,
