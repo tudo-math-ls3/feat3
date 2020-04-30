@@ -379,6 +379,9 @@ namespace FEAT
     MPI_File_open(comm.mpi_comm(), filename.c_str(), amode, MPI_INFO_NULL, &file);
     XASSERTM(file != MPI_FILE_NULL, "failed to open file via MPI_File_open");
 
+    // broadcast file size
+    comm.bcast(&file_size, std::size_t(1), root_rank);
+
     // set final file size
     MPI_File_set_size(file, MPI_Offset(file_size));
 
