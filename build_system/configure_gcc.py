@@ -166,7 +166,10 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=cascadelake -m64"
+        if major >= 9:
+          cxxflags += " -march=cascadelake -m64"
+        else:
+          cxxflags += " -march=skylake -m64"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
