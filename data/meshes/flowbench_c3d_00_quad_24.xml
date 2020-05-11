@@ -1,0 +1,234 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This mesh is the 2D plane of the 3D "flow around a cylinder" benchmark,
+    which can be used to generate a 3D hexa mesh using the mesh-extruder tool.
+    Note that the domain is slightly different from the 2D case.
+    This mesh consists of 24 quadrilateral cells.
+    This is the mesh that was used in the old FEAT versions.
+  </Info>
+  <Chart name="circle">
+    <Circle radius="0.05" midpoint="0.5 0.2" domain="1.5 0.5" />
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="35 59 24">
+    <Vertices>
+      0 0
+      2.5 0
+      2.5 0.41
+      0 0.41
+      0 0.2
+      0.55 0
+      0.55 0.41
+      0.6 0.2
+      0.55 0.11
+      0.55 0.29
+      0.45 0.29
+      0.45 0.11
+      0.4 0.2
+      0.7 0.2
+      0.7 0.29
+      0.7 0.11
+      0.85 0.2
+      0.85 0
+      0.85 0.41
+      1.15 0.2
+      1.65 0.2
+      1.15 0
+      1.65 0
+      2.5 0.2
+      1.65 0.41
+      1.15 0.41
+      0.45 0.2
+      0.474818836021 0.243196168588
+      0.525181153955 0.243196174431
+      0.55 0.2
+      0.525181170614 0.156803835280
+      0.474818852679 0.156803821701
+      0.3 0
+      0.3 0.41
+      0.3 0.2
+    </Vertices>
+    <Topology dim="1">
+      9 7
+      7 13
+      13 14
+      14 9
+      7 8
+      8 15
+      15 13
+      14 18
+      18 6
+      6 9
+      8 5
+      5 17
+      17 15
+      13 16
+      16 18
+      17 16
+      16 19
+      19 25
+      25 18
+      19 20
+      20 24
+      24 25
+      2 24
+      20 23
+      23 2
+      17 21
+      21 19
+      21 22
+      22 20
+      22 1
+      1 23
+      12 26
+      26 27
+      27 10
+      10 12
+      27 28
+      28 9
+      9 10
+      28 29
+      29 7
+      29 30
+      30 8
+      31 11
+      11 8
+      30 31
+      12 11
+      31 26
+      6 33
+      33 10
+      33 34
+      34 12
+      34 32
+      32 11
+      32 5
+      3 4
+      4 34
+      33 3
+      4 0
+      0 32
+    </Topology>
+    <Topology dim="2">
+      9 7 14 13
+      13 7 15 8
+      14 18 9 6
+      15 8 17 5
+      18 14 16 13
+      16 13 17 15
+      16 19 18 25
+      19 20 25 24
+      2 24 23 20
+      19 16 21 17
+      21 22 19 20
+      22 1 20 23
+      12 26 10 27
+      27 28 10 9
+      28 29 9 7
+      29 30 7 8
+      31 11 30 8
+      26 12 31 11
+      6 33 9 10
+      33 34 10 12
+      34 32 12 11
+      32 5 11 8
+      3 4 33 34
+      4 0 34 32
+    </Topology>
+  </Mesh>
+  <MeshPart parent="root" name="bnd:c" chart="circle" topology="full" size="7 6">
+    <Mapping dim="0">
+      30
+      28
+      29
+      27
+      31
+      26
+      26
+    </Mapping>
+    <Mapping dim="1">
+      38
+      44
+      32
+      46
+      35
+      40
+    </Mapping>
+    <Topology dim="1">
+      1 2
+      0 4
+      5 3
+      4 6
+      3 1
+      2 0
+    </Topology>
+    <Attribute name="param" dim="1">
+      0.666666666667
+      0.333333333333
+      0.5
+      0.166666666667
+      0.833333333333
+      0
+      1
+    </Attribute>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:b" topology="none" size="7 6 0">
+    <Mapping dim="0">
+      22
+      32
+      1
+      0
+      21
+      17
+      5
+    </Mapping>
+    <Mapping dim="1">
+      11
+      27
+      58
+      25
+      29
+      53
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:t" topology="none" size="7 6 0">
+    <Mapping dim="0">
+      6
+      18
+      33
+      25
+      3
+      24
+      2
+    </Mapping>
+    <Mapping dim="1">
+      21
+      56
+      22
+      8
+      47
+      18
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:l" topology="none" size="3 2 0">
+    <Mapping dim="0">
+      0
+      3
+      4
+    </Mapping>
+    <Mapping dim="1">
+      57
+      54
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:r" topology="none" size="3 2 0">
+    <Mapping dim="0">
+      1
+      2
+      23
+    </Mapping>
+    <Mapping dim="1">
+      30
+      24
+    </Mapping>
+  </MeshPart>
+</FeatMeshFile>
