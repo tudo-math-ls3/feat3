@@ -1278,22 +1278,23 @@ namespace FEAT
        *
        * \returns \p *this
        */
-      template<int l_, int sma_, int sna_, int smb_, int snb_>
+      template<int la_, int lb_, int sma_, int sna_, int smb_, int snb_>
       Matrix& add_mat_mat_mult(
-        const Matrix<T_, m_, l_, sma_, sna_>& a,
-        const Matrix<T_, l_, n_, smb_, snb_>& b,
+        const Matrix<T_, m_, la_, sma_, sna_>& a,
+        const Matrix<T_, lb_, n_, smb_, snb_>& b,
         DataType alpha = DataType(1))
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
         ASSERTM((const void*)this != (const void*)&b, "result matrix and multiplicand matrix 'b' must be different objects");
+        ASSERTM(la_ == lb_, "second dimension of a must be equal to first dimension of b");
 
         for(int i(0); i < m_; ++i)
         {
           for(int j(0); j < n_; ++j)
           {
             DataType r(0);
-            for(int k(0); k < l_; ++k)
+            for(int k(0); k < la_; ++k)
             {
               r += a.v[i][k] * b.v[k][j];
             }
@@ -1318,12 +1319,13 @@ namespace FEAT
        *
        * \returns \p *this
        */
-      template<int l_, int sma_, int sna_, int smb_, int snb_>
-      Matrix& set_mat_mat_mult(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
+      template<int la_, int lb_, int sma_, int sna_, int smb_, int snb_>
+      Matrix& set_mat_mat_mult(const Matrix<T_, m_, la_, sma_, sna_>& a, const Matrix<T_, lb_, n_, smb_, snb_>& b)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
         ASSERTM((const void*)this != (const void*)&b, "result matrix and multiplicand matrix 'b' must be different objects");
+        ASSERTM(la_ == lb_, "second dimension of a must be equal to first dimension of b");
 
         format();
         return add_mat_mat_mult(a, b);

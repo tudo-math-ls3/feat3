@@ -124,7 +124,7 @@ namespace FEAT
       /// \brief Clones data from another TupleFilter
       void clone(const TupleFilter & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        _first.clone(other._first.get_filter_vector(), clone_mode);
+        _first.clone(other._first, clone_mode);
         _rest.clone(other._rest, clone_mode);
       }
 
@@ -274,7 +274,7 @@ namespace FEAT
       /// \brief Clones data from another TupleFilter
       void clone(const TupleFilter & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        _first.clone(other._first.get_filter_vector(), clone_mode);
+        _first.clone(other._first, clone_mode);
       }
 
       template<typename SubFilter2_>

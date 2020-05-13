@@ -233,7 +233,7 @@ namespace FEAT
         _matrix.apply(r.local(), x.local(), r.local(), alpha);
 
         // synchronise r
-        r.sync_0_async();
+        return r.sync_0_async();
       }
 
       /**

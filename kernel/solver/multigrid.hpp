@@ -859,7 +859,7 @@ namespace FEAT
        */
       void reset_timings()
       {
-        for(const auto& li : _levels)
+        for(auto& li : _levels)
           li.reset_timings();
       }
 

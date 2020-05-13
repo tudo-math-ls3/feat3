@@ -39,7 +39,7 @@ namespace FEAT
       typedef Mirror_ MirrorType;
 
       typedef std::shared_ptr<SynchScalarTicket<DataType>> ScalarTicketType;
-      typedef std::shared_ptr<SynchVectorTicket<LocalVector_, std::vector<Mirror_>>> VectorTicketType;
+      typedef std::shared_ptr<SynchVectorTicket<LocalVector_, Mirror_>> VectorTicketType;
 
     public:
       /// our communicator

@@ -291,6 +291,11 @@ namespace FEAT
         return TupleMirror(_first.clone());
       }
 
+      TupleMirror clone(CloneMode clone_mode = CloneMode::Weak) const
+      {
+        return TupleMirror(_first.clone(clone_mode));
+      }
+
       template<typename SubMirror2_>
       void convert(const TupleMirror<SubMirror2_>& other)
       {

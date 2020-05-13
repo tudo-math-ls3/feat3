@@ -39,7 +39,7 @@ namespace FEAT
        * \param[in] args
        * The argument parser.
        */
-      void add_supported_pdc_args(SimpleArgParser& args)
+      inline void add_supported_pdc_args(SimpleArgParser& args)
       {
         args.support("parti-type", "<types...>\n"
           "Specifies which partitioner types are allowed to be used.\n"

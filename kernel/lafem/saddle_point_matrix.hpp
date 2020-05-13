@@ -431,6 +431,12 @@ namespace FEAT
         diag.rest().format();
       }
 
+      void lump_rows(VectorTypeL& lump, bool /*sync*/ = true) const
+      {
+        _matrix_a.lump_rows(lump.first());
+        lump.rest().format();
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
