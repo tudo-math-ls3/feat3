@@ -17,6 +17,7 @@
 #include <kernel/util/xml_scanner.hpp>
 
 #include <sstream>
+#include <deque>
 
 namespace FEAT
 {
@@ -77,6 +78,8 @@ namespace FEAT
       typedef typename HexaPart::AttributeSetType HexaAttrib;
 
     protected:
+      /// deque of z-coordinates
+      std::deque<CoordType> _z_list;
       /// the number of slices in z-direction
       const Index _slices;
       /// minimal and maximal z-coordinate
@@ -106,6 +109,7 @@ namespace FEAT
        * no mesh-part is generated for the corresponding boundary region.
        */
       explicit MeshExtruder(Index slices, CoordType z_min, CoordType z_max, String zmin_part_name, String zmax_part_name) :
+        _z_list(),
         _slices(slices),
         _z_min(z_min),
         _z_max(z_max),
@@ -122,6 +126,41 @@ namespace FEAT
       {
         XASSERT(slices > Index(0));
         XASSERT(z_min < z_max);
+        for(Index i(0); i < slices; ++i)
+          _z_list.push_back(z_min + (z_max-z_min)*CoordType(i)/CoordType(slices));
+      }
+
+      /**
+       * \brief Creates the mesh extruder object
+       *
+       * \param[in] z_list
+       * A list of z-coordinates in ascending order.
+       *
+       * \param[in] zmin_part_name, zmax_part_name
+       * The names of the mesh-parts which are to be generated for the boundary
+       * regions at \p z_min and \p z_max. If set to an empty string,
+       * no mesh-part is generated for the corresponding boundary region.
+       */
+      explicit MeshExtruder(const std::deque<CoordType>& z_list, String zmin_part_name, String zmax_part_name) :
+        _z_list(z_list),
+        _slices(Index(z_list.size())-1u),
+        _z_min(z_list.front()),
+        _z_max(z_list.back()),
+        _zmin_part_name(zmin_part_name),
+        _zmax_part_name(zmax_part_name),
+        _origin_x(CoordType(0)),
+        _origin_y(CoordType(0)),
+        _angle_y(CoordType(0)),
+        _angle_p(CoordType(0)),
+        _angle_r(CoordType(0)),
+        _offset_x(CoordType(0)),
+        _offset_y(CoordType(0)),
+        _offset_z(CoordType(0))
+      {
+        for(Index i(0); i < _slices; ++i)
+        {
+          XASSERTM(_z_list[i] < z_list[i+1], "z-coordinates not ascending");
+        }
       }
 
       /**
@@ -307,7 +346,8 @@ namespace FEAT
           const Index vo = j * quad_num_verts;
 
           // compute slice z-coord
-          const CoordType z = _z_min + (CoordType(j) / CoordType(_slices))*(_z_max - _z_min);
+          //const CoordType z = _z_min + (CoordType(j) / CoordType(_slices))*(_z_max - _z_min);
+          const CoordType z = _z_list.at(j);
 
           // loop over all vertices
           for(Index i(0); i < quad_num_verts; ++i)
@@ -606,7 +646,8 @@ namespace FEAT
           const Index vo = j * quad_num_values;
 
           // compute slice z-coord
-          const CoordType z = _z_min + (CoordType(j) / CoordType(_slices))*(_z_max - _z_min);
+          //const CoordType z = _z_min + (CoordType(j) / CoordType(_slices))*(_z_max - _z_min);
+          const CoordType z = _z_list.at(j);
 
           // loop over all vertices
           for(Index i(0); i < quad_num_values; ++i)

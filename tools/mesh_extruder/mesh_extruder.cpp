@@ -21,8 +21,10 @@ namespace MeshExtruderTool
   using namespace FEAT;
   using namespace Geometry;
 
-  typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;
-  typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
+  typedef double CoordType;
+
+  typedef ConformalMesh<Shape::Quadrilateral, 2, CoordType> QuadMesh;
+  typedef ConformalMesh<Shape::Hexahedron, 3, CoordType> HexaMesh;
 
   typedef QuadMesh::VertexSetType QuadVertexSet;
   typedef HexaMesh::VertexSetType HexaVertexSet;
@@ -60,9 +62,9 @@ namespace MeshExtruderTool
 
     args.support("in", "<input-files>\nMandatory: Specifies the 2D input mesh files.\n");
     args.support("out", "<output-file>\nMandatory: Specifies the 3D output mesh file.\n");
-    args.support("z", "<z-min> <z-max>\nMandatory: Specifies the Z-coordinate range.\n");
+    args.support("z-list", "<z_0> <z_1> ... <z_n>>\nMandatory: Specifies a list of Z-coordinates.\nMutually exclusive with --z-range.\n");
+    args.support("z-range", "<z-min> <z-max> <n>\nMandatory: Specifies the Z-coordinate range and the number of slices in Z-direction.\nMutually exclusive with --z-list\n");
     args.support("z-names", "<name-min> <name-max>\nMandatory: Specifies the names for the Z-boundary meshparts.\n");
-    args.support("slices", "<n>\nOptional: Specifies the number of slices in Z-direction. Defaults to 1.\n");
     args.support("origin", "<x> <y>\nOptional: Specifies the 2D transformation origin. Default to 0, 0, 0.\n");
     args.support("offset", "<x> <y> <z>\nOptional: Specifies the 3D transformation offset. Default to 0, 0, 0.\n");
     args.support("angles", "<yaw> <pitch> <roll>\nOptional: Specifies the 3D transformation angles in revolutions. Default to 0, 0, 0.\n");
@@ -109,19 +111,76 @@ namespace MeshExtruderTool
       FEAT::Runtime::abort();
     }
 
-    // query Z-ranges
-    Real z_min(0.0), z_max(0.0);
-    if(args.parse("z", z_min, z_max) != 2)
+    // we need either --z-range or --z-list
+    if((args.check("z-range") < 0) && (args.check("z-list") < 0))
     {
-      std::cerr << "ERROR: mandatory option '--z <...>' is invalid or missing" << std::endl;
+      std::cerr << "ERROR: neither --z-range <...> nor --z-list <...> given" << std::endl;
+      std::cerr << "You have to specify one of those two options." << std::endl;
       print_help(args);
       FEAT::Runtime::abort();
     }
-    if(z_min + 1E-3 >= z_max)
+    if((args.check("z-range") >= 0) && (args.check("z-list") >= 0))
     {
-      std::cerr << "ERROR: z_min must be strictly less than z_max" << std::endl;
+      std::cerr << "ERROR: both --z-range <...> and --z-list <...> given, but they are mutually exclusive" << std::endl;
       print_help(args);
       FEAT::Runtime::abort();
+    }
+
+    // query Z-ranges
+    std::deque<CoordType> z_list;
+    if(args.check("z-list") >= 0)
+    {
+      std::deque<String> sz = args.query("z-list")->second;
+      if(sz.size() < std::size_t(2))
+      {
+        std::cerr << "ERROR: at least 2 coordinates are required for --z-list <...>" << std::endl;
+        FEAT::Runtime::abort();
+      }
+      for(const auto& s : sz)
+      {
+        CoordType x(0);
+        if(!s.parse(x))
+        {
+          std::cerr << "ERROR: failed to parse --z-list coordinate: " << s << std::endl;
+          FEAT::Runtime::abort();
+        }
+        z_list.push_back(x);
+      }
+      // ensure that the z-coordinates are ascending
+      for(std::size_t i(0); i+1u < z_list.size(); ++i)
+      {
+        if(z_list[i] + 1E-5 >= z_list[i+1u])
+        {
+          std::cerr << "ERROR: --z-list coordinates must be strictly ascending" << std::endl;
+          FEAT::Runtime::abort();
+        }
+      }
+    }
+    else //if(args.check("z-range") >= 0)
+    {
+      Index slices(0);
+      CoordType z_min(0.0), z_max(0.0);
+
+      if(args.parse("z-range", z_min, z_max, slices) != 3)
+      {
+        std::cerr << "ERROR: mandatory option '--z <...>' is invalid or missing" << std::endl;
+        print_help(args);
+        FEAT::Runtime::abort();
+      }
+      if(z_min + 1E-3 >= z_max)
+      {
+        std::cerr << "ERROR: z_min must be strictly less than z_max" << std::endl;
+        print_help(args);
+        FEAT::Runtime::abort();
+      }
+      if(slices <= Index(0))
+      {
+        std::cerr << "ERROR: slice count must be > 0" << std::endl;
+        print_help(args);
+        FEAT::Runtime::abort();
+      }
+      for(Index i(0); i < slices; ++i)
+        z_list.push_back(z_min + (z_max-z_min)*CoordType(i)/CoordType(slices));
     }
 
     // query meshpart names
@@ -129,21 +188,6 @@ namespace MeshExtruderTool
     if(args.parse("z-names", z_min_name, z_max_name) != 2)
     {
       std::cerr << "ERROR: mandatory option '--z-names <...>' is invalid or missing" << std::endl;
-      print_help(args);
-      FEAT::Runtime::abort();
-    }
-
-    // query number of slices
-    Index slices(1);
-    if(args.parse("slices", slices) < 0)
-    {
-      std::cerr << "ERROR: Failed to parse '--slices <n>' option" << std::endl;
-      print_help(args);
-      FEAT::Runtime::abort();
-    }
-    if(slices <= Index(0))
-    {
-      std::cerr << "ERROR: slice count must be > 0" << std::endl;
       print_help(args);
       FEAT::Runtime::abort();
     }
@@ -233,7 +277,8 @@ namespace MeshExtruderTool
     // extrude
     {
       // create mesh extruder
-      MeshExtruder<QuadMesh> mesh_extruder(slices, z_min, z_max, z_min_name, z_max_name);
+      //MeshExtruder<QuadMesh> mesh_extruder(slices, z_min, z_max, z_min_name, z_max_name);
+      MeshExtruder<QuadMesh> mesh_extruder(z_list, z_min_name, z_max_name);
 
       // set offset, origin and angles
       mesh_extruder.set_origin(origin_x, origin_y);
