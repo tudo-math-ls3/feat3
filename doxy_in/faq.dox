@@ -1,0 +1,43 @@
+/** \page faq_page Frequently Asked Questions
+
+\tableofcontents{html,latex}
+
+\section faq_int_vs_index Why are some arrays indexed using the 'int' type and others using the 'FEAT::Index' type?
+
+Let us begin with the two golden rules of thumb for successfully indexing in FEAT3:
+- All arrays, whose length is runtime dependent, are indexed using the 'FEAT::Index' type.
+- All arrays, whose length is compile-time dependent, are indexed using the builin 'int' type.
+
+The reason for using FEAT::Index, which is typedefed to 'unsigned long' by default, this is quite simple and obvious to any experienced programmer:
+We want to be able to define this type to a 32-bit or 64-bit unsigned integer type depending on whatever is best for the platform
+that FEAT3 is currently compiled on. This desire directly rules out the use of a buildin type name like 'int' or 'unsigned long' or whatever
+and a typedef is the only proper way to go.
+
+Now the main question is: Why don't we always use FEAT::Index for indexing?
+
+The reason for this is quite pragmatic and rather technical:
+Entries of "small" containers like Tiny::Vector and Tiny::Matrix are very often addressed explicitly with literals ("constants")
+to implement various formulae, whereas entries of "large" containers like the LAFEM containers are usually only addressed using
+loop variables. Although it would be more consistent to use the FEAT::Index type for addressing all types of array elements,
+one would have to manually cast each explicit index literal to the Index type to avoid compiler warnings complaining
+about implicit int-to-Index casts -- and this original approach turned out to be much more painful than it sounds.
+
+Let's take a look at an example:
+Let a, b and c denote three Tiny::Vector<double,3>'s and we want to compute the 3D cross product c := a x b.
+The code for the cross product using 'int' for indexing looks like this:
+\code{.cpp}
+c(0) = a(1) * b(2) - a(2) * b(1);
+c(1) = a(2) * b(0) - a(0) * b(2);
+c(2) = a(0) * b(1) - a(1) * b(0);
+\endcode
+
+If the Tiny::Vector entries were addressed using the FEAT::Index type, one would have to write the following code instead:
+\code{.cpp}
+c(Index(0)) = a(Index(1)) * b(Index(2)) - a(Index(2)) * b(Index(1));
+c(Index(1)) = a(Index(2)) * b(Index(0)) - a(Index(0)) * b(Index(2));
+c(Index(2)) = a(Index(0)) * b(Index(1)) - a(Index(1)) * b(Index(0));
+\endcode
+
+Because the latter approach turned out to be difficult to read and tedious to write, the decision was made to use the
+int type for indexing compile-time arrays to keep the literals short and clear, thus sacrificing consistency.
+*/

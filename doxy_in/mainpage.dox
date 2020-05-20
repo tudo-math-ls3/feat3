@@ -1,6 +1,9 @@
 /**
 \mainpage FEAT - Finite Element Analysis Toolbox
 
+\section main_sec_basic Basic Information
+- \ref faq_page
+
 \section main_sec_buildsys Build-System
 - \ref feat_for_win_vs16
 
