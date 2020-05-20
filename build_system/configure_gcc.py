@@ -46,6 +46,9 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   # not recognise the 'q' suffix for __float128 constants when compiling with --std=c++11 starting from gcc version 4.8.
   if "quadmath" in buildid:
     cxxflags += " -fext-numeric-literals"
+    if major < 5:
+      print ("Error: GNU Compiler less then 5 does not have full quadmath support buildin!")
+      sys.exit(1)
   else:
     cxxflags += " -Wpedantic"
 
