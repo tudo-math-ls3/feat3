@@ -13,8 +13,11 @@
 // The contents of this file require the 'fparser' third-party library.
 #if defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)
 
-#include <vector>
 #include <fparser.hh>
+
+#include <array>
+#include <vector>
+#include <map>
 
 namespace FEAT
 {
@@ -54,11 +57,11 @@ namespace FEAT
     };
 
     /**
-     * \brief Parsed function implementation
+     * \brief Parsed scalar function implementation
      *
      * This class provides an implementation of the Analytic::Function interface which
      * can parse and evaluate a formula in the up to three variables 'x', 'y' and 'z'
-     * given as a string at runtime.
+     * as well as user-defined extra variables given as a string at runtime.
      *
      * \attention
      * This class is only available if FEAT is configured and build with support
@@ -98,7 +101,7 @@ namespace FEAT
      * \author Peter Zajac
      */
     template<int dim_>
-    class ParsedFunction :
+    class ParsedScalarFunction :
       public Analytic::Function
     {
     public:
@@ -123,6 +126,8 @@ namespace FEAT
     private:
       /// the actual function parser object
       ::FunctionParser _parser;
+      /// our extra variable names
+      std::map<String, double> _extra_vars;
 
     public:
       /**
@@ -132,8 +137,9 @@ namespace FEAT
        * - <c>pi</c> = 3.14159...
        * - <c>eps</c> = ~1E-16
        */
-      explicit ParsedFunction() :
-        _parser()
+      explicit ParsedScalarFunction() :
+        _parser(),
+        _extra_vars()
       {
         // add constants to our parser
         _parser.AddConstant("pi", Math::pi<double>());
@@ -154,8 +160,8 @@ namespace FEAT
        * contains more information on the cause of the error and should be presented
        * the user in an appropriate way.
        */
-      explicit ParsedFunction(const String& function) :
-        ParsedFunction()
+      explicit ParsedScalarFunction(const String& function) :
+        ParsedScalarFunction()
       {
         parse(function);
       }
@@ -172,6 +178,42 @@ namespace FEAT
       void add_constant(const String& name, double value)
       {
         _parser.AddConstant(name.c_str(), value);
+      }
+
+      /**
+       * \brief Adds an extra variable to the parser.
+       *
+       * The value of the extra variable can be changed lateron by using the #set_variable function.
+       *
+       * \param[in] name
+       * The name of the variable. Must not be 'x', 'y' or 'z'.
+       *
+       * \param[in] value
+       * The value for the extra variable.
+       */
+      void add_variable(const String& name, double value = 0.0)
+      {
+        XASSERTM(_extra_vars.find(name) == _extra_vars.end(), "extra variable '" + name + "' already added");
+        XASSERTM(name.compare_no_case("x") != 0, "variable name 'x' is reserved and cannot be used as extra variable");
+        XASSERTM(name.compare_no_case("y") != 0, "variable name 'y' is reserved and cannot be used as extra variable");
+        XASSERTM(name.compare_no_case("z") != 0, "variable name 'z' is reserved and cannot be used as extra variable");
+        _extra_vars.emplace(name, value);
+      }
+
+      /**
+       * \brief Sets the value of an extra variable.
+       *
+       * \param[in] name
+       * The name of the variable. Must have been added by using the #add_variable function.
+       *
+       * \param[in] value
+       * The value for the extra variable.
+       */
+      void set_variable(const String& name, double value)
+      {
+        auto it = _extra_vars.find(name);
+        XASSERTM(it != _extra_vars.end(), "no variable named '" + name + "' found");
+        it->second = value;
       }
 
       /**
@@ -192,6 +234,10 @@ namespace FEAT
         String vars("x");
         if(dim_ > 1) vars += ",y";
         if(dim_ > 2) vars += ",z";
+
+        // add extra variables
+        for(auto& v : _extra_vars)
+          (vars += ",") += v.first;
 
         // try to parse the function
         const int ret = _parser.Parse(function.c_str(), vars.c_str());
@@ -234,22 +280,29 @@ namespace FEAT
         // are always meant to be so!
         /// our own private copy of the function parser
         ::FunctionParser _parser;
+        /// a vector for the variable values
+        std::vector<double> _vars;
 
       public:
-        explicit Evaluator(const ParsedFunction& function) :
-          _parser(function._parser)
+        explicit Evaluator(const ParsedScalarFunction& function) :
+          _parser(function._parser),
+          _vars(std::size_t(dim_), 0.0)
         {
           // force deep copy to avoid race conditions in case of multi-threading
           _parser.ForceDeepCopy();
+          // set extra vars
+          for(const auto& v : function._extra_vars)
+            _vars.push_back(v.second);
         }
 
         ValueType value(const PointType& point)
         {
-          // copy our image point into a Tiny::Vector<double>
-          Tiny::Vector<double, dim_> v(point);
+          // copy coordinates
+          for(int i(0); i < dim_; ++i)
+            _vars[std::size_t(i)] = point[i];
 
           // evaluate the parser
-          const double val = _parser.Eval(v.v);
+          const double val = _parser.Eval(_vars.data());
 
           // check for errors
           switch(_parser.EvalError())
@@ -258,25 +311,285 @@ namespace FEAT
             break;
 
           case 1: // division by zero
-            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: division by zero");
+            throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: division by zero");
 
           case 2: // sqrt error
           case 3: // log error
           case 4: // trigonometric error
-            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: illegal input value");
+            throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: illegal input value");
 
           case 5: // recursion error
-            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: maximum recursion depth reached");
+            throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: maximum recursion depth reached");
 
           default: // ???
-            throw ParsedFunctionEvalError("Error in ParsedFunction evaluation: unknown error");
+            throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: unknown error");
           }
 
           // return value
           return ValueType(val);
         }
-      }; // class ParsedFunction::Evaluator<...>
-    }; // class ParsedFunction
+      }; // class ParsedScalarFunction::Evaluator<...>
+    }; // class ParsedScalarFunction
+
+    /// for the sake of downwards compatibility
+    template<int dim_>
+    using ParsedFunction = ParsedScalarFunction<dim_>;
+
+
+    /**
+     * \brief Parsed vector function implementation
+     *
+     * This class provides an implementation of the Analytic::Function interface for vector
+     * functions which can parse and evaluate a formula tuple in the up to three variables
+     * 'x', 'y' and 'z' as well as user-defined extra variables given as a string at runtime.
+     *
+     * \tparam dom_dim_
+     * The domain dimension of the vector function. Must be 1 <= dom_dim_ <= 3.
+     *
+     * \tparam img_dim_
+     * The image dimension of the vector function. Must be >= 1.
+     *
+     * See the documentation of ParsedScalarFunction for more details.
+     *
+     * \author Peter Zajac
+     */
+    template<int dom_dim_, int img_dim_ = dom_dim_>
+    class ParsedVectorFunction :
+      public Analytic::Function
+    {
+    public:
+      /// validate our dimensions
+      static_assert((dom_dim_ >= 1) && (dom_dim_ <= 3), "unsupported domain dimension");
+      static_assert(img_dim_ >= 1, "unsupported image dimension");
+
+      /// specify our domain dimension
+      static constexpr int domain_dim = dom_dim_;
+
+      /// This function is always a vector field
+      typedef Analytic::Image::Vector<img_dim_> ImageType;
+
+      /// we can compute function values
+      static constexpr bool can_value = true;
+
+      /// we cannot compute gradients
+      static constexpr bool can_grad = false;
+
+      /// we cannot compute hessians
+      static constexpr bool can_hess = false;
+
+    private:
+      /// our extra variable names
+      std::map<String, double> _extra_vars;
+
+      /// the actual function parser objects
+      std::array<::FunctionParser, img_dim_> _parsers;
+
+    public:
+      /**
+       * \brief Standard constructor
+       *
+       * This constructor adds the following constants to the underlying parser:
+       * - <c>pi</c> = 3.14159...
+       * - <c>eps</c> = ~1E-16
+       */
+      explicit ParsedVectorFunction()
+      {
+        // add constants to our parsers
+        add_constant("pi", Math::pi<double>());
+        add_constant("eps", Math::eps<double>());
+      }
+
+      /**
+       * \brief Adds a constant to the parser.
+       *
+       * \param[in] name
+       * The name of the constant.
+       *
+       * \param[in] value
+       * The value of the constant.
+       */
+      void add_constant(const String& name, double value)
+      {
+        for(auto& p : _parsers)
+          p.AddConstant(name.c_str(), value);
+      }
+
+      /**
+       * \brief Adds an extra variable to the parser.
+       *
+       * The value of the extra variable can be changed lateron by using the #set_variable function.
+       *
+       * \param[in] name
+       * The name of the variable. Must not be 'x', 'y' or 'z'.
+       *
+       * \param[in] value
+       * The value for the extra variable.
+       */
+      void add_variable(const String& name, double value = 0.0)
+      {
+        XASSERTM(_extra_vars.find(name) == _extra_vars.end(), "extra variable '" + name + "' already added");
+        XASSERTM(name.compare_no_case("x") != 0, "variable name 'x' is reserved and cannot be used as extra variable");
+        XASSERTM(name.compare_no_case("y") != 0, "variable name 'y' is reserved and cannot be used as extra variable");
+        XASSERTM(name.compare_no_case("z") != 0, "variable name 'z' is reserved and cannot be used as extra variable");
+        _extra_vars.emplace(name, value);
+      }
+
+      /**
+       * \brief Sets the value of an extra variable.
+       *
+       * \param[in] name
+       * The name of the variable. Must have been added by using the #add_variable function.
+       *
+       * \param[in] value
+       * The value for the extra variable.
+       */
+      void set_variable(const String& name, double value)
+      {
+        auto it = _extra_vars.find(name);
+        XASSERTM(it != _extra_vars.end(), "no variable named '" + name + "' found");
+        it->second = value;
+      }
+
+      /**
+       * \brief Parses a function.
+       *
+       * \param[in] function
+       * The expression that defines the function in the variables \c x, \c y, and \c z.
+       * The individual parts of the vector function components are separated by a single quoation mark <c>'</c>.
+       *
+       * \throws ParsedFunctionParseError
+       * An instance of the ParsedFunctionParseError exception is thrown if the
+       * fparser library fails to parse the formula. The message of the exception
+       * contains more information on the cause of the error and should be presented
+       * the user in an appropriate way.
+       */
+      void parse(const String& function)
+      {
+        // add variables to our parser
+        String vars("x");
+        if(dom_dim_ > 1) vars += ",y";
+        if(dom_dim_ > 2) vars += ",z";
+
+        // add extra variables
+        for(auto& v : _extra_vars)
+          (vars += ",") += v.first;
+
+        String sfunc(function);
+        if(sfunc.starts_with('['))
+          sfunc.pop_front();
+        if(sfunc.ends_with(']'))
+          sfunc.pop_back();
+        sfunc.trim_me();
+
+        // split function string
+        std::deque<String> sfuncs = sfunc.split_by_charset("'");
+        if(sfuncs.size() != _parsers.size())
+        {
+          String msg("Invalid number of formulae: expected ");
+          msg.append(stringify(_parsers.size()));
+          msg.append(" but got ");
+          msg.append(stringify(sfuncs.size()));
+          throw ParsedFunctionParseError(msg);
+        }
+
+        // parse all functions
+        for(std::size_t i(0); i < _parsers.size(); ++i)
+        {
+          // try to parse the function
+          const int ret = _parsers.at(i).Parse(sfuncs.at(i).c_str(), vars.c_str());
+          if(ret >= 0)
+          {
+            String msg(_parsers.at(i).ErrorMsg());
+            msg.append("\n>>> '");
+            msg.append(sfuncs.at(i));
+            msg.append("'");
+            if(ret < int(sfuncs.at(i).size()))
+            {
+              // ret contains the index of the first invalid character in the input string
+              // append an additional line to mark the faulty character
+              msg.append("\n>>>");
+              msg.append(String(std::size_t(ret+2), '-'));
+              msg.append("^");
+            }
+            throw ParsedFunctionParseError(msg);
+          }
+
+          // optimise the parsed function
+          _parsers.at(i).Optimize();
+        }
+      }
+
+      template<typename Traits_>
+      class Evaluator :
+        public Analytic::Function::Evaluator<Traits_>
+      {
+      public:
+        /// coefficient data type
+        typedef typename Traits_::DataType DataType;
+        /// evaluation point type
+        typedef typename Traits_::PointType PointType;
+        /// value type
+        typedef typename Traits_::ValueType ValueType;
+
+      private:
+        /// our own private copy of the function parsers
+        std::array< ::FunctionParser, img_dim_> _parsers;
+        /// a vector for the variable values
+        std::vector<double> _vars;
+
+      public:
+        explicit Evaluator(const ParsedVectorFunction& function) :
+          _parsers(function._parsers),
+          _vars(std::size_t(dom_dim_), 0.0)
+        {
+          // force deep copy to avoid race conditions in case of multi-threading
+          for(auto& p : _parsers)
+            p.ForceDeepCopy();
+
+          // set extra vars
+          for(const auto& v : function._extra_vars)
+            _vars.push_back(v.second);
+        }
+
+        ValueType value(const PointType& point)
+        {
+          // copy coordinates
+          for(int i(0); i < dom_dim_; ++i)
+            _vars[std::size_t(i)] = point[i];
+
+          // evaluate the parser
+          ValueType val;
+        for(std::size_t i(0); i < _parsers.size(); ++i)
+          {
+            // evaluate the parser
+            val[int(i)] = DataType(_parsers[i].Eval(_vars.data()));
+
+            // check for errors
+            switch(_parsers[i] .EvalError())
+            {
+            case 0: // no error
+              break;
+
+            case 1: // division by zero
+              throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: division by zero");
+
+            case 2: // sqrt error
+            case 3: // log error
+            case 4: // trigonometric error
+              throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: illegal input value");
+
+            case 5: // recursion error
+              throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: maximum recursion depth reached");
+
+            default: // ???
+              throw ParsedFunctionEvalError("Error in ParsedScalarFunction evaluation: unknown error");
+            }
+          }
+
+          return val;
+        }
+      }; // class ParsedVectorFunction::Evaluator<...>
+    }; // class ParsedVectorFunction
   } // namespace Analytic
 } // namespace FEAT
 

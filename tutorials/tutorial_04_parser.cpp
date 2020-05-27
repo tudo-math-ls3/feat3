@@ -27,25 +27,25 @@
 // can be used to parse simple parameter as e.g. mesh refinement levels, stopping
 // criterions or VTK output filenames.
 //
-// 2. The 'ParsedFunction' class:
-// ------------------------------
+// 2. The 'ParsedScalarFunction' class:
+// ------------------------------------
 // This class implements the AnalyticFunction interface (which has been presented in
 // tutorial 02) acting as a wrapper around the function parser offered by the 'fparser'
 // third-party library. This class is constructed from a string (e.g. "2*x^2-y") at
 // runtime and offers the possibility of evaluating the function represented by the
 // string in the system assembly and/or post-processing.
 //
-// In combination with the SimpleArgParser, the ParsedFunction class gives us a convenient
-// (yet not impressively efficient) way to specify reference solutions, right-hand-side
-// and/or boundary condition functions for our Poisson equation from the command line at
-// runtime! Yay!
+// In combination with the SimpleArgParser, the ParsedScalarFunction class gives us a
+// convenient (yet not impressively efficient) way to specify reference solutions,
+// right-hand-side and/or boundary condition functions for our Poisson equation from
+// the command line at runtime! Yay!
 //
 // Important Note #1:
 // ==================
-// The ParsedFunction class is only defined if FEAT was configured with the 'fparser'
-// build-id tag, which enables the use of the corresponding third-party library.
+// The ParsedScalarFunction class is only defined if FEAT was configured with the
+// 'fparser' build-id tag, which enables the use of the corresponding third-party library.
 // If you configure without the corresponding token, then this application will compile
-// without support for the ParsedFunction class, therefore seriously limiting the
+// without support for the ParsedScalarFunction class, therefore seriously limiting the
 // functionality offered by this tutorial. In this case, the reference solution,
 // right-hand-side and boundary condition functions are those coinciding to the
 // sine-bubble solution used in Tutorial 01.
@@ -128,7 +128,7 @@
 
 // FEAT-Analytic includes
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction, ConstantFunction
-#include <kernel/analytic/parsed_function.hpp>             // NEW: for ParsedFunction
+#include <kernel/analytic/parsed_function.hpp>             // NEW: for ParsedScalarFunction
 #include <kernel/analytic/auto_derive.hpp>                 // NEW: for AutoDerive
 
 // FEAT-Assembly includes
@@ -250,8 +250,8 @@ namespace Tutorial04
     args.support("vtk", "<filename>\nSpecifies the filename for the VTK exporter.\n"
       "If this option is not specified, no VTK file will be written\n");
 
-    // Beside the support for the 'SimpleArgParser' class, which is a build-in feature
-    // of FEAT, this tutorial also demonstrates the usage of the 'ParsedFunction' later on.
+    // Beside the support for the 'SimpleArgParser' class, which is a build-in feature of FEAT,
+    // this tutorial also demonstrates the usage of the 'ParsedScalarFunction' later on.
     // However, this functionality is only available if the 'fparser' library was included,
     // so we need to use an #ifdef here to include the corresponding options.
 #ifdef FEAT_HAVE_FPARSER
@@ -435,27 +435,27 @@ namespace Tutorial04
     }
 
     // At this point, we have at least one function formula. Now, we need to create
-    // three instances of the ParsedFunction class template, which we will pass on
+    // three instances of the ParsedScalarFunction class template, which we will pass on
     // to our assembly functions later on. The only template parameter is the dimension
     // of the function to be parsed:
-    Analytic::ParsedFunction<ShapeType::dimension> rhs_function; // right-hand-side
-    Analytic::ParsedFunction<ShapeType::dimension> dbc_function; // boundary conditions
+    Analytic::ParsedScalarFunction<ShapeType::dimension> rhs_function; // right-hand-side
+    Analytic::ParsedScalarFunction<ShapeType::dimension> dbc_function; // boundary conditions
 
     // In the case of the reference solution function, we also require the computation of
     // derivates for the assembly of the right-hand-side (if 'f' is not given explicitly)
     // and for the computation of errors in the post-processing step.
-    // Unfortunately, the ParsedFunction cannot compute the derivatives by itself, so
+    // Unfortunately, the ParsedScalarFunction cannot compute the derivatives by itself, so
     // we need to put it into an 'AutoDerive' function wrapper - this one will add
-    // the numeric computation of derivatives to our ParsedFunction automagically.
-    Analytic::AutoDerive<Analytic::ParsedFunction<ShapeType::dimension>> sol_function;
+    // the numeric computation of derivatives to our ParsedScalarFunction automagically.
+    Analytic::AutoDerive<Analytic::ParsedScalarFunction<ShapeType::dimension>> sol_function;
 
-    // We have three ParsedFunction object, but we still need to supply them with
+    // We have three ParsedScalarFunction object, but we still need to supply them with
     // our (or the caller's) function formulae:
     if(have_u)
     {
       // We have a formula for our reference solution function 'u', so we simply
-      // call the 'parse' function of the ParsedFunction object and supply the
-      // formula to it. Note that the ParsedFunction::parse function may throw
+      // call the 'parse' function of the ParsedScalarFunction object and supply the
+      // formula to it. Note that the ParsedScalarFunction::parse function may throw
       // an exception if the user entered garbage at the command line, so we
       // need to put the parse call into a try-catch block here:
       try

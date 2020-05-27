@@ -5,6 +5,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # include kernel subdirectories
 ADD_SUBDIRECTORY( adjacency )
+ADD_SUBDIRECTORY( analytic )
 ADD_SUBDIRECTORY( assembly )
 ADD_SUBDIRECTORY( cubature )
 ADD_SUBDIRECTORY( geometry )
