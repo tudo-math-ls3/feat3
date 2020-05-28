@@ -9,6 +9,14 @@
   </PropertyGroup>
   <!-- import common config -->
   <Import Project="$(FeatRootPath)\build_system\vc16\common-config.xml" />
+  <!-- Kernel Header Inclusion List -->
+  <ItemGroup>
+    <FeatKernelIncludeHeader Include="kernel\**\*.hpp" />
+  </ItemGroup>
+  <!-- Kernel Source Inclusion List -->
+  <ItemGroup>
+    <FeatKernelIncludeSource Include="kernel\**\*.cpp" />
+  </ItemGroup>
   <!-- Kernel Source Exclusion List -->
   <ItemGroup>
     <!-- exclude all test sources -->
@@ -22,18 +30,21 @@
     <!-- exclude OS Windows utility source (this one is included explicitly below) -->
     <FeatKernelExcludeSource Include="kernel\util\os_windows.cpp" />
   </ItemGroup>
+  <!-- Kernel Cuda Inclusion List -->
+  <ItemGroup>
+    <FeatKernelIncludeCuda Include="kernel\**\*.cu" />
+  </ItemGroup>
   <!-- Kernel Cuda Exclusion List -->
   <!-- ************************************************************************************************************* -->
   <!-- File Inclusion Lists -->
   <!-- ************************************************************************************************************* -->
   <!-- C++ Header File List -->
   <ItemGroup>
-    <ClInclude Include="kernel\**\*.hpp" />
+    <ClInclude Include="@(FeatKernelIncludeHeader)" />
   </ItemGroup>
   <!-- C++ Source File List -->
   <ItemGroup>
-    <ClCompile Include="kernel\**\*.cpp" Exclude="@(FeatKernelExcludeSource)" />
-    <ClCompile Include="@(FeatKernelIncludeSource)" Condition="'@(FeatKernelIncludeSource)'!=''" />
+    <ClCompile Include="@(FeatKernelIncludeSource)" Exclude="@(FeatKernelExcludeSource)" />
     <!-- OS Windows utility source file -->
     <ClCompile Include="kernel\util\os_windows.cpp">
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
@@ -42,7 +53,7 @@
   </ItemGroup>
   <!-- CUDA Source File List -->
   <ItemGroup>
-    <CudaCompile Include="kernel\**\*.cu" />
+    <CudaCompile Include="@(FeatKernelIncludeCuda)" />
   </ItemGroup>
   <!-- import lib target -->
   <Import Project="$(FeatRootPath)\build_system\vc16\target-lib.xml" />
