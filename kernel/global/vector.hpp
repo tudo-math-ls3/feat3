@@ -249,9 +249,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      uint64_t get_checkpoint_size()
+      uint64_t get_checkpoint_size(LAFEM::SerialConfig& config)
       {
-        return _vector.get_checkpoint_size();
+        return _vector.get_checkpoint_size(config);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
@@ -261,9 +261,9 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      void set_checkpoint_data(std::vector<char>& data)
+      void set_checkpoint_data(std::vector<char>& data, LAFEM::SerialConfig& config)
       {
-        _vector.set_checkpoint_data(data);
+        _vector.set_checkpoint_data(data, config);
       }
     };
   } // namespace Global
