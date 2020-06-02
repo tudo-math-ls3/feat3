@@ -123,7 +123,7 @@ public:
     unit_asm.add_mesh_part(*mesh_node.find_mesh_part("bnd:2"));
 
     // finally, assemble the filters
-    Analytic::Common::ParProfileVector inflow_func(0.0, 0.0, 0.0, 1.0, 1.0);
+    Analytic::Common::ParProfileVector<DT_> inflow_func(0.0, 0.0, 0.0, 1.0, 1.0);
     unit_asm.assemble(filter.template at<0>(), space_v, inflow_func);
 
     // filter matrices

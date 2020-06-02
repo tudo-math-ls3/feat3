@@ -335,7 +335,7 @@ namespace Tutorial07
     // Now we need to chose the boundary condition function. We want to have a parabolic profile
     // flux, so we can use the pre-defined "ParProfileVector" function, which gives us a parabolic
     // profile flux orthogonal to the line segment (x0,y0)--(x1,y1) with maximum magnitude 'v-max':
-    Analytic::Common::ParProfileVector profile_function(
+    Analytic::Common::ParProfileVector<DataType> profile_function(
       0.0, // x0
       0.0, // y0
       0.0, // x1
@@ -348,9 +348,9 @@ namespace Tutorial07
     // by calling the 'at' member function template and passing the desired index as a template
     // parameter:
     unit_asm.assemble(
-      filter.at<0>(), // velocity unit-filter component of system filter
-      space_velo,              // velocity space
-      profile_function         // parabolic profile function
+      filter.at<0>(),   // velocity unit-filter component of system filter
+      space_velo,       // velocity space
+      profile_function  // parabolic profile function
     );
 
     // That's it for the velocity filter, so let us continue with the pressure filter.
@@ -358,9 +358,9 @@ namespace Tutorial07
     // by the MeanFilterAssembler. Note that there is no special setup required for this assembler,
     // so we can call the "assemble" function directly:
     Assembly::MeanFilterAssembler::assemble(
-      filter.at<1>(),  // pressure mean-filter component of system filter
-      space_pres,               // pressure space
-      cubature_factory          // cubature factory
+      filter.at<1>(),   // pressure mean-filter component of system filter
+      space_pres,       // pressure space
+      cubature_factory  // cubature factory
     );
 
     // Okay, now we have a mean-filter for the pressure and therefore the assembly of the

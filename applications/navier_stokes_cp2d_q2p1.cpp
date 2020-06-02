@@ -948,7 +948,7 @@ namespace NavierStokesCP2D
     comm.print("Assembling system filters...");
 
     // create parabolic inflow profile
-    Analytic::Common::ParProfileVector inflow(cfg.ix0, cfg.iy0, cfg.ix1, cfg.iy1, cfg.vmax);
+    Analytic::Common::ParProfileVector<DataType> inflow(cfg.ix0, cfg.iy0, cfg.ix1, cfg.iy1, cfg.vmax);
 
     for(Index i(0); i < num_levels; ++i)
     {

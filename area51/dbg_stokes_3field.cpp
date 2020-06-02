@@ -477,7 +477,7 @@ namespace Stokes3Field
     // As usual, add the whole boundary to the assembler:
     unit_asm.add_mesh_part(boundary);
 
-    Analytic::Common::ParProfileVector profile_function(0.0, 0.0, 0.0, 1.0, 1.0);
+    Analytic::Common::ParProfileVector<DataType> profile_function(0.0, 0.0, 0.0, 1.0, 1.0);
     unit_asm.assemble(filter_v, space_velo, profile_function);
 
     //Assembly::MeanFilterAssembler::assemble(filter_p, space_pres, cubature);

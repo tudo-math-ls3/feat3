@@ -1951,6 +1951,7 @@ namespace FEAT
        *
        * \author Peter Zajac
        */
+      template<typename DataType_>
       class ParProfileBase :
         public Analytic::Function
       {
@@ -1961,9 +1962,9 @@ namespace FEAT
 
       protected:
         // coordinates of line segment
-        Real _x0, _y0, _x1, _y1;
+        DataType_ _x0, _y0, _x1, _y1;
         // maximum value
-        Real _vmax;
+        DataType_ _vmax;
 
       public:
         /**
@@ -1989,7 +1990,7 @@ namespace FEAT
          * \param[in] vmax
          * Maximum value of the parabolic profile.
          */
-        explicit ParProfileBase(Real x0, Real y0, Real x1, Real y1, Real vmax = Real(1.0)) :
+        explicit ParProfileBase(DataType_ x0, DataType_ y0, DataType_ x1, DataType_ y1, DataType_ vmax = DataType_(1.0)) :
           _x0(x0), _y0(y0), _x1(x1), _y1(y1), _vmax(vmax)
         {
         }
@@ -2047,8 +2048,9 @@ namespace FEAT
        *
        * \author Peter Zajac
        */
+      template<typename DataType_>
       class ParProfileScalar :
-        public ParProfileBase
+        public ParProfileBase<DataType_>
       {
       public:
         static constexpr int domain_dim = 2;
@@ -2057,7 +2059,7 @@ namespace FEAT
         static constexpr bool can_grad = true;
         static constexpr bool can_hess = true;
 
-        using ParProfileBase::ParProfileBase;
+        using ParProfileBase<DataType_>::ParProfileBase;
 
         template<typename Traits_>
         class Evaluator :
@@ -2131,8 +2133,9 @@ namespace FEAT
        *
        * \author Peter Zajac
        */
+      template<typename DataType_>
       class ParProfileVector :
-        public ParProfileBase
+        public ParProfileBase<DataType_>
       {
       public:
         static constexpr int domain_dim = 2;
@@ -2141,7 +2144,7 @@ namespace FEAT
         static constexpr bool can_grad = true;
         static constexpr bool can_hess = true;
 
-        using ParProfileBase::ParProfileBase;
+        using ParProfileBase<DataType_>::ParProfileBase;
 
         template<typename Traits_>
         class Evaluator :

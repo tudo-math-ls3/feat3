@@ -567,7 +567,7 @@ namespace Tutorial07
     // Now we need to chose the boundary condition function. We want to have a parabolic profile
     // flux, so we can use the pre-defined "ParProfileVector" function, which gives us a parabolic
     // profile flux orthogonal to the line segment (x0,y0)--(x1,y1) with maximum magnitude 'v-max':
-    Analytic::Common::ParProfileVector profile_function(
+    Analytic::Common::ParProfileVector<DataType> profile_function(
       0.0, // x0
       0.0, // y0
       0.0, // x1
