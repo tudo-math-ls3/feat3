@@ -12,7 +12,7 @@ class ALGLIB(ThirdpartyPackage):
   def __init__(self,trunk_dirname):
     self.names = ["alglib"]
     self.dirname = "alglib"
-    self.filename = "alglib-3.13.0.cpp.gpl.zip"
+    self.filename = "alglib-3.16.0.cpp.gpl.zip"
     self.url = "http://www.alglib.net/translator/re/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_ALGLIB:BOOL=ON"
     self.trunk_dirname = trunk_dirname
