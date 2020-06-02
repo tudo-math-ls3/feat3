@@ -10,6 +10,7 @@ import subprocess
 import imp
 import inspect
 import glob
+import ssl
 
 # Baseclass for third party packages
 class ThirdpartyPackage(object):
@@ -77,6 +78,9 @@ def download(url,filename):
     class MyOpener(FancyURLopener):
       version = "Wget/1.13.4 (linux-gnu)"
     urlretrieve = MyOpener().retrieve
+    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+    context.verify_mode=ssl.CERT_NONE
+    ssl._create_default_https_context = ssl._create_unverified_context
     urlretrieve(url, filename)
   else:
     import urllib.request
