@@ -420,7 +420,7 @@ namespace FEAT
         odata[op] = weight[j];
       }
 
-      // okay, solver matrix data assembly completer
+      // okay, solver matrix data assembly completed
 
       // initialise umfpack
       _umfpack.init_numeric();
