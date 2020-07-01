@@ -135,10 +135,10 @@ public:
     rnd_range[1] = DT_(+10);
     DenseVectorBlocked<Mem_, DT_, IT_, 3> rnd_vec(rng, rnd_size, rnd_range[0], rnd_range[1]);
     TEST_CHECK_EQUAL(rnd_vec.size(), rnd_size);
-    DT_ rnd_max = rnd_vec.max_element();
+    DT_ rnd_max = rnd_vec.max_abs_element();
     TEST_CHECK_IN_RANGE(rnd_max, rnd_range[0], rnd_range[1]);
     rnd_vec.scale(rnd_vec, DT_(-1));
-    DT_ rnd_min = -rnd_vec.max_element();
+    DT_ rnd_min = -rnd_vec.max_abs_element();
     TEST_CHECK_IN_RANGE(rnd_min, rnd_range[0], rnd_range[1]);
 
   }
@@ -702,16 +702,16 @@ template<
   typename DT_,
   typename IT_,
   Index BS_>
-class DenseVectorBlockedMaxElementTest
+class DenseVectorBlockedMaxAbsElementTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  DenseVectorBlockedMaxElementTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedMaxElementTest")
+  DenseVectorBlockedMaxAbsElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedMaxAbsElementTest")
   {
   }
 
-  virtual ~DenseVectorBlockedMaxElementTest()
+  virtual ~DenseVectorBlockedMaxAbsElementTest()
   {
   }
 
@@ -736,25 +736,85 @@ public:
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
-      DT_ max = a.max_element();
+      DT_ max = a.max_abs_element();
 
       TEST_CHECK_EQUAL(max, DT_((size*BS_) -1));
     }
   }
 };
-DenseVectorBlockedMaxElementTest<Mem::Main, float, unsigned int, 2> dv_max_element_test_float_uint;
-DenseVectorBlockedMaxElementTest<Mem::Main, double, unsigned int, 2> dv_max_element_test_double_uint;
-DenseVectorBlockedMaxElementTest<Mem::Main, float, unsigned long, 3> dv_max_element_test_float_ulong;
-DenseVectorBlockedMaxElementTest<Mem::Main, double, unsigned long, 3> dv_max_element_test_double_ulong;
+DenseVectorBlockedMaxAbsElementTest<Mem::Main, float, unsigned int, 2> dv_max_abs_element_test_float_uint;
+DenseVectorBlockedMaxAbsElementTest<Mem::Main, double, unsigned int, 2> dv_max_abs_element_test_double_uint;
+DenseVectorBlockedMaxAbsElementTest<Mem::Main, float, unsigned long, 3> dv_max_abs_element_test_float_ulong;
+DenseVectorBlockedMaxAbsElementTest<Mem::Main, double, unsigned long, 3> dv_max_abs_element_test_double_ulong;
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMaxElementTest<Mem::Main, __float128, unsigned int, 2> dv_max_element_test_float128_uint;
-DenseVectorBlockedMaxElementTest<Mem::Main, __float128, unsigned long, 3> dv_max_element_test_float128_ulong;
+DenseVectorBlockedMaxAbsElementTest<Mem::Main, __float128, unsigned int, 2> dv_max_abs_element_test_float128_uint;
+DenseVectorBlockedMaxAbsElementTest<Mem::Main, __float128, unsigned long, 3> dv_max_abs_element_test_float128_ulong;
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxElementTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_max_element_test_float_uint;
-DenseVectorBlockedMaxElementTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_max_element_test_double_uint;
-DenseVectorBlockedMaxElementTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_max_element_test_float_ulong;
-DenseVectorBlockedMaxElementTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_max_element_test_double_ulong;
+DenseVectorBlockedMaxAbsElementTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_max_abs_element_test_float_uint;
+DenseVectorBlockedMaxAbsElementTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_max_abs_element_test_double_uint;
+DenseVectorBlockedMaxAbsElementTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_max_abs_element_test_float_ulong;
+DenseVectorBlockedMaxAbsElementTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_max_abs_element_test_double_ulong;
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_,
+  Index BS_>
+class DenseVectorBlockedMinAbsElementTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorBlockedMinAbsElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedMinAbsElementTest")
+  {
+  }
+
+  virtual ~DenseVectorBlockedMinAbsElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    {
+      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        Tiny::Vector<DT_, BS_> tv1;
+        for (Index j(0) ; j < BS_ ; ++j)
+          tv1.v[j]  = DT_(DT_((i * BS_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        a_local(i, tv1);
+      }
+
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> a;
+      a.convert(a_local);
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ min = a.min_abs_element();
+
+      TEST_CHECK_EQUAL(min, DT_(0));
+    }
+  }
+};
+DenseVectorBlockedMinAbsElementTest<Mem::Main, float, unsigned int, 2> dv_min_abs_element_test_float_uint;
+DenseVectorBlockedMinAbsElementTest<Mem::Main, double, unsigned int, 2> dv_min_abs_element_test_double_uint;
+DenseVectorBlockedMinAbsElementTest<Mem::Main, float, unsigned long, 3> dv_min_abs_element_test_float_ulong;
+DenseVectorBlockedMinAbsElementTest<Mem::Main, double, unsigned long, 3> dv_min_abs_element_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedMinAbsElementTest<Mem::Main, __float128, unsigned int, 2> dv_min_abs_element_test_float128_uint;
+DenseVectorBlockedMinAbsElementTest<Mem::Main, __float128, unsigned long, 3> dv_min_abs_element_test_float128_ulong;
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedMinAbsElementTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_min_abs_element_test_float_uint;
+DenseVectorBlockedMinAbsElementTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_min_abs_element_test_double_uint;
+DenseVectorBlockedMinAbsElementTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_min_abs_element_test_float_ulong;
+DenseVectorBlockedMinAbsElementTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_min_abs_element_test_double_ulong;
 #endif
 
 template<

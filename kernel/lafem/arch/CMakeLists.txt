@@ -20,7 +20,10 @@ if (FEAT_EICKT)
     diagonal_generic-eickt.cpp
     dot_product_generic-eickt.cpp
     lumping_generic-eickt.cpp
-    max_element_generic-eickt.cpp
+    max_abs_index_generic-eickt.cpp
+    max_index_generic-eickt.cpp
+    min_abs_index_generic-eickt.cpp
+    min_index_generic-eickt.cpp
     norm_generic-eickt.cpp
     product_matmat_generic-eickt.cpp
     row_norm_generic-eickt.cpp
@@ -38,7 +41,8 @@ if (FEAT_HAVE_MKL)
     apply_mkl.cpp
     component_product_mkl.cpp
     dot_product_mkl.cpp
-    max_element_mkl.cpp
+    max_abs_index_mkl.cpp
+    min_abs_index_mkl.cpp
     norm_mkl.cpp
     product_matmat_mkl.cpp
     unit_filter_mkl.cpp
@@ -61,7 +65,8 @@ if (FEAT_HAVE_CUDA)
     diagonal.cu
     dot_product.cu
     lumping.cu
-    max_element.cu
+    max_abs_index.cu
+    min_abs_index.cu
     mirror.cu
     norm.cu
     product_matmat.cu

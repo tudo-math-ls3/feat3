@@ -474,7 +474,7 @@ namespace FEAT
           this->_norm_dir = this->_vec_pn.norm2();
 
           // First scale so that all entries are |.| < 1
-          this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.max_element());
+          this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.max_abs_element());
           // Now scale so that vec_pn.norm2() == 1. Note that this will only be approximately true
           this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
 

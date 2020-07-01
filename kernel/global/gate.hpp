@@ -330,14 +330,59 @@ namespace FEAT
        *
        * \return The largest absolute value.
        */
+      DataType max_abs_element(const LocalVector_ & x) const
+      {
+        return synch_scalar(x.max_abs_element(), *_comm, Dist::op_max);
+      }
+
+      ScalarTicketType max_abs_element_async(const LocalVector_ & x) const
+      {
+        return std::make_shared<SynchScalarTicket<DataType>>(x.max_abs_element(), *_comm, Dist::op_max);
+      }
+
+      /**
+       * \brief Retrieve the absolute minimum value of this vector.
+       *
+       * \return The smallest absolute value.
+       */
+      DataType min_abs_element(const LocalVector_ & x) const
+      {
+        return synch_scalar(x.min_abs_element(), *_comm, Dist::op_min);
+      }
+
+      ScalarTicketType min_abs_element_async(const LocalVector_ & x) const
+      {
+        return std::make_shared<SynchScalarTicket<DataType>>(x.min_abs_element(), *_comm, Dist::op_min);
+      }
+
+      /**
+       * \brief Retrieve the maximum value of this vector.
+       *
+       * \return The largest value.
+       */
       DataType max_element(const LocalVector_ & x) const
       {
         return synch_scalar(x.max_element(), *_comm, Dist::op_max);
       }
 
-      ScalarTicketType  max_element_async(const LocalVector_ & x) const
+      ScalarTicketType max_element_async(const LocalVector_ & x) const
       {
         return std::make_shared<SynchScalarTicket<DataType>>(x.max_element(), *_comm, Dist::op_max);
+      }
+
+      /**
+       * \brief Retrieve the minimum value of this vector.
+       *
+       * \return The smallest value.
+       */
+      DataType min_element(const LocalVector_ & x) const
+      {
+        return synch_scalar(x.min_element(), *_comm, Dist::op_max);
+      }
+
+      ScalarTicketType min_element_async(const LocalVector_ & x) const
+      {
+        return std::make_shared<SynchScalarTicket<DataType>>(x.min_element(), *_comm, Dist::op_max);
       }
     }; // class Gate<...>
   } // namespace Global

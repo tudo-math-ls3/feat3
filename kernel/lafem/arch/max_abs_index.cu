@@ -6,7 +6,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-#include <kernel/lafem/arch/max_element.hpp>
+#include <kernel/lafem/arch/max_abs_index.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
@@ -20,23 +20,23 @@ namespace FEAT
     namespace Intern
     {
 
-      Index cuda_max_element(const float * x, const Index size)
+      Index cuda_max_abs_index(const float * x, const Index size)
       {
         int result;
         cublasStatus_t status;
         status = cublasIsamax(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasmax failed with status code "+ stringify(status));
         return (Index)result - 1;
       }
 
-      Index cuda_max_element(const double * x, const Index size)
+      Index cuda_max_abs_index(const double * x, const Index size)
       {
         int result;
         cublasStatus_t status;
         status = cublasIdamax(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasmax failed with status code "+ stringify(status));
         return (Index)result - 1;
       }
     }
@@ -48,9 +48,9 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-Index MaxElement<Mem::CUDA>::value(const DT_ * const x, const Index size)
+Index MaxAbsIndex<Mem::CUDA>::value(const DT_ * const x, const Index size)
 {
-  Index result = Intern::cuda_max_element(x, size);
+  Index result = Intern::cuda_max_abs_index(x, size);
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -60,5 +60,5 @@ Index MaxElement<Mem::CUDA>::value(const DT_ * const x, const Index size)
   return result;
 }
 
-template Index MaxElement<Mem::CUDA>::value(const float * const, const Index);
-template Index MaxElement<Mem::CUDA>::value(const double * const, const Index);
+template Index MaxAbsIndex<Mem::CUDA>::value(const float * const, const Index);
+template Index MaxAbsIndex<Mem::CUDA>::value(const double * const, const Index);

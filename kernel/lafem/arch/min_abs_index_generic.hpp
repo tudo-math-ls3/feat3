@@ -4,10 +4,10 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_ARCH_MAX_ELEMENT_GENERIC_HPP
-#define KERNEL_LAFEM_ARCH_MAX_ELEMENT_GENERIC_HPP 1
+#ifndef KERNEL_LAFEM_ARCH_MIN_ABS_INDEX_GENERIC_HPP
+#define KERNEL_LAFEM_ARCH_MIN_ABS_INDEX_GENERIC_HPP 1
 
-#ifndef KERNEL_LAFEM_ARCH_MAX_ELEMENT_HPP
+#ifndef KERNEL_LAFEM_ARCH_MIN_ABS_INDEX_HPP
 #error "Do not include this implementation-only header file directly!"
 #endif
 
@@ -20,25 +20,25 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_>
-      Index MaxElement<Mem::Main>::value_generic(const DT_ * const x, const Index size)
+      Index MinAbsIndex<Mem::Main>::value_generic(const DT_ * const x, const Index size)
       {
-        DT_ max(0);
-        Index max_i(0);
+        DT_ min(Math::abs(x[0]));
+        Index min_i(0);
 
         for (Index i(0) ; i < size ; ++i)
         {
-          if (Math::abs(x[i]) > max)
+          if (Math::abs(x[i]) < min)
           {
-            max = Math::abs(x[i]);
-            max_i = i;
+            min = Math::abs(x[i]);
+            min_i = i;
           }
         }
 
-        return max_i;
+        return min_i;
       }
 
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT
 
-#endif // KERNEL_LAFEM_ARCH_MAX_ELEMENT_GENERIC_HPP
+#endif // KERNEL_LAFEM_ARCH_MIN_ABS_INDEX_GENERIC_HPP

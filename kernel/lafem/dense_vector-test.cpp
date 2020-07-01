@@ -137,10 +137,10 @@ public:
     rnd_range[1] = DT_(+10);
     DenseVector<Mem_, DT_, IT_> rnd_vec(rng, rnd_size, rnd_range[0], rnd_range[1]);
     TEST_CHECK_EQUAL(rnd_vec.size(), rnd_size);
-    DT_ rnd_max = rnd_vec.max_element();
+    DT_ rnd_max = rnd_vec.max_abs_element();
     TEST_CHECK_IN_RANGE(rnd_max, rnd_range[0], rnd_range[1]);
     rnd_vec.scale(rnd_vec, DT_(-1));
-    DT_ rnd_min = -rnd_vec.max_element();
+    DT_ rnd_min = -rnd_vec.max_abs_element();
     TEST_CHECK_IN_RANGE(rnd_min, rnd_range[0], rnd_range[1]);
 
     // new clone testing
@@ -767,6 +767,119 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
+class DenseVectorMaxAbsElementTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorMaxAbsElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMaxAbsElementTest")
+  {
+  }
+
+  virtual ~DenseVectorMaxAbsElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+      }
+
+      DenseVector<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ max = a.max_abs_element();
+
+      TEST_CHECK_EQUAL(max, DT_(size-1));
+    }
+  }
+};
+DenseVectorMaxAbsElementTest<Mem::Main, float, unsigned int> dv_max_abs_element_test_float_uint;
+DenseVectorMaxAbsElementTest<Mem::Main, double, unsigned int> dv_max_abs_element_test_double_uint;
+DenseVectorMaxAbsElementTest<Mem::Main, float, unsigned long> dv_max_abs_element_test_float_ulong;
+DenseVectorMaxAbsElementTest<Mem::Main, double, unsigned long> dv_max_abs_element_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorMaxAbsElementTest<Mem::Main, __float128, unsigned int> dv_max_abs_element_test_float128_uint;
+DenseVectorMaxAbsElementTest<Mem::Main, __float128, unsigned long> dv_max_abs_element_test_float128_ulong;
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMaxAbsElementTest<Mem::CUDA, float, unsigned int> cuda_dv_max_abs_element_test_float_uint;
+DenseVectorMaxAbsElementTest<Mem::CUDA, double, unsigned int> cuda_dv_max_abs_element_test_double_uint;
+DenseVectorMaxAbsElementTest<Mem::CUDA, float, unsigned long> cuda_dv_max_abs_element_test_float_ulong;
+DenseVectorMaxAbsElementTest<Mem::CUDA, double, unsigned long> cuda_dv_max_abs_element_test_double_ulong;
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseVectorMinAbsElementTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorMinAbsElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMinAbsElementTest")
+  {
+  }
+
+  virtual ~DenseVectorMinAbsElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+      }
+
+      DenseVector<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ min = a.min_abs_element();
+
+      TEST_CHECK_EQUAL(min, DT_(0));
+    }
+  }
+};
+DenseVectorMinAbsElementTest<Mem::Main, float, unsigned int> dv_min_abs_element_test_float_uint;
+DenseVectorMinAbsElementTest<Mem::Main, double, unsigned int> dv_min_abs_element_test_double_uint;
+DenseVectorMinAbsElementTest<Mem::Main, float, unsigned long> dv_min_abs_element_test_float_ulong;
+DenseVectorMinAbsElementTest<Mem::Main, double, unsigned long> dv_min_abs_element_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorMinAbsElementTest<Mem::Main, __float128, unsigned int> dv_min_abs_element_test_float128_uint;
+DenseVectorMinAbsElementTest<Mem::Main, __float128, unsigned long> dv_min_abs_element_test_float128_ulong;
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMinAbsElementTest<Mem::CUDA, float, unsigned int> cuda_dv_min_abs_element_test_float_uint;
+DenseVectorMinAbsElementTest<Mem::CUDA, double, unsigned int> cuda_dv_min_abs_element_test_double_uint;
+DenseVectorMinAbsElementTest<Mem::CUDA, float, unsigned long> cuda_dv_min_abs_element_test_float_ulong;
+DenseVectorMinAbsElementTest<Mem::CUDA, double, unsigned long> cuda_dv_min_abs_element_test_double_ulong;
+#endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
 class DenseVectorMaxElementTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
@@ -782,13 +895,14 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    for (Index size(5) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<Mem::Main, DT_, IT_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a_local(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        a_local(i, DT_(i));
       }
+      a_local(0, DT_(-5));
 
       DenseVector<Mem_, DT_, IT_> a;
       a.convert(a_local);
@@ -812,9 +926,54 @@ DenseVectorMaxElementTest<Mem::Main, double, unsigned long> dv_max_element_test_
 DenseVectorMaxElementTest<Mem::Main, __float128, unsigned int> dv_max_element_test_float128_uint;
 DenseVectorMaxElementTest<Mem::Main, __float128, unsigned long> dv_max_element_test_float128_ulong;
 #endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorMaxElementTest<Mem::CUDA, float, unsigned int> cuda_dv_max_element_test_float_uint;
-DenseVectorMaxElementTest<Mem::CUDA, double, unsigned int> cuda_dv_max_element_test_double_uint;
-DenseVectorMaxElementTest<Mem::CUDA, float, unsigned long> cuda_dv_max_element_test_float_ulong;
-DenseVectorMaxElementTest<Mem::CUDA, double, unsigned long> cuda_dv_max_element_test_double_ulong;
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseVectorMinElementTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorMinElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMinElementTest")
+  {
+  }
+
+  virtual ~DenseVectorMinElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(5) ; size < Index(1e3) ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(DT_(i) - DT_(3)));
+      }
+
+      DenseVector<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ min = a.min_element();
+
+      TEST_CHECK_EQUAL(min, DT_(-3.));
+    }
+  }
+};
+DenseVectorMinElementTest<Mem::Main, float, unsigned int> dv_min_element_test_float_uint;
+DenseVectorMinElementTest<Mem::Main, double, unsigned int> dv_min_element_test_double_uint;
+DenseVectorMinElementTest<Mem::Main, float, unsigned long> dv_min_element_test_float_ulong;
+DenseVectorMinElementTest<Mem::Main, double, unsigned long> dv_min_element_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorMinElementTest<Mem::Main, __float128, unsigned int> dv_min_element_test_float128_uint;
+DenseVectorMinElementTest<Mem::Main, __float128, unsigned long> dv_min_element_test_float128_ulong;
 #endif

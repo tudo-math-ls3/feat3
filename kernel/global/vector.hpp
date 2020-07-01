@@ -216,6 +216,18 @@ namespace FEAT
         return dot_async(*this);
       }
 
+      /**
+       * \brief Computes a reduced 2-norm over all processes.
+       *
+       * This function is equivalent to the call
+       *    Math::sqrt(this->sum(x*x))
+       *
+       * \param[in] x
+       * The value that is to be summarised over all processes.
+       *
+       * \returns
+       * The reduced 2-norm of all \p x.
+       */
       DataType norm2() const
       {
         return Math::sqrt(norm2sqr());
@@ -236,6 +248,45 @@ namespace FEAT
         _vector.component_product(x.local(), y.local());
       }
 
+      /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest absolute value.
+       */
+      DataType max_abs_element() const
+      {
+        if (_gate != nullptr)
+          return _gate->max_abs_element(_vector);
+        return _vector.max_abs_element();
+      }
+
+      std::shared_ptr<SynchScalarTicket<DataType>> max_abs_element_async() const
+      {
+        return _gate->max_abs_element_async(_vector);
+      }
+
+      /**
+       * \brief Retrieve the absolute minimum value of this vector.
+       *
+       * \return The smallest absolute value.
+       */
+      DataType min_abs_element() const
+      {
+        if (_gate != nullptr)
+          return _gate->min_abs_element(_vector);
+        return _vector.min_abs_element();
+      }
+
+      std::shared_ptr<SynchScalarTicket<DataType>> min_abs_element_async() const
+      {
+        return _gate->min_abs_element_async(_vector);
+      }
+
+      /**
+       * \brief Retrieve the maximum value of this vector.
+       *
+       * \return The largest value.
+       */
       DataType max_element() const
       {
         if (_gate != nullptr)
@@ -246,6 +297,23 @@ namespace FEAT
       std::shared_ptr<SynchScalarTicket<DataType>> max_element_async() const
       {
         return _gate->max_element_async(_vector);
+      }
+
+      /**
+       * \brief Retrieve the minimum value of this vector.
+       *
+       * \return The smallest value.
+       */
+      DataType min_element() const
+      {
+        if (_gate != nullptr)
+          return _gate->min_element(_vector);
+        return _vector.min_element();
+      }
+
+      std::shared_ptr<SynchScalarTicket<DataType>> min_element_async() const
+      {
+        return _gate->min_element_async(_vector);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
