@@ -378,9 +378,39 @@ namespace FEAT
        *
        * \return The largest absolute value.
        */
+      DataType max_abs_element() const
+      {
+        return Math::max(first().max_abs_element(), rest().max_abs_element());
+      }
+
+      /**
+       * \brief Retrieve the absolute minimum value of this vector.
+       *
+       * \return The smallest absolute value.
+       */
+      DataType min_abs_element() const
+      {
+        return Math::min(first().min_abs_element(), rest().min_abs_element());
+      }
+
+      /**
+       * \brief Retrieve the maximum value of this vector.
+       *
+       * \return The largest value.
+       */
       DataType max_element() const
       {
         return Math::max(first().max_element(), rest().max_element());
+      }
+
+      /**
+       * \brief Retrieve the minimum value of this vector.
+       *
+       * \return The smallest value.
+       */
+      DataType min_element() const
+      {
+        return Math::min(first().min_element(), rest().min_element());
       }
 
       /// \cond internal
@@ -744,9 +774,24 @@ namespace FEAT
         return first().norm2();
       }
 
+      DataType max_abs_element() const
+      {
+        return first().max_abs_element();
+      }
+
+      DataType min_abs_element() const
+      {
+        return first().min_abs_element();
+      }
+
       DataType max_element() const
       {
         return first().max_element();
+      }
+
+      DataType min_element() const
+      {
+        return first().min_element();
       }
 
       const typename First_::DataType operator()(Index index) const
