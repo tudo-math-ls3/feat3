@@ -12,6 +12,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
 #include <kernel/lafem/arch/unit_filter.hpp>
@@ -385,6 +386,31 @@ namespace FEAT
       }
 
       void filter_offdiag_col_mat(SparseMatrixELL<Mem::Main, DT_, IT_> &) const
+      {
+        // nothing to do here
+      }
+
+      template<int block_width_>
+      void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, 1, block_width_> & matrix) const
+      {
+        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
+
+        const IndexType* row_ptr(matrix.row_ptr());
+        auto* v(matrix.val());
+
+        for(Index i(0); i < _sv.used_elements(); ++i)
+        {
+          Index ix(_sv.indices()[i]);
+          // replace by null row
+          for(IndexType j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          {
+            v[j] = DT_(0);
+          }
+        }
+      }
+
+      template<int block_height_>
+      void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, block_height_, 1> &) const
       {
         // nothing to do here
       }
