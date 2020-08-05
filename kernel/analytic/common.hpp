@@ -660,7 +660,7 @@ namespace FEAT
       /// \endcond
 
       /**
-       * \brief Exponential-Bubble Analytic function
+       * \brief Q2-Bubble Analytic function
        *
        * This class implements the AnalyticFunction interface representing the function
        *   - 1D: u(x)     =  4*x*(1-x)
@@ -816,8 +816,7 @@ namespace FEAT
 
           GradientType gradient(const PointType& point) const
           {
-            DataType norm (DataType(0));
-            this->value(norm, point);
+            DataType norm (this->value(point));
 
             if(norm < Math::eps<DataType>())
               return GradientType::null();
@@ -827,21 +826,20 @@ namespace FEAT
 
           HessianType hessian(const PointType& point) const
           {
-            DataType norm (DataType(0));
-            this->value(norm, point);
+            DataType norm (this->value(point));
             if(norm < Math::eps<DataType>())
               return HessianType::null();
 
-            HessianType hess;
+            HessianType hess (DataType(0));
             norm = DataType(1)/norm;
             DataType denom = Math::sqr(norm)*norm;
 
-            for(Index i(0); i < dim_; ++i)
+            for(int i(0); i < dim_; ++i)
             {
               hess[i][i] = norm;
-              for(Index j(0); j < dim_; ++i)
+              for(int j(0); j < dim_; ++j)
               {
-                hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
+                hess[i][j] -= ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
               }
             }
             return hess;
@@ -944,21 +942,21 @@ namespace FEAT
 
           HessianType hessian(const PointType& point) const
           {
-            DataType norm = this->value(point);
+            DataType norm ((point - _origin).norm_euclid());
             if(norm <= Math::eps<DataType>())
               return HessianType::null();
 
-            HessianType hess;
+            HessianType hess(DataType(0));
 
             norm = DataType(1)/norm;
-            DataType denom = Math::sqr(_b)*Math::sqr(norm)*norm;
+            DataType denom = _b*Math::sqr(norm)*norm;
 
-            for(Index i(0); i < dim_; ++i)
+            for(int i(0); i < dim_; ++i)
             {
-              hess[i][i] = norm;
-              for(Index j(0); j < dim_; ++i)
+              hess[i][i] = _b*norm;
+              for(int j(0); j < dim_; ++j)
               {
-                hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
+                hess[i][j] -= ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
               }
             }
 
@@ -1016,6 +1014,7 @@ namespace FEAT
 
         static constexpr bool can_value = true;
         static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
 
         typedef Tiny::Vector<DataType_, dim_> PointType;
 
@@ -1052,19 +1051,24 @@ namespace FEAT
 
           ValueType value(const PointType& point) const
           {
-            return _b * (point[component_] - _origin[component_]);
+            return _b * Math::abs(point[component_] - _origin[component_]);
           }
 
           GradientType gradient(const PointType& point) const
           {
-            DataType norm = this->value(norm, point);
+            DataType norm = this->value(point);
             if(norm < Math::eps<DataType>())
               return GradientType::null();
 
             GradientType grad;
             grad.format();
-            grad[component_] = _b;
+            grad[component_] = _b * Math::signum(point[component_] - _origin[component_]);
             return grad;
+          }
+
+          HessianType hessian(const PointType& DOXY(point)) const
+          {
+            return HessianType::null();
           }
         }; // class PlaneDistanceFunctionSD::Evaluator<...>
 
@@ -1163,15 +1167,15 @@ namespace FEAT
           {
           }
 
-          ValueType value(const PointType& point) const
+          ValueType value(const PointType& point)
           {
             return Math::min(_f1_eval.value(point), _f2_eval.value(point));
           }
 
-          GradientType gradient(const PointType& point) const
+          GradientType gradient(const PointType& point)
           {
-            ValueType val1 = _f1_eval.value(val1, point);
-            ValueType val2 = _f2_eval.value(val2, point);
+            ValueType val1 = _f1_eval.value(point);
+            ValueType val2 = _f2_eval.value(point);
 
             if(Math::abs(val1-val2) < Math::eps<DataType>())
               return GradientType::null();
@@ -1181,10 +1185,10 @@ namespace FEAT
               return _f2_eval.gradient(point);
           }
 
-          HessianType hessian(const PointType& point) const
+          HessianType hessian(const PointType& point)
           {
-            ValueType val1 = _f1_eval.value(val1, point);
-            ValueType val2 = _f2_eval.value(val2, point);
+            ValueType val1 = _f1_eval.value(point);
+            ValueType val2 = _f2_eval.value(point);
 
             if(Math::abs(val1-val2) < Math::eps<DataType>())
               return HessianType::null();
@@ -2248,9 +2252,22 @@ namespace FEAT
         }
       };
 
+      /// \cond internal
       template<typename DataType_>
       using ExpStatic = Analytic::Common::TensorStatic<ExpScalarStatic<DataType_>, DataType_>;
+      /// \endcond
 
+      /**
+       * \brief Exponential Analytic function
+       *
+       * This class implements the AnalyticFunction interface representing the function
+       *   - 1D: u(x)     =  (exp(10) - exp(10*x²)) / (exp(10) - 1)
+       *   - 2D: u(x,y)   =  u(x)*u(y)
+       *   - 3D: u(x,y,z) =  u(x)*u(y)*u(z)
+       *
+       * This class supports function values, gradient and hessians for all dimensions.
+       *
+       */
       template<int dim_>
       using ExpFunction = Analytic::StaticWrapperFunction<dim_, ExpStatic, true, true, true>;
 
