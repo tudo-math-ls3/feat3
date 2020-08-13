@@ -83,7 +83,6 @@ namespace FEAT
      * _scalar_index[1]: row count \n
      * _scalar_index[2]: column count \n
      * _scalar_index[3]: non zero element count (used ValueType elements)\n
-     * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -265,7 +264,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -285,7 +283,6 @@ namespace FEAT
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -307,7 +304,6 @@ namespace FEAT
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(used_elements_in);
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
         this->_indices_size.push_back(_used_elements());
@@ -333,7 +329,6 @@ namespace FEAT
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -441,7 +436,6 @@ namespace FEAT
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size() / Index(BlockHeight_ * BlockWidth_));
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_elements.push_back(val_in.elements());
         this->_elements_size.push_back(val_in.size());
@@ -557,12 +551,10 @@ namespace FEAT
         this->_elements_size.clear();
         this->_indices_size.clear();
         this->_scalar_index.clear();
-        this->_scalar_dt.clear();
 
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -668,7 +660,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
 
         std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
 
@@ -874,7 +865,7 @@ namespace FEAT
             break; //return zero element
         }
 
-        return ValueType(zero_element());
+        return ValueType(0.);
       }
 
       /**
@@ -1004,16 +995,6 @@ namespace FEAT
           return nullptr;
 
         return this->_indices.at(1);
-      }
-
-      /**
-       * \brief Retrieve non zero element.
-       *
-       * \returns Zero element.
-       */
-      DataType zero_element() const
-      {
-        return this->_scalar_dt.at(0);
       }
 
       /**
@@ -2118,8 +2099,6 @@ namespace FEAT
         if (a.columns() != b.columns())
           return false;
         if (a.used_elements() != b.used_elements())
-          return false;
-        if (a.zero_element() != b.zero_element())
           return false;
 
         if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)

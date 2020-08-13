@@ -59,7 +59,6 @@ namespace FEAT
      * _scalar_index[2]: column count \n
      * _scalar_index[3]: non zero element count (used elements) \n
      * _scalar_index[4]: non zero row count
-     * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -132,7 +131,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -153,7 +151,6 @@ namespace FEAT
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -177,7 +174,6 @@ namespace FEAT
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(used_elements_in);
         this->_scalar_index.push_back(used_rows_in);
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
         this->_indices_size.push_back(_used_elements());
@@ -205,7 +201,6 @@ namespace FEAT
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -285,7 +280,6 @@ namespace FEAT
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size());
         this->_scalar_index.push_back(row_numbers_in.size());
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_elements.push_back(val_in.elements());
         this->_elements_size.push_back(val_in.size());
@@ -345,7 +339,6 @@ namespace FEAT
         this->_scalar_index.push_back(csr.columns());
         this->_scalar_index.push_back(tused_elements);
         this->_scalar_index.push_back(non_zero_rows.num_indices());
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
         this->_indices_size.push_back(_used_elements());
@@ -600,12 +593,10 @@ namespace FEAT
         this->_elements_size.clear();
         this->_indices_size.clear();
         this->_scalar_index.clear();
-        this->_scalar_dt.clear();
 
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -739,7 +730,7 @@ namespace FEAT
         }
 
         if (row_index == this->used_rows() || Index(MemoryPool<Mem_>::get_element(this->row_numbers(), row_index)) > row)
-          return zero_element();
+          return DT_(0.);
 
         //row_numbers[row_index] == row
         for (Index i(Index(MemoryPool<Mem_>::get_element(this->row_ptr(), row_index))) ; i < Index(MemoryPool<Mem_>::get_element(this->row_ptr(), row_index + 1)) ; ++i)
@@ -747,9 +738,9 @@ namespace FEAT
           if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) == col)
             return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
           if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) > col)
-            return zero_element();
+            return DT_(0.);
         }
-        return zero_element();
+        return DT_(0.);
       }
 
       /**
@@ -888,16 +879,6 @@ namespace FEAT
           return nullptr;
 
         return this->_indices.at(2);
-      }
-
-      /**
-       * \brief Retrieve non zero element.
-       *
-       * \returns Zero element.
-       */
-      DT_ zero_element() const
-      {
-        return this->_scalar_dt.at(0);
       }
 
       /**
@@ -1158,8 +1139,6 @@ namespace FEAT
         if (a.columns() != b.columns())
           return false;
         if (a.used_elements() != b.used_elements())
-          return false;
-        if (a.zero_element() != b.zero_element())
           return false;
         if (a.used_rows() != b.used_rows())
           return false;

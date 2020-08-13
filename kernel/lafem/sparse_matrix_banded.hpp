@@ -48,7 +48,6 @@ namespace FEAT
      * _scalar_index[2]: column count \n
      * _scalar_index[3]: non zero element count (used elements) \n
      * _scalar_index[4]: number of offsets \n
-     * _scalar_dt[0]: zero element
      *
      * This class saves a sparse-matrix with a banded structure. For each diagonal of
      * the matrix with non-zero elements there must be reserved memory for the whole
@@ -382,7 +381,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -398,7 +396,6 @@ namespace FEAT
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -446,7 +443,6 @@ namespace FEAT
 
         this->_scalar_index.push_back(tused_elements);
         this->_scalar_index.push_back(offsets_in.size());
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_elements.push_back(val_in.elements());
         this->_elements_size.push_back(val_in.size());
@@ -632,12 +628,10 @@ namespace FEAT
         this->_elements_size.clear();
         this->_indices_size.clear();
         this->_scalar_index.clear();
-        this->_scalar_dt.clear();
 
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -769,7 +763,7 @@ namespace FEAT
             return MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
           }
         }
-        return zero_element();
+        return DT_(0.);
       }
 
       /**
@@ -853,16 +847,6 @@ namespace FEAT
       IT_ const * offsets() const
       {
         return this->_indices.at(0);
-      }
-
-      /**
-       * \brief Retrieve non zero element.
-       *
-       * \returns Zero element.
-       */
-      DT_ zero_element() const
-      {
-        return this->_scalar_dt.at(0);
       }
 
       /**
@@ -1236,8 +1220,6 @@ namespace FEAT
         if (a.num_of_offsets() != b.num_of_offsets())
           return false;
         if (a.used_elements() != b.used_elements())
-          return false;
-        if (a.zero_element() != b.zero_element())
           return false;
 
         if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)

@@ -55,7 +55,6 @@ namespace FEAT
      * _scalar_index[4]: allocated elements \n
      * _scalar_index[5]: allocation size increment \n
      * _scalar_index[6]: boolean flag, if container is sorted \n
-     * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -420,7 +419,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(0, 1000));
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -439,7 +437,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(dimensions*dimensions, 1000));
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -459,7 +456,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(rows_in * columns_in, 1000));
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -475,7 +471,6 @@ namespace FEAT
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -520,7 +515,6 @@ namespace FEAT
         this->_scalar_index.push_back(val_in.size());
         this->_scalar_index.push_back(Math::min<Index>(rows_in * columns_in, 1000));
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_elements.push_back(val_in.elements());
         this->_elements_size.push_back(val_in.size());
@@ -704,7 +698,6 @@ namespace FEAT
         this->_scalar_index.push_back(other.used_elements());
         this->_scalar_index.push_back(1000);
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
 
         if (other.used_elements() == 0)
           return;
@@ -777,7 +770,6 @@ namespace FEAT
         this->_scalar_index.push_back(other.used_elements());
         this->_scalar_index.push_back(1000);
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
 
         if (other.used_elements() == 0)
           return;
@@ -855,7 +847,6 @@ namespace FEAT
         this->_scalar_index.push_back(other.used_elements());
         this->_scalar_index.push_back(1000);
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
 
         if (other.used_elements() == 0)
           return;
@@ -1111,7 +1102,6 @@ namespace FEAT
             this->_scalar_index.push_back(0);
             this->_scalar_index.push_back(1000);
             this->_scalar_index.push_back(1);
-            this->_scalar_dt.push_back(DT_(0));
 
             std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
 
@@ -1432,7 +1422,7 @@ namespace FEAT
         ASSERT(col < this->columns());
 
         if (this->_elements.size() == 0)
-          return zero_element();
+          return DT_(0.);
 
         if (sorted() == 0)
           const_cast<SparseMatrixCOO *>(this)->sort();
@@ -1457,7 +1447,7 @@ namespace FEAT
           return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
         }
         else
-          return zero_element();
+          return DT_(0.);
       }
 
       /**
@@ -1566,16 +1556,6 @@ namespace FEAT
         if (sorted() == 0)
           const_cast<SparseMatrixCOO *>(this)->sort();
         return this->_indices.at(1);
-      }
-
-      /**
-       * \brief Retrieve non zero element.
-       *
-       * \returns Zero element.
-       */
-      DT_ zero_element() const
-      {
-        return this->_scalar_dt.at(0);
       }
 
       /**
@@ -1995,8 +1975,6 @@ namespace FEAT
         if (a.columns() != b.columns())
           return false;
         if (a.used_elements() != b.used_elements())
-          return false;
-        if (a.zero_element() != b.zero_element())
           return false;
 
         for (Index i(0) ; i < a.used_elements() ; ++i)

@@ -60,7 +60,6 @@ namespace FEAT
      * _scalar_index[2]: allocated elements \n
      * _scalar_index[3]: allocation size increment \n
      * _scalar_index[4]: boolean flag, if container is sorted \n
-     * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -130,7 +129,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(0, 1000));
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -189,7 +187,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
         this->_scalar_index.push_back(1);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -213,7 +210,6 @@ namespace FEAT
         this->_scalar_index.push_back(elements_in.size());
         this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
         this->_scalar_index.push_back(Index(is_sorted));
-        this->_scalar_dt.push_back(DT_(0));
 
         this->_elements.push_back(elements_in.template elements<Perspective::pod>());
         this->_elements_size.push_back(elements_in.template size<Perspective::pod>());
@@ -380,7 +376,7 @@ namespace FEAT
         ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
         if (this->_elements.size() == 0)
-          return ValueType(zero_element());
+          return ValueType(0.);
 
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();
@@ -400,7 +396,7 @@ namespace FEAT
           return t;
         }
         else
-          return ValueType(zero_element());
+          return ValueType(0.);
       }
 
 
@@ -747,16 +743,6 @@ namespace FEAT
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();
         return this->_scalar_index.at(1);
-      }
-
-      /**
-       * \brief Retrieve non zero element.
-       *
-       * \returns Zero element.
-       */
-      DataType zero_element() const
-      {
-        return this->_scalar_dt.at(0);
       }
 
       /**

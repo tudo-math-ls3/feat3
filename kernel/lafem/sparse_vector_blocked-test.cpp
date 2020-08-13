@@ -61,7 +61,6 @@ public:
     TEST_CHECK_EQUAL(a(3).v[0], tv1.v[0]);
     TEST_CHECK_EQUAL(a(1)[0], tv1[1]);
     TEST_CHECK_EQUAL(a(6)[1], tv2[1]);
-    TEST_CHECK_EQUAL(a(2)[0], a.zero_element());
     TEST_CHECK_EQUAL(a.used_elements(), Index(3));
 
     SparseVectorBlocked<Mem_, DT_, IT_, 2> b(a.clone());

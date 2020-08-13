@@ -60,7 +60,6 @@ namespace FEAT
      * _scalar_index[4]: num_of_chunks rounded up division of row-counter by chunk size \n
      * _scalar_index[5]: size of val- and row-arrays \n
      * _scalar_index[6]: non zero element count (used elements) \n
-     * _scalar_dt[0]: zero element
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -386,7 +385,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -410,7 +408,6 @@ namespace FEAT
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_dt.push_back(DT_(0));
       }
 
       /**
@@ -426,7 +423,6 @@ namespace FEAT
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -485,7 +481,6 @@ namespace FEAT
         this->_scalar_index.push_back((rows_in + C_in - Index(1)) / C_in);
         this->_scalar_index.push_back(val_in.size());
         this->_scalar_index.push_back(used_elements_in);
-        this->_scalar_dt.push_back(DT_(0));
 
         XASSERTM(val_in.size() == col_ind_in.size(), "val- and col-arrays must have the same size!");
         XASSERTM(cs_in.size() == num_of_chunks() + 1, "cs-array-size must match to row-count and chunk size!");
@@ -722,7 +717,6 @@ namespace FEAT
 
         SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         IT_ * tcl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
         MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
@@ -870,7 +864,6 @@ namespace FEAT
 
         SparseMatrixCSR<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         IT_ * tcl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
         MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
@@ -974,7 +967,6 @@ namespace FEAT
 
         SparseMatrixCOO<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
-        this->_scalar_dt.push_back(cother.zero_element());
 
         IT_ * tcl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
         MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
@@ -1181,12 +1173,10 @@ namespace FEAT
         this->_elements_size.clear();
         this->_indices_size.clear();
         this->_scalar_index.clear();
-        this->_scalar_dt.clear();
 
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-        this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
@@ -1480,7 +1470,7 @@ namespace FEAT
           if (Index(MemoryPool<Mem_>::get_element(col_ind(), i)) == col)
             return MemoryPool<Mem_>::get_element(val(), i);
         }
-        return zero_element();
+        return DT_(0.);
       }
 
       /**
@@ -1627,16 +1617,6 @@ namespace FEAT
           return nullptr;
 
         return this->_elements.at(0);
-      }
-
-      /**
-       * \brief Retrieve non zero element.
-       *
-       * \returns Zero element.
-       */
-      DT_ zero_element() const
-      {
-        return this->_scalar_dt.at(0);
       }
 
       /**
@@ -2169,8 +2149,6 @@ namespace FEAT
         if (a.columns() != b.columns())
           return false;
         if (a.used_elements() != b.used_elements())
-          return false;
-        if (a.zero_element() != b.zero_element())
           return false;
         if (a.C() != b.C())
           return false;
