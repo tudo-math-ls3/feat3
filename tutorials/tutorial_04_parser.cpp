@@ -230,7 +230,7 @@ namespace Tutorial04
     //
     // We will now tell the argument parser which options this application supports,
     // along with a short description of what the corresponding option is meant to do.
-    // Although this is step is not mandatory, it is highly recommended for two reasons:
+    // Although this step is not mandatory, it is highly recommended for two reasons:
     // 1. By telling the parser all our supported options, we may later on instruct the
     //    parser to check if the caller has supplied any unsupported options, so that
     //    we may print an appropriate error message. Without this, any mistyped option
@@ -554,8 +554,6 @@ namespace Tutorial04
     // And create the boundary
     Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
     MeshPartType boundary(boundary_factory);
-
-    // Create Mesh, Boundary, Trafo and Space
 
     std::cout << "Creating Trafo and Space..." << std::endl;
 

@@ -2,7 +2,9 @@
 
 \tableofcontents{html,latex}
 
-\section faq_int_vs_index Why are some arrays indexed using the 'int' type and others using the 'FEAT::Index' type?
+\section faq_generic Generic FAQ
+
+\subsection faq_gen_int_vs_index Why are some arrays indexed using the 'int' type and others using the 'FEAT::Index' type?
 
 Let us begin with the two golden rules of thumb for successfully indexing in FEAT3:
 - All arrays, whose length is runtime dependent, are indexed using the 'FEAT::Index' type.
@@ -40,4 +42,88 @@ c(Index(2)) = a(Index(0)) * b(Index(1)) - a(Index(1)) * b(Index(0));
 
 Because the latter approach turned out to be difficult to read and tedious to write, the decision was made to use the
 int type for indexing compile-time arrays to keep the literals short and clear, thus sacrificing consistency.
+
+
+
+\section faq_lafem LAFEM FAQ
+
+\subsection faq_lafem_assign_op Why can't I use the assignment operator '=' to copy LAFEM containers?
+
+The short answer is: efficency.
+
+The standard (copy) assignment operator has been deleted for LAFEM containers to force the programmer to explicitly
+decide, whether a container has to be
+ - cloned (via the clone() member function)
+ - moved (via the std::move function)
+ - copied (via the copy() member function)
+
+The easiest way to create a new stand-alone copy (aka 'clone') of an existing LAFEM container is to use the clone() member function:
+
+\code{.cpp}
+LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create source vector
+LAFEM::DenseVector<Mem::Main, Index, double> vector_dst;      // create empty destination vector
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_dst = vector_src.clone();                              // create clone of source vector as destination vector
+\endcode
+
+See also \ref faq_lafem_clone_convert_copy
+
+\subsection faq_lafem_clone_convert_copy What is the difference between the clone(), copy() and convert() member functions?
+
+The \b copy() member function is more or less a \c memcpy equivalent for LAFEM containers, i.e. it only performs a plain
+bit-wise copy of the (index and data) array element values of one LAFEM container to another.
+In consequence, the \b copy() member function only works between two LAFEM containers of the same class template with the
+same index and data types.
+The \b copy() member function always assumes that both the source and the destination containers are compatible upon call,
+i.e all index and data arrays of the source and destination containers are already allocated to the correct matching sizes.
+The \b copy() member function \e never allocates new arrays in the destination container and it also \e never frees the
+existing arrays of the destination container, so therefore it will abort program execution with a failed assertion if the
+source and destination container dimensions mismatch.
+
+Finally, the \b copy() member function can be used to copy the array element values between different memory types, i.e.
+you can use it to perform a device-to-host or host-to-device copy between two instances of a LAFEM container, e.g.:
+
+\code{.cpp}
+Index n = 10u;                                               // vector size
+LAFEM::DenseVector<Mem::Main, Index, double> vector_main(n); // vector in main memory
+LAFEM::DenseVector<Mem::CUDA, Index, double> vector_cuda(n); // vector in cuda memory
+vector_main.format(1.0);                                     // set all values to 1.0 (or initialise vector_main in some other manner)
+vector_cuda.copy(vector_main);                               // copy main vector to cuda vector
+\endcode
+
+
+The \b clone() member function creates a \e new copy of an existing LAFEM container with the same memory, data and index type.
+Note that there exist two overloads of the \b clone() function: one that takes the source container (of the exact same type)
+as a function argument (in analogy to the copy function), e.g.
+\code{.cpp}
+LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create source vector
+LAFEM::DenseVector<Mem::Main, Index, double> vector_dst;      // create empty destination vector
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_dst.clone(vector_src);                                 // create destination vector as clone of source
+\endcode
+as well as a second overload, which returns the new container as a return value, e.g.
+\code{.cpp}
+LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create source vector
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+auto vector_dst = vector_src.clone();                         // create clone of source vector as destination vector
+\endcode
+In addition to this functionality, both \b clone() overloads of some LAFEM containers support various <em>clone modes</em>,
+which are specified using the LAFEM::CloneMode enumeration.
+
+
+The \b convert() member function is used to convert one LAFEM container into another (compatible) container, possibly using
+a different LAFEM container class template and/or different memory, index and/or data types.
+This member function is used in one of the following scenarios:
+ - A clone of a LAFEM container class template using a different memory, index or data type has to be created.
+ - A LAFEM container has to be converted to a different (compatible) container class template, e.g. one wants to convert
+   a LAFEM::SparseMatrixBanded object into a corresponding LAFEM::SparseMatrixCSR object.
+
+In both scenarios, the source and destination objects must be created, although the destination object may be uninitialised.
+
+\code{.cpp}
+LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create double-precision source vector
+LAFEM::DenseVector<Mem::Main,   int, float > vector_dst;      // create empty single-precision destination vector
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_dst.convert(vector_src);                               // create destination vector as converted source vector
+\endcode
 */

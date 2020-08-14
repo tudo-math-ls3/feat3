@@ -155,7 +155,8 @@ namespace Tutorial01
   // "Space::Lagrange1::Element" class template. This element family takes the transformation
   // type as the one and only template parameter:
 
-  // Use the Lagrange-1 element (aka "Q1" or "P1"):
+  // Use the Lagrange-1 element (aka "Q1" or "P1", depending on whether ShapeType is a
+  // simplex or a hypercube shape type):
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
   // Or you could also use the Lagrange-2 element (aka "Q2" or "P2") instead:
@@ -241,7 +242,8 @@ namespace Tutorial01
     // (as the name suggests) generate a refined unit-square mesh for us.
 
     // First of all, create a mesh factory object representing a refined unit-square domain
-    // and pass the desired refinement level to its constructor:
+    // and pass the desired refinement level to its constructor. The only purpose of this
+    // "factory" object is to create a mesh for us and we will not need it anymore after that.
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
 
     // Now create the actual mesh by using that factory:
@@ -378,7 +380,8 @@ namespace Tutorial01
     // but we will instead use the pre-defined LaplaceFunctional wrapper, which will
     // compute the right-hand-side force for any given solution function based on its
     // second derivatives. The LaplaceFunctional requires the type of the solution function
-    // as its one and only template parameter, so we use the decltype specifier here:
+    // as its one and only template parameter, so we use the decltype specifier here, which
+    // returns the class type of its argument, so that we do not have to write that out again:
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
 
     // Now we can call the LinearFunctionalAssembler class to assemble our linear
@@ -461,7 +464,7 @@ namespace Tutorial01
     // that we intend to solve to the 'Solver::solve' function:
     Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
-    // Once we do not require the solver anymore, we have to release it. This is done my calling
+    // Once we do not require the solver anymore, we have to release it. This is done by calling
     // the 'done' member function, which is the counterpart of the 'init' member function, i.e.
     // this will release all temporary vectors and factorisations.
     solver->done();
@@ -506,8 +509,8 @@ namespace Tutorial01
 
     std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
 
-    // Next, project our solution into the vertices. This is not necessary for Q1, but in case that
-    // someone chose to use the Q1~ element instead of Q1, this will be necessary.
+    // Next, project our solution into the vertices. This is not necessary for Q1, but in case that someone
+    // chose to use the Rannacher-Turek or Crouzeix-Raviart element instead of Q1, this *will* be necessary.
 
     // First, declare a vector that will receive the vertex projection of our solution.
     // We will also project and write out our right-hand-side, just for fun...
