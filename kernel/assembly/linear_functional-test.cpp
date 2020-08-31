@@ -87,10 +87,10 @@ public:
     const DataType_ weight = DataType_(1) / DataType_(4*num_quads);
 
     // get the vertex set of the mesh
-    const typename QuadMesh::VertexSetType vertex_set(mesh.get_vertex_set());
+    //const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // get the index set of the mesh
-    const Geometry::IndexSet<4> index_set(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2,0>());
 
     // loop over all quads
     for(Index i(0); i < num_quads; ++i)
@@ -133,10 +133,10 @@ public:
     TEST_CHECK_EQUAL(vector.size(), num_quads);
 
     // get the vertex set of the mesh
-    const typename QuadMesh::VertexSetType vertex_set(mesh.get_vertex_set());
+    const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // get the index set of the mesh
-    const Geometry::IndexSet<4> index_set(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2,0>());
 
     // get the constant pi
     const DataType_ pi = Math::pi<DataType_>();

@@ -66,6 +66,28 @@ namespace FEAT
           }
         }
 
+        /// move constructor
+        AttributeSet(AttributeSet&& other) :
+          _num_values(other._num_values),
+          _dimension(other._dimension),
+          _values(std::forward<std::vector<DataType>>(other._values))
+        {
+        }
+
+        /// move-assignment operator
+        AttributeSet& operator=(AttributeSet&& other)
+        {
+          // avoid self-move
+          if(this == &other)
+            return *this;
+
+          _num_values = other._num_values;
+          _dimension = other._dimension;
+          _values = std::forward<std::vector<DataType>>(other._values);
+
+          return *this;
+        }
+
         /// virtual destructor
         virtual ~AttributeSet()
         {

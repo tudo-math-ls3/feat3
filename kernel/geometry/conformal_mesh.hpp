@@ -93,6 +93,7 @@ namespace FEAT
           > Type;
       }; // struct IndexSet<...>
 
+      typedef typename IndexSet<shape_dim, shape_dim-1>::Type NeighbourSetType;
 
     protected:
       /// number of entities for each shape dimension
@@ -105,7 +106,7 @@ namespace FEAT
       IndexSetHolderType _index_set_holder;
 
       /// Information about cells sharing a facet
-      typename IndexSet<shape_dim, shape_dim-1>::Type _neighbours;
+      NeighbourSetType _neighbours;
 
     private:
       /// \brief Copy assignment operator declared but not implemented
@@ -165,21 +166,34 @@ namespace FEAT
 
       }
 
-      /**
-       * \brief Copy Constructor
-       *
-       * \param[in] other
-       * The conformal mesh that is to be copied.
-       */
-      ConformalMesh(const ConformalMesh& other) :
-        _vertex_set(other.get_vertex_set()),
-        _index_set_holder(other.get_index_set_holder()),
-        _neighbours(other.get_neighbours())
+      /// move constructor
+      ConformalMesh(ConformalMesh&& other) :
+        _vertex_set(std::forward<VertexSetType>(other._vertex_set)),
+        _index_set_holder(std::forward<IndexSetHolderType>(other._index_set_holder)),
+        _neighbours(std::forward<NeighbourSetType>(other._neighbours))
       {
         for(int i(0); i <= shape_dim; ++i)
         {
           _num_entities[i] = other.get_num_entities(i);
         }
+      }
+
+      /// move-assignment operator
+      ConformalMesh& operator=(ConformalMesh&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+
+        _vertex_set = std::forward<VertexSetType>(other._vertex_set);
+        _index_set_holder = std::forward<IndexSetHolderType>(other._index_set_holder);
+        _neighbours = std::forward<NeighbourSetType>(other._neighbours);
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          _num_entities[i] = other.get_num_entities(i);
+        }
+
+        return *this;
       }
 
       /// virtual destructor

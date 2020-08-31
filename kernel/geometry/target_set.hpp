@@ -48,6 +48,24 @@ namespace FEAT
       {
       }
 
+      /// move constructor
+      TargetSet(TargetSet&& other) :
+        _indices(std::forward<std::vector<Index>>(other._indices))
+      {
+      }
+
+      /// move-assignment operator
+      TargetSet& operator=(TargetSet&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+
+        _indices = std::forward<std::vector<Index>>(other._indices);
+
+        return *this;
+      }
+
       /// virtual destructor
       virtual ~TargetSet()
       {
@@ -139,6 +157,21 @@ namespace FEAT
       {
       }
 
+      TargetSetHolder(TargetSetHolder&& other) :
+        BaseClass(std::forward<BaseClass>(other)),
+        _target_set(std::forward<TargetSet>(other._target_set))
+      {
+      }
+
+      TargetSetHolder& operator=(TargetSetHolder&& other)
+      {
+        if(this == &other)
+          return *this;
+        BaseClass::operator=(std::forward<BaseClass>(other));
+        _target_set = std::forward<TargetSet>(other._target_set);
+        return *this;
+      }
+
       virtual ~TargetSetHolder()
       {
       }
@@ -204,6 +237,19 @@ namespace FEAT
       explicit TargetSetHolder(const Index num_entities[]) :
         _target_set(num_entities[0])
       {
+      }
+
+      TargetSetHolder(TargetSetHolder&& other) :
+        _target_set(std::forward<TargetSet>(other._target_set))
+      {
+      }
+
+      TargetSetHolder& operator=(TargetSetHolder&& other)
+      {
+        if(this == &other)
+          return *this;
+        _target_set = std::forward<TargetSet>(other._target_set);
+        return *this;
       }
 
       virtual ~TargetSetHolder()

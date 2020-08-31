@@ -153,6 +153,33 @@ namespace FEAT
         }
       }
 
+      /// move constructor
+      StructIndexSet(StructIndexSet&& other) :
+        _num_entities(other._num_entities),
+        _index_bound(other._index_bound)
+      {
+        for(int i(0); i < shape_dim_; ++i)
+        {
+          _num_slices[i] = other._num_slices[i];
+        }
+      }
+
+      /// move-assignment operator
+      StructIndexSet& operator=(StructIndexSet&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+
+        _num_entities = other._num_entities;
+        _index_bound = other._index_bound;
+        for(int i(0); i < shape_dim_; ++i)
+        {
+          _num_slices[i] = other._num_slices[i];
+        }
+        return *this;
+      }
+
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
@@ -278,6 +305,23 @@ namespace FEAT
       {
       }
 
+      StructIndexSetWrapper(StructIndexSetWrapper&& other) :
+        BaseClass(std::forward<BaseClass>(other)),
+        _index_set(std::forward<StructIndexSet<shape_dim_, cell_dim_, face_dim_>>(other._index_set))
+      {
+      }
+
+      StructIndexSetWrapper& operator=(StructIndexSetWrapper&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        BaseClass::operator=(std::forward<BaseClass>(other));
+        _index_set = std::forward<StructIndexSet<shape_dim_, cell_dim_, face_dim_>>(other._index_set);
+
+        return *this;
+      }
+
       template<int face_dim__>
       const StructIndexSet<shape_dim_, cell_dim_, face_dim__>& get_index_set() const
       {
@@ -303,6 +347,21 @@ namespace FEAT
       explicit StructIndexSetWrapper(const Index num_slices[]) :
         _index_set(num_slices)
       {
+      }
+
+      StructIndexSetWrapper(StructIndexSetWrapper&& other) :
+        _index_set(std::forward<StructIndexSet<shape_dim_, cell_dim_, 0>>(other._index_set))
+      {
+      }
+
+      StructIndexSetWrapper& operator=(StructIndexSetWrapper&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        _index_set = std::forward<StructIndexSet<shape_dim_, cell_dim_, 0>>(other._index_set);
+
+        return *this;
       }
 
       template<int face_dim__>
@@ -336,6 +395,23 @@ namespace FEAT
       {
       }
 
+      StructIndexSetHolder(StructIndexSetHolder&& other) :
+        BaseClass(std::forward<BaseClass>(other)),
+        _index_set_wrapper(std::forward<StructIndexSetWrapper<shape_dim_, cell_dim_>>(other._index_set_wrapper))
+      {
+      }
+
+      StructIndexSetHolder& operator=(StructIndexSetHolder&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        BaseClass::operator=(std::forward<BaseClass>(other));
+        _index_set_wrapper = std::forward<StructIndexSetWrapper<shape_dim_, cell_dim_>>(other._index_set_wrapper);
+
+        return *this;
+      }
+
       template<int cell_dim__>
       const StructIndexSetWrapper<shape_dim_, cell_dim__>& get_index_set_wrapper() const
       {
@@ -360,6 +436,15 @@ namespace FEAT
     public:
       explicit StructIndexSetHolder(const Index /*num_slices*/[])
       {
+      }
+
+      StructIndexSetHolder(StructIndexSetHolder&&)
+      {
+      }
+
+      StructIndexSetHolder& operator=(StructIndexSetHolder&&)
+      {
+        return *this;
       }
 
       std::size_t bytes() const

@@ -325,7 +325,7 @@ class IndexCalculatorVertexTest
       original_tree.parse(my_mesh.template get_index_set<SubshapeDim,0>());
 
       // This is the IndexSet providing the vertex@shape information
-      VertAtShapeIndexSetType my_vert_at_cell_index_set = my_mesh.template get_index_set<ShapeDim,0>();
+      const VertAtShapeIndexSetType& my_vert_at_cell_index_set = my_mesh.template get_index_set<ShapeDim,0>();
 
       // Calculate vertex@subshape information from the VertAtShapeIndexSet
       VertAtSubshapeIndexSetType my_vert_at_subshape_index_set;
@@ -349,7 +349,7 @@ class IndexCalculatorVertexTest
       IndexTreeType new_tree(my_vert_at_subshape_index_set.get_num_entities());
       new_tree.parse(my_vert_at_subshape_index_set);
       // Original vert@subshape information
-      VertAtSubshapeIndexSetType original_vert_at_subshape_index_set(my_mesh.template get_index_set<SubshapeDim,0>());
+      const VertAtSubshapeIndexSetType& original_vert_at_subshape_index_set(my_mesh.template get_index_set<SubshapeDim,0>());
 
       // Check if every subshape in the original IndexSet ist present in the new IndexSet
       for(Index i(0); i < original_vert_at_subshape_index_set.get_num_entities(); ++i)

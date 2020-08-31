@@ -62,7 +62,7 @@ public:
 
     // run tests
     test_unit_2d_q1(mesh);
-    //test_unit_2d_q0(mesh);
+    test_unit_2d_q0(mesh);
   }
 
   void test_unit_2d_q1(QuadMesh& mesh) const
@@ -84,13 +84,13 @@ public:
     Assembly::Interpolator::project(vector, sine_bubble, space);
 
     // get mesh vertex count
-    Index num_verts = mesh.get_num_entities(0);
+    const Index num_verts = mesh.get_num_entities(0);
 
     // validate vector size
     TEST_CHECK_EQUAL(vector.size(), num_verts);
 
     // get the vertex set of the mesh
-    const typename QuadMesh::VertexSetType vertex_set(mesh.get_vertex_set());
+    const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // loop over all vertices
     for(Index i(0); i < num_verts; ++i)
@@ -104,10 +104,10 @@ public:
     }
   }
 
-  void test_unit_2d_q0( QuadMesh& mesh) const
+  void test_unit_2d_q0(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps =Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -123,16 +123,16 @@ public:
     Assembly::Interpolator::project(vector, sine_bubble, space);
 
     // get mesh element count
-    Index num_quads = mesh.get_num_entities(2);
+    const Index num_quads = mesh.get_num_entities(2);
 
     // validate vector size
     TEST_CHECK_EQUAL(vector.size(), num_quads);
 
     // get the vertex set of the mesh
-    const typename QuadMesh::VertexSetType vertex_set(mesh.get_vertex_set());
+    const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // get the index set of the mesh
-    const Geometry::IndexSet<4> index_set(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2,0>());
 
     // loop over all quads
     for(Index i(0); i < num_quads; ++i)

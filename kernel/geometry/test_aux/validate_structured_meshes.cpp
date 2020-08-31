@@ -97,9 +97,9 @@ namespace FEAT
         };
 
         // get struct- index sets
-        StructIndexSet<2,1,0> set_v_e = mesh->get_index_set<1,0>();
-        StructIndexSet<2,2,0> set_v_q = mesh->get_index_set<2,0>();
-        StructIndexSet<2,2,1> set_e_q = mesh->get_index_set<2,1>();
+        const StructIndexSet<2,1,0>& set_v_e = mesh->get_index_set<1,0>();
+        const StructIndexSet<2,2,0>& set_v_q = mesh->get_index_set<2,0>();
+        const StructIndexSet<2,2,1>& set_e_q = mesh->get_index_set<2,1>();
 
         // check vertex at edge
         Index i(0);
@@ -623,12 +623,12 @@ namespace FEAT
         };
 
         // get struct- index sets
-        StructIndexSet<3,1,0> set_v_e = mesh->get_index_set<1,0>();
-        StructIndexSet<3,2,0> set_v_q = mesh->get_index_set<2,0>();
-        StructIndexSet<3,3,0> set_v_h = mesh->get_index_set<3,0>();
-        StructIndexSet<3,2,1> set_e_q = mesh->get_index_set<2,1>();
-        StructIndexSet<3,3,1> set_e_h = mesh->get_index_set<3,1>();
-        StructIndexSet<3,3,2> set_q_h = mesh->get_index_set<3,2>();
+        const StructIndexSet<3,1,0>& set_v_e = mesh->get_index_set<1,0>();
+        const StructIndexSet<3,2,0>& set_v_q = mesh->get_index_set<2,0>();
+        const StructIndexSet<3,3,0>& set_v_h = mesh->get_index_set<3,0>();
+        const StructIndexSet<3,2,1>& set_e_q = mesh->get_index_set<2,1>();
+        const StructIndexSet<3,3,1>& set_e_h = mesh->get_index_set<3,1>();
+        const StructIndexSet<3,3,2>& set_q_h = mesh->get_index_set<3,2>();
 
         // check vertex at edge
         Index i(0);

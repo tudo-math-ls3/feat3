@@ -216,18 +216,40 @@ namespace FEAT
           factory.fill_attribute_sets(_mesh_attributes);
         }
 
-        /// Explicitly delete move constructor
-        // This is just to avoid anyone using the implicitly generated one - it could be implemented if needed.
-        MeshPart(MeshPart&&) = delete;
+        /// move constructor
+        MeshPart(MeshPart&& other) :
+          _index_set_holder(other._index_set_holder),
+          _target_set_holder(std::forward<TargetSetHolderType>(other._target_set_holder)),
+          _mesh_attributes(std::forward<AttributeSetContainer>(other._mesh_attributes))
+        {
+          for(int i(0); i <= shape_dim; ++i)
+          {
+            _num_entities[i] = other._num_entities[i];
+          }
+          other._index_set_holder = nullptr;
+        }
 
-        /// Explicitly delete copy constructor. Objects of this class shall not be copied.
-        MeshPart(const MeshPart&) = delete;
+        /// move-assignment operator
+        MeshPart& operator=(MeshPart&& other)
+        {
+          // avoid self-move
+          if(this == &other)
+            return *this;
 
-        /// deleted Move assignment operator
-        MeshPart& operator=(MeshPart&&) = delete;
+          if(_index_set_holder != nullptr)
+            delete _index_set_holder;
 
-        /// deleted Copy assignment operator
-        MeshPart& operator=(const MeshPart&) = delete;
+          _index_set_holder = other._index_set_holder;
+          _target_set_holder = std::forward<TargetSetHolderType>(other._target_set_holder);
+          _mesh_attributes = std::forward<AttributeSetContainer>(other._mesh_attributes);
+          for(int i(0); i <= shape_dim; ++i)
+          {
+            _num_entities[i] = other._num_entities[i];
+          }
+          other._index_set_holder = nullptr;
+
+          return *this;
+        }
 
         /// Virtual destructor
         virtual ~MeshPart()

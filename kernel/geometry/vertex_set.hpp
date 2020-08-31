@@ -91,6 +91,22 @@ namespace FEAT
       {
       }
 
+      /// move constructor
+      VertexSet(VertexSet&& other) :
+        _vertices(std::forward<std::vector<VertexType>>(other._vertices))
+      {
+      }
+
+      /// move-assignment operator
+      VertexSet& operator=(VertexSet&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+        _vertices = std::forward<std::vector<VertexType>>(other._vertices);
+        return *this;
+      }
+
       /// virtual destructor
       virtual ~VertexSet()
       {

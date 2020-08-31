@@ -114,6 +114,26 @@ namespace FEAT
       {
       }
 
+      /// move constructor
+      IndexSet(IndexSet&& other) :
+        _index_bound(other._index_bound),
+        _indices(std::forward<std::vector<IndexTupleType>>(other._indices))
+      {
+      }
+
+      /// move-assignment operator
+      IndexSet& operator=(IndexSet&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+
+        _index_bound = other._index_bound;
+        _indices = std::forward<std::vector<IndexTupleType>>(other._indices);
+
+        return *this;
+      }
+
       /// virtual destructor
       virtual ~IndexSet()
       {
@@ -319,6 +339,23 @@ namespace FEAT
       {
       }
 
+      IndexSetWrapper(IndexSetWrapper&& other) :
+        BaseClass(std::forward<BaseClass>(other)),
+        _index_set(std::forward<IndexSetType>(other._index_set))
+      {
+      }
+
+      IndexSetWrapper& operator=(IndexSetWrapper&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        BaseClass::operator=(std::forward<BaseClass>(other));
+        _index_set = std::forward<IndexSetType>(other._index_set);
+
+        return *this;
+      }
+
       virtual ~IndexSetWrapper()
       {
       }
@@ -372,6 +409,21 @@ namespace FEAT
           num_entities[Shape_::dimension],
           num_entities[0])
       {
+      }
+
+      IndexSetWrapper(IndexSetWrapper&& other) :
+        _index_set(std::forward<IndexSetType>(other._index_set))
+      {
+      }
+
+      IndexSetWrapper& operator=(IndexSetWrapper&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        _index_set = std::forward<IndexSetType>(other._index_set);
+
+        return *this;
       }
 
       virtual ~IndexSetWrapper()
@@ -477,6 +529,23 @@ namespace FEAT
       {
       }
 
+      IndexSetHolder(IndexSetHolder&& other) :
+        BaseClass(std::forward<BaseClass>(other)),
+        _index_set_wrapper(std::forward<IndexSetWrapperType>(other._index_set_wrapper))
+      {
+      }
+
+      IndexSetHolder& operator=(IndexSetHolder&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        BaseClass::operator=(std::forward<BaseClass>(other));
+        _index_set_wrapper = std::forward<IndexSetWrapperType>(other._index_set_wrapper);
+
+        return *this;
+      }
+
       virtual ~IndexSetHolder()
       {
       }
@@ -558,6 +627,15 @@ namespace FEAT
 
       explicit IndexSetHolder(const Index* /*num_entities*/)
       {
+      }
+
+      IndexSetHolder(IndexSetHolder&&)
+      {
+      }
+
+      IndexSetHolder& operator=(IndexSetHolder&&)
+      {
+        return *this;
       }
 
       virtual ~IndexSetHolder()
