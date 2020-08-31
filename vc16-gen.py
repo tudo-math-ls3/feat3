@@ -267,7 +267,7 @@ ofs.write("  <!-- Header File List -->\n")
 ofs.write("  <!-- ********************************************************************* -->\n")
 ofs.write("  <ItemGroup Label=\"Header-Files\">\n")
 if test_mode:
-  ofs.write("    <ClInclude Include=\"" + root_path + "\\test_system\\*.hpp\" />\n")
+  ofs.write("    <ClInclude Include=\"" + root_path + "\\test_system\\test_system.hpp\" />\n")
 for fn in hpp_list:
   ofs.write("    <ClInclude Include=\"" + fn + "\" />\n")
 ofs.write("  </ItemGroup>\n")
