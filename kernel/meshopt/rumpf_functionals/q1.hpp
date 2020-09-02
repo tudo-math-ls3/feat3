@@ -348,7 +348,7 @@ namespace FEAT
 
               if(_compute_cof)
               {
-                fval_cof += weight*this->_fac_cof*compute_frobenius_part();
+                fval_cof += weight*this->_fac_cof*compute_cof_part();
               }
 
               if(_compute_det)

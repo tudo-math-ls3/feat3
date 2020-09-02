@@ -342,7 +342,6 @@ namespace FEAT
 
               // Compute quantities for nonlinear form
               set_point(trafo_data, mat_tensor);
-
               DataType weight(_cubature_rule.get_weight(k));
 
               if(_compute_frobenius)
@@ -352,7 +351,7 @@ namespace FEAT
 
               if(_compute_cof)
               {
-                fval_cof += weight*this->_fac_cof*compute_frobenius_part();
+                fval_cof += weight*this->_fac_cof*compute_cof_part();
               }
 
               if(_compute_det)
@@ -364,7 +363,6 @@ namespace FEAT
             }
 
             fval = fval_frobenius + fval_cof + fval_det;
-
           }
 
           /**
