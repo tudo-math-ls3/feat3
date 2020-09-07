@@ -55,7 +55,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(v_c[1], -x_c, tol);
   }
 
-  void test_distance_function() const
+  void test_distance_function_2d() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -78,6 +78,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[0][1], DT_(12)/DT_(125), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[1][0], DT_(12)/DT_(125), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[1][1], DT_(16)/DT_(125), tol);
+  }
+
+  void test_distance_function_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // create 3d DistanceFunction with origin in (2,2,1).
     typename Analytic::Common::DistanceFunction<3, DT_>::PointType orig3d;
@@ -107,7 +112,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[2][2], DT_( 8)/DT_(27), tol);
   }
 
-  void test_distance_function_sd() const
+  void test_distance_function_sd_2d() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -130,6 +135,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[0][1], DT_(120)/DT_(125), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[1][0], DT_(120)/DT_(125), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[1][1], DT_(160)/DT_(125), tol);
+  }
+
+  void test_distance_function_sd_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // create 3d DistanceFunction with origin in (2,2,1).
     typename Analytic::Common::DistanceFunctionSD<3, DT_>::PointType orig3d;
@@ -159,8 +169,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[2][2], DT_( 8)/DT_(9), tol);
   }
 
-
-  void test_plain_distance_function_sd() const
+  void test_plane_distance_function_sd() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -179,7 +188,6 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad3d[1], DT_(-3), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(grad3d[2], DT_(0), tol);
   }
-
 
   void test_min_function() const
   {
@@ -230,9 +238,11 @@ public:
   {
     test_par_profile_scalar();
     test_par_profile_vector();
-    test_distance_function();
-    test_distance_function_sd();
-    test_plain_distance_function_sd();
+    test_distance_function_2d();
+    test_distance_function_3d();
+    test_distance_function_sd_2d();
+    test_distance_function_sd_3d();
+    test_plane_distance_function_sd();
     test_min_function();
   }
 };

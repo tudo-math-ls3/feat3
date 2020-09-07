@@ -675,6 +675,7 @@ namespace FEAT
        */
       template<int dim_>
       using Q2BubbleFunction = StaticWrapperFunction<dim_, Q2BubbleStatic, true, true, true>;
+
       /**
        * \brief Constant Analytic function
        *
@@ -2261,7 +2262,7 @@ namespace FEAT
        * \brief Exponential Analytic function
        *
        * This class implements the AnalyticFunction interface representing the function
-       *   - 1D: u(x)     =  (exp(10) - exp(10*x²)) / (exp(10) - 1)
+       *   - 1D: u(x)     =  (exp(10) - exp(10*x^2)) / (exp(10) - 1)
        *   - 2D: u(x,y)   =  u(x)*u(y)
        *   - 3D: u(x,y,z) =  u(x)*u(y)*u(z)
        *
