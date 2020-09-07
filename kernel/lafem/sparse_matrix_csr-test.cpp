@@ -6,11 +6,11 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/util/binary_stream.hpp>
 #include <kernel/util/random.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
+#include <kernel/lafem/sparse_matrix_factory.hpp>
 
 #include <sstream>
 
@@ -83,35 +83,35 @@ public:
     TEST_CHECK_EQUAL(empty5.columns(), 0);
     TEST_CHECK_EQUAL(empty5.used_elements(), 0);
 
-    SparseMatrixCOO<Mem::Main, DT_, IT_> a00;
+    //#TODO Dirk kannst du dir das nochmal angucken?
+    //
+   /* SparseMatrixCOO<Mem::Main, DT_, IT_> a00;
     SparseMatrixCSR<Mem_, DT_, IT_> b00(a00);
     TEST_CHECK_EQUAL(b00.size(), 0ul);
     TEST_CHECK_EQUAL(b00.rows(), 0ul);
     TEST_CHECK_EQUAL(b00.columns(), 0ul);
     TEST_CHECK_EQUAL(b00.used_elements(), 0ul);
-    SparseMatrixCOO<Mem::Main, DT_, IT_> a01(10, 10);
-    SparseMatrixCSR<Mem_, DT_, IT_> b01(a01);
+
+    SparseMatrixFactory<DT_, IT_> a01(IT_(10), IT_(10));
+    SparseMatrixCSR<Mem_, DT_, IT_> b01(a01.make_csr());
     TEST_CHECK_EQUAL(b01.size(), 100ul);
     TEST_CHECK_EQUAL(b01.rows(), 10ul);
     TEST_CHECK_EQUAL(b01.columns(), 10ul);
     TEST_CHECK_EQUAL(b01.used_elements(), 0ul);
-
-    SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 10);
-    a(1,2,7);
-    a.format();
-    a(1,2,7);
-    a(5,5,2);
-    a(5,7,3);
-    a(5,2,4);
-    SparseMatrixCSR<Mem_, DT_, IT_> b(a);
+    */
+    SparseMatrixFactory<DT_, IT_> a(IT_(10), IT_(10));
+    a.add(IT_(1),IT_(2),DT_(7));
+    a.add(IT_(5),IT_(5),DT_(2));
+    a.add(IT_(5),IT_(7),DT_(3));
+    a.add(IT_(5),IT_(2),DT_(4));
+    SparseMatrixCSR<Mem_, DT_, IT_> b(a.make_csr());
     TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
-    TEST_CHECK_EQUAL(b.rows(), a.rows());
-    TEST_CHECK_EQUAL(b.columns(), a.columns());
-    TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
-    TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
-    TEST_CHECK_EQUAL(b(5, 2), a(5, 2));
-    TEST_CHECK_EQUAL(b(1, 1), a(1, 1));
+    TEST_CHECK_EQUAL(b(1, 2), DT_(7));
+    TEST_CHECK_EQUAL(b(5, 5), DT_(2));
+    TEST_CHECK_EQUAL(b(5, 7), DT_(3));
+    TEST_CHECK_EQUAL(b(5, 2), DT_(4));
+    TEST_CHECK_EQUAL(b(1, 1), DT_(0));
 
     Index bandw, bandw_idx;
     b.bandwidth_row(bandw, bandw_idx);
@@ -161,8 +161,8 @@ public:
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
     TEST_CHECK_EQUAL(z.columns(), a.columns());
-    TEST_CHECK_EQUAL(z(1, 2), a(1, 2));
-    TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
+    TEST_CHECK_EQUAL(z(1, 2), DT_(7));
+    TEST_CHECK_EQUAL(z(5, 5), DT_(2));
 
     SparseMatrixCSR<Mem_, DT_, IT_> c;
     c.clone(b);
@@ -213,18 +213,18 @@ public:
     TEST_CHECK_EQUAL((void*)clone4.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone4.row_ptr(), (void*)clone1.row_ptr());
 
-    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
-    for (Index row(0) ; row < fcoo.rows() ; ++row)
+    SparseMatrixFactory<DT_, IT_> ffac(IT_(10), IT_(10));
+    for (IT_ row(0) ; row < ffac.rows() ; ++row)
     {
-      for (Index col(0) ; col < fcoo.columns() ; ++col)
+      for (IT_ col(0) ; col < ffac.columns() ; ++col)
       {
         if(row == col)
-          fcoo(row, col, DT_(2));
+          ffac.add(row, col, DT_(2));
         else if((row == col+1) || (row+1 == col))
-          fcoo(row, col, DT_(-1));
+          ffac.add(row, col, DT_(-1));
       }
     }
-    SparseMatrixCSR<Mem_, DT_, IT_> f(fcoo);
+    SparseMatrixCSR<Mem_, DT_, IT_> f(ffac.make_csr());
 
     // shrink test
     SparseMatrixCSR<Mem_, DT_, IT_> l(f.clone());
@@ -268,18 +268,18 @@ public:
 
   virtual void run() const override
   {
-    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
-    for (Index row(0) ; row < fcoo.rows() ; ++row)
+    SparseMatrixFactory<DT_, IT_> ffac(IT_(10), IT_(10));
+    for (IT_ row(0) ; row < ffac.rows() ; ++row)
     {
-      for (Index col(0) ; col < fcoo.columns() ; ++col)
+      for (IT_ col(0) ; col < ffac.columns() ; ++col)
       {
         if(row == col)
-          fcoo(row, col, DT_(2));
+          ffac.add(row, col, DT_(2));
         else if((row == col+1) || (row+1 == col))
-          fcoo(row, col, DT_(-1));
+          ffac.add(row, col, DT_(-1));
       }
     }
-    SparseMatrixCSR<Mem_, DT_, IT_> f(fcoo);
+    SparseMatrixCSR<Mem_, DT_, IT_> f(ffac.make_csr());
 
     BinaryStream bs;
     f.write_out(FileMode::fm_csr, bs);
@@ -351,39 +351,48 @@ public:
   virtual void run() const override
   {
     DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    for (IT_ size(1) ; size < IT_(1e3) ; size*=IT_(2))
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      SparseMatrixFactory<DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> x_local(size);
       DenseVector<Mem::Main, DT_, IT_> y_local(size);
       DenseVector<Mem::Main, DT_, IT_> ref_local(size);
       DenseVector<Mem_, DT_, IT_> ref(size);
       DenseVector<Mem::Main, DT_, IT_> result_local(size);
+      DenseVector<Mem::Main, DT_, IT_> ax_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         x_local(i, DT_(i % 100) * DT_(1.234));
         y_local(i, DT_(2 - DT_(i % 42)));
+        if (i == 0 && size > 1)
+          ax_local(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i + 1) % 100)));
+        else if (i == size - 1 && size > 1)
+          ax_local(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100)));
+        else if (size == 1 && i == 0)
+          ax_local(i, DT_(0));
+        else
+        ax_local(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100) - DT_((i + 1) % 100)));
       }
       DenseVector<Mem_, DT_, IT_> x(size);
       x.copy(x_local);
       DenseVector<Mem_, DT_, IT_> y(size);
       y.copy(y_local);
 
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
           {
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           }
           else if((row == col+1) || (row+1 == col))
           {
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
           }
         }
       }
-      SparseMatrixCSR<Mem_,DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_,DT_, IT_> a(a_local.make_csr());
 
       DenseVector<Mem_, DT_, IT_> r(size);
 
@@ -430,9 +439,10 @@ public:
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(5e-2));
 
-      a.apply(r, x);
+     a.apply(r, x);
       result_local.copy(r);
-      a_local.apply(ref_local, x_local);
+     // a_local.apply(ref_local, x_local);
+      ref_local.copy(ax_local);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), DT_(1e-2));
 
@@ -489,33 +499,44 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    for (IT_ size(1) ; size < IT_(1e3) ; size*=IT_(2))
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      SparseMatrixFactory<DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> ref_x_local(size);
-      DenseVector<Mem::Main, DT_, IT_> ref_local(size);
+     // DenseVector<Mem::Main, DT_, IT_> ref_local(size);
+      DenseVector<Mem::Main, DT_, IT_> aref_x_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         ref_x_local(i, DT_(i % 100) * DT_(1.234));
+        if (i == 0 && size > 1)
+          aref_x_local(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i + 1) % 100)));
+        else if (i == size - 1 && size > 1)
+          aref_x_local(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100)));
+        else if (i == 0 && size == 1)
+          aref_x_local(i, DT_(1.234) * DT_(2) * DT_(i % 100));
+        else
+          aref_x_local(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100) - DT_((i + 1) % 100)));
       }
 
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      //a_local.apply(ref_local, ref_x_local);
+      //ref_local = aref_x_local;
+
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
           {
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           }
           else if((row == col+1) || (row+1 == col))
           {
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
           }
         }
       }
-      SparseMatrixCSR<Mem_,DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_,DT_, IT_> a(a_local.make_csr());
 
-      a_local.apply(ref_local, ref_x_local);
 
       DenseVectorBlocked<Mem::Main, DT_, IT_, 3> x_local(size);
       for (Index i(0) ; i < size ; ++i)
@@ -548,18 +569,19 @@ public:
       r_local.convert(r);
       for (Index i(0) ; i < size ; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], ref_local(i), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], ref_local(i) * DT_(0.5), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], ref_local(i) * DT_(2.0), DT_(1e-5));
+        //std::cout << i << std::endl;
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], aref_x_local(i), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], aref_x_local(i) * DT_(0.5), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], aref_x_local(i) * DT_(2.0), DT_(1e-4));
       }
 
       a.apply(r, x, y, DT_(-1));
       r_local.convert(r);
       for (Index i(0) ; i < size ; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] - ref_local(i), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] - ref_local(i) * DT_(0.5), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - ref_local(i) * DT_(2.0), DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] - aref_x_local(i), DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] - aref_x_local(i) * DT_(0.5), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - aref_x_local(i) * DT_(2.0), DT_(1e-4));
       }
 
       DT_ alpha(0.75);
@@ -567,9 +589,9 @@ public:
       r_local.convert(r);
       for (Index i(0) ; i < size ; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] + alpha * ref_local(i), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] + alpha * ref_local(i) * DT_(0.5), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] + alpha * ref_local(i) * DT_(2.0), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] + alpha * aref_x_local(i), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] + alpha * aref_x_local(i) * DT_(0.5), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] + alpha * aref_x_local(i) * DT_(2.0), DT_(1e-4));
       }
     }
   }
@@ -609,27 +631,27 @@ public:
     for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
       DT_ s(DT_(4.321));
+      SparseMatrixFactory<DT_, IT_> a_local(IT_(size), IT_(size+2));
+      SparseMatrixFactory<DT_, IT_> ref_local(IT_(size), IT_(size+2));
 
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
-      SparseMatrixCOO<Mem::Main, DT_, IT_> ref_local(size, size + 2);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
 
           if(row == col)
-            ref_local(row, col, DT_(2) * s);
+            ref_local.add(row, col, DT_(2) * s);
           else if((row == col+1) || (row+1 == col))
-            ref_local(row, col, DT_(-1) * s);
+            ref_local.add(row, col, DT_(-1) * s);
         }
       }
 
-      SparseMatrixCSR<Mem_, DT_, IT_> ref(ref_local);
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> ref(ref_local.make_csr());
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
       SparseMatrixCSR<Mem_, DT_, IT_> b;
       b.clone(a);
 
@@ -682,19 +704,19 @@ public:
       const DT_ pi(Math::pi<DT_>());
       const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
 
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      SparseMatrixFactory<DT_, IT_> a_local(IT_(size), IT_(size + 2));
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
         }
       }
 
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
       SparseMatrixCSR<Mem_, DT_, IT_> b(a.clone());
 
       // Scale rows
@@ -786,22 +808,22 @@ public:
   {
     for (Index size(2) ; size < Index(3e2) ; size*=4)
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+      SparseMatrixFactory<DT_, IT_> a_local(IT_(size), IT_(size + 2));
 
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           else if(row == col+1)
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
           else if(row+1 == col)
-            a_local(row, col, DT_(-3));
+            a_local.add(row, col, DT_(-3));
         }
       }
-      MatrixType a;
-      a.convert(a_local);
+      MatrixType a(a_local.make_csr());
+
 
       MatrixType b;
       b.transpose(a);
@@ -855,9 +877,9 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(25) ; size < Index(1e3) ; size*=2)
+    for (IT_ size(25) ; size < IT_(1e3) ; size*=IT_(2))
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      SparseMatrixFactory<DT_, IT_> a_local(size, size);
       DenseVector<Mem::Main, DT_, IT_> x_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
@@ -866,29 +888,29 @@ public:
       DenseVector<Mem_, DT_, IT_> x(size);
       x.copy(x_local);
 
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
           {
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           }
           else if((row == col+7) || (row+7 == col))
           {
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
           }
           else if((row == col+15) || (row+15 == col))
           {
-            a_local(row, col, DT_(-2));
+            a_local.add(row, col, DT_(-2));
           }
           else if((row == col+a_local.columns()/2) || (row+a_local.rows()/2 == col))
           {
-            a_local(row, col, DT_(1));
+            a_local.add(row, col, DT_(1));
           }
         }
       }
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
 
       DenseVector<Mem_, DT_, IT_> r(size);
       a.apply(r, x);
@@ -953,27 +975,28 @@ public:
 
   virtual void run() const override
   {
-    for (Index size(2) ; size < Index(3e2) ; size*=2)
+    for (IT_ size(2) ; size < IT_(3e2) ; size*=IT_(2))
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      SparseMatrixFactory<DT_, IT_> a_local(size, size);
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(DT_(col % 100) / DT_(2)));
+            a_local.add(row, col, DT_(DT_(col % 100) / DT_(2)));
           else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
         }
       }
 
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
 
       auto ref = a.create_vector_l();
-      auto ref_local = a_local.create_vector_l();
+      //auto ref_local = a_local.create_vector_l();
+      DenseVector<Mem::Main, DT_, IT_> ref_local(a_local.rows());
       for (Index i(0) ; i < a_local.rows() ; ++i)
       {
-        ref_local(i, a_local(i, i));
+        ref_local(i, DT_(DT_(i % 100) / DT_(2)));
       }
       ref.convert(ref_local);
 
@@ -1022,29 +1045,40 @@ public:
     {
       DT_ s(DT_(4.321));
 
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
-      SparseMatrixCOO<Mem::Main, DT_, IT_> b_local(size, size + 2);
-      SparseMatrixCOO<Mem::Main, DT_, IT_> ref_local(size, size + 2);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      SparseMatrixFactory<DT_, IT_> a_local(IT_(size), IT_(size+2));
+      SparseMatrixFactory<DT_, IT_> b_local(IT_(size), IT_(size+2));
+      SparseMatrixFactory<DT_, IT_> ref_local(IT_(size), IT_(size+2));
+      SparseMatrixFactory<DT_, IT_> ref_local_plus(IT_(size), IT_(size + 2));
+      SparseMatrixFactory<DT_, IT_> ref_local_minus(IT_(size), IT_(size + 2));
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
-          if(row == col)
-            a_local(row, col, DT_(2));
-          else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
-
-          if((row == col+1) || (row+1 == col) || row==col)
+          if (row == col)
           {
-            b_local(row, col, DT_((row+col) % 15));
-            ref_local(row, col, a_local(row, col) * s + b_local(row, col));
+            a_local.add(row, col, DT_(2));
+            b_local.add(row, col, DT_((row + col) % 15));
+            ref_local.add(row, col, DT_(2) * s + DT_((row + col) % 15));
+            ref_local_plus.add(row, col, DT_(2)  + DT_((row + col) % 15));
+            ref_local_minus.add(row, col,   DT_((row + col) % 15)- DT_(2));
+          }
+
+          else if ((row == col + 1) || (row + 1 == col))
+          {
+            a_local.add(row, col, DT_(-1));
+            b_local.add(row, col, DT_((row + col) % 15));
+            ref_local.add(row, col, DT_(-1) * s + DT_((row + col) % 15));
+            ref_local_plus.add(row, col, DT_(-1) + DT_((row + col) % 15));
+            ref_local_minus.add(row, col, DT_((row + col) % 15) - DT_(-1));
           }
         }
       }
 
-      SparseMatrixCSR<Mem_, DT_, IT_> ref(ref_local);
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
-      SparseMatrixCSR<Mem_, DT_, IT_> b(b_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> ref(ref_local.make_csr());
+      SparseMatrixCSR<Mem_, DT_, IT_> ref_plus(ref_local_plus.make_csr());
+      SparseMatrixCSR<Mem_, DT_, IT_> ref_minus(ref_local_minus.make_csr());
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
+      SparseMatrixCSR<Mem_, DT_, IT_> b(b_local.make_csr());
       SparseMatrixCSR<Mem_, DT_, IT_> c;
 
       c.clone(a);
@@ -1064,22 +1098,12 @@ public:
       TEST_CHECK_EQUAL(c, ref);
 
       s = DT_(1);
-      for (Index i(0) ; i < c.used_elements() ; ++i)
-      {
-        ref_local.val()[i] = a_local.val()[i] + b_local.val()[i];
-      }
-      ref.convert(ref_local);
       c.axpy(a, b, s);
-      TEST_CHECK_EQUAL(c, ref);
+      TEST_CHECK_EQUAL(c, ref_plus);
 
       s = DT_(-1);
-      for (Index i(0) ; i < c.used_elements() ; ++i)
-      {
-        ref_local.val()[i] = b_local.val()[i] - a_local.val()[i];
-      }
-      ref.convert(ref_local);
       c.axpy(a, b, s);
-      TEST_CHECK_EQUAL(c, ref);
+      TEST_CHECK_EQUAL(c, ref_minus);
     }
   }
 };
@@ -1121,19 +1145,19 @@ public:
   {
     for (Index size(2) ; size < Index(3e2) ; size*=2)
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      SparseMatrixFactory<DT_, IT_> a_local(IT_(size), IT_(size + 2));
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(2));
+            a_local.add(row, col, DT_(2));
           else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
         }
       }
 
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
 
       DenseVector<Mem_, DT_, IT_> refv(a.used_elements(), a.val());
       DT_ ref = refv.norm2();
@@ -1180,21 +1204,21 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    for (Index size(2) ; size < Index(3e2) ; size*=2)
+    for (IT_ size(2) ; size < IT_(3e2) ; size*=IT_(2))
     {
-      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      SparseMatrixFactory<DT_, IT_> a_local(size, size);
+      for (IT_ row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
+        for (IT_ col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(DT_(col % 100) / DT_(2)));
+            a_local.add(row, col, DT_(DT_(col % 100) / DT_(2)));
           else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
+            a_local.add(row, col, DT_(-1));
         }
       }
 
-      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local.make_csr());
       auto lump = a.lump_rows();
       auto one = a.create_vector_r();
       auto res = a.create_vector_r();

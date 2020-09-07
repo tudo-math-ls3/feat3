@@ -60,6 +60,7 @@ SET (test_list
   sparse_matrix_cscr-test
   sparse_matrix_ell-test
   sparse_matrix_bcsr-test
+  sparse_matrix_factory-test
   sparse_vector-test
   sparse_vector_blocked-test
   tuning-test
