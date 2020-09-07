@@ -17,6 +17,9 @@
 *~
 *.bak
 
+# Ingore junk Mac files
+.DS_Store
+
 # Ignore linkinfo files
 *.linkinfo
 
