@@ -43,7 +43,46 @@ c(Index(2)) = a(Index(0)) * b(Index(1)) - a(Index(1)) * b(Index(0));
 Because the latter approach turned out to be difficult to read and tedious to write, the decision was made to use the
 int type for indexing compile-time arrays to keep the literals short and clear, thus sacrificing consistency.
 
+\subsection faq_gen_what_is_eickt Some source files in the kernel subdirectories have "eickt" in their filename. What are these files for?
 
+These source files are used by the build system to <em><b>e</b>xplicitly <b>i</b>nstantiate <b>c</b>ommon <b>k</b>ernel <b>t</b>emplates</em>,
+if the <c>\--eickt</c> option has been passed to the \c configure script.
+
+By design, most classes defined in the FEAT3 kernel are implemented as class templates and by design of the C++ language,
+class templates and -- even more importantly -- their member functions are only compiled if the class template is instantiated
+(i.e. used) in a source file. The advantage of this approach is that class templates are only compiled if they actually
+\b need to be compiled in an application/tutorial/unit-test source file.
+
+However, there are two downsides to this:\n
+Firstly, all class templates, that are used in an application, have to be recompiled when the application source file has changed,
+although the kernel class templates themselves have not changed since the last compilation. This means that you spend a lot of time
+recompiling kernel code over and over again, although that kernel code does not change. (Note that some modern compilers will
+try to reduce this recompilation time as good as they can, which may or may not work out well.)
+
+Secondly, a class template, that is used by many applications/tutorials/unit-tests (think of SparseMatrixCSR as an example),
+has to be compiled for each for each applications separately, although the kernel class template is identical for each application.
+This severely increases overall compilation time if you are compiling a whole bunch of applications, which use a lot of common class templates.
+(The nighly regression test system is a perfect example, because it compiles all applications/unit-tests.)
+
+The <em>eickt</em> mechanism reduces this recompilation overhead to some extend by pre-compiling commonly used kernel class templates
+in the FEAT3 kernel. For instance, the LAFEM::SparseMatrixCSR class template is often used with the <c>\<Mem::Main,double,Index\></c>
+template parameter combination, so the class <c>LAFEM::SparseMatrixCSR\<Mem::Main,double,Index\></c> is explicitly instantiated
+in the kernel library.
+
+The primary advantage of this eickt mechanism is that recompiling an application can be significantly faster if the kernel code has
+not changed since the last compilation, because the precompiled class templates will not have to be recompiled.
+The drawback is that the (initial) compilation of the kernel will be significantly slower because the class templates
+have to be precompiled every time one of the relevant kernel files changes.
+
+\subsection faq_gen_use_eickt_or_not Should I use the \--eickt option for configure or not?
+
+It depends whether you are actively working on kernel code or whether you are only writing application code without changing kernel code.
+In the latter case, using the eickt mechanism may speed up our overall compilation times, so it might be a good idea to use it.
+On the other hand, if you are actively modifying kernel code, then using eickt may significantly increase compiling times for you,
+if some of the eickt sources have to be re-pre-compiled due to the changes that you have made -- even if you did not change any of the
+precompiled class templates themselves.
+
+In a nutshell: If you change kernel files frequently, eickt is usually a bad idea, otherwise it is usually a good idea.
 
 \section faq_lafem LAFEM FAQ
 
