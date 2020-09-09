@@ -626,7 +626,7 @@ namespace FEAT
         ireal_size = this->block_b().set_checkpoint_data(data, config); //add data of block b to the overall checkpoint
         ret_size += ireal_size;
         csize = reinterpret_cast<char*>(&ireal_size);
-        for(uint i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the guessed datalength
+        for(std::size_t i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the guessed datalength
         {
           data[old_size + i] = csize[i];
         }
