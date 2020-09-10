@@ -178,10 +178,24 @@ namespace FEAT
             // grad_R = mat_tensor^T * grad(trafo) because we need to differentiate in the scaled coordinate system
             grad_R.set_transpose(inv_grad_R);
 
+            // compute determinant before the inverse to avoid division by zero
+            // if grad_R is singular
+            if(_compute_det || _compute_inverse)
+            {
+              _det_grad_R = grad_R.det();
+            }
+
             // Set the inverse matrix needed for everything related to the derivative of det(grad_R)
             if(_compute_inverse)
             {
-              inv_grad_R.set_inverse(grad_R);
+              if(Math::isnormal(_det_grad_R))
+                inv_grad_R.set_inverse(grad_R);
+              else
+              {
+                // grad_R is singular, so don't compute inverse to avoid division by zero,
+                // format its entries to NaN instead
+                inv_grad_R.format(Math::nan<DataType>());
+              }
             }
 
             if(_compute_frobenius)
@@ -189,17 +203,11 @@ namespace FEAT
               _frobenius_grad_R = grad_R.norm_frobenius();
             }
 
-            if(_compute_det)
-            {
-              _det_grad_R = grad_R.det();
-            }
-
             if(_compute_cof)
             {
               cof_grad_R.set_cofactor(grad_R);
               _frobenius_cof_grad_R = cof_grad_R.norm_frobenius();
             }
-
           }
 
           /**
