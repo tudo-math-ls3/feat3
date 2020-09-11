@@ -233,6 +233,36 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(diff_hess, DT_(0), tol);
   }
 
+  void test_sine_bubble_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // some useful constants
+    const DT_ pi = Math::pi<DT_>();
+    const DT_ s4 = Math::sin(DT_(0.25 )*pi); // = sin(pi/4)
+    const DT_ s8 = Math::sin(DT_(0.125)*pi); // = sin(pi/8)
+    const DT_ c4 = Math::cos(DT_(0.25 )*pi); // = cos(pi/4)
+    const DT_ c8 = Math::cos(DT_(0.125)*pi); // = cos(pi/8)
+
+    // create sine-bubble-function object
+    Analytic::Common::SineBubbleFunction<2> func;
+
+    // evaluate function value in point (1/4, 1/8)
+    DT_ val = Analytic::eval_value_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, s4*s8, tol);
+
+    // evaluate gradient in point (1/4, 1/8)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], pi*c4*s8, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], pi*s4*c8, tol);
+
+    // evaluate hessian in point (1/4, 1/8)
+    Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], -pi*pi*s4*s8, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], +pi*pi*c4*c8, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], +pi*pi*c4*c8, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], -pi*pi*s4*s8, tol);
+  }
 
   virtual void run() const override
   {
@@ -244,6 +274,7 @@ public:
     test_distance_function_sd_3d();
     test_plane_distance_function_sd();
     test_min_function();
+    test_sine_bubble_function_2d();
   }
 };
 
