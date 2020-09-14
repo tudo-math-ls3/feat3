@@ -67,6 +67,9 @@ TARGET_LINK_LIBRARIES (tri2mesh feat)
 ADD_EXECUTABLE(mpi-info mpi_info/mpi_info.cpp)
 TARGET_LINK_LIBRARIES(mpi-info feat)
 
+ADD_EXECUTABLE(checkpoint-info checkpoint_info/checkpoint_info.cpp)
+TARGET_LINK_LIBRARIES(checkpoint-info feat)
+
 if (FEAT_HAVE_CUDA)
   CUDA_ADD_EXECUTABLE(cuda-device-info cuda_device_info/cuda_device_info.cpp)
   SET_PROPERTY(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CUDA_INCLUDE_DIRS}")
