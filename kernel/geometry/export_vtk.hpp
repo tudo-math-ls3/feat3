@@ -282,7 +282,7 @@ namespace FEAT
             d[Index(3)*i+j] = double(0);
 
           for(int j(0); j < v.BlockSize; ++j)
-            d[Index(3)*i+Index(j)] = v(i)[j];
+            d[Index(3)*i+Index(j)] = double(v(i)[j]);
 
         }
         _vertex_vectors.push_back(std::make_pair(name, std::move(d)));
@@ -394,7 +394,7 @@ namespace FEAT
             d[Index(3)*i+j] = double(0);
 
           for(int j(0); j < v.BlockSize; ++j)
-            d[Index(3)*i+Index(j)] = v(i)[j];
+            d[Index(3)*i+Index(j)] = double(v(i)[j]);
 
         }
         _cell_vectors.push_back(std::make_pair(name, std::move(d)));
