@@ -634,6 +634,74 @@ namespace FEAT
       return std::make_shared<SaddleUmfpackMean<DT_, IT_, dim_>>(matrix, filter);
     }
 
+    /// \cond internal
+    namespace Intern
+    {
+      // This helper is class is required if the data/index type pair of
+      // the system vector is not double/Index. In this case, the system
+      // vector has to be converted to a DenseVector with the same data/index
+      // type pair first and then converted to a double/Index dense vector
+      // in a second step.
+      template<typename DT_, typename IT_>
+      class GenericUmfpackVectorHelper
+      {
+      private:
+        LAFEM::DenseVector<Mem::Main, DT_, IT_> _vec_tmp;
+
+      public:
+        void init(const LAFEM::DenseVector<Mem::Main, double, Index>& v)
+        {
+          _vec_tmp.convert(v);
+        }
+
+        void done()
+        {
+          _vec_tmp.clear();
+        }
+
+        template<typename VT_>
+        void download(LAFEM::DenseVector<Mem::Main, double, Index>& vo, const VT_& vi)
+        {
+          _vec_tmp.copy(vi);
+          vo.convert(_vec_tmp);
+        }
+
+        template<typename VT_>
+        void upload(VT_& vo, const LAFEM::DenseVector<Mem::Main, double, Index>& vi)
+        {
+          _vec_tmp.convert(vi);
+          _vec_tmp.copy_inv(vo);
+        }
+      };
+
+      // specialisation for double/Index vectors; no intermediate conversion is necessary here
+      template<>
+      class GenericUmfpackVectorHelper<double, Index>
+      {
+      public:
+        void init(const LAFEM::DenseVector<Mem::Main, double, Index>&)
+        {
+        }
+
+        void done()
+        {
+        }
+
+        template<typename VT_>
+        void download(LAFEM::DenseVector<Mem::Main, double, Index>& vo, const VT_& vi)
+        {
+          vo.copy(vi);
+        }
+
+        template<typename VT_>
+        void upload(VT_& vo, const LAFEM::DenseVector<Mem::Main, double, Index>& vi)
+        {
+          vi.copy_inv(vo);
+        }
+      };
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief Generic UMFPACK solver class
      *
@@ -664,6 +732,8 @@ namespace FEAT
       typename Umfpack::MatrixType _umf_matrix;
       /// the vectors for our Umfpack solver (DenseVector<Mem::Main, double, Index>)
       typename Umfpack::VectorType _umf_vsol, _umf_vrhs;
+      /// vector helper
+      Intern::GenericUmfpackVectorHelper<typename VectorType::DataType, typename VectorType::IndexType> _vec_helper;
       /// the actual Umfpack solver object
       Umfpack _umfpack;
 
@@ -696,6 +766,9 @@ namespace FEAT
         _umf_vsol = _umf_matrix.create_vector_l();
         _umf_vrhs = _umf_matrix.create_vector_l();
 
+        // initialiase vector helper
+        _vec_helper.init(_umf_vsol);
+
         // factorise symbolic
         _umfpack.init_symbolic();
       }
@@ -703,6 +776,8 @@ namespace FEAT
       virtual void done_symbolic() override
       {
         _umfpack.done_symbolic();
+
+        _vec_helper.done();
 
         _umf_vrhs.clear();
         _umf_vsol.clear();
@@ -741,13 +816,13 @@ namespace FEAT
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // convert RHS vector
-        _umf_vrhs.copy(vec_rhs);
+        _vec_helper.download(_umf_vrhs, vec_rhs);
 
         // solve
         Status status = _umfpack.apply(_umf_vsol, _umf_vrhs);
 
         // convert sol vector
-        _umf_vsol.copy_inv(vec_sol);
+        _vec_helper.upload(vec_sol, _umf_vsol);
 
         return status;
       }

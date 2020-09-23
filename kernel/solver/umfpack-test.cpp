@@ -154,4 +154,70 @@ public:
 };
 
 UmfpackMeanTest umfpack_mean_test;
+
+template<typename DT_>
+class GenericUmfpackTest :
+  public TestSystem::FullTaggedTest<Mem::Main, DT_, Index>
+{
+public:
+  typedef SparseMatrixCSR<Mem::Main, DT_, Index> MatrixType;
+  typedef DenseVector<Mem::Main, DT_, Index> VectorType;
+
+  GenericUmfpackTest() :
+    TestSystem::FullTaggedTest<Mem::Main, DT_, Index>("GenericUmfpackTest")
+  {
+  }
+
+  virtual ~GenericUmfpackTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    // same tolerance for all DT_, since UMFPACK is internally double precision only
+    const DT_ tol = DT_(1E-8);
+
+    // create a pointstar factory
+    PointstarFactoryFD<DT_> psf(17);
+
+    // create a CSR matrix
+    MatrixType mat_sys(psf.matrix_csr());
+
+    // create a reference solution vector
+    VectorType vec_ref(psf.eigenvector_min());
+
+    // create an rhs vector
+    VectorType vec_rhs(mat_sys.create_vector_r());
+    vec_rhs.scale(vec_ref, psf.lambda_min());
+
+    // create an empty solution vector
+    VectorType vec_sol(mat_sys.create_vector_r());
+    vec_sol.format();
+
+    {
+      // create a GenericUmfpack solver
+      GenericUmfpack<MatrixType> umfpack(mat_sys);
+      // initialise
+      umfpack.init();
+      // solve
+      umfpack.apply(vec_sol, vec_rhs);
+      // release
+      umfpack.done();
+    }
+
+    // subtract reference solution
+    vec_sol.axpy(vec_ref, vec_sol, -DT_(1));
+
+    // compute the norm
+    DT_ nrm2 = vec_sol.norm2();
+
+    // check norm
+    TEST_CHECK_EQUAL_WITHIN_EPS(nrm2, DT_(0), tol);
+  }
+};
+
+GenericUmfpackTest<double> generic_umfpack_test_double;
+#ifdef FEAT_HAVE_QUADMATH
+GenericUmfpackTest<__float128> generic_umfpack_test_float128;
+#endif
 #endif // FEAT_HAVE_UMFPACK
