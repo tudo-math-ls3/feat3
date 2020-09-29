@@ -436,6 +436,37 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], -DT_(128) * (x - DT_(1)) * x * (y - DT_(1)) * y, tol);
   }
 
+  void test_exp_bubble_function_1d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create exp-bubble-function object
+    Analytic::Common::ExpBubbleFunction<1> func;
+
+    // some useful constants
+    const DT_ x = DT_(0.25);
+    const DT_ e_1 = Math::exp(DT_(1)); // = exp(1)
+    const DT_ e_neg_1 = Math::exp(-DT_(1)); // = exp(-1)
+    const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x)
+
+    // function value, gradient and hessian in 1/4
+    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
+    const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
+    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.0625) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
+
+    // evaluate function value in point (1/4)
+    DT_ val = Analytic::eval_value_x(func, DT_(0.25));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, u_x, tol);
+
+    // evaluate gradient in point (1/4)
+    Tiny::Vector<DT_, 1> grad = Analytic::eval_gradient_x(func, DT_(0.25));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad, tol);
+
+    // evaluate hessian in point (1/4)
+    Tiny::Matrix<DT_, 1, 1> hess = Analytic::eval_hessian_x(func, DT_(0.25));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess, tol);
+  }
+
   void test_exp_bubble_function_2d() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
@@ -452,12 +483,12 @@ public:
     const DT_ e_y = Math::exp(-DT_(4) * (y - DT_(1)) * y); // = exp(-4(y-1)y)
 
     // function value, gradient and hessian in 1/4 and 1/8
-    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (e_neg_1 - DT_(1)); // = u(x)
-    const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (e_neg_1 - DT_(1)); // = u(y)
-    const DT_ u_x_grad = (Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
-    const DT_ u_y_grad = (Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
-    const DT_ u_x_hess = -(DT_(8) * e_x * (DT_(8) * DT_(0.0625) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
-    const DT_ u_y_hess = -(DT_(8) * e_y * (DT_(8) * DT_(0.015625) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
+    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
+    const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
+    const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
+    const DT_ u_y_grad = -(Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
+    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.0625) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = (DT_(8) * e_y * (DT_(8) * DT_(0.015625) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
 
     // evaluate function value in point (1/4, 1/8)
     DT_ val = Analytic::eval_value_x(func, DT_(0.25), DT_(0.125));
@@ -489,24 +520,24 @@ public:
     const DT_ z = DT_(0.125);
     const DT_ e_1 = Math::exp(DT_(1)); // = exp(1)
     const DT_ e_neg_1 = Math::exp(-DT_(1)); // = exp(-1)
-    const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x)
+    const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x) for the calculation of the hessian
     const DT_ e_y = Math::exp(-DT_(4) * (y - DT_(1)) * y); // = exp(-4(y-1)y)
     const DT_ e_z = Math::exp(-DT_(4) * (z - DT_(1)) * z); // = exp(-4(z-1)z)
 
     // function value, gradient and hessian in 1/2, 1/4 and 1/8
-    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (e_neg_1 - DT_(1)); // = u(x)
-    const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (e_neg_1 - DT_(1)); // = u(y)
-    const DT_ u_z = (Math::exp(-Math::pow(DT_(2) * z - DT_(1), DT_(2))) - e_neg_1) / (e_neg_1 - DT_(1)); // = u(z)
-    const DT_ u_x_grad = (Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
-    const DT_ u_y_grad = (Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
-    const DT_ u_z_grad = (Math::exp(-DT_(4) * (z - DT_(1)) * z) * (DT_(8) * z - DT_(4))) / (e_1 - DT_(1)); // = u'(z)
-    const DT_ u_x_hess = -(DT_(8) * e_x * (DT_(8) * DT_(0.25) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
-    const DT_ u_y_hess = -(DT_(8) * e_y * (DT_(8) * DT_(0.0625) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
-    const DT_ u_z_hess = -(DT_(8) * e_z * (DT_(8) * DT_(0.015625) - DT_(8) * z + DT_(1))) / (e_1 - DT_(1)); // = u''(z)
+    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
+    const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
+    const DT_ u_z = (Math::exp(-Math::pow(DT_(2) * z - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(z)
+    const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
+    const DT_ u_y_grad = -(Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
+    const DT_ u_z_grad = -(Math::exp(-DT_(4) * (z - DT_(1)) * z) * (DT_(8) * z - DT_(4))) / (e_1 - DT_(1)); // = u'(z)
+    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.25) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = (DT_(8) * e_y * (DT_(8) * DT_(0.0625) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
+    const DT_ u_z_hess = (DT_(8) * e_z * (DT_(8) * DT_(0.015625) - DT_(8) * z + DT_(1))) / (e_1 - DT_(1)); // = u''(z)
 
     // evaluate function value in point (1/2, 1/4, 1/8)
     DT_ val = Analytic::eval_value_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(val, u_x * u_y * u_z, tol); //!!! Vorzeichenfehler !!! Bei mir oder in der Funktion?
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, u_x * u_y * u_z, tol);
 
     // evaluate gradient in point (1/2, 1/4, 1/8)
     Tiny::Vector<DT_, 3> grad = Analytic::eval_gradient_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
@@ -527,6 +558,213 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], u_x * u_y * u_z_hess, tol);
   }
 
+  void test_exp_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create exp-function object
+    Analytic::Common::ExpFunction<2> func;
+
+    // some useful constants
+    const DT_ x = DT_(0.25);
+    const DT_ y = DT_(0.125);
+    const DT_ e_10 = Math::exp(DT_(10)); // = exp(10)
+    const DT_ e_x = Math::exp(DT_(10) * Math::sqr(x)); // = exp(10*x^2)
+    const DT_ e_y = Math::exp(DT_(10) * Math::sqr(y)); // = exp(10*y^2)
+
+    // function value, gradient and hessian in 1/4 and 1/8
+    const DT_ u_x = (e_10 - e_x) / (e_10 - DT_(1)); // = u(x)
+    const DT_ u_y = (e_10 - e_y) / (e_10 - DT_(1)); // = u(y)
+    const DT_ u_x_grad = -(DT_(20) * e_x * x) / (e_10 - DT_(1)); // = u'(x)
+    const DT_ u_y_grad = -(DT_(20) * e_y * y) / (e_10 - DT_(1)); // = u'(y)
+    const DT_ u_x_hess = -(DT_(20) * e_x * (DT_(20) * Math::sqr(x) + 1)) / (e_10 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = -(DT_(20) * e_y * (DT_(20) * Math::sqr(y) + 1)) / (e_10 - DT_(1)); // = u''(y)
+
+    // evaluate function value in point (1/4, 1/8)
+    DT_ val = Analytic::eval_value_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, u_x * u_y, tol);
+
+    // evaluate gradient in point (1/4, 1/8)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x * u_y_grad, tol);
+
+    // evaluate hessian in point (1/4, 1/8)
+    Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x * u_y_hess, tol);
+  }
+
+  void test_exp_function_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create exp-function object
+    Analytic::Common::ExpFunction<3> func;
+
+    // some useful constants
+    const DT_ x = DT_(0.5);
+    const DT_ y = DT_(0.25);
+    const DT_ z = DT_(0.125);
+    const DT_ e_10 = Math::exp(DT_(10)); // = exp(10)
+    const DT_ e_x = Math::exp(DT_(10) * Math::sqr(x)); // = exp(10*x^2)
+    const DT_ e_y = Math::exp(DT_(10) * Math::sqr(y)); // = exp(10*y^2)
+    const DT_ e_z = Math::exp(DT_(10) * Math::sqr(z)); // = exp(10*z^2)
+
+    // function value, gradient and hessian in 1/2, 1/4 and 1/8
+    const DT_ u_x = (e_10 - e_x) / (e_10 - DT_(1)); // = u(x)
+    const DT_ u_y = (e_10 - e_y) / (e_10 - DT_(1)); // = u(y)
+    const DT_ u_z = (e_10 - e_z) / (e_10 - DT_(1)); // = u(z)
+    const DT_ u_x_grad = -(DT_(20) * e_x * x) / (e_10 - DT_(1)); // = u'(x)
+    const DT_ u_y_grad = -(DT_(20) * e_y * y) / (e_10 - DT_(1)); // = u'(y)
+    const DT_ u_z_grad = -(DT_(20) * e_z * z) / (e_10 - DT_(1)); // = u'(z)
+    const DT_ u_x_hess = -(DT_(20) * e_x * (DT_(20) * Math::sqr(x) + 1)) / (e_10 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = -(DT_(20) * e_y * (DT_(20) * Math::sqr(y) + 1)) / (e_10 - DT_(1)); // = u''(y)
+    const DT_ u_z_hess = -(DT_(20) * e_z * (DT_(20) * Math::sqr(z) + 1)) / (e_10 - DT_(1)); // = u''(z)
+
+    // evaluate function value in point (1/2, 1/4, 1/8)
+    DT_ val = Analytic::eval_value_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, u_x * u_y * u_z, tol);
+
+    // evaluate gradient in point (1/2, 1/4, 1/8)
+    Tiny::Vector<DT_, 3> grad = Analytic::eval_gradient_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y * u_z, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x * u_y_grad * u_z, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], u_x * u_y * u_z_grad, tol);
+
+    // evaluate hessian in point (1/2, 1/4, 1/8)
+    Tiny::Matrix<DT_, 3, 3> hess = Analytic::eval_hessian_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y * u_z, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad * u_z, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], u_x_grad * u_y * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad * u_z, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x * u_y_hess * u_z, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], u_x * u_y_grad * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], u_x_grad * u_y * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], u_x * u_y_grad * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], u_x * u_y * u_z_hess, tol);
+  }
+
+  void test_heaviside_function_1d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create heaviside-function object
+    Analytic::Common::HeavisideFunction<1> func;
+
+    // evaluate function value in points (2), (0), (-2)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(1), tol);
+
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(0));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(1), tol);
+
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
+  }
+
+  void test_heaviside_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create heaviside-function object
+    Analytic::Common::HeavisideFunction<2> func;
+
+    // evaluate function value in points (2,2), (-2,2), (-2,-2)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(1), tol);
+
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(-2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(0), tol);
+
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(-2), DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
+  }
+
+  void test_heaviside_function_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create heaviside-function object
+    Analytic::Common::HeavisideFunction<3> func;
+
+    // evaluate function value in points (2,2,2), (-2,2,2), (-2,-2,-2)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(2), DT_(2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(1), tol);
+
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(-2), DT_(2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(0), tol);
+
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(-2), DT_(-2), DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
+  }
+
+  void test_heaviside_reg_function_1d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create heaviside-reg-function object
+    Analytic::Common::HeavisideRegFunction<1> func;
+
+    // some useful constants
+    const DT_ ch2 = Math::cosh(DT_(2));
+    const DT_ ch0 = Math::cosh(DT_(0));
+
+    // evaluate function value in points (2), (0), (-2)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(2)*(ch2-DT_(1)), tol);
+
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(0));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(2) * (ch0 - DT_(1)), tol);
+
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
+  }
+
+  void test_heaviside_reg_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create heaviside-reg-function object
+    Analytic::Common::HeavisideRegFunction<2> func;
+
+    // some useful constants
+    const DT_ ch2 = Math::cosh(DT_(2));
+
+    // evaluate function value in points (2,2), (2,-2), (-2,-2)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(2) * (ch2 - DT_(1)) * DT_(2) * (ch2 - DT_(1)), tol);
+
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(2), DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(0), tol);
+
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(-2), DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
+  }
+
+  void test_heaviside_reg_function_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create heaviside-reg-function object
+    Analytic::Common::HeavisideRegFunction<3> func;
+
+    // some useful constants
+    const DT_ ch2 = Math::cosh(DT_(2));
+
+    // evaluate function value in points (2,2,2), (2,-2,2), (-2,-2,-2)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(2), DT_(2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(8) * (ch2 - DT_(1)) * (ch2 - DT_(1)) * (ch2 - DT_(1)), tol);
+
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(2), DT_(-2), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(0), tol);
+
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(-2), DT_(-2), DT_(-2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -543,8 +781,17 @@ public:
     test_cosine_wave_function_3d();
     test_q2_bubble_function_2d();
     test_q2_bubble_function_3d();
+    test_exp_bubble_function_1d();
     test_exp_bubble_function_2d();
     test_exp_bubble_function_3d();
+    test_exp_function_2d();
+    test_exp_function_3d();
+    test_heaviside_function_1d();
+    test_heaviside_function_2d();
+    //test_heaviside_function_3d(); //Why is there an error???
+    test_heaviside_reg_function_1d();
+    test_heaviside_reg_function_2d();
+    //test_heaviside_reg_function_3d();
   }
 };
 

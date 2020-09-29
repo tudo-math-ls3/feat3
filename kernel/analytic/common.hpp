@@ -570,7 +570,7 @@ namespace FEAT
        * \brief Exponential-Bubble scalar Static function
        *
        * This class implements the StaticFunction interface representing the function
-       *   - u(x) = (exp(-(2*x - 1)^2) - exp(-1)) / (exp(-1) - 1)
+       *   - u(x) = (exp(-(2*x - 1)^2) - exp(-1)) / (1 - exp(-1))
        *
        * This function fulfills homogeneous Dirichlet boundary conditions on the unit cube domain.
        *
@@ -608,7 +608,7 @@ namespace FEAT
        * \brief Exponential-Bubble Analytic function
        *
        * This class implements the AnalyticFunction interface representing the function
-       *   - 1D: u(x)     = (exp(-(2*x - 1)^2) - exp(-1)) / (exp(-1) - 1)
+       *   - 1D: u(x)     = (exp(-(2*x - 1)^2) - exp(-1)) / (1 - exp(-1))
        *   - 2D: u(x,y)   = u(x) * u(y)
        *   - 3D: u(x,y,z) = u(x) * u(y) * u(z)
        *
@@ -1292,7 +1292,7 @@ namespace FEAT
        *   u(x) = H(x) =
        *   \begin{cases}
        *     0, & x < 0 \\
-       *     1, & 2 (\cosh(x) - 1) \geq 0
+       *     2 (\cosh(x) - 1), & x \geq 0
        *   \end{cases}
        * \f]
        *
