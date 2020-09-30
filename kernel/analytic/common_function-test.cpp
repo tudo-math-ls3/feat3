@@ -765,6 +765,181 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0), tol);
   }
 
+  void test_goldstein_price_function() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create goldstein-price-function object
+    Analytic::Common::GoldsteinPriceFunction func;
+
+    // evaluate function value in point (1,2)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(137150), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-15840), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(530160), tol);
+
+    // evaluate hessian in point (1,2)
+    Tiny::Matrix<DT_, 2,2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(-31680), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(127320), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(127320), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(1904820), tol);
+
+    // global minimum in (0,-1) with func(0,-1)=3
+    DT_ min = Analytic::eval_value_x(func, DT_(0), DT_(-1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min, DT_(3), tol);
+
+    // evaluate gradient in global minimum
+    Tiny::Vector<DT_, 2> grad_min = Analytic::eval_gradient_x(func, DT_(0), DT_(-1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[1], DT_(0), tol);
+
+    // the other local extrema?
+  }
+
+  void test_bazaraa_shetty_function() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create bazaraa-shetty-function object
+    Analytic::Common::BazaraaShettyFunction func;
+
+    // evaluate function value in point (1,2)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(10), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-10), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(12), tol);
+
+    // evaluate hessian in point (1,2)
+    Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(14), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(-4), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(-4), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(8), tol);
+
+    // global minimum in (2,1) with func(2,1)=0
+    DT_ min = Analytic::eval_value_x(func, DT_(2), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min, DT_(0), tol);
+
+    // evaluate gradient in global minimum
+    Tiny::Vector<DT_, 2> grad_min = Analytic::eval_gradient_x(func, DT_(2), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[1], DT_(0), tol);
+
+    // evaluate hessian in global minimum, because it should be singular
+    Tiny::Matrix<DT_, 2, 2> hess_min = Analytic::eval_hessian_x(func, DT_(2), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][0], DT_(2), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][1], DT_(-4), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][0], DT_(-4), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][1], DT_(8), tol);
+  }
+
+  void test_himmelblau_function() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create himmelblau-function object
+    Analytic::Common::HimmelblauFunction func;
+
+    // evaluate function value in point (1,2)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(68), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-36), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(-32), tol);
+
+    // evaluate hessian in point (1,2)
+    Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(-22), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(12), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(12), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(26), tol);
+
+    // test local minima
+    DT_ min_1 = Analytic::eval_value_x(func, DT_(-3.77931025337774689189076584129), DT_(-3.28318599128616941226600051437));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min_1, DT_(0), tol);
+    DT_ min_2 = Analytic::eval_value_x(func, DT_(-2.80511808695274485305357239809), DT_(3.13131251825057296580430072341));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min_2, DT_(0), tol);
+    DT_ min_3 = Analytic::eval_value_x(func, DT_(3), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min_3, DT_(0), tol);
+    DT_ min_4 = Analytic::eval_value_x(func, DT_(3.58442834033049174494433823938), DT_(-1.84812652696440355353830020904));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min_4, DT_(0), tol);
+
+    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(-3.77931025337774689189076584129), DT_(-3.28318599128616941226600051437));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(0), tol);
+
+    Tiny::Vector<DT_, 2> grad_2 = Analytic::eval_gradient_x(func, DT_(-2.80511808695274485305357239809), DT_(3.13131251825057296580430072341));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1], DT_(0), tol);
+
+    Tiny::Vector<DT_, 2> grad_3 = Analytic::eval_gradient_x(func, DT_(3), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[1], DT_(0), tol);
+
+    Tiny::Vector<DT_, 2> grad_4 = Analytic::eval_gradient_x(func, DT_(3.58442834033049174494433823938), DT_(-1.84812652696440355353830020904));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_4[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_4[1], DT_(0), tol);
+  }
+
+  void test_rosenbrock_function() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create rosenbrock-function object
+    Analytic::Common::RosenbrockFunction func;
+
+    // evaluate function value in point (1,2)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(100), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-400), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(200), tol);
+
+    // evaluate hessian in point (1,2)
+    Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(402), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(-400), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(-400), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(200), tol);
+
+    // test local minimum
+    DT_ min = Analytic::eval_value_x(func, DT_(1), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min, DT_(0), tol);
+
+    Tiny::Vector<DT_, 2> grad_min = Analytic::eval_gradient_x(func, DT_(1), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[1], DT_(0), tol);
+  }
+
+  void test_constant_function() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create constant-function object
+    Analytic::Common::ConstantFunction<1> func(3);
+
+    // evaluate function value in point (1)
+    DT_ val = Analytic::eval_value_x(func, DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(3), tol);
+
+    Tiny::Vector<DT_, 1> grad = Analytic::eval_gradient_x(func, DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(0), tol);
+
+    Tiny::Matrix<DT_, 1,1> hess = Analytic::eval_hessian_x(func, DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(0), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -788,10 +963,15 @@ public:
     test_exp_function_3d();
     test_heaviside_function_1d();
     test_heaviside_function_2d();
-    //test_heaviside_function_3d(); //Why is there an error???
+    test_heaviside_function_3d();
     test_heaviside_reg_function_1d();
     test_heaviside_reg_function_2d();
-    //test_heaviside_reg_function_3d();
+    test_heaviside_reg_function_3d();
+    test_goldstein_price_function();
+    test_bazaraa_shetty_function();
+    test_himmelblau_function();
+    test_rosenbrock_function();
+    test_constant_function();
   }
 };
 

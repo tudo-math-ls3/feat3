@@ -1255,7 +1255,7 @@ namespace FEAT
         /// 3D: function value
         static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
         {
-          return eval(x)*eval*(y)*eval(z);
+          return eval(x)*eval(y)*eval(z);
         }
 
       }; // class HeavisideStatic<...>
@@ -1324,7 +1324,7 @@ namespace FEAT
         /// 3D: function value
         static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
         {
-          return eval(x)*eval*(y)*eval(z);
+          return eval(x)*eval(y)*eval(z);
         }
 
         /// 1D: X-derivative
@@ -1667,7 +1667,7 @@ namespace FEAT
         /// xy-derivative
         static DataType_ der_xy(DataType_ DOXY(x), DataType_ DOXY(y))
         {
-          return DataType_(4);
+          return DataType_(-4);
         }
 
         /// yx-derivative
@@ -1789,7 +1789,7 @@ namespace FEAT
        *
        * This class implements the StaticFunction interface representing the function
        *  \f[
-       *    u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
+       *    u(x,y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2
        *  \f]
        *  The function is nonconvex and has 4 local minima at
        *  \f{align*}{
