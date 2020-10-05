@@ -798,6 +798,32 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[1], DT_(0), tol);
 
     // the other local extrema?
+    // local minimum 1 in point (-0.6,-0.4)
+    DT_ min_1 = Analytic::eval_value_x(func, DT_(-0.6), DT_(-0.4));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min_1, DT_(30), tol);
+
+    // evaluate gradient in local minimum 1
+    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(-0.6), DT_(-0.4));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(0), tol);
+
+    // local minimum 2 in point (1.2,0.8)
+    DT_ min_2 = Analytic::eval_value_x(func, DT_(1.2), DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(min_2, DT_(840), tol);
+
+    // evaluate gradient in local minimum 2
+    //Tiny::Vector<DT_, 2> grad_2 = Analytic::eval_gradient_x(func, DT_(1.2), DT_(0.8));
+    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0], DT_(0), tol);
+    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1], DT_(0), tol);
+
+    // local minimum 3 in point (1.8,0.2)
+    //DT_ min_3 = Analytic::eval_value_x(func, DT_(1.8), DT_(0.2));
+    //TEST_CHECK_EQUAL_WITHIN_EPS(min_3, DT_(84), tol);
+
+    // evaluate gradient in local minimum 3
+    //Tiny::Vector<DT_, 2> grad_3 = Analytic::eval_gradient_x(func, DT_(1.8), DT_(0.2));
+    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[0], DT_(0), tol);
+    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[1], DT_(0), tol);
   }
 
   void test_bazaraa_shetty_function() const
@@ -927,17 +953,104 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // create constant-function object
-    Analytic::Common::ConstantFunction<1> func(3);
+    Analytic::Common::ConstantFunction<1,DT_> func(3);
 
     // evaluate function value in point (1)
     DT_ val = Analytic::eval_value_x(func, DT_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(3), tol);
 
+    // evaluate gradient in point (1)
     Tiny::Vector<DT_, 1> grad = Analytic::eval_gradient_x(func, DT_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(0), tol);
 
+    // evaluate hessian in point (1)
     Tiny::Matrix<DT_, 1,1> hess = Analytic::eval_hessian_x(func, DT_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(0), tol);
+  }
+
+  void test_constant_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create constant-function object
+    Analytic::Common::ConstantFunction<2,DT_> func(4);
+
+    // evaluate function value in point (1,1)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(4), tol);
+
+    // evaluate gradient in point (1,1)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(0), tol);
+
+    // evaluate hessian in point (1,1)
+    Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(0), tol);
+  }
+
+  void test_xy_plane_rotation() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    //create origin vector
+    typename Analytic::Common::XYPlaneRotation<DT_, 3>::PointType origin;
+    origin[0] = DT_(1);
+    origin[1] = DT_(1);
+    origin[2] = DT_(1);
+
+    // create xy-plane-rotation object
+    Analytic::Common::XYPlaneRotation<DT_, 3> func(0.5, origin);
+
+    // evaluate function value in point (1,2,3)
+    Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.5)*-(DT_(2)-DT_(1)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0.5) * (DT_(1) - 1), tol);
+    //TEST_CHECK_EQUAL_WITHIN_EPS(val[2], DT_(0), tol);
+
+    // evaluate gradient in point (1,2,3)
+    Tiny::Matrix<DT_, 3,3> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_(-0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_(0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][2], DT_(0), tol);
+
+    // evaluate hessian in point (1,2,3)
+    Tiny::Tensor3<DT_, 3,3,3,3,3,3> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(0, 0, 0), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(0, 0, 1), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(0, 1, 0), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(0, 1, 1), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(1, 0, 0), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(1, 0, 1), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(1, 1, 0), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess(1, 1, 1), DT_(0), tol);
+  }
+
+  void test_yz_plane_parabolic() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    //create vectors
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::PointType zeros_y;
+    zeros_y[0] = DT_(0);
+    zeros_y[1] = DT_(4);
+
+    // create yz-plane-parabolic object
+    Analytic::Common::YZPlaneParabolic<DT_, 2> func(0.5, zeros_y);
+
+    // evaluate function value in point (2,3)
+    Tiny::Vector<DT_, 2> val = Analytic::eval_value_x(func, DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.1875), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0), tol);
   }
 
   virtual void run() const override
@@ -972,6 +1085,9 @@ public:
     test_himmelblau_function();
     test_rosenbrock_function();
     test_constant_function();
+    test_constant_function_2d();
+    test_xy_plane_rotation();
+    test_yz_plane_parabolic();
   }
 };
 
