@@ -1,0 +1,142 @@
+/** \page parsed_function  Syntax overview, arithmetic operations and supported functions of ParsedFunction
+This page describes the general syntax of ParsedFunction. You can also find a list of arithmetic operations and supported functions.
+
+The Original Website: http://warp.povusers.org/FunctionParser/fparser.html#literals
+
+\section parsed_function_numeric_literals Numeric literals
+A numeric literal is a fixed numerical value in the input function string (either a floating point value or an integer value, depending on the parser type).
+
+An integer literal can consist solely of numerical digits (possibly with a preceding unary minus). For example,<B> "12345" </B>.
+
+If the literal is preceded by the characters <B> "0x"</B>, it will be interpreted as a hexadecimal literal, where digits can also include the letters from <B>'A'</B> to <B>'F'</B> (in either uppercase or lowercase).\n For example, <B>"0x89ABC" </B>(which corresponds to the value 563900).
+
+A floating point literal (only supported by the floating point type parsers) may additionally include a decimal point followed by the decimal part of the value, such as for example <B>"12.34"</B>, optionally followed by a decimal exponent.
+
+A decimal exponent consists of an <B>'E'</B> or <B>'e'</B>, followed by an optional plus or minus sign, followed by decimal digits, and indicates multiplication by a power of 10. For example, <B>"1.2e5" </B> (which is equivalent to the value 120000).
+
+If a floating point literal is preceded by the characters <B>"0x" </B> it will be interpreted in hexadecimal. A hexadecimal floating point literal consists of a hexadecimal value, with an optional decimal point, followed optionally by a binary exponent in base 10 (in other words, the exponent is not in hexadecimal).
+
+A binary exponent has the same format as a decimal exponent, except that <B>'P'</B> or <B>'p'</B> is used. A binary exponent indicates multiplication by a power of 2. For example, <B>"0xA.Bp10" </B>(which is equivalent to the value 10944).
+
+With the complex versions of the library, the imaginary part of a numeric literal is written as a regular numeric literal with an <B>'i'</B> appended, for example <B>"5i" </B>. Note that when also specifying the real part of a complex literal, parentheses should be used to avoid precedence problems. (For example, <B>"(2+5i) * x" </B>is not the same thing as <B>"2+5i * x" </B>. The latter would be equivalent to <B>"2 + (5i * x)" </B>.)
+
+\section parsed_function_identifier_names Identifier names
+
+An identifier is the name of a function (internal or user-defined), variable, constant or unit. New identifiers can be specified with the functions described in the earlier subsections in this document.
+
+The name of an identifier can use any alphanumeric characters, the underscore character and any UTF8-encoded unicode character, excluding those denoting whitespace. The first character of the name cannot be a numeric digit, though.
+
+All functions, variables, constants and units must use unique names. It's not possible to add two different identifiers with the same name.
+
+\section parsed_function_function_string_syntax The function string syntax
+
+The function string understood by the class is very similar (but not completely identical in all aspects) to mathematical expressions in the C/C++ languages. Arithmetic float expressions can be created from float literals, variables or functions using the following operators in this order of precedence:
+
+
+<table>
+<caption id="multi_row">Overview arithmetic expressions </caption>
+<tr><th>Arithmetic expressions                      <th>Description
+<tr><td ><B>() </B><td>expressions in parentheses first
+<tr> <td>      <B>A unit </B>              <td>a unit multiplier (if one has been added)
+<tr> <td>      <B>  A^B </B>           <td> 	exponentiation (A raised to the power B)
+<tr> <td>   <B>  -A   </B>            <td>unary minus
+<tr> <td>   <B>  !A  </B>             <td>unary logical not (result is 1 if int(A) is 0, else 0)
+<tr> <td>    <B>    A*B &nbsp;&nbsp; A/B &nbsp;&nbsp;   A%B  </B>  <td>multiplication, division and modulo
+<tr> <td>    <B>   A+B   &nbsp;&nbsp;  A-B  </B>           <td>addition and subtraction
+<tr> <td>    <B>   A=B &nbsp;&nbsp; A<B &nbsp;&nbsp; A<=B   \n   A!=B  &nbsp;&nbsp;  A>B &nbsp;&nbsp;    A>=B   </B>        <td> comparison between A and B (result is either 0 or 1)
+<tr> <td >   <B>     A&B  </B>          <td >result is 1 if <B> int(A)</B> and <B>int(B)</B> differ from 0, else 0.\n Note: Regardless of the values, both operands are always evaluated. However, if the expression is optimized, it may be changed such that only one of the \n operands is evaluated, according to standard shortcut logical operation semantics. </td> </tr>
+<tr> <td>  <B> A|B </B>  <td>result is 1 if <B>int(A)</B> or <B>int(B)</B> differ from 0, else 0.\n Note: Regardless of the values, both operands are always evaluated. However, if the expression is optimized, it may be changed such that only one of the \n operands is evaluated, according to standard shortcut logical operation semantics. </td> </tr>
+</table>
+
+(Note that currently the exponentiation operator is not supported for <B>FunctionParser_li </B> nor <B>FunctionParser_gmpint </B>. With the former the result would very easily overflow, making its usefulness questionable. With the latter it could be easily abused to make the program run out of memory; think of a function like <B>"10^10^10^100000"</B>.)
+
+Since the unary minus has higher precedence than any other operator, for example the following expression is valid: <B>x*-y </B>
+
+The comparison operators use an epsilon value, so expressions which may differ in very least-significant digits should work correctly.\n For example, <B> "0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1 = 1" </B> should always return 1, and the same comparison done with <B> ">" </B> or <B>"<"</B> should always return 0. (The epsilon value can be configured in the <B>fpconfig.hh </B>file.) \n Without epsilon this comparison probably returns the wrong value.
+
+The class supports these functions:
+
+<table>
+<caption id="multi_row">Overview embedded functions </caption>
+<tr><th>Function handle                     <th>Description
+<tr><td > <B>abs(A) </B> <td>Absolute value (magnitude) of A. With real numbers, if A is negative, returns -A otherwise returns A. With complex numbers, equivalent to <B> hypot(real(x),imag(x))</B>.
+<tr> <td> <B> acos(A) </B>  <td>Arc-cosine of A. Returns the angle, measured in radians, whose cosine is A.
+<tr> <td> <B>acosh(A)  </B>  <td>Same as acos() but for hyperbolic cosine.
+<tr> <td> <B> arg(A) </B>  <td> Phase angle of complex number A. Equivalent to <B>atan2(imag(x),real(x))</B>.
+<tr> <td> <B> asin(A) </B>  <td>Arc-sine of A. Returns the angle, measured in radians, whose sine is A.
+<tr> <td> <B>asinh(A)  </B>  <td>Same as asin() but for hyperbolic sine.
+<tr> <td> <B> atan(A)</B>  <td> Arc-tangent of (A). Returns the angle, measured in radians, whose tangent is A.
+<tr> <td> <B> atan2(A,B) </B>  <td> Principal arc-tangent of A/B, using the signs of the two arguments to determine the quadrant of the result.\n Returns the solution to the two expressions hypot(A,B)*sin(x)=A, hypot(A,B)*cos(x)=B. The return value is in range -pi to pi, inclusive.
+<tr> <td> <B> atanh(A) </B>  <td>Same as atan() but for hyperbolic tangent.
+<tr> <td> <B>cbrt(A)  </B>  <td>Cube root of A. Returns a solution to expression pow(x,3)=A.
+<tr> <td> <B> conj(A) </B>  <td> Complex conjugate of A. Equivalent to <B>real(x) - 1i*imag(x)</B> or <B>polar(abs(x),-arg(x))</B>.
+<tr> <td> <B> ceil(A) </B>  <td>Ceiling of A. Returns the smallest integer not smaller than A. Rounds up to the next higher integer.\n E.g. -2.9, -2.5 and -2.1 are rounded to -2.0, and 2.9, 2.5 and 2.1 are rounded to 3.0.
+<tr> <td> <B> cos(A) </B>  <td>Cosine of A. Returns the cosine of the angle A, where A is measured in radians.
+<tr> <td> <B> cosh(A) </B>  <td>Same as cos() but for hyperbolic cosine.
+<tr> <td> <B> cot(A) </B>  <td>Cotangent of A. Equivalent to <B>1/tan(A)</B>.
+<tr> <td> <B> csc(A) </B>  <td>Cosecant of A. Equivalent to <B> 1/sin(A)</B>.
+<tr> <td> <B> eval(...) </B>  <td> This a recursive call to the function to be evaluated. The number of parameters must be the same as the number of parameters taken by the function. \n Must be called inside <B>if()</B> to avoid infinite recursion.
+<tr> <td> <B>  exp(A)</B>  <td>Exponential of A. Returns the value of e raised to the power A where e is the base of the natural logarithm,\n i.e. the non-repeating value approximately equal to 2.71828182846.
+<tr> <td> <B> exp2(A) </B>  <td> Base 2 exponential of A. Equivalent to <B>pow(2,A)</B>.
+<tr> <td> <B> floor(A) </B>  <td>Floor of A. Returns the largest integer not greater than A. Rounds down to the next lower integer.\n E.g. -2.9, -2.5 and -2.1 are rounded to -3.0, and 2.9, 2.5 and 2.1 are rounded to 2.0.
+<tr> <td> <B> hypot(A,B) </B>  <td>Euclidean distance function. Equivalent to <B>sqrt(A^2+B^2)</B>.
+<tr> <td> <B> if(A,B,C) </B>  <td> If int(A) differs from 0, the return value of this function is B, else C. Only the parameter which needs to be evaluated is evaluated,\n the other parameter is skipped; this makes it safe to use <B>eval()</B> in them.
+<tr> <td> <B>imag(A)  </B>  <td> Return the imaginary part of complex number A. Equivalent to <B> abs(A)*sin(arg(A))</B>.
+<tr> <td> <B> int(A) </B>  <td>Rounds A to the closest integer. Equidistant values are rounded away from zero.\n E.g. -2.9 and -2.5 are rounded to -3.0; -2.1 is rounded to -2.0, and 2.9 and 2.5 are rounded to 3.0; 2.1 is rounded to 2.0.
+<tr> <td> <B> log(A) </B>  <td>Natural (base e) logarithm of A. Returns the solution to expression exp(x)=A.
+<tr> <td> <B> log2(A) </B>  <td>Base 2 logarithm of A. Equivalent to <B>log(A)/log(2)</B>.
+<tr> <td> <B>  log10(A)</B>  <td>Base 10 logarithm of A.
+<tr> <td> <B> max(A,B) </B>  <td>If A>B, the result is A, else B.
+<tr> <td> <B>  min(A,B)</B>  <td>If A<B, the result is A, else B.
+<tr> <td> <B> polar(A,B) </B>  <td>Returns a complex number from magnitude A, phase angle B (in radians). Equivalent to<B> real(A)*(cos(real(B))+1i*sin(real(B)))</B>.
+<tr> <td> <B> pow(A,B) </B>  <td>Exponentiation (A raised to the power B).
+<tr> <td> <B> real(A) </B>  <td>Return the real part of complex number A. Equivalent to <B>abs(A)*cos(arg(A))</B>.
+<tr> <td> <B> sec(A) </B>  <td>Secant of A. Equivalent to <B>1/cos(A)</B>.
+<tr> <td> <B> sin(A) </B>  <td>Sine of A. Returns the sine of the angle A, where A is measured in radians.
+<tr> <td> <B> sinh(A) </B>  <td>Same as sin() but for hyperbolic sine.
+<tr> <td> <B> sqrt(A) </B>  <td> 	Square root of A. Returns a solution to expression pow(x,2)=A.
+<tr> <td> <B> tan(A)  </B>  <td>Tangent of A. Returns the tangent of the angle A, where A is measured in radians.
+<tr> <td> <B> tanh(A) </B>  <td>Same as tan() but for hyperbolic tangent.
+<tr> <td> <B> trunc(A) </B>  <td>Truncated value of A. Returns an integer corresponding to the value of A without its fractional part.\n E.g. -2.9, -2.5 and -2.1 are rounded to -2.0, and 2.9, 2.5 and 2.1 are rounded to 2.0.
+</table>
+
+(Note that for <B>FunctionParser_li</B> and <B>FunctionParser_gmpint</B> only the functions <B>abs()</B>, <B>eval()</B>, <B>if()</B>, <B>min()</B> and <B>max()</B> are supported.)
+
+Examples of function string understood by the class:
+
+<B>"1+2" \n
+"x-1"\n
+"-sin(sqrt(x^2+y^2))"\n
+"sqrt(XCoord*XCoord + YCoord*YCoord)"</B>
+
+An example of a recursive function is the factorial function:<B> "if(n>1, n*eval(n-1), 1)"</B>
+
+Note that a recursive call has some overhead, which makes it a bit slower than any other operation. It may be a good idea to avoid recursive functions in very time-critical applications. \n Recursion also takes some memory, so extremely deep recursions should be avoided (eg. millions of nested recursive calls).
+
+Also note that even though the maximum recursion level of <B>eval() </B> is limited, it is possible to write functions which never reach that level but still take enormous amounts of time to evaluate.\n This can sometimes be undesirable because it is prone to exploitation, which is why <B>eval() </B> is disabled by default. It can be enabled in the<B> fpconfig.hh </B>file.
+
+\section parsed_function_inline_variables Inline variables
+
+The function syntax supports defining new variables inside the function string itself. This can be done with the following syntax:
+
+<B>"<variable name> := <expression>; <function>" </B>
+
+For example:
+
+<B>"length := sqrt(x*x+y*y); 2*length*sin(length)" </B>
+
+(Spaces around the <B>':='</B> operator are optional.)
+
+The obvious benefit of this is that if a long expression needs to be used in the function several times, this allows writing it only once and using a named variable from that point forward.
+
+The variable name must be an unused identifier (in other words, not an existing function, variable or unit name).
+
+The <B><function> </B> part can have further inline variable definitions, and thus it's possible to have any amount of them, for example:
+
+<B>"A := x^2; B := y^2; C := z^2; sqrt(A+B+C)" </B>
+
+The expressions in subsequent inline variable definitions can use any of the previous inline variables. It is also possible to redefine an inline variable. For example:
+
+<B>"A := x^2; A := 2*A; sqrt(A)" </B>
+
+**/
