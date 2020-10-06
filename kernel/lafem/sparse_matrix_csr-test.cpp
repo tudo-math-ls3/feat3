@@ -83,9 +83,7 @@ public:
     TEST_CHECK_EQUAL(empty5.columns(), 0);
     TEST_CHECK_EQUAL(empty5.used_elements(), 0);
 
-    //#TODO Dirk kannst du dir das nochmal angucken?
-    //
-   /* SparseMatrixCOO<Mem::Main, DT_, IT_> a00;
+    SparseMatrixCOO<Mem::Main, DT_, IT_> a00;
     SparseMatrixCSR<Mem_, DT_, IT_> b00(a00);
     TEST_CHECK_EQUAL(b00.size(), 0ul);
     TEST_CHECK_EQUAL(b00.rows(), 0ul);
@@ -98,7 +96,7 @@ public:
     TEST_CHECK_EQUAL(b01.rows(), 10ul);
     TEST_CHECK_EQUAL(b01.columns(), 10ul);
     TEST_CHECK_EQUAL(b01.used_elements(), 0ul);
-    */
+
     SparseMatrixFactory<DT_, IT_> a(IT_(10), IT_(10));
     a.add(IT_(1),IT_(2),DT_(7));
     a.add(IT_(5),IT_(5),DT_(2));

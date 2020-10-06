@@ -97,9 +97,10 @@ void MemoryPool<Mem::CUDA>::finalise()
 template <typename DT_>
 DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
 {
-  assert(count != 0);
-
   DT_ * memory(nullptr);
+  if (count == 0)
+    return memory;
+
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, count * sizeof(DT_)))
     throw InternalError("MemoryPool<CUDA> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == nullptr)
