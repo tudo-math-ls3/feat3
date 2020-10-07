@@ -57,6 +57,13 @@ namespace FEAT
      * This function should be the last function called in an application's
      * \p main function.
      *
+     * \note
+     * Internally this functions calls the MemoryPool::finalise function.
+     * To get proper warnings one memory that is still in use and not freed correctly
+     * one has to make sure, that any FEAT Container has been destructed when calling the finalise method.
+     * This is usually achieved by keeping the C++ main function slim and kicking off all the fancy application stuff in a separate function/method.
+     * Thus (at most) every FEAT related stuff is destructed when this separate function/method ends.
+     *
      * \returns
      * An exit code (<c>EXIT_SUCCESS</c>) that can be returned by the \p main function.
      */
