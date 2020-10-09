@@ -17,7 +17,7 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     print ("Error: Clang Compiler version less then 3.3 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-std=c++11 -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic"
+  cxxflags = "-std=c++11 -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic -stdlib=libc++"
 
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
