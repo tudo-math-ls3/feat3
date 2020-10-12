@@ -43,6 +43,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if major >= 10:
     cxxflags += " -Wtautological-overlap-compare -Wtautological-bitwise-compare -Wmisleading-indentation -Wsizeof-array-div -Wsizeof-pointer-div -Wxor-used-as-pow -Wfinal-dtor-non-final-class"
 
+  if major >= 11:
+    cxxflags += " -Wpointer-to-int-cast"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 
@@ -80,7 +83,7 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
         cxxflags += " -O3"
       else:
         # work around for https://llvm.org/bugs/show_bug.cgi?id=13745 - math.h/math-finite-h broken in gcc 4.6 (host compiler of ubuntu 12.04)
-        cxxflags += " -Ofast -D__extern_always_inline='extern __always_inline'"
+        cxxflags += " -Ofast -D__extern_always_inline='extern __always_inline' -ffp-model=fast"
 
     if cpu == "unknown":
       cxxflags += " -march=native"
