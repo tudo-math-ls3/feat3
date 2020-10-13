@@ -269,12 +269,12 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // some useful constants
-    const DT_ pi = Math::pi<DT_>();
-    const DT_ s4 = Math::sin(DT_(0.25) * pi); // = sin(pi/4)
-    const DT_ s8 = Math::sin(DT_(0.125) * pi); // = sin(pi/8)
+    const DT_ pi  = Math::pi<DT_>();
+    const DT_ s4  = Math::sin(DT_(0.25  ) * pi); // = sin(pi/4)
+    const DT_ s8  = Math::sin(DT_(0.125 ) * pi); // = sin(pi/8)
     const DT_ s16 = Math::sin(DT_(0.0625) * pi); // = sin(pi/16)
-    const DT_ c4 = Math::cos(DT_(0.25) * pi); // = cos(pi/4)
-    const DT_ c8 = Math::cos(DT_(0.125) * pi); // = cos(pi/8)
+    const DT_ c4  = Math::cos(DT_(0.25  ) * pi); // = cos(pi/4)
+    const DT_ c8  = Math::cos(DT_(0.125 ) * pi); // = cos(pi/8)
     const DT_ c16 = Math::cos(DT_(0.0625) * pi); // = cos(pi/16)
 
     // create sine-bubble-function object
@@ -309,9 +309,9 @@ public:
 
     // some useful constants
     const DT_ pi = Math::pi<DT_>();
-    const DT_ s4 = Math::sin(DT_(0.25) * pi); // = sin(pi/4)
+    const DT_ s4 = Math::sin(DT_(0.25 ) * pi); // = sin(pi/4)
     const DT_ s8 = Math::sin(DT_(0.125) * pi); // = sin(pi/8)
-    const DT_ c4 = Math::cos(DT_(0.25) * pi); // = cos(pi/4)
+    const DT_ c4 = Math::cos(DT_(0.25 ) * pi); // = cos(pi/4)
     const DT_ c8 = Math::cos(DT_(0.125) * pi); // = cos(pi/8)
 
     // create cosine-wave-function object
@@ -339,12 +339,12 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // some useful constants
-    const DT_ pi = Math::pi<DT_>();
-    const DT_ s4 = Math::sin(DT_(0.25) * pi); // = sin(pi/4)
-    const DT_ s8 = Math::sin(DT_(0.125) * pi); // = sin(pi/8)
+    const DT_ pi  = Math::pi<DT_>();
+    const DT_ s4  = Math::sin(DT_(0.25  ) * pi); // = sin(pi/4)
+    const DT_ s8  = Math::sin(DT_(0.125 ) * pi); // = sin(pi/8)
     const DT_ s16 = Math::sin(DT_(0.0625) * pi); // = sin(pi/16)
-    const DT_ c4 = Math::cos(DT_(0.25) * pi); // = cos(pi/4)
-    const DT_ c8 = Math::cos(DT_(0.125) * pi); // = cos(pi/8)
+    const DT_ c4  = Math::cos(DT_(0.25  ) * pi); // = cos(pi/4)
+    const DT_ c8  = Math::cos(DT_(0.125 ) * pi); // = cos(pi/8)
     const DT_ c16 = Math::cos(DT_(0.0625) * pi); // = cos(pi/16)
 
     // create cosine-wave-function object
@@ -381,7 +381,7 @@ public:
     Analytic::Common::Q2BubbleFunction<2> func;
 
     //name the constants
-    const DT_ x = DT_(0.25);
+    const DT_ x = DT_(0.25 );
     const DT_ y = DT_(0.125);
 
     // evaluate function value in point (1/4, 1/8)
@@ -409,8 +409,8 @@ public:
     Analytic::Common::Q2BubbleFunction<3> func;
 
     // name the constants
-    const DT_ x = DT_(0.5);
-    const DT_ y = DT_(0.25);
+    const DT_ x = DT_(0.5  );
+    const DT_ y = DT_(0.25 );
     const DT_ z = DT_(0.125);
 
     // evaluate function value in point (1/2, 1/4, 1/8)
@@ -445,7 +445,7 @@ public:
 
     // some useful constants
     const DT_ x = DT_(0.25);
-    const DT_ e_1 = Math::exp(DT_(1)); // = exp(1)
+    const DT_ e_1     = Math::exp( DT_(1)); // = exp( 1)
     const DT_ e_neg_1 = Math::exp(-DT_(1)); // = exp(-1)
     const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x)
 
@@ -475,9 +475,9 @@ public:
     Analytic::Common::ExpBubbleFunction<2> func;
 
     // some useful constants
-    const DT_ x = DT_(0.25);
+    const DT_ x = DT_(0.25 );
     const DT_ y = DT_(0.125);
-    const DT_ e_1 = Math::exp(DT_(1)); // = exp(1)
+    const DT_ e_1     = Math::exp( DT_(1)); // = exp( 1)
     const DT_ e_neg_1 = Math::exp(-DT_(1)); // = exp(-1)
     const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x)
     const DT_ e_y = Math::exp(-DT_(4) * (y - DT_(1)) * y); // = exp(-4(y-1)y)
@@ -487,7 +487,7 @@ public:
     const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
     const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
     const DT_ u_y_grad = -(Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
-    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.0625) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
+    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.0625  ) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
     const DT_ u_y_hess = (DT_(8) * e_y * (DT_(8) * DT_(0.015625) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
 
     // evaluate function value in point (1/4, 1/8)
@@ -496,15 +496,15 @@ public:
 
     // evaluate gradient in point (1/4, 1/8)
     Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x * u_y_grad , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y      , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x      * u_y_grad , tol);
 
     // evaluate hessian in point (1/4, 1/8)
     Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y     , tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad, tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x * u_y_hess, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x      * u_y_hess, tol);
   }
 
   void test_exp_bubble_function_3d() const
@@ -515,10 +515,10 @@ public:
     Analytic::Common::ExpBubbleFunction<3> func;
 
     // some useful constants
-    const DT_ x = DT_(0.5);
-    const DT_ y = DT_(0.25);
+    const DT_ x = DT_(0.5  );
+    const DT_ y = DT_(0.25 );
     const DT_ z = DT_(0.125);
-    const DT_ e_1 = Math::exp(DT_(1)); // = exp(1)
+    const DT_ e_1     = Math::exp( DT_(1)); // = exp( 1)
     const DT_ e_neg_1 = Math::exp(-DT_(1)); // = exp(-1)
     const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x) for the calculation of the hessian
     const DT_ e_y = Math::exp(-DT_(4) * (y - DT_(1)) * y); // = exp(-4(y-1)y)
@@ -531,8 +531,8 @@ public:
     const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
     const DT_ u_y_grad = -(Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
     const DT_ u_z_grad = -(Math::exp(-DT_(4) * (z - DT_(1)) * z) * (DT_(8) * z - DT_(4))) / (e_1 - DT_(1)); // = u'(z)
-    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.25) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
-    const DT_ u_y_hess = (DT_(8) * e_y * (DT_(8) * DT_(0.0625) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
+    const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.25    ) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = (DT_(8) * e_y * (DT_(8) * DT_(0.0625  ) - DT_(8) * y + DT_(1))) / (e_1 - DT_(1)); // = u''(y)
     const DT_ u_z_hess = (DT_(8) * e_z * (DT_(8) * DT_(0.015625) - DT_(8) * z + DT_(1))) / (e_1 - DT_(1)); // = u''(z)
 
     // evaluate function value in point (1/2, 1/4, 1/8)
@@ -541,21 +541,21 @@ public:
 
     // evaluate gradient in point (1/2, 1/4, 1/8)
     Tiny::Vector<DT_, 3> grad = Analytic::eval_gradient_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x * u_y_grad * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], u_x * u_y * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y      * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x      * u_y_grad * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], u_x      * u_y      * u_z_grad, tol);
 
     // evaluate hessian in point (1/2, 1/4, 1/8)
     Tiny::Matrix<DT_, 3, 3> hess = Analytic::eval_hessian_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], u_x_grad * u_y * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x * u_y_hess * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], u_x * u_y_grad * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], u_x_grad * u_y * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], u_x * u_y_grad * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], u_x * u_y * u_z_hess, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y      * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], u_x_grad * u_y      * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x      * u_y_hess * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], u_x      * u_y_grad * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], u_x_grad * u_y      * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], u_x      * u_y_grad * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], u_x      * u_y      * u_z_hess, tol);
   }
 
   void test_exp_function_2d() const
@@ -566,7 +566,7 @@ public:
     Analytic::Common::ExpFunction<2> func;
 
     // some useful constants
-    const DT_ x = DT_(0.25);
+    const DT_ x = DT_(0.25 );
     const DT_ y = DT_(0.125);
     const DT_ e_10 = Math::exp(DT_(10)); // = exp(10)
     const DT_ e_x = Math::exp(DT_(10) * Math::sqr(x)); // = exp(10*x^2)
@@ -586,15 +586,15 @@ public:
 
     // evaluate gradient in point (1/4, 1/8)
     Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x * u_y_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x      * u_y_grad, tol);
 
     // evaluate hessian in point (1/4, 1/8)
     Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y     , tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad, tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x * u_y_hess, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x      * u_y_hess, tol);
   }
 
   void test_exp_function_3d() const
@@ -605,8 +605,8 @@ public:
     Analytic::Common::ExpFunction<3> func;
 
     // some useful constants
-    const DT_ x = DT_(0.5);
-    const DT_ y = DT_(0.25);
+    const DT_ x = DT_(0.5  );
+    const DT_ y = DT_(0.25 );
     const DT_ z = DT_(0.125);
     const DT_ e_10 = Math::exp(DT_(10)); // = exp(10)
     const DT_ e_x = Math::exp(DT_(10) * Math::sqr(x)); // = exp(10*x^2)
@@ -630,21 +630,21 @@ public:
 
     // evaluate gradient in point (1/2, 1/4, 1/8)
     Tiny::Vector<DT_, 3> grad = Analytic::eval_gradient_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x * u_y_grad * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], u_x * u_y * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], u_x_grad * u_y      * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], u_x      * u_y_grad * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], u_x      * u_y      * u_z_grad, tol);
 
     // evaluate hessian in point (1/2, 1/4, 1/8)
     Tiny::Matrix<DT_, 3, 3> hess = Analytic::eval_hessian_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], u_x_grad * u_y * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x * u_y_hess * u_z, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], u_x * u_y_grad * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], u_x_grad * u_y * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], u_x * u_y_grad * u_z_grad, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], u_x * u_y * u_z_hess, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], u_x_hess * u_y      * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], u_x_grad * u_y_grad * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], u_x_grad * u_y      * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], u_x_grad * u_y_grad * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], u_x      * u_y_hess * u_z     , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], u_x      * u_y_grad * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], u_x_grad * u_y      * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], u_x      * u_y_grad * u_z_grad, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], u_x      * u_y      * u_z_hess, tol);
   }
 
   void test_heaviside_function_1d() const
@@ -783,9 +783,9 @@ public:
 
     // evaluate hessian in point (1,2)
     Tiny::Matrix<DT_, 2,2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(-31680), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(127320), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(127320), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(- 31680), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_( 127320), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_( 127320), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(1904820), tol);
 
     // global minimum in (0,-1) with func(0,-1)=3
@@ -797,33 +797,12 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[0], DT_(0), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[1], DT_(0), tol);
 
-    // the other local extrema?
-    // local minimum 1 in point (-0.6,-0.4)
-    DT_ min_1 = Analytic::eval_value_x(func, DT_(-0.6), DT_(-0.4));
-    TEST_CHECK_EQUAL_WITHIN_EPS(min_1, DT_(30), tol);
-
-    // evaluate gradient in local minimum 1
-    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(-0.6), DT_(-0.4));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(0), tol);
-
-    // local minimum 2 in point (1.2,0.8)
-    DT_ min_2 = Analytic::eval_value_x(func, DT_(1.2), DT_(0.8));
-    TEST_CHECK_EQUAL_WITHIN_EPS(min_2, DT_(840), tol);
-
-    // evaluate gradient in local minimum 2
-    //Tiny::Vector<DT_, 2> grad_2 = Analytic::eval_gradient_x(func, DT_(1.2), DT_(0.8));
-    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0], DT_(0), tol);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1], DT_(0), tol);
-
-    // local minimum 3 in point (1.8,0.2)
-    //DT_ min_3 = Analytic::eval_value_x(func, DT_(1.8), DT_(0.2));
-    //TEST_CHECK_EQUAL_WITHIN_EPS(min_3, DT_(84), tol);
-
-    // evaluate gradient in local minimum 3
-    //Tiny::Vector<DT_, 2> grad_3 = Analytic::eval_gradient_x(func, DT_(1.8), DT_(0.2));
-    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[0], DT_(0), tol);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[1], DT_(0), tol);
+    // evaluate hessian in global minimum
+    Tiny::Matrix<DT_, 2, 2> hess_min = Analytic::eval_hessian_x(func, DT_(0), DT_(-1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][0], DT_( 504), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][1], DT_(-216), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][0], DT_(-216), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][1], DT_( 864), tol);
   }
 
   void test_bazaraa_shetty_function() const
@@ -840,14 +819,14 @@ public:
     // evaluate gradient in point (1,2)
     Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
     TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-10), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(12), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_( 12), tol);
 
     // evaluate hessian in point (1,2)
     Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(14), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_( 14), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(-4), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(-4), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(8), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_( 8), tol);
 
     // global minimum in (2,1) with func(2,1)=0
     DT_ min = Analytic::eval_value_x(func, DT_(2), DT_(1));
@@ -860,10 +839,10 @@ public:
 
     // evaluate hessian in global minimum, because it should be singular
     Tiny::Matrix<DT_, 2, 2> hess_min = Analytic::eval_hessian_x(func, DT_(2), DT_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][0], DT_(2), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][0], DT_( 2), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[0][1], DT_(-4), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][0], DT_(-4), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][1], DT_(8), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_min[1][1], DT_( 8), tol);
   }
 
   void test_himmelblau_function() const
@@ -885,17 +864,20 @@ public:
     // evaluate hessian in point (1,2)
     Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(-22), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(12), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(12), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(26), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_( 12), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_( 12), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_( 26), tol);
 
     // test local minima
     DT_ min_1 = Analytic::eval_value_x(func, DT_(-3.77931025337774689189076584129), DT_(-3.28318599128616941226600051437));
     TEST_CHECK_EQUAL_WITHIN_EPS(min_1, DT_(0), tol);
+
     DT_ min_2 = Analytic::eval_value_x(func, DT_(-2.80511808695274485305357239809), DT_(3.13131251825057296580430072341));
     TEST_CHECK_EQUAL_WITHIN_EPS(min_2, DT_(0), tol);
+
     DT_ min_3 = Analytic::eval_value_x(func, DT_(3), DT_(2));
     TEST_CHECK_EQUAL_WITHIN_EPS(min_3, DT_(0), tol);
+
     DT_ min_4 = Analytic::eval_value_x(func, DT_(3.58442834033049174494433823938), DT_(-1.84812652696440355353830020904));
     TEST_CHECK_EQUAL_WITHIN_EPS(min_4, DT_(0), tol);
 
@@ -930,14 +912,14 @@ public:
     // evaluate gradient in point (1,2)
     Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
     TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-400), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(200), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_( 200), tol);
 
     // evaluate hessian in point (1,2)
     Tiny::Matrix<DT_, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(402), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_( 402), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(-400), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(-400), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(200), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_( 200), tol);
 
     // test local minimum
     DT_ min = Analytic::eval_value_x(func, DT_(1), DT_(1));
@@ -948,7 +930,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad_min[1], DT_(0), tol);
   }
 
-  void test_constant_function() const
+  void test_constant_function_1d() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -1009,19 +991,19 @@ public:
     Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
     TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.5)*-(DT_(2)-DT_(1)), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0.5) * (DT_(1) - 1), tol);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(val[2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[2], DT_(0), tol);
 
     // evaluate gradient in point (1,2,3)
     Tiny::Matrix<DT_, 3,3> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2), DT_(3));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_( 0  ), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_(-0.5), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][2], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_(0.5), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][2], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][0], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][1], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][2], DT_( 0  ), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_( 0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_( 0  ), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][2], DT_( 0  ), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][0], DT_( 0  ), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][1], DT_( 0  ), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][2], DT_( 0  ), tol);
 
     // evaluate hessian in point (1,2,3)
     Tiny::Tensor3<DT_, 3,3,3,3,3,3> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2), DT_(3));
@@ -1035,7 +1017,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess(1, 1, 1), DT_(0), tol);
   }
 
-  void test_yz_plane_parabolic() const
+  void test_yz_plane_parabolic_2d() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -1049,8 +1031,376 @@ public:
 
     // evaluate function value in point (2,3)
     Tiny::Vector<DT_, 2> val = Analytic::eval_value_x(func, DT_(2), DT_(3));
-    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.1875), tol);
+    //TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.375), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0), tol);
+
+    // check the zeros of the function
+    Tiny::Vector<DT_, 2> zer_2 = Analytic::eval_value_x(func, DT_(2), DT_(0));
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_2[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_2[1], DT_(0), tol);
+
+    Tiny::Vector<DT_, 2> zer_3 = Analytic::eval_value_x(func, DT_(3), DT_(4));
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_3[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_3[1], DT_(0), tol);
+
+    // check the maximum of the function
+    Tiny::Vector<DT_, 2> max = Analytic::eval_value_x(func, DT_(4), DT_(2));
+    //TEST_CHECK_EQUAL_WITHIN_EPS(max[0], DT_(0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(max[1], DT_(0), tol);
+
+    // evaluate gradient in maximum
+    Tiny::Matrix<DT_, 2, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(0), tol);
+  }
+
+  void test_yz_plane_parabolic_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    //create vectors
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::PointType zeros_y;
+    zeros_y[0] = DT_(0);
+    zeros_y[1] = DT_(4);
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::PointType zeros_z;
+    zeros_z[0] = DT_(1);
+    zeros_z[1] = DT_(5);
+
+    // create yz-plane-parabolic object
+    Analytic::Common::YZPlaneParabolic<DT_, 3> func(DT_(0.5), zeros_y, zeros_z);
+
+    // check the zeros of the function
+    Tiny::Vector<DT_, 3> zer_1 = Analytic::eval_value_x(func, DT_(2), DT_(0), DT_(1));
+    //TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[0], DT_(0), tol);
+    //TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[1], DT_(0), tol);
+  }
+
+  void test_sin_yt0_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create sin-yt0 object
+    Analytic::Common::SinYT0<DT_, 2> func(pi);
+
+    // evaluate function value in point (1,2)
+    Tiny::Vector<DT_, 2> val_1 = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(0), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Matrix<DT_, 2,2> grad_1 = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], pi    , tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (1,2)
+    Tiny::Vector<DT_, 2> val_2 = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1], DT_(0), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Matrix<DT_, 2, 2> grad_2 = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][0],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][1], -DT_(0.5) * pi, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][0],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][1],  DT_(0), tol);
+  }
+
+  void test_sin_yt0_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create sin-yt0 object
+    Analytic::Common::SinYT0<DT_, 3> func(DT_(0.25)*pi);
+
+    // evaluate function value in point (1,2,3)
+    Tiny::Vector<DT_, 3> val_1 = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_(1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[2], DT_(0), tol);
+
+    // evaluate gradient in point (1,2,3)
+    Tiny::Matrix<DT_, 3, 3> grad_1 = Analytic::eval_gradient_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2][2], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (1,2,3)
+    Tiny::Vector<DT_, 3> val_2 = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[2], DT_(0), tol);
+
+    // evaluate gradient in point (1,2,3)
+    Tiny::Matrix<DT_, 3, 3> grad_2 = Analytic::eval_gradient_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][0],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][1], -DT_(0.5) * pi, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][2],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][0],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][1],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][2],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[2][0],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[2][1],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[2][2],  DT_(0), tol);
+  }
+
+  void test_sin_yt0_stokes_rhs_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create sin-yt0-stokes-rhs object
+    Analytic::Common::SinYT0StokesRhs<DT_, 2> func(DT_(2300),pi);
+
+    // evaluate function value in point (1,2)
+    Tiny::Vector<DT_, 2> val_1 = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_(2), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (0,1)
+    Tiny::Vector<DT_, 2> val_2 = Analytic::eval_value_x(func, DT_(0), DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], DT_(1) / DT_(2300) * DT_(0.5) * pi * DT_(0.5) * pi, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1], DT_(0), tol);
+  }
+
+  void test_sin_yt0_stokes_rhs_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create sin-yt0-stokes-rhs object with t=0
+    Analytic::Common::SinYT0StokesRhs<DT_, 3> func(DT_(2300));
+
+    // evaluate function value in point (1,2,3)
+    Tiny::Vector<DT_, 3> val_1 = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_(2), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[2], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (1,2,3)
+    Tiny::Vector<DT_, 3> val_2 = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], DT_(-2), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[2], DT_( 0), tol);
+  }
+
+  void test_guermond_stokes_sol_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create guermond-stokes-sol object
+    Analytic::Common::GuermondStokesSol<DT_, 2> func(pi);
+
+    // evaluate function value in point (pi, 2*pi)
+    Tiny::Vector<DT_, 2> val = Analytic::eval_value_x(func, pi, DT_(2)*pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(-1), tol);
+
+    // evaluate gradient in point (pi, 2*pi)
+    Tiny::Matrix<DT_, 2, 2> grad_1 = Analytic::eval_gradient_x(func, pi, DT_(2)*pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5)*pi);
+
+    // evaluate function value in point (0.5*pi, pi)
+    Tiny::Vector<DT_, 2> val_2 = Analytic::eval_value_x(func, DT_(0.5) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1], DT_(0), tol);
+
+    // evaluate gradient in point (0.5*pi, pi)
+    Tiny::Matrix<DT_, 2,2> grad_2 = Analytic::eval_gradient_x(func, DT_(0.5) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][0], DT_( 1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][1], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][0], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][1], DT_(-1), tol);
+  }
+
+  void test_guermond_stokes_sol_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create guermond-stokes-sol object
+    Analytic::Common::GuermondStokesSol<DT_, 3> func(pi);
+
+    // evaluate function value in point (pi, 2*pi, pi)
+    Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, pi, DT_(2) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(-1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[2], DT_( 0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate gradient in point (0.5 * pi, pi, pi)
+    Tiny::Matrix<DT_, 3, 3> grad = Analytic::eval_gradient_x(func, DT_(0.5) * pi, pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_( 1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][2], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(-1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][2], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][0], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][1], DT_( 0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][2], DT_( 0), tol);
+  }
+
+  void test_guermond_stokes_sol_pressure_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constants
+    const DT_ pi = Math::pi<DT_>();
+    const DT_ s1 = Math::sin(DT_(0.5) * pi + DT_(1));
+
+    // create guermond-stokes-sol-pressure object
+    Analytic::Common::GuermondStokesSolPressure<DT_, 2> func(pi);
+
+    // evaluate function value in point (0.5 * pi, pi)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.5) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(1), tol);
+
+    // evaluate gradient in point (0.5 * pi, pi)
+    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.5) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (0.5 * pi, pi))
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(0.5) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, - (DT_(2) - DT_(2) * s1), tol);
+
+    // evaluate gradient in point (0.5 * pi, pi))
+    Tiny::Vector<DT_, 2> grad_2 = Analytic::eval_gradient_x(func, DT_(0.5) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0], DT_( 1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1], DT_(-1), tol);
+  }
+
+  void test_guermond_stokes_sol_pressure_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constants
+    const DT_ pi = Math::pi<DT_>();
+    const DT_ s1 = Math::sin(DT_(0.5) * pi + DT_(1));
+
+    // create guermond-stokes-sol-pressure object
+    Analytic::Common::GuermondStokesSolPressure<DT_, 3> func(pi);
+
+    // evaluate function value in point (0.5 * pi, pi, pi)
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.5) * pi, pi,pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(1), tol);
+
+    // evaluate gradient in point (0.5 * pi, pi, pi)
+    Tiny::Vector<DT_, 3> grad_1 = Analytic::eval_gradient_x(func, DT_(0.5) * pi, pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2], DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (0.5 * pi, pi, pi)
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(0.5) * pi, pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, -(DT_(2) - DT_(2) * s1), tol);
+
+    // evaluate gradient in point (0.5 * pi, pi, pi)
+    Tiny::Vector<DT_, 3> grad_2 = Analytic::eval_gradient_x(func, DT_(0.5) * pi, pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0], DT_( 1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1], DT_(-1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[2], DT_( 0), tol);
+  }
+
+  void test_guermond_stokes_sol_rhs_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create guermond-stokes-sol-rhs object
+    Analytic::Common::GuermondStokesSolRhs<DT_, 2> func(DT_(2300),pi);
+
+    // evaluate function value in point (pi, 2*pi)
+    Tiny::Vector<DT_, 2>  val_1 = Analytic::eval_value_x(func, pi, DT_(2) * pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0],  DT_(1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], -DT_(2) / DT_(2300) - DT_(1), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (pi, 2*pi)
+    Tiny::Vector<DT_, 2> val_2 = Analytic::eval_value_x(func, pi, DT_(2) * pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], -DT_(2) / DT_(2300), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1],  DT_(0), tol);
+  }
+
+  void test_guermond_stokes_sol_rhs_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // useful constant
+    const DT_ pi = Math::pi<DT_>();
+
+    // create guermond-stokes-sol-rhs object
+    Analytic::Common::GuermondStokesSolRhs<DT_, 3> func(DT_(2300), pi);
+
+    // evaluate function value in point (pi, 2*pi, pi)
+    Tiny::Vector<DT_, 3>  val_1 = Analytic::eval_value_x(func, pi, DT_(2) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0],  DT_(1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], -DT_(2) / DT_(2300) - DT_(1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[2],  DT_(0), tol);
+
+    // change time t
+    func.set_time(DT_(0.5) * pi);
+
+    // evaluate function value in point (pi, 2*pi, pi)
+    Tiny::Vector<DT_, 3> val_2 = Analytic::eval_value_x(func, pi, DT_(2) * pi, pi);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], -DT_(2) / DT_(2300), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1],  DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[2],  DT_(0), tol);
   }
 
   virtual void run() const override
@@ -1084,10 +1434,21 @@ public:
     test_bazaraa_shetty_function();
     test_himmelblau_function();
     test_rosenbrock_function();
-    test_constant_function();
+    test_constant_function_1d();
     test_constant_function_2d();
     test_xy_plane_rotation();
-    test_yz_plane_parabolic();
+    test_yz_plane_parabolic_2d();
+    //test_yz_plane_parabolic_3d();
+    test_sin_yt0_2d();
+    test_sin_yt0_3d();
+    test_sin_yt0_stokes_rhs_2d();
+    test_sin_yt0_stokes_rhs_3d();
+    test_guermond_stokes_sol_2d();
+    test_guermond_stokes_sol_3d();
+    test_guermond_stokes_sol_pressure_2d();
+    test_guermond_stokes_sol_pressure_3d();
+    test_guermond_stokes_sol_rhs_2d();
+    test_guermond_stokes_sol_rhs_3d();
   }
 };
 

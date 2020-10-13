@@ -1691,11 +1691,7 @@ namespace FEAT
        *    u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
        *    *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
        *  \f]
-       *  This function has a global miminum in \f$ x_0 = (0, -0.5)^T, u(x_0) = 3 \f$, three more local minima
-       *  \f[
-       *    x_1 = (-0.6, -0.4)^T, x_2 = (1.2, 0.8)^T, x_3 = (1.8, 0.2),
-       *  \f]
-       *  one saddle point \f$ x_4 = (-0.4, 0.6)^T \f$ and a local maximum in \f$ x_5 = (1.2, -0.2)^T\f$.
+       *  This function has a global miminum in \f$ x_0 = (0, -1)^T, u(x_0) = 3 \f$.
        *
        *
        * \author Jordi Paul
@@ -1760,7 +1756,7 @@ namespace FEAT
        *    u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
        *    *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
        *  \f]
-       *  This function has a global miminum in \f$ x_0 = (0, -0.5)^T, u(x_0) = 3 \f$.
+       *  This function has a global miminum in \f$ x_0 = (0, -1)^T, u(x_0) = 3 \f$.
        *
        * \author Jordi Paul
        */
@@ -2340,6 +2336,7 @@ namespace FEAT
           ValueType value(const PointType& point)
           {
             ValueType val;
+            val.format();
             val[0] = _angular_velocity*(-(point[1] - _origin[1]));
             val[1] = _angular_velocity*( (point[0] - _origin[0]));
             return val;
@@ -2395,8 +2392,8 @@ namespace FEAT
        *
        * This is the mapping
        * \f[
-       *    f: \mathbb{R}^d \to \mathbb{R}^d, f_0(x_0, x_1, x_2)^T =
-       *    \alpha \frac{2^d}{\prod_{i=0}^{d-1}(b_i - a_i)}\prod_{i=0}^{d-1}( (x_i - a_i)(b_i - x_i) ),
+       *    f: \mathbb{R}^d \to \mathbb{R}^d, f_0(x_0, ..., x_d)^T =
+       *    \alpha \frac{2^{d-1}}{\prod_{i=1}^{d-1}(b_i - a_i)}\prod_{i=1}^{d-1}( (x_i - a_i)(b_i - x_i) ),
        *    f_i \equiv 0, i=1,\dots,d
        * \f]
        *
@@ -2481,7 +2478,7 @@ namespace FEAT
             grad.format();
             for(int d(1); d < domain_dim; ++d)
             {
-              grad[d][0] = _fac[d]*(_zeros.at(d-1)[0] + _zeros.at(d-1)[1] - DataType(2)*point(d));
+              grad[d][0] = _fac*(_zeros.at(d-1)[0] + _zeros.at(d-1)[1] - DataType(2)*point(d));
             }
             return grad;
           }
