@@ -16,4 +16,13 @@ class HYPRE(ThirdpartyPackage):
     self.url = "https://computation.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods/download/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_HYPRE:BOOL=ON"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = os.path.join(trunk_dirname, self.dirname)
+
+  def patch(self):
+    print("Patching HYPRE sources...")
+    # there is a shell script named 'version' in "thirdparty/hypre/hypre-2.11.2/src/utilities"
+    # which has to be renamed because it collides with clang's internal <version> header
+    x = os.path.join(self.target_dirname, "hypre-2.11.2", "src", "utilities", "version")
+    if os.path.isfile(x):
+      print("Renaming file '%s'" % x)
+      os.rename(x, x + ".sh")

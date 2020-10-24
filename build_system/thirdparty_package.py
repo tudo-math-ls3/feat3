@@ -31,7 +31,7 @@ class ThirdpartyPackage(object):
     # This is added to the cmake_flags
     self.cmake_flags = "NullCmakeFlags"
 
-# How to add a third party package to the build process
+  # How to add a third party package to the build process
   def add(self):
     # Directory where the package is expected
     target_filename = self.trunk_dirname+os.sep+self.filename
@@ -42,10 +42,12 @@ class ThirdpartyPackage(object):
       if not os.path.isfile(target_filename):
         print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
         download(self.url,target_filename)
-
+      else:
+        print(target_filename + " found, so unpacking the sources now...")
       self.unpack()
     return
 
+  # unpacks the TAR/GZ/ZIP source archive
   def unpack(self):
     target_filename = self.trunk_dirname+os.sep+self.filename
 
@@ -68,7 +70,16 @@ class ThirdpartyPackage(object):
 
     archive.extractall(self.target_dirname)
 
+    # maybe we have to patch the sources manually
+    self.patch()
+
     return
+
+  # patches the source code after unpacking;
+  # this may be overriden by a derived class
+  def patch(self):
+    # nothing to patch by default
+    pass
 
 # Downloads a file from url and saves it to filename
 def download(url,filename):
