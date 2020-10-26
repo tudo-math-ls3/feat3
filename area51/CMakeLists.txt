@@ -70,3 +70,15 @@ TARGET_LINK_LIBRARIES(dbg-tuple-matrix feat)
 
 ADD_EXECUTABLE(dbg-vanka dbg_vanka.cpp)
 TARGET_LINK_LIBRARIES(dbg-vanka feat)
+
+if(FEAT_HAVE_UMFPACK)
+   ADD_EXECUTABLE(FETI_seq_usquare FETI_seq_usquare.cpp)
+   TARGET_LINK_LIBRARIES(FETI_seq_usquare feat)
+   if(FEAT_HAVE_MPI)
+      ADD_EXECUTABLE(FETI_para_usquare FETI_para_usquare.cpp)
+      TARGET_LINK_LIBRARIES(FETI_para_usquare feat)
+
+      ADD_EXECUTABLE(FETI_multigrid_usquare FETI_multigrid_usquare.cpp)
+      TARGET_LINK_LIBRARIES(FETI_multigrid_usquare feat)
+   endif(FEAT_HAVE_MPI)
+endif(FEAT_HAVE_UMFPACK)

@@ -302,6 +302,22 @@ namespace FEAT
           ranks.push_back(int(*it));
         return Index(lvl);
       }
+      /******************WIP********************************************
+      * For now an additional wrapper...
+       */
+      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks, std::vector<int>& tags)
+      {
+        MeshNodeType* nnode = nullptr;
+        std::vector<Index> cranks, ctags;
+        int lvl = create(rank, nprocs, nnode, cranks, ctags);
+        node = std::shared_ptr<MeshNodeType>(nnode);
+        for(auto it = cranks.begin(); it != cranks.end(); ++it)
+          ranks.push_back(int(*it));
+        for(auto it = ctags.begin(); it != ctags.end(); ++it)
+          tags.push_back(int(*it));
+        return Index(lvl);
+      }
+      /*************************************************************************************/
 
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
@@ -387,7 +403,7 @@ namespace FEAT
         if(ii > 0)
         {
           ranks.push_back(Index(n*(jj) + ii-1));
-          ctags.push_back(cto_h + Index(n*jj + ii - 1));
+          ctags.push_back(cto_h + Index((n-1)*jj + ii - 1));
           node->add_halo(int(ranks.back()), create_halo1(2));
           node->add_mesh_part("bnd:2", nullptr);
         }
@@ -399,7 +415,7 @@ namespace FEAT
         if(ii+1 < n)
         {
           ranks.push_back(Index(n*(jj) + ii+1));
-          ctags.push_back(cto_h + Index(n*jj + ii));
+          ctags.push_back(cto_h + Index((n-1)*jj + ii));
           node->add_halo(int(ranks.back()), create_halo1(3));
           node->add_mesh_part("bnd:3", nullptr);
         }
