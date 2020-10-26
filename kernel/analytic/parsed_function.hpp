@@ -69,7 +69,7 @@ namespace FEAT
      * parsing and evaluation.
      *
      * For a full documentation and a list of supported expressions, see the documentation
-     * of the underlying parser at http://warp.povusers.org/FunctionParser/fparser.html
+     * of the underlying parser at the page \ref parsed_function.
      *
      * There are two possibilities how to create an instance of this class:
      * If you have a 'simple' function without any symbolic constants, you can use the
