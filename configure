@@ -514,11 +514,6 @@ if "cuda" in buildid:
     cuda_host_compiler = find_exe("g++")
   cmake_flags += " -DFEAT_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
 
-# at least cuda 8 needs openmp and clang/gcc/intel understand the -fopenmp flag
-# until now, clang needs the openmp library explicitly provided, which is not funny to be automated
-#if "gcc" in buildid or "gnu" in buildid or "g++" in buildid or "icc" in buildid or "intel" in buildid or "icpc" in buildid:
-#  cxxflags += " -fopenmp"
-
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
   cmake_flags += " -DFEAT_HAVE_MKL:BOOL=ON"
