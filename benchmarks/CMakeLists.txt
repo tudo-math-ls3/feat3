@@ -13,6 +13,7 @@ set(benchmarks
   multiprec_hierarch-bench
   product_matmat-bench
   product_matvec-bench
+  product_matvec_dense-bench
 )
 
 ADD_CUSTOM_TARGET(benchmarks DEPENDS ${benchmarks})
