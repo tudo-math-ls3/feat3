@@ -2393,7 +2393,7 @@ namespace FEAT
        * This is the mapping
        * \f[
        *    f: \mathbb{R}^d \to \mathbb{R}^d, f_0(x_0, ..., x_d)^T =
-       *    \alpha \frac{2^{d-1}}{\prod_{i=1}^{d-1}(b_i - a_i)}\prod_{i=1}^{d-1}( (x_i - a_i)(b_i - x_i) ),
+       *    \alpha \frac{4^{d-1}}{\prod_{i=1}^{d-1}(b_i - a_i)^2}\prod_{i=1}^{d-1}( (x_i - a_i)(b_i - x_i) ),
        *    f_i \equiv 0, i=1,\dots,d
        * \f]
        *
@@ -2419,7 +2419,7 @@ namespace FEAT
         /// We can compute the Hessian
         static constexpr bool can_hess = false;
         /// Type to map from
-        typedef Tiny::Vector<DT_, domain_dim> PointType;
+        typedef Tiny::Vector<DT_, 2> RootsType;
 
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
@@ -2452,9 +2452,9 @@ namespace FEAT
           {
             XASSERT(_zeros.size() == size_t(domain_dim-1));
 
-            for(int d(1); d < dim_; ++d)
+            for (int d(1); d < domain_dim; ++d)
             {
-              _fac *= DataType(2)/Math::sqr(_zeros.at(d-1)[1]-_zeros.at(d-1)[0]);
+              _fac *= DataType(4)/Math::sqr(_zeros.at(d-1)[1]-_zeros.at(d-1)[0]);
             }
           }
 
@@ -2464,7 +2464,7 @@ namespace FEAT
             val.format();
             val(0) = _fac;
 
-            for(Index d(1); d < Index(PointType::n); ++d)
+            for (int d(1); d < domain_dim; ++d)
             {
               val(0) *= (point[d] - _zeros.at(d-1)[0])*(_zeros.at(d-1)[1] - point[d]);
             }
@@ -2479,6 +2479,11 @@ namespace FEAT
             for(int d(1); d < domain_dim; ++d)
             {
               grad[d][0] = _fac*(_zeros.at(d-1)[0] + _zeros.at(d-1)[1] - DataType(2)*point(d));
+
+              if (domain_dim == 3)
+              {
+                grad[d][0] *= ((point(3 - d) - _zeros.at(2 - d)[0]) * (_zeros.at(2 - d)[1] - point(3 - d)));
+              }
             }
             return grad;
           }
@@ -2507,7 +2512,7 @@ namespace FEAT
          * The roots for the y part
          *
          */
-        explicit YZPlaneParabolic(const DataType amplitude, const PointType& zeros_y) :
+        explicit YZPlaneParabolic(const DataType amplitude, const RootsType& zeros_y) :
           _amplitude(amplitude),
           _zeros(1)
         {
@@ -2527,7 +2532,7 @@ namespace FEAT
          * The roots for the z part
          *
          */
-        explicit YZPlaneParabolic(const DataType amplitude, const PointType& zeros_y, const PointType& zeros_z) :
+        explicit YZPlaneParabolic(const DataType amplitude, const RootsType& zeros_y, const RootsType& zeros_z) :
           _amplitude(amplitude),
           _zeros(2)
         {

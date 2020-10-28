@@ -1022,7 +1022,7 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     //create vectors
-    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::PointType zeros_y;
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RootsType zeros_y;
     zeros_y[0] = DT_(0);
     zeros_y[1] = DT_(4);
 
@@ -1031,8 +1031,15 @@ public:
 
     // evaluate function value in point (2,3)
     Tiny::Vector<DT_, 2> val = Analytic::eval_value_x(func, DT_(2), DT_(3));
-    //TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.375), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.375), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0), tol);
+
+    // evaluate gradient in point (2,3)
+    Tiny::Matrix<DT_, 2, 2> grad = Analytic::eval_gradient_x(func, DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_(-0.25), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(0), tol);
 
     // check the zeros of the function
     Tiny::Vector<DT_, 2> zer_2 = Analytic::eval_value_x(func, DT_(2), DT_(0));
@@ -1045,15 +1052,15 @@ public:
 
     // check the maximum of the function
     Tiny::Vector<DT_, 2> max = Analytic::eval_value_x(func, DT_(4), DT_(2));
-    //TEST_CHECK_EQUAL_WITHIN_EPS(max[0], DT_(0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(max[0], DT_(0.5), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(max[1], DT_(0), tol);
 
     // evaluate gradient in maximum
-    Tiny::Matrix<DT_, 2, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(0), tol);
+    Tiny::Matrix<DT_, 2, 2> grad_max = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[1][1], DT_(0), tol);
   }
 
   void test_yz_plane_parabolic_3d() const
@@ -1061,20 +1068,63 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     //create vectors
-    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::PointType zeros_y;
-    zeros_y[0] = DT_(0);
-    zeros_y[1] = DT_(4);
-    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::PointType zeros_z;
-    zeros_z[0] = DT_(1);
-    zeros_z[1] = DT_(5);
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RootsType zeros_y;
+    zeros_y[0] = DT_(0); // a_1
+    zeros_y[1] = DT_(4); // b_1
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RootsType zeros_z;
+    zeros_z[0] = DT_(1); // a_2
+    zeros_z[1] = DT_(5); //b_2
 
     // create yz-plane-parabolic object
     Analytic::Common::YZPlaneParabolic<DT_, 3> func(DT_(0.5), zeros_y, zeros_z);
 
-    // check the zeros of the function
+    // evaluate function value in point (2,3,4)
+    Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, DT_(2), DT_(3), DT_(4));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.28125), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[2], DT_(0), tol);
+
+    // evaluate gradient in point (2,3,4)
+    Tiny::Matrix<DT_, 3, 3> grad = Analytic::eval_gradient_x(func, DT_(2), DT_(3), DT_(4));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][0], DT_(-0.1875), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][0], DT_(-0.1875), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2][2], DT_(0), tol);
+
+    // check the zeros of the function in point (2,0,1)
     Tiny::Vector<DT_, 3> zer_1 = Analytic::eval_value_x(func, DT_(2), DT_(0), DT_(1));
-    //TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[0], DT_(0), tol);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_1[2], DT_(0), tol);
+
+    // check the zeros of the function in point (2,3,5)
+    Tiny::Vector<DT_, 3> zer_2 = Analytic::eval_value_x(func, DT_(2), DT_(3), DT_(5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_2[0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_2[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(zer_2[2], DT_(0), tol);
+
+    // check the maximum of the function in point (2,2,3)
+    Tiny::Vector<DT_, 3> max = Analytic::eval_value_x(func, DT_(2), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(max[0], DT_(0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(max[1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(max[2], DT_(0), tol);
+
+    // evaluate gradient in maximum
+    Tiny::Matrix<DT_, 3, 3> grad_max = Analytic::eval_gradient_x(func, DT_(2), DT_(2), DT_(3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[0][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[0][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[1][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[1][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[1][2], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[2][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[2][1], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_max[2][2], DT_(0), tol);
   }
 
   void test_sin_yt0_2d() const
@@ -1403,6 +1453,59 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(val_2[2],  DT_(0), tol);
   }
 
+  void test_polynomial_function_1d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create polynomial-function-1d object
+    Analytic::Common::PolynomialFunction1D<DT_> p;
+    p.set_coeff(0, 5.0); // 5*x^0
+    p.set_coeff(1, -7.0); // -7*x^1
+    p.set_coeff(2, 3.0); // 3*x^2
+
+    // evaluate function value in point (13)
+    DT_ val_1 = Analytic::eval_value_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(421), tol);
+
+    // evaluate gradient in point (13)
+    Tiny::Vector<DT_, 1> grad = Analytic::eval_gradient_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(71), tol);
+
+    // evaluate hessian in point (13)
+    Tiny::Matrix<DT_, 1,1> hess = Analytic::eval_hessian_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(6), tol);
+
+    // change coefficient
+    p.set_coeff(2, 0.0); // 0*x^2
+
+    // evaluate function value in point (13)
+    DT_ val_2 = Analytic::eval_value_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(-86), tol);
+
+    // evaluate gradient in point (13)
+    Tiny::Vector<DT_, 1> grad_2 = Analytic::eval_gradient_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0], DT_(-7), tol);
+
+    // evaluate hessian in point (13)
+    Tiny::Matrix<DT_, 1, 1> hess_2 = Analytic::eval_hessian_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_2[0][0], DT_(0), tol);
+
+    // set coefficient
+    p.set_coeff(3, 3.0); // 3*x^2
+
+    // evaluate function value in point (13)
+    DT_ val_3 = Analytic::eval_value_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(6505), tol);
+
+    // evaluate gradient in point (13)
+    Tiny::Vector<DT_, 1> grad_3 = Analytic::eval_gradient_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_3[0], DT_(1514), tol);
+
+    // evaluate hessian in point (13)
+    Tiny::Matrix<DT_, 1, 1> hess_3 = Analytic::eval_hessian_x(p, DT_(13));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_3[0][0], DT_(234), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1438,7 +1541,7 @@ public:
     test_constant_function_2d();
     test_xy_plane_rotation();
     test_yz_plane_parabolic_2d();
-    //test_yz_plane_parabolic_3d();
+    test_yz_plane_parabolic_3d();
     test_sin_yt0_2d();
     test_sin_yt0_3d();
     test_sin_yt0_stokes_rhs_2d();
@@ -1449,6 +1552,7 @@ public:
     test_guermond_stokes_sol_pressure_3d();
     test_guermond_stokes_sol_rhs_2d();
     test_guermond_stokes_sol_rhs_3d();
+    test_polynomial_function_1d();
   }
 };
 
