@@ -2062,7 +2062,7 @@ namespace FEAT
        * If set to \c false, this function will throw an exception on incompleteness,
        * otherwise the missing entries are ignored (dropped).
        */
-      void add_double_mat_mult(
+      void add_double_mat_product(
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& a,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,
@@ -2189,7 +2189,7 @@ namespace FEAT
        * If set to \c false, this function will throw an exception on incompleteness,
        * otherwise the missing entries are ignored (dropped).
        */
-      void add_double_mat_mult(
+      void add_double_mat_product(
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
         const LAFEM::DenseVector<Mem::Main, DT_, IT_>& a,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,

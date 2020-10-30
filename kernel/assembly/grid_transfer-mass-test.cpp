@@ -95,7 +95,7 @@ public:
     // finally, restrict the fine mesh mass matrix onto the coarse mesh and
     // subtract it from the coarse mesh mass matrix, i.e.
     // M_c <- M_c - R * M_f * P
-    mass_c.add_double_mat_mult(rest_matrix, mass_f, prol_matrix, -DataType(1), true);
+    mass_c.add_double_mat_product(rest_matrix, mass_f, prol_matrix, -DataType(1), true);
 
     // the resulting matrix should now be the null matrix
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqr(mass_c.norm_frobenius()), DataType(0), eps);

@@ -109,7 +109,7 @@ public:
 
     // compute test matrix: X := I_c - T * I_f * P
     VectorType vec_id(space_f.get_num_dofs(), DataType(1));
-    rip_matrix.add_double_mat_mult(trunc_matrix, vec_id, prol_matrix, -DataType(1), true);
+    rip_matrix.add_double_mat_product(trunc_matrix, vec_id, prol_matrix, -DataType(1), true);
 
     // the resulting matrix should now be the null matrix
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqr(rip_matrix.norm_frobenius()), DataType(0), eps);

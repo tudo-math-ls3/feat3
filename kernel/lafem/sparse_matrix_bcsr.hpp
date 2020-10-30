@@ -1616,7 +1616,7 @@ namespace FEAT
        * If set to \c false, this function will throw an exception on incompleteness,
        * otherwise the missing entries are ignored (dropped).
        */
-      void add_double_mat_mult(
+      void add_double_mat_product(
         const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& d,
         const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& a,
         const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& b,
@@ -1735,7 +1735,7 @@ namespace FEAT
        * This function currently only supports data in main memory.
        *
        * \note
-       * This version of the add_double_mat_mult operation works on d and b as scalar csr matrices.
+       * This version of the add_double_mat_product operation works on d and b as scalar csr matrices.
        * Their values are treaded as beeing a fully filled block.
        *
        * \param[in] d, a, b
@@ -1749,7 +1749,7 @@ namespace FEAT
        * If set to \c false, this function will throw an exception on incompleteness,
        * otherwise the missing entries are ignored (dropped).
        */
-      void add_double_mat_mult(
+      void add_double_mat_product(
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
         const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>& a,
         const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,

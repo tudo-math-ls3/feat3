@@ -204,7 +204,7 @@ namespace MultiPrecHierarchBench
     // compute matrix
     LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> matrix_r(grap);
     matrix_r.format();
-    matrix_r.add_double_mat_mult(mrest, matrix, mprol);
+    matrix_r.add_double_mat_product(mrest, matrix, mprol);
 
     // shrink matrix
     {

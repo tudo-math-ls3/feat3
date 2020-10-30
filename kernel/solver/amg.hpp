@@ -486,7 +486,7 @@ namespace FEAT
 
           // compute coarse matrix entries
           matrix_coarse_main.format(DataType(0));
-          matrix_coarse_main.add_double_mat_mult(restriction_main, matrix_fine_local, prolongation_main);
+          matrix_coarse_main.add_double_mat_product(restriction_main, matrix_fine_local, prolongation_main);
 
           //create coarse unit filter
           std::vector<Index> new_filter_entries;
@@ -620,7 +620,7 @@ namespace FEAT
 
           // compute coarse matrix entries
           matrix_coarse_main.format(DataType(0));
-          matrix_coarse_main.add_double_mat_mult(transfer_fine_local.get_mat_rest(), matrix_fine_local, transfer_fine_local.get_mat_prol());
+          matrix_coarse_main.add_double_mat_product(transfer_fine_local.get_mat_rest(), matrix_fine_local, transfer_fine_local.get_mat_prol());
 
           LocalMatrixType local_matrix_coarse;
           local_matrix_coarse.convert(matrix_coarse_main);

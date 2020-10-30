@@ -155,7 +155,7 @@ public:
     mmult(x, d, a, b);
 
     // subtract: X -= D*A*B
-    x.add_double_mat_mult(d, a, b, -DT_(1));
+    x.add_double_mat_product(d, a, b, -DT_(1));
 
     // check norm
     TEST_CHECK_EQUAL_WITHIN_EPS(x.norm_frobenius(), DT_(0), tol);

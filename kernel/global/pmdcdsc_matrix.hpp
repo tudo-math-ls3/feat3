@@ -1293,7 +1293,7 @@ namespace FEAT
       static void _asm_local_schur_matrix(LocalMatrixTypeS& s, const LocalMatrixTypeD& d,
         const LocalVectorTypeV& a, const LocalMatrixTypeB& b)
       {
-        // Note: this is a modified version of SparseMatrixCSR::add_double_mat_mult for BCSR multiplicands
+        // Note: this is a modified version of SparseMatrixCSR::add_double_mat_product for BCSR multiplicands
 
         // validate matrix dimensions
         XASSERT(s.rows() == d.rows());
