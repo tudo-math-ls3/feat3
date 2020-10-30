@@ -116,12 +116,13 @@ namespace FEAT
       }
 
       /**
-      * \brief Returns CSR matrix constructed from Map.
-      *
-      * \returns CSR Matrix.
-      */
+       * \brief Returns CSR matrix constructed from Map.
+       *
+       * \returns CSR Matrix.
+       */
       SparseMatrixCSR<Mem::Main, DT_, IT_> make_csr() const
-      { ///Creates CSR matrix with dimensions and number of NNZ of map.
+      {
+        //Creates CSR matrix with dimensions and number of NNZ of map.
         FEAT::LAFEM::SparseMatrixCSR< Mem::Main, DT_, IT_ > matrix (_num_row, _num_col,IT_( memory.size()));
         // pointer on the empty arrays of the CSR matrix structure
         IT_* row_ptr = matrix.row_ptr();
@@ -134,23 +135,23 @@ namespace FEAT
         // current row count
         IT_ _row_cur = IT_(0);
 
-        ///Iterates over the map to extract the data and paste in the corresponding arrays.
+        //Iterates over the map to extract the data and paste in the corresponding arrays.
         //typename std::map< IT_, DT_>::const_iterator  it = memory.begin();
         for(auto it = memory.begin(); it != memory.end();++it)
         {
           // extract column and row from the map key
           IT_ col = it->first % max_size;
           IT_ row = (it->first - col) / max_size;
-          val[_nnz] = it->second;
-          col_ind[_nnz] = col;
-          _nnz += 1;
-          //make sure the row pointer is valid even if there exist trailing empty rows in the matrix
+          // make sure the row pointer is valid even if there exist preceeding empty rows in the matrix
           while (_row_cur <row )
           {
-            row_ptr[++_row_cur] = _nnz-1;
+            row_ptr[++_row_cur] = _nnz;
           }
+          val[_nnz] = it->second;
+          col_ind[_nnz] = col;
+          ++_nnz;
         }
-        //make sure that the row pointer is valid even if there are empty rows at the end of the matrix
+        // make sure that the row pointer is valid even if there are empty rows at the end of the matrix
         while (_row_cur < _num_row)
         {
           row_ptr[++_row_cur] = _nnz;
