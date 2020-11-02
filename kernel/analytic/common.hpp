@@ -2419,7 +2419,7 @@ namespace FEAT
         /// We can compute the Hessian
         static constexpr bool can_hess = false;
         /// Type to map from
-        typedef Tiny::Vector<DT_, 2> RootsType;
+        typedef Tiny::Vector<DT_, 2> RangeType;
 
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
@@ -2442,19 +2442,19 @@ namespace FEAT
           /// The scaling factor according to the amplitude
           DataType _fac;
           /// The points where the function becomes zero
-          const std::vector<Tiny::Vector<DataType, 2>>& _zeros;
+          const std::vector<Tiny::Vector<DataType, 2>>& _range;
 
         public:
           explicit Evaluator(const YZPlaneParabolic& function) :
             _fac(function._amplitude),
-            _zeros(function._zeros)
+            _range(function._range)
 
           {
-            XASSERT(_zeros.size() == size_t(domain_dim-1));
+            XASSERT(_range.size() == size_t(domain_dim-1));
 
             for (int d(1); d < domain_dim; ++d)
             {
-              _fac *= DataType(4)/Math::sqr(_zeros.at(d-1)[1]-_zeros.at(d-1)[0]);
+              _fac *= DataType(4)/Math::sqr(_range.at(d-1)[1]-_range.at(d-1)[0]);
             }
           }
 
@@ -2466,7 +2466,7 @@ namespace FEAT
 
             for (int d(1); d < domain_dim; ++d)
             {
-              val(0) *= (point[d] - _zeros.at(d-1)[0])*(_zeros.at(d-1)[1] - point[d]);
+              val(0) *= (point[d] - _range.at(d-1)[0])*(_range.at(d-1)[1] - point[d]);
             }
 
             return val;
@@ -2478,11 +2478,12 @@ namespace FEAT
             grad.format();
             for(int d(1); d < domain_dim; ++d)
             {
-              grad[d][0] = _fac*(_zeros.at(d-1)[0] + _zeros.at(d-1)[1] - DataType(2)*point(d));
+              grad[d][0] = _fac*(_range.at(d-1)[0] + _range.at(d-1)[1] - DataType(2)*point(d));
 
-              if (domain_dim == 3)
+              for (int q(1); q < domain_dim; ++q)
               {
-                grad[d][0] *= ((point(3 - d) - _zeros.at(2 - d)[0]) * (_zeros.at(2 - d)[1] - point(3 - d)));
+                if (q != d)
+                  grad[d][0] *= (point[q] - _range.at(q - 1)[0]) * (_range.at(q - 1)[1] - point[q]);
               }
             }
             return grad;
@@ -2499,7 +2500,7 @@ namespace FEAT
         /// The maximum value of the parabolic profile
         const DataType _amplitude;
         /// The points where the function becomes zero
-        std::vector<Tiny::Vector<DataType, 2>> _zeros;
+        std::vector<Tiny::Vector<DataType, 2>> _range;
 
       public:
         /**
@@ -2508,15 +2509,15 @@ namespace FEAT
          * \param[in] amplitude
          * The amplitude to use
          *
-         * \param[in] zeros_y
+         * \param[in] range_y
          * The roots for the y part
          *
          */
-        explicit YZPlaneParabolic(const DataType amplitude, const RootsType& zeros_y) :
+        explicit YZPlaneParabolic(const DataType amplitude, const RangeType& range_y) :
           _amplitude(amplitude),
-          _zeros(1)
+          _range(1)
         {
-          _zeros.at(0) = zeros_y;
+          _range.at(0) = range_y;
         }
 
         /**
@@ -2525,19 +2526,19 @@ namespace FEAT
          * \param[in] amplitude
          * The amplitude to use
          *
-         * \param[in] zeros_y
+         * \param[in] range_y
          * The roots for the y part
          *
-         * \param[in] zeros_z
+         * \param[in] range_z
          * The roots for the z part
          *
          */
-        explicit YZPlaneParabolic(const DataType amplitude, const RootsType& zeros_y, const RootsType& zeros_z) :
+        explicit YZPlaneParabolic(const DataType amplitude, const RangeType& range_y, const RangeType& range_z) :
           _amplitude(amplitude),
-          _zeros(2)
+          _range(2)
         {
-          _zeros.at(0) = zeros_y;
-          _zeros.at(1) = zeros_z;
+          _range.at(0) = range_y;
+          _range.at(1) = range_z;
         }
       }; // class YZPlaneParabolic
 

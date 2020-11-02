@@ -1022,12 +1022,12 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     //create vectors
-    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RootsType zeros_y;
-    zeros_y[0] = DT_(0);
-    zeros_y[1] = DT_(4);
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RangeType range_y;
+    range_y[0] = DT_(0);
+    range_y[1] = DT_(4);
 
     // create yz-plane-parabolic object
-    Analytic::Common::YZPlaneParabolic<DT_, 2> func(0.5, zeros_y);
+    Analytic::Common::YZPlaneParabolic<DT_, 2> func(0.5, range_y);
 
     // evaluate function value in point (2,3)
     Tiny::Vector<DT_, 2> val = Analytic::eval_value_x(func, DT_(2), DT_(3));
@@ -1068,15 +1068,15 @@ public:
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     //create vectors
-    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RootsType zeros_y;
-    zeros_y[0] = DT_(0); // a_1
-    zeros_y[1] = DT_(4); // b_1
-    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RootsType zeros_z;
-    zeros_z[0] = DT_(1); // a_2
-    zeros_z[1] = DT_(5); //b_2
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RangeType range_y;
+    range_y[0] = DT_(0); // a_1
+    range_y[1] = DT_(4); // b_1
+    typename Analytic::Common::YZPlaneParabolic<DT_, 2>::RangeType range_z;
+    range_z[0] = DT_(1); // a_2
+    range_z[1] = DT_(5); //b_2
 
     // create yz-plane-parabolic object
-    Analytic::Common::YZPlaneParabolic<DT_, 3> func(DT_(0.5), zeros_y, zeros_z);
+    Analytic::Common::YZPlaneParabolic<DT_, 3> func(DT_(0.5), range_y, range_z);
 
     // evaluate function value in point (2,3,4)
     Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, DT_(2), DT_(3), DT_(4));
