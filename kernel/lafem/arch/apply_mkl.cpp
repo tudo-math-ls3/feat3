@@ -64,9 +64,9 @@ void Apply<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, 
   else
     trans = 'N';
 
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_scsrmv(&trans, &mrows, &mcolumns, (const float*)&a, matdescra, (const float*) val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const float*)x, (const float*)&b, r);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
 
 #endif
 }
@@ -117,9 +117,9 @@ void Apply<Mem::Main>::csr_mkl(double * r, const double a, const double * const 
   else
     trans = 'N';
 
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_dcsrmv(&trans, &mrows, &mcolumns, (const double*)&a, matdescra, (const double*) val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const double*)x, (const double*)&b, r);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
 
 #endif
 }
@@ -143,9 +143,9 @@ void Apply<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x,
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
   sparse_matrix_t A;
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_sparse_s_create_bsr(&A, SPARSE_INDEX_BASE_ZERO, SPARSE_LAYOUT_ROW_MAJOR, mrows, mcolumns, mblocksize, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr + 1), (MKL_INT*)col_ind, (float*) val);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
   matrix_descr md;
   md.type = SPARSE_MATRIX_TYPE_GENERAL;
   mkl_sparse_s_mv(opt, a, A, md, x, b, r);
@@ -160,9 +160,9 @@ void Apply<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x,
   matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
 
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (const float*)&a, matdescra, (const float*) val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const float*)x, (const float*)&b, r);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
 
 #endif
 }
@@ -186,9 +186,9 @@ void Apply<Mem::Main>::csrb_mkl(double * r, const double a, const double * const
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
   sparse_matrix_t A;
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_sparse_d_create_bsr(&A, SPARSE_INDEX_BASE_ZERO, SPARSE_LAYOUT_ROW_MAJOR, mrows, mcolumns, mblocksize, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr + 1), (MKL_INT*)col_ind, (double*) val);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
   matrix_descr md;
   md.type = SPARSE_MATRIX_TYPE_GENERAL;
   mkl_sparse_d_mv(opt, a, A, md, x, b, r);
@@ -203,9 +203,9 @@ void Apply<Mem::Main>::csrb_mkl(double * r, const double a, const double * const
   matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
 
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (const double*)&a, matdescra, (const double*) val, (const MKL_INT*)col_ind, (const MKL_INT*)row_ptr, (const MKL_INT*)(row_ptr) + 1, (const double*)x, (const double*)&b, r);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
 
 #endif
 }
@@ -226,9 +226,9 @@ void Apply<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, 
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
   sparse_matrix_t A;
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_sparse_s_create_coo(&A, SPARSE_INDEX_BASE_ZERO, mrows, mcolumns, ue, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, (float*) val);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
   matrix_descr md;
   md.type = SPARSE_MATRIX_TYPE_GENERAL;
   mkl_sparse_s_mv(opt, a, A, md, x, b, r);
@@ -251,9 +251,9 @@ void Apply<Mem::Main>::coo_mkl(double * r, const double a, const double * const 
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
   sparse_matrix_t A;
-  FEAT_DISABLE_WARNINGS;
+  FEAT_DISABLE_WARNINGS
   mkl_sparse_d_create_coo(&A, SPARSE_INDEX_BASE_ZERO, mrows, mcolumns, ue, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, (double*) val);
-  FEAT_RESTORE_WARNINGS;
+  FEAT_RESTORE_WARNINGS
   matrix_descr md;
   md.type = SPARSE_MATRIX_TYPE_GENERAL;
   mkl_sparse_d_mv(opt, a, A, md, x, b, r);
