@@ -125,6 +125,8 @@
       Include="DEBUG" />
     <FeatDef Condition="'$(SerialMode)'=='false'"
       Include="FEAT_HAVE_MPI" />
+    <FeatDef Condition="'$(EnableOMP)'=='true'"
+      Include="FEAT_HAVE_OMP" />
     <FeatDef Condition="'$(FeatHaveCuda)'=='true'"
       Include="FEAT_HAVE_CUDA;FEAT_HAVE_CUSOLVER" />
     <!--<FeatDef Condition="'$(BackendMKL)'=='true'"

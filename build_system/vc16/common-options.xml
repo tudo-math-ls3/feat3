@@ -71,7 +71,7 @@
   </ItemDefinitionGroup>
 
   <!-- OpenMP Settings -->
-  <ItemDefinitionGroup Condition="'(EnableOMP)'=='true'">
+  <ItemDefinitionGroup Condition="'$(EnableOMP)'=='true'">
     <ClCompile>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>

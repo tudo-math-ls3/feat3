@@ -40,7 +40,7 @@
 #include <fstream>
 #include <cstring> // for memcpy
 
-#ifdef _OPENMP
+#ifdef FEAT_HAVE_OMP
 #include <omp.h>
 #endif
 
@@ -218,8 +218,7 @@ namespace MixedPrecMultiGridBench
     return Math::sqrt(r);
   }
 
-     /// \compilerhack GCC/ICC fails on omp reduction with floatx
-#if defined(FEAT_COMPILER_GNU) || defined(FEAT_COMPILER_INTEL)
+  // reduction for floatx type is not omp standard conform
 #ifdef FEAT_HAVE_FLOATX
   f_hp norm2(const std::vector<f_hp>& v)
   {
@@ -232,7 +231,6 @@ namespace MixedPrecMultiGridBench
 
     return Math::sqrt(r);
   }
-#endif
 #endif
 
   // perform axpy
@@ -568,7 +566,7 @@ namespace MixedPrecMultiGridBench
       Runtime::abort();
     }
 
-#ifdef _OPENMP
+#ifdef FEAT_HAVE_OMP
     std::cout << "OpenMP max threads: " << omp_get_max_threads() << std::endl;
 #else
     std::cout << "OpenMP not available in this build" << std::endl;

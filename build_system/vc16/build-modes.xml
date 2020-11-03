@@ -27,6 +27,14 @@
       <Configuration>dbg-mpi</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-omp|Win32">
+      <Configuration>dbg-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-omp|x64">
+      <Configuration>dbg-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="opt|Win32">
       <Configuration>opt</Configuration>
       <Platform>Win32</Platform>
@@ -49,6 +57,14 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="opt-mpi|x64">
       <Configuration>opt-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-omp|Win32">
+      <Configuration>opt-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-omp|x64">
+      <Configuration>opt-omp</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -76,6 +92,13 @@
     <SerialMode>false</SerialMode>
     <EnableOMP>false</EnableOMP>
   </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-omp'">
+    <DebugMode>true</DebugMode>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
+  </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt'">
     <DebugMode>false</DebugMode>
     <BackendCUDA>false</BackendCUDA>
@@ -96,5 +119,12 @@
     <BackendMKL>false</BackendMKL>
     <SerialMode>false</SerialMode>
     <EnableOMP>false</EnableOMP>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-omp'">
+    <DebugMode>false</DebugMode>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
   </PropertyGroup>
 </Project>
