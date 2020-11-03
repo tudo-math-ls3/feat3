@@ -229,7 +229,7 @@ if "omp" in buildid or "openmp" in buildid:
   remove_string(unused_tokens, "omp")
   remove_string(unused_tokens, "openmp")
   cmake_flags += " -DFEAT_HAVE_OMP:BOOL=TRUE"
-  if platform.system() != "Darwin":
+  if platform.system() == "Darwin":
     ldflags += " -lomp"
 
 #evaluate extra options
