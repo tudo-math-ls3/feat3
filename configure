@@ -11,6 +11,7 @@ import subprocess
 import os
 import shutil
 import copy
+import platform
 
 sys.dont_write_bytecode = True
 from build_system.detect_cpu import detect_cpu
