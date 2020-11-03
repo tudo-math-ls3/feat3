@@ -230,7 +230,8 @@ if "omp" in buildid or "openmp" in buildid:
   remove_string(unused_tokens, "openmp")
   cmake_flags += " -DFEAT_HAVE_OMP:BOOL=TRUE"
   if platform.system() == "Darwin":
-    ldflags += " -lomp"
+    ldflags += " -L/usr/local/opt/libomp/lib -lomp"
+    cxxflags += " -I/usr/local/opt/libomp/include"
 
 #evaluate extra options
 cputype = ""
