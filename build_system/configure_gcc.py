@@ -42,9 +42,6 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
 
-  if "omp" in buildid or "openmp" in buildid:
-    cxxflags += " -fopenmp"
-
   # For 'quadmath', we need to enable extended numeric literals, as otherwise the g++ will
   # not recognise the 'q' suffix for __float128 constants when compiling with --std=c++11 starting from gcc version 4.8.
   if "quadmath" in buildid:

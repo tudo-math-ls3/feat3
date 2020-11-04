@@ -95,8 +95,13 @@ if (FEAT_HAVE_MPI)
   endif()
 
   ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
-
 endif (FEAT_HAVE_MPI)
+
+find_package(OpenMP)
+if (OpenMP_FOUND)
+  OPTION(FEAT_HAVE_OMP "FEAT OpenMP support available" ON)
+  ADD_COMPILE_OPTIONS(${OpenMP_CXX_FLAGS})
+endif (OpenMP_FOUND)
 
 if (FEAT_VALGRIND)
   find_program(VALGRIND_EXE valgrind)

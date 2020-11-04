@@ -61,7 +61,6 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("It is used to choose different tools and configurations related to the build process.")
   print ("The keywords, sorted by categories are:")
   print ("  Build Mode: debug, opt, fast, noop")
-  print ("  Thread-based Parallelisation: omp")
   print ("  Cluster Parallelisation: mpi")
   print ("  Compiler: gcc, icc, clang, pgi")
   print ("  Compiler frontends: ccache")
@@ -224,14 +223,6 @@ else:
 if "mpi" in buildid:
   remove_string(unused_tokens, "mpi")
   cmake_flags += " -DFEAT_HAVE_MPI:BOOL=TRUE"
-
-if "omp" in buildid or "openmp" in buildid:
-  remove_string(unused_tokens, "omp")
-  remove_string(unused_tokens, "openmp")
-  cmake_flags += " -DFEAT_HAVE_OMP:BOOL=TRUE"
-  if platform.system() == "Darwin":
-    ldflags += " -L/usr/local/opt/libomp/lib -lomp"
-    cxxflags += " -I/usr/local/opt/libomp/include"
 
 #evaluate extra options
 cputype = ""
@@ -541,6 +532,12 @@ if "cotire" in buildid:
 if "mpi" not in buildid and ("parmetis" in buildid or "metis" in buildid):
   print("Error: Using parmetis without mpi is not allowed!")
   sys.exit()
+
+#give cmake on macOS a hint to the openmp lib
+if platform.system() == "Darwin":
+  ldflags += " -L/usr/local/opt/libomp/lib" #-lomp
+  cxxflags += " -I/usr/local/opt/libomp/include"
+
 
 # optional third party libraries
 for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
