@@ -2454,7 +2454,7 @@ namespace FEAT
 
             for (int d(1); d < domain_dim; ++d)
             {
-              _fac *= DataType(4)/Math::sqr(_range.at(d-1)[1]-_range.at(d-1)[0]);
+              _fac *= DataType(4)/Math::sqr(_range.at(std::size_t(d-1))[1]-_range.at(std::size_t(d-1))[0]);
             }
           }
 
@@ -2466,7 +2466,7 @@ namespace FEAT
 
             for (int d(1); d < domain_dim; ++d)
             {
-              val(0) *= (point[d] - _range.at(d-1)[0])*(_range.at(d-1)[1] - point[d]);
+              val(0) *= (point[d] - _range.at(std::size_t(d-1))[0])*(_range.at(std::size_t(d-1))[1] - point[d]);
             }
 
             return val;
@@ -2478,12 +2478,12 @@ namespace FEAT
             grad.format();
             for(int d(1); d < domain_dim; ++d)
             {
-              grad[d][0] = _fac*(_range.at(d-1)[0] + _range.at(d-1)[1] - DataType(2)*point(d));
+              grad[d][0] = _fac*(_range.at(std::size_t(d-1))[0] + _range.at(std::size_t(d-1))[1] - DataType(2)*point(d));
 
               for (int q(1); q < domain_dim; ++q)
               {
                 if (q != d)
-                  grad[d][0] *= (point[q] - _range.at(q - 1)[0]) * (_range.at(q - 1)[1] - point[q]);
+                  grad[d][0] *= (point[q] - _range.at(std::size_t(q - 1))[0]) * (_range.at(std::size_t(q - 1))[1] - point[q]);
               }
             }
             return grad;

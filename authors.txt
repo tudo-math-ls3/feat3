@@ -19,6 +19,7 @@ to the main development code branch of FEAT3:
        2016,   David Schneider
 2018 - 2019,   Malte Schuh
 2013 - 2014,   Stefan Wahlers
+       2020,   Lisa-Marie Walter
 2010 - 2011,   Hilmar Wobker
 2010 - 2020,   Peter Zajac
 
