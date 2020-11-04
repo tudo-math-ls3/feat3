@@ -251,14 +251,28 @@ This macro is defined if the command line option <code>\--unroll_banded</code> i
 This section enlist various macros which control the compiler's code generation.
 
 <hr>
-\subsection ppm_feat_ivdep FEAT_IVDEP
+\subsection ppm_feat_pragma_ivdep FEAT_PRAGMA_IVDEP
 This macro can be used to instruct the compiler to ignore assumed vector dependencies. To use this loop pragma, place it
 immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
 
 See also:
 - https://gcc.gnu.org/onlinedocs/gcc-4.9.2/gcc/Loop-Specific-Pragmas.html
-- https://software.intel.com/en-us/node/524501
 - https://msdn.microsoft.com/en-us/library/hh923901.aspx
+- https://software.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/pragmas/intel-specific-pragma-reference/ivdep.html
+
+<hr>
+\subsection ppm_feat_pragma_omp FEAT_PRAGMA_OMP
+This macro is used to declare OpenMP pragmas in FEAT3 code and its one and only parameter is the omp directive part
+following the <c>#pragma omp</c>, so as an example, the typical <c>#pragma omp parallel for</c> simply becomes
+<c>FEAT_PRAGMA_OMP(parallel for)</c>. The reason for why one should use this macro (instead of the direct
+<c>#pragma omp</c> directive) is that the <c>FEAT_PRAGMA_OMP</c> macro can be deactivated via the build system if FEAT3
+is configured to build without OpenMP support enabled, which would result in 'unknown pragma' warnings otherwise.
+
+\code{.cpp}
+FEAT_PRAGMA_OMP(parallel for shared(alpha)) // <==> #pragma omp parallel for shared(alpha)
+for(int i = 0; i < n; ++i)
+  y[i] *= alpha*x[i];
+\endcode
 
 <hr>
 \subsection ppm_feat_force_inline FORCE_INLINE

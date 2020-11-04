@@ -60,8 +60,8 @@
 #endif
 
 // If the compiler does not support a loop vectorisation specifier, we'll define it as an empty macro.
-#ifndef FEAT_IVDEP
-#define FEAT_IVDEP
+#ifndef FEAT_PRAGMA_IVDEP
+#define FEAT_PRAGMA_IVDEP
 #endif
 
 // If the compiler does not support disabling/restoring warnings, we'll define the corresponding
@@ -73,14 +73,14 @@
 #define FEAT_RESTORE_WARNINGS
 #endif
 
-// Unless the compiler detection header explicitly defined 'FEAT_OMP', we will define it as an OpenMP
-// pramga here, if the FEAT_HAVE_OMP define is set, otherwise we will define it as an empty macro.
-#ifndef FEAT_OMP
+// Unless the compiler detection header explicitly defined 'FEAT_PRAGMA_OMP', we define it as an OpenMP
+// pragma here, if the FEAT_HAVE_OMP define is set, otherwise we will define it as an empty macro.
+#ifndef FEAT_PRAGMA_OMP
 #ifdef FEAT_HAVE_OMP
-#define FEAT_OMP_(x) _Pragma(#x)
-#define FEAT_OMP(x) FEAT_OMP_(omp x)
+#define FEAT_PRAGMA_OMP_HELPER(x) _Pragma(#x)
+#define FEAT_PRAGMA_OMP(x) FEAT_PRAGMA_OMP_HELPER(omp x)
 #else
-#define FEAT_OMP(x)
+#define FEAT_PRAGMA_OMP(x)
 #endif
 #endif
 

@@ -67,7 +67,7 @@
 
 #define FEAT_RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 
-#define FEAT_IVDEP _Pragma("omp simd")
+#define FEAT_PRAGMA_IVDEP _Pragma("omp simd")
 
 // define the noinline specifier
 #define NOINLINE __attribute__((noinline))

@@ -37,7 +37,7 @@
 #    define FEAT_COMPILER "Microsoft C/C++ compiler"
 #  endif
 
-#  define FEAT_IVDEP __pragma(loop(ivdep))
+#  define FEAT_PRAGMA_IVDEP __pragma(loop(ivdep))
 
 #  define FEAT_DISABLE_WARNINGS __pragma(warning(push, 0))
 #  define FEAT_RESTORE_WARNINGS __pragma(warning(pop))

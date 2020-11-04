@@ -68,7 +68,7 @@
 
 #  define FEAT_RESTORE_WARNINGS _Pragma("warning(pop)")
 
-#  define FEAT_IVDEP _Pragma("ivdep")
+#  define FEAT_PRAGMA_IVDEP _Pragma("ivdep")
 
 
 // disable warning #2196 (routine is both "inline" and "noinline") unconditionally

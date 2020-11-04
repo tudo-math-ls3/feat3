@@ -42,9 +42,7 @@
 #endif
 
 #if(_GCC_VER >= 40900)
-#  define FEAT_IVDEP _Pragma("GCC ivdep")
-#else
-#  define FEAT_IVDEP
+#  define FEAT_PRAGMA_IVDEP _Pragma("GCC ivdep")
 #endif
 
 

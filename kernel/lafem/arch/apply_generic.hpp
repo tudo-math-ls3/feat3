@@ -466,14 +466,14 @@ namespace FEAT
               Index end  (Math::min(Intern::ApplyBanded::start_offset(j-2, offsets, rows, columns, noo),
                                     Intern::ApplyBanded::end_offset(i-2, offsets, rows, columns, noo) + 1));
 
-              FEAT_IVDEP
-                for (Index l(start); l < end; ++l)
-                {
-                  DT_ tmp(0);
-                  Intern::LoopUnroller<0, i-j>::step(Intern::ApplyBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
-                                                     offsets + (j-1), x + l + 1 - rows, rows);
-                  r[l] = beta * r[l] + alpha * tmp;
-                }
+              FEAT_PRAGMA_IVDEP
+              for (Index l(start); l < end; ++l)
+              {
+                DT_ tmp(0);
+                Intern::LoopUnroller<0, i-j>::step(Intern::ApplyBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
+                                                   offsets + (j-1), x + l + 1 - rows, rows);
+                r[l] = beta * r[l] + alpha * tmp;
+              }
 
               Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, alpha, beta, val, offsets, x, rows, columns);
             }
