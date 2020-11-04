@@ -73,6 +73,17 @@
 #define FEAT_RESTORE_WARNINGS
 #endif
 
+// Unless the compiler detection header explicitly defined 'FEAT_OMP', we will define it as an OpenMP
+// pramga here, if the FEAT_HAVE_OMP define is set, otherwise we will define it as an empty macro.
+#ifndef FEAT_OMP
+#ifdef FEAT_HAVE_OMP
+#define FEAT_OMP_(x) _Pragma(#x)
+#define FEAT_OMP(x) FEAT_OMP_(omp x)
+#else
+#define FEAT_OMP(x)
+#endif
+#endif
+
 ///\endcond
 // end of block hidden from doxygen
 

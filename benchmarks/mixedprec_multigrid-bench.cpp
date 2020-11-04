@@ -114,7 +114,8 @@ namespace MixedPrecMultiGridBench
     const F_ fac = F_(2*n+2) * (F_(1) - Math::cos(pi*h));
 
     // initialise rhs entries
-    #pragma omp parallel for if(n > N_MIN_OMP)
+    //_Pragma("omp parallel for if(n > N_MIN_OMP)")
+    FEAT_OMP(parallel for if(n > N_MIN_OMP))
     for(llint i = 0; i < n; ++i)
     {
       vx[i] = fac * Math::sin(pi * F_(i+1) * h);
@@ -148,7 +149,7 @@ namespace MixedPrecMultiGridBench
     const F_* vx = vsol.data();
 
     // loop over all intervals
-    #pragma omp parallel for reduction(+:err_h0) if(n > N_MIN_OMP)
+    FEAT_OMP(parallel for reduction(+:err_h0) if(n > N_MIN_OMP))
     for(llint i = 0; i <= n; ++i)
     {
       // left/right vertex coords
@@ -176,7 +177,7 @@ namespace MixedPrecMultiGridBench
     const llint n = llint(v.size());
     F_* x = v.data();
 
-    #pragma omp parallel for if(n > N_MIN_OMP)
+    FEAT_OMP(parallel for if(n > N_MIN_OMP))
     for(llint i = 0; i < n; ++i)
       x[i] = val;
   }
@@ -190,7 +191,7 @@ namespace MixedPrecMultiGridBench
     Fx_* x = vx.data();
     const Fy_* y = vy.data();
 
-    #pragma omp parallel for if(n > N_MIN_OMP)
+    FEAT_OMP(parallel for if(n > N_MIN_OMP))
     for(llint i = 0; i < n; ++i)
       x[i] = Fx_(y[i]);
   }
@@ -211,7 +212,7 @@ namespace MixedPrecMultiGridBench
     const F_* x = v.data();
     F_ r = F_(0);
 
-    #pragma omp parallel for reduction(+:r) if(n > N_MIN_OMP)
+    FEAT_OMP(parallel for reduction(+:r) if(n > N_MIN_OMP))
     for(llint i = 0; i < n; ++i)
       r += x[i]*x[i];
 
@@ -243,7 +244,7 @@ namespace MixedPrecMultiGridBench
     F_* y = vy.data();
     const F_* x = vx.data();
 
-    #pragma omp parallel for if(n > N_MIN_OMP)
+    FEAT_OMP(parallel for if(n > N_MIN_OMP))
     for(llint i = 0; i < n; ++i)
       y[i] += alpha * x[i];
   }
@@ -270,7 +271,7 @@ namespace MixedPrecMultiGridBench
     }
 
     d[0] = b[0] - a1*x[0] - a2*x[1];
-    #pragma omp parallel for if(n > N_MIN_OMP)
+    FEAT_OMP(parallel for if(n > N_MIN_OMP))
     for(llint i = 1; i < n-1; ++i)
     {
       d[i] = b[i] - a1*x[i] - a2*(x[i-1]+x[i+1]);
@@ -294,7 +295,7 @@ namespace MixedPrecMultiGridBench
     //      '\.|./' '\.|./' '\.|./'
     // |-------|-------|-------|-------|
     //         0       1       2
-    #pragma omp parallel for if(nc > N_MIN_OMP)
+    FEAT_OMP(parallel for if(nc > N_MIN_OMP))
     for(llint i = 0; i < nc; ++i)
     {
       xc[i] = xf[2*i+1] + F_(0.5) * (xf[2*i] + xf[2*i+2]);
@@ -318,7 +319,7 @@ namespace MixedPrecMultiGridBench
     // |---|---|---|---|---|---|---|---|
     //     0   1   2   3   4   5   6
     xf[0] = F_(0.5) * xc[0];
-    #pragma omp parallel for if(nc > N_MIN_OMP)
+    FEAT_OMP(parallel for if(nc > N_MIN_OMP))
     for(llint i = 0; i < nc-1; ++i)
     {
       xf[2*i+1] = xc[i];

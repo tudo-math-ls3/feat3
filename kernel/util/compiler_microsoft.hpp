@@ -116,6 +116,12 @@
 // This is an annoying optimisation information.
 #  pragma warning(disable: 4883)
 
+// C4938: 'var' : Floating point reduction variable may cause inconsistent results
+//                under /fp:strict or #pragma fenv_access
+// This warning is issued when reducing floating point variables via OpenMP and
+// it has been enabled because it only states the obvious effects of multithreading.
+#  pragma warning(disable: 4938)
+
 // C5024: 'class' : move constructor was implicitly defined as deleted
 // C5025: 'class' : move assignment operator was implicitly defined as deleted
 // C5026: 'class' : move constructor was implicitly defined as deleted because
