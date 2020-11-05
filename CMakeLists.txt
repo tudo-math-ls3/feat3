@@ -101,6 +101,7 @@ find_package(OpenMP)
 if (OpenMP_FOUND)
   OPTION(FEAT_HAVE_OMP "FEAT OpenMP support available" ON)
   ADD_COMPILE_OPTIONS(${OpenMP_CXX_FLAGS})
+  ADD_LINK_OPTIONS(${OpenMP_CXX_FLAGS})
 endif (OpenMP_FOUND)
 
 if (FEAT_VALGRIND)
