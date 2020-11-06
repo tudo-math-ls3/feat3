@@ -36,8 +36,9 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     cxxflags += " -no-prec-div -diag-disable 11074,11076,25463,25464 -diag-disable openmp"
     if "lto" in buildid and major >= 18:
       cxxflags += " -ipo -diag-disable 11000,11001,11006"
-    else:
-      cxxflags += " -ip"
+    # we don't set -ip because it causes horrific compile times during nightly regression tests
+    #else:
+    #  cxxflags += " -ip"
 
     if "opt" in buildid:
       cxxflags += " -O3"
